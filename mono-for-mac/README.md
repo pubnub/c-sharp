@@ -1,11 +1,11 @@
-# PubNub 3.3.0.1 Web Data Push Cloud-Hosted API - C# Mono 2.10.9 
+# PubNub 3.4 Web Data Push Cloud-Hosted API - C# Mono 2.10.9 
 ##PubNub C Sharp (Mono for Mac) Usage
 
 For a quick video walkthrough, checkout https://vimeo.com/54805916 !
 
-Open 3.3.0.1/PubNub-Messaging/PubNub-Console/PubNub-Messaging.csproj, the example Pubnub_Example.cs should demonstrate all functionality, asyncronously using delegates. The main functionality lies in the pubnub.cs file.
+Open 3.4/PubNub-Messaging/PubNub-Console/PubNub-Messaging.csproj, the example Pubnub_Example.cs should demonstrate all functionality, asyncronously using delegates. The main functionality lies in the pubnub.cs file.
 
-3.3.0.1/PubNub-Messaging/PubNubTest contains the Unit test cases.
+3.4/PubNub-Messaging/PubNubTest contains the Unit test cases.
 
 Please ensure that in order to run on Mono the constant in the pubnub.cs file should be set to "true"
 OVERRIDE_TCP_KEEP_ALIVE = true;
