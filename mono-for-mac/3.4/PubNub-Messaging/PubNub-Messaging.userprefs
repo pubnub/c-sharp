@@ -1,19 +1,20 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="PubNubTest/PubnubUnitTest.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="PubNub-Console/Pubnub.cs">
     <Files>
-      <File FileName="PubNub-Console/Pubnub.cs" Line="14" Column="25" />
-      <File FileName="PubNubTest/PubnubUnitTest.cs" Line="7" Column="32" />
+      <File FileName="PubNub-Console/Pubnub.cs" Line="4360" Column="14" />
+      <File FileName="PubNubTest/PubnubUnitTest.cs" Line="15" Column="35" />
       <File FileName="PubNub-Console/PubnubExample.cs" Line="43" Column="75" />
       <File FileName="PubNubTest/WhenAClientIsPresented.cs" Line="80" Column="7" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
-          <Node name="PubNub-Messaging" expanded="True" />
+          <Node name="PubNub-Messaging" expanded="True">
+            <Node name="Pubnub.cs" selected="True" />
+          </Node>
           <Node name="PubNub-Messaging.Tests" expanded="True">
             <Node name="References" expanded="True" />
-            <Node name="PubnubUnitTest.cs" selected="True" />
           </Node>
         </State>
       </Pad>
@@ -42,9 +43,8 @@
           <Node name="PubNub-Messaging.Tests" expanded="True">
             <Node name="PubNubMessaging" expanded="True">
               <Node name="Tests" expanded="True">
-                <Node name="WhenGetRequestServerTime" expanded="True" />
-                <Node name="WhenSubscribedToAChannel" expanded="True" selected="True" />
-                <Node name="WhenUnsubscribedToAChannel" expanded="True" />
+                <Node name="WhenSubscribedToAChannel" expanded="True" />
+                <Node name="WhenUnsubscribedToAChannel" expanded="True" selected="True" />
               </Node>
             </Node>
           </Node>
