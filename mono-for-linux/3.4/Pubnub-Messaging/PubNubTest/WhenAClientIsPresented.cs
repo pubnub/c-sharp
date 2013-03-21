@@ -33,7 +33,7 @@ namespace PubNubMessaging.Tests
             commonSubscribe.DeliveryStatus = false;
             commonSubscribe.Response = null;
             
-            pubnub.Subscribe(channel, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessageDummy);
+            pubnub.Subscribe(channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessage);
             while (!commonSubscribe.DeliveryStatus) ;
             
             string response = "";

@@ -21,7 +21,7 @@ namespace PubNubMessaging.Tests
         public void DisplayReturnMessageDummy(object result)
         {
           //deliveryStatus = true;
-          //Response = result;
+          //response = result;
         }
 
         public void DisplayReturnMessage(object result)
