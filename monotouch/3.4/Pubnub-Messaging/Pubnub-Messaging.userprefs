@@ -1,0 +1,31 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Pubnub-Messaging/Pubnub.cs">
+    <Files>
+      <File FileName="Pubnub-Messaging.Tests/PubnubUnitTest.cs" Line="28" Column="10" />
+      <File FileName="Pubnub-Messaging/Pubnub_MessagingMain.cs" Line="179" Column="32" />
+      <File FileName="Pubnub-Messaging.Tests/WhenAClientIsPresented.cs" Line="43" Column="17" />
+      <File FileName="Pubnub-Messaging/Pubnub.cs" Line="4333" Column="5" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="Pubnub-Messaging" expanded="True">
+            <Node name="Pubnub.cs" selected="True" />
+          </Node>
+          <Node name="Pubnub-Messaging.Tests" expanded="True" />
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/MonoTouch/Pubnub-Messaging/Pubnub-Messaging/PubNub_Example.cs" line="77" />
+      <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/MonoTouch/Pubnub-Messaging/Pubnub-Messaging/PubNub_Example.cs" line="143" />
+      <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/MonoTouch/Pubnub-Messaging/Pubnub-Messaging/PubNub_Example.cs" line="154" />
+      <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/MonoTouch/Pubnub-Messaging/Pubnub-Messaging/Pubnub_MessagingMain.cs" line="191" />
+      <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/MonoTouch/Pubnub-Messaging/Pubnub-Messaging.Tests/WhenAClientIsPresented.cs" line="40" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
