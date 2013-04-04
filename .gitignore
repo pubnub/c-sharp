@@ -1,0 +1,17 @@
+.settings
+*~
+*.swp
+*.pyc
+*.class
+*.iml
+/flash/*/out
+/csharp.net/*/PubNub-Messaging*/bin/*
+/csharp.net/*/PubNub-Messaging*/obj/*
+/csharp.net/*/*.suo
+/silverlight/*/Debug/*
+/silverlight/*/obj/*
+/windows-phone-7/*/packages/*
+/windows-phone-7/*/packages.config
+/windows-phone-7/*/*/bin/*
+/windows-phone-7/*/*/obj/*
+/windows-phone-7/*/*.suo
