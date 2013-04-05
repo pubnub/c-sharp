@@ -31,6 +31,8 @@ namespace PubNubMessaging.Tests
         ManualResetEvent mreUnencryptObjectDetailedHistory = new ManualResetEvent(false);
         ManualResetEvent mreEncryptObjectDetailedHistory = new ManualResetEvent(false);
         ManualResetEvent mreComplexObjectDetailedHistory = new ManualResetEvent(false);
+        ManualResetEvent mreSerializedObjectMessageForPublish = new ManualResetEvent(false);
+        ManualResetEvent mreSerializedMessagePublishDetailedHistory = new ManualResetEvent(false);
 
         bool isPublished2 = false;
         bool isPublished3 = false;
@@ -47,6 +49,8 @@ namespace PubNubMessaging.Tests
         bool isSecretEncryptDetailedHistory = false;
         bool isComplexObjectPublished = false;
         bool isComplexObjectDetailedHistory = false;
+        bool isSerializedObjectMessagePublished = false;
+        bool isSerializedObjectMessageDetailedHistory = false;
 
         long unEncryptPublishTimetoken = 0;
         long unEncryptObjectPublishTimetoken = 0;
@@ -54,6 +58,7 @@ namespace PubNubMessaging.Tests
         long encryptPublishTimetoken = 0;
         long secretEncryptPublishTimetoken = 0;
         long complexObjectPublishTimetoken = 0;
+        long serializedMessagePublishTimetoken = 0;
 
         const string messageForUnencryptPublish = "Pubnub Messaging API 1";
         const string messageForEncryptPublish = "漢語";
@@ -61,6 +66,7 @@ namespace PubNubMessaging.Tests
         string messageObjectForUnencryptPublish = "";
         string messageObjectForEncryptPublish = "";
         string messageComplexObjectForPublish = "";
+        string serializedObjectMessageForPublish;
 
         [Test]
         public void ThenUnencryptPublishShouldReturnSuccessCodeAndInfo()
@@ -235,6 +241,37 @@ namespace PubNubMessaging.Tests
                 pubnub.DetailedHistory<string>(channel, -1, complexObjectPublishTimetoken, -1, false, CaptureComplexObjectDetailedHistoryCallback);
                 mreComplexObjectDetailedHistory.WaitOne(310 * 1000);
                 Assert.IsTrue(isComplexObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
+            }
+        }
+
+        [Test]
+        public void ThenDisableJsonEncodeShouldSendSerializedObjectMessage()
+        {
+            isSerializedObjectMessagePublished = false;
+            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            pubnub.EnableJsonEncodingForPublish = false;
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAMessageIsPublished";
+            unitTest.TestCaseName = "ThenDisableJsonEncodeShouldSendSerializedObjectMessage";
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channel = "my/channel";
+            object message = "{\"operation\":\"ReturnData\",\"channel\":\"Mobile1\",\"sequenceNumber\":0,\"data\":[\"ping 1.0.0.1\"]}";
+            serializedObjectMessageForPublish = message.ToString();
+
+            pubnub.Publish<string>(channel, message, ReturnSuccessSerializedObjectMessageForPublishCallback);
+            mreSerializedObjectMessageForPublish.WaitOne(310 * 1000);
+
+            if (!isSerializedObjectMessagePublished)
+            {
+                Assert.IsTrue(isSerializedObjectMessagePublished, "Serialized Object Message Publish Failed");
+            }
+            else
+            {
+                pubnub.DetailedHistory<string>(channel, -1, serializedMessagePublishTimetoken, -1, false, CaptureSerializedMessagePublishDetailedHistoryCallback);
+                mreSerializedMessagePublishDetailedHistory.WaitOne(310 * 1000);
+                Assert.IsTrue(isSerializedObjectMessageDetailedHistory, "Unable to match the successful serialized object message Publish");
             }
         }
 
@@ -567,5 +604,43 @@ namespace PubNubMessaging.Tests
             }
             mreNoSslPublish.Set();
         }
+
+        private void ReturnSuccessSerializedObjectMessageForPublishCallback(string result)
+        {
+            if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
+            {
+                object[] deserializedResult = JsonConvert.DeserializeObject<object[]>(result);
+                if (deserializedResult is object[])
+                {
+                    long statusCode = Int64.Parse(deserializedResult[0].ToString());
+                    string statusMessage = (string)deserializedResult[1];
+                    if (statusCode == 1 && statusMessage.ToLower() == "sent")
+                    {
+                        isSerializedObjectMessagePublished = true;
+                        serializedMessagePublishTimetoken = Convert.ToInt64(deserializedResult[2].ToString());
+                    }
+                }
+            }
+            mreSerializedObjectMessageForPublish.Set();
+        }
+
+        private void CaptureSerializedMessagePublishDetailedHistoryCallback(string result)
+        {
+            if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
+            {
+                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                if (deserializedMessage is object[])
+                {
+                    JArray message = deserializedMessage[0] as JArray;
+                    if (message != null && message[0].ToString(Formatting.None) == serializedObjectMessageForPublish)
+                    {
+                        isSerializedObjectMessageDetailedHistory = true;
+                    }
+                }
+            }
+
+            mreSerializedMessagePublishDetailedHistory.Set();
+        }
+
     }
 }

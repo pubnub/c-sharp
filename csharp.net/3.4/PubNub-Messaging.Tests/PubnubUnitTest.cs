@@ -39,11 +39,16 @@ namespace PubNubMessaging.Tests
 #else
             data.Add("/subscribe/demo/my/channel-pnpres/0/0", "[[],\"13596603179264912\"]");
             data.Add("/subscribe/demo/my/channel-pnpres/0/13596603179264912", "[[],\"13596603179264912\"]");
+            data.Add("/subscribe/demo/my/channel-pnpres/0/13596603694444112", "[[],\"13596603179264912\"]");
             data.Add("/subscribe/demo/my/channel,my/channel-pnpres/0/0", "[[],\"13596603179264912\"]");
+            data.Add("/subscribe/demo/my/channel-pnpres,my/channel/0/0", "[[],\"13596603179264912\"]");
             data.Add("/subscribe/demo/my/channel,my/channel-pnpres/0/13596603179264912", "[[{\"action\": \"join\", \"timestamp\": 1355929955, \"uuid\": \"eb4c1645-1319-4425-865f-008563009d67\", \"occupancy\": 1}],\"13559006802662768\"]");
+            data.Add("/subscribe/demo/my/channel-pnpres,my/channel/0/13596603179264912", "[[{\"action\": \"join\", \"timestamp\": 1355929955, \"uuid\": \"eb4c1645-1319-4425-865f-008563009d67\", \"occupancy\": 1}],\"13559006802662768\"]");
             data.Add("/subscribe/demo/my/channel,my/channel-pnpres/0/13559006802662768", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo/my/channel-pnpres,my/channel/0/13559006802662768", "[[],\"13559006802662768\"]");
             data.Add("/subscribe/demo/my/channel-pnpres/0/13559006802662768", "[[{\"action\": \"leave\", \"timestamp\": 1359660369, \"uuid\": \"eb4c1645-1319-4425-865f-008563009d67\", \"occupancy\": 0}],\"13596603694444112\"]");
             data.Add("/subscribe/demo/my/channel,my/channel-pnpres/0/13596603694444112", "[[],\"13596603694444112\"]");
+            data.Add("/subscribe/demo/my/channel-pnpres,my/channel/0/13596603694444112", "[[],\"13596603694444112\"]");
             data.Add("/v2/presence/sub_key/demo/channel/my%252Fchannel/leave", "{\"action\": \"leave\"}");
 #endif
             return data;
@@ -66,8 +71,11 @@ namespace PubNubMessaging.Tests
             data.Add("/subscribe/demo/my/channel-pnpres/0/0", "[[],\"13596603179264912\"]");
             data.Add("/subscribe/demo/my/channel-pnpres/0/13596603179264912", "[[],\"13596603179264912\"]");
             data.Add("/subscribe/demo/my/channel,my/channel-pnpres/0/0", "[[],\"13596603179264912\"]");
+            data.Add("/subscribe/demo/my/channel-pnpres,my/channel/0/0", "[[],\"13596603179264912\"]");
             data.Add("/subscribe/demo/my/channel,my/channel-pnpres/0/13596603179264912", "[[{\"action\": \"join\", \"timestamp\": 1355929955, \"uuid\": \"mylocalmachine.mydomain.com\", \"occupancy\": 1}],\"13559006802662768\"]");
+            data.Add("/subscribe/demo/my/channel-pnpres,my/channel/0/13596603179264912", "[[{\"action\": \"join\", \"timestamp\": 1355929955, \"uuid\": \"mylocalmachine.mydomain.com\", \"occupancy\": 1}],\"13559006802662768\"]");
             data.Add("/subscribe/demo/my/channel,my/channel-pnpres/0/13559006802662768", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo/my/channel-pnpres,my/channel/0/13559006802662768", "[[],\"13559006802662768\"]");
             data.Add("/subscribe/demo/my/channel-pnpres/0/13559006802662768", "[[{\"action\": \"leave\", \"timestamp\": 1359660369, \"uuid\": \"mylocalmachine.mydomain.com\", \"occupancy\": 0}],\"13596603694444112\"]");
             data.Add("/subscribe/demo/my/channel-pnpres/0/13596603694444112", "[[],\"13596603694444112\"]");
             data.Add("/v2/presence/sub_key/demo/channel/my%252Fchannel/leave", "{\"action\": \"leave\"}");
@@ -184,6 +192,19 @@ namespace PubNubMessaging.Tests
             data.Add("/publish/demo/demo/0/my%2Fchannel/0/%22Pubnub%20API%20Usage%20Example%22", "[1,\"Sent\",\"13559014566792817\"]");
 #else
             data.Add("/publish/demo/demo/0/my/channel/0/%22Pubnub%20API%20Usage%20Example%22", "[1,\"Sent\",\"13559014566792817\"]");
+#endif
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenAMessageIsPublishedThenDisableJsonEncodeShouldSendSerializedObjectMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+#if ((!__MonoCS__) && (!SILVERLIGHT) && (!WINDOWS_PHONE))
+            data.Add("/publish/demo/demo/0/my%2Fchannel/0/%7B%22operation%22%3A%22ReturnData%22%2C%22channel%22%3A%22Mobile1%22%2C%22sequenceNumber%22%3A0%2C%22data%22%3A%5B%22ping%201%2E0%2E0%2E1%22%5D%7D", "[1,\"Sent\",\"13602210467298480\"]");
+            data.Add("/v2/history/sub-key/demo/channel/my%252Fchannel", "[[{\"operation\":\"ReturnData\",\"channel\":\"Mobile1\",\"sequenceNumber\":0,\"data\":[\"ping 1.0.0.1\"]}],13651583681093356,13651583681093356]");
+#else
+            data.Add("/publish/demo/demo/0/my/channel/0/%7B%22operation%22%3A%22ReturnData%22%2C%22channel%22%3A%22Mobile1%22%2C%22sequenceNumber%22%3A0%2C%22data%22%3A%5B%22ping%201%2E0%2E0%2E1%22%5D%7D", "[1,\"Sent\",\"13602210467298480\"]");
+            data.Add("/v2/history/sub-key/demo/channel/my%252Fchannel", "[[{\"operation\":\"ReturnData\",\"channel\":\"Mobile1\",\"sequenceNumber\":0,\"data\":[\"ping 1.0.0.1\"]}],13651583681093356,13651583681093356]");
 #endif
             return data;
         }
@@ -360,7 +381,7 @@ namespace PubNubMessaging.Tests
         {
             Dictionary<string, string> responseDictionary = null;
             string stubResponse = "!! Stub Response Not Assigned !!";
-            System.Diagnostics.Debug.WriteLine(string.Format("{0} - {1}",_testClassName,_testCaseName));
+            System.Diagnostics.Debug.WriteLine(string.Format("{0} - {1}", _testClassName, _testCaseName));
             switch (_testClassName)
             {
                 case "WhenAClientIsPresented":
@@ -405,6 +426,9 @@ namespace PubNubMessaging.Tests
                             break;
                         case "IfSSLNotProvidedThenDefaultShouldBeFalse":
                             responseDictionary = LoadWhenAMessageIsPublishedIfSSLNotProvidedThenDefaultShouldBeFalse();
+                            break;
+                        case "ThenDisableJsonEncodeShouldSendSerializedObjectMessage":
+                            responseDictionary = LoadWhenAMessageIsPublishedThenDisableJsonEncodeShouldSendSerializedObjectMessage();
                             break;
                         default:
                             break;

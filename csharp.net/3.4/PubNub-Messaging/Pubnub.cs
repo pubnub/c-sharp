@@ -154,7 +154,7 @@ namespace PubNubMessaging.Core
             }
         }
 
-        internal bool EnableJsonEncodingForPublish
+        public bool EnableJsonEncodingForPublish
         {
             get
             {
