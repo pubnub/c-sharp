@@ -228,22 +228,6 @@ namespace PubNubMessaging.Core
             }
             Console.WriteLine();
 
-            Console.WriteLine("Disable JSON Encoding for Publish?  ENTER Y for Yes, else N");
-            string disableJsonForPublish = Console.ReadLine();
-            Console.ForegroundColor = ConsoleColor.Blue;
-            if (disableJsonForPublish.Trim().ToLower() == "y")
-            {
-                pubnub.EnableJsonEncodingForPublish = false;
-                Console.WriteLine("JSON Encoding for Publish Disabled");
-            }
-            else
-            {
-                pubnub.EnableJsonEncodingForPublish = true;
-                Console.WriteLine("JSON Encoding for Publish Enabled(default)");
-            }
-            Console.ResetColor();
-            Console.WriteLine();
-
             Console.WriteLine("ENTER 1 FOR Subscribe");
             Console.WriteLine("ENTER 2 FOR Publish");
             Console.WriteLine("ENTER 3 FOR Presence");
