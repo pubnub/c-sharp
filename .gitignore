@@ -1,0 +1,17 @@
+.settings
+*~
+/csharp.net/*/PubNub-Messaging*/bin/*
+/csharp.net/*/PubNub-Messaging*/obj/*
+/csharp.net/*/*.suo
+/csharp.net/silverlight-part/*/Debug/*
+/csharp.net/silverlight-part/*/obj/*
+windows-phone-7/*/packages/*
+windows-phone-7/*/packages.config
+windows-phone-7/*/*/bin/*
+windows-phone-7/*/*/obj/*
+windows-phone-7/*/*.suo
+iis/*/bin/*
+iis/*/obj/*
+iis/*/*.sln
+iis/*/*.suo
+iis/*/*.csproj.user
