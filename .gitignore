@@ -10,8 +10,8 @@ windows-phone-7/*/packages.config
 windows-phone-7/*/*/bin/*
 windows-phone-7/*/*/obj/*
 windows-phone-7/*/*.suo
-iis/*/bin/*
-iis/*/obj/*
-iis/*/*.sln
-iis/*/*.suo
-iis/*/*.csproj.user
+iis/3.4/*/bin/*
+iis/3.4/*/obj/*
+iis/3.4/*/*.sln
+iis/3.4/*/*.suo
+iis/3.4/*/*.csproj.user
