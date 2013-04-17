@@ -1,4 +1,4 @@
-﻿//Build Date: March 20, 2013
+﻿//Build Date: April 05, 2013
 #if (__MonoCS__)
 #define TRACE
 #endif
@@ -50,6 +50,7 @@ namespace PubNubMessaging.Core
         int _pubnubWebRequestRetryIntervalInSeconds = 10;
         bool _enableResumeOnReconnect = true;
         bool overrideTcpKeepAlive = true;
+        bool _enableJsonEncodingForPublish = true;
         const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Error;
 
 #if (!SILVERLIGHT && !WINDOWS_PHONE)
@@ -150,6 +151,18 @@ namespace PubNubMessaging.Core
             set
             {
                 _enableResumeOnReconnect = value;
+            }
+        }
+
+        public bool EnableJsonEncodingForPublish
+        {
+            get
+            {
+                return _enableJsonEncodingForPublish;
+            }
+            set
+            {
+                _enableJsonEncodingForPublish = value;
             }
         }
 
@@ -274,7 +287,8 @@ namespace PubNubMessaging.Core
 
         private void ReconnectNetwork<T>(ReconnectState<T> netState)
         {
-            System.Threading.Timer timer = new Timer(new TimerCallback(ReconnectNetworkCallback<T>), netState, 0, _pubnubNetworkTcpCheckIntervalInSeconds * 1000);
+            System.Threading.Timer timer = new Timer(new TimerCallback(ReconnectNetworkCallback<T>), netState, 0,
+                (-1 == _pubnubNetworkTcpCheckIntervalInSeconds) ? Timeout.Infinite : _pubnubNetworkTcpCheckIntervalInSeconds * 1000);
             _channelReconnectTimer.AddOrUpdate(string.Join(",",netState.Channels), timer, (key, oldState) => timer);
         }
 
@@ -2318,7 +2332,7 @@ namespace PubNubMessaging.Core
 
         private Uri BuildPublishRequest(string channel, object originalMessage)
         {
-            string message = JsonEncodePublishMsg(originalMessage);
+            string message = (_enableJsonEncodingForPublish) ? JsonEncodePublishMsg(originalMessage) : originalMessage.ToString();
 
             // Generate String to Sign
             string signature = "0";

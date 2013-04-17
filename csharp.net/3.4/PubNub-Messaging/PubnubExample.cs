@@ -228,7 +228,6 @@ namespace PubNubMessaging.Core
             }
             Console.WriteLine();
 
-
             Console.WriteLine("ENTER 1 FOR Subscribe");
             Console.WriteLine("ENTER 2 FOR Publish");
             Console.WriteLine("ENTER 3 FOR Presence");
