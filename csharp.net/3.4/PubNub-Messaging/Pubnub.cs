@@ -1,4 +1,4 @@
-﻿//Build Date: April 05, 2013
+﻿//Build Date: April 29, 2013
 #if (__MonoCS__)
 #define TRACE
 #endif
@@ -2012,10 +2012,9 @@ namespace PubNubMessaging.Core
                 channel = string.Join(",", asynchRequestState.Channels);
             }
 
+            PubnubWebRequest asyncWebRequest = asynchRequestState.Request as PubnubWebRequest;
             try
             {
-                PubnubWebRequest asyncWebRequest = (PubnubWebRequest)asynchRequestState.Request;
-
                 if (asyncWebRequest != null)
                 {
                     using (PubnubWebResponse asyncWebResponse = (PubnubWebResponse)asyncWebRequest.EndGetResponse(asynchronousResult))
@@ -2081,7 +2080,49 @@ namespace PubNubMessaging.Core
             }
             catch (WebException webEx)
             {
-                ProcessResponseCallbackWebExceptionHandler<T>(webEx, asynchRequestState, channel);
+                bool validPublishErrorMessage = false;
+                if (asynchRequestState != null && asynchRequestState.Type == ResponseType.Publish)
+                {
+                    HttpStatusCode currentStatusCode;
+                    if (webEx.Response.GetType().ToString() == "System.Net.HttpWebResponse")
+                    {
+                        currentStatusCode = ((HttpWebResponse)webEx.Response).StatusCode;
+                    }
+                    else
+                    {
+                        currentStatusCode = ((PubnubWebResponse)webEx.Response).HttpStatusCode;
+                    }
+                    PubnubWebResponse exceptionResponse = new PubnubWebResponse(webEx.Response, currentStatusCode);
+                    if (exceptionResponse != null && exceptionResponse.HttpStatusCode == HttpStatusCode.BadRequest)
+                    {
+                        asynchRequestState.Response = exceptionResponse;
+                        using (StreamReader streamReader = new StreamReader(asynchRequestState.Response.GetResponseStream()))
+                        {
+                            validPublishErrorMessage = true;
+                            string jsonString = streamReader.ReadToEnd();
+                            streamReader.Close();
+                            
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON for channel={1} ({2}) ={3}", DateTime.Now.ToString(), channel, asynchRequestState.Type.ToString(), jsonString), LoggingMethod.LevelInfo);
+
+                            if (overrideTcpKeepAlive)
+                            {
+                                TerminateHeartbeatTimer(asyncWebRequest.RequestUri);
+                            }
+
+                            result = WrapResultBasedOnResponseType(asynchRequestState.Type, jsonString, asynchRequestState.Channels, asynchRequestState.Reconnect, asynchRequestState.Timetoken);
+                        }
+                    }
+                    exceptionResponse.Close();
+                }
+
+                if (validPublishErrorMessage)
+                {
+                    ProcessResponseCallbacks<T>(result, asynchRequestState);
+                }
+                else
+                {
+                    ProcessResponseCallbackWebExceptionHandler<T>(webEx, asynchRequestState, channel);
+                }
             }
             catch (Exception ex)
             {
@@ -2475,7 +2516,6 @@ namespace PubNubMessaging.Core
             {
                 case ResponseType.Subscribe:
                 case ResponseType.Presence:
-                    //var decodedResult = DecodeMessage(result, type);
                     var messages = (from item in result
                                 select item as object).ToArray();
                     if (messages != null && messages.Length > 0)
@@ -3990,7 +4030,7 @@ namespace PubNubMessaging.Core
             set;
         }
 
-        string GetStubResponse(Uri request);
+        string GetStubResponse(HttpWebRequest request);
     }
 
     internal class PubnubWebRequestCreator : IWebRequestCreate
@@ -4019,7 +4059,7 @@ namespace PubNubMessaging.Core
         }
     }
 
-    internal class PubnubWebRequest : WebRequest
+    public class PubnubWebRequest : WebRequest
     {
         private IPubnubUnitTest pubnubUnitTest = null;
         private static bool simulateNetworkFailForTesting = false;
@@ -4183,7 +4223,7 @@ namespace PubNubMessaging.Core
         {
             if (pubnubUnitTest is IPubnubUnitTest && pubnubUnitTest.EnableStubTest)
             {
-                string stubResponse = pubnubUnitTest.GetStubResponse(request.RequestUri);
+                string stubResponse = pubnubUnitTest.GetStubResponse(request);
                 return new PubnubWebResponse(new MemoryStream(Encoding.UTF8.GetBytes(stubResponse)));
             }
             else if (simulateNetworkFailForTesting)
@@ -4197,6 +4237,19 @@ namespace PubNubMessaging.Core
             }
         }
 
+        public override WebResponse GetResponse()
+        {
+            if (pubnubUnitTest is IPubnubUnitTest && pubnubUnitTest.EnableStubTest)
+            {
+                string stubResponse = pubnubUnitTest.GetStubResponse(request);
+                return new PubnubWebResponse(new MemoryStream(Encoding.UTF8.GetBytes(stubResponse)));
+            }
+            else
+            {
+                return new PubnubWebResponse(request.GetResponse());
+            }
+        }
+
         public override Uri RequestUri
         {
             get
@@ -4206,19 +4259,32 @@ namespace PubNubMessaging.Core
         }
     }
 
-    internal class PubnubWebResponse : WebResponse
+    public class PubnubWebResponse : WebResponse
     {
         WebResponse response;
         readonly Stream _responseStream;
+        HttpStatusCode httpStatusCode;
 
         public PubnubWebResponse(WebResponse response)
         {
             this.response = response;
         }
 
+        public PubnubWebResponse(WebResponse response, HttpStatusCode statusCode)
+        {
+            this.response = response;
+            this.httpStatusCode = statusCode;
+        }
+
         public PubnubWebResponse(Stream responseStream)
         {
             _responseStream = responseStream;
+        }
+
+        public PubnubWebResponse(Stream responseStream, HttpStatusCode statusCode)
+        {
+            _responseStream = responseStream;
+            this.httpStatusCode = statusCode;
         }
 
         public override Stream GetResponseStream()
@@ -4258,6 +4324,14 @@ namespace PubNubMessaging.Core
             get
             {
                 return response.ResponseUri;
+            }
+        }
+
+        public HttpStatusCode HttpStatusCode
+        {
+            get
+            {
+                return httpStatusCode;
             }
         }
     }

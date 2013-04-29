@@ -24,6 +24,7 @@ namespace PubNubMessaging.Tests
         ManualResetEvent mreEncryptPublish = new ManualResetEvent(false);
         ManualResetEvent mreSecretEncryptPublish = new ManualResetEvent(false);
         ManualResetEvent mreComplexObjectPublish = new ManualResetEvent(false);
+        ManualResetEvent mreLaregMessagePublish = new ManualResetEvent(false);
 
         ManualResetEvent mreEncryptDetailedHistory = new ManualResetEvent(false);
         ManualResetEvent mreSecretEncryptDetailedHistory = new ManualResetEvent(false);
@@ -51,6 +52,7 @@ namespace PubNubMessaging.Tests
         bool isComplexObjectDetailedHistory = false;
         bool isSerializedObjectMessagePublished = false;
         bool isSerializedObjectMessageDetailedHistory = false;
+        bool isLargeMessagePublished = false;
 
         long unEncryptPublishTimetoken = 0;
         long unEncryptObjectPublishTimetoken = 0;
@@ -63,6 +65,7 @@ namespace PubNubMessaging.Tests
         const string messageForUnencryptPublish = "Pubnub Messaging API 1";
         const string messageForEncryptPublish = "漢語";
         const string messageForSecretEncryptPublish = "Pubnub Messaging API 2";
+        const string messageLarge2K = "Numerous questions remain about the origins of the chemical and what impact its apparent use could have on the ongoing Syrian civil war and international involvement in it.When asked if the intelligence community's conclusion pushed the situation across President Barack Obama's \"red line\" that could potentially trigger more U.S. involvement in the Syrian civil war, Hagel said it's too soon to say.\"We need all the facts. We need all the information,\" he said. \"What I've just given you is what our intelligence community has said they know. As I also said, they are still assessing and they are still looking at what happened, who was responsible and the other specifics that we'll need.\" In a letter sent to lawmakers before Hagel's announcement, the White House said that intelligence analysts have concluded \"with varying degrees of confidence that the Syrian regime has used chemical weapons on a small scale in Syria, specifically the chemical agent sarin.\" In the letter, signed by White House legislative affairs office Director Miguel Rodriguez, the White House said the \"chain of custody\" of the chemicals was not clear and that intelligence analysts could not confirm the circumstances under which the sarin was used, including the role of Syrian President Bashar al-Assad's regime. Read Rodriguez's letter to Levin (PDF) But, the letter said, \"we do believe that any use of chemical weapons in Syria would very likely have originated with the Assad regime.\" The Syrian government has been battling a rebellion for more than two years, bringing international condemnation of the regime and pleas for greater international assistance. The United Nations estimated in February that more than 70,000 people had died since the conflict began. The administration is \"pressing for a comprehensive United Nations investigation that can credibly evaluate the evidence and establish what took place,\" the White House letter said. Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time";
         string messageObjectForUnencryptPublish = "";
         string messageObjectForEncryptPublish = "";
         string messageComplexObjectForPublish = "";
@@ -274,6 +277,27 @@ namespace PubNubMessaging.Tests
                 Assert.IsTrue(isSerializedObjectMessageDetailedHistory, "Unable to match the successful serialized object message Publish");
             }
         }
+
+        [Test]
+        public void ThenLargeMessageShoudFailWithMessageTooLargeInfo()
+        {
+            isLargeMessagePublished = false;
+            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAMessageIsPublished";
+            unitTest.TestCaseName = "ThenLargeMessageShoudFailWithMessageTooLargeInfo";
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channel = "my/channel";
+            string message = messageLarge2K;
+
+            pubnub.Publish<string>(channel, message, ReturnPublishMessageTooLargeInfoCallback);
+            mreLaregMessagePublish.WaitOne(310 * 1000);
+
+            Assert.IsTrue(isLargeMessagePublished, "Message Too Large is not failing as expected.");
+        }
+
 
         private void ReturnSuccessUnencryptPublishCodeCallback(string result)
         {
@@ -497,6 +521,24 @@ namespace PubNubMessaging.Tests
             }
 
             mreComplexObjectDetailedHistory.Set();
+        }
+
+        private void ReturnPublishMessageTooLargeInfoCallback(string result)
+        {
+            if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
+            {
+                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                if (deserializedMessage is object[])
+                {
+                    long statusCode = Int64.Parse(deserializedMessage[0].ToString());
+                    string statusMessage = (string)deserializedMessage[1];
+                    if (statusCode == 0 && statusMessage.ToLower() == "message too large")
+                    {
+                        isLargeMessagePublished = true;
+                    }
+                }
+            }
+            mreLaregMessagePublish.Set();
         }
 
         [Test]

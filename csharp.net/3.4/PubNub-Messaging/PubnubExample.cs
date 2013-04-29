@@ -275,8 +275,21 @@ namespace PubNubMessaging.Core
                         Console.WriteLine(string.Format("Channel = {0}",channel));
                         Console.ResetColor();
 
-                        Console.WriteLine("Enter the message for publish. To exit loop, enter QUIT");
-                        string publishMsg = Console.ReadLine();
+                        Console.WriteLine("Enter the message for publish and press ENTER key to submit");
+
+                        ConsoleKeyInfo enteredKey;
+                        StringBuilder publishBuilder = new StringBuilder();
+                        do
+                        {
+                            enteredKey = Console.ReadKey(); //This logic is being used to capture > 2K input in console window
+                            if (enteredKey.Key != ConsoleKey.Enter)
+                            {
+                                publishBuilder.Append(enteredKey.KeyChar);
+                            }
+                        } while (enteredKey.Key != ConsoleKey.Enter);
+
+                        string publishMsg = publishBuilder.ToString();
+                        
                         
                         Console.WriteLine("Running publish()");
 
