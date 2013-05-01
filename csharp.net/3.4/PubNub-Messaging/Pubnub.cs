@@ -292,7 +292,7 @@ namespace PubNubMessaging.Core
             _channelReconnectTimer.AddOrUpdate(string.Join(",",netState.Channels), timer, (key, oldState) => timer);
         }
 
-        void ReconnectNetworkCallback<T>(object reconnectState)
+        void ReconnectNetworkCallback<T>(System.Object reconnectState)
         {
             string channel = "";
 
@@ -1047,7 +1047,7 @@ namespace PubNubMessaging.Core
             }
         }
 
-        void OnPubnubHeartBeatTimeoutCallback<T>(object heartbeatState)
+        void OnPubnubHeartBeatTimeoutCallback<T>(System.Object heartbeatState)
         {
             LoggingMethod.WriteToLog(string.Format("DateTime: {0}, **OnPubnubHeartBeatTimeoutCallback**", DateTime.Now.ToString()), LoggingMethod.LevelVerbose);
 
@@ -2470,7 +2470,7 @@ namespace PubNubMessaging.Core
             return requestUri;
         }
 
-        void OnPubnubWebRequestTimeout<T>(object requestState)
+        void OnPubnubWebRequestTimeout<T>(System.Object requestState)
         {
             RequestState<T> currentState = requestState as RequestState<T>;
             if (currentState != null && currentState.Response == null && currentState.Request != null)
