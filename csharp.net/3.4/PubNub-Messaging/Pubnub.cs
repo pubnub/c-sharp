@@ -1,4 +1,4 @@
-﻿//Build Date: April 29, 2013
+﻿//Build Date: May 01, 2013
 #if (__MonoCS__)
 #define TRACE
 #endif
@@ -292,7 +292,7 @@ namespace PubNubMessaging.Core
             _channelReconnectTimer.AddOrUpdate(string.Join(",",netState.Channels), timer, (key, oldState) => timer);
         }
 
-        void ReconnectNetworkCallback<T>(Object reconnectState)
+        void ReconnectNetworkCallback<T>(object reconnectState)
         {
             string channel = "";
 
@@ -1047,7 +1047,7 @@ namespace PubNubMessaging.Core
             }
         }
 
-        void OnPubnubHeartBeatTimeoutCallback<T>(Object heartbeatState)
+        void OnPubnubHeartBeatTimeoutCallback<T>(object heartbeatState)
         {
             LoggingMethod.WriteToLog(string.Format("DateTime: {0}, **OnPubnubHeartBeatTimeoutCallback**", DateTime.Now.ToString()), LoggingMethod.LevelVerbose);
 
@@ -2470,7 +2470,7 @@ namespace PubNubMessaging.Core
             return requestUri;
         }
 
-        void OnPubnubWebRequestTimeout<T>(Object requestState)
+        void OnPubnubWebRequestTimeout<T>(object requestState)
         {
             RequestState<T> currentState = requestState as RequestState<T>;
             if (currentState != null && currentState.Response == null && currentState.Request != null)
