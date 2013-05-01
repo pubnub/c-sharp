@@ -15,3 +15,8 @@
 /iis/3.4/*/*.sln
 /iis/3.4/*/*.suo
 /iis/3.4/*/*.csproj.user
+/unity/*/PubnubUnity/Library/*
+/unity/*/PubnubUnity/Temp/*
+/unity/*/PubnubUnity/ProjectSettings/*
+/unity/*/PubnubUnity/*.pidb
+/unity/*/PubnubUnity/*.userprefs
