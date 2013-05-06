@@ -1,5 +1,5 @@
 ﻿//Build Date: May 01, 2013
-#if (__MonoCS__)
+#if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
 #define TRACE
 #endif
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER)
@@ -32,7 +32,7 @@ using System.Windows.Threading;
 using System.IO.IsolatedStorage;
 
 #endif
-#if (__MonoCS__)
+#if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
 using System.Net.Security;
 #endif
 
@@ -219,7 +219,7 @@ namespace PubNubMessaging.Core
 
         // Pubnub Core API implementation
         private string origin = "pubsub.pubnub.com";
-#if (__MonoCS__)
+#if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
         private string domainName = "pubsub.pubnub.com";
 #endif
         private string publishKey = "";
@@ -1472,7 +1472,7 @@ namespace PubNubMessaging.Core
                 LoggingMethod.WriteToLog(string.Format("DateTime {0}, Request={1}", DateTime.Now.ToString(), requestUri.ToString()), LoggingMethod.LevelInfo);
 
 
-#if (__MonoCS__)
+#if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
                 if((pubnubRequestState.Type == ResponseType.Publish) && (RequestIsUnsafe(requestUri)))
                 {
                     SendRequestUsingTcpClient<T>(requestUri, pubnubRequestState);
@@ -1502,7 +1502,7 @@ namespace PubNubMessaging.Core
             }
         }
 
-#if (__MonoCS__)
+#if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
         bool RequestIsUnsafe(Uri requestUri)
         {
             bool isUnsafe = false;
@@ -4449,7 +4449,7 @@ namespace PubNubMessaging.Core
         }
     }
 
-#if (__MonoCS__)
+#if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
     class StateObject<T>
     {
         public RequestState<T> RequestState

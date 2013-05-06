@@ -1,7 +1,7 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2008
 
-Project("{3F5869D2-86AB-9A07-11D8-044AE1982E96}") = "PubnubUnity", "Assembly-CSharp-vs.csproj", "{7F9D55BA-09AA-692B-7E06-025271E5ED2B}"
+Project("{3F5869D2-86AB-9A07-11D8-044AE1982E96}") = "PubnubUnity", "Assembly-CSharp.csproj", "{7F9D55BA-09AA-692B-7E06-025271E5ED2B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,7 +17,7 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-										GlobalSection(MonoDevelopProperties) = preSolution
+														GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Assembly-CSharp.csproj
 		Policies = $0
 		$0.TextStylePolicy = $1
