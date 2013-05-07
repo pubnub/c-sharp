@@ -237,7 +237,7 @@ namespace PubNubMessaging.Tests
             string channel = "my/channel";
             object message = new PubnubDemoObject();
 			messageComplexObjectForPublish = JsonConvert.SerializeObject(message);
-			Debug.Log("Serialized message in ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo() = " + messageComplexObjectForPublish);
+			//Debug.Log("Serialized message in ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo() = " + messageComplexObjectForPublish);
 
             pubnub.Publish<string>(channel, message, ReturnSuccessComplexObjectPublishCodeCallback);
             mreComplexObjectPublish.WaitOne(310 * 1000);
@@ -495,7 +495,6 @@ namespace PubNubMessaging.Tests
 
         private void ReturnSuccessComplexObjectPublishCodeCallback(string result)
         {
-			Debug.Log("Received message in ReturnSuccessComplexObjectPublishCodeCallback() = " + result);
 			if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
                 object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
@@ -517,7 +516,6 @@ namespace PubNubMessaging.Tests
 
         private void CaptureComplexObjectDetailedHistoryCallback(string result)
         {
-			Debug.Log("Callback message in ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo() = " + result);
 			if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
                 object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);

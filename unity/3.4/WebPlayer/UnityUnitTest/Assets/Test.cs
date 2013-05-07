@@ -59,6 +59,8 @@ public class Test : MonoBehaviour {
 			List<Person> ret = new List<Person>();
 			Person p1= new Person();
 			p1.ID = "ABCD123";
+			//PersonID id1 = new PersonID(); id1.ID = "ABCD123" ;
+			//p1.ID = id1;
 			Name n1 = new Name();
 			n1.First = "John";
 			n1.Middle = "P.";
@@ -76,6 +78,8 @@ public class Test : MonoBehaviour {
 		
 			Person p2= new Person();
 			p2.ID = "ABCD456";
+			//PersonID id2 = new PersonID(); id2.ID = "ABCD123" ;
+			//p2.ID = id2;
 			Name n2 = new Name();
 			n2.First = "Peter";
 			n2.Middle = "Z.";
@@ -110,7 +114,6 @@ public class Test : MonoBehaviour {
 
 	public class Person
 	{
-		[XmlAttribute("ID")]
 		public string ID { get; set; }
 	    // C# 3.0 auto-implemented properties
 	    public Name   Name;
@@ -130,6 +133,12 @@ public class Test : MonoBehaviour {
 			public string City { get; set; }
 			public string State { get; set; }
 			public string Country { get; set; }
+	}
+
+	public class PersonID
+	{
+		[XmlAttribute]
+		public string ID { get; set;}
 	}
 
 public class JsonSample: MonoBehaviour
@@ -154,8 +163,8 @@ public class JsonSample: MonoBehaviour
         //Debug.Log(json_bill);
 //		
 //		Newtonsoft.Json.Linq.JObject test = Newtonsoft.Json.Linq.JObject.Parse(json_bill);
-		string jsonString = JsonConvert.SerializeObject(bill);
-		Debug.Log("PersonToJson -> jsonString = " + jsonString);
+		//string jsonString = JsonConvert.SerializeObject(bill);
+		//Debug.Log("PersonToJson -> jsonString = " + jsonString);
 //		
 //		var s = new SerializationWrapper();
 //		string serializedObject;
