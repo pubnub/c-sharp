@@ -9,7 +9,6 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 
 public class PubnubExample : MonoBehaviour {
-	
 	bool ssl = false;
 	bool resumeOnReconnect = true;
 
@@ -124,12 +123,8 @@ public class PubnubExample : MonoBehaviour {
 		if (showPublishPopupWindow)
 		{
 			GUI.backgroundColor = Color.black;
-			//GUIUtility.hotControl = 0;
-			publishWindowRect = GUI.Window(0, publishWindowRect, DoPublishWindow, "Message Publish");
+			publishWindowRect = GUI.ModalWindow(0, publishWindowRect, DoPublishWindow, "Message Publish");
 			GUI.backgroundColor = new Color(1,1,1,1);
-			//ModalWindow.Launch();
-			
-			
 		}
 		
 		if (GUI.Button(new Rect(10,430,120,25), "Unsubscribe"))
@@ -176,8 +171,16 @@ public class PubnubExample : MonoBehaviour {
 			pubnub.TerminateCurrentSubscriberRequest();
 		}
 		
-		scrollPosition = GUI.BeginScrollView(new Rect(300,10,500,500), scrollPosition, new Rect(0,0,450,1000),false, false);
-		pubnubApiResult = GUI.TextArea(new Rect(0,0,485,1000), pubnubApiResult);
+		if (showPublishPopupWindow)
+		{
+			scrollPosition = GUI.BeginScrollView(new Rect(300,10,500,200), scrollPosition, new Rect(0,0,250,500),false, false);
+			pubnubApiResult = GUI.TextArea(new Rect(0,0,485,200), pubnubApiResult);
+		}
+		else
+		{
+			scrollPosition = GUI.BeginScrollView(new Rect(300,10,500,500), scrollPosition, new Rect(0,0,450,1000),false, false);
+			pubnubApiResult = GUI.TextArea(new Rect(0,0,485,1000), pubnubApiResult);			
+		}
 		GUI.EndScrollView();
 		
 	}
@@ -202,22 +205,20 @@ public class PubnubExample : MonoBehaviour {
 	void DoPublishWindow(int windowID) {
 		
 		GUI.Label(new Rect(10,25,100,25), "Enter Message");
-		publishedMessage = GUI.TextField(new Rect(110,25,150,60),publishedMessage,2000);
+		publishedMessage = GUI.TextArea(new Rect(110,25,150,60),publishedMessage,2000);
 
 		if (GUI.Button(new Rect(30, 100, 100, 20), "Publish"))
 		{
 			pubnub.Publish<string>(channel, publishedMessage, DisplayReturnMessage);
 			publishedMessage = "";
-			//GUIUtility.hotControl = -1;
 			showPublishPopupWindow = false;
 		}
 
 		if (GUI.Button(new Rect(150, 100, 100, 20), "Cancel"))
 		{
-			//GUIUtility.hotControl = -1;
 			showPublishPopupWindow = false;
 		}
-        
+		GUI.DragWindow(new Rect(0,0,800,400));
     }	
 	
 	void Start()
@@ -273,6 +274,10 @@ public class PubnubExample : MonoBehaviour {
 	void Update()
 	{
             string recordTest;
+			if (pubnubApiResult.Length > 10000)
+			{
+				pubnubApiResult = pubnubApiResult.Substring(pubnubApiResult.Length/2);
+			}
             if (_recordQueue.TryPeek(out recordTest))
             {
                 string currentRecord;
