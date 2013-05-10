@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace PubNubMessaging.Tests
 {
-    public class PubnubUnitTest : MonoBehaviour,  IPubnubUnitTest
+    public class PubnubUnitTest : IPubnubUnitTest
     {
         private bool enableStubTest = true;
         private string _testClassName = "";
@@ -519,12 +519,6 @@ namespace PubNubMessaging.Tests
                 default:
                     break;
             }
-
-            if (_testClassName == "WhenAMessageIsPublished" && _testCaseName == "ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo")
-            {
-				print(requestUri.AbsolutePath);
-				//print(requestUri.AbsolutePath);
-			}
 
 			if (responseDictionary != null && responseDictionary.ContainsKey(requestUri.AbsolutePath))
             {
