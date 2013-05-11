@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using PubNubMessaging.Core;
+using System.IO;
+using System.Net;
 
 namespace PubNubMessaging.Tests
 {
@@ -209,6 +211,17 @@ namespace PubNubMessaging.Tests
             return data;
         }
 
+        private Dictionary<string, string> LoadWhenAMessageIsPublishedThenLargeMessageShoudFailWithMessageTooLargeInfo()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+#if ((!__MonoCS__) && (!SILVERLIGHT) && (!WINDOWS_PHONE))
+            data.Add("/publish/demo/demo/0/my%2Fchannel/0/%22Numerous%20questions%20remain%20about%20the%20origins%20of%20the%20chemical%20and%20what%20impact%20its%20apparent%20use%20could%20have%20on%20the%20ongoing%20Syrian%20civil%20war%20and%20international%20involvement%20in%20it%2EWhen%20asked%20if%20the%20intelligence%20community%27s%20conclusion%20pushed%20the%20situation%20across%20President%20Barack%20Obama%27s%20%5C%22red%20line%5C%22%20that%20could%20potentially%20trigger%20more%20U%2ES%2E%20involvement%20in%20the%20Syrian%20civil%20war%2C%20Hagel%20said%20it%27s%20too%20soon%20to%20say%2E%5C%22We%20need%20all%20the%20facts%2E%20We%20need%20all%20the%20information%2C%5C%22%20he%20said%2E%20%5C%22What%20I%27ve%20just%20given%20you%20is%20what%20our%20intelligence%20community%20has%20said%20they%20know%2E%20As%20I%20also%20said%2C%20they%20are%20still%20assessing%20and%20they%20are%20still%20looking%20at%20what%20happened%2C%20who%20was%20responsible%20and%20the%20other%20specifics%20that%20we%27ll%20need%2E%5C%22%20In%20a%20letter%20sent%20to%20lawmakers%20before%20Hagel%27s%20announcement%2C%20the%20White%20House%20said%20that%20intelligence%20analysts%20have%20concluded%20%5C%22with%20varying%20degrees%20of%20confidence%20that%20the%20Syrian%20regime%20has%20used%20chemical%20weapons%20on%20a%20small%20scale%20in%20Syria%2C%20specifically%20the%20chemical%20agent%20sarin%2E%5C%22%20In%20the%20letter%2C%20signed%20by%20White%20House%20legislative%20affairs%20office%20Director%20Miguel%20Rodriguez%2C%20the%20White%20House%20said%20the%20%5C%22chain%20of%20custody%5C%22%20of%20the%20chemicals%20was%20not%20clear%20and%20that%20intelligence%20analysts%20could%20not%20confirm%20the%20circumstances%20under%20which%20the%20sarin%20was%20used%2C%20including%20the%20role%20of%20Syrian%20President%20Bashar%20al-Assad%27s%20regime%2E%20Read%20Rodriguez%27s%20letter%20to%20Levin%20%28PDF%29%20But%2C%20the%20letter%20said%2C%20%5C%22we%20do%20believe%20that%20any%20use%20of%20chemical%20weapons%20in%20Syria%20would%20very%20likely%20have%20originated%20with%20the%20Assad%20regime%2E%5C%22%20The%20Syrian%20government%20has%20been%20battling%20a%20rebellion%20for%20more%20than%20two%20years%2C%20bringing%20international%20condemnation%20of%20the%20regime%20and%20pleas%20for%20greater%20international%20assistance%2E%20The%20United%20Nations%20estimated%20in%20February%20that%20more%20than%2070%2C000%20people%20had%20died%20since%20the%20conflict%20began%2E%20The%20administration%20is%20%5C%22pressing%20for%20a%20comprehensive%20United%20Nations%20investigation%20that%20can%20credibly%20evaluate%20the%20evidence%20and%20establish%20what%20took%20place%2C%5C%22%20the%20White%20House%20letter%20said%2E%20Sen%2E%20John%20McCain%2C%20one%20of%20the%20lawmakers%20who%20received%20the%20letter%2C%20said%20the%20use%20of%20chemical%20weapons%20was%20only%20a%20matter%20of%20time%22", "[0,\"Message Too Large\",\"13559014566792817\"]");
+#else
+            data.Add("/publish/demo/demo/0/my/channel/0/%22Numerous%20questions%20remain%20about%20the%20origins%20of%20the%20chemical%20and%20what%20impact%20its%20apparent%20use%20could%20have%20on%20the%20ongoing%20Syrian%20civil%20war%20and%20international%20involvement%20in%20it%2EWhen%20asked%20if%20the%20intelligence%20community%27s%20conclusion%20pushed%20the%20situation%20across%20President%20Barack%20Obama%27s%20%5C%22red%20line%5C%22%20that%20could%20potentially%20trigger%20more%20U%2ES%2E%20involvement%20in%20the%20Syrian%20civil%20war%2C%20Hagel%20said%20it%27s%20too%20soon%20to%20say%2E%5C%22We%20need%20all%20the%20facts%2E%20We%20need%20all%20the%20information%2C%5C%22%20he%20said%2E%20%5C%22What%20I%27ve%20just%20given%20you%20is%20what%20our%20intelligence%20community%20has%20said%20they%20know%2E%20As%20I%20also%20said%2C%20they%20are%20still%20assessing%20and%20they%20are%20still%20looking%20at%20what%20happened%2C%20who%20was%20responsible%20and%20the%20other%20specifics%20that%20we%27ll%20need%2E%5C%22%20In%20a%20letter%20sent%20to%20lawmakers%20before%20Hagel%27s%20announcement%2C%20the%20White%20House%20said%20that%20intelligence%20analysts%20have%20concluded%20%5C%22with%20varying%20degrees%20of%20confidence%20that%20the%20Syrian%20regime%20has%20used%20chemical%20weapons%20on%20a%20small%20scale%20in%20Syria%2C%20specifically%20the%20chemical%20agent%20sarin%2E%5C%22%20In%20the%20letter%2C%20signed%20by%20White%20House%20legislative%20affairs%20office%20Director%20Miguel%20Rodriguez%2C%20the%20White%20House%20said%20the%20%5C%22chain%20of%20custody%5C%22%20of%20the%20chemicals%20was%20not%20clear%20and%20that%20intelligence%20analysts%20could%20not%20confirm%20the%20circumstances%20under%20which%20the%20sarin%20was%20used%2C%20including%20the%20role%20of%20Syrian%20President%20Bashar%20al-Assad%27s%20regime%2E%20Read%20Rodriguez%27s%20letter%20to%20Levin%20%28PDF%29%20But%2C%20the%20letter%20said%2C%20%5C%22we%20do%20believe%20that%20any%20use%20of%20chemical%20weapons%20in%20Syria%20would%20very%20likely%20have%20originated%20with%20the%20Assad%20regime%2E%5C%22%20The%20Syrian%20government%20has%20been%20battling%20a%20rebellion%20for%20more%20than%20two%20years%2C%20bringing%20international%20condemnation%20of%20the%20regime%20and%20pleas%20for%20greater%20international%20assistance%2E%20The%20United%20Nations%20estimated%20in%20February%20that%20more%20than%2070%2C000%20people%20had%20died%20since%20the%20conflict%20began%2E%20The%20administration%20is%20%5C%22pressing%20for%20a%20comprehensive%20United%20Nations%20investigation%20that%20can%20credibly%20evaluate%20the%20evidence%20and%20establish%20what%20took%20place%2C%5C%22%20the%20White%20House%20letter%20said%2E%20Sen%2E%20John%20McCain%2C%20one%20of%20the%20lawmakers%20who%20received%20the%20letter%2C%20said%20the%20use%20of%20chemical%20weapons%20was%20only%20a%20matter%20of%20time%22", "[0,\"Message Too Large\",\"13559014566792817\"]");
+#endif
+            return data;
+        }
+
         private Dictionary<string, string> LoadWhenDetailedHistoryIsRequestedDetailHistoryCount10ReturnsRecords()
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
@@ -377,8 +390,10 @@ namespace PubNubMessaging.Tests
             return data;
         }
 
-        public string GetStubResponse(Uri request)
+        public string GetStubResponse(HttpWebRequest request)
         {
+            Uri requestUri = request.RequestUri;
+
             Dictionary<string, string> responseDictionary = null;
             string stubResponse = "!! Stub Response Not Assigned !!";
             System.Diagnostics.Debug.WriteLine(string.Format("{0} - {1}", _testClassName, _testCaseName));
@@ -429,6 +444,9 @@ namespace PubNubMessaging.Tests
                             break;
                         case "ThenDisableJsonEncodeShouldSendSerializedObjectMessage":
                             responseDictionary = LoadWhenAMessageIsPublishedThenDisableJsonEncodeShouldSendSerializedObjectMessage();
+                            break;
+                        case "ThenLargeMessageShoudFailWithMessageTooLargeInfo":
+                            responseDictionary = LoadWhenAMessageIsPublishedThenLargeMessageShoudFailWithMessageTooLargeInfo();
                             break;
                         default:
                             break;
@@ -499,9 +517,16 @@ namespace PubNubMessaging.Tests
                     break;
             }
 
-            if (responseDictionary != null && responseDictionary.ContainsKey(request.AbsolutePath))
+            if (responseDictionary != null && responseDictionary.ContainsKey(requestUri.AbsolutePath))
             {
-                stubResponse = responseDictionary[request.AbsolutePath];
+                stubResponse = responseDictionary[requestUri.AbsolutePath];
+                if (_testClassName == "WhenAMessageIsPublished" && _testCaseName == "ThenLargeMessageShoudFailWithMessageTooLargeInfo")
+                {
+                    PubnubWebRequest stubRequest = new PubnubWebRequest(request, this);
+                    PubnubWebResponse stubWebResponse = new PubnubWebResponse(new MemoryStream(Encoding.UTF8.GetBytes(stubResponse)), HttpStatusCode.BadRequest);
+                    WebException largeMessageException = new WebException("The remote server returned an error: (400) Bad Request", null, WebExceptionStatus.ProtocolError, stubWebResponse);
+                    throw largeMessageException;
+                }
             }
             else
             {
