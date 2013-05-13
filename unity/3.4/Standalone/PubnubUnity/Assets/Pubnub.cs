@@ -1,4 +1,4 @@
-﻿//Build Date: May 01, 2013
+﻿//Build Date: May 11, 2013
 #if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
 #define TRACE
 #endif
@@ -4234,19 +4234,6 @@ namespace PubNubMessaging.Core
             else
             {
                 return new PubnubWebResponse(request.EndGetResponse(asyncResult));
-            }
-        }
-
-        public override WebResponse GetResponse()
-        {
-            if (pubnubUnitTest is IPubnubUnitTest && pubnubUnitTest.EnableStubTest)
-            {
-                string stubResponse = pubnubUnitTest.GetStubResponse(request);
-                return new PubnubWebResponse(new MemoryStream(Encoding.UTF8.GetBytes(stubResponse)));
-            }
-            else
-            {
-                return new PubnubWebResponse(request.GetResponse());
             }
         }
 
