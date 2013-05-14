@@ -31,3 +31,7 @@
 /unity/*/*/UnityUnitTest/*.exe
 /unity/*/*/UnityUnitTest/*.userprefs
 /unity/*/*/UnityUnitTest/UnityUnitTestBuild_Data/*
+/silverlight/3.4/*/obj/*
+/silverlight/3.4/*/*.user
+/silverlight/3.4/*/*.suo
+/silverlight/3.4/*/bin/*
