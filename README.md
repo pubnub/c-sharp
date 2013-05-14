@@ -1,35 +1,35 @@
-#PubNub C-sharp-based APIs
+##PubNub C-sharp-based APIs
 Learn more at http://www.pubnub.com
 
 ## Subdirectory Description
 This repo contains the following platform-specific subdirectories:
 
-### NugetPkg
+#### NugetPkg
 The latest on Nuget
 
-### csharp.net
+#### csharp.net
 PubNub for MSVS C-Sharp / .net
 
-### iis
+#### iis
 PubNub for the IIS web server
 
-### mono-for-android
+#### mono-for-android
 PubNub for Xamarin's Mono for Android
 
-### monotouch
+#### monotouch
 PubNub for Xamarin's Mono Touch
 
-### mono-for-linux
+#### mono-for-linux
 PubNub for Mono for Linux
 
-### mono-for-mac
+#### mono-for-mac
 PubNub for Mono for Mac
 
-### silverlight
+#### silverlight
 PubNub for Silverlight
 
-### unity
+#### unity
 PubNub for Unity 3D
 
-### windows-phone-7
+#### windows-phone-7
 PubNub for WP7
