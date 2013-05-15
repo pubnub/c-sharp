@@ -31,3 +31,4 @@
 /unity/*/*/UnityUnitTest/*.exe
 /unity/*/*/UnityUnitTest/*.userprefs
 /unity/*/*/UnityUnitTest/UnityUnitTestBuild_Data/*
+.DS_Store
