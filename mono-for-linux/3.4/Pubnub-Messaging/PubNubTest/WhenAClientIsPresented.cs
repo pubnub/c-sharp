@@ -3,6 +3,8 @@ using PubNubMessaging.Core;
 using NUnit.Framework;
 using System.ComponentModel;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 
 namespace PubNubMessaging.Tests
@@ -161,13 +163,19 @@ namespace PubNubMessaging.Tests
           pubnub.HereNow<string>(channel, commonHereNow.DisplayReturnMessage);
 
           while (!commonHereNow.DeliveryStatus);
-
-          if (commonHereNow.Response == null) {
-            Assert.Fail("Null response");
-          }
-          else
+          if (commonHereNow.Response!= null)
           {
-            Assert.True(commonHereNow.Response.ToString().Contains(pubnub.SessionUUID));
+              object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(commonHereNow.Response.ToString());
+              JContainer dictionary = serializedMessage[0] as JContainer;
+              var uuid = dictionary["uuids"].ToString();
+              if (uuid != null)
+              {
+                  Assert.True(uuid.Contains(pubnub.SessionUUID));
+              } else {
+                  Assert.Fail("Custom uuid not found.");
+              }
+          } else {
+              Assert.Fail("Null response");
           }          
         }
     }
