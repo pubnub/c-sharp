@@ -31,18 +31,28 @@ namespace PubnubSilverlight.UnitTest
         bool isSecretEncryptPublished = false;
         bool isEncryptDH = false;
         bool isSecretEncryptDH = false;
+        bool isComplexObjectPublished = false;
+        bool isComplexObjectDetailedHistory = false;
+        bool isSerializedObjectMessagePublished = false;
+        bool isSerializedObjectMessageDetailedHistory = false;
+        bool isLargeMessagePublished = false;
 
         long unEncryptPublishTimetoken = 0;
         long unEncryptObjectPublishTimetoken = 0;
         long encryptObjectPublishTimetoken = 0;
         long encryptPublishTimetoken = 0;
         long secretEncryptPublishTimetoken = 0;
+        long complexObjectPublishTimetoken = 0;
+        long serializedMessagePublishTimetoken = 0;
 
         const string messageForUnencryptPublish = "Pubnub Messaging API 1";
         const string messageForEncryptPublish = "漢語";
         const string messageForSecretEncryptPublish = "Pubnub Messaging API 2";
+        const string messageLarge2K = "Numerous questions remain about the origins of the chemical and what impact its apparent use could have on the ongoing Syrian civil war and international involvement in it.When asked if the intelligence community's conclusion pushed the situation across President Barack Obama's \"red line\" that could potentially trigger more U.S. involvement in the Syrian civil war, Hagel said it's too soon to say.\"We need all the facts. We need all the information,\" he said. \"What I've just given you is what our intelligence community has said they know. As I also said, they are still assessing and they are still looking at what happened, who was responsible and the other specifics that we'll need.\" In a letter sent to lawmakers before Hagel's announcement, the White House said that intelligence analysts have concluded \"with varying degrees of confidence that the Syrian regime has used chemical weapons on a small scale in Syria, specifically the chemical agent sarin.\" In the letter, signed by White House legislative affairs office Director Miguel Rodriguez, the White House said the \"chain of custody\" of the chemicals was not clear and that intelligence analysts could not confirm the circumstances under which the sarin was used, including the role of Syrian President Bashar al-Assad's regime. Read Rodriguez's letter to Levin (PDF) But, the letter said, \"we do believe that any use of chemical weapons in Syria would very likely have originated with the Assad regime.\" The Syrian government has been battling a rebellion for more than two years, bringing international condemnation of the regime and pleas for greater international assistance. The United Nations estimated in February that more than 70,000 people had died since the conflict began. The administration is \"pressing for a comprehensive United Nations investigation that can credibly evaluate the evidence and establish what took place,\" the White House letter said. Sen. John McCain, one of the lawmakers who received the letter, said the use of";
         string messageObjectForUnencryptPublish = "";
         string messageObjectForEncryptPublish = "";
+        string messageComplexObjectForPublish = "";
+        string serializedObjectMessageForPublish;
 
         bool isCheck = false;
         bool isUnencryptCheck = false;
@@ -54,8 +64,13 @@ namespace PubnubSilverlight.UnitTest
         bool isEncryptDHCheck = false;
         bool isSecretEncryptPubCheck = false;
         bool isSecretEncryptDHCheck = false;
-        bool isCkeck2 = false;
-        bool isCkeck3 = false;
+        bool isComplexObjectPublishCheck = false;
+        bool isComplexObjectDetailedHistoryCheck = false;
+        bool isSerializedObjectMessageCheck = false;
+        bool isSerializedMessageDetailedHistoryCheck = false;
+        bool isPublishMessageTooLargeCheck = false;
+        bool isCheck2 = false;
+        bool isCheck3 = false;
 
         [TestMethod]
         [Asynchronous]
@@ -460,7 +475,7 @@ namespace PubnubSilverlight.UnitTest
             pubnub.PubnubUnitTest = unitTest;
 
             EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnSecretKeyPublishCallback));
-            EnqueueConditional(() => isCkeck2);
+            EnqueueConditional(() => isCheck2);
             EnqueueCallback(() => Assert.IsTrue(isPublished2, "Publish Failed with secret key"));
 
             EnqueueTestComplete();
@@ -482,7 +497,7 @@ namespace PubnubSilverlight.UnitTest
                     }
                 }
             }
-            isCkeck2 = true;
+            isCheck2 = true;
         }
 
         [TestMethod]
@@ -500,7 +515,7 @@ namespace PubnubSilverlight.UnitTest
             pubnub.PubnubUnitTest = unitTest;
 
             EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnNoSSLDefaultFalseCallback));
-            EnqueueConditional(() => isCkeck3);
+            EnqueueConditional(() => isCheck3);
             EnqueueCallback(() => Assert.IsTrue(isPublished3, "Publish Failed with no SSL"));
 
             EnqueueTestComplete();
@@ -522,7 +537,203 @@ namespace PubnubSilverlight.UnitTest
                     }
                 }
             }
-            isCkeck3 = true;
+            isCheck3 = true;
         }
+
+        [TestMethod]
+        [Asynchronous]
+        public void ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo()
+        {
+            isComplexObjectPublished = false;
+            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAMessageIsPublished";
+            unitTest.TestCaseName = "ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo";
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channel = "my/channel";
+            object message = new PubnubDemoObject();
+            messageComplexObjectForPublish = JsonConvert.SerializeObject(message);
+
+            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnSuccessComplexObjectPublishCodeCallback));
+            EnqueueConditional(() => isComplexObjectPublishCheck);
+
+            EnqueueCallback(() =>
+                {
+                    if (!isComplexObjectPublished)
+                    {
+                        Assert.IsTrue(isComplexObjectPublished, "Complex Object Publish Failed");
+                    }
+                    else
+                    {
+                        EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, complexObjectPublishTimetoken, -1, false, CaptureComplexObjectDetailedHistoryCallback));
+                        EnqueueConditional(() => isComplexObjectDetailedHistoryCheck);
+                        EnqueueCallback(() => Assert.IsTrue(isComplexObjectDetailedHistory, "Unable to match the successful unencrypt object Publish"));
+                    }
+                });
+
+            EnqueueTestComplete();
+        }
+
+        [Asynchronous]
+        private void ReturnSuccessComplexObjectPublishCodeCallback(string result)
+        {
+            if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
+            {
+                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                if (deserializedMessage is object[])
+                {
+                    long statusCode = Int64.Parse(deserializedMessage[0].ToString());
+                    string statusMessage = (string)deserializedMessage[1];
+                    if (statusCode == 1 && statusMessage.ToLower() == "sent")
+                    {
+                        isComplexObjectPublished = true;
+                        complexObjectPublishTimetoken = Convert.ToInt64(deserializedMessage[2].ToString());
+                    }
+                }
+            }
+
+            isComplexObjectPublishCheck = true;
+
+        }
+
+        [Asynchronous]
+        private void CaptureComplexObjectDetailedHistoryCallback(string result)
+        {
+            if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
+            {
+                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                if (deserializedMessage is object[])
+                {
+                    JArray message = deserializedMessage[0] as JArray;
+                    if (message != null && message[0].ToString(Formatting.None) == messageComplexObjectForPublish)
+                    {
+                        isComplexObjectDetailedHistory = true;
+                    }
+                }
+            }
+
+            isComplexObjectDetailedHistoryCheck = true;
+        }
+
+        [TestMethod]
+        [Asynchronous]
+        public void ThenDisableJsonEncodeShouldSendSerializedObjectMessage()
+        {
+            isSerializedObjectMessagePublished = false;
+            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            pubnub.EnableJsonEncodingForPublish = false;
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAMessageIsPublished";
+            unitTest.TestCaseName = "ThenDisableJsonEncodeShouldSendSerializedObjectMessage";
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channel = "my/channel";
+            object message = "{\"operation\":\"ReturnData\",\"channel\":\"Mobile1\",\"sequenceNumber\":0,\"data\":[\"ping 1.0.0.1\"]}";
+            serializedObjectMessageForPublish = message.ToString();
+
+            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnSuccessSerializedObjectMessageForPublishCallback));
+            EnqueueConditional(() => isSerializedObjectMessageCheck);
+
+            EnqueueCallback(() =>
+                {
+                    if (!isSerializedObjectMessagePublished)
+                    {
+                        EnqueueCallback(() => Assert.IsTrue(isSerializedObjectMessagePublished, "Serialized Object Message Publish Failed"));
+                    }
+                    else
+                    {
+                        EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, serializedMessagePublishTimetoken, -1, false, CaptureSerializedMessagePublishDetailedHistoryCallback));
+                        EnqueueConditional(() => isSerializedMessageDetailedHistoryCheck);
+                        EnqueueCallback(() => Assert.IsTrue(isSerializedObjectMessageDetailedHistory, "Unable to match the successful serialized object message Publish"));
+                    }
+                });
+
+            EnqueueTestComplete();
+        }
+
+        [Asynchronous]
+        private void ReturnSuccessSerializedObjectMessageForPublishCallback(string result)
+        {
+            if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
+            {
+                object[] deserializedResult = JsonConvert.DeserializeObject<object[]>(result);
+                if (deserializedResult is object[])
+                {
+                    long statusCode = Int64.Parse(deserializedResult[0].ToString());
+                    string statusMessage = (string)deserializedResult[1];
+                    if (statusCode == 1 && statusMessage.ToLower() == "sent")
+                    {
+                        isSerializedObjectMessagePublished = true;
+                        serializedMessagePublishTimetoken = Convert.ToInt64(deserializedResult[2].ToString());
+                    }
+                }
+            }
+            isSerializedObjectMessageCheck = true;
+        }
+
+        [Asynchronous]
+        private void CaptureSerializedMessagePublishDetailedHistoryCallback(string result)
+        {
+            if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
+            {
+                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                if (deserializedMessage is object[])
+                {
+                    JArray message = deserializedMessage[0] as JArray;
+                    if (message != null && message[0].ToString(Formatting.None) == serializedObjectMessageForPublish)
+                    {
+                        isSerializedObjectMessageDetailedHistory = true;
+                    }
+                }
+            }
+
+            isSerializedMessageDetailedHistoryCheck = true;
+        }
+
+        [TestMethod]
+        [Asynchronous]
+        public void ThenLargeMessageShoudFailWithMessageTooLargeInfo()
+        {
+            isLargeMessagePublished = false;
+            Pubnub pubnub = new Pubnub("demo", "demo", "", "", true);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAMessageIsPublished";
+            unitTest.TestCaseName = "ThenLargeMessageShoudFailWithMessageTooLargeInfo";
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channel = "my/channel";
+            string message = messageLarge2K.Substring(0,1320);
+
+            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnPublishMessageTooLargeInfoCallback));
+            EnqueueConditional(() => isPublishMessageTooLargeCheck);
+            EnqueueCallback(() => Assert.IsTrue(isLargeMessagePublished, "Message Too Large is not failing as expected."));
+
+            EnqueueTestComplete();
+        }
+
+        [Asynchronous]
+        private void ReturnPublishMessageTooLargeInfoCallback(string result)
+        {
+            if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
+            {
+                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                if (deserializedMessage is object[])
+                {
+                    long statusCode = Int64.Parse(deserializedMessage[0].ToString());
+                    string statusMessage = (string)deserializedMessage[1];
+                    if (statusCode == 0 && statusMessage.ToLower() == "message too large")
+                    {
+                        isLargeMessagePublished = true;
+                    }
+                }
+            }
+            isPublishMessageTooLargeCheck = true;
+        }
+
+
     }
 }
