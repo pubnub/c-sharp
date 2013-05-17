@@ -1925,7 +1925,8 @@ namespace PubNubMessaging.Core
         {
             string json = "";
             int pos = responseString.LastIndexOf('\n');
-            if ((responseString.StartsWith("HTTP/1.1 200 OK") || (responseString.StartsWith("HTTP/1.0 200 OK")) && (pos != -1)))
+            if ((responseString.StartsWith("HTTP/1.1 ") || responseString.StartsWith("HTTP/1.0 "))
+			     && (pos != -1) && responseString.Length >= pos + 1)
             {
                 json = responseString.Substring(pos + 1);
             }
