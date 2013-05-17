@@ -8,13 +8,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-
-using System.Runtime.Serialization.Json;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 
-
-namespace PubnubWindowsPhone.Test.UnitTest
+namespace PubnubSilverlight.UnitTest
 {
     /// <summary>
     /// Custom class for testing the encryption and decryption 
