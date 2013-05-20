@@ -26,6 +26,36 @@ Web Player DLL version was downloaded from Unity forum site. http://forum.unity3
 2. "UUnit" menu will be visible to run unit tests. This menu item was visible due to already UUnit unity package.
 3. Make Console tab as active tab and then Click UUnit so that unit test results will be visible in console.
 
+#### Potential Errors and their resolutions:
+
+1) Internal compiler error. See the console log for more information. output was:
+
+Unhandled Exception: System.TypeLoadException: Could not load type 'Newtonsoft.Json.Linq.JContainer' from assembly 'Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed'
+
+Resolution:
+
+Go To Edit -> Project Settings --> Player --> Inspector tab displays.
+In Inspector tab window, Under  Per-Platform settings --> "Settings for PC, Mac & Linux Standalone", Optimization section, Set Api Compatibility Level to .NET 2.0.
+
+Go To File -> Build Settings -> Under Platform select "PC, Mac & Linux Standalone". 
+Under "PC, Mac & Linux Standalone" section, Set Target Platform to Windows and Architecture to "x86_x64" (for 64 bit OS)
+
+
+
+2) Internal compiler error. See the console log for more information. output was:
+
+Unhandled Exception: System.Reflection.ReflectionTypeLoadException: The classes in the module cannot be loaded.
+
+
+Resolution: This error occurs mostly due to incompatible JSON library. Unity Standalone version is compatible with JSON.net library binary versions targeting .NET Framework 2.0 or 3.5. Please use JSON.NET versions supporting .NET20/.NET35 until future versions support.
+
+
+3) Internal compiler error. See the console log for more information. output was:
+Unhandled Exception: System.TypeLoadException: Could not load type 'System.Runtime.Versioning.TargetFrameworkAttribute' from assembly 'Newtonsoft.Json'
+
+Resolution: Unity Standalone version works only on Windows OS platforms. Current version do not support Unity Android or iOS or any other mobile platform.
+
+
 
 * NOTE: "/" (slash) being part of channel name will not work. So it is recommeded to avoid using "/" in channel names.
 
