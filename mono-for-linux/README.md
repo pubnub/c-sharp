@@ -8,7 +8,7 @@ Open 3.4/PubNub-Messaging/PubNub-Console/PubNub-Messaging.csproj, the example Pu
 3.4/PubNub-Messaging/PubNubTest contains the Unit test cases.
 
 Please ensure that in order to run on Mono the constant in the pubnub.cs file should be set to "true"
-OVERRIDE_TCP_KEEP_ALIVE = true;
+overrideTcpKeepAlive = true;
 
 In the app.config both the projects the value of the key "initializeData" should be full path with rw access default value="/tmp/pubnub-messaging.log".
 
