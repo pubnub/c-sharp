@@ -35,3 +35,4 @@
 /silverlight/3.4/*/*.user
 /silverlight/3.4/*/*.suo
 /silverlight/3.4/*/bin/*
+.DS_Store

@@ -3,24 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using PubNubMessaging.Core;
+using System.Net;
+using System.IO;
 
 namespace PubNubMessaging.Tests
 {
     public class PubnubUnitTest : IPubnubUnitTest
     {
-        private bool enableStubTest = false;
-        private string testClassName = "";
-        private string testCaseName = "";
+        private bool _enableStubTest = false;
+        private string _testClassName = "";
+        private string _testCaseName = "";
 
         public bool EnableStubTest
         {
             get
             {
-                return enableStubTest;
+                return _enableStubTest;
             }
             set
             {
-                enableStubTest = value;
+                _enableStubTest = value;
             }
         }
 
@@ -155,7 +157,7 @@ namespace PubNubMessaging.Tests
         private Dictionary<string, string> LoadWhenAMessageIsPublishedThenItShouldReturnSuccessCodeAndInfo()
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
-            data.Add("/publish/demo/demo/0/hello_world/0/\"Pubnub API Usage Example\"", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo/demo/0/hello_world/0/%22Pubnub%20API%20Usage%20Example%22", "[1,\"Sent\",\"13559014566792817\"]");
             data.Add("/v2/history/sub-key/demo/channel/hello_world", "[[\"Pubnub API Usage Example\"],13557486057035336,13559006802662769]");
             return data;
         }
@@ -163,21 +165,22 @@ namespace PubNubMessaging.Tests
         private Dictionary<string, string> LoadWhenAMessageIsPublishedThenItShouldReturnSuccessCodeAndInfoWhenEncrypted()
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
-            data.Add("/publish/demo/demo/0/hello_world/0/\"5c69IWbJmfgAF18380MRmWe+1V3gHYH4Wxnlzm4l0RM=\"", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo/demo/0/hello_world/0/%225c69IWbJmfgAF18380MRmWe%2B1V3gHYH4Wxnlzm4l0RM%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
             return data;
         }
 
         Dictionary<string, string> LoadWhenAMessageIsPublishedThenItShouldReturnSuccessCodeAndInfoWhenEncryptedAndSecretKeyed()
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
-            data.Add("/publish/demo/demo/73b3782110165adcecf3712fb382a2f8/hello_world/0/\"5c69IWbJmfgAF18380MRmWe+1V3gHYH4Wxnlzm4l0RM=\"", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo/demo/73b3782110165adcecf3712fb382a2f8/hello_world/0/%225c69IWbJmfgAF18380MRmWe%2B1V3gHYH4Wxnlzm4l0RM%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
             return data;
         }
 
         Dictionary<string, string> LoadWhenAMessageIsPublishedThenItShouldReturnSuccessCodeAndInfoForComplexMessage()
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
-            data.Add("/publish/demo/demo/0/hello_world/0/{\"foo\":\"hi!\",\"bar\":[1,2,3,4,5]}", "[1,\"Sent\",\"13609434515497075\"]");
+            //data.Add("/publish/demo/demo/0/hello_world/0/{\"foo\":\"hi!\",\"bar\":[1,2,3,4,5]}", "[1,\"Sent\",\"13609434515497075\"]");
+            data.Add("/publish/demo/demo/0/hello_world/0/%7B%22foo%22%3A%22hi%21%22%2C%22bar%22%3A%5B1%2C2%2C3%2C4%2C5%5D%7D", "[1,\"Sent\",\"13609434515497075\"]");
             return data;    
         }
 
@@ -484,17 +487,25 @@ namespace PubNubMessaging.Tests
           return data;
         }
 
-        public string GetStubResponse(Uri request)
+        Dictionary<string, string> LoadWhenAMessageIsPublishedThenLargeMessageShoudFailWithMessageTooLargeInfo()
         {
-            Dictionary<string,string> responseDictionary = null;
-            string response = "!! Stub Response Not Assigned !!";
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo/demo/0/my/channel/0/%22This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20This%20is%20a%20large%20message%20test%20which%20will%20return%20an%20error%20message.%20%22", "[0,\"Message Too Large\",\"13559014566792817\"]");
+            return data;
+        }
+        
+        public string GetStubResponse(HttpWebRequest request)
+        {
+            Uri requestUri = request.RequestUri;
 
+            Dictionary<string,string> responseDictionary = null;
+            string stubResponse = "!! Stub Response Not Assigned !!";
             //string lookUpString = request.PathAndQuery;
 
-            switch (testClassName)
+            switch (_testClassName)
             {
                 case "WhenAClientIsPresented":
-                    switch (testCaseName)
+                    switch (_testCaseName)
                     {
                         case "ThenPresenceShouldReturnReceivedMessage":
                           responseDictionary = LoadWhenAClientIsPresentedThenPresenceShouldReturnReceivedMessage();
@@ -513,7 +524,7 @@ namespace PubNubMessaging.Tests
                     }
                     break;
                 case "WhenAMessageIsPublished":
-                    switch (testCaseName)
+                    switch (_testCaseName)
                     {
 
                         case "ThenItShouldReturnSuccessCodeAndInfoForEncryptedComplexMessage2":
@@ -558,12 +569,15 @@ namespace PubNubMessaging.Tests
                         case "IfSSLNotProvidedThenDefaultShouldBeFalse":
                             responseDictionary = LoadWhenAMessageIsPublishedIfSSLNotProvidedThenDefaultShouldBeFalse();
                             break;
+                        case "ThenLargeMessageShoudFailWithMessageTooLargeInfo":
+                            responseDictionary = LoadWhenAMessageIsPublishedThenLargeMessageShoudFailWithMessageTooLargeInfo();    
+                            break;
                         default:
                             break;
                     }
                     break;
                 case "WhenDetailedHistoryIsRequested":
-                    switch (testCaseName)
+                    switch (_testCaseName)
                     {
 
                         case "DetailedHistoryDecryptedExample":
@@ -628,7 +642,7 @@ namespace PubNubMessaging.Tests
                     }
                     break;
                 case "WhenGetRequestServerTime":
-                    switch (testCaseName)
+                    switch (_testCaseName)
                     {
                         case "ThenItShouldReturnTimeStamp":
                             responseDictionary = LoadWhenGetRequestServerTimeThenItShouldReturnTimeStamp();
@@ -638,7 +652,7 @@ namespace PubNubMessaging.Tests
                     }
                     break;
                 case "WhenSubscribedToAChannel":
-                    switch (testCaseName)
+                    switch (_testCaseName)
                     {
                         case "ThenSubscriberShouldBeAbleToReceiveManyMessages":
                           responseDictionary = LoadWhenSubscribedToAChannelThenSubscriberShouldBeAbleToReceiveManyMessages();
@@ -669,7 +683,7 @@ namespace PubNubMessaging.Tests
                     }
                     break;
                 case "WhenUnsubscribedToAChannel":
-                  switch (testCaseName)
+                  switch (_testCaseName)
                   {
                     case "ThenShouldReturnUnsubscribedMessage":
                       responseDictionary = LoadWhenUnsubscribedToAChannelThenShouldReturnUnsubscribedMessage();
@@ -684,24 +698,33 @@ namespace PubNubMessaging.Tests
                 default:
                     break;
             }
-
-            if (responseDictionary != null && responseDictionary.ContainsKey(request.LocalPath))
+            if (responseDictionary != null && responseDictionary.ContainsKey(requestUri.AbsolutePath))
             {
-                response = responseDictionary[request.LocalPath];
+              stubResponse = responseDictionary[requestUri.AbsolutePath];
+              if (_testClassName == "WhenAMessageIsPublished" && _testCaseName == "ThenLargeMessageShoudFailWithMessageTooLargeInfo")
+              {
+                PubnubWebResponse stubWebResponse = new PubnubWebResponse(new MemoryStream(Encoding.UTF8.GetBytes(stubResponse)), HttpStatusCode.BadRequest);
+                WebException largeMessageException = new WebException("The remote server returned an error: (400) Bad Request", null, WebExceptionStatus.ProtocolError, stubWebResponse);
+                throw largeMessageException;
+              }
+            }
+            else
+            {
+              stubResponse = "!! Stub Response Not Assigned !!";
             }
 
-            return response;
+      return stubResponse;
         }
 
         public string TestCaseName
         {
             get
             {
-                return testCaseName;
+                return _testCaseName;
             }
             set
             {
-                testCaseName = value;
+                _testCaseName = value;
             }
         }
 
@@ -710,11 +733,11 @@ namespace PubNubMessaging.Tests
         {
             get
             {
-                return testClassName;
+                return _testClassName;
             }
             set
             {
-                testClassName = value;
+                _testClassName = value;
             }
         }
     }

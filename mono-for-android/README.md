@@ -9,7 +9,7 @@ Run the project in the emulator to see a working example. The main functionality
 3.4/PubNub-Messaging/Andr.Unit contains the Unit test cases. Run the project to see the unit test results,
 
 Please ensure that in order to run on Mono the constant in the pubnub.cs file should be set to "true"
-OVERRIDE_TCP_KEEP_ALIVE = true;
+overrideTcpKeepAlive = true;
 
 When creating a new project or a new configuration please add a compiler flag by going into the "Options -> Compiler -> Define Symbols" and adding "MONODROID;" to it.
 

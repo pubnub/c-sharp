@@ -360,6 +360,33 @@ namespace PubNubMessaging.Tests
             Common common = new Common();
             Assert.AreEqual(false, pubnub.Publish(channel, message, common.DisplayReturnMessage));
         }
+
+        [Test]
+        public void ThenLargeMessageShoudFailWithMessageTooLargeInfo(){
+            Pubnub pubnub = new Pubnub(
+                "demo",
+                "demo",
+                "",
+                "",
+                false
+                );
+            string channel = "hello_world";
+            string messageLarge2K = "This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. This is a large message test which will return an error message. ";
+            
+            Common common = new Common();
+            
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenAMessageIsPublished", "ThenLargeMessageShoudFailWithMessageTooLargeInfo");
+            
+            common.DeliveryStatus = false;
+            common.Response = null;
+            
+            pubnub.Publish(channel, messageLarge2K, common.DisplayReturnMessage);
+            //wait till the response is received from the server
+            while (!common.DeliveryStatus) ;
+            IList<object> fields = common.Response as IList<object>;
+            string sent = fields[1].ToString();
+            Assert.AreEqual("Message Too Large", sent);
+        }
     }
 }
 
