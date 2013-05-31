@@ -1,18 +1,15 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Andr.Unit-master/Andr.Unit/PubnubUnitTest.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="PubNub_Messaging/Pubnub.cs">
     <Files>
-      <File FileName="PubNub_Messaging/Pubnub.cs" Line="1" Column="1" />
-      <File FileName="Andr.Unit-master/Andr.Unit/PubnubUnitTest.cs" Line="12" Column="3" />
-      <File FileName="../../MonoTouch/Pubnub-Messaging/Pubnub-Messaging.Tests/WhenAMessageIsPublished.cs" Line="1" Column="1" />
-      <File FileName="Andr.Unit-master/Andr.Unit/WhenAMessageIsPublished.cs" Line="1" Column="1" />
+      <File FileName="PubNub_Messaging/Pubnub.cs" Line="2039" Column="3" />
+      <File FileName="Andr.Unit-master/Andr.Unit/PubnubUnitTest.cs" Line="1" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
-          <Node name="Andr.Unit" expanded="True">
-            <Node name="PubnubUnitTest.cs" selected="True" />
-          </Node>
+          <Node name="Andr.Unit" expanded="True" />
+          <Node name="PubNubMessaging" expanded="True" selected="True" />
         </State>
       </Pad>
       <Pad Id="ClassPad">
@@ -36,6 +33,6 @@
   <MonoDevelop.Ide.DebuggingService.PinnedWatches>
     <Watch file="PubNub_Messaging/Pubnub.cs" line="1526" offsetX="915" offsetY="22880" expression="cert" liveUpdate="False" />
   </MonoDevelop.Ide.DebuggingService.PinnedWatches>
-  <MonoDevelop.Ide.ItemProperties.Andr.Unit AndroidDeviceId-Debug="emulator-5554" />
-  <MonoDevelop.Ide.ItemProperties.PubNubMessaging AndroidDeviceId-Debug="emulator-5554" />
+  <MonoDevelop.Ide.ItemProperties.PubNubMessaging AndroidDeviceId-Debug="emulator-5554" AndroidDeviceId-Release="emulator-5554" />
+  <MonoDevelop.Ide.ItemProperties.Andr.Unit AndroidDeviceId-Debug="emulator-5554" AndroidDeviceId-Release="emulator-5554" />
 </Properties>

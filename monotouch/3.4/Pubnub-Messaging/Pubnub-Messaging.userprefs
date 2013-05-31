@@ -1,20 +1,17 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhone.6.1" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Pubnub-Messaging.Tests/WhenAMessageIsPublished.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Pubnub-Messaging/Pubnub.cs">
     <Files>
-      <File FileName="../../mono-mac/3.4/PubNub-Messaging/PubNub-Console/Pubnub.cs" Line="1" Column="1" />
-      <File FileName="Pubnub-Messaging/Pubnub.cs" Line="1" Column="1" />
-      <File FileName="Pubnub-Messaging.Tests/PubnubUnitTest.cs" Line="1" Column="1" />
-      <File FileName="../../mono-mac/3.4/PubNub-Messaging/PubNubTest/WhenAMessageIsPublished.cs" Line="1" Column="1" />
-      <File FileName="Pubnub-Messaging.Tests/WhenAMessageIsPublished.cs" Line="365" Column="8" />
+      <File FileName="Pubnub-Messaging/Pubnub.cs" Line="3" Column="14" />
+      <File FileName="Pubnub-Messaging.Tests/PubnubUnitTest.cs" Line="7" Column="12" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
-          <Node name="Pubnub-Messaging" expanded="True" />
-          <Node name="Pubnub-Messaging.Tests" expanded="True">
-            <Node name="WhenAMessageIsPublished.cs" selected="True" />
+          <Node name="Pubnub-Messaging" expanded="True">
+            <Node name="Pubnub.cs" selected="True" />
           </Node>
+          <Node name="Pubnub-Messaging.Tests" expanded="True" />
         </State>
       </Pad>
       <Pad Id="ClassPad">

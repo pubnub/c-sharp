@@ -9,13 +9,11 @@
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
-          <Node name="PubNub-Messaging" expanded="True">
+          <Node name="PubNub-Messaging" expanded="True" selected="True">
             <Node name="References" expanded="True" />
             <Node name="Library" expanded="True" />
           </Node>
-          <Node name="PubNub-Messaging.Tests" expanded="True">
-            <Node name="PubnubUnitTest.cs" selected="True" />
-          </Node>
+          <Node name="PubNub-Messaging.Tests" expanded="True" />
         </State>
       </Pad>
       <Pad Id="ClassPad">
