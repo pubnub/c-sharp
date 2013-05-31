@@ -1,4 +1,4 @@
-﻿//Build Date: May 16, 2013
+﻿//Build Date: May 31, 2013
 #if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
 #define TRACE
 #endif
@@ -252,7 +252,7 @@ namespace PubNubMessaging.Core
          */
         private void Init(string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
         {
-#if(MONOTOUCH || MONODROID || SILVERLIGHT || WINDOWS_PHONE || UNITY_STANDALONE || UNITY_WEBPLAYER)
+#if(MONOTOUCH || MONODROID || SILVERLIGHT || WINDOWS_PHONE || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
             LoggingMethod.LogLevel = pubnubLogLevel;
 #else
             string configuredLogLevel = ConfigurationManager.AppSettings["PubnubMessaging.LogLevel"];
@@ -1490,7 +1490,6 @@ namespace PubNubMessaging.Core
                     }
                 }
 #elif (SILVERLIGHT || WINDOWS_PHONE)
-                
                 //For WP7, Ensure that the RequestURI length <= 1599
                 //For SL, Ensure that the RequestURI length <= 1482 for Large Text Message. If RequestURI Length < 1343, Successful Publish occurs
                 IAsyncResult asyncResult = request.BeginGetResponse(new AsyncCallback(UrlProcessResponseCallback<T>), pubnubRequestState);
@@ -1927,6 +1926,7 @@ namespace PubNubMessaging.Core
             int pos = responseString.LastIndexOf('\n');
             if ((responseString.StartsWith("HTTP/1.1 ") || responseString.StartsWith("HTTP/1.0 "))
 			     && (pos != -1) && responseString.Length >= pos + 1)
+
             {
                 json = responseString.Substring(pos + 1);
             }
@@ -2092,25 +2092,11 @@ namespace PubNubMessaging.Core
                     {
                         currentStatusCode = ((HttpWebResponse)webEx.Response).StatusCode;
                     }
-                    //else if (webEx.Response.GetType().ToString() == "System.Net.Browser.BrowserHttpWebResponse")
-                    //{
-                    //    currentStatusCode = ((HttpWebResponse)webEx.Response).StatusCode;
-                    //    if (currentStatusCode == HttpStatusCode.NotFound)
-                    //    {
-                    //        currentStatusCode = HttpStatusCode.BadRequest;
-                    //    }
-                    //    else
-                    //    {
-                    //        currentStatusCode = ((PubnubWebResponse)webEx.Response).HttpStatusCode;
-                    //    }
-                    //}
                     else
                     {
                         currentStatusCode = ((PubnubWebResponse)webEx.Response).HttpStatusCode;
                     }
-
                     PubnubWebResponse exceptionResponse = new PubnubWebResponse(webEx.Response, currentStatusCode);
-                    
                     if (exceptionResponse != null && exceptionResponse.HttpStatusCode == HttpStatusCode.BadRequest)
                     {
                         asynchRequestState.Response = exceptionResponse;
