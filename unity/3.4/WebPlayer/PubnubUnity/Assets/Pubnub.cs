@@ -1,4 +1,4 @@
-﻿//Build Date: May 11, 2013
+﻿//Build Date: May 31, 2013
 #if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
 #define TRACE
 #endif
@@ -252,7 +252,7 @@ namespace PubNubMessaging.Core
          */
         private void Init(string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
         {
-#if(MONOTOUCH || MONODROID || SILVERLIGHT || WINDOWS_PHONE || UNITY_STANDALONE || UNITY_WEBPLAYER)
+#if(MONOTOUCH || MONODROID || SILVERLIGHT || WINDOWS_PHONE || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
             LoggingMethod.LogLevel = pubnubLogLevel;
 #else
             string configuredLogLevel = ConfigurationManager.AppSettings["PubnubMessaging.LogLevel"];
@@ -1918,7 +1918,9 @@ namespace PubNubMessaging.Core
         {
             string json = "";
             int pos = responseString.LastIndexOf('\n');
-            if ((responseString.StartsWith("HTTP/1.1 200 OK") || (responseString.StartsWith("HTTP/1.0 200 OK")) && (pos != -1)))
+            if ((responseString.StartsWith("HTTP/1.1 ") || responseString.StartsWith("HTTP/1.0 "))
+			     && (pos != -1) && responseString.Length >= pos + 1)
+
             {
                 json = responseString.Substring(pos + 1);
             }
