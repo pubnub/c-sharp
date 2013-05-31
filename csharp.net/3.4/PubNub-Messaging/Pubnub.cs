@@ -1,4 +1,4 @@
-﻿//Build Date: May 11, 2013
+﻿//Build Date: May 31, 2013
 #if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
 #define TRACE
 #endif
@@ -30,7 +30,7 @@ using Newtonsoft.Json.Linq;
 #if (SILVERLIGHT || WINDOWS_PHONE)
 using System.Windows.Threading;
 using System.IO.IsolatedStorage;
-
+using System.Net.Browser;
 #endif
 #if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
 using System.Net.Security;
@@ -252,7 +252,7 @@ namespace PubNubMessaging.Core
          */
         private void Init(string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
         {
-#if(MONOTOUCH || MONODROID || SILVERLIGHT || WINDOWS_PHONE || UNITY_STANDALONE || UNITY_WEBPLAYER)
+#if(MONOTOUCH || MONODROID || SILVERLIGHT || WINDOWS_PHONE || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
             LoggingMethod.LogLevel = pubnubLogLevel;
 #else
             string configuredLogLevel = ConfigurationManager.AppSettings["PubnubMessaging.LogLevel"];
@@ -267,6 +267,10 @@ namespace PubNubMessaging.Core
             }
 #endif
 
+#if (SILVERLIGHT || WINDOWS_PHONE)
+            HttpWebRequest.RegisterPrefix("https://", WebRequestCreator.ClientHttp);
+            HttpWebRequest.RegisterPrefix("http://", WebRequestCreator.ClientHttp);
+#endif
             this.publishKey = publishKey;
             this.subscribeKey = subscribeKey;
             this.secretKey = secretKey;
@@ -1486,6 +1490,8 @@ namespace PubNubMessaging.Core
                     }
                 }
 #elif (SILVERLIGHT || WINDOWS_PHONE)
+                //For WP7, Ensure that the RequestURI length <= 1599
+                //For SL, Ensure that the RequestURI length <= 1482 for Large Text Message. If RequestURI Length < 1343, Successful Publish occurs
                 IAsyncResult asyncResult = request.BeginGetResponse(new AsyncCallback(UrlProcessResponseCallback<T>), pubnubRequestState);
                 Timer webRequestTimer = new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.Type) * 1000, Timeout.Infinite);
 #else
@@ -1918,7 +1924,9 @@ namespace PubNubMessaging.Core
         {
             string json = "";
             int pos = responseString.LastIndexOf('\n');
-            if ((responseString.StartsWith("HTTP/1.1 200 OK") || (responseString.StartsWith("HTTP/1.0 200 OK")) && (pos != -1)))
+            if ((responseString.StartsWith("HTTP/1.1 ") || responseString.StartsWith("HTTP/1.0 "))
+			     && (pos != -1) && responseString.Length >= pos + 1)
+
             {
                 json = responseString.Substring(pos + 1);
             }
@@ -2079,7 +2087,8 @@ namespace PubNubMessaging.Core
                 if (asynchRequestState != null && asynchRequestState.Type == ResponseType.Publish)
                 {
                     HttpStatusCode currentStatusCode;
-                    if (webEx.Response.GetType().ToString() == "System.Net.HttpWebResponse")
+                    if (webEx.Response.GetType().ToString() == "System.Net.HttpWebResponse"
+                        || webEx.Response.GetType().ToString() == "System.Net.Browser.ClientHttpWebResponse")
                     {
                         currentStatusCode = ((HttpWebResponse)webEx.Response).StatusCode;
                     }
