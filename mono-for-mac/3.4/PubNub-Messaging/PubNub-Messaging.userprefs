@@ -1,10 +1,10 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release|x86" />
   <MonoDevelop.Ide.Workbench ActiveDocument="PubNubTest/PubnubUnitTest.cs">
     <Files>
-      <File FileName="PubNubTest/PubnubUnitTest.cs" Line="24" Column="14" />
+      <File FileName="PubNubTest/PubnubUnitTest.cs" Line="20" Column="14" />
       <File FileName="PubNub-Console/PubnubExample.cs" Line="1" Column="1" />
-      <File FileName="PubNub-Console/Pubnub.cs" Line="6" Column="19" />
+      <File FileName="PubNub-Console/Pubnub.cs" Line="1" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -38,11 +38,11 @@
       </Pad>
       <Pad Id="MonoDevelop.NUnit.TestPad">
         <State expanded="True">
-          <Node name="PubNub-Messaging.Tests" expanded="True">
-            <Node name="PubNubMessaging" expanded="True" selected="True">
+          <Node name="PubNub-Messaging.Tests" expanded="True" selected="True">
+            <Node name="PubNubMessaging" expanded="True">
               <Node name="Tests" expanded="True">
-                <Node name="WhenDetailedHistoryIsRequested" expanded="True" />
-                <Node name="WhenUnsubscribedToAChannel" expanded="True" />
+                <Node name="WhenGetRequestServerTime" expanded="True" />
+                <Node name="WhenSubscribedToAChannel" expanded="True" />
               </Node>
             </Node>
           </Node>

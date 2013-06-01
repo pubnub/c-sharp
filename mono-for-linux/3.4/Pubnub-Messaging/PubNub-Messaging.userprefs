@@ -1,17 +1,18 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="PubNubTest/PubnubUnitTest.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="PubNub-Console/Pubnub.cs">
     <Files>
-      <File FileName="PubNub-Console/Pubnub.cs" Line="6" Column="19" />
-      <File FileName="PubNubTest/PubnubUnitTest.cs" Line="13" Column="38" />
+      <File FileName="PubNub-Console/Pubnub.cs" Line="1" Column="1" />
+      <File FileName="PubNubTest/PubnubUnitTest.cs" Line="13" Column="44" />
       <File FileName="PubNubTest/WhenAClientIsPresented.cs" Line="174" Column="23" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
-          <Node name="PubNub-Messaging" expanded="True" selected="True">
+          <Node name="PubNub-Messaging" expanded="True">
             <Node name="References" expanded="True" />
             <Node name="Library" expanded="True" />
+            <Node name="Pubnub.cs" selected="True" />
           </Node>
           <Node name="PubNub-Messaging.Tests" expanded="True" />
         </State>
@@ -44,6 +45,8 @@
                 <Node name="WhenAClientIsPresented" expanded="True">
                   <Node name="ThenPresenceShouldReturnCustomUUID" selected="True" />
                 </Node>
+                <Node name="WhenDetailedHistoryIsRequested" expanded="True" />
+                <Node name="WhenGetRequestServerTime" expanded="True" />
                 <Node name="WhenSubscribedToAChannel" expanded="True" />
               </Node>
             </Node>

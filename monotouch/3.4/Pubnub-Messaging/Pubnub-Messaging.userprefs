@@ -1,16 +1,14 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhone.6.1" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Pubnub-Messaging/Pubnub.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Pubnub-Messaging.Tests/PubnubUnitTest.cs">
     <Files>
-      <File FileName="Pubnub-Messaging/Pubnub.cs" Line="3" Column="14" />
-      <File FileName="Pubnub-Messaging.Tests/PubnubUnitTest.cs" Line="7" Column="12" />
+      <File FileName="Pubnub-Messaging/Pubnub.cs" Line="2091" Column="94" />
+      <File FileName="Pubnub-Messaging.Tests/PubnubUnitTest.cs" Line="17" Column="29" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
-          <Node name="Pubnub-Messaging" expanded="True">
-            <Node name="Pubnub.cs" selected="True" />
-          </Node>
+          <Node name="Pubnub-Messaging" selected="True" />
           <Node name="Pubnub-Messaging.Tests" expanded="True" />
         </State>
       </Pad>
