@@ -43,7 +43,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "my/channel";
 
-            pubnub.DetailedHistory<string>(channel, 10, DetailedHistoryCount10Callback);
+            pubnub.DetailedHistory<string>(channel, 10, DetailedHistoryCount10Callback, DummyErrorCallback);
             mreMessageCount10.WaitOne(310 * 1000);
             Assert.IsTrue(message10Received, "Detailed History Failed");
         }
@@ -84,7 +84,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "my/channel";
 
-            pubnub.DetailedHistory<string>(channel, -1, -1, 10, true, DetailedHistoryCount10ReverseTrueCallback);
+            pubnub.DetailedHistory<string>(channel, -1, -1, 10, true, DetailedHistoryCount10ReverseTrueCallback, DummyErrorCallback);
             mreMessageCount10ReverseTrue.WaitOne(310 * 1000);
             Assert.IsTrue(message10ReverseTrueReceived, "Detailed History Failed");
         }
@@ -129,14 +129,14 @@ namespace PubNubMessaging.Tests
             for (int index = 0; index < 10; index++)
             {
                 pubnub.Publish<string>(channel, 
-                    string.Format("DetailedHistoryStartTimeWithReverseTrue {0}", index), 
-                    DetailedHistorySamplePublishCallback);
+                    string.Format("DetailedHistoryStartTimeWithReverseTrue {0}", index),
+                    DetailedHistorySamplePublishCallback, DummyErrorCallback);
                 mrePublishStartReverseTrue.WaitOne();
             }
 
             Thread.Sleep(2000);
 
-            pubnub.DetailedHistory<string>(channel, startTimeWithReverseTrue, DetailedHistoryStartWithReverseTrueCallback, true);
+            pubnub.DetailedHistory<string>(channel, startTimeWithReverseTrue, DetailedHistoryStartWithReverseTrueCallback, DummyErrorCallback, true);
             Thread.Sleep(2000);
             mreMessageStartReverseTrue.WaitOne(310 * 1000);
             Assert.IsTrue(messageStartReverseTrue, "Detailed History with Start and Reverse True Failed");
@@ -190,5 +190,11 @@ namespace PubNubMessaging.Tests
             }
             mrePublishStartReverseTrue.Set();
         }
+
+        private void DummyErrorCallback(string result)
+        {
+
+        }
+
     }
 }

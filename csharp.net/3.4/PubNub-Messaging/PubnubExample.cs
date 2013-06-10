@@ -13,6 +13,7 @@ namespace PubNubMessaging.Core
 
         static public bool deliveryStatus = false;
         static public string channel = "";
+        static public bool showErrorCallbackMessages = true;
 
         static public void Main()
         {
@@ -57,7 +58,6 @@ namespace PubNubMessaging.Core
 
             pubnub = new Pubnub("demo", "demo", "", cipheryKey,
                 (enableSSL.Trim().ToLower() == "y") ? true : false);
-
             Console.WriteLine("Use Custom Session UUID? ENTER Y for Yes, else N");
             string enableCustomUUID = Console.ReadLine();
             if (enableCustomUUID.Trim().ToLower() == "y")
@@ -228,6 +228,23 @@ namespace PubNubMessaging.Core
             }
             Console.WriteLine();
 
+            Console.WriteLine("Display ErrorCallback messages? Enter Y for Yes, Else N for No.");
+            Console.WriteLine("Default = Y  ");
+            string displayErrMessage = Console.ReadLine();
+            Console.ForegroundColor = ConsoleColor.Blue;
+            if (displayErrMessage.Trim().ToLower() == "n" )
+            {
+                showErrorCallbackMessages = false;
+                Console.WriteLine("ErrorCallback messages will NOT be displayed.");
+            }
+            else
+            {
+                showErrorCallbackMessages = true;
+                Console.WriteLine("ErrorCallback messages will  be displayed");
+            }
+            Console.ResetColor();
+            Console.WriteLine();
+
             Console.WriteLine("ENTER 1 FOR Subscribe");
             Console.WriteLine("ENTER 2 FOR Publish");
             Console.WriteLine("ENTER 3 FOR Presence");
@@ -264,7 +281,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine();
 
                         Console.WriteLine("Running subscribe()");
-                        pubnub.Subscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage);
+                        pubnub.Subscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
 
                         break;
                     case "2":
@@ -275,8 +292,12 @@ namespace PubNubMessaging.Core
                         Console.WriteLine(string.Format("Channel = {0}",channel));
                         Console.ResetColor();
 
+                        /* TO TEST SMALL TEXT PUBLISH ONLY */
                         Console.WriteLine("Enter the message for publish and press ENTER key to submit");
+                        //string publishMsg = Console.ReadLine();
 
+                        /* UNCOMMENT THE FOLLOWING CODE BLOCK TO TEST LARGE TEXT PUBLISH ONLY */
+                        #region Code To Test Large Text Publish
                         ConsoleKeyInfo enteredKey;
                         StringBuilder publishBuilder = new StringBuilder();
                         do
@@ -287,9 +308,8 @@ namespace PubNubMessaging.Core
                                 publishBuilder.Append(enteredKey.KeyChar);
                             }
                         } while (enteredKey.Key != ConsoleKey.Enter);
-
                         string publishMsg = publishBuilder.ToString();
-                        
+                        #endregion
                         
                         Console.WriteLine("Running publish()");
 
@@ -297,11 +317,11 @@ namespace PubNubMessaging.Core
                         int intData;
                         if (int.TryParse(publishMsg, out intData)) //capture numeric data
                         {
-                            pubnub.Publish<string>(channel, intData, DisplayReturnMessage);
+                            pubnub.Publish<string>(channel, intData, DisplayReturnMessage, DisplayErrorMessage);
                         }
                         else if (double.TryParse(publishMsg, out doubleData)) //capture numeric data
                         {
-                            pubnub.Publish<string>(channel, doubleData, DisplayReturnMessage);
+                            pubnub.Publish<string>(channel, doubleData, DisplayReturnMessage, DisplayErrorMessage);
                         }
                         else
                         {
@@ -311,20 +331,20 @@ namespace PubNubMessaging.Core
                                 string strMsg = publishMsg.Substring(1, publishMsg.Length - 2);
                                 if (int.TryParse(strMsg, out intData))
                                 {
-                                    pubnub.Publish<string>(channel, strMsg, DisplayReturnMessage);
+                                    pubnub.Publish<string>(channel, strMsg, DisplayReturnMessage, DisplayErrorMessage);
                                 }
                                 else if (double.TryParse(strMsg, out doubleData))
                                 {
-                                    pubnub.Publish<string>(channel, strMsg, DisplayReturnMessage);
+                                    pubnub.Publish<string>(channel, strMsg, DisplayReturnMessage, DisplayErrorMessage);
                                 }
                                 else
                                 {
-                                    pubnub.Publish<string>(channel, publishMsg, DisplayReturnMessage);
+                                    pubnub.Publish<string>(channel, publishMsg, DisplayReturnMessage, DisplayErrorMessage);
                                 }
                             }
                             else
                             {
-                                pubnub.Publish<string>(channel, publishMsg, DisplayReturnMessage);
+                                pubnub.Publish<string>(channel, publishMsg, DisplayReturnMessage, DisplayErrorMessage);
                             }
                         }
                         break;
@@ -338,7 +358,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine();
 
                         Console.WriteLine("Running presence()");
-                        pubnub.Presence<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage);
+                        pubnub.Presence<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
 
                         break;
                     case "4":
@@ -351,7 +371,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine();
 
                         Console.WriteLine("Running detailed history()");
-                        pubnub.DetailedHistory<string>(channel, 100, DisplayReturnMessage);
+                        pubnub.DetailedHistory<string>(channel, 100, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "5":
                         Console.WriteLine("Enter CHANNEL name for HereNow");
@@ -363,7 +383,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine();
 
                         Console.WriteLine("Running Here_Now()");
-                        pubnub.HereNow<string>(channel, DisplayReturnMessage);
+                        pubnub.HereNow<string>(channel, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "6":
                         Console.WriteLine("Enter CHANNEL name for Unsubscribe. Use comma to enter multiple channels.");
@@ -375,7 +395,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine();
 
                         Console.WriteLine("Running unsubscribe()");
-                        pubnub.Unsubscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayDisconnectStatusMessage);
+                        pubnub.Unsubscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayDisconnectStatusMessage, DisplayErrorMessage);
                         break;
                     case "7":
                         Console.WriteLine("Enter CHANNEL name for Presence Unsubscribe. Use comma to enter multiple channels.");
@@ -387,11 +407,11 @@ namespace PubNubMessaging.Core
                         Console.WriteLine();
 
                         Console.WriteLine("Running presence-unsubscribe()");
-                        pubnub.PresenceUnsubscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayDisconnectStatusMessage);
+                        pubnub.PresenceUnsubscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayDisconnectStatusMessage, DisplayErrorMessage);
                         break;
                     case "8":
                         Console.WriteLine("Running time()");
-                        pubnub.Time<string>(DisplayReturnMessage);
+                        pubnub.Time<string>(DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "9":
                         Console.WriteLine("Running Disconnect/auto-Reconnect Subscriber Request Connection");
@@ -431,7 +451,9 @@ namespace PubNubMessaging.Core
         /// <param name="result"></param>
         static void DisplayReturnMessage(string result)
         {
+            Console.WriteLine("REGULAR CALLBACK:");
             Console.WriteLine(result);
+            Console.WriteLine();
         }
 
         /// <summary>
@@ -440,12 +462,30 @@ namespace PubNubMessaging.Core
         /// <param name="result"></param>
         static void DisplayConnectStatusMessage(string result)
         {
+            Console.WriteLine("CONNECT CALLBACK:");
             Console.WriteLine(result);
+            Console.WriteLine();
         }
 
         static void DisplayDisconnectStatusMessage(string result)
         {
+            Console.WriteLine("DISCONNECT CALLBACK:");
             Console.WriteLine(result);
+            Console.WriteLine();
+        }
+
+        /// <summary>
+        /// Callback method for error messages
+        /// </summary>
+        /// <param name="result"></param>
+        static void DisplayErrorMessage(string result)
+        {
+            if (showErrorCallbackMessages)
+            {
+                Console.WriteLine("ERROR CALLBACK:");
+                Console.WriteLine(result);
+                Console.WriteLine();
+            }
         }
     }
 }
