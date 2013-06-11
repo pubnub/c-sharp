@@ -1,4 +1,4 @@
-﻿//Build Date: June 10, 2013
+﻿//Build Date: June 11, 2013
 #if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
 #define TRACE
 #endif
@@ -4047,11 +4047,11 @@ namespace PubNubMessaging.Core
                     SocketAsyncEventArgs sae = new SocketAsyncEventArgs();
                     sae.UserToken = state;
                     sae.RemoteEndPoint = new DnsEndPoint("pubsub.pubnub.com", 80);
-                    sae.Completed += new EventHandler<SocketAsyncEventArgs>(socketAsync_Completed);
+                    sae.Completed += new EventHandler<SocketAsyncEventArgs>(socketAsync_Completed<T>);
                     bool test = socket.ConnectAsync(sae);
 
                     mreSocketAsync.WaitOne(1000);
-                    sae.Completed -= new EventHandler<SocketAsyncEventArgs>(socketAsync_Completed);
+                    sae.Completed -= new EventHandler<SocketAsyncEventArgs>(socketAsync_Completed<T>);
                     socket.Close();
                 }
 #else
@@ -4113,16 +4113,16 @@ namespace PubNubMessaging.Core
         }
 
 #if (SILVERLIGHT || WINDOWS_PHONE)
-        static void socketAsync_Completed(object sender, SocketAsyncEventArgs e)
+        static void socketAsync_Completed<T>(object sender, SocketAsyncEventArgs e)
         {
             if (e.LastOperation == SocketAsyncOperation.Connect)
             {
                 Socket skt = sender as Socket;
-                InternetState state = e.UserToken as InternetState;
+                InternetState<T> state = e.UserToken as InternetState<T>;
                 if (state != null)
                 {
                     LoggingMethod.WriteToLog(string.Format("DateTime {0} socketAsync_Completed.", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
-                    state.callback(true);
+                    state.Callback(true);
                 }
                 mreSocketAsync.Set();
             }
