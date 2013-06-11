@@ -47,11 +47,11 @@ namespace PubnubSilverlight.UnitTest
             unitTest.TestCaseName = "ThenPresenceShouldReturnReceivedMessage";
             pubnub.PubnubUnitTest = unitTest;
 
-            EnqueueCallback(() => pubnub.Presence<string>(channel, ThenPresenceShouldReturnMessage, PresenceDummyMethodForConnectCallback));
-            EnqueueCallback(() => pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback));
+            EnqueueCallback(() => pubnub.Presence<string>(channel, ThenPresenceShouldReturnMessage, PresenceDummyMethodForConnectCallback, DummyErrorCallback));
+            EnqueueCallback(() => pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback));
             EnqueueConditional(() => subscribeConnectStatusCallbackInvoked);
             EnqueueConditional(() => subscribeCallbackInvoked);
-            EnqueueCallback(() => pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback));
+            EnqueueCallback(() => pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback));
             EnqueueConditional(() => unSubscribeCallbackInvoked);
             EnqueueCallback(() => pubnub.EndPendingRequests());
             EnqueueConditional(() => presenceReturnMessageCallbackInvoked);
@@ -150,20 +150,20 @@ namespace PubnubSilverlight.UnitTest
 
             string channel = "my/channel";
 
-            EnqueueCallback(() => pubnub.Presence<string>(channel, ThenPresenceWithCustomUUIDShouldReturnMessage, PresenceUUIDDummyMethodForConnectCallback));
+            EnqueueCallback(() => pubnub.Presence<string>(channel, ThenPresenceWithCustomUUIDShouldReturnMessage, PresenceUUIDDummyMethodForConnectCallback, DummyErrorCallback));
             //Thread.Sleep(1000);
 
             //since presence expects from stimulus from sub/unsub...
             EnqueueCallback(() =>
             {
                 pubnub.SessionUUID = customUUID;
-                pubnub.Subscribe<string>(channel, DummyMethodForSubscribeUUID, SubscribeUUIDDummyMethodForConnectCallback);
+                pubnub.Subscribe<string>(channel, DummyMethodForSubscribeUUID, SubscribeUUIDDummyMethodForConnectCallback, DummyErrorCallback);
             });
             EnqueueConditional(() => subscribeUUIDConnectStatusCallbackInvoked);
             EnqueueConditional(() => subscribeUUIDCallbackInvoked);
             //Thread.Sleep(1000);
 
-            EnqueueCallback(() => pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribeUUID, UnsubscribeUUIDDummyMethodForConnectCallback, UnsubscribeUUIDDummyMethodForDisconnectCallback));
+            EnqueueCallback(() => pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribeUUID, UnsubscribeUUIDDummyMethodForConnectCallback, UnsubscribeUUIDDummyMethodForDisconnectCallback, DummyErrorCallback));
             //Thread.Sleep(1000);
             EnqueueConditional(() => unSubscribeUUIDCallbackInvoked);
 
@@ -263,7 +263,7 @@ namespace PubnubSilverlight.UnitTest
             unitTest.TestCaseName = "IfHereNowIsCalledThenItShouldReturnInfo";
             pubnub.PubnubUnitTest = unitTest;
 
-            EnqueueCallback(() => pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage));
+            EnqueueCallback(() => pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback));
             EnqueueConditional(() => hereNowReturnMessageCallbackInvoked);
             EnqueueCallback(() => Assert.IsTrue(receivedHereNowMessage, "here_now message not received"));
 
@@ -290,7 +290,10 @@ namespace PubnubSilverlight.UnitTest
             hereNowReturnMessageCallbackInvoked = true;
         }
 
-
+        [Asynchronous]
+        private void DummyErrorCallback(string result)
+        {
+        }
 
     }
 }
