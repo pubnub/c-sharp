@@ -108,19 +108,6 @@ namespace PubNubMessaging
         private void AddToPubnubResultContainer(string result)
         {
             _recordQueue.Enqueue(result);
-            //lock (_lockObject)
-            //{
-            //    RecordStatusHolder recordHolder = new RecordStatusHolder();
-            //    recordHolder.Record = result;
-            //    recordHolder.Status = false;
-            //    _pubnubRecordHolder.Add(
-            //    int recordsCount = _pubnubResult.Count;
-            //    if (recordsCount > 50)
-            //    {
-            //        _pubnubResult.RemoveRange(0, recordsCount - 50);
-            //    }
-            //    _pubnubResult.Add(result);
-            //}
         }
 
         /// <summary>
@@ -130,7 +117,9 @@ namespace PubNubMessaging
         protected void DisplayUserCallbackMessage(string result)
         {
             UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("REGULAR CALLBACK");
             AddToPubnubResultContainer(result);
+            AddToPubnubResultContainer("");
         }
 
 
@@ -141,13 +130,29 @@ namespace PubNubMessaging
         protected void DisplayConnectCallbackMessage(string result)
         {
             UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("CONNECT CALLBACK");
             AddToPubnubResultContainer(result);
+            AddToPubnubResultContainer("");
         }
 
         protected void DisplayDisconnectCallbackMessage(string result)
         {
             UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("DISCONNECT CALLBACK");
             AddToPubnubResultContainer(result);
+            AddToPubnubResultContainer("");
+        }
+
+        /// <summary>
+        /// Callback method for error messages
+        /// </summary>
+        /// <param name="result"></param>
+        protected void DisplayErrorMessage(string result)
+        {
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("ERROR CALLBACK");
+            AddToPubnubResultContainer(result);
+            AddToPubnubResultContainer("");
         }
 
         protected void btnTime_Command(object sender, CommandEventArgs e)
@@ -215,30 +220,30 @@ namespace PubNubMessaging
             switch (requestType.ToLower())
             {
                 case "presence":
-                    pubnub.Presence<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage);
+                    pubnub.Presence<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayErrorMessage);
                     break;
                 case "subscribe":
-                    pubnub.Subscribe<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage);
+                    pubnub.Subscribe<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayErrorMessage);
                     break;
                 case "detailedhistory":
-                    pubnub.DetailedHistory<string>(channel, 10, DisplayUserCallbackMessage);
+                    pubnub.DetailedHistory<string>(channel, 10, DisplayUserCallbackMessage, DisplayErrorMessage);
                     break;
                 case "publish":
-                    pubnub.Publish<string>(channel, messageToBePublished, DisplayUserCallbackMessage);
+                    pubnub.Publish<string>(channel, messageToBePublished, DisplayUserCallbackMessage, DisplayErrorMessage);
                     txtPublishMessage.Text = "";
                     lblErrorMessage.Text = "";
                     break;
                 case "unsubscribe":
-                    pubnub.Unsubscribe<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayDisconnectCallbackMessage);
+                    pubnub.Unsubscribe<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayDisconnectCallbackMessage, DisplayErrorMessage);
                     break;
                 case "presenceunsubscribe":
-                    pubnub.PresenceUnsubscribe<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayDisconnectCallbackMessage);
+                    pubnub.PresenceUnsubscribe<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayDisconnectCallbackMessage, DisplayErrorMessage);
                     break;
                 case "herenow":
-                    pubnub.HereNow<string>(channel, DisplayUserCallbackMessage);
+                    pubnub.HereNow<string>(channel, DisplayUserCallbackMessage, DisplayErrorMessage);
                     break;
                 case "time":
-                    pubnub.Time<string>(DisplayUserCallbackMessage);
+                    pubnub.Time<string>(DisplayUserCallbackMessage, DisplayErrorMessage);
                     break;
                 case "disablenetwork":
                     pubnub.EnableSimulateNetworkFailForTestingOnly();
