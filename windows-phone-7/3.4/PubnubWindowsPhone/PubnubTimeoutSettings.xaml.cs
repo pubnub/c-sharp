@@ -20,6 +20,7 @@ namespace PubnubWindowsPhone
         string cipherKey = "";
         string sessionUUID = "";
         bool resumeOnReconnect = false;
+        bool hideErrCallbackMsg = true;
         
         int subscribeTimeoutInSeconds = 0;
         int operationTimeoutInSeconds = 0;
@@ -41,6 +42,7 @@ namespace PubnubWindowsPhone
             secretKey = NavigationContext.QueryString["secretkey"].ToString();
             sessionUUID = NavigationContext.QueryString["uuid"].ToString();
             resumeOnReconnect = Boolean.Parse(NavigationContext.QueryString["resumeOnReconnect"].ToString());
+            hideErrCallbackMsg = Boolean.Parse(NavigationContext.QueryString["hideErrCallbackMsg"].ToString());
         }
 
         private void btnContinue_Click(object sender, RoutedEventArgs e)
@@ -60,7 +62,7 @@ namespace PubnubWindowsPhone
             Int32.TryParse(txtHeartbeatInterval.Text, out heartbeatIntervalInSeconds);
             heartbeatIntervalInSeconds = (heartbeatIntervalInSeconds <= 0) ? 10 : heartbeatIntervalInSeconds;
 
-            Uri nextPage = new Uri(string.Format("/PubnubOperation.xaml?ssl={0}&cipherkey={1}&secretkey={2}&uuid={3}&subtimeout={4}&optimeout={5}&retries={6}&retryinterval={7}&beatinterval={8}&resumeOnReconnect={9}", ssl, cipherKey, secretKey, sessionUUID, subscribeTimeoutInSeconds, operationTimeoutInSeconds, networkMaxRetries, networkRetryIntervalInSeconds, heartbeatIntervalInSeconds, resumeOnReconnect), UriKind.Relative);
+            Uri nextPage = new Uri(string.Format("/PubnubOperation.xaml?ssl={0}&cipherkey={1}&secretkey={2}&uuid={3}&subtimeout={4}&optimeout={5}&retries={6}&retryinterval={7}&beatinterval={8}&resumeOnReconnect={9}&hideErrCallbackMsg={10}", ssl, cipherKey, secretKey, sessionUUID, subscribeTimeoutInSeconds, operationTimeoutInSeconds, networkMaxRetries, networkRetryIntervalInSeconds, heartbeatIntervalInSeconds, resumeOnReconnect, hideErrCallbackMsg), UriKind.Relative);
             NavigationService.Navigate(nextPage);
         }
 

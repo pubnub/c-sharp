@@ -25,6 +25,7 @@ namespace PubnubWindowsPhone
         string cipherKey = "";
         string uuid = "";
         bool resumeOnReconnect = false;
+        bool hideErrorCallbackMsg = true;
 
         int subscribeTimeoutInSeconds;
         int operationTimeoutInSeconds;
@@ -65,6 +66,7 @@ namespace PubnubWindowsPhone
             networkRetryIntervalInSeconds = Convert.ToInt32(NavigationContext.QueryString["retryinterval"]);
             heartbeatIntervalInSeconds = Convert.ToInt32(NavigationContext.QueryString["beatinterval"]);
             resumeOnReconnect = Boolean.Parse(NavigationContext.QueryString["resumeOnReconnect"].ToString());
+            hideErrorCallbackMsg = Boolean.Parse(NavigationContext.QueryString["hideErrCallbackMsg"].ToString());
         }
 
         protected override void OnBackKeyPress(System.ComponentModel.CancelEventArgs e)
@@ -82,7 +84,7 @@ namespace PubnubWindowsPhone
 
         private void btnTime_Click(object sender, RoutedEventArgs e)
         {
-            pubnub.Time<string>(PubnubCallbackResult);
+            pubnub.Time<string>(PubnubCallbackResult, PubnubDisplayErrorMessage);
         }
 
         private void PubnubCallbackResult(string result)
@@ -92,7 +94,7 @@ namespace PubnubWindowsPhone
                     {
                         TextBlock textBlock = new TextBlock();
                         textBlock.TextWrapping = TextWrapping.Wrap;
-                        textBlock.Text = result;
+                        textBlock.Text = string.Format("REGULAR CALLBACK: {0}", result);
                         messageStackPanel.Children.Add(textBlock);
                         scrollViewerResult.UpdateLayout();
                         scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
@@ -107,7 +109,7 @@ namespace PubnubWindowsPhone
                 {
                     TextBlock textBlock = new TextBlock();
                     textBlock.TextWrapping = TextWrapping.Wrap;
-                    textBlock.Text = result;
+                    textBlock.Text = string.Format("CONNECT CALLBACK: {0}", result);
                     messageStackPanel.Children.Add(textBlock);
                     scrollViewerResult.UpdateLayout();
                     scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
@@ -122,13 +124,32 @@ namespace PubnubWindowsPhone
                 {
                     TextBlock textBlock = new TextBlock();
                     textBlock.TextWrapping = TextWrapping.Wrap;
-                    textBlock.Text = result;
+                    textBlock.Text = string.Format("DISCONNECT CALLBACK: {0}",result);
                     messageStackPanel.Children.Add(textBlock);
                     scrollViewerResult.UpdateLayout();
                     scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
                 }
                 );
         }
+
+        private void PubnubDisplayErrorMessage(string result)
+        {
+            if (!hideErrorCallbackMsg)
+            {
+                Deployment.Current.Dispatcher.BeginInvoke(
+                    () =>
+                    {
+                        TextBlock textBlock = new TextBlock();
+                        textBlock.TextWrapping = TextWrapping.Wrap;
+                        textBlock.Text = string.Format("ERROR CALLBACK: {0}", result);
+                        messageStackPanel.Children.Add(textBlock);
+                        scrollViewerResult.UpdateLayout();
+                        scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
+                    }
+                    );
+            }
+        }
+
 
         private void btnPublish_Click(object sender, RoutedEventArgs e)
         {
@@ -158,7 +179,7 @@ namespace PubnubWindowsPhone
             {
                 publishPopup.IsOpen = false;
                 string publishedMessage = control.txtPublish.Text;
-                pubnub.Publish<string>(channel, publishedMessage, PubnubCallbackResult);
+                pubnub.Publish<string>(channel, publishedMessage, PubnubCallbackResult, PubnubDisplayErrorMessage);
                 TextBlock textBlock = new TextBlock();
                 textBlock.Text = string.Format("Publishing {0}\n", publishedMessage);
                 messageStackPanel.Children.Add(textBlock);
@@ -179,19 +200,19 @@ namespace PubnubWindowsPhone
         private void btnHereNow_Click(object sender, RoutedEventArgs e)
         {
             channel = txtChannel.Text;
-            pubnub.HereNow<string>(channel, PubnubCallbackResult);
+            pubnub.HereNow<string>(channel, PubnubCallbackResult, PubnubDisplayErrorMessage);
         }
 
         private void btnPresence_Click(object sender, RoutedEventArgs e)
         {
             channel = txtChannel.Text;
-            pubnub.Presence<string>(channel, PubnubCallbackResult, PubnubConnectCallbackResult);
+            pubnub.Presence<string>(channel, PubnubCallbackResult, PubnubConnectCallbackResult, PubnubDisplayErrorMessage);
         }
 
         private void btnDetailedHistory_Click(object sender, RoutedEventArgs e)
         {
             channel = txtChannel.Text;
-            pubnub.DetailedHistory<string>(channel, 10, PubnubCallbackResult);
+            pubnub.DetailedHistory<string>(channel, 10, PubnubCallbackResult, PubnubDisplayErrorMessage);
         }
 
         private void scrollViewerResult_DoubleTap(object sender, GestureEventArgs e)
@@ -206,19 +227,19 @@ namespace PubnubWindowsPhone
         private void btnUnsubscribe_Click(object sender, RoutedEventArgs e)
         {
             channel = txtChannel.Text;
-            pubnub.Unsubscribe<string>(channel, PubnubCallbackResult, PubnubConnectCallbackResult, PubnubDisconnectCallbackResult);
+            pubnub.Unsubscribe<string>(channel, PubnubCallbackResult, PubnubConnectCallbackResult, PubnubDisconnectCallbackResult, PubnubDisplayErrorMessage);
         }
 
         private void btnPresenceUnsub_Click(object sender, RoutedEventArgs e)
         {
             channel = txtChannel.Text;
-            pubnub.PresenceUnsubscribe<string>(channel, PubnubCallbackResult, PubnubConnectCallbackResult, PubnubDisconnectCallbackResult);
+            pubnub.PresenceUnsubscribe<string>(channel, PubnubCallbackResult, PubnubConnectCallbackResult, PubnubDisconnectCallbackResult, PubnubDisplayErrorMessage);
         }
 
         private void btnSubscribe_Click(object sender, RoutedEventArgs e)
         {
             channel = txtChannel.Text;
-            pubnub.Subscribe<string>(channel, PubnubCallbackResult, PubnubConnectCallbackResult);
+            pubnub.Subscribe<string>(channel, PubnubCallbackResult, PubnubConnectCallbackResult, PubnubDisplayErrorMessage);
         }
 
         private void btnDisableNetwork_Click(object sender, RoutedEventArgs e)

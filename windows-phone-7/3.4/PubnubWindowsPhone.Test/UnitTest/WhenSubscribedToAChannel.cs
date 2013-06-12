@@ -56,13 +56,13 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     unitTest.TestCaseName = "ThenSubscribeShouldReturnReceivedMessage";
                     pubnub.PubnubUnitTest = unitTest;
 
-                    pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback);
+                    pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
                     //Thread.Sleep(500);
-                    pubnub.Publish<string>(channel, "Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage", dummyPublishCallback);
+                    pubnub.Publish<string>(channel, "Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage", dummyPublishCallback, DummyErrorCallback);
                     mePublish.WaitOne(310 * 1000);
                     //Thread.Sleep(500);
                     meSubscribeNoConnect.WaitOne(310 * 1000);
-                    pubnub.Unsubscribe<string>(channel, dummyUnsubscribeCallback, SubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback);
+                    pubnub.Unsubscribe<string>(channel, dummyUnsubscribeCallback, SubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
                     Thread.Sleep(500);
                     meUnsubscribe.WaitOne(310 * 1000);
 
@@ -92,7 +92,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
 
                     string channel = "my/channel";
 
-                    pubnub.Subscribe<string>(channel, ReceivedMessageCallbackYesConnect, ConnectStatusCallback);
+                    pubnub.Subscribe<string>(channel, ReceivedMessageCallbackYesConnect, ConnectStatusCallback, DummyErrorCallback);
                     meSubscribeYesConnect.WaitOne(310 * 1000);
 
                     pubnub.EndPendingRequests();
@@ -122,11 +122,11 @@ namespace PubnubWindowsPhone.Test.UnitTest
 
 
                     string channel1 = "my/channel1";
-                    pubnub.Subscribe<string>(channel1, ReceivedChannelUserCallback, ReceivedChannel1ConnectCallback);
+                    pubnub.Subscribe<string>(channel1, ReceivedChannelUserCallback, ReceivedChannel1ConnectCallback, DummyErrorCallback);
                     meChannel1SubscribeConnect.WaitOne(310 * 1000);
 
                     string channel2 = "my/channel2";
-                    pubnub.Subscribe<string>(channel2, ReceivedChannelUserCallback, ReceivedChannel2ConnectCallback);
+                    pubnub.Subscribe<string>(channel2, ReceivedChannelUserCallback, ReceivedChannel2ConnectCallback, DummyErrorCallback);
                     meChannel2SubscribeConnect.WaitOne(310 * 1000);
 
                     Thread.Sleep(500);
@@ -157,10 +157,10 @@ namespace PubnubWindowsPhone.Test.UnitTest
 
                     string channel = "my/channel";
 
-                    pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback1, DummyMethodDuplicateChannelConnectCallback);
+                    pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback1, DummyMethodDuplicateChannelConnectCallback, DummyErrorCallback);
                     Thread.Sleep(100);
 
-                    pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback2, DummyMethodDuplicateChannelConnectCallback);
+                    pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback2, DummyMethodDuplicateChannelConnectCallback, DummyErrorCallback);
                     meAlreadySubscribed.WaitOne();
 
                     pubnub.EndPendingRequests();
@@ -189,7 +189,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
 
                     string channel = "my/channel";
 
-                    pubnub.Subscribe<string>(channel, SubscriberDummyMethodForManyMessagesUserCallback, SubscribeDummyMethodForManyMessagesConnectCallback);
+                    pubnub.Subscribe<string>(channel, SubscriberDummyMethodForManyMessagesUserCallback, SubscribeDummyMethodForManyMessagesConnectCallback, DummyErrorCallback);
                     Thread.Sleep(1000);
                     meSubscriberManyMessages.WaitOne();
 
@@ -348,6 +348,11 @@ namespace PubnubWindowsPhone.Test.UnitTest
         {
             meUnsubscribe.Set();
         }
-    
+
+        [Asynchronous]
+        private void DummyErrorCallback(string result)
+        {
+        }
+
     }
 }

@@ -46,13 +46,14 @@
                 <TextBlock Name="lblUUID" VerticalAlignment="Center" Text="Session UUID"></TextBlock>
                 <TextBox Name="txtUUID" Text="" Width="236"></TextBox>
             </StackPanel>
-            <!--<StackPanel Orientation="Horizontal" Margin="20,304,19,0" Name="spnlInput5" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="70">
+            <StackPanel Orientation="Horizontal" Margin="20,304,19,0" Name="spnlInput5" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="70">
+                <CheckBox Content="Hide Error Callback Messages" Height="70" Name="chkHideErrCallbackMsg" VerticalAlignment="Center" HorizontalAlignment="Stretch" IsChecked="True" />
             </StackPanel>
-            <StackPanel Height="65" HorizontalAlignment="Stretch" Margin="20,376,19,0" Name="spnlInput6" Orientation="Horizontal" VerticalAlignment="Top">
+            <!--<StackPanel Height="65" HorizontalAlignment="Stretch" Margin="20,376,19,0" Name="spnlInput6" Orientation="Horizontal" VerticalAlignment="Top">
             </StackPanel>
             <StackPanel Height="65" HorizontalAlignment="Stretch" Margin="20,444,19,0" Name="spnlInput7" Orientation="Horizontal" VerticalAlignment="Top">
             </StackPanel>-->
-            <Button Content="Continue" Height="72" HorizontalAlignment="Stretch" Margin="277,337,19,0" Name="btnContinue" VerticalAlignment="Top" Width="160" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Center" Click="btnContinue_Click" />
+            <Button Content="Continue" Height="72" HorizontalAlignment="Stretch" Margin="277,387,19,0" Name="btnContinue" VerticalAlignment="Top" Width="160" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Center" Click="btnContinue_Click" />
         </Grid>
     </Grid>
 

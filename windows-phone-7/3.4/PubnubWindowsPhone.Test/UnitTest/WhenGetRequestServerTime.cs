@@ -39,7 +39,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     unitTest.TestCaseName = "ThenItShouldReturnTimeStamp";
                     pubnub.PubnubUnitTest = unitTest;
 
-                    pubnub.Time<string>(ReturnTimeStampCallback);
+                    pubnub.Time<string>(ReturnTimeStampCallback, DummyErrorCallback);
                     mreTime.WaitOne(310 * 1000);
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
@@ -68,6 +68,11 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                 });
             mreTime.Set();
+        }
+
+        [Asynchronous]
+        private void DummyErrorCallback(string result)
+        {
         }
 
         [TestMethod]

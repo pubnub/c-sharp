@@ -27,9 +27,10 @@ namespace PubnubWindowsPhone
             string cipherKey = txtCipher.Text;
             string sessionUUID = txtUUID.Text;
             bool resumeOnReconnect = chkResumeOnReconnect.IsChecked.Value;
+            bool hideErrorCallbackMsg = chkHideErrCallbackMsg.IsChecked.Value;
 
             //Uri nextPage = new Uri(string.Format("/PubnubOperation.xaml?ssl={0}&cipherkey={1}&secretkey={2}&uuid={3}", ssl, cipherKey, secretKey,sessionUUID), UriKind.Relative);
-            Uri nextPage = new Uri(string.Format("/PubnubTimeoutSettings.xaml?ssl={0}&cipherkey={1}&secretkey={2}&uuid={3}&resumeOnReconnect={4}", ssl, cipherKey, secretKey, sessionUUID, resumeOnReconnect), UriKind.Relative);
+            Uri nextPage = new Uri(string.Format("/PubnubTimeoutSettings.xaml?ssl={0}&cipherkey={1}&secretkey={2}&uuid={3}&resumeOnReconnect={4}&hideErrCallbackMsg={5}", ssl, cipherKey, secretKey, sessionUUID, resumeOnReconnect, hideErrorCallbackMsg), UriKind.Relative);
             NavigationService.Navigate(nextPage);
         }
 
