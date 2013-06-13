@@ -12,7 +12,7 @@ using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
 {
-    public class WhenDetailedHistoryIsRequested: UUnitTestCase
+    public class WhenDetailedHistoryIsRequested//: UUnitTestCase
     {
         ManualResetEvent mreMessageCount10 = new ManualResetEvent(false);
         ManualResetEvent mreMessageCount10ReverseTrue = new ManualResetEvent(false);
@@ -42,7 +42,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "my/channel";
 
-            pubnub.DetailedHistory<string>(channel, 10, DetailedHistoryCount10Callback);
+            pubnub.DetailedHistory<string>(channel, 10, DetailedHistoryCount10Callback, DummyErrorCallback);
             mreMessageCount10.WaitOne(310 * 1000);
             UUnitAssert.True(message10Received, "Detailed History Failed");
         }
@@ -83,7 +83,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "my/channel";
 
-            pubnub.DetailedHistory<string>(channel, -1, -1, 10, true, DetailedHistoryCount10ReverseTrueCallback);
+            pubnub.DetailedHistory<string>(channel, -1, -1, 10, true, DetailedHistoryCount10ReverseTrueCallback, DummyErrorCallback);
             mreMessageCount10ReverseTrue.WaitOne(310 * 1000);
             UUnitAssert.True(message10ReverseTrueReceived, "Detailed History Failed");
         }
@@ -129,13 +129,13 @@ namespace PubNubMessaging.Tests
             {
                 pubnub.Publish<string>(channel, 
                     string.Format("DetailedHistoryStartTimeWithReverseTrue {0}", index), 
-                    DetailedHistorySamplePublishCallback);
+                    DetailedHistorySamplePublishCallback, DummyErrorCallback);
                 mrePublishStartReverseTrue.WaitOne();
             }
 
             Thread.Sleep(2000);
 
-            pubnub.DetailedHistory<string>(channel, startTimeWithReverseTrue, DetailedHistoryStartWithReverseTrueCallback, true);
+            pubnub.DetailedHistory<string>(channel, startTimeWithReverseTrue, DetailedHistoryStartWithReverseTrueCallback, DummyErrorCallback, true);
             Thread.Sleep(2000);
             mreMessageStartReverseTrue.WaitOne(310 * 1000);
             UUnitAssert.True(messageStartReverseTrue, "Detailed History with Start and Reverse True Failed");
@@ -188,6 +188,10 @@ namespace PubNubMessaging.Tests
                 }
             }
             mrePublishStartReverseTrue.Set();
+        }
+		
+        void DummyErrorCallback(string result)
+        {
         }
     }
 }

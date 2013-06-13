@@ -12,7 +12,7 @@ using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
 {
-    public class WhenSubscribedToAChannel: UUnitTestCase
+    public class WhenSubscribedToAChannel//: UUnitTestCase
     {
         ManualResetEvent meSubscribeNoConnect = new ManualResetEvent(false);
         ManualResetEvent meSubscribeYesConnect = new ManualResetEvent(false);
@@ -46,13 +46,13 @@ namespace PubNubMessaging.Tests
 
             string channel = "my/channel";
 
-            pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback);
+            pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
 
-            pubnub.Publish<string>(channel, "Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage", dummyPublishCallback);
+            pubnub.Publish<string>(channel, "Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage", dummyPublishCallback, DummyErrorCallback);
             mePublish.WaitOne(310 * 1000);
 
             meSubscribeNoConnect.WaitOne(310 * 1000);
-            pubnub.Unsubscribe<string>(channel, dummyUnsubscribeCallback, SubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback);
+            pubnub.Unsubscribe<string>(channel, dummyUnsubscribeCallback, SubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
             
             meUnsubscribe.WaitOne(310 * 1000);
             
@@ -76,7 +76,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "my/channel";
 
-            pubnub.Subscribe<string>(channel, ReceivedMessageCallbackYesConnect, ConnectStatusCallback);
+            pubnub.Subscribe<string>(channel, ReceivedMessageCallbackYesConnect, ConnectStatusCallback, DummyErrorCallback);
             meSubscribeYesConnect.WaitOne(310 * 1000);
 
             pubnub.EndPendingRequests();
@@ -99,11 +99,11 @@ namespace PubNubMessaging.Tests
 
 
             string channel1 = "my/channel1";
-            pubnub.Subscribe<string>(channel1, ReceivedChannelUserCallback, ReceivedChannel1ConnectCallback);
+            pubnub.Subscribe<string>(channel1, ReceivedChannelUserCallback, ReceivedChannel1ConnectCallback, DummyErrorCallback);
             meChannel1SubscribeConnect.WaitOne(310 * 1000);
 
             string channel2 = "my/channel2";
-            pubnub.Subscribe<string>(channel2, ReceivedChannelUserCallback, ReceivedChannel2ConnectCallback);
+            pubnub.Subscribe<string>(channel2, ReceivedChannelUserCallback, ReceivedChannel2ConnectCallback, DummyErrorCallback);
             meChannel2SubscribeConnect.WaitOne(310 * 1000);
 
             pubnub.EndPendingRequests();
@@ -126,10 +126,10 @@ namespace PubNubMessaging.Tests
 
             string channel = "my/channel";
 
-            pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback1, DummyMethodDuplicateChannelConnectCallback);
+            pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback1, DummyMethodDuplicateChannelConnectCallback, DummyErrorCallback);
             Thread.Sleep(100);
             
-            pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback2, DummyMethodDuplicateChannelConnectCallback);
+            pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback2, DummyMethodDuplicateChannelConnectCallback, DummyErrorCallback);
             meAlreadySubscribed.WaitOne();
 
             pubnub.EndPendingRequests();
@@ -150,7 +150,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "my/channel";
 
-            pubnub.Subscribe<string>(channel, SubscriberDummyMethodForManyMessagesUserCallback, SubscribeDummyMethodForManyMessagesConnectCallback);
+            pubnub.Subscribe<string>(channel, SubscriberDummyMethodForManyMessagesUserCallback, SubscribeDummyMethodForManyMessagesConnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
             meSubscriberManyMessages.WaitOne(310 * 1000);
 
@@ -290,5 +290,8 @@ namespace PubNubMessaging.Tests
             meUnsubscribe.Set();
         }
 
+        void DummyErrorCallback(string result)
+        {
+        }
     }
 }

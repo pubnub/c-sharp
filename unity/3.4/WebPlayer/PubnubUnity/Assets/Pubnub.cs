@@ -1,8 +1,8 @@
-﻿//Build Date: June 11, 2013
+﻿//Build Date: June 13, 2013
 #if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
 #define TRACE
 #endif
-#if (UNITY_STANDALONE || UNITY_WEBPLAYER)
+#if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
 using UnityEngine;
 using System.Security.Cryptography.X509Certificates;
 #endif
@@ -253,7 +253,7 @@ namespace PubNubMessaging.Core
          */
         private void Init(string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
         {
-#if(MONOTOUCH || MONODROID || SILVERLIGHT || WINDOWS_PHONE || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
+#if(MONOTOUCH || MONODROID || SILVERLIGHT || WINDOWS_PHONE || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
             LoggingMethod.LogLevel = pubnubLogLevel;
 #else
             string configuredLogLevel = ConfigurationManager.AppSettings["PubnubMessaging.LogLevel"];
@@ -397,7 +397,7 @@ namespace PubNubMessaging.Core
 
         private void InitiatePowerModeCheck()
         {
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !MONODROID && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !MONODROID && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
             try
             {
                 SystemEvents.PowerModeChanged += new PowerModeChangedEventHandler(SystemEvents_PowerModeChanged);
@@ -411,7 +411,7 @@ namespace PubNubMessaging.Core
 #endif
         }
 
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !MONODROID && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !MONODROID && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
         void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
         {
             if (e.Mode == PowerModes.Suspend)
@@ -523,7 +523,7 @@ namespace PubNubMessaging.Core
             }
         }
 
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !MONODROID && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !MONODROID && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
         ~Pubnub()
         {
             //detach
@@ -1454,7 +1454,7 @@ namespace PubNubMessaging.Core
 
             Uri requestUri = new Uri(url.ToString());
 
-#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
+#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
             // Force canonical path and query
             FieldInfo flagsFieldInfo = typeof(Uri).GetField("m_Flags", BindingFlags.Instance | BindingFlags.NonPublic);
             ulong flags = (ulong)flagsFieldInfo.GetValue(requestUri);
@@ -1547,7 +1547,7 @@ namespace PubNubMessaging.Core
                 LoggingMethod.WriteToLog(string.Format("DateTime {0}, Request={1}", DateTime.Now.ToString(), requestUri.ToString()), LoggingMethod.LevelInfo);
 
 
-#if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
+#if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
                 if((pubnubRequestState.Type == ResponseType.Publish) && (RequestIsUnsafe(requestUri)))
                 {
                     SendRequestUsingTcpClient<T>(requestUri, pubnubRequestState);
@@ -1588,7 +1588,7 @@ namespace PubNubMessaging.Core
             }
         }
 
-#if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
+#if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
         bool RequestIsUnsafe(Uri requestUri)
         {
             bool isUnsafe = false;
@@ -2578,7 +2578,7 @@ namespace PubNubMessaging.Core
 
             Uri requestUri = new Uri(url.ToString());
 
-#if ((!__MonoCS__) && (!SILVERLIGHT) && (!WINDOWS_PHONE) && (!UNITY_STANDALONE) && (!UNITY_WEBPLAYER))
+#if ((!__MonoCS__) && (!SILVERLIGHT) && (!WINDOWS_PHONE) && (!UNITY_STANDALONE) && (!UNITY_WEBPLAYER) && (!UNITY_IOS) && (!UNITY_ANDROID))
             if ((type == ResponseType.Publish || type == ResponseType.Subscribe || type == ResponseType.Presence))
             {
                 // Force canonical path and query
@@ -3767,7 +3767,7 @@ namespace PubNubMessaging.Core
         private string GetEncryptionKey()
         {
             //Compute Hash using the SHA256 
-#if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || MONODROID || UNITY_STANDALONE || UNITY_WEBPLAYER)
+#if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || MONODROID || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
             string strKeySHA256HashRaw = ComputeHash(this.cipherKey, new System.Security.Cryptography.SHA256Managed());
 #else
             string strKeySHA256HashRaw = ComputeHash(this.cipherKey, new SHA256CryptoServiceProvider());
@@ -4131,7 +4131,7 @@ namespace PubNubMessaging.Core
 
     }
 
-#if (UNITY_STANDALONE || UNITY_WEBPLAYER)
+#if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
 	internal class LoggingMethod:MonoBehaviour
 #else
 	internal class LoggingMethod
@@ -4196,7 +4196,7 @@ namespace PubNubMessaging.Core
             {
 #if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || MONODROID)
                 Debug.WriteLine(logText);
-#elif (UNITY_STANDALONE || UNITY_WEBPLAYER)
+#elif (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
                 print(logText);
 #else
                 Trace.WriteLine(logText);
@@ -4631,7 +4631,7 @@ namespace PubNubMessaging.Core
         }
     }
 
-#if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
+#if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
     class StateObject<T>
     {
         public RequestState<T> RequestState

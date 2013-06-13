@@ -98,20 +98,20 @@ public class PubnubExample : MonoBehaviour {
 		{
 			InstantiatePubnub();
 			allowUserSettingsChange = false;
-			pubnub.Presence<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage);
+			pubnub.Presence<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
 		}
 		if (GUI.Button(new Rect(140,370,120,25), "Subscribe"))
 		{
 			InstantiatePubnub();
 			allowUserSettingsChange = false;
-			pubnub.Subscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage);
+			pubnub.Subscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
 		}
 
 		if (GUI.Button(new Rect(10,400,120,25), "Detailed History"))
 		{
 			InstantiatePubnub();
 			allowUserSettingsChange = false;
-			pubnub.DetailedHistory<string>(channel, 100, DisplayReturnMessage);
+			pubnub.DetailedHistory<string>(channel, 100, DisplayReturnMessage, DisplayErrorMessage);
 		}
 		
 		if (GUI.Button(new Rect(140,400,120,25), "Publish"))
@@ -131,27 +131,27 @@ public class PubnubExample : MonoBehaviour {
 		{
 			InstantiatePubnub();
 			allowUserSettingsChange = false;
-			pubnub.Unsubscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayDisconnectStatusMessage);
+			pubnub.Unsubscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayDisconnectStatusMessage, DisplayErrorMessage);
 		}
 		
 		if (GUI.Button(new Rect(140,430,120,25), "Here Now"))
 		{
 			InstantiatePubnub();
 			allowUserSettingsChange = false;
-			pubnub.HereNow<string>(channel, DisplayReturnMessage);
+			pubnub.HereNow<string>(channel, DisplayReturnMessage, DisplayErrorMessage);
 		}
 		
 		if (GUI.Button(new Rect(10,460,120,25), "Presence-Unsub"))
 		{
 			InstantiatePubnub();
 			allowUserSettingsChange = false;
-			pubnub.PresenceUnsubscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayDisconnectStatusMessage);
+			pubnub.PresenceUnsubscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayDisconnectStatusMessage, DisplayErrorMessage);
 		}
 		if (GUI.Button(new Rect(140,460,120,25), "Time"))
 		{
 			InstantiatePubnub();
 			allowUserSettingsChange = false;
-			pubnub.Time<string>(DisplayReturnMessage);
+			pubnub.Time<string>(DisplayReturnMessage, DisplayErrorMessage);
 		}
 
 		if (GUI.Button(new Rect(10,490,120,25), "Disable Network"))
@@ -209,7 +209,7 @@ public class PubnubExample : MonoBehaviour {
 
 		if (GUI.Button(new Rect(30, 100, 100, 20), "Publish"))
 		{
-			pubnub.Publish<string>(channel, publishedMessage, DisplayReturnMessage);
+			pubnub.Publish<string>(channel, publishedMessage, DisplayReturnMessage, DisplayErrorMessage);
 			publishedMessage = "";
 			showPublishPopupWindow = false;
 		}
@@ -306,22 +306,28 @@ public class PubnubExample : MonoBehaviour {
     void DisplayReturnMessage(string result)
     {
         print(result);
-		AddToPubnubResultContainer(result);
+		AddToPubnubResultContainer(string.Format("REGULAR CALLBACK: {0}",result));
 	}
 
     void DisplayConnectStatusMessage(string result)
     {
         print(result);
-		AddToPubnubResultContainer(result);
+		AddToPubnubResultContainer(string.Format("CONNECT CALLBACK: {0}",result));
     }
 
     void DisplayDisconnectStatusMessage(string result)
     {
         print(result);
-		AddToPubnubResultContainer(result);
+		AddToPubnubResultContainer(string.Format("DISCONNECT CALLBACK: {0}",result));
     }
 	
-    void AddToPubnubResultContainer(string result)
+    void DisplayErrorMessage(string result)
+    {
+        print(result);
+		AddToPubnubResultContainer(string.Format("ERROR CALLBACK: {0}",result));
+    }
+
+	void AddToPubnubResultContainer(string result)
     {
         _recordQueue.Enqueue(result);
     }

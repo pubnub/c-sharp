@@ -30,7 +30,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.Time<string>(ReturnTimeStampCallback);
+            pubnub.Time<string>(ReturnTimeStampCallback, DummyErrorCallback);
             mreTime.WaitOne(310 * 1000);
             UUnitAssert.True(timeReceived, "time() Failed");
         }
@@ -53,7 +53,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.Time<string>(ReturnProxyPresenceTimeStampCallback);
+            pubnub.Time<string>(ReturnProxyPresenceTimeStampCallback, DummyErrorCallback);
             mreProxy.WaitOne(310 * 1000);
             UUnitAssert.True(timeReceivedWhenProxy, "time() Failed");
         }
@@ -111,5 +111,9 @@ namespace PubNubMessaging.Tests
             DateTime actualDate = Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(13406688000000000);
             UUnitAssert.Equals(expectedDate.ToString(), actualDate.ToString());
         }
-    }
+    
+        void DummyErrorCallback(string result)
+        {
+        }
+	}
 }
