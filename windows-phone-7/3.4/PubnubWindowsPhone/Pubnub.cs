@@ -1,8 +1,8 @@
-﻿//Build Date: June 11, 2013
+﻿//Build Date: June 14, 2013
 #if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
 #define TRACE
 #endif
-#if (UNITY_STANDALONE || UNITY_WEBPLAYER)
+#if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
 using UnityEngine;
 using System.Security.Cryptography.X509Certificates;
 #endif
@@ -33,13 +33,15 @@ using System.Windows.Threading;
 using System.IO.IsolatedStorage;
 using System.Net.Browser;
 #endif
-#if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
+#if (__MonoCS__)
 using System.Net.Security;
 #endif
 
 #if(MONODROID)
 using Android.Runtime;
 using Javax.Net.Ssl;
+#endif
+#if(MONODROID || UNITY_ANDROID)
 using System.Security.Cryptography.X509Certificates;
 #endif
 
@@ -220,7 +222,7 @@ namespace PubNubMessaging.Core
 
         // Pubnub Core API implementation
         private string origin = "pubsub.pubnub.com";
-#if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
+#if (__MonoCS__)
         private string domainName = "pubsub.pubnub.com";
 #endif
         private string publishKey = "";
@@ -253,7 +255,7 @@ namespace PubNubMessaging.Core
          */
         private void Init(string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
         {
-#if(MONOTOUCH || MONODROID || SILVERLIGHT || WINDOWS_PHONE || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
+#if(MONOTOUCH || MONODROID || SILVERLIGHT || WINDOWS_PHONE || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
             LoggingMethod.LogLevel = pubnubLogLevel;
 #else
             string configuredLogLevel = ConfigurationManager.AppSettings["PubnubMessaging.LogLevel"];
@@ -286,7 +288,11 @@ namespace PubNubMessaging.Core
             else
                 this.origin = "http://" + this.origin;
 
-            //Initiate System Events for PowerModeChanged - to monitor suspend/resume
+#if(UNITY_ANDROID)
+			ServicePointManager.ServerCertificateValidationCallback = ValidatorUnity;
+#endif
+
+			//Initiate System Events for PowerModeChanged - to monitor suspend/resume
             InitiatePowerModeCheck();
         }
 
@@ -397,7 +403,7 @@ namespace PubNubMessaging.Core
 
         private void InitiatePowerModeCheck()
         {
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !MONODROID && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !MONODROID && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
             try
             {
                 SystemEvents.PowerModeChanged += new PowerModeChangedEventHandler(SystemEvents_PowerModeChanged);
@@ -411,7 +417,7 @@ namespace PubNubMessaging.Core
 #endif
         }
 
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !MONODROID && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !MONODROID && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
         void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
         {
             if (e.Mode == PowerModes.Suspend)
@@ -523,7 +529,7 @@ namespace PubNubMessaging.Core
             }
         }
 
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !MONODROID && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !MONODROID && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
         ~Pubnub()
         {
             //detach
@@ -1454,7 +1460,7 @@ namespace PubNubMessaging.Core
 
             Uri requestUri = new Uri(url.ToString());
 
-#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
+#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
             // Force canonical path and query
             FieldInfo flagsFieldInfo = typeof(Uri).GetField("m_Flags", BindingFlags.Instance | BindingFlags.NonPublic);
             ulong flags = (ulong)flagsFieldInfo.GetValue(requestUri);
@@ -1547,7 +1553,7 @@ namespace PubNubMessaging.Core
                 LoggingMethod.WriteToLog(string.Format("DateTime {0}, Request={1}", DateTime.Now.ToString(), requestUri.ToString()), LoggingMethod.LevelInfo);
 
 
-#if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
+#if (__MonoCS__)
                 if((pubnubRequestState.Type == ResponseType.Publish) && (RequestIsUnsafe(requestUri)))
                 {
                     SendRequestUsingTcpClient<T>(requestUri, pubnubRequestState);
@@ -1588,7 +1594,7 @@ namespace PubNubMessaging.Core
             }
         }
 
-#if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
+#if (__MonoCS__)
         bool RequestIsUnsafe(Uri requestUri)
         {
             bool isUnsafe = false;
@@ -1755,16 +1761,36 @@ namespace PubNubMessaging.Core
             }
         }
 #endif
-
+		
+#if(UNITY_ANDROID)      
+		/// <summary>
+		/// Workaround for the bug described here 
+		/// https://bugzilla.xamarin.com/show_bug.cgi?id=6501
+		/// </summary>
+		/// <param name="sender">Sender.</param>
+		/// <param name="certificate">Certificate.</param>
+		/// <param name="chain">Chain.</param>
+		/// <param name="sslPolicyErrors">Ssl policy errors.</param>
+		static bool ValidatorUnity (object sender,
+		                       System.Security.Cryptography.X509Certificates.X509Certificate
+		                       certificate,
+		                       System.Security.Cryptography.X509Certificates.X509Chain chain,
+		                       System.Net.Security.SslPolicyErrors sslPolicyErrors)
+		{
+			//TODO:
+			return true;
+		}
+#endif
+		
         private void ConnectToHostAndSendRequestCallback<T>(IAsyncResult asynchronousResult)
         {
             StateObject<T> asynchStateObject = asynchronousResult.AsyncState as StateObject<T>;
             RequestState<T> asynchRequestState = asynchStateObject.RequestState;
 
-            string channel = "";
+            string channels = "";
             if (asynchRequestState != null && asynchRequestState.Channels != null)
             {
-                channel = string.Join(",", asynchRequestState.Channels);
+                channels = string.Join(",", asynchRequestState.Channels);
             }
 
             try
@@ -1797,10 +1823,28 @@ namespace PubNubMessaging.Core
             }
             catch (WebException webEx)
             {
-                ProcessResponseCallbackWebExceptionHandler<T>(webEx, asynchRequestState, channel);
+                if (asynchRequestState != null && asynchRequestState.ErrorCallback != null)
+                {
+                    //TODO: Identify refactoring
+                    List<object> errorResult = new List<object>();
+                    string errorJsonString = string.Format("[2, \"{0}\"]", webEx.ToString().Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\""));
+                    errorResult = (List<object>)JsonConvert.DeserializeObject<List<object>>(errorJsonString);
+                    errorResult.Add(channels);
+                    GoToCallback<T>(errorResult, asynchRequestState.ErrorCallback);
+                }
+                ProcessResponseCallbackWebExceptionHandler<T>(webEx, asynchRequestState, channels);
             }
             catch (Exception ex)
             {
+                if (asynchRequestState != null && asynchRequestState.ErrorCallback != null)
+                {
+                    //TODO: Identify refactoring
+                    List<object> errorResult = new List<object>();
+                    string errorJsonString = string.Format("[2, \"{0}\"]", ex.ToString().Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\""));
+                    errorResult = (List<object>)JsonConvert.DeserializeObject<List<object>>(errorJsonString);
+                    errorResult.Add(channels);
+                    GoToCallback<T>(errorResult, asynchRequestState.ErrorCallback);
+                }
                 ProcessResponseCallbackExceptionHandler<T>(ex, asynchRequestState);
             }
         }
@@ -1809,6 +1853,9 @@ namespace PubNubMessaging.Core
         {
 #if(MONODROID)
             SslStream sslStream = new SslStream(netStream, true, Validator, null);
+#elif(UNITY_ANDROID)
+			ServicePointManager.ServerCertificateValidationCallback = ValidatorUnity;
+			SslStream sslStream = new SslStream(netStream, true, ValidatorUnity, null);
 #else
             SslStream sslStream = new SslStream(netStream);
 #endif
@@ -1828,7 +1875,7 @@ namespace PubNubMessaging.Core
             
             sslStream.Write(sendBuffer);
             sslStream.Flush();
-#if(!MONODROID)         
+#if(!MONODROID && !UNITY_ANDROID)         
             sslStream.ReadTimeout = state.RequestState.Request.Timeout;
 #endif
             sslStream.BeginRead(state.buffer, 0, state.buffer.Length, new AsyncCallback(SendRequestUsingTcpClientCallback<T>), state);
@@ -1838,20 +1885,38 @@ namespace PubNubMessaging.Core
         {
             StateObject<T> state = asynchronousResult.AsyncState as StateObject<T>;
             RequestState<T> asynchRequestState = state.RequestState;
-            string channel = "";
+            string channels = "";
             if (asynchRequestState != null && asynchRequestState.Channels != null)
             {
-                channel = string.Join(",", asynchRequestState.Channels);
+                channels = string.Join(",", asynchRequestState.Channels);
             }
             try{
                 AfterAuthentication(state);
             }
             catch (WebException webEx)
             {
-                ProcessResponseCallbackWebExceptionHandler<T>(webEx, asynchRequestState, channel);
+                if (asynchRequestState != null && asynchRequestState.ErrorCallback != null)
+                {
+                    //TODO: Identify refactoring
+                    List<object> errorResult = new List<object>();
+                    string errorJsonString = string.Format("[2, \"{0}\"]", webEx.ToString().Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\""));
+                    errorResult = (List<object>)JsonConvert.DeserializeObject<List<object>>(errorJsonString);
+                    errorResult.Add(channels);
+                    GoToCallback<T>(errorResult, asynchRequestState.ErrorCallback);
+                }
+                ProcessResponseCallbackWebExceptionHandler<T>(webEx, asynchRequestState, channels);
             }
             catch (Exception ex)
             {
+                if (asynchRequestState != null && asynchRequestState.ErrorCallback != null)
+                {
+                    //TODO: Identify refactoring
+                    List<object> errorResult = new List<object>();
+                    string errorJsonString = string.Format("[2, \"{0}\"]", ex.ToString().Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\""));
+                    errorResult = (List<object>)JsonConvert.DeserializeObject<List<object>>(errorJsonString);
+                    errorResult.Add(channels);
+                    GoToCallback<T>(errorResult, asynchRequestState.ErrorCallback);
+                }
                 ProcessResponseCallbackExceptionHandler<T>(ex, asynchRequestState);
             }
         }
@@ -1868,7 +1933,7 @@ namespace PubNubMessaging.Core
             System.IO.StreamWriter streamWriter = new System.IO.StreamWriter(netStream);
             streamWriter.Write(requestString);
             streamWriter.Flush();
-#if(!MONODROID)
+#if(!MONODROID && !UNITY_ANDROID)
             netStream.ReadTimeout = pubnubRequestState.Request.Timeout;
 #endif
             netStream.BeginRead(state.buffer, 0, state.buffer.Length, new AsyncCallback(SendRequestUsingTcpClientCallback<T>), state);
@@ -1879,7 +1944,7 @@ namespace PubNubMessaging.Core
         {
             TcpClient tcpClient = new TcpClient();
             tcpClient.NoDelay = false;
-#if(!MONODROID)
+#if(!MONODROID && !UNITY_ANDROID)
             tcpClient.SendTimeout = pubnubRequestState.Request.Timeout;
 #endif          
 
@@ -1991,7 +2056,7 @@ namespace PubNubMessaging.Core
 				
                 if (jsonString != null && !string.IsNullOrEmpty(jsonString) && !string.IsNullOrEmpty(channel.Trim()))
                 {
-                    result = WrapResultBasedOnResponseType(asynchRequestState.Type, jsonString, asynchRequestState.Channels, asynchRequestState.Reconnect, asynchRequestState.Timetoken);
+                    result = WrapResultBasedOnResponseType(asynchRequestState.Type, jsonString, asynchRequestState.Channels, asynchRequestState.Reconnect, asynchRequestState.Timetoken, asynchRequestState.ErrorCallback);
                 }
 
                 ProcessResponseCallbacks<T>(result, asynchRequestState);
@@ -2578,7 +2643,7 @@ namespace PubNubMessaging.Core
 
             Uri requestUri = new Uri(url.ToString());
 
-#if ((!__MonoCS__) && (!SILVERLIGHT) && (!WINDOWS_PHONE) && (!UNITY_STANDALONE) && (!UNITY_WEBPLAYER))
+#if ((!__MonoCS__) && (!SILVERLIGHT) && (!WINDOWS_PHONE) && (!UNITY_STANDALONE) && (!UNITY_WEBPLAYER) && (!UNITY_IOS) && (!UNITY_ANDROID))
             if ((type == ResponseType.Publish || type == ResponseType.Subscribe || type == ResponseType.Presence))
             {
                 // Force canonical path and query
@@ -3767,7 +3832,7 @@ namespace PubNubMessaging.Core
         private string GetEncryptionKey()
         {
             //Compute Hash using the SHA256 
-#if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || MONODROID || UNITY_STANDALONE || UNITY_WEBPLAYER)
+#if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || MONODROID || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
             string strKeySHA256HashRaw = ComputeHash(this.cipherKey, new System.Security.Cryptography.SHA256Managed());
 #else
             string strKeySHA256HashRaw = ComputeHash(this.cipherKey, new SHA256CryptoServiceProvider());
@@ -4131,7 +4196,7 @@ namespace PubNubMessaging.Core
 
     }
 
-#if (UNITY_STANDALONE || UNITY_WEBPLAYER)
+#if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
 	internal class LoggingMethod:MonoBehaviour
 #else
 	internal class LoggingMethod
@@ -4194,8 +4259,8 @@ namespace PubNubMessaging.Core
         {
             if (writeToLog)
             {
-#if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || MONODROID)
-                Debug.WriteLine(logText);
+#if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || MONODROID || UNITY_IOS || UNITY_ANDROID)
+                System.Diagnostics.Debug.WriteLine(logText);
 #elif (UNITY_STANDALONE || UNITY_WEBPLAYER)
                 print(logText);
 #else
@@ -4631,7 +4696,7 @@ namespace PubNubMessaging.Core
         }
     }
 
-#if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
+#if (__MonoCS__)
     class StateObject<T>
     {
         public RequestState<T> RequestState
