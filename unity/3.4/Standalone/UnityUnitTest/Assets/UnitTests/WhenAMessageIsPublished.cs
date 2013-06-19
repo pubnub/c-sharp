@@ -6,15 +6,14 @@ using UnityEngine;
 using System.ComponentModel;
 using System.Threading;
 using System.Collections;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
 using System.Reflection;
 
 namespace PubNubMessaging.Tests
 {
-    public class WhenAMessageIsPublished: UUnitTestCase
+    public class WhenAMessageIsPublished//: UUnitTestCase
     {
+		/*
         ManualResetEvent mreUnencryptedPublish = new ManualResetEvent(false);
         ManualResetEvent mreOptionalSecretKeyPublish = new ManualResetEvent(false);
         ManualResetEvent mreNoSslPublish = new ManualResetEvent(false);
@@ -77,6 +76,8 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running ThenUnencryptPublishShouldReturnSuccessCodeAndInfo()");
             isUnencryptPublished = false;
             Pubnub pubnub = new Pubnub("demo","demo","","",false);
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
+			
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
             unitTest.TestCaseName = "ThenUnencryptPublishShouldReturnSuccessCodeAndInfo";
@@ -105,6 +106,8 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo()");
             isUnencryptObjectPublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
+			
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
             unitTest.TestCaseName = "ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo";
@@ -134,7 +137,8 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo()");
             isEncryptObjectPublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "enigma", false);
-            
+            pubnub.JsonPluggableLibrary = new JsonFXDotNet();
+			
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
             unitTest.TestCaseName = "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo";
@@ -166,6 +170,7 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running ThenEncryptPublishShouldReturnSuccessCodeAndInfo()");
             isEncryptPublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "enigma", false);
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -197,6 +202,7 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo()");
             isSecretEncryptPublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "key", "enigma", false);
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -221,14 +227,15 @@ namespace PubNubMessaging.Tests
                 UUnitAssert.True(isSecretEncryptDetailedHistory, "Unable to decrypt the successful Secret key Publish");
             }
         }
-#if !UNITY_WEBPLAYER
+
         [UUnitTest]
         public void ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo()
         {
 			Debug.Log("Running ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo()");
             isComplexObjectPublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
+			
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
             unitTest.TestCaseName = "ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo";
@@ -252,7 +259,7 @@ namespace PubNubMessaging.Tests
                 UUnitAssert.True(isComplexObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
             }
         }
-#endif
+
         [UUnitTest]
         public void ThenDisableJsonEncodeShouldSendSerializedObjectMessage()
         {
@@ -260,6 +267,7 @@ namespace PubNubMessaging.Tests
             isSerializedObjectMessagePublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
             pubnub.EnableJsonEncodingForPublish = false;
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -291,7 +299,8 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running ThenLargeMessageShoudFailWithMessageTooLargeInfo()");
             isLargeMessagePublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
+			
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
             unitTest.TestCaseName = "ThenLargeMessageShoudFailWithMessageTooLargeInfo";
@@ -554,7 +563,8 @@ namespace PubNubMessaging.Tests
         {
 			Debug.Log("Running ThenPubnubShouldGenerateUniqueIdentifier()");
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
+			
             UUnitAssert.NotNull(pubnub.GenerateGuid());
         }
 
@@ -565,7 +575,8 @@ namespace PubNubMessaging.Tests
 			bool isExpectedException = false;
 			
             Pubnub pubnub = new Pubnub("", "demo", "", "", false);
-
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
+			
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
             unitTest.TestCaseName = "ThenPublishKeyShouldNotBeEmpty";
@@ -599,7 +610,8 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running ThenOptionalSecretKeyShouldBeProvidedInConstructor()");
             isPublished2 = false;
             Pubnub pubnub = new Pubnub("demo","demo","key");
-
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
+			
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
             unitTest.TestCaseName = "ThenOptionalSecretKeyShouldBeProvidedInConstructor";
@@ -640,7 +652,8 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running IfSSLNotProvidedThenDefaultShouldBeFalse()");
             isPublished3 = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "");
-
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
+			
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
             unitTest.TestCaseName = "IfSSLNotProvidedThenDefaultShouldBeFalse";
@@ -714,5 +727,6 @@ namespace PubNubMessaging.Tests
         {
 			//Debug.Log("Error callback = " + result);
         }
+        */
     }
 }

@@ -1,4 +1,4 @@
-﻿//Build Date: June 14, 2013
+﻿//Build Date: June 18, 2013
 #if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
 #define TRACE
 #endif
@@ -26,8 +26,6 @@ using System.Configuration;
 using Microsoft.Win32;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 #if (SILVERLIGHT || WINDOWS_PHONE)
 using System.Windows.Threading;
 using System.IO.IsolatedStorage;
@@ -45,6 +43,13 @@ using Javax.Net.Ssl;
 using System.Security.Cryptography.X509Certificates;
 #endif
 
+#if (!__MonoCS__)
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Runtime.Serialization.Json;
+using System.Web.Script.Serialization;
+#endif
+using JsonFx.Json;
 
 namespace PubNubMessaging.Core
 {
@@ -182,6 +187,28 @@ namespace PubNubMessaging.Core
             set
             {
                 _pubnubUnitTest = value;
+            }
+        }
+
+        private IJsonPluggableLibrary _jsonPluggableLibrary = null;
+        public IJsonPluggableLibrary JsonPluggableLibrary
+        {
+            get
+            {
+                return _jsonPluggableLibrary;
+            }
+            set
+            {
+                _jsonPluggableLibrary = value;
+                if (_jsonPluggableLibrary is IJsonPluggableLibrary)
+                {
+                    ClientNetworkStatus.JsonPluggableLibrary = _jsonPluggableLibrary;
+                }
+                else
+                {
+                    _jsonPluggableLibrary = null;
+                    throw new ArgumentException("Missing or Incorrect JsonPluggableLibrary value");
+                }
             }
         }
 
@@ -330,7 +357,7 @@ namespace PubNubMessaging.Core
 
                             List<object> result = new List<object>();
                             string jsonString = string.Format("[0, \"Detected internet connection problem. Retrying connection attempt {0} of {1}\"]", _channelInternetRetry[channel], _pubnubNetworkCheckRetries);
-                            result = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonString);
+                            result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
                             result.Add(string.Join(",", netState.Channels));
                             GoToCallback<T>(result, netState.ConnectCallback);
                         }
@@ -346,7 +373,7 @@ namespace PubNubMessaging.Core
 
                         List<object> result = new List<object>();
                         string jsonString = string.Format("[1, \"Internet connection available\"]");
-                        result = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonString);
+                        result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
                         result.Add(string.Join(",", netState.Channels));
                         GoToCallback<T>(result, netState.ConnectCallback);
 
@@ -390,8 +417,8 @@ namespace PubNubMessaging.Core
                 {
                     //TODO: Identify refactoring
                     List<object> errorResult = new List<object>();
-                    string jsonErrorString = string.Format("[2, \"{0}\"]", Regex.Replace(ex.ToString(), @"(?<!\\)\\(?!\\)", @"\\", RegexOptions.IgnorePatternWhitespace));
-                    errorResult = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonErrorString);
+                    string jsonErrorString = string.Format("[2, \"{0}\"]", ex.ToString().Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\""));
+                    errorResult = _jsonPluggableLibrary.DeserializeToListOfObject(jsonErrorString);
                     errorResult.Add(string.Join(",", netState.Channels));
                     GoToCallback<T>(errorResult, netState.ErrorCallback);
                 }
@@ -611,16 +638,19 @@ namespace PubNubMessaging.Core
             {
                 throw new ArgumentException("Missing Channel");
             }
-
             if (userCallback == null)
             {
-                throw new ArgumentException("Missing User Callback");
+                throw new ArgumentException("Missing userCallback");
             }
-
             if (errorCallback == null)
             {
-                throw new ArgumentException("Missing Error Callback");
+                throw new ArgumentException("Missing errorCallback");
             }
+            if (_jsonPluggableLibrary == null)
+            {
+                throw new NullReferenceException("Missing Json Pluggable Library for Pubnub Instance");
+            }
+
 
             Uri request = BuildDetailedHistoryRequest(channel, start, end, count, reverse);
 
@@ -678,15 +708,17 @@ namespace PubNubMessaging.Core
             {
                 throw new MissingFieldException("Invalid publish key");
             }
-
             if (userCallback == null)
             {
-                throw new ArgumentException("Missing User Callback");
+                throw new ArgumentException("Missing userCallback");
             }
-
             if (errorCallback == null)
             {
-                throw new ArgumentException("Missing Error Callback");
+                throw new ArgumentException("Missing errorCallback");
+            }
+            if (_jsonPluggableLibrary == null)
+            {
+                throw new NullReferenceException("Missing Json Pluggable Library for Pubnub Instance");
             }
 
             Uri request = BuildPublishRequest(channel, message);
@@ -703,14 +735,14 @@ namespace PubNubMessaging.Core
 
         private string JsonEncodePublishMsg(object originalMessage)
         {
-            string message = SerializeToJsonString(originalMessage);
+            string message = _jsonPluggableLibrary.SerializeToJsonString(originalMessage);
 
 
             if (this.cipherKey.Length > 0)
             {
                 PubnubCrypto aes = new PubnubCrypto(this.cipherKey);
                 string encryptMessage = aes.Encrypt(message);
-                message = SerializeToJsonString(encryptMessage);
+                message = _jsonPluggableLibrary.SerializeToJsonString(encryptMessage);
             }
 
             return message;
@@ -739,12 +771,12 @@ namespace PubNubMessaging.Core
                             decryptMessage = "**DECRYPT ERROR**";
                             //TODO: Identify refactoring
                             List<object> errorResult = new List<object>();
-                            string jsonErrorString = string.Format("[2, \"{0}\"]", Regex.Replace(ex.ToString(), @"(?<!\\)\\(?!\\)", @"\\", RegexOptions.IgnorePatternWhitespace));
-                            errorResult = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonErrorString);
+                            string jsonErrorString = string.Format("[2, \"{0}\"]", ex.ToString().Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\""));
+                            errorResult = _jsonPluggableLibrary.DeserializeToListOfObject(jsonErrorString);
                             errorResult.Add(string.Join(",", channels));
                             GoToCallback<T>(errorResult, errorCallback);
                         }
-                        object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : JsonConvert.DeserializeObject<object>(decryptMessage);
+                        object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : _jsonPluggableLibrary.DeserializeToObject(decryptMessage);
                         receivedMsg.Add(decodeMessage);
                     }
                     returnMessage.Add(receivedMsg);
@@ -808,6 +840,10 @@ namespace PubNubMessaging.Core
             {
                 throw new ArgumentException("Missing errorCallback");
             }
+            if (_jsonPluggableLibrary == null)
+            {
+                throw new NullReferenceException("Missing Json Pluggable Library for Pubnub Instance");
+            }
 
             LoggingMethod.WriteToLog(string.Format("DateTime {0}, requested subscribe for channel={1}", DateTime.Now.ToString(), channel), LoggingMethod.LevelInfo);
 
@@ -826,7 +862,7 @@ namespace PubNubMessaging.Core
                     rawChannels = rawChannels.Distinct().ToArray();
                     List<object> result = new List<object>();
                     string jsonString = "[0, \"Detected and removed duplicate channels\"]";
-                    result = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonString);
+                    result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
                     result.Add(channel);
                     GoToCallback<T>(result, userCallback);
                 }
@@ -844,8 +880,8 @@ namespace PubNubMessaging.Core
                         {
                             List<object> result = new List<object>();
                             string jsonString = string.Format("[0, \"{0}{1} already subscribed \"]", (IsPresenceChannel(channelName)) ? "Presence " : "", channelName.Replace("-pnpres", ""));
-                            
-                            result = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonString);
+
+                            result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
                             result.Add(channelName.Replace("-pnpres",""));
                             LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
                             GoToCallback<T>(result, userCallback);
@@ -859,7 +895,7 @@ namespace PubNubMessaging.Core
                     {
                         List<object> result = new List<object>();
                         string jsonString = "[0, \"Invalid Channel Name\"]";
-                        result = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonString);
+                        result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
                         result.Add(channel.Replace("-pnpres", ""));
                         LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
                         GoToCallback<T>(result, userCallback);
@@ -933,7 +969,7 @@ namespace PubNubMessaging.Core
                             List<object> result = new List<object>();
                             string jsonString = string.Format("[1, \"{0}{1} not subscribed \"]", (IsPresenceChannel(channelName)) ? "Presence " : "", channelName.Replace("-pnpres", ""));
 
-                            result = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonString);
+                            result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
                             result.Add(channelName.Replace("-pnpres", ""));
                             LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
                             GoToCallback<T>(result, userCallback);
@@ -947,7 +983,7 @@ namespace PubNubMessaging.Core
                     {
                         List<object> result = new List<object>();
                         string jsonString = "[0, \"Invalid Channel Name\"]";
-                        result = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonString);
+                        result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
                         result.Add(channel.Replace("-pnpres", ""));
                         LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
                         GoToCallback<T>(result, userCallback);
@@ -991,7 +1027,7 @@ namespace PubNubMessaging.Core
                     {
                         List<object> result = new List<object>();
                         string jsonString = string.Format("[1, \"{0}Unsubscribed from {1}\"]", (IsPresenceChannel(channelToBeRemoved)) ? "Presence " : "",  channelToBeRemoved.Replace("-pnpres", ""));
-                        result = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonString);
+                        result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
                         result.Add(channelToBeRemoved.Replace("-pnpres", ""));
                         LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
                         GoToCallback<T>(result, disconnectCallback);
@@ -1000,7 +1036,7 @@ namespace PubNubMessaging.Core
                     {
                         List<object> result = new List<object>();
                         string jsonString = string.Format("[1, \"{0}unsubscribe error from {1}\"]", (IsPresenceChannel(channelToBeRemoved)) ? "Presence " : "", channelToBeRemoved.Replace("-pnpres", ""));
-                        result = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonString);
+                        result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
                         result.Add(channelToBeRemoved.Replace("-pnpres", ""));
                         LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
                         GoToCallback<T>(result, userCallback);
@@ -1208,6 +1244,10 @@ namespace PubNubMessaging.Core
             {
                 throw new ArgumentException("Missing errorCallback");
             }
+            if (_jsonPluggableLibrary == null)
+            {
+                throw new NullReferenceException("Missing Json Pluggable Library for Pubnub Instance");
+            }
 
             LoggingMethod.WriteToLog(string.Format("DateTime {0}, requested unsubscribe for channel(s)={1}", DateTime.Now.ToString(), channel), LoggingMethod.LevelInfo);
             MultiChannelUnSubscribeInit<T>(ResponseType.Unsubscribe, channel, userCallback, connectCallback, disconnectCallback, errorCallback);
@@ -1308,8 +1348,8 @@ namespace PubNubMessaging.Core
             {
                 //TODO: Identify refactoring
                 List<object> errorResult = new List<object>();
-                string jsonErrorString = string.Format("[2, \"{0}\"]", Regex.Replace(ex.ToString(), @"(?<!\\)\\(?!\\)", @"\\", RegexOptions.IgnorePatternWhitespace));
-                errorResult = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonErrorString);
+                string jsonErrorString = string.Format("[2, \"{0}\"]", ex.ToString().Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\""));
+                errorResult = _jsonPluggableLibrary.DeserializeToListOfObject(jsonErrorString);
                 errorResult.Add(string.Join(",", channels));
                 GoToCallback<T>(errorResult, errorCallback);
 
@@ -1337,10 +1377,17 @@ namespace PubNubMessaging.Core
             {
                 throw new ArgumentException("Missing Channel");
             }
-
             if (userCallback == null)
             {
-                throw new ArgumentException("Missing Callback");
+                throw new ArgumentException("Missing userCallback");
+            }
+            if (errorCallback == null)
+            {
+                throw new ArgumentException("Missing errorCallback");
+            }
+            if (_jsonPluggableLibrary == null)
+            {
+                throw new NullReferenceException("Missing Json Pluggable Library for Pubnub Instance");
             }
 
             LoggingMethod.WriteToLog(string.Format("DateTime {0}, requested presence for channel={1}", DateTime.Now.ToString(), channel), LoggingMethod.LevelInfo);
@@ -1371,6 +1418,14 @@ namespace PubNubMessaging.Core
             {
                 throw new ArgumentException("Missing disconnectCallback");
             }
+            if (errorCallback == null)
+            {
+                throw new ArgumentException("Missing errorCallback");
+            }
+            if (_jsonPluggableLibrary == null)
+            {
+                throw new NullReferenceException("Missing Json Pluggable Library for Pubnub Instance");
+            }
 
             LoggingMethod.WriteToLog(string.Format("DateTime {0}, requested presence-unsubscribe for channel(s)={1}", DateTime.Now.ToString(), channel), LoggingMethod.LevelInfo);
             MultiChannelUnSubscribeInit<T>(ResponseType.PresenceUnsubscribe, channel, userCallback, connectCallback, disconnectCallback, errorCallback);
@@ -1387,6 +1442,19 @@ namespace PubNubMessaging.Core
             {
                 throw new ArgumentException("Missing Channel");
             }
+            if (userCallback == null)
+            {
+                throw new ArgumentException("Missing userCallback");
+            }
+            if (errorCallback == null)
+            {
+                throw new ArgumentException("Missing errorCallback");
+            }
+            if (_jsonPluggableLibrary == null)
+            {
+                throw new NullReferenceException("Missing Json Pluggable Library for Pubnub Instance");
+            }
+
 
             Uri request = BuildHereNowRequest(channel);
 
@@ -1415,6 +1483,19 @@ namespace PubNubMessaging.Core
 
         public bool Time<T>(Action<T> userCallback, Action<T> errorCallback)
         {
+            if (userCallback == null)
+            {
+                throw new ArgumentException("Missing userCallback");
+            }
+            if (errorCallback == null)
+            {
+                throw new ArgumentException("Missing errorCallback");
+            }
+            if (_jsonPluggableLibrary == null)
+            {
+                throw new NullReferenceException("Missing Json Pluggable Library for Pubnub Instance");
+            }
+
             Uri request = BuildTimeRequest();
 
             RequestState<T> requestState = new RequestState<T>();
@@ -1583,8 +1664,8 @@ namespace PubNubMessaging.Core
                 {
                     //TODO: Identify refactoring
                     List<object> errorResult = new List<object>();
-                    string jsonString = string.Format("[2, \"{0}\"]", Regex.Replace(ex.ToString(), @"(?<!\\)\\(?!\\)", @"\\", RegexOptions.IgnorePatternWhitespace));
-                    errorResult = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonString);
+                    string jsonString = string.Format("[2, \"{0}\"]", ex.ToString().Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\""));
+                    errorResult = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
                     errorResult.Add(string.Join(",", pubnubRequestState.Channels));
                     GoToCallback<T>(errorResult, pubnubRequestState.ErrorCallback);
                 }
@@ -1828,7 +1909,7 @@ namespace PubNubMessaging.Core
                     //TODO: Identify refactoring
                     List<object> errorResult = new List<object>();
                     string errorJsonString = string.Format("[2, \"{0}\"]", webEx.ToString().Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\""));
-                    errorResult = (List<object>)JsonConvert.DeserializeObject<List<object>>(errorJsonString);
+                    errorResult = _jsonPluggableLibrary.DeserializeToListOfObject(errorJsonString);
                     errorResult.Add(channels);
                     GoToCallback<T>(errorResult, asynchRequestState.ErrorCallback);
                 }
@@ -1841,7 +1922,7 @@ namespace PubNubMessaging.Core
                     //TODO: Identify refactoring
                     List<object> errorResult = new List<object>();
                     string errorJsonString = string.Format("[2, \"{0}\"]", ex.ToString().Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\""));
-                    errorResult = (List<object>)JsonConvert.DeserializeObject<List<object>>(errorJsonString);
+                    errorResult = _jsonPluggableLibrary.DeserializeToListOfObject(errorJsonString);
                     errorResult.Add(channels);
                     GoToCallback<T>(errorResult, asynchRequestState.ErrorCallback);
                 }
@@ -1900,7 +1981,7 @@ namespace PubNubMessaging.Core
                     //TODO: Identify refactoring
                     List<object> errorResult = new List<object>();
                     string errorJsonString = string.Format("[2, \"{0}\"]", webEx.ToString().Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\""));
-                    errorResult = (List<object>)JsonConvert.DeserializeObject<List<object>>(errorJsonString);
+                    errorResult = _jsonPluggableLibrary.DeserializeToListOfObject(errorJsonString);
                     errorResult.Add(channels);
                     GoToCallback<T>(errorResult, asynchRequestState.ErrorCallback);
                 }
@@ -1913,7 +1994,7 @@ namespace PubNubMessaging.Core
                     //TODO: Identify refactoring
                     List<object> errorResult = new List<object>();
                     string errorJsonString = string.Format("[2, \"{0}\"]", ex.ToString().Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\""));
-                    errorResult = (List<object>)JsonConvert.DeserializeObject<List<object>>(errorJsonString);
+                    errorResult = _jsonPluggableLibrary.DeserializeToListOfObject(errorJsonString);
                     errorResult.Add(channels);
                     GoToCallback<T>(errorResult, asynchRequestState.ErrorCallback);
                 }
@@ -2125,7 +2206,7 @@ namespace PubNubMessaging.Core
 
                         List<object> result = new List<object>();
                         string jsonString = string.Format("[0, \"Detected internet connection problem. Retrying connection attempt {0} of {1}\"]", _channelInternetRetry[channel], _pubnubNetworkCheckRetries);
-                        result = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonString);
+                        result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
                         result.Add(string.Join(",", asynchRequestState.Channels));
                         GoToCallback<T>(result, asynchRequestState.ConnectCallback);
                     }
@@ -2177,7 +2258,7 @@ namespace PubNubMessaging.Core
                                 {
                                     List<object> internetStatus = new List<object>();
                                     string statusJsonString = string.Format("[1, \"Internet connection available\"]");
-                                    internetStatus = (List<object>)JsonConvert.DeserializeObject<List<object>>(statusJsonString);
+                                    internetStatus = _jsonPluggableLibrary.DeserializeToListOfObject(statusJsonString);
                                     internetStatus.Add(channel);
                                     GoToCallback<T>(internetStatus, asynchRequestState.ConnectCallback);
                                 }
@@ -2232,9 +2313,9 @@ namespace PubNubMessaging.Core
                 {
                     //TODO: Identify refactoring
                     List<object> errorResult = new List<object>();
-                    string jsonString = string.Format("[2, \"{0}\"]", Regex.Replace(webEx.ToString(), @"(?<!\\)\\(?!\\)", @"\\" ,RegexOptions.IgnorePatternWhitespace));
+                    string jsonString = string.Format("[2, \"{0}\"]", webEx.ToString().Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\""));
 
-                    errorResult = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonString);
+                    errorResult = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
                     errorResult.Add(string.Join(",", asynchRequestState.Channels));
                     GoToCallback<T>(errorResult, asynchRequestState.ErrorCallback);
                 }
@@ -2268,17 +2349,8 @@ namespace PubNubMessaging.Core
                                 TerminateHeartbeatTimer(asyncWebRequest.RequestUri);
                             }
 
-                            //jsonString = jsonString.Replace("\r\n", " ")
-                            //                          .Replace("\r", " ")
-                            //                          .Replace("\n", " ")
-                            //                          .Replace("\\", "\\\\")
-                            //                          .Replace("\"", "\\\"");
-
-                            //jsonString = Regex.Replace(jsonString, @"(?<!\\)\\(?!\\)", @"\\", RegexOptions.IgnorePatternWhitespace).Replace("\"","");
-                            //jsonString = Regex.Replace(jsonString, @"\""", @"\""", RegexOptions.IgnorePatternWhitespace);
                             if (jsonString != "[]")
                             {
-                                //jsonString = string.Format("[2, \"{0}\"]", jsonString);
                                 result = WrapResultBasedOnResponseType(asynchRequestState.Type, jsonString, asynchRequestState.Channels, asynchRequestState.Reconnect, asynchRequestState.Timetoken, asynchRequestState.ErrorCallback);
                             }
                             else
@@ -2306,8 +2378,7 @@ namespace PubNubMessaging.Core
                     //TODO: Identify refactoring
                     List<object> errorResult = new List<object>();
                     string jsonString = string.Format("[2, \"{0}\"]", ex.ToString().Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\""));
-                    //string jsonString = string.Format("[2, \"{0}\"]", Regex.Replace(ex.ToString(), @"(?<!\\)\\(?!\\)", @"\\", RegexOptions.IgnorePatternWhitespace));
-                    errorResult = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonString);
+                    errorResult = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
                     if (asynchRequestState.Channels != null)
                     {
                         errorResult.Add(string.Join(",", asynchRequestState.Channels));
@@ -2464,13 +2535,13 @@ namespace PubNubMessaging.Core
                         {
                             case ResponseType.Subscribe:
                                 jsonString = string.Format("[1, \"Connected\"]");
-                                connectResult = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonString);
+                                connectResult = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
                                 connectResult.Add(channel);
                                 GoToCallback<T>(connectResult, connectCallback);
                                 break;
                             case ResponseType.Presence:
                                 jsonString = string.Format("[1, \"Presence Connected\"]");
-                                connectResult = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonString);
+                                connectResult = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
                                 connectResult.Add(channel.Replace("-pnpres", ""));
                                 GoToCallback<T>(connectResult, connectCallback);
                                 break;
@@ -2709,12 +2780,12 @@ namespace PubNubMessaging.Core
                                 select item as object).ToArray();
                     if (messages != null && messages.Length > 0)
                     {
-                        JArray messageList = messages[0] as JArray;
+                        object[] messageList = messages[0] as object[];
                         messageChannels = messages[2].ToString().Split(',');
                         
-                        if (messageList != null && messageList.Count > 0)
+                        if (messageList != null && messageList.Length > 0)
                         {
-                            for (int messageIndex = 0; messageIndex < messageList.Count; messageIndex++)
+                            for (int messageIndex = 0; messageIndex < messageList.Length; messageIndex++)
                             {
                                 string currentChannel = (messageChannels.Length == 1) ? (string)messageChannels[0] : (string)messageChannels[messageIndex];
                                 List<object> itemMessage = new List<object>();
@@ -2729,7 +2800,7 @@ namespace PubNubMessaging.Core
                                     {
                                         PubnubCrypto aes = new PubnubCrypto(this.cipherKey);
                                         string decryptMessage = aes.Decrypt(messageList[messageIndex].ToString());
-                                        object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : JsonConvert.DeserializeObject<object>(decryptMessage);
+                                        object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : _jsonPluggableLibrary.DeserializeToObject(decryptMessage);
 
                                         itemMessage.Add(decodeMessage);
                                     }
@@ -2783,7 +2854,7 @@ namespace PubNubMessaging.Core
 
             if (typeof(T) == typeof(string))
             {
-                callbackJson = JsonConvert.SerializeObject(result);
+                callbackJson = _jsonPluggableLibrary.SerializeToJsonString(result);
 
                 Action<string> castCallback = callback as Action<string>;
                 castCallback(callbackJson);
@@ -2812,7 +2883,7 @@ namespace PubNubMessaging.Core
                 {
                     List<object> errorResult = new List<object>();
                     string jsonString = string.Format("[0, \"Unsubscribed after {0} failed retries\"]", _pubnubNetworkCheckRetries);
-                    errorResult = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonString);
+                    errorResult = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
                     string activeMultiChannel = string.Join(",", subscribeChannels);
                     errorResult.Add(activeMultiChannel);
 
@@ -2826,7 +2897,7 @@ namespace PubNubMessaging.Core
                 {
                     List<object> errorResult = new List<object>();
                     string jsonString = string.Format("[0, \"Presence Unsubscribed after {0} failed retries\"]", _pubnubNetworkCheckRetries);
-                    errorResult = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonString);
+                    errorResult = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
                     string activeMultiChannel = string.Join(",", presenceChannels).Replace("-pnpres", "");
                     errorResult.Add(activeMultiChannel);
 
@@ -2860,7 +2931,7 @@ namespace PubNubMessaging.Core
         {
             List<object> result = new List<object>();
             string jsonString = (requestTimeout) ? "[0, \"Operation Timeout\"]" : "[0, \"Network connnect error\"]";
-            result = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonString);
+            result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
             result.Add(channelName);
             LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON publish response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
             GoToCallback<T>(result, userCallback);
@@ -2870,7 +2941,7 @@ namespace PubNubMessaging.Core
         {
             List<object> result = new List<object>();
             string jsonString = (requestTimeout) ? "[0, \"Operation Timeout\"]" : "[0, \"Network connnect error\"]";
-            result = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonString);
+            result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
             result.Add(channelName);
             LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON here_now response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
             GoToCallback<T>(result, userCallback);
@@ -2880,7 +2951,7 @@ namespace PubNubMessaging.Core
         {
             List<object> result = new List<object>();
             string jsonString = (requestTimeout) ? "[0, \"Operation Timeout\"]" : "[0, \"Network connnect error\"]";
-            result = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonString);
+            result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
             result.Add(channelName);
             LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON detailedHistoryExceptionHandler response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
             GoToCallback<T>(result, userCallback);
@@ -2890,7 +2961,7 @@ namespace PubNubMessaging.Core
         {
             List<object> result = new List<object>();
             string jsonString = (requestTimeout) ? "[0, \"Operation Timeout\"]" : "[0, \"Network connnect error\"]";
-            result = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonString);
+            result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
             LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON timeExceptionHandler response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
             GoToCallback<T>(result, userCallback);
         }
@@ -2912,7 +2983,7 @@ namespace PubNubMessaging.Core
 
             try
             {
-                object deSerializedResult = JsonConvert.DeserializeObject<object>(jsonString);
+                object deSerializedResult = _jsonPluggableLibrary.DeserializeToObject(jsonString);
                 List<object> result1 = ((IEnumerable)deSerializedResult).Cast<object>().ToList();
 
                 if (result1 != null && result1.Count > 0)
@@ -2946,7 +3017,7 @@ namespace PubNubMessaging.Core
                         result.Add(channels.First<string>());
                         break;
                     case ResponseType.Here_Now:
-                        Dictionary<string, object> dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+                        Dictionary<string, object> dictionary = _jsonPluggableLibrary.DeserializeToDictionaryOfObject(jsonString);
                         result = new List<object>();
                         result.Add(dictionary);
                         result.Add(channels.First<string>());
@@ -3011,7 +3082,7 @@ namespace PubNubMessaging.Core
                     //TODO: Identify refactoring
                     List<object> errorResult = new List<object>();
                     string errorJsonString = string.Format("[2, \"{0}\"]", ex.ToString().Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\""));
-                    errorResult = (List<object>)JsonConvert.DeserializeObject<List<object>>(errorJsonString);
+                    errorResult = _jsonPluggableLibrary.DeserializeToListOfObject(errorJsonString);
                     errorResult.Add(string.Join(",", channels));
                     GoToCallback<T>(errorResult, errorCallback);
                 }
@@ -3066,26 +3137,6 @@ namespace PubNubMessaging.Core
                     break;
             };
             return channelName;
-        }
-
-        /// <summary>
-        /// Serialize the given object into JSON string
-        /// </summary>
-        /// <param name="objectToSerialize"></param>
-        /// <returns></returns>
-        public static string SerializeToJsonString(object objectToSerialize)
-        {
-            return JsonConvert.SerializeObject(objectToSerialize);
-        }
-
-        /// <summary>
-        /// Deserialize JSON string into List of Objects
-        /// </summary>
-        /// <param name="jsonString"></param>
-        /// <returns></returns>
-        public static List<object> DeserializeToListOfObject(string jsonString)
-        {
-            return JsonConvert.DeserializeObject<List<object>>(jsonString);
         }
 
         private string EncodeUricomponent(string s, ResponseType type, bool ignoreComma)
@@ -4044,6 +4095,19 @@ namespace PubNubMessaging.Core
         private static bool _status = true;
         private static bool _failClientNetworkForTesting = false;
 
+        private static IJsonPluggableLibrary _jsonPluggableLibrary;
+        internal static IJsonPluggableLibrary JsonPluggableLibrary
+        {
+            get
+            {
+                return _jsonPluggableLibrary;
+            }
+            set
+            {
+                _jsonPluggableLibrary = value;
+            }
+        }
+
 #if (SILVERLIGHT  || WINDOWS_PHONE)
         private static ManualResetEvent mres = new ManualResetEvent(false);
         private static ManualResetEvent mreSocketAsync = new ManualResetEvent(false);
@@ -4136,8 +4200,8 @@ namespace PubNubMessaging.Core
             {
                 //TODO: Identify refactoring
                 List<object> errorResult = new List<object>();
-                string jsonErrorString = string.Format("[2, \"{0}\"]", Regex.Replace(ex.ToString(), @"(?<!\\)\\(?!\\)", @"\\", RegexOptions.IgnorePatternWhitespace));
-                errorResult = (List<object>)JsonConvert.DeserializeObject<List<object>>(jsonErrorString);
+                string jsonErrorString = string.Format("[2, \"{0}\"]", ex.ToString().Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\""));
+                errorResult = _jsonPluggableLibrary.DeserializeToListOfObject(jsonErrorString);
                 errorResult.Add(string.Join(",", channels));
                 GoToCallback<T>(errorResult, errorCallback);
 
@@ -4170,7 +4234,7 @@ namespace PubNubMessaging.Core
 
             if (typeof(T) == typeof(string))
             {
-                callbackJson = JsonConvert.SerializeObject(result);
+                callbackJson = _jsonPluggableLibrary.SerializeToJsonString(result);
 
                 Action<string> castCallback = callback as Action<string>;
                 castCallback(callbackJson);
@@ -4695,6 +4759,131 @@ namespace PubNubMessaging.Core
             }
         }
     }
+
+
+    public interface IJsonPluggableLibrary
+    {
+        string SerializeToJsonString(object objectToSerialize);
+
+        List<object> DeserializeToListOfObject(string jsonString);
+
+        object DeserializeToObject(string jsonString);
+
+        Dictionary<string, object> DeserializeToDictionaryOfObject(string jsonString);
+    }
+
+#if (!__MonoCS__)
+    public class NewtonJsonDotNet : IJsonPluggableLibrary
+    {
+        #region IJsonPlugableLibrary methods implementation
+
+        public string SerializeToJsonString(object objectToSerialize)
+        {
+            return JsonConvert.SerializeObject(objectToSerialize);
+        }
+
+        public List<object> DeserializeToListOfObject(string jsonString)
+        {
+            List<object> result = JsonConvert.DeserializeObject<List<object>>(jsonString);
+
+            //var resultItems = (from item in result
+            //                select item as object).ToArray();
+
+            //result = resultItems.ToList();
+
+            return result;
+        }
+
+        public object DeserializeToObject(string jsonString)
+        {
+            object result = JsonConvert.DeserializeObject<object>(jsonString);
+            if (result.GetType().ToString() == "Newtonsoft.Json.Linq.JArray")
+            {
+                JArray jarrayResult = result as JArray;
+                List<object> objectContainer = jarrayResult.ToObject<List<object>>();
+                if (objectContainer != null && objectContainer.Count > 0)
+                {
+                    for (int index = 0; index < objectContainer.Count; index++)
+                    {
+                        if (objectContainer[index].GetType().ToString() == "Newtonsoft.Json.Linq.JArray")
+                        {
+                            JArray internalItem = objectContainer[index] as JArray;
+                            objectContainer[index] = internalItem.Select(item => (object)item).ToArray();
+                        }
+                    }
+                    result = objectContainer;
+                }
+            }
+            return result;
+        }
+
+        public Dictionary<string, object> DeserializeToDictionaryOfObject(string jsonString)
+        {
+            return JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+        }
+        #endregion
+    }
+#endif
+
+    public class JsonFXDotNet : IJsonPluggableLibrary
+    {
+        public string SerializeToJsonString(object objectToSerialize)
+        {
+            var writer = new JsonFx.Json.JsonWriter();
+            string json = writer.Write(objectToSerialize);
+            return json;
+        }
+
+        public List<object> DeserializeToListOfObject(string jsonString)
+        {
+            var reader = new JsonFx.Json.JsonReader();
+            var output = reader.Read<List<object>>(jsonString);
+            return output;
+        }
+
+        public object DeserializeToObject(string jsonString)
+        {
+            var reader = new JsonFx.Json.JsonReader();
+            var output = reader.Read<object>(jsonString);
+            return output;
+        }
+
+        public Dictionary<string, object> DeserializeToDictionaryOfObject(string jsonString)
+        {
+            var reader = new JsonFx.Json.JsonReader();
+            var output = reader.Read<Dictionary<string, object>>(jsonString);
+            return output;
+        }
+    }
+
+#if (!__MonoCS__)
+    public class JscriptSerializer : IJsonPluggableLibrary
+    {
+        public string SerializeToJsonString(object objectToSerialize)
+        {
+            JavaScriptSerializer jS = new JavaScriptSerializer();
+            return jS.Serialize(objectToSerialize);
+        }
+
+        public List<object> DeserializeToListOfObject(string jsonString)
+        {
+            JavaScriptSerializer jS = new JavaScriptSerializer();
+            return (List<object>)jS.Deserialize<List<object>>(jsonString);
+        }
+
+        public object DeserializeToObject(string jsonString)
+        {
+            JavaScriptSerializer jS = new JavaScriptSerializer();
+            return (object)jS.Deserialize<object>(jsonString);
+        }
+
+        public Dictionary<string, object> DeserializeToDictionaryOfObject(string jsonString)
+        {
+            JavaScriptSerializer jS = new JavaScriptSerializer();
+            return (Dictionary<string, object>)jS.Deserialize<Dictionary<string, object>>(jsonString);
+        }
+    }
+#endif
 
 #if (__MonoCS__)
     class StateObject<T>

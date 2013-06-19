@@ -6,14 +6,13 @@ using UnityEngine;
 using System.ComponentModel;
 using System.Threading;
 using System.Collections;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
 {
-    public class WhenAClientIsPresented: UUnitTestCase
+    public class WhenAClientIsPresented//: UUnitTestCase
     {
+		/*
         ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
         ManualResetEvent presenceManualEvent = new ManualResetEvent(false);
         ManualResetEvent unsubscribeManualEvent = new ManualResetEvent(false);
@@ -39,6 +38,7 @@ namespace PubNubMessaging.Tests
             receivedPresenceMessage = false;
 
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAClientIsPresented";
@@ -73,6 +73,7 @@ namespace PubNubMessaging.Tests
             receivedCustomUUID = false;
 
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAClientIsPresented";
@@ -108,6 +109,8 @@ namespace PubNubMessaging.Tests
             receivedHereNowMessage = false;
 
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
+			
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAClientIsPresented";
             unitTest.TestCaseName = "IfHereNowIsCalledThenItShouldReturnInfo";
@@ -285,5 +288,6 @@ namespace PubNubMessaging.Tests
         void DummyErrorCallback(string result)
         {
         }
+        */
     }
 }

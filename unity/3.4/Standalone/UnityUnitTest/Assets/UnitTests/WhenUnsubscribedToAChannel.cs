@@ -6,8 +6,6 @@ using UnityEngine;
 using System.ComponentModel;
 using System.Threading;
 using System.Collections;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
@@ -27,6 +25,7 @@ namespace PubNubMessaging.Tests
         {
             receivedNotSubscribedMessage = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenUnsubscribedToAChannel";
@@ -52,6 +51,7 @@ namespace PubNubMessaging.Tests
             receivedUnsubscribedMessage = false;
 
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenUnsubscribedToAChannel";

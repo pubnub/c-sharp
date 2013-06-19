@@ -6,14 +6,13 @@ using UnityEngine;
 using System.ComponentModel;
 using System.Threading;
 using System.Collections;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
 {
     public class WhenDetailedHistoryIsRequested//: UUnitTestCase
     {
+		/*
         ManualResetEvent mreMessageCount10 = new ManualResetEvent(false);
         ManualResetEvent mreMessageCount10ReverseTrue = new ManualResetEvent(false);
         ManualResetEvent mreMessageStartReverseTrue = new ManualResetEvent(false);
@@ -33,6 +32,7 @@ namespace PubNubMessaging.Tests
             message10Received = false;
 
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
@@ -74,6 +74,7 @@ namespace PubNubMessaging.Tests
             message10ReverseTrueReceived = false;
 
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
@@ -115,6 +116,7 @@ namespace PubNubMessaging.Tests
             expectedCountAtStartTimeWithReverseTrue = 0;
             messageStartReverseTrue = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
@@ -193,5 +195,6 @@ namespace PubNubMessaging.Tests
         void DummyErrorCallback(string result)
         {
         }
+        */
     }
 }

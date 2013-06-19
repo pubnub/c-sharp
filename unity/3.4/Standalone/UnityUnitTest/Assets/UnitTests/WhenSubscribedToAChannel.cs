@@ -6,14 +6,13 @@ using UnityEngine;
 using System.ComponentModel;
 using System.Threading;
 using System.Collections;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
 {
     public class WhenSubscribedToAChannel//: UUnitTestCase
     {
+		/*
         ManualResetEvent meSubscribeNoConnect = new ManualResetEvent(false);
         ManualResetEvent meSubscribeYesConnect = new ManualResetEvent(false);
         ManualResetEvent mePublish = new ManualResetEvent(false);
@@ -37,6 +36,7 @@ namespace PubNubMessaging.Tests
         {
             receivedMessage = false;
             Pubnub pubnub = new Pubnub("demo","demo","","",false);
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannel";
@@ -66,6 +66,7 @@ namespace PubNubMessaging.Tests
         {
             receivedConnectMessage = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannel";
@@ -90,6 +91,7 @@ namespace PubNubMessaging.Tests
             receivedChannel1ConnectMessage = false;
             receivedChannel2ConnectMessage = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannel";
@@ -116,6 +118,7 @@ namespace PubNubMessaging.Tests
         {
             receivedAlreadySubscribedMessage = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannel";
@@ -142,6 +145,7 @@ namespace PubNubMessaging.Tests
         {
             receivedManyMessages = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannel";
@@ -293,5 +297,6 @@ namespace PubNubMessaging.Tests
         void DummyErrorCallback(string result)
         {
         }
+        */
     }
 }
