@@ -12,7 +12,6 @@ namespace PubNubMessaging.Tests
 {
     public class WhenAClientIsPresented//: UUnitTestCase
     {
-		/*
         ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
         ManualResetEvent presenceManualEvent = new ManualResetEvent(false);
         ManualResetEvent unsubscribeManualEvent = new ManualResetEvent(false);
@@ -50,16 +49,16 @@ namespace PubNubMessaging.Tests
             pubnub.Presence<string>(channel, ThenPresenceShouldReturnMessage, PresenceDummyMethodForConnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
             
-            //since presence expects from stimulus from sub/unsub...
-            pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
-            subscribeManualEvent.WaitOne(2000);
+//            //since presence expects from stimulus from sub/unsub...
+//            pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
+//            Thread.Sleep(1000);
+//            subscribeManualEvent.WaitOne(2000);
+//
+//            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+//            Thread.Sleep(1000);
+//            unsubscribeManualEvent.WaitOne(2000);
 
-            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
-            unsubscribeManualEvent.WaitOne(2000);
-
-            presenceManualEvent.WaitOne(310 * 1000);
+            presenceManualEvent.WaitOne(10 * 1000);
 
             pubnub.EndPendingRequests();
             
@@ -87,15 +86,15 @@ namespace PubNubMessaging.Tests
             
             //since presence expects from stimulus from sub/unsub...
             pubnub.SessionUUID = customUUID;
-            pubnub.Subscribe<string>(channel, DummyMethodForSubscribeUUID, SubscribeUUIDDummyMethodForConnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
-            subscribeUUIDManualEvent.WaitOne(2000);
+//            pubnub.Subscribe<string>(channel, DummyMethodForSubscribeUUID, SubscribeUUIDDummyMethodForConnectCallback, DummyErrorCallback);
+//            Thread.Sleep(1000);
+//            subscribeUUIDManualEvent.WaitOne(2000);
+//
+//            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribeUUID, UnsubscribeUUIDDummyMethodForConnectCallback, UnsubscribeUUIDDummyMethodForDisconnectCallback, DummyErrorCallback);
+//            Thread.Sleep(1000);
+//            unsubscribeUUIDManualEvent.WaitOne(2000);
 
-            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribeUUID, UnsubscribeUUIDDummyMethodForConnectCallback, UnsubscribeUUIDDummyMethodForDisconnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
-            unsubscribeUUIDManualEvent.WaitOne(2000);
-
-            presenceUUIDManualEvent.WaitOne(310 * 1000);
+            presenceUUIDManualEvent.WaitOne(10 * 1000);
 
             pubnub.EndPendingRequests();
 
@@ -127,8 +126,8 @@ namespace PubNubMessaging.Tests
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    object[] serializedMessage = new JsonFXDotNet().DeserializeToListOfObject(receivedMessage).ToArray();
+                    Dictionary<string,object> dictionary = serializedMessage[0] as Dictionary<string,object>;
                     var uuid = dictionary["uuid"].ToString();
                     if (uuid != null)
                     {
@@ -136,7 +135,7 @@ namespace PubNubMessaging.Tests
                     }
                 }
             }
-            catch { }
+            catch{}
             finally
             {
                 presenceManualEvent.Set();
@@ -149,8 +148,8 @@ namespace PubNubMessaging.Tests
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    object[] serializedMessage = new JsonFXDotNet().DeserializeToListOfObject(receivedMessage).ToArray();
+                    Dictionary<string,object> dictionary = serializedMessage[0] as Dictionary<string,object>;
                     var uuid = dictionary["uuid"].ToString();
                     if (uuid != null && uuid.Contains(customUUID))
                     {
@@ -171,8 +170,8 @@ namespace PubNubMessaging.Tests
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    var dictionary = ((JContainer)serializedMessage[0])["uuids"];
+                    object[] serializedMessage = new JsonFXDotNet().DeserializeToListOfObject(receivedMessage).ToArray();
+                    Dictionary<string,object> dictionary = serializedMessage[0] as Dictionary<string,object>;
                     if (dictionary != null)
                     {
                         receivedHereNowMessage = true;
@@ -192,16 +191,16 @@ namespace PubNubMessaging.Tests
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    object[] serializedMessage = new JsonFXDotNet().DeserializeToListOfObject(receivedMessage).ToArray();
+                    Dictionary<string,object> dictionary = serializedMessage[0] as Dictionary<string,object>;
                     if (dictionary != null)
                     {
-                    var uuid = dictionary["uuid"].ToString();
-                    if (uuid != null)
-                    {
-                        receivedPresenceMessage = true;
-                    }
-                        }
+	                    var uuid = dictionary["uuid"].ToString();
+	                    if (uuid != null)
+	                    {
+	                        receivedPresenceMessage = true;
+	                    }
+					}
                 }
             }
             catch { }
@@ -218,8 +217,8 @@ namespace PubNubMessaging.Tests
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    object[] serializedMessage = new JsonFXDotNet().DeserializeToListOfObject(receivedMessage).ToArray();
+                    Dictionary<string,object> dictionary = serializedMessage[0] as Dictionary<string,object>;
                     if (dictionary != null)
                     {
                         var uuid = dictionary["uuid"].ToString();
@@ -288,6 +287,5 @@ namespace PubNubMessaging.Tests
         void DummyErrorCallback(string result)
         {
         }
-        */
     }
 }

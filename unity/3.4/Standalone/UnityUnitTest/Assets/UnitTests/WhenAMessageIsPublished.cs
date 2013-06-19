@@ -11,9 +11,8 @@ using System.Reflection;
 
 namespace PubNubMessaging.Tests
 {
-    public class WhenAMessageIsPublished//: UUnitTestCase
+    public class WhenAMessageIsPublished: UUnitTestCase
     {
-		/*
         ManualResetEvent mreUnencryptedPublish = new ManualResetEvent(false);
         ManualResetEvent mreOptionalSecretKeyPublish = new ManualResetEvent(false);
         ManualResetEvent mreNoSslPublish = new ManualResetEvent(false);
@@ -114,10 +113,10 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
             string channel = "my/channel";
             object message = new CustomClass();
-            messageObjectForUnencryptPublish = JsonConvert.SerializeObject(message);
-
+            messageObjectForUnencryptPublish = new JsonFXDotNet().SerializeToJsonString(message);
+			Debug.Log("messageObjectForUnencryptPublish = " + messageObjectForUnencryptPublish);
             pubnub.Publish<string>(channel, message, ReturnSuccessUnencryptObjectPublishCodeCallback, DummyErrorCallback);
-            mreUnencryptObjectPublish.WaitOne(310 * 1000);
+            mreUnencryptObjectPublish.WaitOne(10 * 1000);
 
             if (!isUnencryptObjectPublished)
             {
@@ -126,7 +125,7 @@ namespace PubNubMessaging.Tests
             else
             {
                 pubnub.DetailedHistory<string>(channel, -1, unEncryptObjectPublishTimetoken, -1, false, CaptureUnencryptObjectDetailedHistoryCallback, DummyErrorCallback);
-                mreUnencryptObjectDetailedHistory.WaitOne(310 * 1000);
+                mreUnencryptObjectDetailedHistory.WaitOne(10 * 1000);
                 UUnitAssert.True(isUnencryptObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
             }
         }
@@ -147,7 +146,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "my/channel";
             object message = new SecretCustomClass();
-            messageObjectForEncryptPublish = JsonConvert.SerializeObject(message);
+            messageObjectForEncryptPublish = new JsonFXDotNet().SerializeToJsonString(message);
 
             pubnub.Publish<string>(channel, message, ReturnSuccessEncryptObjectPublishCodeCallback, DummyErrorCallback);
             mreEncryptObjectPublish.WaitOne(310 * 1000);
@@ -228,7 +227,8 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        [UUnitTest]
+        /*
+		[UUnitTest]
         public void ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo()
         {
 			Debug.Log("Running ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo()");
@@ -243,8 +243,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "my/channel";
             object message = new PubnubDemoObject();
-			messageComplexObjectForPublish = JsonConvert.SerializeObject(message);
-
+			messageComplexObjectForPublish = new JsonFXDotNet().SerializeToJsonString(message);
             pubnub.Publish<string>(channel, message, ReturnSuccessComplexObjectPublishCodeCallback, DummyErrorCallback);
             mreComplexObjectPublish.WaitOne(30 * 1000);
 
@@ -259,7 +258,8 @@ namespace PubNubMessaging.Tests
                 UUnitAssert.True(isComplexObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
             }
         }
-
+		*/
+		
         [UUnitTest]
         public void ThenDisableJsonEncodeShouldSendSerializedObjectMessage()
         {
@@ -320,7 +320,7 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
@@ -339,7 +339,7 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
@@ -358,7 +358,7 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
@@ -377,7 +377,7 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
@@ -396,7 +396,7 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
@@ -415,10 +415,10 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
-                    JArray message = deserializedMessage[0] as JArray;
+                    object[] message = deserializedMessage[0] as object[];
                     if (message != null && message[0].ToString() == messageForUnencryptPublish)
                     {
                         isUnencryptDetailedHistory = true;
@@ -433,11 +433,13 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
-                    JArray message = deserializedMessage[0] as JArray;
-                    if (message != null && message[0].ToString(Formatting.None) == messageObjectForUnencryptPublish)
+
+					object[] message = deserializedMessage[0] as object[];
+					string receivedObjectString = new JsonFXDotNet().SerializeToJsonString(message[0]);
+                    if (receivedObjectString != null && receivedObjectString == messageObjectForUnencryptPublish)
                     {
                         isUnencryptObjectDetailedHistory = true;
                     }
@@ -451,11 +453,12 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
-                    JArray message = deserializedMessage[0] as JArray;
-                    if (message != null && message[0].ToString(Formatting.None) == messageObjectForEncryptPublish)
+                    object[] message = deserializedMessage[0] as object[];
+					string receivedObjectString = new JsonFXDotNet().SerializeToJsonString(message[0]);
+                    if (receivedObjectString != null && receivedObjectString == messageObjectForEncryptPublish)
                     {
                         isEncryptObjectDetailedHistory = true;
                     }
@@ -469,10 +472,10 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
-                    JArray message = deserializedMessage[0] as JArray;
+                    object[] message = deserializedMessage[0] as object[];
                     if (message != null && message[0].ToString() == messageForEncryptPublish)
                     {
                         isEncryptDetailedHistory = true;
@@ -487,10 +490,10 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedResult = JsonConvert.DeserializeObject<object[]>(result);
+                object[] deserializedResult = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedResult is object[])
                 {
-                    JArray message = deserializedResult[0] as JArray;
+                    object[] message = deserializedResult[0] as object[];
                     if (message != null && message[0].ToString() == messageForSecretEncryptPublish)
                     {
                         isSecretEncryptDetailedHistory = true;
@@ -505,7 +508,7 @@ namespace PubNubMessaging.Tests
         {
 			if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
@@ -526,11 +529,12 @@ namespace PubNubMessaging.Tests
         {
 			if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
-                    JArray message = deserializedMessage[0] as JArray;
-                    if (message != null && message[0].ToString(Formatting.None) == messageComplexObjectForPublish)
+                    object[] message = deserializedMessage[0] as object[];
+					string receivedObjectString = new JsonFXDotNet().SerializeToJsonString(message[0]);
+                    if (receivedObjectString != null && receivedObjectString == messageComplexObjectForPublish)
                     {
                         isComplexObjectDetailedHistory = true;
                     }
@@ -544,7 +548,7 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
@@ -632,7 +636,7 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedResult = JsonConvert.DeserializeObject<object[]>(result);
+                object[] deserializedResult = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedResult is object[])
                 {
                     long statusCode = Int64.Parse(deserializedResult[0].ToString());
@@ -672,7 +676,7 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedResult = JsonConvert.DeserializeObject<object[]>(result);
+                object[] deserializedResult = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedResult is object[])
                 {
                     long statusCode = Int64.Parse(deserializedResult[0].ToString());
@@ -690,7 +694,7 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedResult = JsonConvert.DeserializeObject<object[]>(result);
+                object[] deserializedResult = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedResult is object[])
                 {
                     long statusCode = Int64.Parse(deserializedResult[0].ToString());
@@ -709,11 +713,13 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
-                    JArray message = deserializedMessage[0] as JArray;
-                    if (message != null && message[0].ToString(Formatting.None) == serializedObjectMessageForPublish)
+                    object[] message = deserializedMessage[0] as object[];
+					string receivedObjectString = new JsonFXDotNet().SerializeToJsonString(message[0]);
+
+                    if (receivedObjectString != null && receivedObjectString == serializedObjectMessageForPublish)
                     {
                         isSerializedObjectMessageDetailedHistory = true;
                     }
@@ -727,6 +733,5 @@ namespace PubNubMessaging.Tests
         {
 			//Debug.Log("Error callback = " + result);
         }
-        */
     }
 }

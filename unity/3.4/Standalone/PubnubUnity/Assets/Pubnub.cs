@@ -1,4 +1,4 @@
-﻿//Build Date: June 18, 2013
+﻿//Build Date: June 19, 2013
 #if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
 #define TRACE
 #endif
@@ -1150,7 +1150,15 @@ namespace PubNubMessaging.Core
                     && (currentState.Type == ResponseType.Subscribe || currentState.Type == ResponseType.Presence)
                     && overrideTcpKeepAlive)
                 {
-                    bool networkConnection = ClientNetworkStatus.CheckInternetStatus(_pubnetSystemActive, currentState.ErrorCallback, currentState.Channels);
+                    bool networkConnection;
+                    if (_pubnubUnitTest is IPubnubUnitTest && _pubnubUnitTest.EnableStubTest)
+                    {
+                        networkConnection = true;
+                    }
+                    else
+                    {
+                        networkConnection = ClientNetworkStatus.CheckInternetStatus(_pubnetSystemActive, currentState.ErrorCallback, currentState.Channels);
+                    }
 
                     _channelInternetStatus[channel] = networkConnection;
 
