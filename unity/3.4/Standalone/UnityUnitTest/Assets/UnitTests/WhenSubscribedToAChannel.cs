@@ -10,9 +10,8 @@ using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
 {
-    public class WhenSubscribedToAChannel//: UUnitTestCase
+    public class WhenSubscribedToAChannel: UUnitTestCase
     {
-		/*
         ManualResetEvent meSubscribeNoConnect = new ManualResetEvent(false);
         ManualResetEvent meSubscribeYesConnect = new ManualResetEvent(false);
         ManualResetEvent mePublish = new ManualResetEvent(false);
@@ -34,6 +33,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void ThenSubscribeShouldReturnReceivedMessage()
         {
+			Debug.Log("Running ThenSubscribeShouldReturnReceivedMessage()");
             receivedMessage = false;
             Pubnub pubnub = new Pubnub("demo","demo","","",false);
 			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
@@ -64,6 +64,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void ThenSubscribeShouldReturnConnectStatus()
         {
+			Debug.Log("Running ThenSubscribeShouldReturnConnectStatus()");
             receivedConnectMessage = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
@@ -88,6 +89,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void ThenMultiSubscribeShouldReturnConnectStatus()
         {
+			Debug.Log("Running ThenMultiSubscribeShouldReturnConnectStatus()");
             receivedChannel1ConnectMessage = false;
             receivedChannel2ConnectMessage = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
@@ -116,6 +118,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void ThenDuplicateChannelShouldReturnAlreadySubscribed()
         {
+			Debug.Log("Running ThenDuplicateChannelShouldReturnAlreadySubscribed()");
             receivedAlreadySubscribedMessage = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
@@ -143,6 +146,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void ThenSubscriberShouldBeAbleToReceiveManyMessages()
         {
+			Debug.Log("Running ThenSubscriberShouldBeAbleToReceiveManyMessages()");
             receivedManyMessages = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
@@ -156,7 +160,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.Subscribe<string>(channel, SubscriberDummyMethodForManyMessagesUserCallback, SubscribeDummyMethodForManyMessagesConnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
-            meSubscriberManyMessages.WaitOne(310 * 1000);
+            meSubscriberManyMessages.WaitOne(10 * 1000);
 
             pubnub.EndPendingRequests();
 
@@ -186,7 +190,7 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
@@ -204,7 +208,7 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
@@ -239,7 +243,7 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
                     object subscribedObject = (object)deserializedMessage[0];
@@ -261,7 +265,7 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
@@ -296,7 +300,7 @@ namespace PubNubMessaging.Tests
 
         void DummyErrorCallback(string result)
         {
+			Debug.Log(result);
         }
-        */
     }
 }

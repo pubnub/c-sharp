@@ -114,7 +114,6 @@ namespace PubNubMessaging.Tests
             string channel = "my/channel";
             object message = new CustomClass();
             messageObjectForUnencryptPublish = new JsonFXDotNet().SerializeToJsonString(message);
-			Debug.Log("messageObjectForUnencryptPublish = " + messageObjectForUnencryptPublish);
             pubnub.Publish<string>(channel, message, ReturnSuccessUnencryptObjectPublishCodeCallback, DummyErrorCallback);
             mreUnencryptObjectPublish.WaitOne(10 * 1000);
 
@@ -227,7 +226,6 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        /*
 		[UUnitTest]
         public void ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo()
         {
@@ -258,7 +256,6 @@ namespace PubNubMessaging.Tests
                 UUnitAssert.True(isComplexObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
             }
         }
-		*/
 		
         [UUnitTest]
         public void ThenDisableJsonEncodeShouldSendSerializedObjectMessage()

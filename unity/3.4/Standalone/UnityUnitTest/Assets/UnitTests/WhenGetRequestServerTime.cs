@@ -10,9 +10,8 @@ using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
 {
-    public class WhenGetRequestServerTime//: UUnitTestCase
+    public class WhenGetRequestServerTime: UUnitTestCase
     {
-		/*
         ManualResetEvent mreTime = new ManualResetEvent(false);
         ManualResetEvent mreProxy = new ManualResetEvent(false);
         bool timeReceived = false;
@@ -21,6 +20,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void ThenItShouldReturnTimeStamp()
         {
+			Debug.Log("Running ThenItShouldReturnTimeStamp()");
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 			
@@ -38,6 +38,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void ThenWithProxyItShouldReturnTimeStamp()
         {
+			Debug.Log("Running ThenWithProxyItShouldReturnTimeStamp()");
             PubnubProxy proxy = new PubnubProxy();
             proxy.ProxyServer = "test.pandu.com";
             proxy.ProxyPort = 808;
@@ -63,7 +64,7 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
                     string time = deserializedMessage[0].ToString();
@@ -81,7 +82,7 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
                     string time = deserializedMessage[0].ToString();
@@ -98,6 +99,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TranslateDateTimeToUnixTime()
         {
+			Debug.Log("Running TranslateDateTimeToUnixTime()");
             //Test for 26th June 2012 GMT
             DateTime dt = new DateTime(2012,6,26,0,0,0,DateTimeKind.Utc);
             long nanoSecondTime = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(dt);
@@ -107,6 +109,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TranslateUnixTimeToDateTime()
         {
+			Debug.Log("Running TranslateUnixTimeToDateTime()");
             //Test for 26th June 2012 GMT
             DateTime expectedDate = new DateTime(2012, 6, 26, 0, 0, 0, DateTimeKind.Utc);
             DateTime actualDate = Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(13406688000000000);
@@ -116,6 +119,5 @@ namespace PubNubMessaging.Tests
         void DummyErrorCallback(string result)
         {
         }
-        */
 	}
 }

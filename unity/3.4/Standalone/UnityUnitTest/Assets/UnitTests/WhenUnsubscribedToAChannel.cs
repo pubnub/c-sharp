@@ -10,7 +10,7 @@ using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
 {
-    public class WhenUnsubscribedToAChannel//: UUnitTestCase
+    public class WhenUnsubscribedToAChannel: UUnitTestCase
     {
         ManualResetEvent meNotSubscribed = new ManualResetEvent(false);
         ManualResetEvent meChannelSubscribed = new ManualResetEvent(false);
@@ -23,6 +23,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void ThenNoExistChannelShouldReturnNotSubscribed()
         {
+			Debug.Log("Running ThenNoExistChannelShouldReturnNotSubscribed()");
             receivedNotSubscribedMessage = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
@@ -47,6 +48,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void ThenShouldReturnUnsubscribedMessage()
         {
+			Debug.Log("Running ThenShouldReturnUnsubscribedMessage()");
             receivedChannelConnectedMessage = false;
             receivedUnsubscribedMessage = false;
 

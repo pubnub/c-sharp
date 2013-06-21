@@ -10,7 +10,7 @@ using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
 {
-    public class WhenAClientIsPresented//: UUnitTestCase
+    public class WhenAClientIsPresented: UUnitTestCase
     {
         ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
         ManualResetEvent presenceManualEvent = new ManualResetEvent(false);
