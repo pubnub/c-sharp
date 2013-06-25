@@ -190,7 +190,6 @@ public class PubnubExample : MonoBehaviour {
 		if (pubnub == null)
 		{
 			pubnub = new Pubnub("demo","demo",secretKey,cipherKey,ssl);
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 			
 	        pubnub.SessionUUID = uuid;
 	        pubnub.SubscribeTimeout = int.Parse(subscribeTimeoutInSeconds);

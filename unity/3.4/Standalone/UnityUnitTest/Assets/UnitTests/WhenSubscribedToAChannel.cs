@@ -36,15 +36,13 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running ThenSubscribeShouldReturnReceivedMessage()");
             receivedMessage = false;
             Pubnub pubnub = new Pubnub("demo","demo","","",false);
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenSubscribedToAChannel";
-            unitTest.TestCaseName = "ThenSubscribeShouldReturnReceivedMessage";
+//            PubnubUnitTest unitTest = new PubnubUnitTest();
+//            unitTest.TestClassName = "WhenSubscribedToAChannel";
+//            unitTest.TestCaseName = "ThenSubscribeShouldReturnReceivedMessage";
+//            pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.PubnubUnitTest = unitTest;
-
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
 
             pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
 
@@ -67,16 +65,13 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running ThenSubscribeShouldReturnConnectStatus()");
             receivedConnectMessage = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenSubscribedToAChannel";
-            unitTest.TestCaseName = "ThenSubscribeShouldReturnConnectStatus";
+//            PubnubUnitTest unitTest = new PubnubUnitTest();
+//            unitTest.TestClassName = "WhenSubscribedToAChannel";
+//            unitTest.TestCaseName = "ThenSubscribeShouldReturnConnectStatus";
+//            pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.PubnubUnitTest = unitTest;
-
-
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
 
             pubnub.Subscribe<string>(channel, ReceivedMessageCallbackYesConnect, ConnectStatusCallback, DummyErrorCallback);
             meSubscribeYesConnect.WaitOne(310 * 1000);
@@ -93,20 +88,18 @@ namespace PubNubMessaging.Tests
             receivedChannel1ConnectMessage = false;
             receivedChannel2ConnectMessage = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenSubscribedToAChannel";
-            unitTest.TestCaseName = "ThenMultiSubscribeShouldReturnConnectStatus";
-
-            pubnub.PubnubUnitTest = unitTest;
+//            PubnubUnitTest unitTest = new PubnubUnitTest();
+//            unitTest.TestClassName = "WhenSubscribedToAChannel";
+//            unitTest.TestCaseName = "ThenMultiSubscribeShouldReturnConnectStatus";
+//            pubnub.PubnubUnitTest = unitTest;
 
 
-            string channel1 = "my/channel1";
+            string channel1 = "hello_my_channel1";
             pubnub.Subscribe<string>(channel1, ReceivedChannelUserCallback, ReceivedChannel1ConnectCallback, DummyErrorCallback);
             meChannel1SubscribeConnect.WaitOne(310 * 1000);
 
-            string channel2 = "my/channel2";
+            string channel2 = "hello_my_channel2";
             pubnub.Subscribe<string>(channel2, ReceivedChannelUserCallback, ReceivedChannel2ConnectCallback, DummyErrorCallback);
             meChannel2SubscribeConnect.WaitOne(310 * 1000);
 
@@ -121,16 +114,13 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running ThenDuplicateChannelShouldReturnAlreadySubscribed()");
             receivedAlreadySubscribedMessage = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenSubscribedToAChannel";
-            unitTest.TestCaseName = "ThenDuplicateChannelShouldReturnAlreadySubscribed";
+//            PubnubUnitTest unitTest = new PubnubUnitTest();
+//            unitTest.TestClassName = "WhenSubscribedToAChannel";
+//            unitTest.TestCaseName = "ThenDuplicateChannelShouldReturnAlreadySubscribed";
+//            pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.PubnubUnitTest = unitTest;
-
-
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
 
             pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback1, DummyMethodDuplicateChannelConnectCallback, DummyErrorCallback);
             Thread.Sleep(100);
@@ -141,45 +131,6 @@ namespace PubNubMessaging.Tests
             pubnub.EndPendingRequests();
 
             UUnitAssert.True(receivedAlreadySubscribedMessage, "WhenSubscribedToAChannel --> ThenDuplicateChannelShouldReturnAlreadySubscribed Failed");
-        }
-
-        [UUnitTest]
-        public void ThenSubscriberShouldBeAbleToReceiveManyMessages()
-        {
-			Debug.Log("Running ThenSubscriberShouldBeAbleToReceiveManyMessages()");
-            receivedManyMessages = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenSubscribedToAChannel";
-            unitTest.TestCaseName = "ThenSubscriberShouldBeAbleToReceiveManyMessages";
-            pubnub.PubnubUnitTest = unitTest;
-
-            string channel = "my/channel";
-
-            pubnub.Subscribe<string>(channel, SubscriberDummyMethodForManyMessagesUserCallback, SubscribeDummyMethodForManyMessagesConnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
-            meSubscriberManyMessages.WaitOne(10 * 1000);
-
-            pubnub.EndPendingRequests();
-
-            UUnitAssert.True(receivedManyMessages, "WhenSubscribedToAChannel --> ThenSubscriberShouldBeAbleToReceiveManyMessages Failed");
-        }
-
-        private void SubscriberDummyMethodForManyMessagesUserCallback(string result)
-        {
-            numberOfReceivedMessages = numberOfReceivedMessages + 1;
-            if (numberOfReceivedMessages >= 10)
-            {
-                receivedManyMessages = true;
-                meSubscriberManyMessages.Set();
-            }
-            
-        }
-
-        private void SubscribeDummyMethodForManyMessagesConnectCallback(string result)
-        {
         }
 
         private void ReceivedChannelUserCallback(string result)
@@ -300,7 +251,7 @@ namespace PubNubMessaging.Tests
 
         void DummyErrorCallback(string result)
         {
-			Debug.Log(result);
+			Debug.Log("WhenSubscribedToAChannel ErrorCallback" + result);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿//Build Date: June 19, 2013
+﻿//Build Date: June 25, 2013
 #if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
 #define TRACE
 #endif
@@ -18,6 +18,7 @@ using System.Reflection;
 using System.Threading;
 using System.Diagnostics;
 using System.Collections.Concurrent;
+using System.Globalization;
 #if !UNITY_WEBPLAYER
 using System.Net.NetworkInformation;
 #endif
@@ -43,13 +44,15 @@ using Javax.Net.Ssl;
 using System.Security.Cryptography.X509Certificates;
 #endif
 
-#if (!__MonoCS__)
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+#if (USE_JSONFX)
+using JsonFx.Json;
+#elif (USE_DOTNET_SERIALIZATION)
 using System.Runtime.Serialization.Json;
 using System.Web.Script.Serialization;
+#else
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 #endif
-using JsonFx.Json;
 
 namespace PubNubMessaging.Core
 {
@@ -282,6 +285,14 @@ namespace PubNubMessaging.Core
          */
         private void Init(string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
         {
+#if (USE_JSONFX)
+			this.JsonPluggableLibrary = new JsonFXDotNet();
+#elif (USE_DOTNET_SERIALIZATION)
+			this.JsonPluggableLibrary = new JscriptSerializer();    
+#else
+			this.JsonPluggableLibrary = new NewtonsoftJsonDotNet();
+#endif
+			
 #if(MONOTOUCH || MONODROID || SILVERLIGHT || WINDOWS_PHONE || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
             LoggingMethod.LogLevel = pubnubLogLevel;
 #else
@@ -3999,6 +4010,23 @@ namespace PubNubMessaging.Core
 #endif
             return obj.ComputeHash(data);
         }
+
+		/// <summary>
+		/// Converts the upper case hex to lower case hex.
+		/// </summary>
+		/// <returns>The lower case hex.</returns>
+		/// <param name="value">Hex Value.</param>
+		private string ConvertHexToUnicodeChars( string value ) {
+			//if(;
+			return Regex.Replace(
+				value,
+				@"\\u(?<Value>[a-zA-Z0-9]{4})",
+				m => {
+				return ((char) int.Parse( m.Groups["Value"].Value, NumberStyles.HexNumber )).ToString();
+			}     
+			);
+		}
+
         /// <summary>
         /// Encodes the non ASCII characters.
         /// </summary>
@@ -4010,6 +4038,8 @@ namespace PubNubMessaging.Core
         /// </param>
         private string EncodeNonAsciiCharacters(string value)
         {
+			value = ConvertHexToUnicodeChars(value);
+			
             StringBuilder sb = new StringBuilder();
             foreach (char c in value)
             {
@@ -4779,9 +4809,67 @@ namespace PubNubMessaging.Core
 
         Dictionary<string, object> DeserializeToDictionaryOfObject(string jsonString);
     }
+	
+#if (USE_JSONFX)
+    public class JsonFXDotNet : IJsonPluggableLibrary
+    {
+        public string SerializeToJsonString(object objectToSerialize)
+        {
+            var writer = new JsonFx.Json.JsonWriter();
+            string json = writer.Write(objectToSerialize);
+            return json;
+        }
 
-#if (!__MonoCS__)
-    public class NewtonJsonDotNet : IJsonPluggableLibrary
+        public List<object> DeserializeToListOfObject(string jsonString)
+        {
+            var reader = new JsonFx.Json.JsonReader();
+            var output = reader.Read<List<object>>(jsonString);
+            return output;
+        }
+
+        public object DeserializeToObject(string jsonString)
+        {
+            var reader = new JsonFx.Json.JsonReader();
+            var output = reader.Read<object>(jsonString);
+            return output;
+        }
+
+        public Dictionary<string, object> DeserializeToDictionaryOfObject(string jsonString)
+        {
+            var reader = new JsonFx.Json.JsonReader();
+            var output = reader.Read<Dictionary<string, object>>(jsonString);
+            return output;
+        }
+    }
+#elif (USE_DOTNET_SERIALIZATION)
+    public class JscriptSerializer : IJsonPluggableLibrary
+    {
+        public string SerializeToJsonString(object objectToSerialize)
+        {
+            JavaScriptSerializer jS = new JavaScriptSerializer();
+            return jS.Serialize(objectToSerialize);
+        }
+
+        public List<object> DeserializeToListOfObject(string jsonString)
+        {
+            JavaScriptSerializer jS = new JavaScriptSerializer();
+            return (List<object>)jS.Deserialize<List<object>>(jsonString);
+        }
+
+        public object DeserializeToObject(string jsonString)
+        {
+            JavaScriptSerializer jS = new JavaScriptSerializer();
+            return (object)jS.Deserialize<object>(jsonString);
+        }
+
+        public Dictionary<string, object> DeserializeToDictionaryOfObject(string jsonString)
+        {
+            JavaScriptSerializer jS = new JavaScriptSerializer();
+            return (Dictionary<string, object>)jS.Deserialize<Dictionary<string, object>>(jsonString);
+        }
+    }
+#else
+    public class NewtonsoftJsonDotNet : IJsonPluggableLibrary
     {
         #region IJsonPlugableLibrary methods implementation
 
@@ -4832,67 +4920,7 @@ namespace PubNubMessaging.Core
         #endregion
     }
 #endif
-
-    public class JsonFXDotNet : IJsonPluggableLibrary
-    {
-        public string SerializeToJsonString(object objectToSerialize)
-        {
-            var writer = new JsonFx.Json.JsonWriter();
-            string json = writer.Write(objectToSerialize);
-            return json;
-        }
-
-        public List<object> DeserializeToListOfObject(string jsonString)
-        {
-            var reader = new JsonFx.Json.JsonReader();
-            var output = reader.Read<List<object>>(jsonString);
-            return output;
-        }
-
-        public object DeserializeToObject(string jsonString)
-        {
-            var reader = new JsonFx.Json.JsonReader();
-            var output = reader.Read<object>(jsonString);
-            return output;
-        }
-
-        public Dictionary<string, object> DeserializeToDictionaryOfObject(string jsonString)
-        {
-            var reader = new JsonFx.Json.JsonReader();
-            var output = reader.Read<Dictionary<string, object>>(jsonString);
-            return output;
-        }
-    }
-
-#if (!__MonoCS__)
-    public class JscriptSerializer : IJsonPluggableLibrary
-    {
-        public string SerializeToJsonString(object objectToSerialize)
-        {
-            JavaScriptSerializer jS = new JavaScriptSerializer();
-            return jS.Serialize(objectToSerialize);
-        }
-
-        public List<object> DeserializeToListOfObject(string jsonString)
-        {
-            JavaScriptSerializer jS = new JavaScriptSerializer();
-            return (List<object>)jS.Deserialize<List<object>>(jsonString);
-        }
-
-        public object DeserializeToObject(string jsonString)
-        {
-            JavaScriptSerializer jS = new JavaScriptSerializer();
-            return (object)jS.Deserialize<object>(jsonString);
-        }
-
-        public Dictionary<string, object> DeserializeToDictionaryOfObject(string jsonString)
-        {
-            JavaScriptSerializer jS = new JavaScriptSerializer();
-            return (Dictionary<string, object>)jS.Deserialize<Dictionary<string, object>>(jsonString);
-        }
-    }
-#endif
-
+	
 #if (__MonoCS__)
     class StateObject<T>
     {

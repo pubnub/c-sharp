@@ -26,15 +26,13 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running ThenNoExistChannelShouldReturnNotSubscribed()");
             receivedNotSubscribedMessage = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenUnsubscribedToAChannel";
-            unitTest.TestCaseName = "ThenNoExistChannelShouldReturnNotSubscribed";
+//            PubnubUnitTest unitTest = new PubnubUnitTest();
+//            unitTest.TestClassName = "WhenUnsubscribedToAChannel";
+//            unitTest.TestCaseName = "ThenNoExistChannelShouldReturnNotSubscribed";
+//            pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.PubnubUnitTest = unitTest;
-
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
 
             pubnub.Unsubscribe<string>(channel, DummyMethodNoExistChannelUnsubscribeChannelUserCallback, DummyMethodNoExistChannelUnsubscribeChannelConnectCallback, DummyMethodNoExistChannelUnsubscribeChannelDisconnectCallback1, DummyErrorCallback);
 
@@ -53,15 +51,13 @@ namespace PubNubMessaging.Tests
             receivedUnsubscribedMessage = false;
 
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenUnsubscribedToAChannel";
-            unitTest.TestCaseName = "ThenShouldReturnUnsubscribedMessage";
+//            PubnubUnitTest unitTest = new PubnubUnitTest();
+//            unitTest.TestClassName = "WhenUnsubscribedToAChannel";
+//            unitTest.TestCaseName = "ThenShouldReturnUnsubscribedMessage";
+//            pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.PubnubUnitTest = unitTest;
-
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
 
             pubnub.Subscribe<string>(channel, DummyMethodChannelSubscribeUserCallback, DummyMethodChannelSubscribeConnectCallback, DummyErrorCallback);
             meChannelSubscribed.WaitOne();
@@ -126,6 +122,7 @@ namespace PubNubMessaging.Tests
 
         void DummyErrorCallback(string result)
         {
+			Debug.Log("WhenUnsubscribedToAChannel ErrorCallback = " + result);
         }
     }
 }

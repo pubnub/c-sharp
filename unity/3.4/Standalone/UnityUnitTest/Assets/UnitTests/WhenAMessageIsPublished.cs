@@ -75,17 +75,18 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running ThenUnencryptPublishShouldReturnSuccessCodeAndInfo()");
             isUnencryptPublished = false;
             Pubnub pubnub = new Pubnub("demo","demo","","",false);
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 			
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenUnencryptPublishShouldReturnSuccessCodeAndInfo";
-            pubnub.PubnubUnitTest = unitTest;
-            string channel = "my/channel";
+//            PubnubUnitTest unitTest = new PubnubUnitTest();
+//            unitTest.TestClassName = "WhenAMessageIsPublished";
+//            unitTest.TestCaseName = "ThenUnencryptPublishShouldReturnSuccessCodeAndInfo";
+//            pubnub.PubnubUnitTest = unitTest;
+			
+            string channel = "hello_my_channel";
             string message = messageForUnencryptPublish;
 
             pubnub.Publish<string>(channel, message, ReturnSuccessUnencryptPublishCodeCallback, DummyErrorCallback);
             mreUnencryptedPublish.WaitOne(310*1000);
+			Thread.Sleep(1000);
 
             if (!isUnencryptPublished)
             {
@@ -105,18 +106,19 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo()");
             isUnencryptObjectPublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 			
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo";
-            pubnub.PubnubUnitTest = unitTest;
-            string channel = "my/channel";
+//            PubnubUnitTest unitTest = new PubnubUnitTest();
+//            unitTest.TestClassName = "WhenAMessageIsPublished";
+//            unitTest.TestCaseName = "ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo";
+//            pubnub.PubnubUnitTest = unitTest;
+
+			string channel = "hello_my_channel";
             object message = new CustomClass();
             messageObjectForUnencryptPublish = new JsonFXDotNet().SerializeToJsonString(message);
             pubnub.Publish<string>(channel, message, ReturnSuccessUnencryptObjectPublishCodeCallback, DummyErrorCallback);
-            mreUnencryptObjectPublish.WaitOne(10 * 1000);
-
+            mreUnencryptObjectPublish.WaitOne(310 * 1000);
+			Thread.Sleep(1000);
+			
             if (!isUnencryptObjectPublished)
             {
                 UUnitAssert.True(isUnencryptObjectPublished, "Unencrypt Publish Failed");
@@ -124,7 +126,7 @@ namespace PubNubMessaging.Tests
             else
             {
                 pubnub.DetailedHistory<string>(channel, -1, unEncryptObjectPublishTimetoken, -1, false, CaptureUnencryptObjectDetailedHistoryCallback, DummyErrorCallback);
-                mreUnencryptObjectDetailedHistory.WaitOne(10 * 1000);
+                mreUnencryptObjectDetailedHistory.WaitOne(310 * 1000);
                 UUnitAssert.True(isUnencryptObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
             }
         }
@@ -135,20 +137,19 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo()");
             isEncryptObjectPublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "enigma", false);
-            pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 			
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo";
+//            PubnubUnitTest unitTest = new PubnubUnitTest();
+//            unitTest.TestClassName = "WhenAMessageIsPublished";
+//            unitTest.TestCaseName = "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo";
+//            pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.PubnubUnitTest = unitTest;
-
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             object message = new SecretCustomClass();
             messageObjectForEncryptPublish = new JsonFXDotNet().SerializeToJsonString(message);
 
             pubnub.Publish<string>(channel, message, ReturnSuccessEncryptObjectPublishCodeCallback, DummyErrorCallback);
             mreEncryptObjectPublish.WaitOne(310 * 1000);
+			Thread.Sleep(1000);
 
             if (!isEncryptObjectPublished)
             {
@@ -168,19 +169,18 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running ThenEncryptPublishShouldReturnSuccessCodeAndInfo()");
             isEncryptPublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "enigma", false);
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenEncryptPublishShouldReturnSuccessCodeAndInfo";
+//            PubnubUnitTest unitTest = new PubnubUnitTest();
+//            unitTest.TestClassName = "WhenAMessageIsPublished";
+//            unitTest.TestCaseName = "ThenEncryptPublishShouldReturnSuccessCodeAndInfo";
+//            pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.PubnubUnitTest = unitTest;
-
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             string message = messageForEncryptPublish;
 
             pubnub.Publish<string>(channel, message, ReturnSuccessEncryptPublishCodeCallback, DummyErrorCallback);
             mreEncryptPublish.WaitOne(310 * 1000);
+			Thread.Sleep(1000);
 
             if (!isEncryptPublished)
             {
@@ -200,19 +200,18 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo()");
             isSecretEncryptPublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "key", "enigma", false);
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo";
+//            PubnubUnitTest unitTest = new PubnubUnitTest();
+//            unitTest.TestClassName = "WhenAMessageIsPublished";
+//            unitTest.TestCaseName = "ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo";
+//            pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.PubnubUnitTest = unitTest;
-
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             string message = messageForSecretEncryptPublish;
 
             pubnub.Publish<string>(channel, message, ReturnSuccessSecretEncryptPublishCodeCallback, DummyErrorCallback);
             mreSecretEncryptPublish.WaitOne(310 * 1000);
+			Thread.Sleep(1000);
 
             if (!isSecretEncryptPublished)
             {
@@ -232,18 +231,18 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo()");
             isComplexObjectPublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 			
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo";
-            pubnub.PubnubUnitTest = unitTest;
+//            PubnubUnitTest unitTest = new PubnubUnitTest();
+//            unitTest.TestClassName = "WhenAMessageIsPublished";
+//            unitTest.TestCaseName = "ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo";
+//            pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             object message = new PubnubDemoObject();
 			messageComplexObjectForPublish = new JsonFXDotNet().SerializeToJsonString(message);
             pubnub.Publish<string>(channel, message, ReturnSuccessComplexObjectPublishCodeCallback, DummyErrorCallback);
-            mreComplexObjectPublish.WaitOne(30 * 1000);
+            mreComplexObjectPublish.WaitOne(310 * 1000);
+			Thread.Sleep(1000);
 
             if (!isComplexObjectPublished)
             {
@@ -252,7 +251,7 @@ namespace PubNubMessaging.Tests
             else
             {
                 pubnub.DetailedHistory<string>(channel, -1, complexObjectPublishTimetoken, -1, false, CaptureComplexObjectDetailedHistoryCallback, DummyErrorCallback);
-                mreComplexObjectDetailedHistory.WaitOne(30 * 1000);
+                mreComplexObjectDetailedHistory.WaitOne(310 * 1000);
                 UUnitAssert.True(isComplexObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
             }
         }
@@ -264,19 +263,19 @@ namespace PubNubMessaging.Tests
             isSerializedObjectMessagePublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
             pubnub.EnableJsonEncodingForPublish = false;
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenDisableJsonEncodeShouldSendSerializedObjectMessage";
-            pubnub.PubnubUnitTest = unitTest;
+//            PubnubUnitTest unitTest = new PubnubUnitTest();
+//            unitTest.TestClassName = "WhenAMessageIsPublished";
+//            unitTest.TestCaseName = "ThenDisableJsonEncodeShouldSendSerializedObjectMessage";
+//            pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             object message = "{\"operation\":\"ReturnData\",\"channel\":\"Mobile1\",\"sequenceNumber\":0,\"data\":[\"ping 1.0.0.1\"]}";
             serializedObjectMessageForPublish = message.ToString();
 
             pubnub.Publish<string>(channel, message, ReturnSuccessSerializedObjectMessageForPublishCallback, DummyErrorCallback);
             mreSerializedObjectMessageForPublish.WaitOne(310 * 1000);
+			Thread.Sleep(1000);
 
             if (!isSerializedObjectMessagePublished)
             {
@@ -296,14 +295,13 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running ThenLargeMessageShoudFailWithMessageTooLargeInfo()");
             isLargeMessagePublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 			
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenLargeMessageShoudFailWithMessageTooLargeInfo";
-            pubnub.PubnubUnitTest = unitTest;
+//            PubnubUnitTest unitTest = new PubnubUnitTest();
+//            unitTest.TestClassName = "WhenAMessageIsPublished";
+//            unitTest.TestCaseName = "ThenLargeMessageShoudFailWithMessageTooLargeInfo";
+//            pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             string message = messageLarge2K;
 
             pubnub.Publish<string>(channel, message, ReturnPublishMessageTooLargeInfoCallback, DummyErrorCallback);
@@ -416,10 +414,14 @@ namespace PubNubMessaging.Tests
                 if (deserializedMessage is object[])
                 {
                     object[] message = deserializedMessage[0] as object[];
-                    if (message != null && message[0].ToString() == messageForUnencryptPublish)
-                    {
-                        isUnencryptDetailedHistory = true;
-                    }
+					if (message != null && message.Length > 0)
+					{
+						string receivedUnencryptString = message[0].ToString();
+	                    if (receivedUnencryptString != null && receivedUnencryptString == messageForUnencryptPublish)
+	                    {
+	                        isUnencryptDetailedHistory = true;
+	                    }
+					}
                 }
             }
 
@@ -433,13 +435,15 @@ namespace PubNubMessaging.Tests
                 object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
-
 					object[] message = deserializedMessage[0] as object[];
-					string receivedObjectString = new JsonFXDotNet().SerializeToJsonString(message[0]);
-                    if (receivedObjectString != null && receivedObjectString == messageObjectForUnencryptPublish)
-                    {
-                        isUnencryptObjectDetailedHistory = true;
-                    }
+					if (message != null && message.Length > 0)
+					{
+						string receivedObjectString = new JsonFXDotNet().SerializeToJsonString(message[0]);
+	                    if (receivedObjectString != null && receivedObjectString == messageObjectForUnencryptPublish)
+	                    {
+	                        isUnencryptObjectDetailedHistory = true;
+	                    }
+					}
                 }
             }
 
@@ -454,11 +458,14 @@ namespace PubNubMessaging.Tests
                 if (deserializedMessage is object[])
                 {
                     object[] message = deserializedMessage[0] as object[];
-					string receivedObjectString = new JsonFXDotNet().SerializeToJsonString(message[0]);
-                    if (receivedObjectString != null && receivedObjectString == messageObjectForEncryptPublish)
-                    {
-                        isEncryptObjectDetailedHistory = true;
-                    }
+					if (message != null && message.Length > 0)
+					{
+						string receivedObjectString = new JsonFXDotNet().SerializeToJsonString(message[0]);
+	                    if (receivedObjectString != null && receivedObjectString == messageObjectForEncryptPublish)
+	                    {
+	                        isEncryptObjectDetailedHistory = true;
+	                    }
+					}
                 }
             }
 
@@ -470,10 +477,10 @@ namespace PubNubMessaging.Tests
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
                 object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
-                if (deserializedMessage is object[])
+                if (deserializedMessage is object[] && deserializedMessage.Length > 0)
                 {
                     object[] message = deserializedMessage[0] as object[];
-                    if (message != null && message[0].ToString() == messageForEncryptPublish)
+                    if (message != null && message.Length > 0 && message[0].ToString() == messageForEncryptPublish)
                     {
                         isEncryptDetailedHistory = true;
                     }
@@ -488,10 +495,10 @@ namespace PubNubMessaging.Tests
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
                 object[] deserializedResult = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
-                if (deserializedResult is object[])
+                if (deserializedResult is object[] && deserializedResult.Length > 0)
                 {
                     object[] message = deserializedResult[0] as object[];
-                    if (message != null && message[0].ToString() == messageForSecretEncryptPublish)
+                    if (message != null && message.Length > 0 && message[0].ToString() == messageForSecretEncryptPublish)
                     {
                         isSecretEncryptDetailedHistory = true;
                     }
@@ -527,14 +534,17 @@ namespace PubNubMessaging.Tests
 			if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
                 object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
-                if (deserializedMessage is object[])
+                if (deserializedMessage is object[] && deserializedMessage.Length > 0)
                 {
                     object[] message = deserializedMessage[0] as object[];
-					string receivedObjectString = new JsonFXDotNet().SerializeToJsonString(message[0]);
-                    if (receivedObjectString != null && receivedObjectString == messageComplexObjectForPublish)
-                    {
-                        isComplexObjectDetailedHistory = true;
-                    }
+					if (message != null && message.Length > 0)
+					{
+						string receivedObjectString = new JsonFXDotNet().SerializeToJsonString(message[0]);
+	                    if (receivedObjectString != null && receivedObjectString == messageComplexObjectForPublish)
+	                    {
+	                        isComplexObjectDetailedHistory = true;
+	                    }
+					}
                 }
             }
 
@@ -564,7 +574,6 @@ namespace PubNubMessaging.Tests
         {
 			Debug.Log("Running ThenPubnubShouldGenerateUniqueIdentifier()");
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 			
             UUnitAssert.NotNull(pubnub.GenerateGuid());
         }
@@ -576,7 +585,6 @@ namespace PubNubMessaging.Tests
 			bool isExpectedException = false;
 			
             Pubnub pubnub = new Pubnub("", "demo", "", "", false);
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 			
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -585,7 +593,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
 
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
 
             try
@@ -611,16 +619,14 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running ThenOptionalSecretKeyShouldBeProvidedInConstructor()");
             isPublished2 = false;
             Pubnub pubnub = new Pubnub("demo","demo","key");
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 			
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenOptionalSecretKeyShouldBeProvidedInConstructor";
+//            PubnubUnitTest unitTest = new PubnubUnitTest();
+//            unitTest.TestClassName = "WhenAMessageIsPublished";
+//            unitTest.TestCaseName = "ThenOptionalSecretKeyShouldBeProvidedInConstructor";
+//            pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.PubnubUnitTest = unitTest;
 
-
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
 
             pubnub.Publish<string>(channel, message, ReturnSecretKeyPublishCallback, DummyErrorCallback);
@@ -653,15 +659,13 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running IfSSLNotProvidedThenDefaultShouldBeFalse()");
             isPublished3 = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "");
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 			
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "IfSSLNotProvidedThenDefaultShouldBeFalse";
+//            PubnubUnitTest unitTest = new PubnubUnitTest();
+//            unitTest.TestClassName = "WhenAMessageIsPublished";
+//            unitTest.TestCaseName = "IfSSLNotProvidedThenDefaultShouldBeFalse";
+//            pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.PubnubUnitTest = unitTest;
-
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
 
             pubnub.Publish<string>(channel, message, ReturnNoSSLDefaultFalseCallback, DummyErrorCallback);
@@ -714,12 +718,14 @@ namespace PubNubMessaging.Tests
                 if (deserializedMessage is object[])
                 {
                     object[] message = deserializedMessage[0] as object[];
-					string receivedObjectString = new JsonFXDotNet().SerializeToJsonString(message[0]);
-
-                    if (receivedObjectString != null && receivedObjectString == serializedObjectMessageForPublish)
-                    {
-                        isSerializedObjectMessageDetailedHistory = true;
-                    }
+					if (message != null && message.Length > 0)
+					{
+						string receivedObjectString = new JsonFXDotNet().SerializeToJsonString(message[0]);
+	                    if (receivedObjectString != null && receivedObjectString == serializedObjectMessageForPublish)
+	                    {
+	                        isSerializedObjectMessageDetailedHistory = true;
+	                    }
+					}
                 }
             }
 
@@ -728,7 +734,7 @@ namespace PubNubMessaging.Tests
 
         void DummyErrorCallback(string result)
         {
-			//Debug.Log("Error callback = " + result);
+			Debug.Log("WhenAMessageIsPublished ErrorCallback : " + result);
         }
     }
 }

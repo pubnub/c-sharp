@@ -22,42 +22,15 @@ namespace PubNubMessaging.Tests
         {
 			Debug.Log("Running ThenItShouldReturnTimeStamp()");
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 			
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGetRequestServerTime";
-            unitTest.TestCaseName = "ThenItShouldReturnTimeStamp";
-
-            pubnub.PubnubUnitTest = unitTest;
+//            PubnubUnitTest unitTest = new PubnubUnitTest();
+//            unitTest.TestClassName = "WhenGetRequestServerTime";
+//            unitTest.TestCaseName = "ThenItShouldReturnTimeStamp";
+//            pubnub.PubnubUnitTest = unitTest;
 
             pubnub.Time<string>(ReturnTimeStampCallback, DummyErrorCallback);
             mreTime.WaitOne(310 * 1000);
             UUnitAssert.True(timeReceived, "time() Failed");
-        }
-
-        [UUnitTest]
-        public void ThenWithProxyItShouldReturnTimeStamp()
-        {
-			Debug.Log("Running ThenWithProxyItShouldReturnTimeStamp()");
-            PubnubProxy proxy = new PubnubProxy();
-            proxy.ProxyServer = "test.pandu.com";
-            proxy.ProxyPort = 808;
-            proxy.ProxyUserName = "tuvpnfreeproxy";
-            proxy.ProxyPassword = "Rx8zW78k";
-
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-            pubnub.Proxy = proxy;
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
-			
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGetRequestServerTime";
-            unitTest.TestCaseName = "ThenWithProxyItShouldReturnTimeStamp";
-
-            pubnub.PubnubUnitTest = unitTest;
-
-            pubnub.Time<string>(ReturnProxyPresenceTimeStampCallback, DummyErrorCallback);
-            mreProxy.WaitOne(310 * 1000);
-            UUnitAssert.True(timeReceivedWhenProxy, "time() Failed");
         }
 
         private void ReturnTimeStampCallback(string result)
@@ -76,24 +49,6 @@ namespace PubNubMessaging.Tests
                 }
             }
             mreTime.Set();
-        }
-
-        private void ReturnProxyPresenceTimeStampCallback(string result)
-        {
-            if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
-            {
-                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
-                if (deserializedMessage is object[])
-                {
-                    string time = deserializedMessage[0].ToString();
-                    Int64 nanoTime;
-                    if (time.Length > 2 && Int64.TryParse(time, out nanoTime))
-                    {
-                        timeReceivedWhenProxy = true;
-                    }
-                }
-            }
-            mreProxy.Set();
         }
 
         [UUnitTest]
@@ -118,6 +73,7 @@ namespace PubNubMessaging.Tests
     
         void DummyErrorCallback(string result)
         {
+			Debug.Log("WhenGetRequestServerTime ErrorCallback = " + result);
         }
 	}
 }

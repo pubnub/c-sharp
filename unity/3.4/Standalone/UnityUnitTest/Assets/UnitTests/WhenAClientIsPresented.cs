@@ -37,28 +37,27 @@ namespace PubNubMessaging.Tests
             receivedPresenceMessage = false;
 
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAClientIsPresented";
-            unitTest.TestCaseName = "ThenPresenceShouldReturnReceivedMessage";
-            pubnub.PubnubUnitTest = unitTest;
+//            PubnubUnitTest unitTest = new PubnubUnitTest();
+//            unitTest.TestClassName = "WhenAClientIsPresented";
+//            unitTest.TestCaseName = "ThenPresenceShouldReturnReceivedMessage";
+//            pubnub.PubnubUnitTest = unitTest;
             
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
 
             pubnub.Presence<string>(channel, ThenPresenceShouldReturnMessage, PresenceDummyMethodForConnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
             
-//            //since presence expects from stimulus from sub/unsub...
-//            pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
-//            Thread.Sleep(1000);
-//            subscribeManualEvent.WaitOne(2000);
-//
-//            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
-//            Thread.Sleep(1000);
-//            unsubscribeManualEvent.WaitOne(2000);
+            //since presence expects from stimulus from sub/unsub...
+            pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            subscribeManualEvent.WaitOne(310 * 1000);
 
-            presenceManualEvent.WaitOne(10 * 1000);
+            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            unsubscribeManualEvent.WaitOne(310 * 1000);
+
+            presenceManualEvent.WaitOne(310 * 1000);
 
             pubnub.EndPendingRequests();
             
@@ -72,29 +71,28 @@ namespace PubNubMessaging.Tests
             receivedCustomUUID = false;
 
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAClientIsPresented";
-            unitTest.TestCaseName = "ThenPresenceShouldReturnCustomUUID";
-            pubnub.PubnubUnitTest = unitTest;
+//            PubnubUnitTest unitTest = new PubnubUnitTest();
+//            unitTest.TestClassName = "WhenAClientIsPresented";
+//            unitTest.TestCaseName = "ThenPresenceShouldReturnCustomUUID";
+//            pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
 
             pubnub.Presence<string>(channel, ThenPresenceWithCustomUUIDShouldReturnMessage, PresenceUUIDDummyMethodForConnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
             
             //since presence expects from stimulus from sub/unsub...
             pubnub.SessionUUID = customUUID;
-//            pubnub.Subscribe<string>(channel, DummyMethodForSubscribeUUID, SubscribeUUIDDummyMethodForConnectCallback, DummyErrorCallback);
-//            Thread.Sleep(1000);
-//            subscribeUUIDManualEvent.WaitOne(2000);
-//
-//            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribeUUID, UnsubscribeUUIDDummyMethodForConnectCallback, UnsubscribeUUIDDummyMethodForDisconnectCallback, DummyErrorCallback);
-//            Thread.Sleep(1000);
-//            unsubscribeUUIDManualEvent.WaitOne(2000);
+            pubnub.Subscribe<string>(channel, DummyMethodForSubscribeUUID, SubscribeUUIDDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            subscribeUUIDManualEvent.WaitOne(310 * 1000);
 
-            presenceUUIDManualEvent.WaitOne(10 * 1000);
+            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribeUUID, UnsubscribeUUIDDummyMethodForConnectCallback, UnsubscribeUUIDDummyMethodForDisconnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            unsubscribeUUIDManualEvent.WaitOne(310 * 1000);
+
+            presenceUUIDManualEvent.WaitOne(310 * 1000);
 
             pubnub.EndPendingRequests();
 
@@ -108,15 +106,15 @@ namespace PubNubMessaging.Tests
             receivedHereNowMessage = false;
 
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-			pubnub.JsonPluggableLibrary = new JsonFXDotNet();
 			
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAClientIsPresented";
-            unitTest.TestCaseName = "IfHereNowIsCalledThenItShouldReturnInfo";
-            pubnub.PubnubUnitTest = unitTest;
-            string channel = "my/channel";
+//            PubnubUnitTest unitTest = new PubnubUnitTest();
+//            unitTest.TestClassName = "WhenAClientIsPresented";
+//            unitTest.TestCaseName = "IfHereNowIsCalledThenItShouldReturnInfo";
+//            pubnub.PubnubUnitTest = unitTest;
+			
+            string channel = "hello_my_channel";
             pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback);
-            hereNowManualEvent.WaitOne();
+            hereNowManualEvent.WaitOne(310 * 1000);
             UUnitAssert.True(receivedHereNowMessage, "here_now message not received");
         }
 
@@ -203,7 +201,10 @@ namespace PubNubMessaging.Tests
 					}
                 }
             }
-            catch { }
+            catch(Exception ex) 
+			{ 
+				Debug.Log("DummyMethodForSubscribe exception = " + ex.ToString());
+			}
             finally
             {
                 presenceManualEvent.Set();
@@ -229,7 +230,10 @@ namespace PubNubMessaging.Tests
                     }
                 }
             }
-            catch { }
+            catch(Exception ex) 
+			{ 
+				Debug.Log("DummyMethodForSubscribeUUID exception = " + ex.ToString());
+			}
             finally
             {
                 presenceUUIDManualEvent.Set();
@@ -286,6 +290,7 @@ namespace PubNubMessaging.Tests
 
         void DummyErrorCallback(string result)
         {
+			Debug.Log("WhenAClientIsPresented ErrorCallback : " + result);
         }
     }
 }
