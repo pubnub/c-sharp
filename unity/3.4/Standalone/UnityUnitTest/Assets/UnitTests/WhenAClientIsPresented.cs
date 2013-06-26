@@ -53,9 +53,9 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(1000);
             subscribeManualEvent.WaitOne(310 * 1000);
 
-            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
-            unsubscribeManualEvent.WaitOne(310 * 1000);
+//            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+//            Thread.Sleep(1000);
+//            unsubscribeManualEvent.WaitOne(310 * 1000);
 
             presenceManualEvent.WaitOne(310 * 1000);
 
@@ -88,9 +88,9 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(1000);
             subscribeUUIDManualEvent.WaitOne(310 * 1000);
 
-            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribeUUID, UnsubscribeUUIDDummyMethodForConnectCallback, UnsubscribeUUIDDummyMethodForDisconnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
-            unsubscribeUUIDManualEvent.WaitOne(310 * 1000);
+//            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribeUUID, UnsubscribeUUIDDummyMethodForConnectCallback, UnsubscribeUUIDDummyMethodForDisconnectCallback, DummyErrorCallback);
+//            Thread.Sleep(1000);
+//            unsubscribeUUIDManualEvent.WaitOne(310 * 1000);
 
             presenceUUIDManualEvent.WaitOne(310 * 1000);
 
