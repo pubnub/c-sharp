@@ -23,10 +23,10 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running ThenItShouldReturnTimeStamp()");
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 			
-//            PubnubUnitTest unitTest = new PubnubUnitTest();
-//            unitTest.TestClassName = "WhenGetRequestServerTime";
-//            unitTest.TestCaseName = "ThenItShouldReturnTimeStamp";
-//            pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenGetRequestServerTime";
+            unitTest.TestCaseName = "ThenItShouldReturnTimeStamp";
+            pubnub.PubnubUnitTest = unitTest;
 
             pubnub.Time<string>(ReturnTimeStampCallback, DummyErrorCallback);
             mreTime.WaitOne(310 * 1000);

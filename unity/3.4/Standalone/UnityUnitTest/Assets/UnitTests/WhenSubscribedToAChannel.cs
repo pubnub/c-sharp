@@ -37,10 +37,10 @@ namespace PubNubMessaging.Tests
             receivedMessage = false;
             Pubnub pubnub = new Pubnub("demo","demo","","",false);
 
-//            PubnubUnitTest unitTest = new PubnubUnitTest();
-//            unitTest.TestClassName = "WhenSubscribedToAChannel";
-//            unitTest.TestCaseName = "ThenSubscribeShouldReturnReceivedMessage";
-//            pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenSubscribedToAChannel";
+            unitTest.TestCaseName = "ThenSubscribeShouldReturnReceivedMessage";
+            pubnub.PubnubUnitTest = unitTest;
 
             string channel = "hello_my_channel";
 
@@ -66,10 +66,10 @@ namespace PubNubMessaging.Tests
             receivedConnectMessage = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 
-//            PubnubUnitTest unitTest = new PubnubUnitTest();
-//            unitTest.TestClassName = "WhenSubscribedToAChannel";
-//            unitTest.TestCaseName = "ThenSubscribeShouldReturnConnectStatus";
-//            pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenSubscribedToAChannel";
+            unitTest.TestCaseName = "ThenSubscribeShouldReturnConnectStatus";
+            pubnub.PubnubUnitTest = unitTest;
 
             string channel = "hello_my_channel";
 
@@ -89,10 +89,10 @@ namespace PubNubMessaging.Tests
             receivedChannel2ConnectMessage = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 
-//            PubnubUnitTest unitTest = new PubnubUnitTest();
-//            unitTest.TestClassName = "WhenSubscribedToAChannel";
-//            unitTest.TestCaseName = "ThenMultiSubscribeShouldReturnConnectStatus";
-//            pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenSubscribedToAChannel";
+            unitTest.TestCaseName = "ThenMultiSubscribeShouldReturnConnectStatus";
+            pubnub.PubnubUnitTest = unitTest;
 
 
             string channel1 = "hello_my_channel1";
@@ -115,10 +115,10 @@ namespace PubNubMessaging.Tests
             receivedAlreadySubscribedMessage = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 
-//            PubnubUnitTest unitTest = new PubnubUnitTest();
-//            unitTest.TestClassName = "WhenSubscribedToAChannel";
-//            unitTest.TestCaseName = "ThenDuplicateChannelShouldReturnAlreadySubscribed";
-//            pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenSubscribedToAChannel";
+            unitTest.TestCaseName = "ThenDuplicateChannelShouldReturnAlreadySubscribed";
+            pubnub.PubnubUnitTest = unitTest;
 
             string channel = "hello_my_channel";
 
@@ -251,7 +251,7 @@ namespace PubNubMessaging.Tests
 
         void DummyErrorCallback(string result)
         {
-			Debug.Log("WhenSubscribedToAChannel ErrorCallback" + result);
+			//Debug.Log("WhenSubscribedToAChannel ErrorCallback" + result);
         }
     }
 }

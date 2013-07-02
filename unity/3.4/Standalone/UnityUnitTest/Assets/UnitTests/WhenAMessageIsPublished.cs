@@ -76,10 +76,10 @@ namespace PubNubMessaging.Tests
             isUnencryptPublished = false;
             Pubnub pubnub = new Pubnub("demo","demo","","",false);
 			
-//            PubnubUnitTest unitTest = new PubnubUnitTest();
-//            unitTest.TestClassName = "WhenAMessageIsPublished";
-//            unitTest.TestCaseName = "ThenUnencryptPublishShouldReturnSuccessCodeAndInfo";
-//            pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAMessageIsPublished";
+            unitTest.TestCaseName = "ThenUnencryptPublishShouldReturnSuccessCodeAndInfo";
+            pubnub.PubnubUnitTest = unitTest;
 			
             string channel = "hello_my_channel";
             string message = messageForUnencryptPublish;
@@ -107,10 +107,10 @@ namespace PubNubMessaging.Tests
             isUnencryptObjectPublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 			
-//            PubnubUnitTest unitTest = new PubnubUnitTest();
-//            unitTest.TestClassName = "WhenAMessageIsPublished";
-//            unitTest.TestCaseName = "ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo";
-//            pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAMessageIsPublished";
+            unitTest.TestCaseName = "ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo";
+            pubnub.PubnubUnitTest = unitTest;
 
 			string channel = "hello_my_channel";
             object message = new CustomClass();
@@ -138,10 +138,10 @@ namespace PubNubMessaging.Tests
             isEncryptObjectPublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "enigma", false);
 			
-//            PubnubUnitTest unitTest = new PubnubUnitTest();
-//            unitTest.TestClassName = "WhenAMessageIsPublished";
-//            unitTest.TestCaseName = "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo";
-//            pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAMessageIsPublished";
+            unitTest.TestCaseName = "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo";
+            pubnub.PubnubUnitTest = unitTest;
 
             string channel = "hello_my_channel";
             object message = new SecretCustomClass();
@@ -170,10 +170,10 @@ namespace PubNubMessaging.Tests
             isEncryptPublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "enigma", false);
 
-//            PubnubUnitTest unitTest = new PubnubUnitTest();
-//            unitTest.TestClassName = "WhenAMessageIsPublished";
-//            unitTest.TestCaseName = "ThenEncryptPublishShouldReturnSuccessCodeAndInfo";
-//            pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAMessageIsPublished";
+            unitTest.TestCaseName = "ThenEncryptPublishShouldReturnSuccessCodeAndInfo";
+            pubnub.PubnubUnitTest = unitTest;
 
             string channel = "hello_my_channel";
             string message = messageForEncryptPublish;
@@ -201,10 +201,10 @@ namespace PubNubMessaging.Tests
             isSecretEncryptPublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "key", "enigma", false);
 
-//            PubnubUnitTest unitTest = new PubnubUnitTest();
-//            unitTest.TestClassName = "WhenAMessageIsPublished";
-//            unitTest.TestCaseName = "ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo";
-//            pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAMessageIsPublished";
+            unitTest.TestCaseName = "ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo";
+            pubnub.PubnubUnitTest = unitTest;
 
             string channel = "hello_my_channel";
             string message = messageForSecretEncryptPublish;
@@ -232,14 +232,21 @@ namespace PubNubMessaging.Tests
             isComplexObjectPublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 			
-//            PubnubUnitTest unitTest = new PubnubUnitTest();
-//            unitTest.TestClassName = "WhenAMessageIsPublished";
-//            unitTest.TestCaseName = "ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo";
-//            pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAMessageIsPublished";
+            unitTest.TestCaseName = "ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo";
+            pubnub.PubnubUnitTest = unitTest;
+			
+			if (pubnub.PubnubUnitTest != null)
+			{
+				Debug.Log("** ATTENTION ** : TEST CASE = \"ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo\" cannot run with local unit test stubs. You can run this test case with pubnub.PubnubUnitTest = null  ");
+				return;
+			}
 
             string channel = "hello_my_channel";
             object message = new PubnubDemoObject();
 			messageComplexObjectForPublish = new JsonFXDotNet().SerializeToJsonString(message);
+			Debug.Log("messageComplexObjectForPublish = " + messageComplexObjectForPublish);
             pubnub.Publish<string>(channel, message, ReturnSuccessComplexObjectPublishCodeCallback, DummyErrorCallback);
             mreComplexObjectPublish.WaitOne(310 * 1000);
 			Thread.Sleep(1000);
@@ -264,10 +271,10 @@ namespace PubNubMessaging.Tests
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
             pubnub.EnableJsonEncodingForPublish = false;
 
-//            PubnubUnitTest unitTest = new PubnubUnitTest();
-//            unitTest.TestClassName = "WhenAMessageIsPublished";
-//            unitTest.TestCaseName = "ThenDisableJsonEncodeShouldSendSerializedObjectMessage";
-//            pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAMessageIsPublished";
+            unitTest.TestCaseName = "ThenDisableJsonEncodeShouldSendSerializedObjectMessage";
+            pubnub.PubnubUnitTest = unitTest;
 
             string channel = "hello_my_channel";
             object message = "{\"operation\":\"ReturnData\",\"channel\":\"Mobile1\",\"sequenceNumber\":0,\"data\":[\"ping 1.0.0.1\"]}";
@@ -296,10 +303,10 @@ namespace PubNubMessaging.Tests
             isLargeMessagePublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 			
-//            PubnubUnitTest unitTest = new PubnubUnitTest();
-//            unitTest.TestClassName = "WhenAMessageIsPublished";
-//            unitTest.TestCaseName = "ThenLargeMessageShoudFailWithMessageTooLargeInfo";
-//            pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAMessageIsPublished";
+            unitTest.TestCaseName = "ThenLargeMessageShoudFailWithMessageTooLargeInfo";
+            pubnub.PubnubUnitTest = unitTest;
 
             string channel = "hello_my_channel";
             string message = messageLarge2K;
@@ -620,10 +627,10 @@ namespace PubNubMessaging.Tests
             isPublished2 = false;
             Pubnub pubnub = new Pubnub("demo","demo","key");
 			
-//            PubnubUnitTest unitTest = new PubnubUnitTest();
-//            unitTest.TestClassName = "WhenAMessageIsPublished";
-//            unitTest.TestCaseName = "ThenOptionalSecretKeyShouldBeProvidedInConstructor";
-//            pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAMessageIsPublished";
+            unitTest.TestCaseName = "ThenOptionalSecretKeyShouldBeProvidedInConstructor";
+            pubnub.PubnubUnitTest = unitTest;
 
 
             string channel = "hello_my_channel";
@@ -660,10 +667,10 @@ namespace PubNubMessaging.Tests
             isPublished3 = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "");
 			
-//            PubnubUnitTest unitTest = new PubnubUnitTest();
-//            unitTest.TestClassName = "WhenAMessageIsPublished";
-//            unitTest.TestCaseName = "IfSSLNotProvidedThenDefaultShouldBeFalse";
-//            pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAMessageIsPublished";
+            unitTest.TestCaseName = "IfSSLNotProvidedThenDefaultShouldBeFalse";
+            pubnub.PubnubUnitTest = unitTest;
 
             string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";

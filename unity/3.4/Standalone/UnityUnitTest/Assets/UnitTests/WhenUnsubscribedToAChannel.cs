@@ -27,11 +27,6 @@ namespace PubNubMessaging.Tests
             receivedNotSubscribedMessage = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 
-//            PubnubUnitTest unitTest = new PubnubUnitTest();
-//            unitTest.TestClassName = "WhenUnsubscribedToAChannel";
-//            unitTest.TestCaseName = "ThenNoExistChannelShouldReturnNotSubscribed";
-//            pubnub.PubnubUnitTest = unitTest;
-
             string channel = "hello_my_channel";
 
             pubnub.Unsubscribe<string>(channel, DummyMethodNoExistChannelUnsubscribeChannelUserCallback, DummyMethodNoExistChannelUnsubscribeChannelConnectCallback, DummyMethodNoExistChannelUnsubscribeChannelDisconnectCallback1, DummyErrorCallback);
@@ -52,10 +47,10 @@ namespace PubNubMessaging.Tests
 
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 
-//            PubnubUnitTest unitTest = new PubnubUnitTest();
-//            unitTest.TestClassName = "WhenUnsubscribedToAChannel";
-//            unitTest.TestCaseName = "ThenShouldReturnUnsubscribedMessage";
-//            pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenUnsubscribedToAChannel";
+            unitTest.TestCaseName = "ThenShouldReturnUnsubscribedMessage";
+            pubnub.PubnubUnitTest = unitTest;
 
             string channel = "hello_my_channel";
 

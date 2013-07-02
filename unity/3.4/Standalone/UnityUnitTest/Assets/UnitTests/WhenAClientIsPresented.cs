@@ -38,10 +38,10 @@ namespace PubNubMessaging.Tests
 
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 
-//            PubnubUnitTest unitTest = new PubnubUnitTest();
-//            unitTest.TestClassName = "WhenAClientIsPresented";
-//            unitTest.TestCaseName = "ThenPresenceShouldReturnReceivedMessage";
-//            pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "ThenPresenceShouldReturnReceivedMessage";
+            pubnub.PubnubUnitTest = unitTest;
             
             string channel = "hello_my_channel";
 
@@ -52,10 +52,6 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
             subscribeManualEvent.WaitOne(310 * 1000);
-
-//            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
-//            Thread.Sleep(1000);
-//            unsubscribeManualEvent.WaitOne(310 * 1000);
 
             presenceManualEvent.WaitOne(310 * 1000);
 
@@ -72,10 +68,10 @@ namespace PubNubMessaging.Tests
 
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 
-//            PubnubUnitTest unitTest = new PubnubUnitTest();
-//            unitTest.TestClassName = "WhenAClientIsPresented";
-//            unitTest.TestCaseName = "ThenPresenceShouldReturnCustomUUID";
-//            pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "ThenPresenceShouldReturnCustomUUID";
+            pubnub.PubnubUnitTest = unitTest;
 
             string channel = "hello_my_channel";
 
@@ -87,10 +83,6 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>(channel, DummyMethodForSubscribeUUID, SubscribeUUIDDummyMethodForConnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
             subscribeUUIDManualEvent.WaitOne(310 * 1000);
-
-//            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribeUUID, UnsubscribeUUIDDummyMethodForConnectCallback, UnsubscribeUUIDDummyMethodForDisconnectCallback, DummyErrorCallback);
-//            Thread.Sleep(1000);
-//            unsubscribeUUIDManualEvent.WaitOne(310 * 1000);
 
             presenceUUIDManualEvent.WaitOne(310 * 1000);
 
@@ -107,10 +99,10 @@ namespace PubNubMessaging.Tests
 
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 			
-//            PubnubUnitTest unitTest = new PubnubUnitTest();
-//            unitTest.TestClassName = "WhenAClientIsPresented";
-//            unitTest.TestCaseName = "IfHereNowIsCalledThenItShouldReturnInfo";
-//            pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "IfHereNowIsCalledThenItShouldReturnInfo";
+            pubnub.PubnubUnitTest = unitTest;
 			
             string channel = "hello_my_channel";
             pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback);

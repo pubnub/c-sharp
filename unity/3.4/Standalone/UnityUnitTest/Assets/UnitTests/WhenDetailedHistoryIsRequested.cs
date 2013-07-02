@@ -33,10 +33,10 @@ namespace PubNubMessaging.Tests
 
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 
-//            PubnubUnitTest unitTest = new PubnubUnitTest();
-//            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-//            unitTest.TestCaseName = "DetailHistoryCount10ReturnsRecords";
-//            pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
+            unitTest.TestCaseName = "DetailHistoryCount10ReturnsRecords";
+            pubnub.PubnubUnitTest = unitTest;
 
             string channel = "hello_my_channel";
 
@@ -71,10 +71,10 @@ namespace PubNubMessaging.Tests
 
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 
-//            PubnubUnitTest unitTest = new PubnubUnitTest();
-//            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-//            unitTest.TestCaseName = "DetailHistoryCount10ReverseTrueReturnsRecords";
-//            pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
+            unitTest.TestCaseName = "DetailHistoryCount10ReverseTrueReturnsRecords";
+            pubnub.PubnubUnitTest = unitTest;
 
             string channel = "hello_my_channel";
 
@@ -113,10 +113,14 @@ namespace PubNubMessaging.Tests
             messageStartReverseTrue = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 
-//            PubnubUnitTest unitTest = new PubnubUnitTest();
-//            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-//            unitTest.TestCaseName = "DetailedHistoryStartWithReverseTrue";
-//            pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
+            unitTest.TestCaseName = "DetailedHistoryStartWithReverseTrue";
+            pubnub.PubnubUnitTest = unitTest;
+			if (pubnub.PubnubUnitTest is IPubnubUnitTest)
+			{
+				enableLocalStubTest = true;
+			}
 
             string channel = "hello_my_channel";
 			if (enableLocalStubTest)

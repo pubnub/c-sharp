@@ -1,4 +1,4 @@
-﻿//Build Date: June 26, 2013
+﻿//Build Date: July 02, 2013
 #define USE_JSONFX
 #if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
 #define TRACE
@@ -4039,7 +4039,9 @@ namespace PubNubMessaging.Core
         /// </param>
         private string EncodeNonAsciiCharacters(string value)
         {
+#if (USE_JSONFX)
 			value = ConvertHexToUnicodeChars(value);
+#endif
 			
             StringBuilder sb = new StringBuilder();
             foreach (char c in value)
@@ -4798,8 +4800,7 @@ namespace PubNubMessaging.Core
             }
         }
     }
-
-
+	
     public interface IJsonPluggableLibrary
     {
         string SerializeToJsonString(object objectToSerialize);
