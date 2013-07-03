@@ -117,7 +117,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
             unitTest.TestCaseName = "DetailedHistoryStartWithReverseTrue";
             pubnub.PubnubUnitTest = unitTest;
-			if (pubnub.PubnubUnitTest is IPubnubUnitTest)
+			if (pubnub.PubnubUnitTest is IPubnubUnitTest && pubnub.PubnubUnitTest.EnableStubTest)
 			{
 				enableLocalStubTest = true;
 			}
