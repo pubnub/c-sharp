@@ -1,6 +1,9 @@
 ## PubNub 3.4 Web Data Push Cloud-Hosted API
 ### Unity 4 for Standalone and Web Player
 
+### View this First!
+We've made a [screencast](https://vimeo.com/69591819) that will walk you through the general setup. Check it out!
+
 #### Prerequisites
 1. Intall Free Full version of Unity 4 from http://unity3d.com/unity/download/ (Unity 4 is recommended, but current/later versions should be ok). MonoDevelop IDE tool will be installed as part of Unity to write C# scripts.
 
