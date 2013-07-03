@@ -37,7 +37,12 @@ namespace PubNubMessaging.Tests
             data.Add("/subscribe/demo/hello_my_channel,hello_my_channel-pnpres/0/0", "[[],\"13596603179264912\"]");
             data.Add("/subscribe/demo/hello_my_channel,hello_my_channel-pnpres/0/13596603179264912", "[[{\"action\": \"join\", \"timestamp\": 1355929955, \"uuid\": \"eb4c1645-1319-4425-865f-008563009d67\", \"occupancy\": 1}],\"13559006802662768\"]");
             data.Add("/subscribe/demo/hello_my_channel,hello_my_channel-pnpres/0/13559006802662768", "[[],\"13559006802662768\"]");
-            return data;
+
+            data.Add("/subscribe/demo/hello_my_channel-pnpres,hello_my_channel/0/0", "[[],\"13596603179264912\"]");
+            data.Add("/subscribe/demo/hello_my_channel-pnpres,hello_my_channel/0/13596603179264912", "[[{\"action\": \"join\", \"timestamp\": 1355929955, \"uuid\": \"eb4c1645-1319-4425-865f-008563009d67\", \"occupancy\": 1}],\"13559006802662768\"]");
+            data.Add("/subscribe/demo/hello_my_channel-pnpres,hello_my_channel/0/13559006802662768", "[[],\"13559006802662768\"]");
+			
+			return data;
         }
 
         private Dictionary<string, string> LoadWhenAClientIsPresentedThenPresenceShouldReturnCustomUUID()
@@ -48,7 +53,11 @@ namespace PubNubMessaging.Tests
             data.Add("/subscribe/demo/hello_my_channel,hello_my_channel-pnpres/0/0", "[[],\"13596603179264912\"]");
             data.Add("/subscribe/demo/hello_my_channel,hello_my_channel-pnpres/0/13596603179264912", "[[{\"action\": \"join\", \"timestamp\": 1355929955, \"uuid\": \"mylocalmachine.mydomain.com\", \"occupancy\": 1}],\"13559006802662768\"]");
             data.Add("/subscribe/demo/hello_my_channel,hello_my_channel-pnpres/0/13559006802662768", "[[],\"13559006802662768\"]");
-            return data;
+
+            data.Add("/subscribe/demo/hello_my_channel-pnpres,hello_my_channel/0/0", "[[],\"13596603179264912\"]");
+            data.Add("/subscribe/demo/hello_my_channel-pnpres,hello_my_channel/0/13596603179264912", "[[{\"action\": \"join\", \"timestamp\": 1355929955, \"uuid\": \"mylocalmachine.mydomain.com\", \"occupancy\": 1}],\"13559006802662768\"]");
+            data.Add("/subscribe/demo/hello_my_channel-pnpres,hello_my_channel/0/13559006802662768", "[[],\"13559006802662768\"]");
+			return data;
         }
 
         private Dictionary<string, string> LoadWhenAClientIsPresentedIfHereNowIsCalledThenItShouldReturnInfo()
