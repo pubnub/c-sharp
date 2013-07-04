@@ -53,6 +53,7 @@ public class PubnubExample : MonoBehaviour {
 		{
 			allowUserSettingsChange = true;
 			ResetPubnubInstance();
+			pubnubApiResult = "";
 		}
 		
 		GUI.enabled = allowUserSettingsChange;
@@ -97,22 +98,31 @@ public class PubnubExample : MonoBehaviour {
 		
 		if (GUI.Button(new Rect(10,370,120,25), "Presence"))
 		{
-			InstantiatePubnub();
-			allowUserSettingsChange = false;
-			pubnub.Presence<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
+			Task presenceTask = Task.Factory.StartNew(() => 
+			{
+				InstantiatePubnub();
+				allowUserSettingsChange = false;
+				pubnub.Presence<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
+			});
 		}
 		if (GUI.Button(new Rect(140,370,120,25), "Subscribe"))
 		{
-			InstantiatePubnub();
-			allowUserSettingsChange = false;
-			pubnub.Subscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
+			Task subscribeTask = Task.Factory.StartNew(() => 
+			{
+				InstantiatePubnub();
+				allowUserSettingsChange = false;
+				pubnub.Subscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
+			});
 		}
 
 		if (GUI.Button(new Rect(10,400,120,25), "Detailed History"))
 		{
-			InstantiatePubnub();
-			allowUserSettingsChange = false;
-			pubnub.DetailedHistory<string>(channel, 100, DisplayReturnMessage, DisplayErrorMessage);
+			Task detailedhistoryTask = Task.Factory.StartNew(() => 
+			{
+				InstantiatePubnub();
+				allowUserSettingsChange = false;
+				pubnub.DetailedHistory<string>(channel, 100, DisplayReturnMessage, DisplayErrorMessage);
+			});
 		}
 		
 		if (GUI.Button(new Rect(140,400,120,25), "Publish"))
@@ -130,29 +140,41 @@ public class PubnubExample : MonoBehaviour {
 		
 		if (GUI.Button(new Rect(10,430,120,25), "Unsubscribe"))
 		{
-			InstantiatePubnub();
-			allowUserSettingsChange = false;
-			pubnub.Unsubscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayDisconnectStatusMessage, DisplayErrorMessage);
+			Task unsubTask = Task.Factory.StartNew(() => 
+			{
+				InstantiatePubnub();
+				allowUserSettingsChange = false;
+				pubnub.Unsubscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayDisconnectStatusMessage, DisplayErrorMessage);
+			});
 		}
 		
 		if (GUI.Button(new Rect(140,430,120,25), "Here Now"))
 		{
-			InstantiatePubnub();
-			allowUserSettingsChange = false;
-			pubnub.HereNow<string>(channel, DisplayReturnMessage, DisplayErrorMessage);
+			Task herenowTask = Task.Factory.StartNew(() => 
+			{
+				InstantiatePubnub();
+				allowUserSettingsChange = false;
+				pubnub.HereNow<string>(channel, DisplayReturnMessage, DisplayErrorMessage);
+			});
 		}
 		
 		if (GUI.Button(new Rect(10,460,120,25), "Presence-Unsub"))
 		{
-			InstantiatePubnub();
-			allowUserSettingsChange = false;
-			pubnub.PresenceUnsubscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayDisconnectStatusMessage, DisplayErrorMessage);
+			Task preunsubTask = Task.Factory.StartNew(() => 
+			{
+				InstantiatePubnub();
+				allowUserSettingsChange = false;
+				pubnub.PresenceUnsubscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayDisconnectStatusMessage, DisplayErrorMessage);
+			});
 		}
 		if (GUI.Button(new Rect(140,460,120,25), "Time"))
 		{
-			InstantiatePubnub();
-			allowUserSettingsChange = false;
-			pubnub.Time<string>(DisplayReturnMessage, DisplayErrorMessage);
+			Task timeTask = Task.Factory.StartNew(() => 
+			{
+				InstantiatePubnub();
+				allowUserSettingsChange = false;
+				pubnub.Time<string>(DisplayReturnMessage, DisplayErrorMessage);
+			});
 		}
 
 		if (GUI.Button(new Rect(10,490,120,25), "Disable Network"))
@@ -183,13 +205,13 @@ public class PubnubExample : MonoBehaviour {
 		
 		if (showPublishPopupWindow)
 		{
-			scrollPosition = GUI.BeginScrollView(new Rect(300,10,500,200), scrollPosition, new Rect(0,0,250,500),false, false);
-			pubnubApiResult = GUI.TextArea(new Rect(0,0,485,200), pubnubApiResult);
+			scrollPosition = GUI.BeginScrollView(new Rect(300,10,415,200), scrollPosition, new Rect(0,0,250,500),false, true);
+			pubnubApiResult = GUI.TextArea(new Rect(0,0,400,500), pubnubApiResult);
 		}
 		else
 		{
-			scrollPosition = GUI.BeginScrollView(new Rect(300,10,500,500), scrollPosition, new Rect(0,0,450,1000),false, false);
-			pubnubApiResult = GUI.TextArea(new Rect(0,0,485,1000), pubnubApiResult);			
+			scrollPosition = GUI.BeginScrollView(new Rect(300,10,415,600), scrollPosition, new Rect(0,0,375,1200),false, true);
+			pubnubApiResult = GUI.TextArea(new Rect(0,0,400,1200), pubnubApiResult);			
 		}
 		GUI.EndScrollView();
 		
@@ -284,17 +306,40 @@ public class PubnubExample : MonoBehaviour {
 	void Update()
 	{
             string recordTest;
-			if (pubnubApiResult.Length > 10000)
-			{
-				pubnubApiResult = pubnubApiResult.Substring(pubnubApiResult.Length/2);
-			}
+			System.Text.StringBuilder sbResult = new System.Text.StringBuilder();
+	
+			int existingLen = pubnubApiResult.Length;
+			int newRecordLen = 0;
+			sbResult.Append(pubnubApiResult);
+
             if (_recordQueue.TryPeek(out recordTest))
             {
-                string currentRecord;
+                string currentRecord = "";
                 while (_recordQueue.TryDequeue(out currentRecord))
                 {
-					pubnubApiResult += currentRecord + "\n";
+					sbResult.AppendLine(currentRecord);
                 }
+			
+				pubnubApiResult = sbResult.ToString();
+				
+				newRecordLen = pubnubApiResult.Length - existingLen;
+				int windowLength = 2000;
+	
+				if (pubnubApiResult.Length > windowLength)
+				{
+					bool trimmed = false;
+					if (pubnubApiResult.Length > windowLength){
+						trimmed = true;
+						int lengthToTrim = (((pubnubApiResult.Length - windowLength) < pubnubApiResult.Length -newRecordLen)? pubnubApiResult.Length - windowLength : pubnubApiResult.Length - newRecordLen);
+						pubnubApiResult = pubnubApiResult.Substring(lengthToTrim);
+					}
+					if(trimmed)
+					{
+						string prefix = "Output trimmed...\n";
+						
+						pubnubApiResult = prefix + pubnubApiResult;
+					}
+				}
             }
 	}
 	
