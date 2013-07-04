@@ -7,6 +7,7 @@ using System;
 using System.Reflection;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 
 public class PubnubExample : MonoBehaviour {
 	bool ssl = false;
@@ -156,19 +157,28 @@ public class PubnubExample : MonoBehaviour {
 
 		if (GUI.Button(new Rect(10,490,120,25), "Disable Network"))
 		{
-			InstantiatePubnub();
-			pubnub.EnableSimulateNetworkFailForTestingOnly();
+			Task disableNetwork = Task.Factory.StartNew(() => 
+			{
+				InstantiatePubnub();
+				pubnub.EnableSimulateNetworkFailForTestingOnly();
+			});
 		}
 		if (GUI.Button(new Rect(140,490,120,25), "Enable Network"))
 		{
-			InstantiatePubnub();
-			pubnub.DisableSimulateNetworkFailForTestingOnly();
+			Task enableNetwork = Task.Factory.StartNew(() => 
+			{
+				InstantiatePubnub();
+				pubnub.DisableSimulateNetworkFailForTestingOnly();
+			});
 		}
 
 		if (GUI.Button(new Rect(10,520,120,25), "Disconnect/Retry"))
 		{
-			InstantiatePubnub();
-			pubnub.TerminateCurrentSubscriberRequest();
+			Task disconnectRetry = Task.Factory.StartNew(() => 
+			{
+				InstantiatePubnub();
+				pubnub.TerminateCurrentSubscriberRequest();
+			});
 		}
 		
 		if (showPublishPopupWindow)
