@@ -115,18 +115,18 @@ public class PubnubExample : MonoBehaviour {
 		if (GUI.Button(new Rect(10,370,120,25), "Presence"))
 		{
 			InstantiatePubnub();
-			ThreadPool.QueueUserWorkItem(new WaitCallback(SendAsyncRequest), PubnubState.Presence);
+			AsyncOrNonAsyncCall(PubnubState.Presence);
 		}
 		if (GUI.Button(new Rect(140,370,120,25), "Subscribe"))
 		{
 			InstantiatePubnub();
-			ThreadPool.QueueUserWorkItem(new WaitCallback(SendAsyncRequest), PubnubState.Subscribe);
+			AsyncOrNonAsyncCall(PubnubState.Subscribe);
 		}
 
 		if (GUI.Button(new Rect(10,400,120,25), "Detailed History"))
 		{
 			InstantiatePubnub();
-			ThreadPool.QueueUserWorkItem(new WaitCallback(SendAsyncRequest), PubnubState.DetailedHistory);
+			AsyncOrNonAsyncCall(PubnubState.DetailedHistory);
 		}
 		
 		if (GUI.Button(new Rect(140,400,120,25), "Publish"))
@@ -145,41 +145,41 @@ public class PubnubExample : MonoBehaviour {
 		if (GUI.Button(new Rect(10,430,120,25), "Unsubscribe"))
 		{
 			InstantiatePubnub();
-			ThreadPool.QueueUserWorkItem(new WaitCallback(SendAsyncRequest), PubnubState.Unsubscribe);
+			AsyncOrNonAsyncCall(PubnubState.Unsubscribe);
 		}
 		
 		if (GUI.Button(new Rect(140,430,120,25), "Here Now"))
 		{
 			InstantiatePubnub();
-			ThreadPool.QueueUserWorkItem(new WaitCallback(SendAsyncRequest), PubnubState.HereNow);
+			AsyncOrNonAsyncCall(PubnubState.HereNow);
 		}
 		
 		if (GUI.Button(new Rect(10,460,120,25), "Presence-Unsub"))
 		{
 			InstantiatePubnub();
-			ThreadPool.QueueUserWorkItem(new WaitCallback(SendAsyncRequest), PubnubState.PresenceUnsubscribe);
+			AsyncOrNonAsyncCall(PubnubState.PresenceUnsubscribe);
 		}
 		if (GUI.Button(new Rect(140,460,120,25), "Time"))
 		{
 			InstantiatePubnub();
-			ThreadPool.QueueUserWorkItem(new WaitCallback(SendAsyncRequest), PubnubState.Time);
+			AsyncOrNonAsyncCall(PubnubState.Time);
 		}
 
 		if (GUI.Button(new Rect(10,490,120,25), "Disable Network"))
 		{
 			InstantiatePubnub();
-			ThreadPool.QueueUserWorkItem(new WaitCallback(SendAsyncRequest), PubnubState.DisableNetwork);
+			AsyncOrNonAsyncCall(PubnubState.DisableNetwork);
 		}
 		if (GUI.Button(new Rect(140,490,120,25), "Enable Network"))
 		{
 			InstantiatePubnub();
-			ThreadPool.QueueUserWorkItem(new WaitCallback(SendAsyncRequest), PubnubState.EnableNetwork);
+			AsyncOrNonAsyncCall(PubnubState.EnableNetwork);
 		}
 
 		if (GUI.Button(new Rect(10,520,120,25), "Disconnect/Retry"))
 		{
 			InstantiatePubnub();
-			ThreadPool.QueueUserWorkItem(new WaitCallback(SendAsyncRequest), PubnubState.DisconnectRetry);
+			ThreadPool.QueueUserWorkItem(new WaitCallback(DoAction), PubnubState.DisconnectRetry);
 		}
 		
 		if (showPublishPopupWindow)
@@ -196,49 +196,67 @@ public class PubnubExample : MonoBehaviour {
 		
 	}
 	
-	private static void DisconnectRetry (object internetState)
+	/// <summary>
+	/// Determines whether to send an asynchronous or synchronous call on the button click
+	/// Async calls on button click when used in iOS results in random crashes thus sync calls 
+	/// are preferred in case iOS
+	/// </summary>
+	/// <param name="pubnubState">Pubnub state.</param>
+	void AsyncOrNonAsyncCall (PubnubState pubnubState)
 	{
-		pubnub.TerminateCurrentSubscriberRequest();
+#if(UNITY_IOS)
+		DoAction(pubnubState);
+#else
+		ThreadPool.QueueUserWorkItem(new WaitCallback(DoAction), pubnubState);
+#endif
 	}
-	private void SendAsyncRequest (object pubnubState)
+
+	private void DoAction(object pubnubState)
 	{
-		if ((PubnubState)pubnubState == PubnubState.Presence) {
-			AddToPubnubResultContainer ("Running Presence");
-			allowUserSettingsChange = false;
-			pubnub.Presence<string> (channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
-		} else if ((PubnubState)pubnubState == PubnubState.Subscribe) {
-			AddToPubnubResultContainer ("Running Subscribe");
-			allowUserSettingsChange = false;
-			pubnub.Subscribe<string> (channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
-		} else if ((PubnubState)pubnubState == PubnubState.DetailedHistory) {
-			AddToPubnubResultContainer ("Running Detailed History");
-			allowUserSettingsChange = false;
-			pubnub.DetailedHistory<string>(channel, 100, DisplayReturnMessage, DisplayErrorMessage);
-		} else if ((PubnubState)pubnubState == PubnubState.HereNow) {
-			AddToPubnubResultContainer ("Running Here Now");
-			allowUserSettingsChange = false;
-			pubnub.HereNow<string>(channel, DisplayReturnMessage, DisplayErrorMessage);
-		} else if ((PubnubState)pubnubState == PubnubState.Time) {
-			AddToPubnubResultContainer ("Running Time");
-			allowUserSettingsChange = false;
-			pubnub.Time<string>(DisplayReturnMessage, DisplayErrorMessage);
-		} else if ((PubnubState)pubnubState == PubnubState.Unsubscribe) {
-			AddToPubnubResultContainer ("Running Unsubscribe");
-			allowUserSettingsChange = false;
-			pubnub.Unsubscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayDisconnectStatusMessage, DisplayErrorMessage);
-		} else if ((PubnubState)pubnubState == PubnubState.PresenceUnsubscribe) {
-			AddToPubnubResultContainer ("Running Presence Subscribe");
-			allowUserSettingsChange = false;
-			pubnub.PresenceUnsubscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayDisconnectStatusMessage, DisplayErrorMessage);
-		} else if ((PubnubState)pubnubState == PubnubState.EnableNetwork) {
-			AddToPubnubResultContainer ("Running Enable Network");
-			pubnub.DisableSimulateNetworkFailForTestingOnly();
-		} else if ((PubnubState)pubnubState == PubnubState.DisableNetwork) {
-			AddToPubnubResultContainer ("Running Disable Network");
-			pubnub.EnableSimulateNetworkFailForTestingOnly();
-		} else if ((PubnubState)pubnubState == PubnubState.DisconnectRetry) {
-			AddToPubnubResultContainer ("Running Disconnect Retry");
-			pubnub.TerminateCurrentSubscriberRequest();
+		try
+		{
+			if ((PubnubState)pubnubState == PubnubState.Presence) {
+				AddToPubnubResultContainer ("Running Presence");
+				allowUserSettingsChange = false;
+				pubnub.Presence<string> (channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
+			} else if ((PubnubState)pubnubState == PubnubState.Subscribe) {
+				AddToPubnubResultContainer ("Running Subscribe");
+				allowUserSettingsChange = false;
+				pubnub.Subscribe<string> (channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
+			} else if ((PubnubState)pubnubState == PubnubState.DetailedHistory) {
+				AddToPubnubResultContainer ("Running Detailed History");
+				allowUserSettingsChange = false;
+				pubnub.DetailedHistory<string>(channel, 100, DisplayReturnMessage, DisplayErrorMessage);
+			} else if ((PubnubState)pubnubState == PubnubState.HereNow) {
+				AddToPubnubResultContainer ("Running Here Now");
+				allowUserSettingsChange = false;
+				pubnub.HereNow<string>(channel, DisplayReturnMessage, DisplayErrorMessage);
+			} else if ((PubnubState)pubnubState == PubnubState.Time) {
+				AddToPubnubResultContainer ("Running Time");
+				allowUserSettingsChange = false;
+				pubnub.Time<string>(DisplayReturnMessage, DisplayErrorMessage);
+			} else if ((PubnubState)pubnubState == PubnubState.Unsubscribe) {
+				AddToPubnubResultContainer ("Running Unsubscribe");
+				allowUserSettingsChange = false;
+				pubnub.Unsubscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayDisconnectStatusMessage, DisplayErrorMessage);
+			} else if ((PubnubState)pubnubState == PubnubState.PresenceUnsubscribe) {
+				AddToPubnubResultContainer ("Running Presence Subscribe");
+				allowUserSettingsChange = false;
+				pubnub.PresenceUnsubscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayDisconnectStatusMessage, DisplayErrorMessage);
+			} else if ((PubnubState)pubnubState == PubnubState.EnableNetwork) {
+				AddToPubnubResultContainer ("Running Enable Network");
+				pubnub.DisableSimulateNetworkFailForTestingOnly();
+			} else if ((PubnubState)pubnubState == PubnubState.DisableNetwork) {
+				AddToPubnubResultContainer ("Running Disable Network");
+				pubnub.EnableSimulateNetworkFailForTestingOnly();
+			} else if ((PubnubState)pubnubState == PubnubState.DisconnectRetry) {
+				AddToPubnubResultContainer ("Running Disconnect Retry");
+				pubnub.TerminateCurrentSubscriberRequest();
+			}
+		}
+		catch(Exception ex)
+		{
+			UnityEngine.Debug.Log (ex.ToString());
 		}
 	}
 	
