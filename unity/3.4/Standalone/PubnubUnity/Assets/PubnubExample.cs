@@ -50,6 +50,8 @@ public class PubnubExample : MonoBehaviour {
 	Vector2 scrollPosition = Vector2.zero;
 	string pubnubApiResult = "";
 	
+	bool _requestInProcess = false;
+	
 	bool showPublishPopupWindow = false;
 	
 	Rect publishWindowRect = new Rect(270, 250, 300, 150);
@@ -179,7 +181,7 @@ public class PubnubExample : MonoBehaviour {
 		if (GUI.Button(new Rect(10,520,120,25), "Disconnect/Retry"))
 		{
 			InstantiatePubnub();
-			ThreadPool.QueueUserWorkItem(new WaitCallback(DoAction), PubnubState.DisconnectRetry);
+			AsyncOrNonAsyncCall(PubnubState.DisconnectRetry);
 		}
 		
 		if (showPublishPopupWindow)
@@ -205,7 +207,18 @@ public class PubnubExample : MonoBehaviour {
 	void AsyncOrNonAsyncCall (PubnubState pubnubState)
 	{
 #if(UNITY_IOS)
-		DoAction(pubnubState);
+		if(pubnubState == PubnubState.DisconnectRetry)
+		{
+			if(!requestInProcess)
+			{
+				requestInProcess = true;
+				ThreadPool.QueueUserWorkItem(new WaitCallback(DoAction), pubnubState);
+			}
+		}
+		else
+		{
+        	DoAction(pubnubState);
+		}
 #else
 		ThreadPool.QueueUserWorkItem(new WaitCallback(DoAction), pubnubState);
 #endif
@@ -252,6 +265,7 @@ public class PubnubExample : MonoBehaviour {
 			} else if ((PubnubState)pubnubState == PubnubState.DisconnectRetry) {
 				AddToPubnubResultContainer ("Running Disconnect Retry");
 				pubnub.TerminateCurrentSubscriberRequest();
+				_requestInProcess = false;
 			}
 		}
 		catch(Exception ex)
