@@ -1,24 +1,23 @@
 ## PubNub 3.4 Web Data Push Cloud-Hosted API
-### Unity 4 for Standalone and Web Player
+### Unity 4 for "PC, Mac& Linux Standalone" and "Android" platforms (WebPlayer
 
 #### Prerequisites
-1. Intall Free Full version of Unity 4 from http://unity3d.com/unity/download/ (Unity 4 is recommended, but current/later versions should be ok). MonoDevelop IDE tool will be installed as part of Unity to write C# scripts.
+1. Intall Free Full version of Unity 4 with Pro from http://unity3d.com/unity/download/ (Unity 4 is recommended, but current/later versions should be ok). MonoDevelop IDE tool will be installed as part of Unity to write C# scripts.
 
-#### To run the unit test code (under UnityUnitTest folder of Standalone and WebPlayer), in addition to the above step, you need to 
+#### To run the unit test code (under UnityUnitTest folder of Standalone), in addition to the above step, you need to 
 1. Import UUnit unity package from http://uunit.googlecode.com/files/UUnit_0.4.unitypackage into your Assets (Updates on this pacakage can be obtained from http://wiki.unity3d.com/index.php?title=UUnit). After import, please delete TestCaseDummy.cs and TestCaseTest.cs files from /Assets/Standard Assets/UUnit/UUnitSelfTest folder to avoid unintendend test case runs.
    
 
 #### Running the Demo App
 
-1. Open up the Unity Project from either Standalone\PubnubUnity or WebPlayer\PubnubUnity folder.
+1. Open up the Unity Project from either Standalone\PubnubUnity folder.
 2. Ensure "Pubnub Example" is added as component to Main Camera.
-3. If running from Standalone\PubnubUnity, Go to Edit menu --> Project Settings --> Player. 
+3. Go to Edit menu --> Project Settings --> Player. 
    Under "Optimization" section, ensure Api Compatibility Level is ".Net 2.0".
-4. Click the Play button symbol in Game view of toolbar.(You will see Play/Pause/Step buttons).
-5. Ensure "Maximize on Play" is selected to view the full game scene of the demo example.
+4. Go to File menu --> Build Settings --> Select "PC, Mac& Linux Standalone" or "Android" Platform.
+   Click "Switch Platform" if it is enabled. (NOTE: It will be enabled if there is change in Platform settings)
+5. Click Build and Run. (NOTE: To run the demo on "PC, Mac& Linux Standalone" platform, Unity Pro version is required)
 
-* NOTE: WebPlayer Assets\Newtonsoft.Json.dll version is different from Standalone version due to compatibility issues.
-Web Player DLL version was downloaded from Unity forum site. http://forum.unity3d.com/threads/50998-Newtonsoft-JSON-NET-Converter-fails-in-Unity
 
 #### Running the Tests
 
