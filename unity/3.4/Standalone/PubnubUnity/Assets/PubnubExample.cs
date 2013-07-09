@@ -348,6 +348,8 @@ public class PubnubExample : MonoBehaviour {
 	
 	void Update()
 	{
+			if (pubnub == null) return;
+		
 			UnityEngine.Debug.Log(DateTime.Now.ToLongTimeString() + " Update called " + pubnubApiResult.Length.ToString());			
 			string recordTest;
 			System.Text.StringBuilder sbResult = new System.Text.StringBuilder();
