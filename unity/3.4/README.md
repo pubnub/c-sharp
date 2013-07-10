@@ -1,5 +1,5 @@
 ## PubNub 3.4 Web Data Push Cloud-Hosted API
-### Unity 4 for "PC, Mac& Linux Standalone" and "Android" platforms (WebPlayer
+### Unity 4 for "PC, Mac& Linux Standalone", iOS and "Android" platforms 
 
 ### View this First!
 We've made a [screencast](https://vimeo.com/69591819) that will walk you through the general setup. Check it out!
@@ -24,36 +24,40 @@ We've made a [screencast](https://vimeo.com/69591819) that will walk you through
 5. Click Build and Run. (NOTE: To run the demo on "PC, Mac& Linux Standalone" platform, Unity Pro version is required)
 
 #### Running the Demo App on Mac
-Common Steps:
+####Common Steps:
+
 1. Open up the Unity Project from Standalone\PubnubUnity folder present in the PubNub github repo.
 2. Ensure "Pubnub Example" is added as component to Main Camera.
 3. Goto File menu -> Build Settings.
 
-##### Mac
-Follow the 3 steps listed under Common Steps for Running the Demo App on Mac
-3. In the dialog that opens select PC, Mac, Linux Standalone under the platform and click "Switch Platform".
-4. On the right side of the same dialog select Mac under "Target Platform".
-5. Click "Build and Run"
-6. This will run the PubNub example in the unity standalone player for Mac
+##### Mac 
+
+1. Follow the 3 steps listed under Common Steps for Running the Demo App on Mac.
+2. In the dialog that opens select PC, Mac, Linux Standalone under the platform and click "Switch Platform".
+3. On the right side of the same dialog select Mac under "Target Platform".
+4. Click "Build and Run"
+5. This will run the PubNub example in the unity standalone player for Mac
 
 ##### iOS (requires Xcode to be installed)
-Follow the 3 steps listed under Common Steps for Running the Demo App on Mac
-3. In the dialog the opens select iOS under the platform and click "Switch Platform".
-4. Click "Build and Run"
-5. This will run the PubNub example in the iPad simulator
-6. You may get an error SystemException: System.Net.Sockets are supported only on Unity Pro. Referenced from assembly 'Assembly-CSharp'. If so you need to use the Unity3d pro.
-7. The code uses the pre-compiler flag UNITY_IOS to distinguish between other platforms.
-8. Target iOS version 4.0 and above. 
+
+1. Follow the 3 steps listed under Common Steps for Running the Demo App on Mac.
+2. In the dialog the opens select iOS under the platform and click "Switch Platform".
+3. Click "Build and Run"
+4. This will run the PubNub example in the iPad simulator
+5. You may get an error SystemException: System.Net.Sockets are supported only on Unity Pro. Referenced from assembly 'Assembly-CSharp'. If so you need to use the Unity3d pro.
+6. The code uses the pre-compiler flag UNITY_IOS to distinguish between other platforms.
+7. Target iOS version 4.0 and above. 
 
 ##### Android (requires Android development environment to be set)
-Follow the 3 steps listed under Common Steps for Running the Demo App on Mac
-3. In the dialog the opens select Android under the platform and click "Switch Platform".
-4. Click "Build and Run". This button may be disabled or you may get an error that no devices are found. To resolve this please ensure that the android emulator is running.
-5. This will run the PubNub example in the Android emulator. 
-6. You may get an error SystemException: System.Net.Sockets are supported only on Unity Pro. Referenced from assembly 'Assembly-CSharp'. If so you need to use the Unity3d pro.
-7. The code uses the pre-compiler flag UNITY_ANDROID to distinguish between other platforms.
-8. If running on the emulator please enable GPU emulation.
-9. Target Android version 4 (Ice cream sandwich) and above.
+
+1. Follow the 3 steps listed under Common Steps for Running the Demo App on Mac.
+2. In the dialog the opens select Android under the platform and click "Switch Platform".
+3. Click "Build and Run". This button may be disabled or you may get an error that no devices are found. To resolve this please ensure that the android emulator is running.
+4. This will run the PubNub example in the Android emulator. 
+5. You may get an error SystemException: System.Net.Sockets are supported only on Unity Pro. Referenced from assembly 'Assembly-CSharp'. If so you need to use the Unity3d pro.
+6. The code uses the pre-compiler flag UNITY_ANDROID to distinguish between other platforms.
+7. If running on the emulator please enable GPU emulation.
+8. Target Android version 4 (Ice cream sandwich) and above.
 
 
 #### Running the Tests
