@@ -1,26 +1,59 @@
 ## PubNub 3.4 Web Data Push Cloud-Hosted API
 ### Unity 4 for "PC, Mac& Linux Standalone" and "Android" platforms (WebPlayer
 
-* NOTES: 
-1. "/" (slash character) being part of channel name is not supported. So it is recommeded to avoid using "/" in channel names.
-2. JsonFX JSON library is used by defining USE_JSONFX as C# directive. Other JSON libraries like Newton Json.NET are not fully supported for all Unity environments.
+### View this First!
+We've made a [screencast](https://vimeo.com/69591819) that will walk you through the general setup. Check it out!
 
 #### Prerequisites
-1. Intall Free Full version of Unity 4 with Pro trial from http://unity3d.com/unity/download/ (Unity 4 is recommended, but current/later versions should be ok). MonoDevelop IDE tool will be installed as part of Unity to write C# scripts.
+1. Install Free Full version of Unity 4 Pro from http://unity3d.com/unity/download/ (Unity 4 is recommended, but current/later versions should be ok). MonoDevelop IDE tool will be installed as part of Unity to write C# scripts.
+2. In case of unity we need to use JSONFX as the serialization library. To use JSONFX we have defined a pre-compiler variable USE_JSONFX. The other serialization libraries used in the pubnub.cs class are the default serialization from inbuilt .NET class (activated when the pre-compiler directive USE_DOTNET_SERIALIZATION is used) and Newtonsoft.Json (activated when neither USE_JSONFX nor USE_DOTNET_SERIALIZATION is defined). Both of these libraries won't work with UNITY. So you need to retain the pre-compiler variable USE_JSONFX is "defined" at the top of the pubnub.cs class (default behavior).
+3. The unit tests for unity also require JSONFX library for serialization.
 
 #### To run the unit test code (under UnityUnitTest folder of Standalone), in addition to the above step, you need to 
-1. Import UUnit unity package from http://uunit.googlecode.com/files/UUnit_0.4.unitypackage into your Assets (Updates on this pacakage can be obtained from http://wiki.unity3d.com/index.php?title=UUnit). After import, please delete TestCaseDummy.cs and TestCaseTest.cs files from /Assets/Standard Assets/UUnit/UUnitSelfTest folder to avoid unintendend test case runs.
+1. Import UUnit unity package from http://uunit.googlecode.com/files/UUnit_0.4.unitypackage into your Assets (Updates on this pacakage can be obtained from http://wiki.unity3d.com/index.php?title=UUnit). After import, please delete TestCaseDummy.cs and TestCaseTest.cs files from /Assets/Standard Assets/UUnit/UUnitSelfTest folder to avoid unintended test case runs.
    
 
-#### Running the Demo App
+#### Running the Demo App on PC
 
-1. Open up the Unity Project from either Standalone\PubnubUnity folder.
-2. Ensure "Pubnub Example" is added as component to Main Camera.
+1. Open up the Unity Project from Standalone\PubnubUnity folder present in the PubNub github repo.
+2. Ensure "PubNub Example" is added as component to Main Camera.
 3. Go to Edit menu --> Project Settings --> Player. 
    Under "Optimization" section, ensure Api Compatibility Level is ".Net 2.0".
-4. Go to File menu --> Build Settings --> Select "PC, Mac& Linux Standalone" or "Android" Platform.
+4. Go to File menu --> Build Settings --> Select "PC, Linux Standalone" or "Android" Platform.
    Click "Switch Platform" if it is enabled. (NOTE: It will be enabled if there is change in Platform settings)
 5. Click Build and Run. (NOTE: To run the demo on "PC, Mac& Linux Standalone" platform, Unity Pro version is required)
+
+#### Running the Demo App on Mac
+Common Steps:
+1. Open up the Unity Project from Standalone\PubnubUnity folder present in the PubNub github repo.
+2. Ensure "Pubnub Example" is added as component to Main Camera.
+3. Goto File menu -> Build Settings.
+
+##### Mac
+Follow the 3 steps listed under Common Steps for Running the Demo App on Mac
+3. In the dialog that opens select PC, Mac, Linux Standalone under the platform and click "Switch Platform".
+4. On the right side of the same dialog select Mac under "Target Platform".
+5. Click "Build and Run"
+6. This will run the PubNub example in the unity standalone player for Mac
+
+##### iOS (requires Xcode to be installed)
+Follow the 3 steps listed under Common Steps for Running the Demo App on Mac
+3. In the dialog the opens select iOS under the platform and click "Switch Platform".
+4. Click "Build and Run"
+5. This will run the PubNub example in the iPad simulator
+6. You may get an error SystemException: System.Net.Sockets are supported only on Unity Pro. Referenced from assembly 'Assembly-CSharp'. If so you need to use the Unity3d pro.
+7. The code uses the pre-compiler flag UNITY_IOS to distinguish between other platforms.
+8. Target iOS version 4.0 and above. 
+
+##### Android (requires Android development environment to be set)
+Follow the 3 steps listed under Common Steps for Running the Demo App on Mac
+3. In the dialog the opens select Android under the platform and click "Switch Platform".
+4. Click "Build and Run". This button may be disabled or you may get an error that no devices are found. To resolve this please ensure that the android emulator is running.
+5. This will run the PubNub example in the Android emulator. 
+6. You may get an error SystemException: System.Net.Sockets are supported only on Unity Pro. Referenced from assembly 'Assembly-CSharp'. If so you need to use the Unity3d pro.
+7. The code uses the pre-compiler flag UNITY_ANDROID to distinguish between other platforms.
+8. If running on the emulator please enable GPU emulation.
+9. Target Android version 4 (Ice cream sandwich) and above.
 
 
 #### Running the Tests
@@ -62,6 +95,6 @@ Resolution: Unity Standalone version works only on Windows OS platforms. Current
 
 Resolution: This error may occur when the Unity example was run with SSL enabled. Please ensure that ValidateServerCertificate method in PubnubExample.cs do not get Untrust root error. For testing, you can return "true" for ValidateServerCertificate method to verify whether error is gone or not. However there is security risk in hardcoding "true" in production environment.
 
-
+* NOTE: "/" (slash) being part of channel name will not work. So it is recommeded to avoid using "/" in channel names.
 
 Report an issue, or email us at support if there are any additional questions or comments.
