@@ -43,7 +43,7 @@ namespace PubnubSilverlight.UnitTest
             unitTest.TestCaseName = "DetailHistoryCount10ReturnsRecords";
             pubnub.PubnubUnitTest = unitTest;
 
-            EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, 10, DetailedHistoryCount10Callback));
+            EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, 10, DetailedHistoryCount10Callback, DummyErrorCallback));
             EnqueueConditional(() => detailedHistoryCount10CallbackInvoked);
             EnqueueCallback(() => Assert.IsTrue(message10Received, "Detailed History Failed"));
 
@@ -86,7 +86,7 @@ namespace PubnubSilverlight.UnitTest
             unitTest.TestCaseName = "DetailHistoryCount10ReverseTrueReturnsRecords";
             pubnub.PubnubUnitTest = unitTest;
 
-            EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, -1, 10, true, DetailedHistoryCount10ReverseTrueCallback));
+            EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, -1, 10, true, DetailedHistoryCount10ReverseTrueCallback, DummyErrorCallback));
             EnqueueConditional(() => detailedHistoryCount10ReverseCallbackInvoked);
             EnqueueCallback(() => Assert.IsTrue(message10ReverseTrueReceived, "Detailed History Failed"));
 
@@ -137,13 +137,13 @@ namespace PubnubSilverlight.UnitTest
                 {
                     pubnub.Publish<string>(channel,
                                         string.Format("DetailedHistoryStartTimeWithReverseTrue {0}", index),
-                                        DetailedHistorySamplePublishCallback);
+                                        DetailedHistorySamplePublishCallback, DummyErrorCallback);
                     Thread.Sleep(100);
                     EnqueueConditional(() => detailedHistoryPublishCallbackInvoked);
                 }
             });
 
-            EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, startTimeWithReverseTrue, DetailedHistoryStartWithReverseTrueCallback, true));
+            EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, startTimeWithReverseTrue, DetailedHistoryStartWithReverseTrueCallback, DummyErrorCallback, true));
             EnqueueConditional(() => isDetailedHistoryStartReverseTrue);
             EnqueueCallback(() => Assert.IsTrue(messageStartReverseTrue, "Detailed History with Start and Reverse True Failed"));
 
@@ -200,5 +200,11 @@ namespace PubnubSilverlight.UnitTest
             }
             detailedHistoryPublishCallbackInvoked = true;
         }
+
+        [Asynchronous]
+        private void DummyErrorCallback(string result)
+        {
+        }
+
     }
 }

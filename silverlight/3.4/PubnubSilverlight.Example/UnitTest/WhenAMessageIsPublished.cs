@@ -10,8 +10,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Microsoft.Silverlight.Testing;
 using PubNubMessaging.Core;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace PubnubSilverlight.UnitTest
 {
@@ -86,7 +84,7 @@ namespace PubnubSilverlight.UnitTest
             unitTest.TestCaseName = "ThenUnencryptPublishShouldReturnSuccessCodeAndInfo";
             pubnub.PubnubUnitTest = unitTest;
 
-            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnSuccessUnencryptPublishCodeCallback));
+            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnSuccessUnencryptPublishCodeCallback, DummyErrorCallback));
             EnqueueConditional(() => isCheck);
 
             EnqueueCallback(() => 
@@ -97,7 +95,7 @@ namespace PubnubSilverlight.UnitTest
                 }
                 else
                 {
-                    EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, unEncryptPublishTimetoken, -1, false, CaptureUnencryptDetailedHistoryCallback));
+                    EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, unEncryptPublishTimetoken, -1, false, CaptureUnencryptDetailedHistoryCallback, DummyErrorCallback));
                     EnqueueConditional(() => isUnencryptCheck);
                     EnqueueCallback(() => Assert.IsTrue(isUnencryptDH, "Unable to match the successful unencrypt Publish"));
                 }
@@ -161,7 +159,7 @@ namespace PubnubSilverlight.UnitTest
             unitTest.TestCaseName = "ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo";
             pubnub.PubnubUnitTest = unitTest;
 
-            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnSuccessUnencryptObjectPublishCodeCallback));
+            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnSuccessUnencryptObjectPublishCodeCallback, DummyErrorCallback));
             EnqueueConditional(() => isUnencryptObjectPubCheck);
 
             EnqueueCallback(() =>
@@ -172,7 +170,7 @@ namespace PubnubSilverlight.UnitTest
                 }
                 else
                 {
-                    EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, unEncryptObjectPublishTimetoken, -1, false, CaptureUnencryptObjectDetailedHistoryCallback));
+                    EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, unEncryptObjectPublishTimetoken, -1, false, CaptureUnencryptObjectDetailedHistoryCallback, DummyErrorCallback));
                     EnqueueConditional(() => isUnencryptObjectDHCheck);
                     EnqueueCallback(() => Assert.IsTrue(isUnencryptObjectDH, "Unable to match the successful unencrypt object Publish"));
                 }
@@ -235,7 +233,7 @@ namespace PubnubSilverlight.UnitTest
             unitTest.TestCaseName = "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo";
             pubnub.PubnubUnitTest = unitTest;
 
-            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnSuccessEncryptObjectPublishCodeCallback));
+            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnSuccessEncryptObjectPublishCodeCallback, DummyErrorCallback));
             EnqueueConditional(() => isEncryptObjectPubCheck);
 
             EnqueueCallback(() =>
@@ -246,7 +244,7 @@ namespace PubnubSilverlight.UnitTest
                 }
                 else
                 {
-                   EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, encryptObjectPublishTimetoken, -1, false, CaptureEncryptObjectDetailedHistoryCallback));
+                    EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, encryptObjectPublishTimetoken, -1, false, CaptureEncryptObjectDetailedHistoryCallback, DummyErrorCallback));
                    EnqueueConditional(() => isEncryptObjectDHCheck);
                    EnqueueCallback(() => Assert.IsTrue(isEncryptObjectDH, "Unable to match the successful encrypt object Publish"));
                 }
@@ -308,7 +306,7 @@ namespace PubnubSilverlight.UnitTest
             unitTest.TestCaseName = "ThenEncryptPublishShouldReturnSuccessCodeAndInfo";
             pubnub.PubnubUnitTest = unitTest;
 
-            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnSuccessEncryptPublishCodeCallback));
+            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnSuccessEncryptPublishCodeCallback, DummyErrorCallback));
             EnqueueConditional(() => isEncryptPubCheck);
        
             EnqueueCallback(() =>
@@ -319,7 +317,7 @@ namespace PubnubSilverlight.UnitTest
                 }
                 else
                 {
-                    EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, encryptPublishTimetoken, -1, false, CaptureEncryptDetailedHistoryCallback));
+                    EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, encryptPublishTimetoken, -1, false, CaptureEncryptDetailedHistoryCallback, DummyErrorCallback));
                     EnqueueConditional(() => isEncryptDHCheck);
                     EnqueueCallback(() => Assert.IsTrue(isEncryptDH, "Unable to decrypt the successful Publish"));
                 }
@@ -381,7 +379,7 @@ namespace PubnubSilverlight.UnitTest
             unitTest.TestCaseName = "ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo";
             pubnub.PubnubUnitTest = unitTest;
 
-            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnSuccessSecretEncryptPublishCodeCallback));
+            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnSuccessSecretEncryptPublishCodeCallback, DummyErrorCallback));
             EnqueueConditional(() => isSecretEncryptPubCheck);
 
             EnqueueCallback(() =>
@@ -392,7 +390,7 @@ namespace PubnubSilverlight.UnitTest
                 }
                 else
                 {
-                    EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, secretEncryptPublishTimetoken, -1, false, CaptureSecretEncryptDetailedHistoryCallback));
+                    EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, secretEncryptPublishTimetoken, -1, false, CaptureSecretEncryptDetailedHistoryCallback, DummyErrorCallback));
                     EnqueueConditional(() => isSecretEncryptDHCheck);
                     EnqueueCallback(() => Assert.IsTrue(isSecretEncryptDH, "Unable to decrypt the successful Secret key Publish"));
                 }
@@ -457,7 +455,7 @@ namespace PubnubSilverlight.UnitTest
             string channel = "my/channel";
             string message = "Pubnub API Usage Example";
 
-            pubnub.Publish<string>(channel, message, null);
+            pubnub.Publish<string>(channel, message, null, DummyErrorCallback);
         }
 
         [TestMethod]
@@ -474,7 +472,7 @@ namespace PubnubSilverlight.UnitTest
             unitTest.TestCaseName = "ThenOptionalSecretKeyShouldBeProvidedInConstructor";
             pubnub.PubnubUnitTest = unitTest;
 
-            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnSecretKeyPublishCallback));
+            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnSecretKeyPublishCallback, DummyErrorCallback));
             EnqueueConditional(() => isCheck2);
             EnqueueCallback(() => Assert.IsTrue(isPublished2, "Publish Failed with secret key"));
 
@@ -514,7 +512,7 @@ namespace PubnubSilverlight.UnitTest
             unitTest.TestCaseName = "IfSSLNotProvidedThenDefaultShouldBeFalse";
             pubnub.PubnubUnitTest = unitTest;
 
-            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnNoSSLDefaultFalseCallback));
+            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnNoSSLDefaultFalseCallback, DummyErrorCallback));
             EnqueueConditional(() => isCheck3);
             EnqueueCallback(() => Assert.IsTrue(isPublished3, "Publish Failed with no SSL"));
 
@@ -556,7 +554,7 @@ namespace PubnubSilverlight.UnitTest
             object message = new PubnubDemoObject();
             messageComplexObjectForPublish = JsonConvert.SerializeObject(message);
 
-            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnSuccessComplexObjectPublishCodeCallback));
+            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnSuccessComplexObjectPublishCodeCallback, DummyErrorCallback));
             EnqueueConditional(() => isComplexObjectPublishCheck);
 
             EnqueueCallback(() =>
@@ -567,7 +565,7 @@ namespace PubnubSilverlight.UnitTest
                     }
                     else
                     {
-                        EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, complexObjectPublishTimetoken, -1, false, CaptureComplexObjectDetailedHistoryCallback));
+                        EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, complexObjectPublishTimetoken, -1, false, CaptureComplexObjectDetailedHistoryCallback, DummyErrorCallback));
                         EnqueueConditional(() => isComplexObjectDetailedHistoryCheck);
                         EnqueueCallback(() => Assert.IsTrue(isComplexObjectDetailedHistory, "Unable to match the successful unencrypt object Publish"));
                     }
@@ -634,7 +632,7 @@ namespace PubnubSilverlight.UnitTest
             object message = "{\"operation\":\"ReturnData\",\"channel\":\"Mobile1\",\"sequenceNumber\":0,\"data\":[\"ping 1.0.0.1\"]}";
             serializedObjectMessageForPublish = message.ToString();
 
-            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnSuccessSerializedObjectMessageForPublishCallback));
+            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnSuccessSerializedObjectMessageForPublishCallback, DummyErrorCallback));
             EnqueueConditional(() => isSerializedObjectMessageCheck);
 
             EnqueueCallback(() =>
@@ -645,7 +643,7 @@ namespace PubnubSilverlight.UnitTest
                     }
                     else
                     {
-                        EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, serializedMessagePublishTimetoken, -1, false, CaptureSerializedMessagePublishDetailedHistoryCallback));
+                        EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, serializedMessagePublishTimetoken, -1, false, CaptureSerializedMessagePublishDetailedHistoryCallback, DummyErrorCallback));
                         EnqueueConditional(() => isSerializedMessageDetailedHistoryCheck);
                         EnqueueCallback(() => Assert.IsTrue(isSerializedObjectMessageDetailedHistory, "Unable to match the successful serialized object message Publish"));
                     }
@@ -708,7 +706,7 @@ namespace PubnubSilverlight.UnitTest
             string channel = "my/channel";
             string message = messageLarge2K.Substring(0,1320);
 
-            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnPublishMessageTooLargeInfoCallback));
+            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnPublishMessageTooLargeInfoCallback, DummyErrorCallback));
             EnqueueConditional(() => isPublishMessageTooLargeCheck);
             EnqueueCallback(() => Assert.IsTrue(isLargeMessagePublished, "Message Too Large is not failing as expected."));
 
@@ -734,6 +732,10 @@ namespace PubnubSilverlight.UnitTest
             isPublishMessageTooLargeCheck = true;
         }
 
+        [Asynchronous]
+        private void DummyErrorCallback(string result)
+        {
+        }
 
     }
 }

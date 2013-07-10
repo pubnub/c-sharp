@@ -47,15 +47,15 @@ namespace PubNubMessaging.Tests
             
             string channel = "my/channel";
 
-            pubnub.Presence<string>(channel, ThenPresenceShouldReturnMessage, PresenceDummyMethodForConnectCallback);
+            pubnub.Presence<string>(channel, ThenPresenceShouldReturnMessage, PresenceDummyMethodForConnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
             
             //since presence expects from stimulus from sub/unsub...
-            pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback);
+            pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
             subscribeManualEvent.WaitOne(2000);
 
-            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback);
+            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
             unsubscribeManualEvent.WaitOne(2000);
 
@@ -80,16 +80,16 @@ namespace PubNubMessaging.Tests
 
             string channel = "my/channel";
 
-            pubnub.Presence<string>(channel, ThenPresenceWithCustomUUIDShouldReturnMessage, PresenceUUIDDummyMethodForConnectCallback);
+            pubnub.Presence<string>(channel, ThenPresenceWithCustomUUIDShouldReturnMessage, PresenceUUIDDummyMethodForConnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
             
             //since presence expects from stimulus from sub/unsub...
             pubnub.SessionUUID = customUUID;
-            pubnub.Subscribe<string>(channel, DummyMethodForSubscribeUUID, SubscribeUUIDDummyMethodForConnectCallback);
+            pubnub.Subscribe<string>(channel, DummyMethodForSubscribeUUID, SubscribeUUIDDummyMethodForConnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
             subscribeUUIDManualEvent.WaitOne(2000);
 
-            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribeUUID, UnsubscribeUUIDDummyMethodForConnectCallback, UnsubscribeUUIDDummyMethodForDisconnectCallback);
+            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribeUUID, UnsubscribeUUIDDummyMethodForConnectCallback, UnsubscribeUUIDDummyMethodForDisconnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
             unsubscribeUUIDManualEvent.WaitOne(2000);
 
@@ -111,7 +111,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "IfHereNowIsCalledThenItShouldReturnInfo";
             pubnub.PubnubUnitTest = unitTest;
             string channel = "my/channel";
-            pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage);
+            pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback);
             hereNowManualEvent.WaitOne();
             Assert.IsTrue(receivedHereNowMessage, "here_now message not received");
         }
@@ -278,6 +278,10 @@ namespace PubNubMessaging.Tests
         void UnsubscribeUUIDDummyMethodForDisconnectCallback(string receivedMessage)
         {
             unsubscribeUUIDManualEvent.Set();
+        }
+
+        void DummyErrorCallback(string result)
+        {
         }
 
     }

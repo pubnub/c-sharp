@@ -103,7 +103,7 @@ namespace PubnubSilverlight
             CheckUserInputs();
             channel = txtChannel.Text;
             Console.WriteLine("Running subscribe()");
-            pubnub.Subscribe<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage);
+            pubnub.Subscribe<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayErrorMessage);
         }
 
         private void Publish_Click(object sender, RoutedEventArgs e)
@@ -121,7 +121,7 @@ namespace PubnubSilverlight
                 if (publishView.DialogResult == true && publishView.Message.Text.Length > 0)
                 {
                     string publishedMessage = publishView.Message.Text;
-                    pubnub.Publish<string>(channel, publishedMessage, DisplayUserCallbackMessage);
+                    pubnub.Publish<string>(channel, publishedMessage, DisplayUserCallbackMessage, DisplayErrorMessage);
                 }
             };
         }
@@ -131,7 +131,7 @@ namespace PubnubSilverlight
             CheckUserInputs();
             channel = txtChannel.Text;
             Console.WriteLine("Running presence()");
-            pubnub.Presence<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage);
+            pubnub.Presence<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayErrorMessage);
         }
 
         private void History_Click(object sender, RoutedEventArgs e)
@@ -139,7 +139,7 @@ namespace PubnubSilverlight
             CheckUserInputs();
             channel = txtChannel.Text;
             Console.WriteLine("Running detailed history()");
-            pubnub.DetailedHistory<string>(channel, 10, DisplayUserCallbackMessage);
+            pubnub.DetailedHistory<string>(channel, 10, DisplayUserCallbackMessage, DisplayErrorMessage);
         }
 
         private void HereNow_Click(object sender, RoutedEventArgs e)
@@ -147,7 +147,7 @@ namespace PubnubSilverlight
             CheckUserInputs();
             channel = txtChannel.Text;
             Console.WriteLine("Running Here_Now()");
-            pubnub.HereNow<string>(channel, DisplayUserCallbackMessage);
+            pubnub.HereNow<string>(channel, DisplayUserCallbackMessage, DisplayErrorMessage);
         }
 
         private void Unsubscribe_Click(object sender, RoutedEventArgs e)
@@ -155,7 +155,7 @@ namespace PubnubSilverlight
             CheckUserInputs();
             channel = txtChannel.Text;
             Console.WriteLine("Running unsubscribe()");
-            pubnub.Unsubscribe<string>(channel, DisplayUserCallbackMessage, DisplayUserCallbackMessage, DisplayDisconnectCallbackMessage);
+            pubnub.Unsubscribe<string>(channel, DisplayUserCallbackMessage, DisplayUserCallbackMessage, DisplayDisconnectCallbackMessage, DisplayErrorMessage);
         }
 
         private void PresenceUnsubscrib_Click(object sender, RoutedEventArgs e)
@@ -163,28 +163,41 @@ namespace PubnubSilverlight
             CheckUserInputs();
             channel = txtChannel.Text;
             Console.WriteLine("Running presence-unsubscribe()");
-            pubnub.PresenceUnsubscribe<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayDisconnectCallbackMessage);
+            pubnub.PresenceUnsubscribe<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayDisconnectCallbackMessage, DisplayErrorMessage);
         }
 
         private void Time_Click(object sender, RoutedEventArgs e)
         {
             Console.WriteLine("Running time()");
-            pubnub.Time<string>(DisplayUserCallbackMessage);
+            pubnub.Time<string>(DisplayUserCallbackMessage, DisplayErrorMessage);
         }
 
         static void DisplayUserCallbackMessage(string result)
         {
+            Console.WriteLine("REGULAR CALLBACK:");
             Console.WriteLine(result);
+            Console.WriteLine("");
         }
 
         static void DisplayConnectCallbackMessage(string result)
         {
+            Console.WriteLine("CONNECT CALLBACK:");
             Console.WriteLine(result);
+            Console.WriteLine("");
         }
 
         static void DisplayDisconnectCallbackMessage(string result)
         {
+            Console.WriteLine("DISCONNECT CALLBACK:");
             Console.WriteLine(result);
+            Console.WriteLine("");
+        }
+
+        static void DisplayErrorMessage(string result)
+        {
+            Console.WriteLine("ERROR CALLBACK:");
+            Console.WriteLine(result);
+            Console.WriteLine("");
         }
 
         private void btnDisconnectRetry_Click(object sender, RoutedEventArgs e)

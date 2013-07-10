@@ -50,7 +50,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     unitTest.TestCaseName = "DetailHistoryCount10ReturnsRecords";
                     pubnub.PubnubUnitTest = unitTest;
 
-                    pubnub.DetailedHistory<string>(channel, 10, DetailedHistoryCount10Callback);
+                    pubnub.DetailedHistory<string>(channel, 10, DetailedHistoryCount10Callback, DummyErrorCallback);
                     mreMessageCount10.WaitOne(310 * 1000);
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
@@ -96,7 +96,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     unitTest.TestCaseName = "DetailHistoryCount10ReverseTrueReturnsRecords";
                     pubnub.PubnubUnitTest = unitTest;
 
-                    pubnub.DetailedHistory<string>(channel, -1, -1, 10, true, DetailedHistoryCount10ReverseTrueCallback);
+                    pubnub.DetailedHistory<string>(channel, -1, -1, 10, true, DetailedHistoryCount10ReverseTrueCallback, DummyErrorCallback);
                     mreMessageCount10ReverseTrue.WaitOne(310 * 1000);
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
@@ -148,12 +148,12 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     {
                         pubnub.Publish<string>(channel,
                             string.Format("DetailedHistoryStartTimeWithReverseTrue {0}", index),
-                            DetailedHistorySamplePublishCallback);
+                            DetailedHistorySamplePublishCallback, DummyErrorCallback);
                         mrePublishStartReverseTrue.WaitOne(310 * 1000);
                         Thread.Sleep(200);
                     }
 
-                    pubnub.DetailedHistory<string>(channel, startTimeWithReverseTrue, DetailedHistoryStartWithReverseTrueCallback, true);
+                    pubnub.DetailedHistory<string>(channel, startTimeWithReverseTrue, DetailedHistoryStartWithReverseTrueCallback, DummyErrorCallback, true);
                     mreMessageStartReverseTrue.WaitOne(310 * 1000);
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
@@ -213,5 +213,11 @@ namespace PubnubWindowsPhone.Test.UnitTest
             }
             mrePublishStartReverseTrue.Set();
         }
+
+        [Asynchronous]
+        private void DummyErrorCallback(string result)
+        {
+        }
+
     }
 }

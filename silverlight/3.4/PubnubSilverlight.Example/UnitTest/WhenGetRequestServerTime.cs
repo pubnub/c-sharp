@@ -30,7 +30,7 @@ namespace PubnubSilverlight.UnitTest
             unitTest.TestCaseName = "ThenItShouldReturnTimeStamp";
             pubnub.PubnubUnitTest = unitTest;
 
-            EnqueueCallback(() => pubnub.Time<string>(ReturnTimeStampCallback));
+            EnqueueCallback(() => pubnub.Time<string>(ReturnTimeStampCallback, DummyErrorCallback));
             EnqueueConditional(() => isTimeStamp);
             EnqueueCallback(() => Assert.IsTrue(timeReceived, "time() Failed"));
             EnqueueTestComplete();
@@ -52,6 +52,11 @@ namespace PubnubSilverlight.UnitTest
                 }
             }
             isTimeStamp = true;
+        }
+
+        [Asynchronous]
+        private void DummyErrorCallback(string result)
+        {
         }
 
         [TestMethod]

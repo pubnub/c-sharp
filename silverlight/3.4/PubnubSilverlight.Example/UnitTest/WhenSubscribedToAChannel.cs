@@ -43,10 +43,10 @@ namespace PubnubSilverlight.UnitTest
             unitTest.TestCaseName = "ThenSubscribeShouldReturnReceivedMessage";
             pubnub.PubnubUnitTest = unitTest;
 
-            EnqueueCallback(() => pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback));
+            EnqueueCallback(() => pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback, DummyErrorCallback));
             EnqueueConditional(() => receivedSubscribeMessage);
             //EnqueueConditional(() => subscribeConnected);
-            EnqueueCallback(() => pubnub.Publish<string>(channel, "Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage", dummyPublishCallback));
+            EnqueueCallback(() => pubnub.Publish<string>(channel, "Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage", dummyPublishCallback, DummyErrorCallback));
             EnqueueConditional(() => publishInCallback);
             //EnqueueConditional(() => receivedMessageInCallback);
             EnqueueCallback(() => pubnub.EndPendingRequests());
@@ -71,7 +71,7 @@ namespace PubnubSilverlight.UnitTest
 
             string channel = "my/channel";
 
-            EnqueueCallback(() => pubnub.Subscribe<string>(channel, ReceivedMessageCallbackYesConnect, ConnectStatusCallback));
+            EnqueueCallback(() => pubnub.Subscribe<string>(channel, ReceivedMessageCallbackYesConnect, ConnectStatusCallback, DummyErrorCallback));
             EnqueueConditional(() => receivedConnectMessage);
 
             EnqueueCallback(() => pubnub.EndPendingRequests());
@@ -97,11 +97,11 @@ namespace PubnubSilverlight.UnitTest
                 pubnub.PubnubUnitTest = unitTest;
 
                 string channel1 = "my/channel1";
-                EnqueueCallback(() => pubnub.Subscribe<string>(channel1, ReceivedChannelUserCallback, ReceivedChannel1ConnectCallback));
+                EnqueueCallback(() => pubnub.Subscribe<string>(channel1, ReceivedChannelUserCallback, ReceivedChannel1ConnectCallback, DummyErrorCallback));
                 EnqueueConditional(() => receivedChannel1ConnectMessage);
 
                 string channel2 = "my/channel2";
-                EnqueueCallback(() => pubnub.Subscribe<string>(channel2, ReceivedChannelUserCallback, ReceivedChannel2ConnectCallback));
+                EnqueueCallback(() => pubnub.Subscribe<string>(channel2, ReceivedChannelUserCallback, ReceivedChannel2ConnectCallback, DummyErrorCallback));
                 EnqueueConditional(() => receivedChannel2ConnectMessage);
 
                 EnqueueCallback(() => pubnub.EndPendingRequests());
@@ -128,11 +128,11 @@ namespace PubnubSilverlight.UnitTest
 
             string channel = "my/channel";
 
-            EnqueueCallback(() => pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback1, DummyMethodDuplicateChannelConnectCallback));
+            EnqueueCallback(() => pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback1, DummyMethodDuplicateChannelConnectCallback, DummyErrorCallback));
             EnqueueConditional(() => subscribeConnectedBeforeDuplicate);
             EnqueueCallback(() => Thread.Sleep(100));
 
-            EnqueueCallback(() => pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback2, DummyMethodDuplicateChannelConnectCallback));
+            EnqueueCallback(() => pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback2, DummyMethodDuplicateChannelConnectCallback, DummyErrorCallback));
             //receivedAlreadySubscribedMessage = true;
             EnqueueConditional(() => receivedAlreadySubscribedMessage);
             EnqueueCallback(() => Thread.Sleep(100));
@@ -159,7 +159,7 @@ namespace PubnubSilverlight.UnitTest
 
                 string channel = "my/channel";
 
-                EnqueueCallback(() => pubnub.Subscribe<string>(channel, SubscriberDummyMethodForManyMessagesUserCallback, SubscribeDummyMethodForManyMessagesConnectCallback));
+                EnqueueCallback(() => pubnub.Subscribe<string>(channel, SubscriberDummyMethodForManyMessagesUserCallback, SubscribeDummyMethodForManyMessagesConnectCallback, DummyErrorCallback));
                 //EnqueueCallback(() => Thread.Sleep(1000));
                 Thread.Sleep(1000);
                 //meSubscriberManyMessages.WaitOne();
@@ -330,6 +330,11 @@ namespace PubnubSilverlight.UnitTest
         private void dummyPublishCallback(string result)
         {
             publishInCallback = true;
+        }
+
+        [Asynchronous]
+        private void DummyErrorCallback(string result)
+        {
         }
 
     }

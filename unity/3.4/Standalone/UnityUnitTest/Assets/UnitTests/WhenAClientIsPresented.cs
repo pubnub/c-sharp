@@ -6,8 +6,6 @@ using UnityEngine;
 using System.ComponentModel;
 using System.Threading;
 using System.Collections;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
@@ -45,19 +43,15 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "ThenPresenceShouldReturnReceivedMessage";
             pubnub.PubnubUnitTest = unitTest;
             
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
 
-            pubnub.Presence<string>(channel, ThenPresenceShouldReturnMessage, PresenceDummyMethodForConnectCallback);
+            pubnub.Presence<string>(channel, ThenPresenceShouldReturnMessage, PresenceDummyMethodForConnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
             
             //since presence expects from stimulus from sub/unsub...
-            pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback);
+            pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
-            subscribeManualEvent.WaitOne(2000);
-
-            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback);
-            Thread.Sleep(1000);
-            unsubscribeManualEvent.WaitOne(2000);
+            subscribeManualEvent.WaitOne(310 * 1000);
 
             presenceManualEvent.WaitOne(310 * 1000);
 
@@ -79,20 +73,16 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "ThenPresenceShouldReturnCustomUUID";
             pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
 
-            pubnub.Presence<string>(channel, ThenPresenceWithCustomUUIDShouldReturnMessage, PresenceUUIDDummyMethodForConnectCallback);
+            pubnub.Presence<string>(channel, ThenPresenceWithCustomUUIDShouldReturnMessage, PresenceUUIDDummyMethodForConnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
             
             //since presence expects from stimulus from sub/unsub...
             pubnub.SessionUUID = customUUID;
-            pubnub.Subscribe<string>(channel, DummyMethodForSubscribeUUID, SubscribeUUIDDummyMethodForConnectCallback);
+            pubnub.Subscribe<string>(channel, DummyMethodForSubscribeUUID, SubscribeUUIDDummyMethodForConnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
-            subscribeUUIDManualEvent.WaitOne(2000);
-
-            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribeUUID, UnsubscribeUUIDDummyMethodForConnectCallback, UnsubscribeUUIDDummyMethodForDisconnectCallback);
-            Thread.Sleep(1000);
-            unsubscribeUUIDManualEvent.WaitOne(2000);
+            subscribeUUIDManualEvent.WaitOne(310 * 1000);
 
             presenceUUIDManualEvent.WaitOne(310 * 1000);
 
@@ -108,13 +98,15 @@ namespace PubNubMessaging.Tests
             receivedHereNowMessage = false;
 
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+			
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAClientIsPresented";
             unitTest.TestCaseName = "IfHereNowIsCalledThenItShouldReturnInfo";
             pubnub.PubnubUnitTest = unitTest;
-            string channel = "my/channel";
-            pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage);
-            hereNowManualEvent.WaitOne();
+			
+            string channel = "hello_my_channel";
+            pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback);
+            hereNowManualEvent.WaitOne(310 * 1000);
             UUnitAssert.True(receivedHereNowMessage, "here_now message not received");
         }
 
@@ -124,8 +116,8 @@ namespace PubNubMessaging.Tests
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    object[] serializedMessage = new JsonFXDotNet().DeserializeToListOfObject(receivedMessage).ToArray();
+                    Dictionary<string,object> dictionary = serializedMessage[0] as Dictionary<string,object>;
                     var uuid = dictionary["uuid"].ToString();
                     if (uuid != null)
                     {
@@ -133,7 +125,7 @@ namespace PubNubMessaging.Tests
                     }
                 }
             }
-            catch { }
+            catch{}
             finally
             {
                 presenceManualEvent.Set();
@@ -146,8 +138,8 @@ namespace PubNubMessaging.Tests
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    object[] serializedMessage = new JsonFXDotNet().DeserializeToListOfObject(receivedMessage).ToArray();
+                    Dictionary<string,object> dictionary = serializedMessage[0] as Dictionary<string,object>;
                     var uuid = dictionary["uuid"].ToString();
                     if (uuid != null && uuid.Contains(customUUID))
                     {
@@ -168,8 +160,8 @@ namespace PubNubMessaging.Tests
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    var dictionary = ((JContainer)serializedMessage[0])["uuids"];
+                    object[] serializedMessage = new JsonFXDotNet().DeserializeToListOfObject(receivedMessage).ToArray();
+                    Dictionary<string,object> dictionary = serializedMessage[0] as Dictionary<string,object>;
                     if (dictionary != null)
                     {
                         receivedHereNowMessage = true;
@@ -189,19 +181,22 @@ namespace PubNubMessaging.Tests
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    object[] serializedMessage = new JsonFXDotNet().DeserializeToListOfObject(receivedMessage).ToArray();
+                    Dictionary<string,object> dictionary = serializedMessage[0] as Dictionary<string,object>;
                     if (dictionary != null)
                     {
-                    var uuid = dictionary["uuid"].ToString();
-                    if (uuid != null)
-                    {
-                        receivedPresenceMessage = true;
-                    }
-                        }
+	                    var uuid = dictionary["uuid"].ToString();
+	                    if (uuid != null)
+	                    {
+	                        receivedPresenceMessage = true;
+	                    }
+					}
                 }
             }
-            catch { }
+            catch(Exception ex) 
+			{ 
+				Debug.Log("DummyMethodForSubscribe exception = " + ex.ToString());
+			}
             finally
             {
                 presenceManualEvent.Set();
@@ -215,8 +210,8 @@ namespace PubNubMessaging.Tests
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    object[] serializedMessage = new JsonFXDotNet().DeserializeToListOfObject(receivedMessage).ToArray();
+                    Dictionary<string,object> dictionary = serializedMessage[0] as Dictionary<string,object>;
                     if (dictionary != null)
                     {
                         var uuid = dictionary["uuid"].ToString();
@@ -227,7 +222,10 @@ namespace PubNubMessaging.Tests
                     }
                 }
             }
-            catch { }
+            catch(Exception ex) 
+			{ 
+				Debug.Log("DummyMethodForSubscribeUUID exception = " + ex.ToString());
+			}
             finally
             {
                 presenceUUIDManualEvent.Set();
@@ -282,5 +280,9 @@ namespace PubNubMessaging.Tests
             unsubscribeUUIDManualEvent.Set();
         }
 
+        void DummyErrorCallback(string result)
+        {
+			Debug.Log("WhenAClientIsPresented ErrorCallback : " + result);
+        }
     }
 }
