@@ -1,8 +1,12 @@
 ## PubNub 3.4 Web Data Push Cloud-Hosted API
 ### Unity 4 for "PC, Mac& Linux Standalone" and "Android" platforms (WebPlayer
 
+* NOTES: 
+1. "/" (slash character) being part of channel name is not supported. So it is recommeded to avoid using "/" in channel names.
+2. JsonFX JSON library is used by defining USE_JSONFX as C# directive. Other JSON libraries like Newton Json.NET are not fully supported for all Unity environments.
+
 #### Prerequisites
-1. Intall Free Full version of Unity 4 with Pro from http://unity3d.com/unity/download/ (Unity 4 is recommended, but current/later versions should be ok). MonoDevelop IDE tool will be installed as part of Unity to write C# scripts.
+1. Intall Free Full version of Unity 4 with Pro trial from http://unity3d.com/unity/download/ (Unity 4 is recommended, but current/later versions should be ok). MonoDevelop IDE tool will be installed as part of Unity to write C# scripts.
 
 #### To run the unit test code (under UnityUnitTest folder of Standalone), in addition to the above step, you need to 
 1. Import UUnit unity package from http://uunit.googlecode.com/files/UUnit_0.4.unitypackage into your Assets (Updates on this pacakage can be obtained from http://wiki.unity3d.com/index.php?title=UUnit). After import, please delete TestCaseDummy.cs and TestCaseTest.cs files from /Assets/Standard Assets/UUnit/UUnitSelfTest folder to avoid unintendend test case runs.
@@ -21,7 +25,7 @@
 
 #### Running the Tests
 
-1. Open up the Unity Project from either Standalone\UnityUnitTest or WebPlayer\UnityUnitTest folder.
+1. Open up the Unity Project from Standalone\UnityUnitTest folder.
 2. Click "UUnit" menu to run unit tests. NOTE: If "UUnit" menu item is not showing up, ensure that /Assets/Standard Assets/Editor/UUnit/UUnitTestRunner.cs file exists.
 3. Make Console tab as active tab and then Click UUnit so that unit test results will be visible in console.
 
@@ -59,6 +63,5 @@ Resolution: Unity Standalone version works only on Windows OS platforms. Current
 Resolution: This error may occur when the Unity example was run with SSL enabled. Please ensure that ValidateServerCertificate method in PubnubExample.cs do not get Untrust root error. For testing, you can return "true" for ValidateServerCertificate method to verify whether error is gone or not. However there is security risk in hardcoding "true" in production environment.
 
 
-* NOTE: "/" (slash) being part of channel name will not work. So it is recommeded to avoid using "/" in channel names.
 
 Report an issue, or email us at support if there are any additional questions or comments.
