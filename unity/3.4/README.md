@@ -7,6 +7,18 @@ We've made a [screencast](https://vimeo.com/69591819) that will walk you through
 ### Important Change from previous version
 1. Error Callback parameter is being introducted in all operation/non-operation methods of C# Core Pubnub.cs file. If you have previous version, your application might break due to signature difference. Please consider handling Error Callback
 
+### Cheatsheet to migrate to the current version containing Error Callback
+Example:
+```
+Previous => pubnub.Subscribe<string> (channel, DisplayReturnMessage, DisplayConnectStatusMessage);
+
+Migration => pubnub.Subscribe<string> (channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
+
+NOTE: The callback methods DisplayReturnMessage, DisplayConnectStatusMessage and DisplayErrorMessage(new callback parameter) are used in example code for your review.
+
+```
+
+
 #### Prerequisites
 1. Install Free Full version of Unity 4 Pro from http://unity3d.com/unity/download/ (Unity 4 is recommended, but current/later versions should be ok). MonoDevelop IDE tool will be installed as part of Unity to write C# scripts.
 2. In case of unity we need to use JSONFX as the serialization library. To use JSONFX we have defined a pre-compiler variable USE_JSONFX. The other serialization libraries used in the pubnub.cs class are the default serialization from inbuilt .NET class (activated when the pre-compiler directive USE_DOTNET_SERIALIZATION is used) and Newtonsoft.Json (activated when neither USE_JSONFX nor USE_DOTNET_SERIALIZATION is defined). Both of these libraries won't work with UNITY. So you need to retain the pre-compiler variable USE_JSONFX is "defined" at the top of the pubnub.cs class (default behavior).
