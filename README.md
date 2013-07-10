@@ -22,6 +22,9 @@ PubNub for Xamarin's Mono Touch
 #### mono-for-linux
 PubNub for Mono for Linux
 
+#### GTK+
+PubNub for GTK+ (see the demo made under [mono-for-linux](mono-for-linux/Demo/GTK%2B))
+
 #### mono-for-mac
 PubNub for Mono for Mac
 
@@ -33,3 +36,4 @@ PubNub for Unity 3D
 
 #### windows-phone-7
 PubNub for WP7
+
