@@ -1,5 +1,7 @@
-﻿//Build Date: July 02, 2013
+﻿//Build Date: July 10, 2013
+#if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
 #define USE_JSONFX
+#endif
 #if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
 #define TRACE
 #endif
