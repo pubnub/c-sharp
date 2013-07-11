@@ -80,7 +80,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestClassName = "WhenAMessageIsPublished";
             unitTest.TestCaseName = "ThenUnencryptPublishShouldReturnSuccessCodeAndInfo";
             pubnub.PubnubUnitTest = unitTest;
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             string message = messageForUnencryptPublish;
 
             pubnub.Publish<string>(channel, message, ReturnSuccessUnencryptPublishCodeCallback, DummyErrorCallback);
@@ -107,7 +107,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestClassName = "WhenAMessageIsPublished";
             unitTest.TestCaseName = "ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo";
             pubnub.PubnubUnitTest = unitTest;
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             object message = new CustomClass();
             messageObjectForUnencryptPublish = JsonConvert.SerializeObject(message);
 
@@ -138,7 +138,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             object message = new SecretCustomClass();
             messageObjectForEncryptPublish = JsonConvert.SerializeObject(message);
 
@@ -169,7 +169,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             string message = messageForEncryptPublish;
 
             pubnub.Publish<string>(channel, message, ReturnSuccessEncryptPublishCodeCallback, DummyErrorCallback);
@@ -199,7 +199,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             string message = messageForSecretEncryptPublish;
 
             pubnub.Publish<string>(channel, message, ReturnSuccessSecretEncryptPublishCodeCallback, DummyErrorCallback);
@@ -228,7 +228,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo";
             pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             object message = new PubnubDemoObject();
             messageComplexObjectForPublish = JsonConvert.SerializeObject(message);
 
@@ -259,7 +259,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "ThenDisableJsonEncodeShouldSendSerializedObjectMessage";
             pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             object message = "{\"operation\":\"ReturnData\",\"channel\":\"Mobile1\",\"sequenceNumber\":0,\"data\":[\"ping 1.0.0.1\"]}";
             serializedObjectMessageForPublish = message.ToString();
 
@@ -289,7 +289,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "ThenLargeMessageShoudFailWithMessageTooLargeInfo";
             pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             string message = messageLarge2K;
 
             pubnub.Publish<string>(channel, message, ReturnPublishMessageTooLargeInfoCallback, DummyErrorCallback);
@@ -562,7 +562,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
 
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
 
             pubnub.Publish<string>(channel, message, null, DummyErrorCallback);
@@ -582,7 +582,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
 
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
 
             pubnub.Publish<string>(channel, message, ReturnSecretKeyPublishCallback, DummyErrorCallback);
@@ -621,7 +621,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
 
             pubnub.Publish<string>(channel, message, ReturnNoSSLDefaultFalseCallback, DummyErrorCallback);

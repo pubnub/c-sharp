@@ -45,7 +45,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "ThenPresenceShouldReturnReceivedMessage";
             pubnub.PubnubUnitTest = unitTest;
             
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
 
             pubnub.Presence<string>(channel, ThenPresenceShouldReturnMessage, PresenceDummyMethodForConnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
@@ -78,7 +78,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "ThenPresenceShouldReturnCustomUUID";
             pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
 
             pubnub.Presence<string>(channel, ThenPresenceWithCustomUUIDShouldReturnMessage, PresenceUUIDDummyMethodForConnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
@@ -110,7 +110,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestClassName = "WhenAClientIsPresented";
             unitTest.TestCaseName = "IfHereNowIsCalledThenItShouldReturnInfo";
             pubnub.PubnubUnitTest = unitTest;
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback);
             hereNowManualEvent.WaitOne();
             Assert.IsTrue(receivedHereNowMessage, "here_now message not received");
