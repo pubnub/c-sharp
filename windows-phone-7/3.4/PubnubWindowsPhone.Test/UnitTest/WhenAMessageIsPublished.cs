@@ -93,7 +93,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 {
                     isUnencryptPublished = false;
                     Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-                    string channel = "my/channel";
+                    string channel = "hello_my_channel";
                     string message = messageForUnencryptPublish;
 
                     PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -132,7 +132,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 {
                     isUnencryptObjectPublished = false;
                     Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-                    string channel = "my/channel";
+                    string channel = "hello_my_channel";
                     object message = new CustomClass();
                     messageObjectForUnencryptPublish = JsonConvert.SerializeObject(message);
 
@@ -172,7 +172,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 {
                     isEncryptObjectPublished = false;
                     Pubnub pubnub = new Pubnub("demo", "demo", "", "enigma", false);
-                    string channel = "my/channel";
+                    string channel = "hello_my_channel";
                     
                     object message = new SecretCustomClass();
 
@@ -215,7 +215,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 {
                     isEncryptPublished = false;
                     Pubnub pubnub = new Pubnub("demo", "demo", "", "enigma", false);
-                    string channel = "my/channel";
+                    string channel = "hello_my_channel";
                     string message = messageForEncryptPublish;
 
                     PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -254,7 +254,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 {
                     isSecretEncryptPublished = false;
                     Pubnub pubnub = new Pubnub("demo", "demo", "key", "enigma", false);
-                    string channel = "my/channel";
+                    string channel = "hello_my_channel";
                     string message = messageForSecretEncryptPublish;
 
                     PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -505,7 +505,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 {
                     Pubnub pubnub = new Pubnub("", "demo", "", "", false);
 
-                    string channel = "my/channel";
+                    string channel = "hello_my_channel";
                     string message = "Pubnub API Usage Example";
 
                     try
@@ -536,7 +536,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 {
                     isPublished2 = false;
                     Pubnub pubnub = new Pubnub("demo", "demo", "key");
-                    string channel = "my/channel";
+                    string channel = "hello_my_channel";
                     string message = "Pubnub API Usage Example";
 
                     PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -580,7 +580,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 {
                     isPublished3 = false;
                     Pubnub pubnub = new Pubnub("demo", "demo", "");
-                    string channel = "my/channel";
+                    string channel = "hello_my_channel";
                     string message = "Pubnub API Usage Example";
 
                     PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -633,7 +633,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     unitTest.TestCaseName = "ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo";
                     pubnub.PubnubUnitTest = unitTest;
 
-                    string channel = "my/channel";
+                    string channel = "hello_my_channel";
                     object message = new PubnubDemoObject();
                     messageComplexObjectForPublish = JsonConvert.SerializeObject(message);
 
@@ -723,7 +723,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     unitTest.TestCaseName = "ThenDisableJsonEncodeShouldSendSerializedObjectMessage";
                     pubnub.PubnubUnitTest = unitTest;
 
-                    string channel = "my/channel";
+                    string channel = "hello_my_channel";
                     object message = "{\"operation\":\"ReturnData\",\"channel\":\"Mobile1\",\"sequenceNumber\":0,\"data\":[\"ping 1.0.0.1\"]}";
                     serializedObjectMessageForPublish = message.ToString();
 
@@ -809,8 +809,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     unitTest.TestCaseName = "ThenLargeMessageShoudFailWithMessageTooLargeInfo";
                     pubnub.PubnubUnitTest = unitTest;
 
-                    string channel = "my/channel";
-                    string message = messageLarge2K;
+                    string channel = "hello_my_channel";
+                    string message = messageLarge2K.Substring(0, 1320);
 
                     pubnub.Publish<string>(channel, message, ReturnPublishMessageTooLargeInfoCallback, DummyErrorCallback);
                     mreLaregMessagePublish.WaitOne(310 * 1000);
