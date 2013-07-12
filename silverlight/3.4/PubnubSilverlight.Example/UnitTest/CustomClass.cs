@@ -32,12 +32,12 @@ namespace PubnubSilverlight.UnitTest
     public class PubnubDemoObject
     {
         public double VersionID = 3.4;
-        public long Timetoken = 13601488652764619;
+        public string Timetoken = "13601488652764619";
         public string OperationName = "Publish";
         public string[] Channels = { "ch1" };
         public PubnubDemoMessage DemoMessage = new PubnubDemoMessage();
         public PubnubDemoMessage CustomMessage = new PubnubDemoMessage("Welcome to the world of Pubnub for Publish and Subscribe. Hah!");
-        public DemoRoot SampleXml = new DemoRoot();
+        public Person[] SampleXml = new DemoRoot().Person.ToArray();
     }
 
     public class PubnubDemoMessage
