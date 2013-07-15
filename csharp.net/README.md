@@ -6,6 +6,13 @@ You can also view and inspect the tests for additional insight.
 
 NuGet usage and example screencast is also available here: https://vimeo.com/pubnub/videos/search:.net/sort:date/format:detail
 
+## Object Cleanup
+
+For best performance after completion of all intended operations, please call the EndPendingRequests() method
+of the Pubnub instance, and assign it to null. This will help ensure speedy resources cleanup when you are done
+with the object.
+
+
 ### Important Change from previous version
 1. Error Callback parameter is being introducted in all operation/non-operation methods of C# Core Pubnub.cs file. If you have previous version, your application might break due to signature difference. Please consider handling Error Callback
 
