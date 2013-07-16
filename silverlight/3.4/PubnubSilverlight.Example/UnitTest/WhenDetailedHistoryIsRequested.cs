@@ -36,7 +36,7 @@ namespace PubnubSilverlight.UnitTest
             message10Received = false;
 
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
@@ -79,7 +79,7 @@ namespace PubnubSilverlight.UnitTest
             message10ReverseTrueReceived = false;
 
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
@@ -128,7 +128,7 @@ namespace PubnubSilverlight.UnitTest
             unitTest.TestCaseName = "DetailedHistoryStartWithReverseTrue";
             pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             startTimeWithReverseTrue = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(DateTime.UtcNow);
 
             EnqueueCallback(() =>

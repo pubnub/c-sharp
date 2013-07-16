@@ -40,7 +40,7 @@ namespace PubnubSilverlight.UnitTest
             receivedPresenceMessage = false;
 
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAClientIsPresented";
@@ -51,8 +51,6 @@ namespace PubnubSilverlight.UnitTest
             EnqueueCallback(() => pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback));
             EnqueueConditional(() => subscribeConnectStatusCallbackInvoked);
             EnqueueConditional(() => subscribeCallbackInvoked);
-            EnqueueCallback(() => pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback));
-            EnqueueConditional(() => unSubscribeCallbackInvoked);
             EnqueueCallback(() => pubnub.EndPendingRequests());
             EnqueueConditional(() => presenceReturnMessageCallbackInvoked);
             EnqueueCallback(() => Assert.IsTrue(receivedPresenceMessage, "Presence message not received"));
@@ -148,7 +146,7 @@ namespace PubnubSilverlight.UnitTest
             unitTest.TestCaseName = "ThenPresenceShouldReturnCustomUUID";
             pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
 
             EnqueueCallback(() => pubnub.Presence<string>(channel, ThenPresenceWithCustomUUIDShouldReturnMessage, PresenceUUIDDummyMethodForConnectCallback, DummyErrorCallback));
             //Thread.Sleep(1000);
@@ -162,10 +160,6 @@ namespace PubnubSilverlight.UnitTest
             EnqueueConditional(() => subscribeUUIDConnectStatusCallbackInvoked);
             EnqueueConditional(() => subscribeUUIDCallbackInvoked);
             //Thread.Sleep(1000);
-
-            EnqueueCallback(() => pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribeUUID, UnsubscribeUUIDDummyMethodForConnectCallback, UnsubscribeUUIDDummyMethodForDisconnectCallback, DummyErrorCallback));
-            //Thread.Sleep(1000);
-            EnqueueConditional(() => unSubscribeUUIDCallbackInvoked);
 
             //presenceUUIDManualEvent.WaitOne();
             //Thread.Sleep(1000);
@@ -256,7 +250,7 @@ namespace PubnubSilverlight.UnitTest
         public void IfHereNowIsCalledThenItShouldReturnInfo()
         {
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAClientIsPresented";

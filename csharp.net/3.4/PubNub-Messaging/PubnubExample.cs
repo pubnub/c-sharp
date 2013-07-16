@@ -28,30 +28,6 @@ namespace PubNubMessaging.Core
             Console.WriteLine("      NETWORK ERROR MESSAGE WILL BE SENT");
             Console.WriteLine();
 
-            Console.WriteLine("You have the option to select JSON library to use.");
-            Console.WriteLine("Enter the option from the below(Enter 1 or 2 or 3).");
-            Console.WriteLine("If no option is selected, Newton Json.Net will be used by default");
-            Console.WriteLine("   1. JsonFx.NET");
-            Console.WriteLine("   2. Native .NET JavaScriptSerializer");
-            Console.WriteLine("   3. Newton Json.Net");
-            string jsonChoice = Console.ReadLine();
-            Console.ForegroundColor = ConsoleColor.Blue;
-            switch (jsonChoice)
-            {
-                case "1":
-                    Console.WriteLine("Selected 1. JsonFx.NET");
-                    break;
-                case "2":
-                    Console.WriteLine("Selected 2. Native .NET JavaScriptSerializer");
-                    break;
-                case "3":
-                default:
-                    Console.WriteLine("Selected default option 3. Newton Json.Net");
-                    break;
-            }
-            Console.ResetColor();
-            Console.WriteLine();
-            
             Console.WriteLine("Enable SSL? ENTER Y for Yes, else N");
             string enableSSL = Console.ReadLine();
             Console.ForegroundColor = ConsoleColor.Blue;
@@ -83,20 +59,6 @@ namespace PubNubMessaging.Core
 
             pubnub = new Pubnub("demo", "demo", "", cipheryKey,
                 (enableSSL.Trim().ToLower() == "y") ? true : false);
-
-            switch (jsonChoice)
-            {
-                case "1":
-                    pubnub.JsonPluggableLibrary = new JsonFXDotNet();
-                    break;
-                case "2":
-                    pubnub.JsonPluggableLibrary = new JscriptSerializer();
-                    break;
-                case "3":
-                default:
-                    pubnub.JsonPluggableLibrary = new NewtonJsonDotNet();
-                    break;
-            }
 
             Console.WriteLine("Use Custom Session UUID? ENTER Y for Yes, else N");
             string enableCustomUUID = Console.ReadLine();

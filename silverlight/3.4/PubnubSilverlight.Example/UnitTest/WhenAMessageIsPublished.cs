@@ -76,7 +76,7 @@ namespace PubnubSilverlight.UnitTest
         {
             isUnencryptPublished = false;
             Pubnub pubnub = new Pubnub("demo","demo","","",false);
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             string message = messageForUnencryptPublish;
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -149,7 +149,7 @@ namespace PubnubSilverlight.UnitTest
         {
             isUnencryptObjectPublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
 
             object message = new CustomClass();
             messageObjectForUnencryptPublish = JsonConvert.SerializeObject(message);
@@ -224,7 +224,7 @@ namespace PubnubSilverlight.UnitTest
         {
             isEncryptObjectPublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "enigma", false);
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             object message = new SecretCustomClass();
             messageObjectForEncryptPublish = JsonConvert.SerializeObject(message);
 
@@ -298,7 +298,7 @@ namespace PubnubSilverlight.UnitTest
         {
             isEncryptPublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "enigma", false);
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             string message = messageForEncryptPublish;
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -371,7 +371,7 @@ namespace PubnubSilverlight.UnitTest
         {
             isSecretEncryptPublished = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "key", "enigma", false);
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             string message = messageForSecretEncryptPublish;
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -452,7 +452,7 @@ namespace PubnubSilverlight.UnitTest
         {
             Pubnub pubnub = new Pubnub("", "demo", "", "", false);
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
 
             pubnub.Publish<string>(channel, message, null, DummyErrorCallback);
@@ -464,7 +464,7 @@ namespace PubnubSilverlight.UnitTest
         {
             isPublished2 = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "key");
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -504,7 +504,7 @@ namespace PubnubSilverlight.UnitTest
         {
             isPublished3 = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "");
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -550,7 +550,7 @@ namespace PubnubSilverlight.UnitTest
             unitTest.TestCaseName = "ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo";
             pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             object message = new PubnubDemoObject();
             messageComplexObjectForPublish = JsonConvert.SerializeObject(message);
 
@@ -628,7 +628,7 @@ namespace PubnubSilverlight.UnitTest
             unitTest.TestCaseName = "ThenDisableJsonEncodeShouldSendSerializedObjectMessage";
             pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             object message = "{\"operation\":\"ReturnData\",\"channel\":\"Mobile1\",\"sequenceNumber\":0,\"data\":[\"ping 1.0.0.1\"]}";
             serializedObjectMessageForPublish = message.ToString();
 
@@ -703,9 +703,8 @@ namespace PubnubSilverlight.UnitTest
             unitTest.TestCaseName = "ThenLargeMessageShoudFailWithMessageTooLargeInfo";
             pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             string message = messageLarge2K.Substring(0,1320);
-
             EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnPublishMessageTooLargeInfoCallback, DummyErrorCallback));
             EnqueueConditional(() => isPublishMessageTooLargeCheck);
             EnqueueCallback(() => Assert.IsTrue(isLargeMessagePublished, "Message Too Large is not failing as expected."));

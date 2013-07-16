@@ -43,7 +43,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             ThreadPool.QueueUserWorkItem((s) =>
                 {
                     Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-                    string channel = "my/channel";
+                    string channel = "hello_my_channel";
 
                     PubnubUnitTest unitTest = new PubnubUnitTest();
                     unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
@@ -89,7 +89,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             ThreadPool.QueueUserWorkItem((s) =>
                 {
                     Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-                    string channel = "my/channel";
+                    string channel = "hello_my_channel";
 
                     PubnubUnitTest unitTest = new PubnubUnitTest();
                     unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
@@ -142,7 +142,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     unitTest.TestCaseName = "DetailedHistoryStartWithReverseTrue";
                     pubnub.PubnubUnitTest = unitTest;
 
-                    string channel = "my/channel";
+                    string channel = "hello_my_channel";
                     startTimeWithReverseTrue = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(new DateTime(2012, 12, 1));
                     for (int index = 0; index < 10; index++)
                     {

@@ -30,18 +30,18 @@ namespace PubNubMessaging.Tests
         public int[] bar = { 10, 20, 30, 40, 50 };
     }
 
-    class PubnubDemoObject
+    public class PubnubDemoObject
     {
         public double VersionID = 3.4;
-        public long Timetoken = 13601488652764619;
+        public string Timetoken = "13601488652764619";
         public string OperationName = "Publish";
         public string[] Channels = { "ch1" };
         public PubnubDemoMessage DemoMessage = new PubnubDemoMessage();
         public PubnubDemoMessage CustomMessage = new PubnubDemoMessage("Welcome to the world of Pubnub for Publish and Subscribe. Hah!");
-        public XmlDocument SampleXml = new PubnubDemoMessage().TryXmlDemo();
+        public Person[] SampleXml = new DemoRoot().Person.ToArray();
     }
 
-    class PubnubDemoMessage
+    public class PubnubDemoMessage
     {
         public string DefaultMessage = "~!@#$%^&*()_+ `1234567890-= qwertyuiop[]\\ {}| asdfghjkl;' :\" zxcvbnm,./ <>? ";
 
@@ -54,12 +54,81 @@ namespace PubNubMessaging.Tests
             DefaultMessage = message;
         }
 
-        public XmlDocument TryXmlDemo()
+    }
+
+    public class DemoRoot
+    {
+        public List<Person> Person
         {
-            XmlDocument xmlDocument = new XmlDocument();
-            xmlDocument.LoadXml("<DemoRoot><Person ID='ABCD123'><Name><First>John</First><Middle>P.</Middle><Last>Doe</Last></Name><Address><Street>123 Duck Street</Street><City>New City</City><State>New York</State><Country>United States</Country></Address></Person><Person ID='ABCD456'><Name><First>Peter</First><Middle>Z.</Middle><Last>Smith</Last></Name><Address><Street>12 Hollow Street</Street><City>Philadelphia</City><State>Pennsylvania</State><Country>United States</Country></Address></Person></DemoRoot>");
-            return xmlDocument;
+            get
+            {
+                List<Person> ret = new List<Person>();
+                Person p1 = new Person();
+                p1.ID = "ABCD123";
+                //PersonID id1 = new PersonID(); id1.ID = "ABCD123" ;
+                //p1.ID = id1;
+                Name n1 = new Name();
+                n1.First = "John";
+                n1.Middle = "P.";
+                n1.Last = "Doe";
+                p1.Name = n1;
+
+                Address a1 = new Address();
+                a1.Street = "123 Duck Street";
+                a1.City = "New City";
+                a1.State = "New York";
+                a1.Country = "United States";
+                p1.Address = a1;
+
+                ret.Add(p1);
+
+                Person p2 = new Person();
+                p2.ID = "ABCD456";
+                //PersonID id2 = new PersonID(); id2.ID = "ABCD123" ;
+                //p2.ID = id2;
+                Name n2 = new Name();
+                n2.First = "Peter";
+                n2.Middle = "Z.";
+                n2.Last = "Smith";
+                p2.Name = n2;
+
+                Address a2 = new Address();
+                a2.Street = "12 Hollow Street";
+                a2.City = "Philadelphia";
+                a2.State = "Pennsylvania";
+                a2.Country = "United States";
+                p2.Address = a2;
+
+                ret.Add(p2);
+
+                return ret;
+
+            }
         }
+    }
+
+    public class Person
+    {
+        public string ID { get; set; }
+
+        public Name Name;
+
+        public Address Address;
+    }
+
+    public class Name
+    {
+        public string First { get; set; }
+        public string Middle { get; set; }
+        public string Last { get; set; }
+    }
+
+    public class Address
+    {
+        public string Street { get; set; }
+        public string City { get; set; }
+        public string State { get; set; }
+        public string Country { get; set; }
     }
 
     [TestFixture]

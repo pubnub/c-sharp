@@ -12,6 +12,19 @@ For best performance after completion of all intended operations, please call th
 of the Pubnub instance, and assign it to null. This will help ensure speedy resources cleanup when you are done
 with the object.
 
+### Important Change from previous version
+1. Error Callback parameter is being introducted in all operation/non-operation methods of C# Core Pubnub.cs file. If you have previous version, your application might break due to signature difference. Please consider handling Error Callback
+
+### Cheatsheet to migrate to the current version containing Error Callback
+Example:
+```
+Previous => pubnub.Subscribe<string> (channel, DisplayReturnMessage, DisplayConnectStatusMessage);
+
+Migration => pubnub.Subscribe<string> (channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
+
+NOTE: The callback methods DisplayReturnMessage, DisplayConnectStatusMessage and DisplayErrorMessage(new callback parameter) are used in example code for your review.
+
+```
 ## Running the Demo App
 
 1. Open up the solution file

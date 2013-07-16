@@ -45,7 +45,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
 
             pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
 
@@ -75,7 +75,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
 
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
 
             pubnub.Subscribe<string>(channel, ReceivedMessageCallbackYesConnect, ConnectStatusCallback, DummyErrorCallback);
             meSubscribeYesConnect.WaitOne(310 * 1000);
@@ -99,11 +99,11 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
 
 
-            string channel1 = "my/channel1";
+            string channel1 = "hello_my_channel1";
             pubnub.Subscribe<string>(channel1, ReceivedChannelUserCallback, ReceivedChannel1ConnectCallback, DummyErrorCallback);
             meChannel1SubscribeConnect.WaitOne(310 * 1000);
 
-            string channel2 = "my/channel2";
+            string channel2 = "hello_my_channel2";
             pubnub.Subscribe<string>(channel2, ReceivedChannelUserCallback, ReceivedChannel2ConnectCallback, DummyErrorCallback);
             meChannel2SubscribeConnect.WaitOne(310 * 1000);
 
@@ -125,7 +125,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
 
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
 
             pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback1, DummyMethodDuplicateChannelConnectCallback, DummyErrorCallback);
             Thread.Sleep(100);
@@ -149,7 +149,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "ThenSubscriberShouldBeAbleToReceiveManyMessages";
             pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
 
             pubnub.Subscribe<string>(channel, SubscriberDummyMethodForManyMessagesUserCallback, SubscribeDummyMethodForManyMessagesConnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);

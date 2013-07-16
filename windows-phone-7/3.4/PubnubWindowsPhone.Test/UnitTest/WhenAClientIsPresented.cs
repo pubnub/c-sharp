@@ -47,7 +47,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             ThreadPool.QueueUserWorkItem((s) =>
                 {
                     Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-                    string channel = "my/channel";
+                    string channel = "hello_my_channel";
 
                     PubnubUnitTest unitTest = new PubnubUnitTest();
                     unitTest.TestClassName = "WhenAClientIsPresented";
@@ -62,9 +62,9 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Thread.Sleep(1000);
                     subscribeManualEvent.WaitOne(2000);
 
-                    pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
-                    unsubscribeManualEvent.WaitOne(2000);
+                    //pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+                    //Thread.Sleep(1000);
+                    //unsubscribeManualEvent.WaitOne(2000);
 
                     presenceManualEvent.WaitOne(310 * 1000);
 
@@ -91,7 +91,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     unitTest.TestCaseName = "ThenPresenceShouldReturnCustomUUID";
                     pubnub.PubnubUnitTest = unitTest;
 
-                    string channel = "my/channel";
+                    string channel = "hello_my_channel";
 
                     pubnub.Presence<string>(channel, ThenPresenceWithCustomUUIDShouldReturnMessage, PresenceUUIDDummyMethodForConnectCallback, DummyErrorCallback);
                     Thread.Sleep(1000);
@@ -102,12 +102,11 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     subscribeUUIDManualEvent.WaitOne();
                     Thread.Sleep(1000);
 
-                    pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribeUUID, UnsubscribeUUIDDummyMethodForConnectCallback, UnsubscribeUUIDDummyMethodForDisconnectCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
-                    unsubscribeUUIDManualEvent.WaitOne(2000);
+                    //pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribeUUID, UnsubscribeUUIDDummyMethodForConnectCallback, UnsubscribeUUIDDummyMethodForDisconnectCallback, DummyErrorCallback);
+                    //Thread.Sleep(1000);
+                    //unsubscribeUUIDManualEvent.WaitOne(2000);
 
                     presenceUUIDManualEvent.WaitOne();
-                    Thread.Sleep(1000);
                     pubnub.EndPendingRequests();
 
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
@@ -177,7 +176,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             ThreadPool.QueueUserWorkItem((s) =>
                 {
                     Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-                    string channel = "my/channel";
+                    string channel = "hello_my_channel";
 
                     PubnubUnitTest unitTest = new PubnubUnitTest();
                     unitTest.TestClassName = "WhenAClientIsPresented";

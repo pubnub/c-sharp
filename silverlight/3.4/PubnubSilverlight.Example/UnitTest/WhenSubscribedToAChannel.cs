@@ -37,7 +37,7 @@ namespace PubnubSilverlight.UnitTest
             receivedSubscribeMessage = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannel";
             unitTest.TestCaseName = "ThenSubscribeShouldReturnReceivedMessage";
@@ -69,7 +69,7 @@ namespace PubnubSilverlight.UnitTest
 
             pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
 
             EnqueueCallback(() => pubnub.Subscribe<string>(channel, ReceivedMessageCallbackYesConnect, ConnectStatusCallback, DummyErrorCallback));
             EnqueueConditional(() => receivedConnectMessage);
@@ -96,11 +96,11 @@ namespace PubnubSilverlight.UnitTest
 
                 pubnub.PubnubUnitTest = unitTest;
 
-                string channel1 = "my/channel1";
+                string channel1 = "hello_my_channel1";
                 EnqueueCallback(() => pubnub.Subscribe<string>(channel1, ReceivedChannelUserCallback, ReceivedChannel1ConnectCallback, DummyErrorCallback));
                 EnqueueConditional(() => receivedChannel1ConnectMessage);
 
-                string channel2 = "my/channel2";
+                string channel2 = "hello_my_channel2";
                 EnqueueCallback(() => pubnub.Subscribe<string>(channel2, ReceivedChannelUserCallback, ReceivedChannel2ConnectCallback, DummyErrorCallback));
                 EnqueueConditional(() => receivedChannel2ConnectMessage);
 
@@ -126,7 +126,7 @@ namespace PubnubSilverlight.UnitTest
             unitTest.TestCaseName = "ThenDuplicateChannelShouldReturnAlreadySubscribed";
             pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "my/channel";
+            string channel = "hello_my_channel";
 
             EnqueueCallback(() => pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback1, DummyMethodDuplicateChannelConnectCallback, DummyErrorCallback));
             EnqueueConditional(() => subscribeConnectedBeforeDuplicate);
@@ -157,7 +157,7 @@ namespace PubnubSilverlight.UnitTest
                 unitTest.TestCaseName = "ThenSubscriberShouldBeAbleToReceiveManyMessages";
                 pubnub.PubnubUnitTest = unitTest;
 
-                string channel = "my/channel";
+                string channel = "hello_my_channel";
 
                 EnqueueCallback(() => pubnub.Subscribe<string>(channel, SubscriberDummyMethodForManyMessagesUserCallback, SubscribeDummyMethodForManyMessagesConnectCallback, DummyErrorCallback));
                 //EnqueueCallback(() => Thread.Sleep(1000));
