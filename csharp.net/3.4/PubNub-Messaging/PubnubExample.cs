@@ -283,7 +283,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine();
 
                         Console.WriteLine("Running subscribe()");
-                        pubnub.Subscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
+                        pubnub.Subscribe<string>(channel, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeErrorMessage);
 
                         break;
                     case "2":
@@ -360,7 +360,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine();
 
                         Console.WriteLine("Running presence()");
-                        pubnub.Presence<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
+                        pubnub.Presence<string>(channel, DisplayPresenceReturnMessage, DisplayPresenceConnectStatusMessage, DisplayPresenceErrorMessage);
 
                         break;
                     case "4":
@@ -397,7 +397,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine();
 
                         Console.WriteLine("Running unsubscribe()");
-                        pubnub.Unsubscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayDisconnectStatusMessage, DisplayErrorMessage);
+                        pubnub.Unsubscribe<string>(channel, DisplayReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeDisconnectStatusMessage, DisplayErrorMessage);
                         break;
                     case "7":
                         Console.WriteLine("Enter CHANNEL name for Presence Unsubscribe. Use comma to enter multiple channels.");
@@ -409,7 +409,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine();
 
                         Console.WriteLine("Running presence-unsubscribe()");
-                        pubnub.PresenceUnsubscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayDisconnectStatusMessage, DisplayErrorMessage);
+                        pubnub.PresenceUnsubscribe<string>(channel, DisplayReturnMessage, DisplayPresenceConnectStatusMessage, DisplayPresenceDisconnectStatusMessage, DisplayErrorMessage);
                         break;
                     case "8":
                         Console.WriteLine("Running time()");
@@ -459,19 +459,59 @@ namespace PubNubMessaging.Core
         }
 
         /// <summary>
-        /// Callback method to provide the connect status of Subscribe call
+        /// Callback method captures the response in JSON string format for Subscribe
         /// </summary>
         /// <param name="result"></param>
-        static void DisplayConnectStatusMessage(string result)
+        static void DisplaySubscribeReturnMessage(string result)
         {
-            Console.WriteLine("CONNECT CALLBACK:");
+            Console.WriteLine("SUBSCRIBE REGULAR CALLBACK:");
             Console.WriteLine(result);
             Console.WriteLine();
         }
 
-        static void DisplayDisconnectStatusMessage(string result)
+        /// <summary>
+        /// Callback method captures the response in JSON string format for Presence
+        /// </summary>
+        /// <param name="result"></param>
+        static void DisplayPresenceReturnMessage(string result)
         {
-            Console.WriteLine("DISCONNECT CALLBACK:");
+            Console.WriteLine("PRESENCE REGULAR CALLBACK:");
+            Console.WriteLine(result);
+            Console.WriteLine();
+        }
+
+        /// <summary>
+        /// Callback method to provide the connect status of Subscribe call
+        /// </summary>
+        /// <param name="result"></param>
+        static void DisplaySubscribeConnectStatusMessage(string result)
+        {
+            Console.WriteLine("SUBSCRIBE CONNECT CALLBACK:");
+            Console.WriteLine(result);
+            Console.WriteLine();
+        }
+
+        /// <summary>
+        /// Callback method to provide the connect status of Presence call
+        /// </summary>
+        /// <param name="result"></param>
+        static void DisplayPresenceConnectStatusMessage(string result)
+        {
+            Console.WriteLine("PRESENCE CONNECT CALLBACK:");
+            Console.WriteLine(result);
+            Console.WriteLine();
+        }
+
+        static void DisplaySubscribeDisconnectStatusMessage(string result)
+        {
+            Console.WriteLine("SUBSCRIBE DISCONNECT CALLBACK:");
+            Console.WriteLine(result);
+            Console.WriteLine();
+        }
+
+        static void DisplayPresenceDisconnectStatusMessage(string result)
+        {
+            Console.WriteLine("PRESENCE DISCONNECT CALLBACK:");
             Console.WriteLine(result);
             Console.WriteLine();
         }
@@ -485,6 +525,26 @@ namespace PubNubMessaging.Core
             if (showErrorCallbackMessages)
             {
                 Console.WriteLine("ERROR CALLBACK:");
+                Console.WriteLine(result);
+                Console.WriteLine();
+            }
+        }
+
+        static void DisplaySubscribeErrorMessage(string result)
+        {
+            if (showErrorCallbackMessages)
+            {
+                Console.WriteLine("SUBSCRIBE ERROR CALLBACK:");
+                Console.WriteLine(result);
+                Console.WriteLine();
+            }
+        }
+
+        static void DisplayPresenceErrorMessage(string result)
+        {
+            if (showErrorCallbackMessages)
+            {
+                Console.WriteLine("PRESENCE ERROR CALLBACK:");
                 Console.WriteLine(result);
                 Console.WriteLine();
             }
