@@ -1010,7 +1010,7 @@ namespace PubNubMessaging.Core
 							result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
 							result.Add(channelName.Replace("-pnpres", ""));
 							LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
-                            GoToCallback<T>(result, disconnectCallback);
+                            GoToCallback<T>(result, userCallback);
 						}
 						else
 						{
