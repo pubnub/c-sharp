@@ -585,9 +585,22 @@ namespace PubNubMessaging.Core
 				}
 			}
 		}
-		
+
+        private void RemoveChannelCallback()
+        {
+            ICollection<string> channelCollection = _channelCallbacks.Keys;
+            foreach(string keyChannel in channelCollection)
+            {
+                if (_channelCallbacks.ContainsKey(keyChannel))
+                {
+                    object tempChannelCallback;
+                    _channelCallbacks.TryRemove(keyChannel, out tempChannelCallback);
+                }
+            }
+        }
+
 #if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !MONODROID && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
-		~Pubnub()
+        ~Pubnub()
 		{
 			//detach
 			SystemEvents.PowerModeChanged -= new PowerModeChangedEventHandler(SystemEvents_PowerModeChanged);
@@ -3411,6 +3424,7 @@ namespace PubNubMessaging.Core
 			TerminatePendingWebRequest();
 			TerminateHeartbeatTimer();
 			TerminateReconnectTimer();
+            RemoveChannelCallback();
 		}
 		
 		public void TerminateCurrentSubscriberRequest()
