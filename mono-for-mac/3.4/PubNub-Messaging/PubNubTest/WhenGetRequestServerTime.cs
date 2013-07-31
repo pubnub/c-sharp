@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using System.Threading;
 
-
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
@@ -30,9 +29,9 @@ namespace PubNubMessaging.Tests
             
             string response = "";
 
-            pubnub.Time(common.DisplayReturnMessage);
+            pubnub.Time(common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
            
-            while (!common.DeliveryStatus) ;
+            common.WaitForResponse();
 
             IList<object> fields = common.Response as IList<object>;
             response = fields[0].ToString();

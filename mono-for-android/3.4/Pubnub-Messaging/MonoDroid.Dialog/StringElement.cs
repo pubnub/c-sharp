@@ -14,7 +14,7 @@ namespace MonoDroid.Dialog
 {
     public class StringElement : Element
     {
-		public int FontSize {get;set;}
+        public int FontSize {get;set;}
         public string Value
         {
             get { return _value; }
@@ -23,9 +23,9 @@ namespace MonoDroid.Dialog
         private string _value;
 
         public object Alignment;
-		
-		public int Lines { get; set; }
-		public bool Multiline { get; set; }
+        
+        public int Lines { get; set; }
+        public bool Multiline { get; set; }
 
         public StringElement(string caption)
             : base(caption, (int)DroidResources.ElementLayout.dialog_labelfieldright)
@@ -42,13 +42,13 @@ namespace MonoDroid.Dialog
         {
             Value = value;
         }
-		
-		
+        
+        
         public StringElement(string caption, string value, Action clicked)
             : base(caption, (int)DroidResources.ElementLayout.dialog_labelfieldright)
         {
             Value = value;
-			this.Tapped = clicked;
+            this.Tapped = clicked;
         }
 
         public StringElement(string caption, string value, int layoutId)
@@ -56,12 +56,12 @@ namespace MonoDroid.Dialog
         {
             Value = value;
         }
-		
-		public StringElement(string caption, Action clicked)
+        
+        public StringElement(string caption, Action clicked)
             : base(caption, (int)DroidResources.ElementLayout.dialog_labelfieldright)
         {
             Value = null;
-			this.Tapped = clicked;
+            this.Tapped = clicked;
         }
 
         public override View GetView(Context context, View convertView, ViewGroup parent)
@@ -70,30 +70,30 @@ namespace MonoDroid.Dialog
             if (view != null)
             {
                 _caption.Text = Caption;
-				if (FontSize != 0)
-				  _caption.TextSize = FontSize;
-				
-				_text.SetSingleLine(!Multiline);
-				if (Multiline)
-					_text.SetLines(Lines);
+                if (FontSize != 0)
+                  _caption.TextSize = FontSize;
+                
+                _text.SetSingleLine(!Multiline);
+                if (Multiline)
+                    _text.SetLines(Lines);
                 _text.Text = Value;
-				if (FontSize != 0)
-				  _text.TextSize = FontSize;
-				
-				if (Tapped != null)
-					view.Click += delegate { this.Tapped(); };
+                if (FontSize != 0)
+                  _text.TextSize = FontSize;
+                
+                if (Tapped != null)
+                    view.Click += delegate { this.Tapped(); };
             }
             return view;
         }
-		
-		public override void Selected ()
-		{
-			base.Selected ();
-			
-			if(this.Tapped != null) {
-				Tapped();
-			}
-		}
+        
+        public override void Selected ()
+        {
+            base.Selected ();
+            
+            if(this.Tapped != null) {
+                Tapped();
+            }
+        }
 
         public override string Summary()
         {

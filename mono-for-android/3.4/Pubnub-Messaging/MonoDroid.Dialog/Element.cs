@@ -53,16 +53,16 @@ namespace MonoDroid.Dialog
         /// An Object that contains data about the element. The default is null.
         /// </summary>
         public Object Tag { get; set; }
-		
-		
+        
+        
          
         public void Dispose()
         {
             Dispose(true);
-			
-			// Use SupressFinalize in case a subclass
-	        // of this type implements a finalizer.
-	        GC.SuppressFinalize(this);
+            
+            // Use SupressFinalize in case a subclass
+            // of this type implements a finalizer.
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing) { }
@@ -88,30 +88,30 @@ namespace MonoDroid.Dialog
         /// <returns></returns>
         public virtual View GetView(Context context, View convertView, ViewGroup parent)
         {
-			var view = LayoutId == 0 ? new View(context) : null;
-			
-			
-//			view.Click += delegate {
-//				
-//			};
-//			
-//			if (view != null)
+            var view = LayoutId == 0 ? new View(context) : null;
+            
+            
+//            view.Click += delegate {
+//                
+//            };
+//            
+//            if (view != null)
 //            {
 //                _caption.Text = Caption;
-//				_caption.TextSize = FontSize;
+//                _caption.TextSize = FontSize;
 //                _text.Text = Value;
-//				_text.TextSize = FontSize;
-//				if (Click != null)
-//					view.Click += this.Click; 
+//                _text.TextSize = FontSize;
+//                if (Click != null)
+//                    view.Click += this.Click; 
 //            }
             return view;
         }
 
         public virtual void Selected() 
-		{
-			Console.WriteLine("Selected");
-		}
-				
+        {
+            Console.WriteLine("Selected");
+        }
+                
         public virtual bool Matches(string text)
         {
             return Caption != null && Caption.IndexOf(text, StringComparison.CurrentCultureIgnoreCase) != -1;

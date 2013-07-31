@@ -139,7 +139,7 @@ namespace NUnit.Framework.Constraints
                 s = sb.ToString();
             }
 
-			return s;
+            return s;
         }
 
         /// <summary>

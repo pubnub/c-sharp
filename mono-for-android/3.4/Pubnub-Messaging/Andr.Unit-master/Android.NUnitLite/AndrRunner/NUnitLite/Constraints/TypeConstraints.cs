@@ -51,11 +51,11 @@ namespace NUnit.Framework.Constraints
         /// the name of the type.
         /// </summary>
         /// <param name="writer">The writer on which the actual value is displayed</param>
-		public override void WriteActualValueTo(MessageWriter writer)
-		{
-			writer.WriteActualValue( actual == null ? null : actual.GetType() ); 
-		}
-	}
+        public override void WriteActualValueTo(MessageWriter writer)
+        {
+            writer.WriteActualValue( actual == null ? null : actual.GetType() ); 
+        }
+    }
 
     /// <summary>
     /// ExactTypeConstraint is used to test that an object
@@ -128,7 +128,7 @@ namespace NUnit.Framework.Constraints
             writer.WritePredicate("instance of");
             writer.WriteExpectedValue(expectedType);
         }
-	}
+    }
 
     /// <summary>
     /// AssignableFromConstraint is used to test that an object

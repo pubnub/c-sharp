@@ -60,7 +60,7 @@ namespace Newtonsoft.Json
     /// Gets or sets a value that indicates whether to preserve object reference data.
     /// </summary>
     /// <value>
-    /// 	<c>true</c> to keep object reference; otherwise, <c>false</c>. The default is <c>false</c>.
+    ///     <c>true</c> to keep object reference; otherwise, <c>false</c>. The default is <c>false</c>.
     /// </value>
     public bool IsReference
     {

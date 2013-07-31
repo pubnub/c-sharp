@@ -18,6 +18,15 @@ mozroots --import --ask-remove
 For more details please see:
 http://www.mono-project.com/FAQ%3a_Security#Secure_Socket_Layer_.28SSL.29_.2F_Transport_Layer_Security_.28TLS.29
 
+You can use either Newtonsoft.Json (recommended) or JsonFx as the serialization library. The example project has the references for both Newtonsoft.Json and JsonFx. You can retain either one.
+
+To use JsonFx as the serialization library you need to use the pre-compiler directive USE_JSONFX and REMOVE the reference of Newtonsoft.Json from the project
+Limitations of JsonFx: JsonFx doesn't support the serialization for type XmlDocument.
+
+To use Newtonsoft.Json you need not specify any pre-compiler directive. This is the used as the default serialization library. You need to REMOVE the reference of JsonFx from the project and retain the reference of Newtonsoft.Json
+
+Inbuilt .net serialization is activated by using the pre-compiler directive USE_DOTNET_SERIALIZATION. The use of this library is NOT recommended for pubnub client created on mono platform as this causes issues in "talking" to pubub clients developed for other platforms.
+
 Dev environment setup:
 - ubuntu 12.04
 - Mono Develop 2.8.6.3+dfsg-2 or higher 

@@ -507,7 +507,7 @@ namespace Newtonsoft.Json.Utilities
     /// </summary>
     /// <param name="member">The member.</param>
     /// <returns>
-    /// 	<c>true</c> if the member is an indexed property; otherwise, <c>false</c>.
+    ///     <c>true</c> if the member is an indexed property; otherwise, <c>false</c>.
     /// </returns>
     public static bool IsIndexedProperty(MemberInfo member)
     {
@@ -526,7 +526,7 @@ namespace Newtonsoft.Json.Utilities
     /// </summary>
     /// <param name="property">The property.</param>
     /// <returns>
-    /// 	<c>true</c> if the property is an indexed property; otherwise, <c>false</c>.
+    ///     <c>true</c> if the property is an indexed property; otherwise, <c>false</c>.
     /// </returns>
     public static bool IsIndexedProperty(PropertyInfo property)
     {
@@ -594,7 +594,7 @@ namespace Newtonsoft.Json.Utilities
     /// <param name="member">The MemberInfo to determine whether can be read.</param>
     /// /// <param name="nonPublic">if set to <c>true</c> then allow the member to be gotten non-publicly.</param>
     /// <returns>
-    /// 	<c>true</c> if the specified MemberInfo can be read; otherwise, <c>false</c>.
+    ///     <c>true</c> if the specified MemberInfo can be read; otherwise, <c>false</c>.
     /// </returns>
     public static bool CanReadMemberValue(MemberInfo member, bool nonPublic)
     {
@@ -628,7 +628,7 @@ namespace Newtonsoft.Json.Utilities
     /// <param name="nonPublic">if set to <c>true</c> then allow the member to be set non-publicly.</param>
     /// <param name="canSetReadOnly">if set to <c>true</c> then allow the member to be set if read-only.</param>
     /// <returns>
-    /// 	<c>true</c> if the specified MemberInfo can be set; otherwise, <c>false</c>.
+    ///     <c>true</c> if the specified MemberInfo can be set; otherwise, <c>false</c>.
     /// </returns>
     public static bool CanSetMemberValue(MemberInfo member, bool nonPublic, bool canSetReadOnly)
     {

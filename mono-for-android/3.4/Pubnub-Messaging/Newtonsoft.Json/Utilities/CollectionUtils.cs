@@ -53,7 +53,7 @@ namespace Newtonsoft.Json.Utilities
     /// </summary>
     /// <param name="collection">The collection.</param>
     /// <returns>
-    /// 	<c>true</c> if the collection is null or empty; otherwise, <c>false</c>.
+    ///     <c>true</c> if the collection is null or empty; otherwise, <c>false</c>.
     /// </returns>
     public static bool IsNullOrEmpty(ICollection collection)
     {
@@ -69,7 +69,7 @@ namespace Newtonsoft.Json.Utilities
     /// </summary>
     /// <param name="collection">The collection.</param>
     /// <returns>
-    /// 	<c>true</c> if the collection is null or empty; otherwise, <c>false</c>.
+    ///     <c>true</c> if the collection is null or empty; otherwise, <c>false</c>.
     /// </returns>
     public static bool IsNullOrEmpty<T>(ICollection<T> collection)
     {
@@ -85,7 +85,7 @@ namespace Newtonsoft.Json.Utilities
     /// </summary>
     /// <param name="list">The list.</param>
     /// <returns>
-    /// 	<c>true</c> if the collection is null or empty or its contents are uninitialized values; otherwise, <c>false</c>.
+    ///     <c>true</c> if the collection is null or empty or its contents are uninitialized values; otherwise, <c>false</c>.
     /// </returns>
     public static bool IsNullOrEmptyOrDefault<T>(IList<T> list)
     {

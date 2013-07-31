@@ -28,14 +28,14 @@ using NUnit.Framework.Constraints;
 
 namespace NUnit.Framework
 {
-	/// <summary>
-	/// AssertionHelper is an optional base class for user tests,
-	/// allowing the use of shorter names for constraints and
-	/// asserts and avoiding conflict with the definition of 
-	/// <see cref="Is"/>, from which it inherits much of its
-	/// behavior, in certain mock object frameworks.
-	/// </summary>
-	public class AssertionHelper : ConstraintFactory
+    /// <summary>
+    /// AssertionHelper is an optional base class for user tests,
+    /// allowing the use of shorter names for constraints and
+    /// asserts and avoiding conflict with the definition of 
+    /// <see cref="Is"/>, from which it inherits much of its
+    /// behavior, in certain mock object frameworks.
+    /// </summary>
+    public class AssertionHelper : ConstraintFactory
     {
         #region Assert
         //private Assertions assert = new Assertions();
@@ -208,38 +208,38 @@ namespace NUnit.Framework
 
         #region Boolean
         /// <summary>
-		/// Asserts that a condition is true. If the condition is false the method throws
-		/// an <see cref="AssertionException"/>. Works Identically to 
+        /// Asserts that a condition is true. If the condition is false the method throws
+        /// an <see cref="AssertionException"/>. Works Identically to 
         /// <see cref="Assert.That(bool, string, object[])"/>.
-		/// </summary> 
-		/// <param name="condition">The evaluated condition</param>
-		/// <param name="message">The message to display if the condition is false</param>
-		/// <param name="args">Arguments to be used in formatting the message</param>
-		public void Expect(bool condition, string message, params object[] args)
-		{
-			Assert.That(condition, Is.True, message, args);
-		}
+        /// </summary> 
+        /// <param name="condition">The evaluated condition</param>
+        /// <param name="message">The message to display if the condition is false</param>
+        /// <param name="args">Arguments to be used in formatting the message</param>
+        public void Expect(bool condition, string message, params object[] args)
+        {
+            Assert.That(condition, Is.True, message, args);
+        }
 
-		/// <summary>
-		/// Asserts that a condition is true. If the condition is false the method throws
-		/// an <see cref="AssertionException"/>. Works Identically to 
+        /// <summary>
+        /// Asserts that a condition is true. If the condition is false the method throws
+        /// an <see cref="AssertionException"/>. Works Identically to 
         /// <see cref="Assert.That(bool, string)"/>.
-		/// </summary>
-		/// <param name="condition">The evaluated condition</param>
-		/// <param name="message">The message to display if the condition is false</param>
-		public void Expect(bool condition, string message)
-		{
-			Assert.That(condition, Is.True, message, null);
-		}
+        /// </summary>
+        /// <param name="condition">The evaluated condition</param>
+        /// <param name="message">The message to display if the condition is false</param>
+        public void Expect(bool condition, string message)
+        {
+            Assert.That(condition, Is.True, message, null);
+        }
 
-		/// <summary>
-		/// Asserts that a condition is true. If the condition is false the method throws
-		/// an <see cref="AssertionException"/>. Works Identically to <see cref="Assert.That(bool)"/>.
-		/// </summary>
-		/// <param name="condition">The evaluated condition</param>
-		public void Expect(bool condition)
-		{
-			Assert.That(condition, Is.True, null, null);
+        /// <summary>
+        /// Asserts that a condition is true. If the condition is false the method throws
+        /// an <see cref="AssertionException"/>. Works Identically to <see cref="Assert.That(bool)"/>.
+        /// </summary>
+        /// <param name="condition">The evaluated condition</param>
+        public void Expect(bool condition)
+        {
+            Assert.That(condition, Is.True, null, null);
         }
         #endregion
 
@@ -259,15 +259,15 @@ namespace NUnit.Framework
         #region Map
 #if !NUNITLITE
         /// <summary>
-		/// Returns a ListMapper based on a collection.
-		/// </summary>
-		/// <param name="original">The original collection</param>
-		/// <returns></returns>
-		public ListMapper Map( ICollection original )
-		{
-			return new ListMapper( original );
-		}
+        /// Returns a ListMapper based on a collection.
+        /// </summary>
+        /// <param name="original">The original collection</param>
+        /// <returns></returns>
+        public ListMapper Map( ICollection original )
+        {
+            return new ListMapper( original );
+        }
 #endif
-		#endregion
-	}
+        #endregion
+    }
 }

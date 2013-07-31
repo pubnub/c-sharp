@@ -35,26 +35,26 @@
       />
   </LinearLayout>
   <!--LinearLayout>
-	  <ImageView
-			android:id="@+id/dialog_ImageRight"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_gravity="right|center_vertical"
-			android:src="@drawable/dialog_disclosure"
-			android:layout_marginLeft="3dp"
-			android:layout_marginRight="3dp"
-			/>
-		<TextView android:id="@+id/dialog_LabelPercentageField"
-	      android:layout_width="wrap_content"
-	      android:layout_height="wrap_content"
+      <ImageView
+            android:id="@+id/dialog_ImageRight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center_vertical"
+            android:src="@drawable/dialog_disclosure"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            />
+        <TextView android:id="@+id/dialog_LabelPercentageField"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
           android:layout_gravity="right|center_vertical"
-	      android:layout_marginTop="2dp"
-	      android:layout_marginLeft="2dp"
-	      android:ellipsize="end"
-	      android:singleLine="true"
-	      android:text="0"
-	      android:textAppearance="?android:attr/textAppearanceSmall"
-	      />
+          android:layout_marginTop="2dp"
+          android:layout_marginLeft="2dp"
+          android:ellipsize="end"
+          android:singleLine="true"
+          android:text="0"
+          android:textAppearance="?android:attr/textAppearanceSmall"
+          />
   </LinearLayout-->
   <CheckBox
     android:id="@+id/dialog_BoolField"

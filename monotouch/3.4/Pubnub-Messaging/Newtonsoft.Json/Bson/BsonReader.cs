@@ -87,7 +87,7 @@ namespace Newtonsoft.Json.Bson
     /// Gets or sets a value indicating whether binary data reading should compatible with incorrect Json.NET 3.5 written binary.
     /// </summary>
     /// <value>
-    /// 	<c>true</c> if binary data reading will be compatible with incorrect Json.NET 3.5 written binary; otherwise, <c>false</c>.
+    ///     <c>true</c> if binary data reading will be compatible with incorrect Json.NET 3.5 written binary; otherwise, <c>false</c>.
     /// </value>
     public bool JsonNet35BinaryCompatibility
     {
@@ -99,7 +99,7 @@ namespace Newtonsoft.Json.Bson
     /// Gets or sets a value indicating whether the root object will be read as a JSON array.
     /// </summary>
     /// <value>
-    /// 	<c>true</c> if the root object will be read as a JSON array; otherwise, <c>false</c>.
+    ///     <c>true</c> if the root object will be read as a JSON array; otherwise, <c>false</c>.
     /// </value>
     public bool ReadRootValueAsArray
     {

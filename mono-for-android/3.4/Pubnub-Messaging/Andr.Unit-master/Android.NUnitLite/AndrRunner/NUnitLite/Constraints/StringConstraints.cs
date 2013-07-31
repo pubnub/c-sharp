@@ -143,9 +143,9 @@ namespace NUnit.Framework.Constraints
 
     #region Substring Constraint
     /// <summary>
-	/// SubstringConstraint can test whether a string contains
-	/// the expected substring.
-	/// </summary>
+    /// SubstringConstraint can test whether a string contains
+    /// the expected substring.
+    /// </summary>
     public class SubstringConstraint : StringConstraint
     {
         /// <summary>
@@ -180,17 +180,17 @@ namespace NUnit.Framework.Constraints
         {
             writer.WritePredicate("String containing");
             writer.WriteExpectedValue(expected);
-			if ( this.caseInsensitive )
-				writer.WriteModifier( "ignoring case" );
-		}
+            if ( this.caseInsensitive )
+                writer.WriteModifier( "ignoring case" );
+        }
     }
     #endregion
 
     #region StartsWithConstraint
     /// <summary>
-	/// StartsWithConstraint can test whether a string starts
-	/// with an expected substring.
-	/// </summary>
+    /// StartsWithConstraint can test whether a string starts
+    /// with an expected substring.
+    /// </summary>
     public class StartsWithConstraint : StringConstraint
     {
         /// <summary>
@@ -227,9 +227,9 @@ namespace NUnit.Framework.Constraints
         {
             writer.WritePredicate("String starting with");
             writer.WriteExpectedValue( MsgUtils.ClipString(expected, writer.MaxLineLength - 40, 0) );
-			if ( this.caseInsensitive )
-				writer.WriteModifier( "ignoring case" );
-		}
+            if ( this.caseInsensitive )
+                writer.WriteModifier( "ignoring case" );
+        }
     }
     #endregion
 
@@ -274,9 +274,9 @@ namespace NUnit.Framework.Constraints
         {
             writer.WritePredicate("String ending with");
             writer.WriteExpectedValue(expected);
-			if ( this.caseInsensitive )
-				writer.WriteModifier( "ignoring case" );
-		}
+            if ( this.caseInsensitive )
+                writer.WriteModifier( "ignoring case" );
+        }
     }
     #endregion
 
@@ -318,9 +318,9 @@ namespace NUnit.Framework.Constraints
         {
             writer.WritePredicate("String matching");
             writer.WriteExpectedValue(this.expected);
-			if ( this.caseInsensitive )
-				writer.WriteModifier( "ignoring case" );
-		}
+            if ( this.caseInsensitive )
+                writer.WriteModifier( "ignoring case" );
+        }
     }
 #endif
     #endregion

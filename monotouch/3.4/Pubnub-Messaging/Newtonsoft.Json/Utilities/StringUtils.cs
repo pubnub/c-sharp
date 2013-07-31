@@ -58,7 +58,7 @@ namespace Newtonsoft.Json.Utilities
     /// </summary>
     /// <param name="s">The string to test for white space.</param>
     /// <returns>
-    /// 	<c>true</c> if the string contains white space; otherwise, <c>false</c>.
+    ///     <c>true</c> if the string contains white space; otherwise, <c>false</c>.
     /// </returns>
     public static bool ContainsWhiteSpace(string s)
     {
@@ -78,7 +78,7 @@ namespace Newtonsoft.Json.Utilities
     /// </summary>
     /// <param name="s">The string to test whether it is all white space.</param>
     /// <returns>
-    /// 	<c>true</c> if the string is all white space; otherwise, <c>false</c>.
+    ///     <c>true</c> if the string is all white space; otherwise, <c>false</c>.
     /// </returns>
     public static bool IsWhiteSpace(string s)
     {

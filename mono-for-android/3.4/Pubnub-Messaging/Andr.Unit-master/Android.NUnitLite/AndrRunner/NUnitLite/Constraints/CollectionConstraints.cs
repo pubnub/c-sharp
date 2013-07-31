@@ -54,39 +54,39 @@ namespace NUnit.Framework.Constraints
         /// </summary>
         /// <param name="enumerable">The enumerable.</param>
         /// <returns>
-        /// 	<c>true</c> if the specified enumerable is empty; otherwise, <c>false</c>.
+        ///     <c>true</c> if the specified enumerable is empty; otherwise, <c>false</c>.
         /// </returns>
-		protected static bool IsEmpty( IEnumerable enumerable )
-		{
-			ICollection collection = enumerable as ICollection;
-			if ( collection != null )
-				return collection.Count == 0;
-			else
-				return !enumerable.GetEnumerator().MoveNext();
-		}
+        protected static bool IsEmpty( IEnumerable enumerable )
+        {
+            ICollection collection = enumerable as ICollection;
+            if ( collection != null )
+                return collection.Count == 0;
+            else
+                return !enumerable.GetEnumerator().MoveNext();
+        }
 
-		/// <summary>
-		/// Test whether the constraint is satisfied by a given value
-		/// </summary>
-		/// <param name="actual">The value to be tested</param>
-		/// <returns>True for success, false for failure</returns>
-		public override bool Matches(object actual)
-		{
-			this.actual = actual;
+        /// <summary>
+        /// Test whether the constraint is satisfied by a given value
+        /// </summary>
+        /// <param name="actual">The value to be tested</param>
+        /// <returns>True for success, false for failure</returns>
+        public override bool Matches(object actual)
+        {
+            this.actual = actual;
 
-			IEnumerable enumerable = actual as IEnumerable;
-			if ( enumerable == null )
-				throw new ArgumentException( "The actual value must be an IEnumerable", "actual" );
-		
-			return doMatch( enumerable );
-		}
+            IEnumerable enumerable = actual as IEnumerable;
+            if ( enumerable == null )
+                throw new ArgumentException( "The actual value must be an IEnumerable", "actual" );
+        
+            return doMatch( enumerable );
+        }
 
-		/// <summary>
-		/// Protected method to be implemented by derived classes
-		/// </summary>
-		/// <param name="collection"></param>
-		/// <returns></returns>
-		protected abstract bool doMatch(IEnumerable collection);
+        /// <summary>
+        /// Protected method to be implemented by derived classes
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <returns></returns>
+        protected abstract bool doMatch(IEnumerable collection);
     }
     #endregion
 
@@ -273,29 +273,29 @@ namespace NUnit.Framework.Constraints
     /// EmptyCollectionConstraint tests whether a collection is empty. 
     /// </summary>
     public class EmptyCollectionConstraint : CollectionConstraint
-	{
-		/// <summary>
-		/// Check that the collection is empty
-		/// </summary>
-		/// <param name="collection"></param>
-		/// <returns></returns>
-		protected override bool doMatch(IEnumerable collection)
-		{
-			return IsEmpty( collection );
-		}
-	
-		/// <summary>
-		/// Write the constraint description to a MessageWriter
-		/// </summary>
-		/// <param name="writer"></param>
-		public override void WriteDescriptionTo(MessageWriter writer)
-		{
-			writer.Write( "<empty>" );
-		}
-	}
-	#endregion
+    {
+        /// <summary>
+        /// Check that the collection is empty
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <returns></returns>
+        protected override bool doMatch(IEnumerable collection)
+        {
+            return IsEmpty( collection );
+        }
+    
+        /// <summary>
+        /// Write the constraint description to a MessageWriter
+        /// </summary>
+        /// <param name="writer"></param>
+        public override void WriteDescriptionTo(MessageWriter writer)
+        {
+            writer.Write( "<empty>" );
+        }
+    }
+    #endregion
 
-	#region UniqueItemsConstraint
+    #region UniqueItemsConstraint
     /// <summary>
     /// UniqueItemsConstraint tests whether all the items in a 
     /// collection are unique.
@@ -405,10 +405,10 @@ namespace NUnit.Framework.Constraints
         /// <returns></returns>
         protected override bool doMatch(IEnumerable actual)
         {
-			// This is just an optimization
-			if( expected is ICollection && actual is ICollection )
-				if( ((ICollection)actual).Count != ((ICollection)expected).Count )
-					return false;
+            // This is just an optimization
+            if( expected is ICollection && actual is ICollection )
+                if( ((ICollection)actual).Count != ((ICollection)expected).Count )
+                    return false;
 
             CollectionTally tally = Tally(expected);
             return tally.TryRemove(actual) && tally.Count == 0;
@@ -537,10 +537,10 @@ namespace NUnit.Framework.Constraints
         /// a specified property and returns self.
         /// </summary>
         public CollectionOrderedConstraint By(string propertyName)
-		{
-			this.propertyName = propertyName;
-			return this;
-		}
+        {
+            this.propertyName = propertyName;
+            return this;
+        }
 
         /// <summary>
         /// Test whether the collection is ordered

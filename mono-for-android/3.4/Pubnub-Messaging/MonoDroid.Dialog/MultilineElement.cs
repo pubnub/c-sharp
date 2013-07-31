@@ -6,7 +6,7 @@ namespace MonoDroid.Dialog
     public class MultilineElement : EntryElement
     {
         public int Lines { get; set; }
-		public int MaxLength {get;set;}
+        public int MaxLength {get;set;}
 
         public MultilineElement(string caption, string value)
             : base(caption, value, (int)DroidResources.ElementLayout.dialog_textarea)
@@ -22,10 +22,10 @@ namespace MonoDroid.Dialog
                 _entry.SetLines(Lines);
                 _entry.Text = Value;
                 _entry.Hint = Caption;
-				_entry.TextChanged += delegate(object sender, Android.Text.TextChangedEventArgs e) {
-					if(MaxLength > 0 && _entry.Text.Length > MaxLength)
-						_entry.Text = _entry.Text.Substring(0,MaxLength);
-				};
+                _entry.TextChanged += delegate(object sender, Android.Text.TextChangedEventArgs e) {
+                    if(MaxLength > 0 && _entry.Text.Length > MaxLength)
+                        _entry.Text = _entry.Text.Substring(0,MaxLength);
+                };
             }
             return view;
         }

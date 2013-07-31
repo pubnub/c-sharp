@@ -292,7 +292,7 @@ namespace Newtonsoft.Json.Utilities
     /// <param name="initialValue">The value to convert.</param>
     /// <param name="convertedValue">The converted value if the conversion was successful or the default value of <c>T</c> if it failed.</param>
     /// <returns>
-    /// 	<c>true</c> if <c>initialValue</c> was converted successfully; otherwise, <c>false</c>.
+    ///     <c>true</c> if <c>initialValue</c> was converted successfully; otherwise, <c>false</c>.
     /// </returns>
     public static bool TryConvert<T>(object initialValue, out T convertedValue)
     {
@@ -307,7 +307,7 @@ namespace Newtonsoft.Json.Utilities
     /// <param name="culture">The culture to use when converting.</param>
     /// <param name="convertedValue">The converted value if the conversion was successful or the default value of <c>T</c> if it failed.</param>
     /// <returns>
-    /// 	<c>true</c> if <c>initialValue</c> was converted successfully; otherwise, <c>false</c>.
+    ///     <c>true</c> if <c>initialValue</c> was converted successfully; otherwise, <c>false</c>.
     /// </returns>
     public static bool TryConvert<T>(object initialValue, CultureInfo culture, out T convertedValue)
     {
@@ -328,7 +328,7 @@ namespace Newtonsoft.Json.Utilities
     /// <param name="targetType">The type to convert the value to.</param>
     /// <param name="convertedValue">The converted value if the conversion was successful or the default value of <c>T</c> if it failed.</param>
     /// <returns>
-    /// 	<c>true</c> if <c>initialValue</c> was converted successfully; otherwise, <c>false</c>.
+    ///     <c>true</c> if <c>initialValue</c> was converted successfully; otherwise, <c>false</c>.
     /// </returns>
     public static bool TryConvert(object initialValue, CultureInfo culture, Type targetType, out object convertedValue)
     {
@@ -399,7 +399,7 @@ namespace Newtonsoft.Json.Utilities
     /// <param name="initialValue">The value to convert.</param>
     /// <param name="convertedValue">The converted value if the conversion was successful or the default value of <c>T</c> if it failed.</param>
     /// <returns>
-    /// 	<c>true</c> if <c>initialValue</c> was converted successfully or is assignable; otherwise, <c>false</c>.
+    ///     <c>true</c> if <c>initialValue</c> was converted successfully or is assignable; otherwise, <c>false</c>.
     /// </returns>
     public static bool TryConvertOrCast<T>(object initialValue, out T convertedValue)
     {
@@ -415,7 +415,7 @@ namespace Newtonsoft.Json.Utilities
     /// <param name="culture">The culture to use when converting.</param>
     /// <param name="convertedValue">The converted value if the conversion was successful or the default value of <c>T</c> if it failed.</param>
     /// <returns>
-    /// 	<c>true</c> if <c>initialValue</c> was converted successfully or is assignable; otherwise, <c>false</c>.
+    ///     <c>true</c> if <c>initialValue</c> was converted successfully or is assignable; otherwise, <c>false</c>.
     /// </returns>
     public static bool TryConvertOrCast<T>(object initialValue, CultureInfo culture, out T convertedValue)
     {
@@ -437,7 +437,7 @@ namespace Newtonsoft.Json.Utilities
     /// <param name="targetType">The type to convert the value to.</param>
     /// <param name="convertedValue">The converted value if the conversion was successful or the default value of <c>T</c> if it failed.</param>
     /// <returns>
-    /// 	<c>true</c> if <c>initialValue</c> was converted successfully or is assignable; otherwise, <c>false</c>.
+    ///     <c>true</c> if <c>initialValue</c> was converted successfully or is assignable; otherwise, <c>false</c>.
     /// </returns>
     public static bool TryConvertOrCast(object initialValue, CultureInfo culture, Type targetType, out object convertedValue)
     {

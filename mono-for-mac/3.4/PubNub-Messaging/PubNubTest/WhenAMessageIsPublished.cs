@@ -3,7 +3,6 @@ using PubNubMessaging.Core;
 using NUnit.Framework;
 using System.ComponentModel;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using System.Net;
 using System.IO;
 using System.Diagnostics;
@@ -31,14 +30,21 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
 
-            pubnub.Publish(channel, message, common.DisplayReturnMessage);
+            pubnub.Publish(channel, message, common.DisplayReturnMessage, common.DisplayReturnMessage);
             //wait till the response is received from the server
-            while (!common.DeliveryStatus) ;
-            IList<object> fields = common.Response as IList<object>;
-            string sent = fields[1].ToString();
-            string one = fields[0].ToString();
-            Assert.AreEqual("Sent", sent);
-            Assert.AreEqual("1", one);
+            common.WaitForResponse();
+            if (common.Response != null)
+            {
+                IList<object> fields = common.Response as IList<object>;
+                string sent = fields [1].ToString();
+                string one = fields [0].ToString();
+                Assert.AreEqual("Sent", sent);
+                Assert.AreEqual("1", one);
+            } 
+            else
+            {
+                Assert.Fail("Null response");
+            }
         }
         [Test]
         public void ThenItShouldReturnSuccessCodeAndInfoForEncryptedComplexMessage2()
@@ -60,14 +66,21 @@ namespace PubNubMessaging.Tests
           common.DeliveryStatus = false;
           common.Response = null;
           
-          pubnub.Publish(channel, message, common.DisplayReturnMessage);
+          pubnub.Publish(channel, message, common.DisplayReturnMessage, common.DisplayReturnMessage);
           //wait till the response is received from the server
-          while (!common.DeliveryStatus) ;
-          IList<object> fields = common.Response as IList<object>;
-          string sent = fields[1].ToString();
-          string one = fields[0].ToString();
-          Assert.AreEqual("Sent", sent);
-          Assert.AreEqual("1", one);
+          common.WaitForResponse();
+          if (common.Response != null)
+          {
+              IList<object> fields = common.Response as IList<object>;
+              string sent = fields[1].ToString();
+              string one = fields[0].ToString();
+              Assert.AreEqual("Sent", sent);
+              Assert.AreEqual("1", one);
+          }
+          else
+          {
+              Assert.Fail("Null response");
+          }
         }
 
         [Test]
@@ -84,7 +97,7 @@ namespace PubNubMessaging.Tests
           object message = new PubnubDemoObject();
           //object message = new CustomClass2();
           
-          string json = JsonConvert.SerializeObject(message);
+          string json = Common.Serialize(message);
           Common common = new Common();
           
           pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenAMessageIsPublished", "ThenItShouldReturnSuccessCodeAndInfoForComplexMessage2WithSsl");
@@ -92,14 +105,21 @@ namespace PubNubMessaging.Tests
           common.DeliveryStatus = false;
           common.Response = null;
           
-          pubnub.Publish(channel, message, common.DisplayReturnMessage);
+          pubnub.Publish(channel, message, common.DisplayReturnMessage, common.DisplayReturnMessage);
           //wait till the response is received from the server
-          while (!common.DeliveryStatus);
-          IList<object> fields = common.Response as IList<object>;
-          string sent = fields[1].ToString();
-          string one = fields[0].ToString();
-          Assert.AreEqual("Sent", sent);
-          Assert.AreEqual("1", one);
+          common.WaitForResponse();
+          if (common.Response != null)
+          {
+            IList<object> fields = common.Response as IList<object>;
+            string sent = fields[1].ToString();
+            string one = fields[0].ToString();
+            Assert.AreEqual("Sent", sent);
+            Assert.AreEqual("1", one);
+          }
+          else
+          {
+            Assert.Fail("Null response");
+          }
         }
 
         [Test]
@@ -116,7 +136,7 @@ namespace PubNubMessaging.Tests
             object message = new PubnubDemoObject();
             //object message = new CustomClass2();
 
-            string json = JsonConvert.SerializeObject(message);
+            string json = Common.Serialize(message);
             Common common = new Common();
 
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenAMessageIsPublished", "ThenItShouldReturnSuccessCodeAndInfoForComplexMessage2");
@@ -124,14 +144,21 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
 
-            pubnub.Publish(channel, message, common.DisplayReturnMessage);
+            pubnub.Publish(channel, message, common.DisplayReturnMessage, common.DisplayReturnMessage);
             //wait till the response is received from the server
-            while (!common.DeliveryStatus);
-            IList<object> fields = common.Response as IList<object>;
-            string sent = fields[1].ToString();
-            string one = fields[0].ToString();
-            Assert.AreEqual("Sent", sent);
-            Assert.AreEqual("1", one);
+            common.WaitForResponse();
+            if (common.Response != null)
+            {
+              IList<object> fields = common.Response as IList<object>;
+              string sent = fields[1].ToString();
+              string one = fields[0].ToString();
+              Assert.AreEqual("Sent", sent);
+              Assert.AreEqual("1", one);
+            }
+            else
+            {
+              Assert.Fail("Null response");
+            }
         }
 
         [Test]
@@ -154,14 +181,21 @@ namespace PubNubMessaging.Tests
           common.DeliveryStatus = false;
           common.Response = null;
           
-          pubnub.Publish(channel, message, common.DisplayReturnMessage);
+          pubnub.Publish(channel, message, common.DisplayReturnMessage, common.DisplayReturnMessage);
           //wait till the response is received from the server
-          while (!common.DeliveryStatus) ;
-          IList<object> fields = common.Response as IList<object>;
-          string sent = fields[1].ToString();
-          string one = fields[0].ToString();
-          Assert.AreEqual("Sent", sent);
-          Assert.AreEqual("1", one);
+          common.WaitForResponse();
+          if (common.Response != null)
+          {
+            IList<object> fields = common.Response as IList<object>;
+            string sent = fields[1].ToString();
+            string one = fields[0].ToString();
+            Assert.AreEqual("Sent", sent);
+            Assert.AreEqual("1", one);
+          }
+          else
+          {
+            Assert.Fail("Null response");
+          }
         }
 
         [Test]
@@ -184,15 +218,22 @@ namespace PubNubMessaging.Tests
           common.DeliveryStatus = false;
           common.Response = null;
           
-          pubnub.Publish(channel, message, common.DisplayReturnMessage);
+          pubnub.Publish(channel, message, common.DisplayReturnMessage, common.DisplayReturnMessage);
           //wait till the response is received from the server
-          while (!common.DeliveryStatus) ;
-          Console.WriteLine(common.Response.ToString());
-          IList<object> fields = common.Response as IList<object>;
-          string sent = fields[1].ToString();
-          string one = fields[0].ToString();
-          Assert.AreEqual("Sent", sent);
-          Assert.AreEqual("1", one);
+          common.WaitForResponse();
+          if (common.Response != null)
+          {
+            Console.WriteLine(common.Response.ToString());
+            IList<object> fields = common.Response as IList<object>;
+            string sent = fields[1].ToString();
+            string one = fields[0].ToString();
+            Assert.AreEqual("Sent", sent);
+            Assert.AreEqual("1", one);
+          }
+          else
+          {
+            Assert.Fail("Null response");
+          }
         }
 
         [Test]
@@ -215,15 +256,22 @@ namespace PubNubMessaging.Tests
           common.DeliveryStatus = false;
           common.Response = null;
           
-          pubnub.Publish(channel, message, common.DisplayReturnMessage);
+          pubnub.Publish(channel, message, common.DisplayReturnMessage, common.DisplayReturnMessage);
           //wait till the response is received from the server
-          while (!common.DeliveryStatus) ;
-          Console.WriteLine(common.Response.ToString());
-          IList<object> fields = common.Response as IList<object>;
-          string sent = fields[1].ToString();
-          string one = fields[0].ToString();
-          Assert.AreEqual("Sent", sent);
-          Assert.AreEqual("1", one);
+          common.WaitForResponse();
+          if (common.Response != null)
+          {
+            Console.WriteLine(common.Response.ToString());
+            IList<object> fields = common.Response as IList<object>;
+            string sent = fields[1].ToString();
+            string one = fields[0].ToString();
+            Assert.AreEqual("Sent", sent);
+            Assert.AreEqual("1", one);
+          }
+          else
+          {
+            Assert.Fail("Null response");
+          }
         }
 
         [Test]
@@ -246,14 +294,21 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
 
-            pubnub.Publish(channel, message, common.DisplayReturnMessage);
+            pubnub.Publish(channel, message, common.DisplayReturnMessage, common.DisplayReturnMessage);
             //wait till the response is received from the server
-            while (!common.DeliveryStatus) ;
-            IList<object> fields = common.Response as IList<object>;
-            string sent = fields[1].ToString();
-            string one = fields[0].ToString();
-            Assert.AreEqual("Sent", sent);
-            Assert.AreEqual("1", one);
+            common.WaitForResponse();
+            if (common.Response != null)
+            {
+              IList<object> fields = common.Response as IList<object>;
+              string sent = fields[1].ToString();
+              string one = fields[0].ToString();
+              Assert.AreEqual("Sent", sent);
+              Assert.AreEqual("1", one);
+            }
+            else
+            {
+              Assert.Fail("Null response");
+            }
         }
 
         [Test]
@@ -291,7 +346,7 @@ namespace PubNubMessaging.Tests
                 false
             );
             Common common = new Common();
-            Assert.AreEqual(true, pubnub.Publish(channel, message, common.DisplayReturnMessage));
+            Assert.AreEqual(true, pubnub.Publish(channel, message, common.DisplayReturnMessage, common.DisplayReturnMessage));
         }
 
         [Test]
@@ -308,7 +363,7 @@ namespace PubNubMessaging.Tests
             string channel = "mychannel";
             string message = "Pubnub API Usage Example";
             Common common = new Common();
-            Assert.AreEqual(false, pubnub.Publish(channel, message, common.DisplayReturnMessage));
+            Assert.AreEqual(false, pubnub.Publish(channel, message, common.DisplayReturnMessage, common.DisplayReturnMessage));
         }
 
         [Test]
@@ -321,13 +376,13 @@ namespace PubNubMessaging.Tests
             string channel = "mychannel";
             string message = "Pubnub API Usage Example";
             Common common = new Common();
-            Assert.AreEqual(true, pubnub.Publish(channel, message, common.DisplayReturnMessage));
+            Assert.AreEqual(true, pubnub.Publish(channel, message, common.DisplayReturnMessage, common.DisplayReturnMessage));
             pubnub = new Pubnub(
                 "demo",
                 "demo",
                 "key"
             );
-            Assert.AreEqual(true, pubnub.Publish(channel, message, common.DisplayReturnMessage));
+            Assert.AreEqual(true, pubnub.Publish(channel, message, common.DisplayReturnMessage, common.DisplayReturnMessage));
         }
 
         [Test]
@@ -341,7 +396,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_world";
             string message = "Pubnub API Usage Example";
             Common common = new Common();
-            Assert.AreEqual(true, pubnub.Publish(channel, message, common.DisplayReturnMessage));
+            Assert.AreEqual(true, pubnub.Publish(channel, message, common.DisplayReturnMessage, common.DisplayReturnMessage));
         }
 
         [Test]
@@ -358,7 +413,7 @@ namespace PubNubMessaging.Tests
             string channel = "mychannel";
             string message = "Pubnub API Usage Example";
             Common common = new Common();
-            Assert.AreEqual(false, pubnub.Publish(channel, message, common.DisplayReturnMessage));
+            Assert.AreEqual(false, pubnub.Publish(channel, message, common.DisplayReturnMessage, common.DisplayReturnMessage));
         }
 
         [Test]
@@ -380,12 +435,19 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
             
-            pubnub.Publish(channel, messageLarge2K, common.DisplayReturnMessage);
+            pubnub.Publish(channel, messageLarge2K, common.DisplayReturnMessage, common.DisplayReturnMessage);
             //wait till the response is received from the server
-            while (!common.DeliveryStatus) ;
-            IList<object> fields = common.Response as IList<object>;
-            string sent = fields[1].ToString();
-            Assert.AreEqual("Message Too Large", sent);
+            common.WaitForResponse();
+            if (common.Response != null)
+            {
+              IList<object> fields = common.Response as IList<object>;
+              string sent = fields[1].ToString();
+              Assert.AreEqual("Message Too Large", sent);
+            }
+            else
+            {
+              Assert.Fail("Null response");
+            }
         }
     }
 }
