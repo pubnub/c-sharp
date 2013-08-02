@@ -2,7 +2,8 @@
 ### Supports PC, Mac, Linux, iOS and Android
 
 ### View this First!
-We've made a [screencast](https://vimeo.com/69591819) that will walk you through the general setup. Check it out!
+We've made a [screencast](https://vimeo.com/69591819) that will walk you through the general setup. 
+After checking out the general setup video, [For iOS targets](https://vimeo.com/71549964) be sure to view this walkthrough next. Check it out!
 
 ### Important Change from previous version
 Error Callback parameter is being introduced in all operation/non-operation methods of C# Core Pubnub.cs file. 
