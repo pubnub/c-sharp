@@ -13,7 +13,7 @@ overrideTcpKeepAlive = true;
 When creating a new project or a new configuration please add a compiler flag by going into the "Options -> Compiler -> Define Symbols" and adding "MONOTOUCH;" to it.
 
 You can only use Newtonsoft.Json as the serialization library. The other serialization libraries (JsonFx and the inbuilt serialization library) are not compatible with MonoTouch (Xamarin.iOS)
-Limitations of Newtonsoft.Json: Newtonsoft.Json doesn't support the serialization for type XmlDocument on this platform.
+Limitations of Newtonsoft.Json: Newtonsoft.Json doesn't support the serialization for type XmlDocument on this platform. 
 
 Dev environment setup:
 - MAC OS X 10.7.5 (Lion)
