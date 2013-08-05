@@ -1,9 +1,0 @@
-/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/MonoDroid.Dialog/bin/Debug/MonoDroid.Dialog.dll.mdb
-/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/MonoDroid.Dialog/bin/Debug/MonoDroid.Dialog.dll
-/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/MonoDroid.Dialog/bin/Debug/MonoDroid.Dialog.apk
-/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/MonoDroid.Dialog/obj/Debug/android/bin/MonoDroid.Dialog.apk
-/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/MonoDroid.Dialog/obj/Debug/R.cs.flag
-/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/MonoDroid.Dialog/bin/Debug/MonoDroid.Dialog-Signed.apk
-/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/MonoDroid.Dialog/obj/Debug/uploadflags.txt
-/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/MonoDroid.Dialog/obj/Debug/MonoDroid.Dialog.dll
-/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/MonoDroid.Dialog/obj/Debug/MonoDroid.Dialog.dll.mdb

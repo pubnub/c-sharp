@@ -1,2 +1,0 @@
-PubNubMessaging.Core.MainActivity;pubnubmessaging.core.MainActivity
-PubNubMessaging.Core.LaunchScreen;pubnubmessaging.core.LaunchScreen

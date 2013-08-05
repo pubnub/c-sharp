@@ -1,9 +1,0 @@
-/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/Newtonsoft.Json/bin/Debug/Newtonsoft.Json.MonoDroid.dll.mdb
-/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/Newtonsoft.Json/bin/Debug/Newtonsoft.Json.MonoDroid.dll
-/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/Newtonsoft.Json/bin/Debug/Newtonsoft.Json.MonoDroid.apk
-/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/Newtonsoft.Json/obj/Debug/android/bin/Newtonsoft.Json.MonoDroid.apk
-/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/Newtonsoft.Json/obj/Debug/R.cs.flag
-/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/Newtonsoft.Json/bin/Debug/Newtonsoft.Json.MonoDroid-Signed.apk
-/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/Newtonsoft.Json/obj/Debug/uploadflags.txt
-/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/Newtonsoft.Json/obj/Debug/Newtonsoft.Json.MonoDroid.dll
-/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/Newtonsoft.Json/obj/Debug/Newtonsoft.Json.MonoDroid.dll.mdb
