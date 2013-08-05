@@ -1,4 +1,4 @@
-//Build Date: August 01, 2013
+//Build Date: July 22, 2013
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
 #define USE_JSONFX
 #endif
@@ -3262,7 +3262,7 @@ namespace PubNubMessaging.Core
 								List<object> errorResult = new List<object>();
 								string errorJsonString = string.Format("[2, \"{0}\"]", ex.ToString().Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\""));
 								errorResult = _jsonPluggableLibrary.DeserializeToListOfObject(errorJsonString);
-								errorResult.Add(activeChannel);
+								errorResult.Add(string.Join(",", activeChannel));
 
 								PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[activeChannel] as PubnubChannelCallback<T>;
 								if (currentPubnubCallback != null && currentPubnubCallback.ErrorCallback != null)
