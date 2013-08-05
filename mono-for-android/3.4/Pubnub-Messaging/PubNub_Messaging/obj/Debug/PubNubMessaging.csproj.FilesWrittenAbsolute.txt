@@ -1,0 +1,16 @@
+/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/PubNub_Messaging/bin/Debug/PubNub_Messaging.dll.mdb
+/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/PubNub_Messaging/bin/Debug/PubNub_Messaging.dll
+/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/PubNub_Messaging/bin/Debug/PubNubMessaging.PubNubMessaging.apk
+/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/PubNub_Messaging/obj/Debug/android/bin/PubNubMessaging.PubNubMessaging.apk
+/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/PubNub_Messaging/obj/Debug/res/layout/main.xml
+/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/PubNub_Messaging/obj/Debug/res/values/strings.xml
+/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/PubNub_Messaging/obj/Debug/res/drawable/icon.png
+/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/PubNub_Messaging/obj/Debug/res/layout/launch.xml
+/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/PubNub_Messaging/obj/Debug/res/layout-large/main.xml
+/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/PubNub_Messaging/obj/Debug/res/layout-large/launch.xml
+/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/PubNub_Messaging/obj/Debug/res/layout/proxy.xml
+/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/PubNub_Messaging/obj/Debug/R.cs.flag
+/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/PubNub_Messaging/bin/Debug/PubNubMessaging.PubNubMessaging-Signed.apk
+/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/PubNub_Messaging/obj/Debug/uploadflags.txt
+/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/PubNub_Messaging/obj/Debug/PubNub_Messaging.dll
+/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/PubNub_Messaging/obj/Debug/PubNub_Messaging.dll.mdb

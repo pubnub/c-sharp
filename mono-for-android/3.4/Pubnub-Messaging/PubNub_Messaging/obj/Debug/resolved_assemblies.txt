@@ -1,0 +1,3 @@
+/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/PubNub_Messaging/bin/Debug/PubNub_Messaging.dll
+/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/PubNub_Messaging/bin/Debug/Newtonsoft.Json.MonoDroid.dll
+/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/git-master/c-sharp/mono-for-android/3.4/Pubnub-Messaging/PubNub_Messaging/Library/JsonFx.dll
