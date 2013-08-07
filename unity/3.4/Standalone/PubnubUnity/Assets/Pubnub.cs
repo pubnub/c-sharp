@@ -1,4 +1,4 @@
-﻿//Build Date: August 01, 2013
+﻿//Build Date: August 07, 2013
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
 #define USE_JSONFX
 #endif
@@ -1177,7 +1177,8 @@ namespace PubNubMessaging.Core
 					PubnubWebRequest request = currentState.Request;
 					if (request != null)
 					{
-						LoggingMethod.WriteToLog(string.Format("DateTime: {0}, OnPubnubWebRequestTimeout: client request timeout reached.Request abort for channel = {1}", DateTime.Now.ToString(), string.Join(",", currentState.Channels)), LoggingMethod.LevelInfo);
+                        string currentMultiChannel = (currentState.Channels == null) ? "" : string.Join(",", currentState.Channels);
+                        LoggingMethod.WriteToLog(string.Format("DateTime: {0}, OnPubnubWebRequestTimeout: client request timeout reached.Request abort for channel = {1}", DateTime.Now.ToString(), currentMultiChannel), LoggingMethod.LevelInfo);
 						currentState.Timeout = true;
 						TerminatePendingWebRequest(currentState);
 					}
