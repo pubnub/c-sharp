@@ -2,7 +2,10 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
   <MonoDevelop.Ide.Workbench ActiveDocument="PubNub-Console/Pubnub.cs">
     <Files>
-      <File FileName="PubNub-Console/Pubnub.cs" Line="1" Column="1" />
+      <File FileName="PubNub-Console/Pubnub.cs" Line="1" Column="30" />
+      <File FileName="PubNubTest/PubnubUnitTest.cs" Line="1" Column="1" />
+      <File FileName="PubNubTest/Common.cs" Line="1" Column="1" />
+      <File FileName="PubNub-Console/PubnubExample.cs" Line="67" Column="57" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -38,8 +41,8 @@
         <State expanded="True">
           <Node name="PubNub-Messaging.Tests" expanded="True">
             <Node name="PubNubMessaging" expanded="True">
-              <Node name="Tests" expanded="True">
-                <Node name="WhenAMessageIsPublished" expanded="True" selected="True" />
+              <Node name="Tests" expanded="True" selected="True">
+                <Node name="WhenGetRequestServerTime" expanded="True" />
               </Node>
             </Node>
           </Node>
@@ -57,7 +60,7 @@
       <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/MonoTouch/Pubnub-Messaging/Pubnub-Messaging/PubNub_Example.cs" line="154" column="1" />
       <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/MonoTouch/Pubnub-Messaging/Pubnub-Messaging/Pubnub_MessagingMain.cs" line="191" column="1" />
       <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/MonoTouch/Pubnub-Messaging/Pubnub-Messaging.Tests/WhenAClientIsPresented.cs" line="43" column="1" />
-      <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/mono-mac/3.4/PubNub-Messaging/PubNub-Console/Pubnub.cs" line="1125" column="19" />
+      <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/mono-mac/3.4/PubNub-Messaging/PubNub-Console/Pubnub.cs" line="3261" column="1" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches>

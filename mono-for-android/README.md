@@ -21,7 +21,7 @@ Limitations of JsonFx: JsonFx doesn't support the serialization for type XmlDocu
 To use Newtonsoft.Json you need not specify any pre-compiler directive. This is the used as the default serialization library. You need to REMOVE the reference of JsonFx from the project and retain the reference of Newtonsoft.Json
 Limitations of Newtonsoft.Json: Newtonsoft.Json doesn't support the serialization for type XmlDocument on this platform.
 
-Inbuilt .net serialization is activated by using the pre-compiler directive USE_DOTNET_SERIALIZATION. The use of this library is NOT recommended for pubnub client created on mono platform as this causes issues in "talking" to pubub clients developed for other platforms.
+System.Runtime.Serialization.Json/System.Web.Script.Serialization libraries are activated  by using the pre-compiler directive USE_DOTNET_SERIALIZATION. The use of this library is NOT recommended for pubnub client created on mono platform as this causes issues in "talking" to pubnub clients developed for other platforms.
 
 Dev environment setup:
 - MAC OS X 10.7.5 (Lion)

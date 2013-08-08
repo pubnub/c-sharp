@@ -1,20 +1,18 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhone.6.1" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Pubnub-Messaging.Tests/Common.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Pubnub-Messaging/Pubnub.cs">
     <Files>
-      <File FileName="Pubnub-Messaging.Tests/PubnubUnitTest.cs" Line="109" Column="15" />
-      <File FileName="Pubnub-Messaging/Pubnub.cs" Line="599" Column="5" />
-      <File FileName="Pubnub-Messaging.Tests/Common.cs" Line="6" Column="18" />
+      <File FileName="Pubnub-Messaging/Pubnub.cs" Line="11" Column="7" />
+      <File FileName="Pubnub-Messaging.Tests/Common.cs" Line="1" Column="1" />
+      <File FileName="Pubnub-Messaging.Tests/PubnubUnitTest.cs" Line="128" Column="41" />
+      <File FileName="../../mono-mac/3.4/PubNub-Messaging/PubNub-Console/Pubnub.cs" Line="10" Column="44" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
-          <Node name="Pubnub-Messaging" expanded="True">
+          <Node name="Pubnub-Messaging" expanded="True" />
+          <Node name="Pubnub-Messaging.Tests" expanded="True" selected="True">
             <Node name="References" expanded="True" />
-          </Node>
-          <Node name="Pubnub-Messaging.Tests" expanded="True">
-            <Node name="References" expanded="True" />
-            <Node name="Common.cs" selected="True" />
           </Node>
         </State>
       </Pad>
