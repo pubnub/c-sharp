@@ -24,7 +24,7 @@
     android:maxWidth="350dp"
     android:layout_marginRight="8dp"
     android:singleLine="true"
-	  android:gravity="center_vertical"
+      android:gravity="center_vertical"
     android:text="Value"
     android:textAppearance="?android:attr/textAppearanceLarge"
     />

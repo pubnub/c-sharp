@@ -31,14 +31,14 @@ namespace PubNubMessaging.Tests
       pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested" ,"ItShouldReturnDetailedHistory");
       
       //publish a test message. 
-      pubnub.Publish(channel, message, common.DisplayReturnMessage);
+      pubnub.Publish(channel, message, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
-      while (!common.DeliveryStatus); 
+      common.WaitForResponse();
 
       common.DeliveryStatus = false;
       common.Response = null;
-      pubnub.DetailedHistory(channel, 1, common.DisplayReturnMessage);
-      while (!common.DeliveryStatus);
+      pubnub.DetailedHistory(channel, 1, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+      common.WaitForResponse();
 
       ParseResponse(common.Response, 0, 0, message);
     }
@@ -53,9 +53,9 @@ namespace PubNubMessaging.Tests
       {
         common.DeliveryStatus = false;
         string msg = i.ToString();
-        pubnub.Publish(channel, msg, common.DisplayReturnMessage);
+        pubnub.Publish(channel, msg, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-        while (!common.DeliveryStatus) ;
+        common.WaitForResponse();
 
         Console.WriteLine("Message # " + i.ToString() + " published");
       }
@@ -149,9 +149,9 @@ namespace PubNubMessaging.Tests
       common.Response = null;
       Console.WriteLine("DetailedHistory with start & end");
       
-      pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage);
+      pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
-      while (!common.DeliveryStatus) ;
+      common.WaitForResponse();
       
       Console.WriteLine("DetailedHistory with start & reverse = true");
       
@@ -161,9 +161,9 @@ namespace PubNubMessaging.Tests
       
       common.DeliveryStatus = false;
       common.Response = null;
-      pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage);
+      pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
-      while (!common.DeliveryStatus) ;
+      common.WaitForResponse();
       
       Console.WriteLine("DetailedHistory with start & reverse = false");
       
@@ -173,9 +173,9 @@ namespace PubNubMessaging.Tests
       
       common.DeliveryStatus = false;
       common.Response = null;
-      pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage);
+      pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
-      while (!common.DeliveryStatus) ;
+      common.WaitForResponse();
       
       Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
       
@@ -216,9 +216,9 @@ namespace PubNubMessaging.Tests
       common.Response = null;
       Console.WriteLine("DetailedHistory with start & end");
 
-      pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage);
+      pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
-      while (!common.DeliveryStatus) ;
+      common.WaitForResponse();
       
       Console.WriteLine("DetailedHistory with start & reverse = true");
 
@@ -228,9 +228,9 @@ namespace PubNubMessaging.Tests
       
       common.DeliveryStatus = false;
       common.Response = null;
-      pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage);
+      pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
-      while (!common.DeliveryStatus) ;
+      common.WaitForResponse();
       
       Console.WriteLine("DetailedHistory with start & reverse = false");
 
@@ -240,9 +240,9 @@ namespace PubNubMessaging.Tests
       
       common.DeliveryStatus = false;
       common.Response = null;
-      pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage);
+      pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
-      while (!common.DeliveryStatus) ;
+      common.WaitForResponse();
 
       Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
 
@@ -276,15 +276,15 @@ namespace PubNubMessaging.Tests
       SendMultipleIntMessages(totalMessages/2, totalMessages, channel, pubnub);
 
       long endtime = common.Timestamp(pubnub);
-      while (!common.DeliveryStatus) ;
+      common.WaitForResponse();
       
       pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestUnencryptedDetailedHistory");
 
       common.DeliveryStatus = false;
       common.Response = null;
       
-      pubnub.DetailedHistory(channel, totalMessages, common.DisplayReturnMessage);
-      while (!common.DeliveryStatus) ;
+      pubnub.DetailedHistory(channel, totalMessages, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+      common.WaitForResponse();
       
       Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
 
@@ -317,16 +317,16 @@ namespace PubNubMessaging.Tests
       SendMultipleIntMessages(totalMessages, totalMessages/2, channel, pubnub);
 
       long endtime = common.Timestamp(pubnub);
-      while (!common.DeliveryStatus) ;
+      common.WaitForResponse();
       
       pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestEncryptedDetailedHistory");
       
       common.Response = null;
       common.DeliveryStatus = false;
 
-      pubnub.DetailedHistory(channel, totalMessages, common.DisplayReturnMessage);
+      pubnub.DetailedHistory(channel, totalMessages, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-      while (!common.DeliveryStatus) ;
+      common.WaitForResponse();
       Console.WriteLine("\n*********** DetailedHistory Messages Received*********** ");
 
       ParseResponse(common.Response, 0, totalMessages, "");
@@ -349,17 +349,17 @@ namespace PubNubMessaging.Tests
       common.DeliveryStatus = false;
       common.Response = null;
       
-      pubnub.Publish(channel, message, common.DisplayReturnMessage);
-      while (!common.DeliveryStatus) ;
+      pubnub.Publish(channel, message, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+      common.WaitForResponse();
       
       pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "DetailHistoryCount10ReturnsRecords");
       
       common.DeliveryStatus = false;
       common.Response = null;
       
-      pubnub.DetailedHistory(channel, 10, common.DisplayReturnMessage);
+      pubnub.DetailedHistory(channel, 10, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-      while (!common.DeliveryStatus) ;
+      common.WaitForResponse();
       Console.WriteLine("\n*********** DetailedHistory Messages Received*********** ");
 
       ParseResponse(common.Response, 0,  0, "");
@@ -382,17 +382,17 @@ namespace PubNubMessaging.Tests
       common.DeliveryStatus = false;
       common.Response = null;
       
-      pubnub.Publish(channel, message, common.DisplayReturnMessage);
-      while (!common.DeliveryStatus) ;
+      pubnub.Publish(channel, message, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+      common.WaitForResponse();
 
       pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "DetailedHistoryDecryptedExample");
 
       common.DeliveryStatus = false;
       common.Response = null;
 
-      pubnub.DetailedHistory(channel, 1, common.DisplayReturnMessage);
+      pubnub.DetailedHistory(channel, 1, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-      while (!common.DeliveryStatus) ;
+      common.WaitForResponse();
       Console.WriteLine("\n*********** DetailedHistory Messages Received*********** ");
 
       ParseResponse(common.Response, 0, 0, message);
@@ -432,9 +432,9 @@ namespace PubNubMessaging.Tests
       common.Response = null;
       Console.WriteLine("DetailedHistory with start & end");
       
-      pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage);
+      pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
-      while (!common.DeliveryStatus) ;
+      common.WaitForResponse();
       
       Console.WriteLine("DetailedHistory with start & reverse = true");
       
@@ -444,9 +444,9 @@ namespace PubNubMessaging.Tests
       
       common.DeliveryStatus = false;
       common.Response = null;
-      pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage);
+      pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
-      while (!common.DeliveryStatus) ;
+      common.WaitForResponse();
       
       Console.WriteLine("DetailedHistory with start & reverse = false");
       
@@ -456,9 +456,9 @@ namespace PubNubMessaging.Tests
       
       common.DeliveryStatus = false;
       common.Response = null;
-      pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage);
+      pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
-      while (!common.DeliveryStatus) ;
+      common.WaitForResponse();
       
       Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
       
@@ -500,9 +500,9 @@ namespace PubNubMessaging.Tests
       common.Response = null;
       Console.WriteLine("DetailedHistory with start & end");
       
-      pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage);
+      pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
-      while (!common.DeliveryStatus) ;
+      common.WaitForResponse();
       
       Console.WriteLine("DetailedHistory with start & reverse = true");
       
@@ -512,9 +512,9 @@ namespace PubNubMessaging.Tests
       
       common.DeliveryStatus = false;
       common.Response = null;
-      pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage);
+      pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
-      while (!common.DeliveryStatus) ;
+      common.WaitForResponse();
       
       Console.WriteLine("DetailedHistory with start & reverse = false");
       
@@ -524,9 +524,9 @@ namespace PubNubMessaging.Tests
       
       common.DeliveryStatus = false;
       common.Response = null;
-      pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage);
+      pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
-      while (!common.DeliveryStatus) ;
+      common.WaitForResponse();
       
       Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
       

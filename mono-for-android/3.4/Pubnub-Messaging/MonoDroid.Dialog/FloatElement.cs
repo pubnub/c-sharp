@@ -8,12 +8,12 @@ using Android.Widget;
 namespace MonoDroid.Dialog
 {
     public class FloatElement : Element, SeekBar.IOnSeekBarChangeListener
-	{
-		public bool ShowCaption;
-		public int Value;
-		public int MinValue, MaxValue;
-	    public Bitmap Left;
-	    public Bitmap Right;
+    {
+        public bool ShowCaption;
+        public int Value;
+        public int MinValue, MaxValue;
+        public Bitmap Left;
+        public Bitmap Right;
 
         public FloatElement(string caption)
             : this(caption, (int)DroidResources.ElementLayout.dialog_floatimage)

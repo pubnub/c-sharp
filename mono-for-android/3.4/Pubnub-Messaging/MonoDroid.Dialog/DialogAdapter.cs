@@ -5,67 +5,67 @@ using System;
 
 namespace MonoDroid.Dialog
 {
-	public class DialogAdapter : BaseAdapter<Section>
-	{
-		const int TYPE_SECTION_HEADER = 0;
+    public class DialogAdapter : BaseAdapter<Section>
+    {
+        const int TYPE_SECTION_HEADER = 0;
 
-		Context context;
-		LayoutInflater inflater;
+        Context context;
+        LayoutInflater inflater;
 
-		public DialogAdapter(Context context, RootElement root)
-		{
-			this.context = context;
-			this.inflater = LayoutInflater.From(context);
-			this.Root = root;			
-		}
+        public DialogAdapter(Context context, RootElement root)
+        {
+            this.context = context;
+            this.inflater = LayoutInflater.From(context);
+            this.Root = root;            
+        }
 
-		public RootElement Root { get; set; }
+        public RootElement Root { get; set; }
 
-		public override bool IsEnabled(int position)
-		{
-			// start counting from here
-			int typeOffset = TYPE_SECTION_HEADER;
+        public override bool IsEnabled(int position)
+        {
+            // start counting from here
+            int typeOffset = TYPE_SECTION_HEADER;
 
-			foreach (var s in Root.Sections)
-			{
-				if (position == 0)
-					return false;
+            foreach (var s in Root.Sections)
+            {
+                if (position == 0)
+                    return false;
 
-				int size = s.Adapter.Count + 1;
+                int size = s.Adapter.Count + 1;
 
-				if (position < size)
-					return true;
+                if (position < size)
+                    return true;
 
-				position -= size;
-				typeOffset += s.Adapter.ViewTypeCount;
-			}
+                position -= size;
+                typeOffset += s.Adapter.ViewTypeCount;
+            }
 
-			return false;
-		}
+            return false;
+        }
 
-		public override int Count
-		{
-			get
-			{
-				int count = 0;
+        public override int Count
+        {
+            get
+            {
+                int count = 0;
 
-				//Get each adapter's count + 1 for the header
-				foreach (var s in Root.Sections)
-					count += s.Adapter.Count + 1;
+                //Get each adapter's count + 1 for the header
+                foreach (var s in Root.Sections)
+                    count += s.Adapter.Count + 1;
 
                 return count;
-			}
-		}
+            }
+        }
 
-		public override int ViewTypeCount
-		{
-			get
-			{
+        public override int ViewTypeCount
+        {
+            get
+            {
                 // ViewTypeCount is the same as Count for these,
                 // there are as many ViewTypes as Views as everyone is unique!
                 return Count;
-			}
-		}
+            }
+        }
 
         public Element ElementAtIndex(int position)
         {
@@ -87,85 +87,85 @@ namespace MonoDroid.Dialog
             return null;
         }
 
-		public override Section this[int position]
-		{
-			get { return this.Root.Sections[position]; }
-		}
+        public override Section this[int position]
+        {
+            get { return this.Root.Sections[position]; }
+        }
 
-		public override bool AreAllItemsEnabled()
-		{
-			return false;
-		}
+        public override bool AreAllItemsEnabled()
+        {
+            return false;
+        }
 
-		public override int GetItemViewType(int position)
-		{
-			try {
+        public override int GetItemViewType(int position)
+        {
+            try {
 
-				// start counting from here
-				int typeOffset = TYPE_SECTION_HEADER;
+                // start counting from here
+                int typeOffset = TYPE_SECTION_HEADER;
 
-				foreach (var s in Root.Sections)
-				{
-					if (position == 0)
-						return (TYPE_SECTION_HEADER);
+                foreach (var s in Root.Sections)
+                {
+                    if (position == 0)
+                        return (TYPE_SECTION_HEADER);
 
-					int size = s.Adapter.Count + 1;
+                    int size = s.Adapter.Count + 1;
 
-					if (position < size)
-						return (typeOffset + s.Adapter.GetItemViewType(position - 1));
+                    if (position < size)
+                        return (typeOffset + s.Adapter.GetItemViewType(position - 1));
 
-					position -= size;
-					typeOffset += s.Adapter.ViewTypeCount;
-				}
+                    position -= size;
+                    typeOffset += s.Adapter.ViewTypeCount;
+                }
 
-				return -1;
-			} 
-			catch (System.Exception ex) {
-				Console.WriteLine ( "Breaking : " + ex.Message );
-				return -1;
-			}
-		}
+                return -1;
+            } 
+            catch (System.Exception ex) {
+                Console.WriteLine ( "Breaking : " + ex.Message );
+                return -1;
+            }
+        }
 
-		public override long GetItemId(int position)
-		{
+        public override long GetItemId(int position)
+        {
             return position;
-		}
+        }
 
-		public override View GetView(int position, View convertView, ViewGroup parent)
-		{
-			try {
-	            int sectionIndex = 0;
+        public override View GetView(int position, View convertView, ViewGroup parent)
+        {
+            try {
+                int sectionIndex = 0;
 
-				foreach (var s in Root.Sections)
-				{
-					if (s.Adapter.Context == null)
-						s.Adapter.Context = this.context;
+                foreach (var s in Root.Sections)
+                {
+                    if (s.Adapter.Context == null)
+                        s.Adapter.Context = this.context;
 
-					if (position == 0)
-						return s.GetView(context, convertView, parent);
+                    if (position == 0)
+                        return s.GetView(context, convertView, parent);
 
-					int size = s.Adapter.Count + 1;
+                    int size = s.Adapter.Count + 1;
 
-					if (position < size)
-						return (s.Adapter.GetView(position - 1, convertView, parent));
+                    if (position < size)
+                        return (s.Adapter.GetView(position - 1, convertView, parent));
 
-					position -= size;
-					sectionIndex++;
-				}
+                    position -= size;
+                    sectionIndex++;
+                }
 
-				return null;
-			}
-			catch (System.Exception ex) {
-				Console.WriteLine ( "Breaking : " + ex.Message );
-				return null;
-			}
-		}
-		
-		public void ReloadData()
-		{
-			if(Root != null) {
-				this.NotifyDataSetChanged();
-			}
-		}
-	}
+                return null;
+            }
+            catch (System.Exception ex) {
+                Console.WriteLine ( "Breaking : " + ex.Message );
+                return null;
+            }
+        }
+        
+        public void ReloadData()
+        {
+            if(Root != null) {
+                this.NotifyDataSetChanged();
+            }
+        }
+    }
 }

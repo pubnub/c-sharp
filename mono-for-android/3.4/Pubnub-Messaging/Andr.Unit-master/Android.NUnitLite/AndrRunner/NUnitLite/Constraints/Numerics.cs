@@ -25,63 +25,63 @@ using System;
 
 namespace NUnit.Framework.Constraints
 {
-	/// <summary>
-	/// The Numerics class contains common operations on numeric values.
-	/// </summary>
-	public class Numerics
-	{
-		#region Numeric Type Recognition
-		/// <summary>
-		/// Checks the type of the object, returning true if
-		/// the object is a numeric type.
-		/// </summary>
-		/// <param name="obj">The object to check</param>
-		/// <returns>true if the object is a numeric type</returns>
-		public static bool IsNumericType(Object obj)
-		{
-			return IsFloatingPointNumeric( obj ) || IsFixedPointNumeric( obj );
-		}
+    /// <summary>
+    /// The Numerics class contains common operations on numeric values.
+    /// </summary>
+    public class Numerics
+    {
+        #region Numeric Type Recognition
+        /// <summary>
+        /// Checks the type of the object, returning true if
+        /// the object is a numeric type.
+        /// </summary>
+        /// <param name="obj">The object to check</param>
+        /// <returns>true if the object is a numeric type</returns>
+        public static bool IsNumericType(Object obj)
+        {
+            return IsFloatingPointNumeric( obj ) || IsFixedPointNumeric( obj );
+        }
 
-		/// <summary>
-		/// Checks the type of the object, returning true if
-		/// the object is a floating point numeric type.
-		/// </summary>
-		/// <param name="obj">The object to check</param>
-		/// <returns>true if the object is a floating point numeric type</returns>
-		public static bool IsFloatingPointNumeric(Object obj)
-		{
-			if (null != obj)
-			{
-				if (obj is System.Double) return true;
-				if (obj is System.Single) return true;
-			}
-			return false;
-		}
-		/// <summary>
-		/// Checks the type of the object, returning true if
-		/// the object is a fixed point numeric type.
-		/// </summary>
-		/// <param name="obj">The object to check</param>
-		/// <returns>true if the object is a fixed point numeric type</returns>
-		public static bool IsFixedPointNumeric(Object obj)
-		{
-			if (null != obj)
-			{
-				if (obj is System.Byte) return true;
-				if (obj is System.SByte) return true;
-				if (obj is System.Decimal) return true;
-				if (obj is System.Int32) return true;
-				if (obj is System.UInt32) return true;
-				if (obj is System.Int64) return true;
-				if (obj is System.UInt64) return true;
-				if (obj is System.Int16) return true;
-				if (obj is System.UInt16) return true;
-			}
-			return false;
-		}
-		#endregion
+        /// <summary>
+        /// Checks the type of the object, returning true if
+        /// the object is a floating point numeric type.
+        /// </summary>
+        /// <param name="obj">The object to check</param>
+        /// <returns>true if the object is a floating point numeric type</returns>
+        public static bool IsFloatingPointNumeric(Object obj)
+        {
+            if (null != obj)
+            {
+                if (obj is System.Double) return true;
+                if (obj is System.Single) return true;
+            }
+            return false;
+        }
+        /// <summary>
+        /// Checks the type of the object, returning true if
+        /// the object is a fixed point numeric type.
+        /// </summary>
+        /// <param name="obj">The object to check</param>
+        /// <returns>true if the object is a fixed point numeric type</returns>
+        public static bool IsFixedPointNumeric(Object obj)
+        {
+            if (null != obj)
+            {
+                if (obj is System.Byte) return true;
+                if (obj is System.SByte) return true;
+                if (obj is System.Decimal) return true;
+                if (obj is System.Int32) return true;
+                if (obj is System.UInt32) return true;
+                if (obj is System.Int64) return true;
+                if (obj is System.UInt64) return true;
+                if (obj is System.Int16) return true;
+                if (obj is System.UInt16) return true;
+            }
+            return false;
+        }
+        #endregion
 
-		#region Numeric Equality
+        #region Numeric Equality
         /// <summary>
         /// Test two numeric values for equality, performing the usual numeric 
         /// conversions and using a provided or default tolerance. If the tolerance 
@@ -91,8 +91,8 @@ namespace NUnit.Framework.Constraints
         /// <param name="actual">The actual value</param>
         /// <param name="tolerance">A reference to the tolerance in effect</param>
         /// <returns>True if the values are equal</returns>
-		public static bool AreEqual( object expected, object actual, ref Tolerance tolerance )
-		{
+        public static bool AreEqual( object expected, object actual, ref Tolerance tolerance )
+        {
             if ( expected is double || actual is double )
                 return AreEqual( Convert.ToDouble(expected), Convert.ToDouble(actual), ref tolerance );
 
@@ -102,23 +102,23 @@ namespace NUnit.Framework.Constraints
             if (tolerance.Mode == ToleranceMode.Ulps)
                 throw new InvalidOperationException("Ulps may only be specified for floating point arguments");
 
-			if ( expected is decimal || actual is decimal )
-				return AreEqual( Convert.ToDecimal(expected), Convert.ToDecimal(actual), tolerance );
+            if ( expected is decimal || actual is decimal )
+                return AreEqual( Convert.ToDecimal(expected), Convert.ToDecimal(actual), tolerance );
 
             if (expected is ulong || actual is ulong)
                 return AreEqual(Convert.ToUInt64(expected), Convert.ToUInt64(actual), tolerance );
-		
-			if ( expected is long || actual is long )
-				return AreEqual( Convert.ToInt64(expected), Convert.ToInt64(actual), tolerance );
-			
-			if ( expected is uint || actual is uint )
-				return AreEqual( Convert.ToUInt32(expected), Convert.ToUInt32(actual), tolerance );
+        
+            if ( expected is long || actual is long )
+                return AreEqual( Convert.ToInt64(expected), Convert.ToInt64(actual), tolerance );
+            
+            if ( expected is uint || actual is uint )
+                return AreEqual( Convert.ToUInt32(expected), Convert.ToUInt32(actual), tolerance );
 
-			return AreEqual( Convert.ToInt32(expected), Convert.ToInt32(actual), tolerance );
-		}
+            return AreEqual( Convert.ToInt32(expected), Convert.ToInt32(actual), tolerance );
+        }
 
         private static bool AreEqual( double expected, double actual, ref Tolerance tolerance )
-		{
+        {
             if (double.IsNaN(expected) && double.IsNaN(actual))
                 return true;
 
@@ -159,7 +159,7 @@ namespace NUnit.Framework.Constraints
         }
 
         private static bool AreEqual( float expected, float actual, ref Tolerance tolerance )
-		{
+        {
             if ( float.IsNaN(expected) && float.IsNaN(actual) )
                 return true;
 
@@ -195,7 +195,7 @@ namespace NUnit.Framework.Constraints
                 default:
                     throw new ArgumentException("Unknown tolerance mode specified", "mode");
             }
-		}
+        }
 
 
         private static bool AreEqual( decimal expected, decimal actual, Tolerance tolerance )
@@ -209,8 +209,8 @@ namespace NUnit.Framework.Constraints
                     decimal decimalTolerance = Convert.ToDecimal(tolerance.Value);
                     if(decimalTolerance > 0m)
                       return Math.Abs(expected - actual) <= decimalTolerance;
-				
-			        return expected.Equals( actual );
+                
+                    return expected.Equals( actual );
 
                 case ToleranceMode.Percent:
                     if(expected == 0m)
@@ -225,8 +225,8 @@ namespace NUnit.Framework.Constraints
             }
         }
 
-		private static bool AreEqual( ulong expected, ulong actual, Tolerance tolerance )
-		{
+        private static bool AreEqual( ulong expected, ulong actual, Tolerance tolerance )
+        {
             switch (tolerance.Mode)
             {
                 case ToleranceMode.None:
@@ -235,12 +235,12 @@ namespace NUnit.Framework.Constraints
                 case ToleranceMode.Linear:
                     ulong ulongTolerance = Convert.ToUInt64(tolerance.Value);
                     if(ulongTolerance > 0ul)
-			        {
-				        ulong diff = expected >= actual ? expected - actual : actual - expected;
+                    {
+                        ulong diff = expected >= actual ? expected - actual : actual - expected;
                         return diff <= ulongTolerance;
-			        }
+                    }
 
-			        return expected.Equals( actual );
+                    return expected.Equals( actual );
 
                 case ToleranceMode.Percent:
                     if (expected == 0ul)
@@ -254,10 +254,10 @@ namespace NUnit.Framework.Constraints
                 default:
                     throw new ArgumentException("Unknown tolerance mode specified", "mode");
             }
-		}
+        }
 
-		private static bool AreEqual( long expected, long actual, Tolerance tolerance )
-		{
+        private static bool AreEqual( long expected, long actual, Tolerance tolerance )
+        {
             switch (tolerance.Mode)
             {
                 case ToleranceMode.None:
@@ -266,9 +266,9 @@ namespace NUnit.Framework.Constraints
                 case ToleranceMode.Linear:
                     long longTolerance = Convert.ToInt64(tolerance.Value);
                     if(longTolerance > 0L)
-				        return Math.Abs(expected - actual) <= longTolerance;
+                        return Math.Abs(expected - actual) <= longTolerance;
 
-			        return expected.Equals( actual );
+                    return expected.Equals( actual );
 
                 case ToleranceMode.Percent:
                     if(expected == 0L)
@@ -281,10 +281,10 @@ namespace NUnit.Framework.Constraints
                 default:
                     throw new ArgumentException("Unknown tolerance mode specified", "mode");
             }
-		}
+        }
 
-		private static bool AreEqual( uint expected, uint actual, Tolerance tolerance )
-		{
+        private static bool AreEqual( uint expected, uint actual, Tolerance tolerance )
+        {
             switch (tolerance.Mode)
             {
                 case ToleranceMode.None:
@@ -293,12 +293,12 @@ namespace NUnit.Framework.Constraints
                 case ToleranceMode.Linear:
                     uint uintTolerance = Convert.ToUInt32(tolerance.Value);
                     if(uintTolerance > 0)
-			        {
-				        uint diff = expected >= actual ? expected - actual : actual - expected;
+                    {
+                        uint diff = expected >= actual ? expected - actual : actual - expected;
                         return diff <= uintTolerance;
-			        }
-				
-			        return expected.Equals( actual );
+                    }
+                
+                    return expected.Equals( actual );
 
                 case ToleranceMode.Percent:
                     if(expected == 0u)
@@ -312,10 +312,10 @@ namespace NUnit.Framework.Constraints
                 default:
                     throw new ArgumentException("Unknown tolerance mode specified", "mode");
             }
-		}
+        }
 
-		private static bool AreEqual( int expected, int actual, Tolerance tolerance )
-		{
+        private static bool AreEqual( int expected, int actual, Tolerance tolerance )
+        {
             switch (tolerance.Mode)
             {
                 case ToleranceMode.None:
@@ -339,42 +339,42 @@ namespace NUnit.Framework.Constraints
                 default:
                     throw new ArgumentException("Unknown tolerance mode specified", "mode");
             }
-		}
-		#endregion
+        }
+        #endregion
 
-		#region Numeric Comparisons 
+        #region Numeric Comparisons 
         /// <summary>
         /// Compare two numeric values, performing the usual numeric conversions.
         /// </summary>
         /// <param name="expected">The expected value</param>
         /// <param name="actual">The actual value</param>
         /// <returns>The relationship of the values to each other</returns>
-		public static int Compare( object expected, object actual )
-		{
-			if( !IsNumericType( expected ) || !IsNumericType( actual ) )
-				throw new ArgumentException( "Both arguments must be numeric");
+        public static int Compare( object expected, object actual )
+        {
+            if( !IsNumericType( expected ) || !IsNumericType( actual ) )
+                throw new ArgumentException( "Both arguments must be numeric");
 
-			if ( IsFloatingPointNumeric(expected) || IsFloatingPointNumeric(actual) )
-				return Convert.ToDouble(expected).CompareTo(Convert.ToDouble(actual));
+            if ( IsFloatingPointNumeric(expected) || IsFloatingPointNumeric(actual) )
+                return Convert.ToDouble(expected).CompareTo(Convert.ToDouble(actual));
 
-			if ( expected is decimal || actual is decimal )
-				return Convert.ToDecimal(expected).CompareTo(Convert.ToDecimal(actual));
-		
-			if ( expected is ulong || actual is ulong )
-				return Convert.ToUInt64(expected).CompareTo(Convert.ToUInt64(actual));
-	
-			if ( expected is long || actual is long )
-				return Convert.ToInt64(expected).CompareTo(Convert.ToInt64(actual));
-		
-			if ( expected is uint || actual is uint )
-				return Convert.ToUInt32(expected).CompareTo(Convert.ToUInt32(actual));
+            if ( expected is decimal || actual is decimal )
+                return Convert.ToDecimal(expected).CompareTo(Convert.ToDecimal(actual));
+        
+            if ( expected is ulong || actual is ulong )
+                return Convert.ToUInt64(expected).CompareTo(Convert.ToUInt64(actual));
+    
+            if ( expected is long || actual is long )
+                return Convert.ToInt64(expected).CompareTo(Convert.ToInt64(actual));
+        
+            if ( expected is uint || actual is uint )
+                return Convert.ToUInt32(expected).CompareTo(Convert.ToUInt32(actual));
 
-			return Convert.ToInt32(expected).CompareTo(Convert.ToInt32(actual));
+            return Convert.ToInt32(expected).CompareTo(Convert.ToInt32(actual));
         }
-		#endregion
+        #endregion
 
-		private Numerics()
-		{
-		}
-	}
+        private Numerics()
+        {
+        }
+    }
 }

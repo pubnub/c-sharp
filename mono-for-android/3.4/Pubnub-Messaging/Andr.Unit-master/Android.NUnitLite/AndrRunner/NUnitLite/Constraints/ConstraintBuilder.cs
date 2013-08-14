@@ -48,7 +48,7 @@ namespace NUnit.Framework.Constraints
 #if NET_2_0
             private Stack<ConstraintOperator> stack = new Stack<ConstraintOperator>();
 #else
-		    private Stack stack = new Stack();
+            private Stack stack = new Stack();
 #endif
             /// <summary>
             /// Initializes a new instance of the <see cref="T:OperatorStack"/> class.
@@ -105,7 +105,7 @@ namespace NUnit.Framework.Constraints
 #if NET_2_0
             private Stack<Constraint> stack = new Stack<Constraint>();
 #else
-		    private Stack stack = new Stack();
+            private Stack stack = new Stack();
 #endif
             private ConstraintBuilder builder;
 
@@ -187,7 +187,7 @@ namespace NUnit.Framework.Constraints
         /// Gets a value indicating whether this instance is resolvable.
         /// </summary>
         /// <value>
-        /// 	<c>true</c> if this instance is resolvable; otherwise, <c>false</c>.
+        ///     <c>true</c> if this instance is resolvable; otherwise, <c>false</c>.
         /// </value>
         public bool IsResolvable
         {

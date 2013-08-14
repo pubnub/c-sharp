@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +13,7 @@ namespace PubNubMessaging.Core
         
         static public bool deliveryStatus = false;
         static public string channel = "";
+		static public bool showErrorCallbackMessages = true;
         
         static public void Main()
         {
@@ -225,6 +226,22 @@ namespace PubNubMessaging.Core
             }
             Console.WriteLine();
             
+			Console.WriteLine("Display ErrorCallback messages? Enter Y for Yes, Else N for No.");
+			Console.WriteLine("Default = Y  ");
+			string displayErrMessage = Console.ReadLine();
+			Console.ForegroundColor = ConsoleColor.Blue;
+			if (displayErrMessage.Trim().ToLower() == "n" )
+			{
+				showErrorCallbackMessages = false;
+				Console.WriteLine("ErrorCallback messages will NOT be displayed.");
+			}
+			else
+			{
+				showErrorCallbackMessages = true;
+				Console.WriteLine("ErrorCallback messages will  be displayed");
+			}
+			Console.ResetColor();
+			Console.WriteLine();
             
             Console.WriteLine("ENTER 1 FOR Subscribe");
             Console.WriteLine("ENTER 2 FOR Publish");
@@ -262,7 +279,7 @@ namespace PubNubMessaging.Core
                     Console.WriteLine();
                     
                     Console.WriteLine("Running subscribe()");
-                    pubnub.Subscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage);
+					pubnub.Subscribe<string>(channel, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeErrorMessage);
                     
                     break;
                 case "2":
@@ -282,11 +299,11 @@ namespace PubNubMessaging.Core
                     int intData;
                     if (int.TryParse(publishMsg, out intData)) //capture numeric data
                     {
-                        pubnub.Publish<string>(channel, intData, DisplayReturnMessage);
+                        pubnub.Publish<string>(channel, intData, DisplayReturnMessage, DisplayErrorMessage);
                     }
                     else if (double.TryParse(publishMsg, out doubleData)) //capture numeric data
                     {
-                        pubnub.Publish<string>(channel, doubleData, DisplayReturnMessage);
+                        pubnub.Publish<string>(channel, doubleData, DisplayReturnMessage, DisplayErrorMessage);
                     }
                     else
                     {
@@ -296,20 +313,20 @@ namespace PubNubMessaging.Core
                             string strMsg = publishMsg.Substring(1, publishMsg.Length - 2);
                             if (int.TryParse(strMsg, out intData))
                             {
-                                pubnub.Publish<string>(channel, strMsg, DisplayReturnMessage);
+                                pubnub.Publish<string>(channel, strMsg, DisplayReturnMessage, DisplayErrorMessage);
                             }
                             else if (double.TryParse(strMsg, out doubleData))
                             {
-                                pubnub.Publish<string>(channel, strMsg, DisplayReturnMessage);
+                                pubnub.Publish<string>(channel, strMsg, DisplayReturnMessage, DisplayErrorMessage);
                             }
                             else
                             {
-                                pubnub.Publish<string>(channel, publishMsg, DisplayReturnMessage);
+                                pubnub.Publish<string>(channel, publishMsg, DisplayReturnMessage, DisplayErrorMessage);
                             }
                         }
                         else
                         {
-                            pubnub.Publish<string>(channel, publishMsg, DisplayReturnMessage);
+                            pubnub.Publish<string>(channel, publishMsg, DisplayReturnMessage, DisplayErrorMessage);
                         }
                     }
                     break;
@@ -323,7 +340,7 @@ namespace PubNubMessaging.Core
                     Console.WriteLine();
                     
                     Console.WriteLine("Running presence()");
-                    pubnub.Presence<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage);
+					pubnub.Presence<string>(channel, DisplayPresenceReturnMessage, DisplayPresenceConnectStatusMessage, DisplayPresenceErrorMessage);
                     
                     break;
                 case "4":
@@ -336,7 +353,7 @@ namespace PubNubMessaging.Core
                     Console.WriteLine();
                     
                     Console.WriteLine("Running detailed history()");
-                    pubnub.DetailedHistory<string>(channel, 100, DisplayReturnMessage);
+                    pubnub.DetailedHistory<string>(channel, 100, DisplayReturnMessage, DisplayErrorMessage);
                     break;
                 case "5":
                     Console.WriteLine("Enter CHANNEL name for HereNow");
@@ -348,7 +365,7 @@ namespace PubNubMessaging.Core
                     Console.WriteLine();
                     
                     Console.WriteLine("Running Here_Now()");
-                    pubnub.HereNow<string>(channel, DisplayReturnMessage);
+                    pubnub.HereNow<string>(channel, DisplayReturnMessage, DisplayErrorMessage);
                     break;
                 case "6":
                     Console.WriteLine("Enter CHANNEL name for Unsubscribe. Use comma to enter multiple channels.");
@@ -360,7 +377,7 @@ namespace PubNubMessaging.Core
                     Console.WriteLine();
                     
                     Console.WriteLine("Running unsubscribe()");
-                    pubnub.Unsubscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayDisconnectStatusMessage);
+					pubnub.Unsubscribe<string>(channel, DisplayReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeDisconnectStatusMessage, DisplayErrorMessage);
                     break;
                 case "7":
                     Console.WriteLine("Enter CHANNEL name for Presence Unsubscribe. Use comma to enter multiple channels.");
@@ -372,11 +389,11 @@ namespace PubNubMessaging.Core
                     Console.WriteLine();
                     
                     Console.WriteLine("Running presence-unsubscribe()");
-                    pubnub.PresenceUnsubscribe<string>(channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayDisconnectStatusMessage);
+					pubnub.PresenceUnsubscribe<string>(channel, DisplayReturnMessage, DisplayPresenceConnectStatusMessage, DisplayPresenceDisconnectStatusMessage, DisplayErrorMessage);
                     break;
                 case "8":
                     Console.WriteLine("Running time()");
-                    pubnub.Time<string>(DisplayReturnMessage);
+                    pubnub.Time<string>(DisplayReturnMessage, DisplayErrorMessage);
                     break;
                 case "9":
                     Console.WriteLine("Running Disconnect/auto-Reconnect Subscriber Request Connection");
@@ -418,19 +435,113 @@ namespace PubNubMessaging.Core
         {
             Console.WriteLine(result);
         }
-        
-        /// <summary>
-        /// Callback method to provide the connect status of Subscribe call
-        /// </summary>
-        /// <param name="result"></param>
-        static void DisplayConnectStatusMessage(string result)
-        {
-            Console.WriteLine(result);
-        }
-        
-        static void DisplayDisconnectStatusMessage(string result)
-        {
-            Console.WriteLine(result);
-        }
+
+
+		/// <summary>
+		/// Callback method captures the response in JSON string format for Subscribe
+		/// </summary>
+		/// <param name="result"></param>
+		static void DisplaySubscribeReturnMessage(string result)
+		{
+			Console.WriteLine("SUBSCRIBE REGULAR CALLBACK:");
+			Console.WriteLine(result);
+			Console.WriteLine();
+		}
+
+		/// <summary>
+		/// Callback method captures the response in JSON string format for Presence
+		/// </summary>
+		/// <param name="result"></param>
+		static void DisplayPresenceReturnMessage(string result)
+		{
+			Console.WriteLine("PRESENCE REGULAR CALLBACK:");
+			Console.WriteLine(result);
+			Console.WriteLine();
+		}
+
+		/// <summary>
+		/// Callback method to provide the connect status of Subscribe call
+		/// </summary>
+		/// <param name="result"></param>
+		static void DisplaySubscribeConnectStatusMessage(string result)
+		{
+			Console.WriteLine("SUBSCRIBE CONNECT CALLBACK:");
+			Console.WriteLine(result);
+			Console.WriteLine();
+		}
+
+		/// <summary>
+		/// Callback method to provide the connect status of Presence call
+		/// </summary>
+		/// <param name="result"></param>
+		static void DisplayPresenceConnectStatusMessage(string result)
+		{
+			Console.WriteLine("PRESENCE CONNECT CALLBACK:");
+			Console.WriteLine(result);
+			Console.WriteLine();
+		}
+
+		/// <summary>
+		/// Displays the subscribe disconnect status message.
+		/// </summary>
+		/// <param name="result">Result.</param>
+		static void DisplaySubscribeDisconnectStatusMessage(string result)
+		{
+			Console.WriteLine("SUBSCRIBE DISCONNECT CALLBACK:");
+			Console.WriteLine(result);
+			Console.WriteLine();
+		}
+
+		/// <summary>
+		/// Displays the presence disconnect status message.
+		/// </summary>
+		/// <param name="result">Result.</param>
+		static void DisplayPresenceDisconnectStatusMessage(string result)
+		{
+			Console.WriteLine("PRESENCE DISCONNECT CALLBACK:");
+			Console.WriteLine(result);
+			Console.WriteLine();
+		}
+
+		/// <summary>
+		/// Callback method for error messages
+		/// </summary>
+		/// <param name="result"></param>
+		static void DisplayErrorMessage(string result)
+		{
+			if (showErrorCallbackMessages)
+			{
+				Console.Write("ERROR CALLBACK:");
+				Console.WriteLine(result);
+			}
+		}
+
+		/// <summary>
+		/// Displays the subscribe error message.
+		/// </summary>
+		/// <param name="result">Result.</param>
+		static void DisplaySubscribeErrorMessage(string result)
+		{
+			if (showErrorCallbackMessages)
+			{
+				Console.WriteLine("SUBSCRIBE ERROR CALLBACK:");
+				Console.WriteLine(result);
+				Console.WriteLine();
+			}
+		}
+
+		/// <summary>
+		/// Displays the presence error message.
+		/// </summary>
+		/// <param name="result">Result.</param>
+		static void DisplayPresenceErrorMessage(string result)
+		{
+			if (showErrorCallbackMessages)
+			{
+				Console.WriteLine("PRESENCE ERROR CALLBACK:");
+				Console.WriteLine(result);
+				Console.WriteLine();
+			}
+		}
     }
 }

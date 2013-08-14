@@ -16,14 +16,14 @@ namespace MonoDroid.Dialog
         private Dictionary<String, String> _dialogState;
     }
 
-	public class DialogActivity : ListActivity
-	{
-		public RootElement Root { get; set; }
+    public class DialogActivity : ListActivity
+    {
+        public RootElement Root { get; set; }
         private DialogHelper Dialog { get; set; }
-		
-		protected override void OnCreate(Bundle savedInstanceState)
-		{
-			base.OnCreate(savedInstanceState);
+        
+        protected override void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
             Dialog = new DialogHelper(this, this.ListView, this.Root);
 
             if (this.LastNonConfigurationInstance != null)
@@ -36,17 +36,17 @@ namespace MonoDroid.Dialog
         {
             return null;
         }
-		
-		public void ReloadData()
-		{
-			if(Root == null) {
-				return;
-			}
-			
-			this.Dialog.ReloadData();
-			
-			
-		}
-	}
-	
+        
+        public void ReloadData()
+        {
+            if(Root == null) {
+                return;
+            }
+            
+            this.Dialog.ReloadData();
+            
+            
+        }
+    }
+    
 }

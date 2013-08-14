@@ -6,7 +6,7 @@
   android:paddingBottom="8dp"
   >
   <TextView
-  	android:id="@+id/dialog_LabelField"
+      android:id="@+id/dialog_LabelField"
     android:layout_width="wrap_content"
     android:layout_height="fill_parent"
     android:layout_marginLeft="8dp"
@@ -16,8 +16,8 @@
     android:text="Label"
     android:textAppearance="?android:attr/textAppearanceLarge"
     android:gravity="left|center_vertical"
-	  android:layout_weight="1.0"
-	/>
+      android:layout_weight="1.0"
+    />
   <TextView
     android:id="@+id/dialog_ValueField"
     android:layout_width="wrap_content"
@@ -26,7 +26,7 @@
     android:maxWidth="350dp"
     android:text="FieldValue"
     android:singleLine="true"
-	  android:gravity="center_vertical"
+      android:gravity="center_vertical"
     android:textAppearance="?android:attr/textAppearanceLarge"
     android:ellipsize="end"
     />

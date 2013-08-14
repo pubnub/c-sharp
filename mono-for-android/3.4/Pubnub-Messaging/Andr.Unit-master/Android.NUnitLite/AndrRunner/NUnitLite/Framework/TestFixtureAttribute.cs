@@ -23,17 +23,17 @@
 
 namespace NUnit.Framework
 {
-	using System;
+    using System;
 
-	/// <example>
-	/// [TestFixture]
-	/// public class ExampleClass 
-	/// {}
-	/// </example>
-	[AttributeUsage(AttributeTargets.Class, AllowMultiple=true, Inherited=true)]
-	public class TestFixtureAttribute : Attribute
-	{
-		private string description;
+    /// <example>
+    /// [TestFixture]
+    /// public class ExampleClass 
+    /// {}
+    /// </example>
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple=true, Inherited=true)]
+    public class TestFixtureAttribute : Attribute
+    {
+        private string description;
 
         private object[] arguments;
         private bool isIgnored;
@@ -62,14 +62,14 @@ namespace NUnit.Framework
                 : arguments;
         }
 
-		/// <summary>
-		/// Descriptive text for this fixture
-		/// </summary>
-		public string Description
-		{
-			get { return description; }
-			set { description = value; }
-		}
+        /// <summary>
+        /// Descriptive text for this fixture
+        /// </summary>
+        public string Description
+        {
+            get { return description; }
+            set { description = value; }
+        }
 
         /// <summary>
         /// The arguments originally provided to the attribute
@@ -160,5 +160,5 @@ namespace NUnit.Framework
             argsSeparated = true;
         }
 #endif
-	}
+    }
 }

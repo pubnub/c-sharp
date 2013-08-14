@@ -101,7 +101,7 @@ namespace Newtonsoft.Json.Serialization
         new BsonObjectIdConverter()
       };
 #if MONOTOUCH
-		
+        
     private readonly ThreadSafeStore<Type, JsonContract> _typeContractCache;
 #else
     private static Dictionary<ResolverContractKey, JsonContract> _sharedContractCache;
@@ -116,7 +116,7 @@ namespace Newtonsoft.Json.Serialization
     /// This value is determined by the runtime permissions available.
     /// </summary>
     /// <value>
-    /// 	<c>true</c> if using dynamic code generation; otherwise, <c>false</c>.
+    ///     <c>true</c> if using dynamic code generation; otherwise, <c>false</c>.
     /// </value>
     public bool DynamicCodeGeneration
     {
@@ -133,7 +133,7 @@ namespace Newtonsoft.Json.Serialization
     /// Gets or sets a value indicating whether compiler generated members should be serialized.
     /// </summary>
     /// <value>
-    /// 	<c>true</c> if serialized compiler generated members; otherwise, <c>false</c>.
+    ///     <c>true</c> if serialized compiler generated members; otherwise, <c>false</c>.
     /// </value>
     public bool SerializeCompilerGeneratedMembers { get; set; }
 
@@ -158,11 +158,11 @@ namespace Newtonsoft.Json.Serialization
     {
       DefaultMembersSearchFlags = BindingFlags.Public | BindingFlags.Instance;
       _sharedCache = shareCache;
-			
+            
 #if MONOTOUCH
       _typeContractCache = new ThreadSafeStore<Type, JsonContract>(CreateContract);
 #endif
-			
+            
     }
 #if !MONOTOUCH
     private Dictionary<ResolverContractKey, JsonContract> GetCache()
@@ -191,9 +191,9 @@ namespace Newtonsoft.Json.Serialization
     {
       if (type == null)
         throw new ArgumentNullException("type");
-			
+            
 #if MONOTOUCH
-				return _typeContractCache.Get(type);
+                return _typeContractCache.Get(type);
 #else
       JsonContract contract;
       ResolverContractKey key = new ResolverContractKey(GetType(), type);
@@ -204,7 +204,7 @@ namespace Newtonsoft.Json.Serialization
         // avoid the possibility of modifying the cache dictionary while another thread is accessing it
         lock (_typeContractCacheLock)
         {
-          cache = GetCache();	
+          cache = GetCache();    
           Dictionary<ResolverContractKey, JsonContract> updatedCache =
             (cache != null)
               ? new Dictionary<ResolverContractKey, JsonContract>(cache)
@@ -212,7 +212,7 @@ namespace Newtonsoft.Json.Serialization
           updatedCache[key] = contract;
           UpdateCache(updatedCache);
         }
-      }	
+      }    
       
       return contract;
 #endif

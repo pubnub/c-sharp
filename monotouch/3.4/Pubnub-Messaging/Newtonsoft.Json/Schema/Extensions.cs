@@ -43,7 +43,7 @@ namespace Newtonsoft.Json.Schema
     /// <param name="source">The source <see cref="JToken"/> to test.</param>
     /// <param name="schema">The schema to test with.</param>
     /// <returns>
-    /// 	<c>true</c> if the specified <see cref="JToken"/> is valid; otherwise, <c>false</c>.
+    ///     <c>true</c> if the specified <see cref="JToken"/> is valid; otherwise, <c>false</c>.
     /// </returns>
     public static bool IsValid(this JToken source, JsonSchema schema)
     {

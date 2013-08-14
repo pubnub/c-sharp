@@ -131,8 +131,8 @@ namespace NUnitLite
         }
 
 
-	    public void Failure(string message)
-	    {
+        public void Failure(string message)
+        {
                 this.resultState = ResultState.Failure;
                 if (this.message == null || this.message == string.Empty)
                     this.message = message;
@@ -176,7 +176,7 @@ namespace NUnitLite
         {
             if (ex is AssertionException)
 #if NETCF_1_0
-		this.Failure(ex.Message);
+        this.Failure(ex.Message);
 #else
                 this.Failure(ex.Message, StackFilter.Filter(ex.StackTrace));
 #endif
