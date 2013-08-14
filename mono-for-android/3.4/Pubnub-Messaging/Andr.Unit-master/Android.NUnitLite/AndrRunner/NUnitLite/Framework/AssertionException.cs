@@ -23,39 +23,39 @@
 
 namespace NUnit.Framework 
 {
-	using System;
+    using System;
 #if !NETCF
-	using System.Runtime.Serialization;
+    using System.Runtime.Serialization;
 #endif
-	
-	/// <summary>
-	/// Thrown when an assertion failed.
-	/// </summary>
+    
+    /// <summary>
+    /// Thrown when an assertion failed.
+    /// </summary>
 #if !NETCF_1_0
-	[Serializable]
+    [Serializable]
 #endif
-	public class AssertionException : System.Exception
-	{
-		/// <param name="message">The error message that explains 
-		/// the reason for the exception</param>
-		public AssertionException (string message) : base(message) 
-		{}
+    public class AssertionException : System.Exception
+    {
+        /// <param name="message">The error message that explains 
+        /// the reason for the exception</param>
+        public AssertionException (string message) : base(message) 
+        {}
 
-		/// <param name="message">The error message that explains 
-		/// the reason for the exception</param>
-		/// <param name="inner">The exception that caused the 
-		/// current exception</param>
-		public AssertionException(string message, Exception inner) :
-			base(message, inner) 
-		{}
+        /// <param name="message">The error message that explains 
+        /// the reason for the exception</param>
+        /// <param name="inner">The exception that caused the 
+        /// current exception</param>
+        public AssertionException(string message, Exception inner) :
+            base(message, inner) 
+        {}
 
 #if !NETCF
-		/// <summary>
-		/// Serialization Constructor
-		/// </summary>
-		protected AssertionException(SerializationInfo info, 
-			StreamingContext context) : base(info,context)
-		{}
+        /// <summary>
+        /// Serialization Constructor
+        /// </summary>
+        protected AssertionException(SerializationInfo info, 
+            StreamingContext context) : base(info,context)
+        {}
 #endif
-	}
+    }
 }

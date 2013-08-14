@@ -35,13 +35,13 @@ namespace MonoDroid.Dialog
         public DateElement(string caption, DateTime date)
             : base(caption, date)
         {
-			this.Tapped = delegate { EditDate(); };
+            this.Tapped = delegate { EditDate(); };
         }
 
         public DateElement(string caption, DateTime date, int layoutId)
             : base(caption, date, layoutId)
         {
-			this.Tapped = delegate { EditDate(); };
+            this.Tapped = delegate { EditDate(); };
         }
 
         public override string Format(DateTime dt)
@@ -74,13 +74,13 @@ namespace MonoDroid.Dialog
         public TimeElement(string caption, DateTime date)
             : base(caption, date)
         {
-			this.Tapped = delegate { EditDate(); };
+            this.Tapped = delegate { EditDate(); };
         }
 
         public TimeElement(string caption, DateTime date, int layoutId)
             : base(caption, date, layoutId)
         {
-			this.Tapped = delegate { EditDate(); };
+            this.Tapped = delegate { EditDate(); };
         }
 
         public override string Format(DateTime dt)

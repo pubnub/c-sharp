@@ -27,12 +27,12 @@ using System.Collections.Specialized;
 
 namespace NUnit.Framework
 {
-	/// <summary>
-	/// PropertyAttribute is used to attach information to a test as a name/value pair..
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Class|AttributeTargets.Method|AttributeTargets.Assembly, AllowMultiple=true)]
-	public class PropertyAttribute : Attribute
-	{
+    /// <summary>
+    /// PropertyAttribute is used to attach information to a test as a name/value pair..
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class|AttributeTargets.Method|AttributeTargets.Assembly, AllowMultiple=true)]
+    public class PropertyAttribute : Attribute
+    {
         private IDictionary properties = new ListDictionary();
 
         /// <summary>
@@ -72,20 +72,20 @@ namespace NUnit.Framework
         protected PropertyAttribute() { }
 
         /// <summary>
-		/// Constructor for use by derived classes that use the
-		/// name of the type as the property name. Derived classes
+        /// Constructor for use by derived classes that use the
+        /// name of the type as the property name. Derived classes
         /// must ensure that the Type of the property value is
         /// a standard type supported by the BCL. Any custom
         /// types will cause a serialization Exception when
         /// in the client.
-		/// </summary>
-		protected PropertyAttribute( object propertyValue )
-		{
-			string propertyName = this.GetType().Name;
-			if ( propertyName.EndsWith( "Attribute" ) )
-				propertyName = propertyName.Substring( 0, propertyName.Length - 9 );
+        /// </summary>
+        protected PropertyAttribute( object propertyValue )
+        {
+            string propertyName = this.GetType().Name;
+            if ( propertyName.EndsWith( "Attribute" ) )
+                propertyName = propertyName.Substring( 0, propertyName.Length - 9 );
             this.properties.Add(propertyName, propertyValue);
-		}
+        }
 
         /// <summary>
         /// Gets the property dictionary for this attribute

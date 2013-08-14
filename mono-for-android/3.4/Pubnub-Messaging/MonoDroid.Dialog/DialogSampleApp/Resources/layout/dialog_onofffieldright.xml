@@ -18,7 +18,7 @@
     android:textAppearance="?android:attr/textAppearanceLarge"
     android:gravity="left|center_vertical"
     android:layout_weight="1.0"
-	/>
+    />
   <ToggleButton
     android:id="@+id/dialog_BoolField"
     android:layout_width="wrap_content"

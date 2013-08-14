@@ -23,8 +23,8 @@ namespace PubNubMessaging.Tests
       
       string channel = "hello_world";
       
-      pubnub.Unsubscribe<string>(channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
-      while (!common.DeliveryStatus) ;
+      pubnub.Unsubscribe<string>(channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
+      common.WaitForResponse();
       
       if (common.Response.ToString().Contains ("not subscribed")) {
         Console.WriteLine("Response:" + common.Response);
@@ -49,14 +49,14 @@ namespace PubNubMessaging.Tests
       
       string channel = "hello_world";
 
-      pubnub.Subscribe<string>(channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessage);
+      pubnub.Subscribe<string>(channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-      while (!common.DeliveryStatus) ;
+      common.WaitForResponse();
       common.DeliveryStatus = false;
       common.Response = null;
 
-      pubnub.Unsubscribe<string>(channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessage);
-      while (!common.DeliveryStatus) ;
+      pubnub.Unsubscribe<string>(channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+      common.WaitForResponse();
 
       if (common.Response.ToString().Contains ("Unsubscribed from")) {
         Console.WriteLine("Response:" + common.Response);

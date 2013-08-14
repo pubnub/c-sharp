@@ -1500,7 +1500,7 @@ namespace Newtonsoft.Json.Converters
     /// </summary>
     /// <param name="valueType">Type of the value.</param>
     /// <returns>
-    /// 	<c>true</c> if this instance can convert the specified value type; otherwise, <c>false</c>.
+    ///     <c>true</c> if this instance can convert the specified value type; otherwise, <c>false</c>.
     /// </returns>
     public override bool CanConvert(Type valueType)
     {

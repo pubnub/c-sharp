@@ -147,7 +147,7 @@ namespace Newtonsoft.Json.Schema
     /// Gets or sets a value indicating whether additional properties are allowed.
     /// </summary>
     /// <value>
-    /// 	<c>true</c> if additional properties are allowed; otherwise, <c>false</c>.
+    ///     <c>true</c> if additional properties are allowed; otherwise, <c>false</c>.
     /// </value>
     public bool AllowAdditionalProperties { get; set; }
     /// <summary>

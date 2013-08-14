@@ -30,7 +30,7 @@ namespace MonoDroid.Dialog
             InitSection ();
         }
 
-		public RootElement(string caption, DroidResources.ElementLayout layoutid)
+        public RootElement(string caption, DroidResources.ElementLayout layoutid)
             : base(caption, (int) layoutid)
         {
             InitSection();
@@ -47,7 +47,7 @@ namespace MonoDroid.Dialog
         public RootElement(string caption, Func<RootElement, View> createOnSelected)
             : base(caption, (int)DroidResources.ElementLayout.dialog_root)
         {
-			InitSection();
+            InitSection();
             this._createOnSelected = createOnSelected;
         }
 
@@ -87,11 +87,11 @@ namespace MonoDroid.Dialog
         }
 
 
-		void InitSection ()
-		{
-			_summarySection = -1;
-			Sections = new List<Section> ();
-		}
+        void InitSection ()
+        {
+            _summarySection = -1;
+            Sections = new List<Section> ();
+        }
 
         /// <summary>
         /// Single save point for a context, elements can get this context via GetContext() for navigation operations
@@ -148,16 +148,16 @@ namespace MonoDroid.Dialog
         {
             return GetSelectedValue();
         }
-		
-		void SetSectionStartIndex()
-		{
-			int currentIndex = 0;
-			foreach(var section in Sections)
-			{
-				section.StartIndex = currentIndex;
-				currentIndex += section.Count;
-			}
-		}
+        
+        void SetSectionStartIndex()
+        {
+            int currentIndex = 0;
+            foreach(var section in Sections)
+            {
+                section.StartIndex = currentIndex;
+                currentIndex += section.Count;
+            }
+        }
         /// <summary>
         /// Adds a new section to this RootElement
         /// </summary>
@@ -171,7 +171,7 @@ namespace MonoDroid.Dialog
 
             Sections.Add(section);
             section.Parent = this;
-			SetSectionStartIndex();
+            SetSectionStartIndex();
         }
 
         //
@@ -185,8 +185,8 @@ namespace MonoDroid.Dialog
         {
             foreach (var s in sections)
                 Add(s);
-			
-			SetSectionStartIndex();
+            
+            SetSectionStartIndex();
         }
 
         /// <summary>
@@ -218,8 +218,8 @@ namespace MonoDroid.Dialog
                 s.Parent = this;
                 Sections.Insert(pos++, s);
             }
-			
-			SetSectionStartIndex();
+            
+            SetSectionStartIndex();
         }
 
         /// <summary>
@@ -231,8 +231,8 @@ namespace MonoDroid.Dialog
                 return;
 
             Sections.RemoveAt(idx);
-			
-			SetSectionStartIndex();
+            
+            SetSectionStartIndex();
         }
 
         public void Remove(Section s)
@@ -243,8 +243,8 @@ namespace MonoDroid.Dialog
             if (idx == -1)
                 return;
             RemoveAt(idx);
-			
-			SetSectionStartIndex();
+            
+            SetSectionStartIndex();
         }
 
         public void Clear()
@@ -312,7 +312,7 @@ namespace MonoDroid.Dialog
             return string.Empty;
         }
 
-		public override View GetView(Context context, View convertView, ViewGroup parent)
+        public override View GetView(Context context, View convertView, ViewGroup parent)
         {
             Context = context;
 
@@ -330,7 +330,7 @@ namespace MonoDroid.Dialog
                     _caption.Text = Caption;
                     _value.Text = radioValue;
 //                    this.Click = (o, e) => { SelectRadio(); };
-					this.Tapped += delegate { SelectRadio(); };
+                    this.Tapped += delegate { SelectRadio(); };
                 }
             }
             else if (_group != null)

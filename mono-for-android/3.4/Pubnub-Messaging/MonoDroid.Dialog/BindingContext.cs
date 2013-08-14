@@ -141,7 +141,7 @@ namespace MonoDroid.Dialog
                     section = new Section();
 
                 Element element = null;
-				
+                
                 if (mType == typeof(string)) {
                     PasswordAttribute pa = null;
                     AlignmentAttribute align = null;
@@ -197,9 +197,9 @@ namespace MonoDroid.Dialog
                     }
 
                     if (invoke != null)
-					{
-						//                        ((StringElement)element).Click += invoke;
-					}
+                    {
+                        //                        ((StringElement)element).Click += invoke;
+                    }
                 }
                 else if (mType == typeof(float))
                 {

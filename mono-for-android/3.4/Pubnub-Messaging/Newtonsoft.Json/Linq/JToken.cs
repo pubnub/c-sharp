@@ -118,7 +118,7 @@ namespace Newtonsoft.Json.Linq
     /// Gets a value indicating whether this token has childen tokens.
     /// </summary>
     /// <value>
-    /// 	<c>true</c> if this token has child values; otherwise, <c>false</c>.
+    ///     <c>true</c> if this token has child values; otherwise, <c>false</c>.
     /// </value>
     public abstract bool HasValues { get; }
 

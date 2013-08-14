@@ -23,10 +23,10 @@
 
 namespace NUnitLite
 {
-	/// <summary>
-	/// The RunState enum indicates whether a test
+    /// <summary>
+    /// The RunState enum indicates whether a test
     /// has been or can be executed.
-	/// </summary>
+    /// </summary>
     public enum RunState
     {
         /// <summary>

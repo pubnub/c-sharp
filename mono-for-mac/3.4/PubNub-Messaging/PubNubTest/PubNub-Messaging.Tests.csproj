@@ -40,17 +40,20 @@
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Web" />
+    <Reference Include="JsonFx">
+      <HintPath>..\PubNub-Console\Library\JsonFx.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="WhenAMessageIsPublished.cs" />
     <Compile Include="EncryptionTests.cs" />
-    <Compile Include="WhenDetailedHistoryIsRequested.cs" />
-    <Compile Include="WhenGetRequestServerTime.cs" />
-    <Compile Include="WhenSubscribedToAChannel.cs" />
-    <Compile Include="WhenAClientIsPresented.cs" />
+    <Compile Include="WhenAMessageIsPublished.cs" />
     <Compile Include="Common.cs" />
     <Compile Include="PubnubUnitTest.cs" />
+    <Compile Include="WhenSubscribedToAChannel.cs" />
+    <Compile Include="WhenAClientIsPresented.cs" />
+    <Compile Include="WhenDetailedHistoryIsRequested.cs" />
+    <Compile Include="WhenGetRequestServerTime.cs" />
     <Compile Include="WhenUnsubscribedToAChannel.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

@@ -238,7 +238,7 @@ namespace Newtonsoft.Json.Linq
     /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
     /// <param name="item">The object to insert into the <see cref="T:System.Collections.Generic.IList`1"/>.</param>
     /// <exception cref="T:System.ArgumentOutOfRangeException">
-    /// 	<paramref name="index"/> is not a valid index in the <see cref="T:System.Collections.Generic.IList`1"/>.</exception>
+    ///     <paramref name="index"/> is not a valid index in the <see cref="T:System.Collections.Generic.IList`1"/>.</exception>
     /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.IList`1"/> is read-only.</exception>
     public void Insert(int index, JToken item)
     {
@@ -250,7 +250,7 @@ namespace Newtonsoft.Json.Linq
     /// </summary>
     /// <param name="index">The zero-based index of the item to remove.</param>
     /// <exception cref="T:System.ArgumentOutOfRangeException">
-    /// 	<paramref name="index"/> is not a valid index in the <see cref="T:System.Collections.Generic.IList`1"/>.</exception>
+    ///     <paramref name="index"/> is not a valid index in the <see cref="T:System.Collections.Generic.IList`1"/>.</exception>
     /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.IList`1"/> is read-only.</exception>
     public void RemoveAt(int index)
     {

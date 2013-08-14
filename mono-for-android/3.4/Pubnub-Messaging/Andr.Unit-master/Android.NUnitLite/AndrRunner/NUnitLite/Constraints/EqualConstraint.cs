@@ -370,10 +370,10 @@ namespace NUnit.Framework.Constraints
                 DisplayStringDifferences(writer, (string)expected, (string)actual);
             else if (expected is ICollection && actual is ICollection)
                 DisplayCollectionDifferences(writer, (ICollection)expected, (ICollection)actual, depth);
-			else if (expected is Stream && actual is Stream)
-				DisplayStreamDifferences(writer, (Stream)expected, (Stream)actual, depth);
-			else if ( comparer.Tolerance != null )
-				writer.DisplayDifferences( expected, actual, comparer.Tolerance );
+            else if (expected is Stream && actual is Stream)
+                DisplayStreamDifferences(writer, (Stream)expected, (Stream)actual, depth);
+            else if ( comparer.Tolerance != null )
+                writer.DisplayDifferences( expected, actual, comparer.Tolerance );
             else
                 writer.DisplayDifferences(expected, actual);
         }
@@ -410,11 +410,11 @@ namespace NUnit.Framework.Constraints
         /// <summary>
         /// Display the failure information for two collections that did not match.
         /// </summary>
-		/// <param name="writer">The MessageWriter on which to display</param>
+        /// <param name="writer">The MessageWriter on which to display</param>
         /// <param name="expected">The expected collection.</param>
         /// <param name="actual">The actual collection</param>
         /// <param name="depth">The depth of this failure in a set of nested collections</param>
-	private void DisplayCollectionDifferences(MessageWriter writer, ICollection expected, ICollection actual, int depth)
+    private void DisplayCollectionDifferences(MessageWriter writer, ICollection expected, ICollection actual, int depth)
         {
             int failurePoint = comparer.FailurePoints.Count > depth ? (int)comparer.FailurePoints[depth] : -1;
 

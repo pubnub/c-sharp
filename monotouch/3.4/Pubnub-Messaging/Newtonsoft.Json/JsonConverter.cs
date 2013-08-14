@@ -59,7 +59,7 @@ namespace Newtonsoft.Json
     /// </summary>
     /// <param name="objectType">Type of the object.</param>
     /// <returns>
-    /// 	<c>true</c> if this instance can convert the specified object type; otherwise, <c>false</c>.
+    ///     <c>true</c> if this instance can convert the specified object type; otherwise, <c>false</c>.
     /// </returns>
     public abstract bool CanConvert(Type objectType);
 

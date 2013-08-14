@@ -25,7 +25,7 @@
     android:singleLine="true"
     android:layout_marginTop="2dp"
     android:text="SubText"
-	  android:textAppearance="?android:attr/textAppearanceSmall"
+      android:textAppearance="?android:attr/textAppearanceSmall"
     />   
   <TextView
     android:id="@+id/dialog_LabelField"

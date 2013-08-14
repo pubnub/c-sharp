@@ -3,9 +3,15 @@ using PubNubMessaging.Core;
 using NUnit.Framework;
 using System.ComponentModel;
 using System.Collections.Generic;
+#if (USE_JSONFX)
+using JsonFx.Json;
+#elif (USE_DOTNET_SERIALIZATION)
+using System.Runtime.Serialization.Json;
+using System.Web.Script.Serialization;
+#else
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
+#endif
 
 namespace PubNubMessaging.Tests
 {
@@ -29,22 +35,24 @@ namespace PubNubMessaging.Tests
             
             pubnub.PubnubUnitTest = commonPresence.CreateUnitTestInstance("WhenAClientIsPresented", "ThenPresenceShouldReturnReceivedMessage");
             
-            pubnub.Presence(channel, commonPresence.DisplayReturnMessageDummy, commonPresence.DisplayReturnMessageDummy);
+            pubnub.Presence(channel, commonPresence.DisplayReturnMessage, commonPresence.DisplayReturnMessageDummy, commonPresence.DisplayReturnMessageDummy);
             
             Common commonSubscribe = new Common();
             commonSubscribe.DeliveryStatus = false;
             commonSubscribe.Response = null;
             
-            pubnub.Subscribe(channel, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessageDummy);
-            while (!commonSubscribe.DeliveryStatus) ;
+            pubnub.Subscribe(channel, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessageDummy, commonPresence.DisplayReturnMessageDummy);
+            //while (!commonSubscribe.DeliveryStatus) ;
+            
+            commonPresence.WaitForResponse(30);
             
             string response = "";
-            if (commonSubscribe.Response == null) {
+            if (commonPresence.Response == null) {
               Assert.Fail("Null response");
             }
             else
             {
-              IList<object> responseFields = commonSubscribe.Response as IList<object>;
+              IList<object> responseFields = commonPresence.Response as IList<object>;
               foreach (object item in responseFields)
               {
                 response = item.ToString();
@@ -70,7 +78,7 @@ namespace PubNubMessaging.Tests
             common.Response = null;
             
             HereNow(pubnub, "IfHereNowIsCalledThenItShouldReturnInfo", common.DisplayReturnMessage);
-            while (!common.DeliveryStatus) ;
+            common.WaitForResponse();
 
             ParseResponse(common.Response);
         }
@@ -85,7 +93,7 @@ namespace PubNubMessaging.Tests
           unitTest.TestCaseName = unitTestCaseName;
           pubnub.PubnubUnitTest = unitTest;
 
-          pubnub.HereNow(channel, userCallback);
+          pubnub.HereNow(channel, userCallback, userCallback);
         }
 
         public void ParseResponse(object commonResponse)
@@ -133,7 +141,7 @@ namespace PubNubMessaging.Tests
             common.Response = null;
             
             HereNow(pubnub, "IfHereNowIsCalledThenItShouldReturnInfo", common.DisplayReturnMessage);
-            while (!common.DeliveryStatus) ;
+            common.WaitForResponse();
 
             ParseResponse(common.Response);
         }
@@ -156,15 +164,44 @@ namespace PubNubMessaging.Tests
           
           string channel = "hello_world";
 
-          pubnub.Subscribe(channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessage);
+          pubnub.Subscribe(channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessage);
             
-          while (!commonSubscribe.DeliveryStatus);
+          //while (!commonSubscribe.DeliveryStatus);
+          commonSubscribe.WaitForResponse();
 
-          pubnub.HereNow<string>(channel, commonHereNow.DisplayReturnMessage);
+          pubnub.HereNow<string>(channel, commonHereNow.DisplayReturnMessage, commonHereNow.DisplayReturnMessage);
 
-          while (!commonHereNow.DeliveryStatus);
+          //while (!commonHereNow.DeliveryStatus);
+          commonHereNow.WaitForResponse();
           if (commonHereNow.Response!= null)
           {
+#if (USE_JSONFX)
+              IList<object> fields = new JsonFXDotNet ().DeserializeToObject (commonHereNow.Response.ToString ()) as IList<object>;
+              if (fields [0] != null)
+              {
+                  bool result = false;
+                  Dictionary<string, object> message = (Dictionary<string, object>)fields [0];
+                  foreach (KeyValuePair<String, object> entry in message)
+                  {
+                      Console.WriteLine("value:" + entry.Value + "  " + "key:" + entry.Key);
+                      Type valueType = entry.Value.GetType();
+                      var expectedType = typeof(string[]);
+                      if (valueType.IsArray && expectedType.IsAssignableFrom(valueType))
+                      {
+                        List<string> uuids = new List<string>(entry.Value as string[]);
+                        if(uuids.Contains(pubnub.SessionUUID )){
+                            result= true;
+                            break;
+                        }
+                      }
+                  }
+                  Assert.True(result);
+              } 
+              else
+              {
+                Assert.Fail("Null response");
+              }
+#else
               object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(commonHereNow.Response.ToString());
               JContainer dictionary = serializedMessage[0] as JContainer;
               var uuid = dictionary["uuids"].ToString();
@@ -174,9 +211,11 @@ namespace PubNubMessaging.Tests
               } else {
                   Assert.Fail("Custom uuid not found.");
               }
+#endif
           } else {
               Assert.Fail("Null response");
           }
+
         }
     }
 }

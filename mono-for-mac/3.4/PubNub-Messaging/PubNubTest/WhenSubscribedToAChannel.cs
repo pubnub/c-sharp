@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System.Threading;
-using Newtonsoft.Json;
-
 
 namespace PubNubMessaging.Tests
 {
@@ -17,112 +15,152 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenItShouldReturnReceivedMessageForComplexMessage () 
         {
-          
-          Pubnub pubnub = new Pubnub (
+            Pubnub pubnub = new Pubnub (
             "demo",
             "demo",
             "",
             "",
             false);
-          string channel = "hello_world";
-          
-          Common common = new Common();
-          common.DeliveryStatus = false;
-          common.Response = null;
-          
-          pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenSubscribedToAChannel", "ThenItShouldReturnReceivedMessageForComplexMessage");
-          
-          pubnub.Subscribe (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy); 
-          Thread.Sleep(3000);
-          
-          CustomClass message = new CustomClass();
-          
-          pubnub.Publish (channel, (object)message, common.DisplayReturnMessageDummy);
-          
-          //cm.deliveryStatus = false;
-          while (!common.DeliveryStatus);
+            string channel = "hello_world";
 
-          if (common.Response != null) {
-            IList<object> fields = common.Response as IList<object>;
-            
-            if (fields [0] != null)
-            {
-              var myObjectArray = (from item in fields select item as object).ToArray ();
-              Console.WriteLine ("Response:" + myObjectArray[0].ToString ());
-              CustomClass cc = JsonConvert.DeserializeObject<CustomClass>(myObjectArray[0].ToString());
-              if(cc.bar.SequenceEqual(message.bar) && cc.foo.Equals(message.foo))
-              {
-                Assert.Pass("Complex message test successful");
-              }
-              else
-              {
-                Assert.Fail("Complex message test not successful");
-              }
+            Common common = new Common();
+            common.DeliveryStatus = false;
+            common.Response = null;
+
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenSubscribedToAChannel", "ThenItShouldReturnReceivedMessageForComplexMessage");
+
+            pubnub.Subscribe (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
+            Thread.Sleep(3000);
+
+            CustomClass message = new CustomClass();
+
+            pubnub.Publish (channel, (object)message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
+
+            //cm.deliveryStatus = false;
+            common.WaitForResponse();
+
+            if (common.Response != null) {
+                IList<object> fields = common.Response as IList<object>;
+
+                if (fields [0] != null)
+                {
+                    var myObjectArray = (from item in fields select item as object).ToArray ();
+
+                    CustomClass cc = new CustomClass();
+
+                    //If the custom class is serialized with jsonfx the response is received as a dictionary and
+                    //on deserialization with Newtonsoft.Json we get an error.
+                    //As a work around we parse the dictionary object.   
+                    var dict = myObjectArray [0] as IDictionary;
+
+                    if ((dict != null) && (dict.Count > 1))
+                    {
+                      cc.foo = (string)dict["foo"];
+                      cc.bar = (int[])dict["bar"];
+                    }
+                    else
+                    {
+                        cc = Common.Deserialize<CustomClass>(myObjectArray[0].ToString());
+                      /*#if (USE_JSONFX)
+                          var reader = new JsonFx.Json.JsonReader();
+                          cc = reader.Read<CustomClass>(myObjectArray[0].ToString());
+                      #else
+                          cc = JsonConvert.DeserializeObject<CustomClass>(myObjectArray[0].ToString());
+                      #endif*/
+                    }  
+                    if(cc.bar.SequenceEqual(message.bar) && cc.foo.Equals(message.foo))
+                    {
+                      Assert.Pass("Complex message test successful");
+                    }
+                    else
+                    {
+                      Assert.Fail("Complex message test not successful");
+                    }
+                }
+                else
+                {
+                Assert.Fail("No response");
+                }
             }
             else
             {
-              Assert.Fail("No response");
+                Assert.Fail("No response");
             }
-          }
-          else
-          {
-            Assert.Fail("No response");
-          }
         }
 
         [Test]
         public void ThenItShouldReturnReceivedMessageCipherForComplexMessage ()
         {
-          
-          Pubnub pubnub = new Pubnub (
+            Pubnub pubnub = new Pubnub (
             "demo",
             "demo",
             "",
             "enigma",
             false);
-          string channel = "hello_world";
-          
-          Common common = new Common();
-          common.DeliveryStatus = false;
-          common.Response = null;
-          
-          pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenSubscribedToAChannel", "ThenItShouldReturnReceivedMessageCipherForComplexMessage");
-          
-          CustomClass message = new CustomClass();
-          
-          pubnub.Subscribe (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy); 
-          Thread.Sleep(3000);
-          
-          pubnub.Publish (channel, (object)message, common.DisplayReturnMessageDummy);
-          
-          while (!common.DeliveryStatus);
-          
-          if (common.Response != null) {
-            IList<object> fields = common.Response as IList<object>;
-            
-            if (fields [0] != null)
-            {
-              var myObjectArray = (from item in fields select item as object).ToArray ();
-              Console.WriteLine ("Response:" + myObjectArray[0].ToString ());
-              CustomClass cc = JsonConvert.DeserializeObject<CustomClass>(myObjectArray[0].ToString());
-              if(cc.bar.SequenceEqual(message.bar) && cc.foo.Equals(message.foo))
-              {
-                Assert.Pass("Complex message test successful");
-              }
-              else
-              {
-                Assert.Fail("Complex message test not successful");
-              }
+            string channel = "hello_world";
+
+            Common common = new Common();
+            common.DeliveryStatus = false;
+            common.Response = null;
+
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenSubscribedToAChannel", "ThenItShouldReturnReceivedMessageCipherForComplexMessage");
+
+            CustomClass message = new CustomClass();
+
+            pubnub.Subscribe (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
+            Thread.Sleep(3000);
+
+            pubnub.Publish (channel, (object)message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
+
+            common.WaitForResponse();
+
+            if (common.Response != null) {
+                IList<object> fields = common.Response as IList<object>;
+
+                if (fields [0] != null)
+                {
+                    var myObjectArray = (from item in fields select item as object).ToArray ();
+
+                    CustomClass cc = new CustomClass();
+
+                    //If the custom class is serialized with jsonfx the response is received as a dictionary and
+                    //on deserialization with Newtonsoft.Json we get an error.
+                    //As a work around we parse the dictionary object.   
+                    var dict = myObjectArray [0] as IDictionary;
+
+                    if ((dict != null) && (dict.Count > 1))
+                    {
+                        cc.foo = (string)dict["foo"];
+                        cc.bar = (int[])dict["bar"];
+                    }
+                    else
+                    {
+                        cc = Common.Deserialize<CustomClass>(myObjectArray[0].ToString());
+/*            #if (USE_JSONFX)
+                        var reader = new JsonFx.Json.JsonReader();
+                        cc = reader.Read<CustomClass>(myObjectArray[0].ToString());
+            #else
+                        cc = JsonConvert.DeserializeObject<CustomClass>(myObjectArray[0].ToString());
+            #endif*/
+                    }  
+                    if(cc.bar.SequenceEqual(message.bar) && cc.foo.Equals(message.foo))
+                    {
+                        Assert.Pass("Complex message test successful");
+                    }
+                    else
+                    {
+                        Assert.Fail("Complex message test not successful");
+                    }
+                }
+                else
+                {
+                Assert.Fail("No response");
+                }
             }
             else
             {
-              Assert.Fail("No response");
-            }
-          }
-          else
-          {
             Assert.Fail("No response");
-          }
+            }
         }
 
         [Test]
@@ -143,33 +181,33 @@ namespace PubNubMessaging.Tests
 
           pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenSubscribedToAChannel", "ThenSubscribeShouldReturnReceivedMessage");
 
-          pubnub.Subscribe (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy); 
+          pubnub.Subscribe (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
           Thread.Sleep(3000);
 
           string message = "Test Message";
 
-          pubnub.Publish (channel, message, common.DisplayReturnMessageDummy);
+          pubnub.Publish (channel, message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
 
           //cm.deliveryStatus = false;
-          while (!common.DeliveryStatus);
-             if (common.Response != null) {
-                IList<object> fields = common.Response as IList<object>;
+          common.WaitForResponse();
+          if (common.Response != null) {
+            IList<object> fields = common.Response as IList<object>;
 
-                if (fields [0] != null)
-                {
-                    var myObjectArray = (from item in fields select item as object).ToArray ();
-                    Console.WriteLine ("Response:" + myObjectArray[0].ToString ());
-                    Assert.AreEqual(message, myObjectArray[0].ToString());
-                }
-                else
-                {
-                    Assert.Fail("No response");
-                }
-             }
+            if (fields [0] != null)
+            {
+                var myObjectArray = (from item in fields select item as object).ToArray ();
+                Console.WriteLine ("Response:" + myObjectArray[0].ToString ());
+                Assert.AreEqual(message, myObjectArray[0].ToString());
+            }
             else
             {
-              Assert.Fail("No response");
+                Assert.Fail("No response");
             }
+          }
+          else
+          {
+            Assert.Fail("No response");
+          }
         }
 
         [Test]
@@ -192,12 +230,12 @@ namespace PubNubMessaging.Tests
 
           string message = "Test Message";
 
-          pubnub.Subscribe (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy); 
+          pubnub.Subscribe (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
           Thread.Sleep(3000);
 
-          pubnub.Publish (channel, message, common.DisplayReturnMessageDummy);
+          pubnub.Publish (channel, message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
 
-          while (!common.DeliveryStatus);
+          common.WaitForResponse();
           
           if (common.Response != null) 
           {
@@ -245,9 +283,9 @@ namespace PubNubMessaging.Tests
           
           string channel = "hello_world";
           
-          pubnub.Subscribe<string>(channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessage);
+          pubnub.Subscribe<string>(channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
           
-          while (!common.DeliveryStatus);          
+          common.WaitForResponse();         
 
           if(ParseResponse(common.Response))
           {
@@ -264,8 +302,13 @@ namespace PubNubMessaging.Tests
           bool retVal = false;
           if (response != null)
           {
-            object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(response.ToString());
-            
+            object[] deserializedMessage = Common.Deserialize<object[]>(response.ToString());
+/*        #if (USE_JSONFX)
+            var reader = new JsonFx.Json.JsonReader();
+            deserializedMessage = reader.Read<object[]>(response.ToString());
+        #else
+            deserializedMessage = JsonConvert.DeserializeObject<object[]>(response.ToString());
+        #endif*/
             if (deserializedMessage is object[])
             {
               long statusCode = Int64.Parse(deserializedMessage[0].ToString());
@@ -291,15 +334,18 @@ namespace PubNubMessaging.Tests
           pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenSubscribedToAChannel", "ThenMultiSubscribeShouldReturnConnectStatus");
           
           string channel1 = "testChannel1";
-          pubnub.Subscribe<string>(channel1, common.DisplayReturnMessageDummy, common.DisplayReturnMessage);
-          while (!common.DeliveryStatus);  
+          pubnub.Subscribe<string>(channel1, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+          
+          common.WaitForResponse();
+
           bool receivedChannel1ConnectMessage = ParseResponse(common.Response);
           common.DeliveryStatus = false;
           common.Response = null;
 
           string channel2 = "testChannel2";
-          pubnub.Subscribe<string>(channel2,  common.DisplayReturnMessageDummy, common.DisplayReturnMessage);
-          while (!common.DeliveryStatus);  
+          pubnub.Subscribe<string>(channel2,  common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+          common.WaitForResponse(); 
+
           bool receivedChannel2ConnectMessage = ParseResponse(common.Response);
 
           if(receivedChannel1ConnectMessage && receivedChannel2ConnectMessage)
@@ -325,11 +371,11 @@ namespace PubNubMessaging.Tests
           
           string channel = "testChannel";
 
-          pubnub.Subscribe<string>(channel, common.DisplayReturnMessageDummy,  common.DisplayReturnMessageDummy);
-              Thread.Sleep(100);
+          pubnub.Subscribe<string>(channel, common.DisplayReturnMessageDummy,  common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
+          Thread.Sleep(100);
               
-          pubnub.Subscribe<string>(channel,  common.DisplayReturnMessage,  common.DisplayReturnMessageDummy);
-          while (!common.DeliveryStatus);  
+          pubnub.Subscribe<string>(channel,  common.DisplayReturnMessage,  common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
+          common.WaitForResponse();  
 
           if(common.Response.ToString().Contains("already subscribed"))
           {
@@ -354,7 +400,7 @@ namespace PubNubMessaging.Tests
           
           string channel = "testChannel";
 
-          pubnub.Subscribe<string>(channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+          pubnub.Subscribe<string>(channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
           Thread.Sleep(1000);
            
           int iPassCount =0;
@@ -369,16 +415,17 @@ namespace PubNubMessaging.Tests
             }
             else
             {*/
-                string message = "Test Message " + i;
-                pubnub.Publish(channel, message, common.DisplayReturnMessageDummy);
-                Console.WriteLine(string.Format("Sent {0}", message)); 
-          
-                while (!common.DeliveryStatus); 
-                if(common.Response.ToString().Contains(message))
-                {
-                  iPassCount++;
-                  Console.WriteLine(string.Format("Received {0}", message)); 
-                }
+            string message = "Test Message " + i;
+            pubnub.Publish(channel, message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
+            Console.WriteLine(string.Format("Sent {0}", message)); 
+      
+            common.WaitForResponse();
+
+            if(common.Response.ToString().Contains(message))
+            {
+              iPassCount++;
+              Console.WriteLine(string.Format("Received {0}", message)); 
+            }
             //}
             common.DeliveryStatus = false;
             common.Response = null;            

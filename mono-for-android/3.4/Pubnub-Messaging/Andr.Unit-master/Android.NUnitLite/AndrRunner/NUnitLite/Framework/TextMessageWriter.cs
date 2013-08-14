@@ -28,37 +28,37 @@ using NUnit.Framework.Constraints;
 
 namespace NUnit.Framework
 {
-	/// <summary>
-	/// TextMessageWriter writes constraint descriptions and messages
-	/// in displayable form as a text stream. It tailors the display
-	/// of individual message components to form the standard message
-	/// format of NUnit assertion failure messages.
-	/// </summary>
+    /// <summary>
+    /// TextMessageWriter writes constraint descriptions and messages
+    /// in displayable form as a text stream. It tailors the display
+    /// of individual message components to form the standard message
+    /// format of NUnit assertion failure messages.
+    /// </summary>
     public class TextMessageWriter : MessageWriter
     {
         #region Message Formats and Constants
         private static readonly int DEFAULT_LINE_LENGTH = 78;
 
-		// Prefixes used in all failure messages. All must be the same
-		// length, which is held in the PrefixLength field. Should not
-		// contain any tabs or newline characters.
-		/// <summary>
-		/// Prefix used for the expected value line of a message
-		/// </summary>
-		public static readonly string Pfx_Expected = "  Expected: ";
-		/// <summary>
-		/// Prefix used for the actual value line of a message
-		/// </summary>
-		public static readonly string Pfx_Actual = "  But was:  ";
-		/// <summary>
-		/// Length of a message prefix
-		/// </summary>
-		public static readonly int PrefixLength = Pfx_Expected.Length;
-		
-		private static readonly string Fmt_Connector = " {0} ";
+        // Prefixes used in all failure messages. All must be the same
+        // length, which is held in the PrefixLength field. Should not
+        // contain any tabs or newline characters.
+        /// <summary>
+        /// Prefix used for the expected value line of a message
+        /// </summary>
+        public static readonly string Pfx_Expected = "  Expected: ";
+        /// <summary>
+        /// Prefix used for the actual value line of a message
+        /// </summary>
+        public static readonly string Pfx_Actual = "  But was:  ";
+        /// <summary>
+        /// Length of a message prefix
+        /// </summary>
+        public static readonly int PrefixLength = Pfx_Expected.Length;
+        
+        private static readonly string Fmt_Connector = " {0} ";
         private static readonly string Fmt_Predicate = "{0} ";
         //private static readonly string Fmt_Label = "{0}";
-		private static readonly string Fmt_Modifier = ", {0}";
+        private static readonly string Fmt_Modifier = ", {0}";
 
         private static readonly string Fmt_Null = "null";
         private static readonly string Fmt_EmptyString = "<string.Empty>";
@@ -66,17 +66,17 @@ namespace NUnit.Framework
 
         private static readonly string Fmt_String = "\"{0}\"";
         private static readonly string Fmt_Char = "'{0}'";
-		private static readonly string Fmt_DateTime = "yyyy-MM-dd HH:mm:ss.fff";
+        private static readonly string Fmt_DateTime = "yyyy-MM-dd HH:mm:ss.fff";
         private static readonly string Fmt_ValueType = "{0}";
         private static readonly string Fmt_Default = "<{0}>";
         #endregion
 
-		private int maxLineLength = DEFAULT_LINE_LENGTH;
+        private int maxLineLength = DEFAULT_LINE_LENGTH;
 
         #region Constructors
-		/// <summary>
-		/// Construct a TextMessageWriter
-		/// </summary>
+        /// <summary>
+        /// Construct a TextMessageWriter
+        /// </summary>
         public TextMessageWriter() { }
 
         /// <summary>
@@ -85,10 +85,10 @@ namespace NUnit.Framework
         /// </summary>
         /// <param name="userMessage"></param>
         /// <param name="args"></param>
-		public TextMessageWriter(string userMessage, params object[] args)
+        public TextMessageWriter(string userMessage, params object[] args)
         {
-			if ( userMessage != null && userMessage != string.Empty)
-				this.WriteMessageLine(userMessage, args);
+            if ( userMessage != null && userMessage != string.Empty)
+                this.WriteMessageLine(userMessage, args);
         }
         #endregion
 
@@ -137,34 +137,34 @@ namespace NUnit.Framework
             WriteActualLine(constraint);
         }
 
-		/// <summary>
-		/// Display Expected and Actual lines for given values. This
-		/// method may be called by constraints that need more control over
-		/// the display of actual and expected values than is provided
-		/// by the default implementation.
-		/// </summary>
-		/// <param name="expected">The expected value</param>
-		/// <param name="actual">The actual value causing the failure</param>
-		public override void DisplayDifferences(object expected, object actual)
-		{
-			WriteExpectedLine(expected);
-			WriteActualLine(actual);
-		}
+        /// <summary>
+        /// Display Expected and Actual lines for given values. This
+        /// method may be called by constraints that need more control over
+        /// the display of actual and expected values than is provided
+        /// by the default implementation.
+        /// </summary>
+        /// <param name="expected">The expected value</param>
+        /// <param name="actual">The actual value causing the failure</param>
+        public override void DisplayDifferences(object expected, object actual)
+        {
+            WriteExpectedLine(expected);
+            WriteActualLine(actual);
+        }
 
-		/// <summary>
-		/// Display Expected and Actual lines for given values, including
-		/// a tolerance value on the expected line.
-		/// </summary>
-		/// <param name="expected">The expected value</param>
-		/// <param name="actual">The actual value causing the failure</param>
-		/// <param name="tolerance">The tolerance within which the test was made</param>
-		public override void DisplayDifferences(object expected, object actual, Tolerance tolerance)
-		{
-			WriteExpectedLine(expected, tolerance);
-			WriteActualLine(actual);
-		}
+        /// <summary>
+        /// Display Expected and Actual lines for given values, including
+        /// a tolerance value on the expected line.
+        /// </summary>
+        /// <param name="expected">The expected value</param>
+        /// <param name="actual">The actual value causing the failure</param>
+        /// <param name="tolerance">The tolerance within which the test was made</param>
+        public override void DisplayDifferences(object expected, object actual, Tolerance tolerance)
+        {
+            WriteExpectedLine(expected, tolerance);
+            WriteActualLine(actual);
+        }
 
-		/// <summary>
+        /// <summary>
         /// Display the expected and actual string values on separate lines.
         /// If the mismatch parameter is >=0, an additional line is displayed
         /// line containing a caret that points to the mismatch point.
@@ -190,12 +190,12 @@ namespace NUnit.Framework
             // The mismatch position may have changed due to clipping or white space conversion
             mismatch = MsgUtils.FindMismatchPosition(expected, actual, 0, ignoreCase);
 
-			Write( Pfx_Expected );
-			WriteExpectedValue( expected );
-			if ( ignoreCase )
-				WriteModifier( "ignoring case" );
-			WriteLine();
-			WriteActualLine( actual );
+            Write( Pfx_Expected );
+            WriteExpectedValue( expected );
+            if ( ignoreCase )
+                WriteModifier( "ignoring case" );
+            WriteLine();
+            WriteActualLine( actual );
             //DisplayDifferences(expected, actual);
             if (mismatch >= 0)
                 WriteCaretLine(mismatch);
@@ -203,20 +203,20 @@ namespace NUnit.Framework
         #endregion
 
         #region Public Methods - Low Level
-		/// <summary>
-		/// Writes the text for a connector.
-		/// </summary>
-		/// <param name="connector">The connector.</param>
-		public override void WriteConnector(string connector)
+        /// <summary>
+        /// Writes the text for a connector.
+        /// </summary>
+        /// <param name="connector">The connector.</param>
+        public override void WriteConnector(string connector)
         {
             Write(Fmt_Connector, connector);
         }
 
-		/// <summary>
-		/// Writes the text for a predicate.
-		/// </summary>
-		/// <param name="predicate">The predicate.</param>
-		public override void WritePredicate(string predicate)
+        /// <summary>
+        /// Writes the text for a predicate.
+        /// </summary>
+        /// <param name="predicate">The predicate.</param>
+        public override void WritePredicate(string predicate)
         {
             Write(Fmt_Predicate, predicate);
         }
@@ -230,35 +230,35 @@ namespace NUnit.Framework
         /// Write the text for a modifier.
         /// </summary>
         /// <param name="modifier">The modifier.</param>
-		public override void WriteModifier(string modifier)
-		{
-			Write(Fmt_Modifier, modifier);
-		}
+        public override void WriteModifier(string modifier)
+        {
+            Write(Fmt_Modifier, modifier);
+        }
 
 
-		/// <summary>
-		/// Writes the text for an expected value.
-		/// </summary>
-		/// <param name="expected">The expected value.</param>
-		public override void WriteExpectedValue(object expected)
+        /// <summary>
+        /// Writes the text for an expected value.
+        /// </summary>
+        /// <param name="expected">The expected value.</param>
+        public override void WriteExpectedValue(object expected)
         {
             WriteValue(expected);
         }
 
-		/// <summary>
-		/// Writes the text for an actual value.
-		/// </summary>
-		/// <param name="actual">The actual value.</param>
-		public override void WriteActualValue(object actual)
+        /// <summary>
+        /// Writes the text for an actual value.
+        /// </summary>
+        /// <param name="actual">The actual value.</param>
+        public override void WriteActualValue(object actual)
         {
             WriteValue(actual);
         }
 
-		/// <summary>
-		/// Writes the text for a generalized value.
-		/// </summary>
-		/// <param name="val">The value.</param>
-		public override void WriteValue(object val)
+        /// <summary>
+        /// Writes the text for a generalized value.
+        /// </summary>
+        /// <param name="val">The value.</param>
+        public override void WriteValue(object val)
         {
             if (val == null)
                 Write(Fmt_Null);
@@ -276,8 +276,8 @@ namespace NUnit.Framework
                 WriteFloat((float)val);
             else if (val is decimal)
                 WriteDecimal((decimal)val);
-			else if (val is DateTime)
-				WriteDateTime((DateTime)val);
+            else if (val is DateTime)
+                WriteDateTime((DateTime)val);
             else if (val.GetType().IsValueType)
                 Write(Fmt_ValueType, val);
             else
@@ -291,45 +291,45 @@ namespace NUnit.Framework
         /// <param name="collection">The collection containing elements to write.</param>
         /// <param name="start">The starting point of the elements to write</param>
         /// <param name="max">The maximum number of elements to write</param>
-		public override void WriteCollectionElements(ICollection collection, int start, int max)
-		{
-			if ( collection.Count == 0 )
-			{
-				Write(Fmt_EmptyCollection);
-				return;
-			}
-
-			int count = 0;
-			int index = 0;
-			Write("< ");
-
-			foreach (object obj in collection)
-			{
-				if ( index++ >= start )
-				{
-					if (count > 0)
-						Write(", ");
-					WriteValue(obj);
-					if ( ++count >= max )
-						break;
-				}
-			}
-
-			if ( index < collection.Count )
-				Write("...");
-
-			Write(" >");
-		}
-
-		private void WriteArray(Array array)
+        public override void WriteCollectionElements(ICollection collection, int start, int max)
         {
-			if ( array.Length == 0 )
-			{
-				Write( Fmt_EmptyCollection );
-				return;
-			}
-			
-			int rank = array.Rank;
+            if ( collection.Count == 0 )
+            {
+                Write(Fmt_EmptyCollection);
+                return;
+            }
+
+            int count = 0;
+            int index = 0;
+            Write("< ");
+
+            foreach (object obj in collection)
+            {
+                if ( index++ >= start )
+                {
+                    if (count > 0)
+                        Write(", ");
+                    WriteValue(obj);
+                    if ( ++count >= max )
+                        break;
+                }
+            }
+
+            if ( index < collection.Count )
+                Write("...");
+
+            Write(" >");
+        }
+
+        private void WriteArray(Array array)
+        {
+            if ( array.Length == 0 )
+            {
+                Write( Fmt_EmptyCollection );
+                return;
+            }
+            
+            int rank = array.Rank;
             int[] products = new int[rank];
 
             for (int product = 1, r = rank; --r >= 0; )
@@ -410,10 +410,10 @@ namespace NUnit.Framework
             Write(d.ToString("G29", CultureInfo.InvariantCulture) + "m");
         }
 
-		private void WriteDateTime(DateTime dt)
-		{
-			Write(dt.ToString(Fmt_DateTime, CultureInfo.InvariantCulture));
-		}
+        private void WriteDateTime(DateTime dt)
+        {
+            Write(dt.ToString(Fmt_DateTime, CultureInfo.InvariantCulture));
+        }
         #endregion
 
         #region Helper Methods
@@ -428,25 +428,25 @@ namespace NUnit.Framework
             WriteLine();
         }
 
-		/// <summary>
-		/// Write the generic 'Expected' line for a given value
-		/// </summary>
-		/// <param name="expected">The expected value</param>
-		private void WriteExpectedLine(object expected)
-		{
+        /// <summary>
+        /// Write the generic 'Expected' line for a given value
+        /// </summary>
+        /// <param name="expected">The expected value</param>
+        private void WriteExpectedLine(object expected)
+        {
             WriteExpectedLine(expected, null);
-		}
+        }
 
-		/// <summary>
-		/// Write the generic 'Expected' line for a given value
-		/// and tolerance.
-		/// </summary>
-		/// <param name="expected">The expected value</param>
-		/// <param name="tolerance">The tolerance within which the test was made</param>
-		private void WriteExpectedLine(object expected, Tolerance tolerance)
-		{
-			Write(Pfx_Expected);
-			WriteExpectedValue(expected);
+        /// <summary>
+        /// Write the generic 'Expected' line for a given value
+        /// and tolerance.
+        /// </summary>
+        /// <param name="expected">The expected value</param>
+        /// <param name="tolerance">The tolerance within which the test was made</param>
+        private void WriteExpectedLine(object expected, Tolerance tolerance)
+        {
+            Write(Pfx_Expected);
+            WriteExpectedValue(expected);
 
             if (tolerance != null && !tolerance.IsEmpty)
             {
@@ -454,32 +454,32 @@ namespace NUnit.Framework
                 WriteExpectedValue(tolerance.Value);
             }
 
-			WriteLine();
-		}
+            WriteLine();
+        }
 
-		/// <summary>
-		/// Write the generic 'Actual' line for a constraint
-		/// </summary>
-		/// <param name="constraint">The constraint for which the actual value is to be written</param>
-		private void WriteActualLine(Constraint constraint)
-		{
-			Write(Pfx_Actual);
-			constraint.WriteActualValueTo(this);
-			WriteLine();
-		}
+        /// <summary>
+        /// Write the generic 'Actual' line for a constraint
+        /// </summary>
+        /// <param name="constraint">The constraint for which the actual value is to be written</param>
+        private void WriteActualLine(Constraint constraint)
+        {
+            Write(Pfx_Actual);
+            constraint.WriteActualValueTo(this);
+            WriteLine();
+        }
 
-		/// <summary>
-		/// Write the generic 'Actual' line for a given value
-		/// </summary>
-		/// <param name="actual">The actual value causing a failure</param>
-		private void WriteActualLine(object actual)
-		{
-			Write(Pfx_Actual);
-			WriteActualValue(actual);
-			WriteLine();
-		}
+        /// <summary>
+        /// Write the generic 'Actual' line for a given value
+        /// </summary>
+        /// <param name="actual">The actual value causing a failure</param>
+        private void WriteActualLine(object actual)
+        {
+            Write(Pfx_Actual);
+            WriteActualValue(actual);
+            WriteLine();
+        }
 
-		private void WriteCaretLine(int mismatch)
+        private void WriteCaretLine(int mismatch)
         {
             // We subtract 2 for the initial 2 blanks and add back 1 for the initial quote
             WriteLine("  {0}^", new string('-', PrefixLength + mismatch - 2 + 1));

@@ -98,7 +98,7 @@ namespace Newtonsoft.Json
     /// Gets or sets a value indicating whether this property is required.
     /// </summary>
     /// <value>
-    /// 	A value indicating whether this property is required.
+    ///     A value indicating whether this property is required.
     /// </value>
     public Required Required { get; set; }
 
