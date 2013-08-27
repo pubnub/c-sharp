@@ -39,11 +39,11 @@ using System.Net.Browser;
 using System.Net.Security;
 #endif
 
-#if(MONODROID)
+#if(MONODROID || __ANDROID__)
 using Android.Runtime;
 using Javax.Net.Ssl;
 #endif
-#if(MONODROID || UNITY_ANDROID)
+#if(MONODROID || __ANDROID__ || UNITY_ANDROID)
 using System.Security.Cryptography.X509Certificates;
 #endif
 
@@ -297,7 +297,7 @@ namespace PubNubMessaging.Core
 			this.JsonPluggableLibrary = new NewtonsoftJsonDotNet();
 #endif
 			
-#if(MONOTOUCH || MONODROID || SILVERLIGHT || WINDOWS_PHONE || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
+#if(MONOTOUCH || __IOS__ || MONODROID || __ANDROID__ || SILVERLIGHT || WINDOWS_PHONE || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
 			LoggingMethod.LogLevel = pubnubLogLevel;
 #else
 			string configuredLogLevel = ConfigurationManager.AppSettings["PubnubMessaging.LogLevel"];
@@ -460,7 +460,7 @@ namespace PubNubMessaging.Core
 		
 		private void InitiatePowerModeCheck()
 		{
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !MONODROID && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
 			try
 			{
 				SystemEvents.PowerModeChanged += new PowerModeChangedEventHandler(SystemEvents_PowerModeChanged);
@@ -473,9 +473,9 @@ namespace PubNubMessaging.Core
 			}
 #endif
 		}
-		
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !MONODROID && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
-		void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
+
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
+        void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
 		{
 			if (e.Mode == PowerModes.Suspend)
 			{
@@ -599,7 +599,7 @@ namespace PubNubMessaging.Core
             }
         }
 
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !MONODROID && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
         ~Pubnub()
 		{
 			//detach
@@ -1854,7 +1854,7 @@ namespace PubNubMessaging.Core
 			}
 		}
 		
-#if(MONODROID)      
+#if(MONODROID || __ANDROID__)      
 		/// <summary>
 		/// Workaround for the bug described here 
 		/// https://bugzilla.xamarin.com/show_bug.cgi?id=6501
@@ -1993,7 +1993,7 @@ namespace PubNubMessaging.Core
 		
 		void SendSslRequest<T>(NetworkStream netStream, TcpClient tcpClient, RequestState<T> pubnubRequestState, string requestString)
 		{
-#if(MONODROID)
+#if(MONODROID || __ANDROID__)
 			SslStream sslStream = new SslStream(netStream, true, Validator, null);
 #elif(UNITY_ANDROID)
 			ServicePointManager.ServerCertificateValidationCallback = ValidatorUnity;
@@ -2017,7 +2017,7 @@ namespace PubNubMessaging.Core
 			
 			sslStream.Write(sendBuffer);
 			sslStream.Flush();
-#if(!MONODROID && !UNITY_ANDROID)         
+#if(!MONODROID && !__ANDROID__ && !UNITY_ANDROID)         
 			sslStream.ReadTimeout = state.RequestState.Request.Timeout;
 #endif
 			sslStream.BeginRead(state.buffer, 0, state.buffer.Length, new AsyncCallback(SendRequestUsingTcpClientCallback<T>), state);
@@ -2075,7 +2075,7 @@ namespace PubNubMessaging.Core
 			System.IO.StreamWriter streamWriter = new System.IO.StreamWriter(netStream);
 			streamWriter.Write(requestString);
 			streamWriter.Flush();
-#if(!MONODROID && !UNITY_ANDROID)
+#if(!MONODROID && !__ANDROID__ && !UNITY_ANDROID)
 			netStream.ReadTimeout = pubnubRequestState.Request.Timeout;
 #endif
 			netStream.BeginRead(state.buffer, 0, state.buffer.Length, new AsyncCallback(SendRequestUsingTcpClientCallback<T>), state);
@@ -2086,7 +2086,7 @@ namespace PubNubMessaging.Core
 		{
 			TcpClient tcpClient = new TcpClient();
 			tcpClient.NoDelay = false;
-#if(!MONODROID && !UNITY_ANDROID)
+#if(!MONODROID && !__ANDROID__ && !UNITY_ANDROID)
 			tcpClient.SendTimeout = pubnubRequestState.Request.Timeout;
 #endif          
 			
@@ -2221,8 +2221,8 @@ namespace PubNubMessaging.Core
 		}
 		
 #endif
-		
-		void ProcessResponseCallbackExceptionHandler<T>(Exception ex, RequestState<T> asynchRequestState)
+
+        void ProcessResponseCallbackExceptionHandler<T>(Exception ex, RequestState<T> asynchRequestState)
 		{
 			//common Exception handler
 			if (asynchRequestState.Response != null)
@@ -4084,7 +4084,7 @@ namespace PubNubMessaging.Core
 		private string GetEncryptionKey()
 		{
 			//Compute Hash using the SHA256 
-#if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || MONODROID || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
+#if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || __IOS__ || MONODROID || __ANDROID__ || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
 			string strKeySHA256HashRaw = ComputeHash(this.cipherKey, new System.Security.Cryptography.SHA256Managed());
 #else
 			string strKeySHA256HashRaw = ComputeHash(this.cipherKey, new SHA256CryptoServiceProvider());
@@ -4562,7 +4562,7 @@ namespace PubNubMessaging.Core
 		{
 			if (writeToLog)
 			{
-#if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || MONODROID || UNITY_IOS || UNITY_ANDROID)
+#if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || __IOS__ || MONODROID || __ANDROID__ || UNITY_IOS || UNITY_ANDROID)
 				System.Diagnostics.Debug.WriteLine(logText);
 #elif (UNITY_STANDALONE || UNITY_WEBPLAYER)
 				print(logText);
