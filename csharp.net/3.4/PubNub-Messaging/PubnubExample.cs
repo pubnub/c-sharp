@@ -258,6 +258,7 @@ namespace PubNubMessaging.Core
             Console.WriteLine("ENTER 9 FOR Disconnect/Reconnect existing Subscriber(s) (when internet is available)");
             Console.WriteLine("ENTER 10 TO Disable Network Connection (no internet)");
             Console.WriteLine("ENTER 11 TO Enable Network Connection (yes internet)");
+            Console.WriteLine("ENTER 1234 TO Test Synchronous Publish");
             Console.WriteLine("ENTER 99 FOR EXIT OR QUIT");
 
             bool exitFlag = false;
@@ -435,6 +436,24 @@ namespace PubNubMessaging.Core
                         Console.WriteLine("Stopping Simulation of Internet non-availability");
                         Console.ResetColor();
                         pubnub.DisableSimulateNetworkFailForTestingOnly();
+                        break;
+                    case "1234":
+                        Console.WriteLine("Enter CHANNEL name for publish.");
+                        channel = Console.ReadLine();
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}",channel));
+                        Console.ResetColor();
+
+                        /* TO TEST SMALL TEXT PUBLISH ONLY */
+                        Console.WriteLine("Enter the message for publish and press ENTER key to submit");
+                        string publishMsg2 = Console.ReadLine();
+
+
+                        Console.WriteLine("Running publish()");
+                        List<object> status = pubnub.Publish(channel, publishMsg2);
+                        List<string> msg = status.Select(i => i.ToString()).ToList();
+                        Console.WriteLine(string.Join(",", msg.ToArray()));
                         break;
                     default:
                         Console.WriteLine("INVALID CHOICE. ENTER 99 FOR EXIT OR QUIT");

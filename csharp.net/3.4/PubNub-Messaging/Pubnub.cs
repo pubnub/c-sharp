@@ -1,4 +1,4 @@
-﻿//Build Date: August 07, 2013
+﻿//Build Date: August 30, 2013
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
 #define USE_JSONFX
 #endif
@@ -19,6 +19,7 @@ using System.Security.Cryptography;
 using System.ComponentModel;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Collections.Concurrent;
 using System.Globalization;
@@ -775,8 +776,21 @@ namespace PubNubMessaging.Core
 			
 			return UrlProcessRequest<T>(request, requestState); 
 		}
-		
-		private string JsonEncodePublishMsg(object originalMessage)
+
+        public List<object> Publish(string channel, object message)
+        {
+            List<object> result = new List<object>();
+            var t = new TaskCompletionSource<object>();
+            Publish<object>(channel, message, s => t.TrySetResult(s), s => t.TrySetResult(s));
+            IList<object> publishResponse = t.Task.Result as IList<object>;
+            if (publishResponse != null)
+            {
+                result = publishResponse.ToList();
+            }
+            return result;
+        }
+        
+        private string JsonEncodePublishMsg(object originalMessage)
 		{
 			string message = _jsonPluggableLibrary.SerializeToJsonString(originalMessage);
 			
