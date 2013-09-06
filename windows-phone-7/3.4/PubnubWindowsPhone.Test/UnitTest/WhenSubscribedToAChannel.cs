@@ -31,6 +31,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
         ManualResetEvent meChannel1SubscribeConnect = new ManualResetEvent(false);
         ManualResetEvent meChannel2SubscribeConnect = new ManualResetEvent(false);
         ManualResetEvent meSubscriberManyMessages = new ManualResetEvent(false);
+        ManualResetEvent subscribeEvent = new ManualResetEvent(false);
 
         bool receivedMessage = false;
         bool receivedConnectMessage = false;
@@ -57,6 +58,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     pubnub.PubnubUnitTest = unitTest;
 
                     pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
+                    subscribeEvent.WaitOne(30 * 1000);
                     //Thread.Sleep(500);
                     pubnub.Publish<string>(channel, "Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage", dummyPublishCallback, DummyErrorCallback);
                     mePublish.WaitOne(310 * 1000);
@@ -190,8 +192,17 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     string channel = "hello_my_channel";
 
                     pubnub.Subscribe<string>(channel, SubscriberDummyMethodForManyMessagesUserCallback, SubscribeDummyMethodForManyMessagesConnectCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
-                    meSubscriberManyMessages.WaitOne();
+                    subscribeEvent.WaitOne(310 * 1000);
+                    if (!unitTest.EnableStubTest)
+                    {
+                        for (int index = 0; index < 10; index++)
+                        {
+                            pubnub.Publish<string>(channel, index.ToString(), dummyPublishCallback, DummyErrorCallback);
+                            mePublish.WaitOne(10 * 1000);
+                        }
+                    }
+
+                    meSubscriberManyMessages.WaitOne(310 * 1000);
 
                     pubnub.EndPendingRequests();
 
@@ -217,6 +228,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
         [Asynchronous]
         private void SubscribeDummyMethodForManyMessagesConnectCallback(string result)
         {
+            subscribeEvent.Set();
         }
 
         [Asynchronous]
@@ -341,6 +353,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
         [Asynchronous]
         void SubscribeDummyMethodForConnectCallback(string receivedMessage)
         {
+            subscribeEvent.Set();
         }
 
         [Asynchronous]

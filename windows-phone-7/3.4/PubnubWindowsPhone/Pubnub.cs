@@ -3154,97 +3154,100 @@ namespace PubNubMessaging.Core
 			
 			try
 			{
-				object deSerializedResult = _jsonPluggableLibrary.DeserializeToObject(jsonString);
-				List<object> result1 = ((IEnumerable)deSerializedResult).Cast<object>().ToList();
-				
-				if (result1 != null && result1.Count > 0)
-				{
-					result = result1;
-				}
-				
-				switch (type)
-				{
-				case ResponseType.Publish:
-					result.Add(channels.First<string>());
-					break;
-				case ResponseType.History:
-					if (this.cipherKey.Length > 0)
-					{
-						List<object> historyDecrypted = new List<object>();
-						PubnubCrypto aes = new PubnubCrypto(this.cipherKey);
-						foreach (object message in result)
-						{
-							historyDecrypted.Add(aes.Decrypt(message.ToString()));
-						}
-						History = historyDecrypted;
-					}
-					else
-					{
-						History = result;
-					}
-					break;
-				case ResponseType.DetailedHistory:
-					result = DecodeDecryptLoop(result, channels, errorCallback);
-					result.Add(channels.First<string>());
-					break;
-				case ResponseType.Here_Now:
-					Dictionary<string, object> dictionary = _jsonPluggableLibrary.DeserializeToDictionaryOfObject(jsonString);
-					result = new List<object>();
-					result.Add(dictionary);
-					result.Add(channels.First<string>());
-					break;
-				case ResponseType.Time:
-					break;
-				case ResponseType.Subscribe:
-				case ResponseType.Presence:
-					result.Add(string.Join(",", channels));
-					long receivedTimetoken = (result.Count > 1) ? Convert.ToInt64(result[1].ToString()) : 0;
-					long minimumTimetoken = (_multiChannelSubscribe.Count > 0) ? _multiChannelSubscribe.Min(token => token.Value) : 0;
-					long maximumTimetoken = (_multiChannelSubscribe.Count > 0) ? _multiChannelSubscribe.Max(token => token.Value) : 0;
-					
-					if (minimumTimetoken == 0 || lastTimetoken == 0)
-					{
-						if (maximumTimetoken == 0)
-						{
-							lastSubscribeTimetoken = receivedTimetoken;
-						}
-						else
-						{
-							if (!_enableResumeOnReconnect)
-							{
-								lastSubscribeTimetoken = receivedTimetoken;
-							}
-							else
-							{
-								//do nothing. keep last subscribe token
-							}
-						}
-					}
-					else
-					{
-						if (reconnect)
-						{
-							if (_enableResumeOnReconnect)
-							{
-								//do nothing. keep last subscribe token
-							}
-							else
-							{
-								lastSubscribeTimetoken = receivedTimetoken;
-							}
-						}
-						else
-						{
-							lastSubscribeTimetoken = receivedTimetoken;
-						}
-					}
-					break;
-				case ResponseType.Leave:
-					result.Add(channels);
-					break;
-				default:
-					break;
-				};//switch stmt end
+                if (!string.IsNullOrEmpty(jsonString))
+                {
+                    object deSerializedResult = _jsonPluggableLibrary.DeserializeToObject(jsonString);
+                    List<object> result1 = ((IEnumerable)deSerializedResult).Cast<object>().ToList();
+
+                    if (result1 != null && result1.Count > 0)
+                    {
+                        result = result1;
+                    }
+
+                    switch (type)
+                    {
+                        case ResponseType.Publish:
+                            result.Add(channels.First<string>());
+                            break;
+                        case ResponseType.History:
+                            if (this.cipherKey.Length > 0)
+                            {
+                                List<object> historyDecrypted = new List<object>();
+                                PubnubCrypto aes = new PubnubCrypto(this.cipherKey);
+                                foreach (object message in result)
+                                {
+                                    historyDecrypted.Add(aes.Decrypt(message.ToString()));
+                                }
+                                History = historyDecrypted;
+                            }
+                            else
+                            {
+                                History = result;
+                            }
+                            break;
+                        case ResponseType.DetailedHistory:
+                            result = DecodeDecryptLoop(result, channels, errorCallback);
+                            result.Add(channels.First<string>());
+                            break;
+                        case ResponseType.Here_Now:
+                            Dictionary<string, object> dictionary = _jsonPluggableLibrary.DeserializeToDictionaryOfObject(jsonString);
+                            result = new List<object>();
+                            result.Add(dictionary);
+                            result.Add(channels.First<string>());
+                            break;
+                        case ResponseType.Time:
+                            break;
+                        case ResponseType.Subscribe:
+                        case ResponseType.Presence:
+                            result.Add(string.Join(",", channels));
+                            long receivedTimetoken = (result.Count > 1) ? Convert.ToInt64(result[1].ToString()) : 0;
+                            long minimumTimetoken = (_multiChannelSubscribe.Count > 0) ? _multiChannelSubscribe.Min(token => token.Value) : 0;
+                            long maximumTimetoken = (_multiChannelSubscribe.Count > 0) ? _multiChannelSubscribe.Max(token => token.Value) : 0;
+
+                            if (minimumTimetoken == 0 || lastTimetoken == 0)
+                            {
+                                if (maximumTimetoken == 0)
+                                {
+                                    lastSubscribeTimetoken = receivedTimetoken;
+                                }
+                                else
+                                {
+                                    if (!_enableResumeOnReconnect)
+                                    {
+                                        lastSubscribeTimetoken = receivedTimetoken;
+                                    }
+                                    else
+                                    {
+                                        //do nothing. keep last subscribe token
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (reconnect)
+                                {
+                                    if (_enableResumeOnReconnect)
+                                    {
+                                        //do nothing. keep last subscribe token
+                                    }
+                                    else
+                                    {
+                                        lastSubscribeTimetoken = receivedTimetoken;
+                                    }
+                                }
+                                else
+                                {
+                                    lastSubscribeTimetoken = receivedTimetoken;
+                                }
+                            }
+                            break;
+                        case ResponseType.Leave:
+                            result.Add(channels);
+                            break;
+                        default:
+                            break;
+                    };//switch stmt end
+                }
 			}
 			catch (Exception ex)
 			{

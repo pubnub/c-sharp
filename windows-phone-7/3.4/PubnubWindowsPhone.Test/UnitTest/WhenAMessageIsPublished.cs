@@ -411,10 +411,10 @@ namespace PubnubWindowsPhone.Test.UnitTest
             if (!string.IsNullOrWhiteSpace(result))
             {
                 object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                if (deserializedMessage is object[] && deserializedMessage.Length > 0)
                 {
                     JArray message = deserializedMessage[0] as JArray;
-                    if (message != null && message[0].ToString(Formatting.None) == messageObjectForUnencryptPublish)
+                    if (message != null && message.Count > 0 && message[0].ToString(Formatting.None) == messageObjectForUnencryptPublish)
                     {
                         isUnencryptObjectDetailedHistory = true;
                     }
@@ -430,10 +430,10 @@ namespace PubnubWindowsPhone.Test.UnitTest
             if (!string.IsNullOrWhiteSpace(result))
             {
                 object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                if (deserializedMessage is object[] && deserializedMessage.Length > 0)
                 {
                     JArray message = deserializedMessage[0] as JArray;
-                    if (message != null && message[0].ToString(Formatting.None) == messageObjectForEncryptPublish)
+                    if (message != null && message.Count > 0 && message[0].ToString(Formatting.None) == messageObjectForEncryptPublish)
                     {
                         isEncryptObjectDetailedHistory = true;
                     }

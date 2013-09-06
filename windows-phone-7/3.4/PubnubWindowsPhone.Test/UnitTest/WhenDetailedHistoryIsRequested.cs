@@ -152,6 +152,10 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         mrePublishStartReverseTrue.WaitOne(310 * 1000);
                         Thread.Sleep(200);
                     }
+                    if (!unitTest.EnableStubTest)
+                    {
+                        Thread.Sleep(1000);
+                    }
 
                     pubnub.DetailedHistory<string>(channel, startTimeWithReverseTrue, DetailedHistoryStartWithReverseTrueCallback, DummyErrorCallback, true);
                     mreMessageStartReverseTrue.WaitOne(310 * 1000);
@@ -182,6 +186,10 @@ namespace PubnubWindowsPhone.Test.UnitTest
                                 if (item.ToString().Contains("DetailedHistoryStartTimeWithReverseTrue"))
                                 {
                                     actualCountAtStartTimeWithReverseFalse++;
+                                }
+                                if (actualCountAtStartTimeWithReverseFalse >= expectedCountAtStartTimeWithReverseTrue)
+                                {
+                                    break;
                                 }
                             }
                             if (actualCountAtStartTimeWithReverseFalse == expectedCountAtStartTimeWithReverseTrue)

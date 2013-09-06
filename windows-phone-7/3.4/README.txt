@@ -1,7 +1,7 @@
-# PubNub 3.3.0.1 Web Data Push Cloud-Hosted API
+# PubNub 3.4 Web Data Push Cloud-Hosted API
 # Windows Phone 7.1
 
-Open csharp-windows-phone/3.3.0.1/PubnubWindowsPhone.sln and the .xaml files(MainPage.xaml, PubnubOperation.xaml, PublishMessageUserControl.xaml) should demonstrate all functionality, asynchronously using callbacks/delegates. You can also view and inspect the tests for additional insight.
+Open c-sharp/windows-phone-7/3.4/PubnubWindowsPhone.sln and the .xaml files(MainPage.xaml, PubnubOperation.xaml, PublishMessageUserControl.xaml) should demonstrate all functionality, asynchronously using callbacks/delegates. You can also view and inspect the tests for additional insight.
 
 ## Running the Demo App
 

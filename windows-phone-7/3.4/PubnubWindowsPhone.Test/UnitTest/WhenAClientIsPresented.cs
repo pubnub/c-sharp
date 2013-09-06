@@ -203,10 +203,13 @@ namespace PubnubWindowsPhone.Test.UnitTest
                            if (!string.IsNullOrWhiteSpace(receivedMessage))
                            {
                                object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                               var dictionary = ((JContainer)serializedMessage[0])["uuids"];
-                               if (dictionary != null)
+                               if (serializedMessage != null && serializedMessage.Length > 0)
                                {
-                                   receivedHereNowMessage = true;
+                                   var dictionary = ((JContainer)serializedMessage[0])["uuids"];
+                                   if (dictionary != null)
+                                   {
+                                       receivedHereNowMessage = true;
+                                   }
                                }
                            }
                        });
@@ -256,7 +259,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     JContainer dictionary = serializedMessage[0] as JContainer;
                     if (dictionary != null)
                     {
-                        var uuid = dictionary["uuid"].ToString();
+                        var uuid = dictionary["uuid"];
                         if (uuid != null)
                         {
                             receivedCustomUUID = true;
