@@ -928,8 +928,26 @@ namespace PubNubMessaging.Core
 		{
 			string[] rawChannels = channel.Split(',');
 			List<string> validChannels = new List<string>();
-			
-			if (rawChannels.Length > 0)
+            
+            bool networkConnection;
+            if (_pubnubUnitTest is IPubnubUnitTest && _pubnubUnitTest.EnableStubTest)
+            {
+                networkConnection = true;
+            }
+            else
+            {
+                networkConnection = ClientNetworkStatus.CheckInternetStatus(_pubnetSystemActive, errorCallback, rawChannels);
+                if (!networkConnection)
+                {
+                    List<object> result = new List<object>();
+                    string jsonString = "[0, \"Network connnect error\"]";
+                    result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
+                    result.Add(channel);
+                    GoToCallback<T>(result, errorCallback);
+                }
+            }
+
+			if (rawChannels.Length > 0 && networkConnection)
 			{
 				if (rawChannels.Length != rawChannels.Distinct().Count())
 				{
