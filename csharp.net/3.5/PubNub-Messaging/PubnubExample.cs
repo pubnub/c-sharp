@@ -14,6 +14,7 @@ namespace PubNubMessaging.Core
         static public bool deliveryStatus = false;
         static public string channel = "";
         static public bool showErrorCallbackMessages = true;
+        static public string authKey = "";
 
         static public void Main()
         {
@@ -26,6 +27,21 @@ namespace PubNubMessaging.Core
             Console.WriteLine();
             Console.WriteLine("      IF NO NETWORK BEFORE MAX RE-TRY CONNECT,");
             Console.WriteLine("      NETWORK ERROR MESSAGE WILL BE SENT");
+            Console.WriteLine();
+
+            Console.WriteLine("Enter Pubnub Origin. Default Origin = pubsub.pubnub.com");
+            Console.WriteLine("If you want to accept default value, press ENTER.");
+            string origin = Console.ReadLine();
+            Console.ForegroundColor = ConsoleColor.Blue;
+            if (origin.Trim() == "")
+            {
+                Console.WriteLine("Default Origin selected");
+            }
+            else
+            {
+                Console.WriteLine("Pubnub Origin Provided");
+            }
+            Console.ResetColor();
             Console.WriteLine();
 
             Console.WriteLine("Enable SSL? ENTER Y for Yes, else N");
@@ -57,7 +73,8 @@ namespace PubNubMessaging.Core
             Console.ResetColor();
             Console.WriteLine();
 
-            pubnub = new Pubnub("demo", "demo", "", cipheryKey,
+            //pubnub = new Pubnub("demo", "demo", "", cipheryKey,
+            pubnub = new Pubnub("pub-c-a2650a22-deb1-44f5-aa87-1517049411d5", "sub-c-a478dd2a-c33d-11e2-883f-02ee2ddab7fe", "sec-c-YjFmNzYzMGMtYmI3NC00NzJkLTlkYzYtY2MwMzI4YTJhNDVh", cipheryKey,
                 (enableSSL.Trim().ToLower() == "y") ? true : false);
 
             Console.WriteLine("Use Custom Session UUID? ENTER Y for Yes, else N");
@@ -230,6 +247,15 @@ namespace PubNubMessaging.Core
             }
             Console.WriteLine();
 
+            Console.WriteLine("Enter Auth Key. If you don't want to use Auth Key, Press ENTER Key");
+            authKey = Console.ReadLine();
+            pubnub.AuthenticationKey = authKey;
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine(string.Format("Auth Key = {0}", authKey));
+            Console.ResetColor();
+            Console.WriteLine();
+
             Console.WriteLine("Display ErrorCallback messages? Enter Y for Yes, Else N for No.");
             Console.WriteLine("Default = Y  ");
             string displayErrMessage = Console.ReadLine();
@@ -258,6 +284,10 @@ namespace PubNubMessaging.Core
             Console.WriteLine("ENTER 9 FOR Disconnect/Reconnect existing Subscriber(s) (when internet is available)");
             Console.WriteLine("ENTER 10 TO Disable Network Connection (no internet)");
             Console.WriteLine("ENTER 11 TO Enable Network Connection (yes internet)");
+            Console.WriteLine("ENTER 12 FOR Grant Access");
+            Console.WriteLine("ENTER 13 FOR Audit Access");
+            Console.WriteLine("ENTER 14 FOR Revoke Access");
+            Console.WriteLine("ENTER 15 FOR Change/Update Auth Key");
             Console.WriteLine("ENTER 99 FOR EXIT OR QUIT");
 
             bool exitFlag = false;
@@ -432,9 +462,77 @@ namespace PubNubMessaging.Core
                     case "11":
                         Console.WriteLine("Enabling Network Connection (yes internet)");
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Stopping Simulation of Internet non-availability");
+                        Console.WriteLine("Stopping Simulation of Internet non-availability");  
                         Console.ResetColor();
                         pubnub.DisableSimulateNetworkFailForTestingOnly();
+                        break;
+                    case "12":
+                        Console.WriteLine("Enter CHANNEL name for PAM Grant. For Presence explict -pnpres needs to be appended for channel.");
+                        channel = Console.ReadLine();
+                        Console.WriteLine("Read Access? Enter Y for Yes (default), N for No.");
+                        string readAccess = Console.ReadLine();
+                        bool read = (readAccess.ToLower() == "n") ? false : true;
+                        Console.WriteLine("Write Access? Enter Y for Yes (default), N for No.");
+                        string writeAccess = Console.ReadLine();
+                        bool write = (writeAccess.ToLower() == "n") ? false : true;
+                        Console.WriteLine("How many minutes do you want to allow Grant Access? Enter the number of minutes.");
+                        Console.WriteLine("Default = 1440 minutes (24 hours). Press ENTER now to accept default value.");
+                        string grantTimeLimit = Console.ReadLine();
+                        int grantTimeLimitInSeconds;
+                        Int32.TryParse(grantTimeLimit, out grantTimeLimitInSeconds);
+                        if (grantTimeLimitInSeconds == 0) grantTimeLimitInSeconds = 1440;
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}",channel));
+                        Console.WriteLine(string.Format("Read Access = {0}", read.ToString()));
+                        Console.WriteLine(string.Format("Write Access = {0}", write.ToString()));
+                        Console.WriteLine(string.Format("Grant Access Time Limit = {0}", grantTimeLimitInSeconds.ToString()));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
+                        Console.WriteLine("Running PamGrant()");
+                        pubnub.GrantAccess<string>(channel, read, write, grantTimeLimitInSeconds, DisplayReturnMessage, DisplayErrorMessage);
+                        //if (!string.IsNullOrEmpty(channel))
+                        //{
+                        //    Console.WriteLine("Running PamGrant() for presence as well **WORKAROUND UNTIL SERVER CODE FIX**");
+                        //    pubnub.GrantAccess<string>(channel + "-pnpres", read, true, grantTimeLimitInSeconds, DisplayReturnMessage, DisplayErrorMessage);
+                        //}
+                        break;
+                    case "13":
+                        Console.WriteLine("Enter CHANNEL name for PAM Audit");
+                        channel = Console.ReadLine();
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}", channel));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
+                        Console.WriteLine("Running PamAudit()");
+                        pubnub.AuditAccess<string>(channel,DisplayReturnMessage, DisplayErrorMessage);
+                        break;
+                    case "14":
+                        Console.WriteLine("Enter CHANNEL name for PAM Revoke");
+                        channel = Console.ReadLine();
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}", channel));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
+                        Console.WriteLine("Running PamRevoke()");
+                        pubnub.GrantAccess<string>(channel, false,false, DisplayReturnMessage, DisplayErrorMessage);
+                        break;
+                    case "15":
+                        Console.WriteLine("Enter Auth Key. Use comma to enter multiple Auth Keys.");
+                        Console.WriteLine("If you don't want to use Auth Key, Press ENTER Key");
+                        authKey = Console.ReadLine();
+                        pubnub.AuthenticationKey = authKey;
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Auth Key(s) = {0}", authKey));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
                         break;
                     default:
                         Console.WriteLine("INVALID CHOICE. ENTER 99 FOR EXIT OR QUIT");

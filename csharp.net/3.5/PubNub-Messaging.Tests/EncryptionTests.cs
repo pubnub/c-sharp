@@ -567,6 +567,17 @@ namespace PubNubMessaging.Tests
             Assert.AreEqual("stpgsG1DZZxb44J7mFNSzg==", encryptedMessage);
         }
 
+        [Test]
+        public void TestPAMSignature()
+        {
+            PubnubCrypto crypto = new PubnubCrypto("");
+            string secretKey = "secret";
+            string message = "Pubnub Messaging 1";
+
+            string signature = crypto.PubnubAccessManagerSign(secretKey, message);
+
+            Assert.AreEqual("mIoxTVM2WAM5j-M2vlp9bVblDLoZQI5XIoYyQ48U0as=", signature);
+        }
         /// <summary>
         /// Tests the cipher.
         /// </summary>

@@ -86,11 +86,14 @@
   <ItemGroup>
     <Compile Include="EncryptionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PubnubCommon.cs" />
     <Compile Include="PubnubUnitTest.cs" />
     <Compile Include="WhenAClientIsPresented.cs" />
     <Compile Include="WhenAMessageIsPublished.cs" />
+    <Compile Include="WhenAuditIsRequested.cs" />
     <Compile Include="WhenDetailedHistoryIsRequested.cs" />
     <Compile Include="WhenGetRequestServerTime.cs" />
+    <Compile Include="WhenGrantIsRequested.cs" />
     <Compile Include="WhenSubscribedToAChannel.cs" />
     <Compile Include="WhenUnsubscribedToAChannel.cs" />
   </ItemGroup>

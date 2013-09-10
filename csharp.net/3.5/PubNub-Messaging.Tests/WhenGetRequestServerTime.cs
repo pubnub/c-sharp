@@ -23,7 +23,7 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenItShouldReturnTimeStamp()
         {
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGetRequestServerTime";
@@ -39,6 +39,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenWithProxyItShouldReturnTimeStamp()
         {
+            bool proxyConfigured = false;
+
             PubnubProxy proxy = new PubnubProxy();
             proxy.ProxyServer = "test.pandu.com";
             proxy.ProxyPort = 808;
@@ -46,17 +48,24 @@ namespace PubNubMessaging.Tests
             proxy.ProxyPassword = "Rx8zW78k";
 
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-            pubnub.Proxy = proxy;
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGetRequestServerTime";
             unitTest.TestCaseName = "ThenWithProxyItShouldReturnTimeStamp";
-
             pubnub.PubnubUnitTest = unitTest;
+            
+            if (proxyConfigured)
+            {
+                pubnub.Proxy = proxy;
+                pubnub.Time<string>(ReturnProxyPresenceTimeStampCallback, DummyErrorCallback);
+                mreProxy.WaitOne(310 * 1000);
+                Assert.IsTrue(timeReceivedWhenProxy, "time() Failed");
+            }
+            else
+            {
+                Assert.Ignore("Proxy setup not configured. After setup Set proxyConfigured to true");
+            }
 
-            pubnub.Time<string>(ReturnProxyPresenceTimeStampCallback, DummyErrorCallback);
-            mreProxy.WaitOne(310 * 1000);
-            Assert.IsTrue(timeReceivedWhenProxy, "time() Failed");
         }
 
         private void ReturnTimeStampCallback(string result)

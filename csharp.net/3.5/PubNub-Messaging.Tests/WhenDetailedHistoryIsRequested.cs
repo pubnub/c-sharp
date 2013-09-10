@@ -19,21 +19,46 @@ namespace PubNubMessaging.Tests
         ManualResetEvent mreMessageCount10ReverseTrue = new ManualResetEvent(false);
         ManualResetEvent mreMessageStartReverseTrue = new ManualResetEvent(false);
         ManualResetEvent mrePublishStartReverseTrue = new ManualResetEvent(false);
-
+        ManualResetEvent grantManualEvent = new ManualResetEvent(false);
 
         bool message10Received = false;
         bool message10ReverseTrueReceived = false;
         bool messageStartReverseTrue = false;
+        bool receivedGrantMessage = false;
 
         int expectedCountAtStartTimeWithReverseTrue=0;
         long startTimeWithReverseTrue = 0;
+
+        [TestFixtureSetUp]
+        public void Init()
+        {
+            if (!PubnubCommon.PAMEnabled) return;
+
+            receivedGrantMessage = false;
+
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "GrantRequestUnitTest";
+            unitTest.TestCaseName = "Init";
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channel = "hello_my_channel";
+
+            pubnub.GrantAccess<string>(channel, true, true, 20, ThenDetailedHistoryInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            Thread.Sleep(1000);
+
+            grantManualEvent.WaitOne();
+
+            Assert.IsTrue(receivedGrantMessage, "WhenDetailedHistoryIsRequested Grant access failed.");
+        }
 
         [Test]
         public void DetailHistoryCount10ReturnsRecords()
         {
             message10Received = false;
 
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
@@ -46,6 +71,28 @@ namespace PubNubMessaging.Tests
             pubnub.DetailedHistory<string>(channel, 10, DetailedHistoryCount10Callback, DummyErrorCallback);
             mreMessageCount10.WaitOne(310 * 1000);
             Assert.IsTrue(message10Received, "Detailed History Failed");
+        }
+
+        void ThenDetailedHistoryInitializeShouldReturnGrantMessage(string receivedMessage)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                {
+                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
+                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    var status = dictionary["status"].ToString();
+                    if (status == "200")
+                    {
+                        receivedGrantMessage = true;
+                    }
+                }
+            }
+            catch { }
+            finally
+            {
+                grantManualEvent.Set();
+            }
         }
 
         void DetailedHistoryCount10Callback(string result)
@@ -74,7 +121,7 @@ namespace PubNubMessaging.Tests
         {
             message10ReverseTrueReceived = false;
 
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
@@ -115,7 +162,7 @@ namespace PubNubMessaging.Tests
         {
             expectedCountAtStartTimeWithReverseTrue = 0;
             messageStartReverseTrue = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
@@ -162,7 +209,7 @@ namespace PubNubMessaging.Tests
                                     actualCountAtStartTimeWithReverseFalse++;
                                 }
                             }
-                            if (actualCountAtStartTimeWithReverseFalse == expectedCountAtStartTimeWithReverseTrue)
+                            if (actualCountAtStartTimeWithReverseFalse >= expectedCountAtStartTimeWithReverseTrue)
                             {
                                 messageStartReverseTrue = true;
                             }
