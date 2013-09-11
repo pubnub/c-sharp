@@ -1,4 +1,4 @@
-﻿//Build Date: September 10, 2013
+﻿//Build Date: September 12, 2013
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
 #define USE_JSONFX
 #endif
@@ -413,9 +413,9 @@ namespace PubNubMessaging.Core
                                     if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(activeChannel))
                                     {
                                         PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[activeChannel] as PubnubChannelCallback<T>;
-                                        if (currentPubnubCallback != null && currentPubnubCallback.ConnectCallback != null)
+                                        if (currentPubnubCallback != null && currentPubnubCallback.ErrorCallback != null)
                                         {
-                                            GoToCallback<T>(result, currentPubnubCallback.ConnectCallback);
+                                            GoToCallback<T>(result, currentPubnubCallback.ErrorCallback);
                                         }
                                     }
                                 }
@@ -435,7 +435,7 @@ namespace PubNubMessaging.Core
 						string jsonString = string.Format("[1, \"Internet connection available\"]");
 						result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
 						result.Add(string.Join(",", netState.Channels));
-						GoToCallback<T>(result, netState.ConnectCallback);
+						GoToCallback<T>(result, netState.ErrorCallback);
 						
 						LoggingMethod.WriteToLog(string.Format("DateTime {0}, {1} {2} reconnectNetworkCallback. Internet Available : {3}", DateTime.Now.ToString(), channel, netState.Type, _channelInternetStatus[channel]), LoggingMethod.LevelInfo);
 						switch (netState.Type)
@@ -956,7 +956,7 @@ namespace PubNubMessaging.Core
 					string jsonString = "[0, \"Detected and removed duplicate channels\"]";
 					result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
 					result.Add(channel);
-					GoToCallback<T>(result, userCallback);
+                    GoToCallback<T>(result, errorCallback);
 				}
 				
 				for (int index = 0; index < rawChannels.Length; index++)
@@ -976,7 +976,7 @@ namespace PubNubMessaging.Core
 							result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
 							result.Add(channelName.Replace("-pnpres",""));
 							LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
-							GoToCallback<T>(result, userCallback);
+                            GoToCallback<T>(result, errorCallback);
 						}
 						else
 						{
@@ -990,7 +990,7 @@ namespace PubNubMessaging.Core
 						result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
 						result.Add(channel.Replace("-pnpres", ""));
 						LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
-						GoToCallback<T>(result, userCallback);
+                        GoToCallback<T>(result, errorCallback);
 					}
 				}
 			}
@@ -1082,7 +1082,7 @@ namespace PubNubMessaging.Core
 							result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
 							result.Add(channelName.Replace("-pnpres", ""));
 							LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
-                            GoToCallback<T>(result, userCallback);
+                            GoToCallback<T>(result, errorCallback);
 						}
 						else
 						{
@@ -1097,7 +1097,7 @@ namespace PubNubMessaging.Core
 						result.Add(channel.Replace("-pnpres", ""));
 						LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
 
-                        GoToCallback<T>(result, userCallback);
+                        GoToCallback<T>(result, errorCallback);
 					}
 				}
 			}
@@ -1155,11 +1155,11 @@ namespace PubNubMessaging.Core
 					else
 					{
 						List<object> result = new List<object>();
-						string jsonString = string.Format("[1, \"{0}unsubscribe error from {1}\"]", (IsPresenceChannel(channelToBeRemoved)) ? "Presence " : "", channelToBeRemoved.Replace("-pnpres", ""));
+						string jsonString = string.Format("[0, \"{0}unsubscribe error from {1}\"]", (IsPresenceChannel(channelToBeRemoved)) ? "Presence " : "", channelToBeRemoved.Replace("-pnpres", ""));
 						result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
 						result.Add(channelToBeRemoved.Replace("-pnpres", ""));
 						LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
-						GoToCallback<T>(result, userCallback);
+						GoToCallback<T>(result, errorCallback);
 					}
 				}
 				
@@ -2339,7 +2339,7 @@ namespace PubNubMessaging.Core
 						string jsonString = string.Format("[0, \"Detected internet connection problem. Retrying connection attempt {0} of {1}\"]", _channelInternetRetry[channel], _pubnubNetworkCheckRetries);
 						result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
                         result.Add(multiChannel);
-						GoToCallback<T>(result, asynchRequestState.ConnectCallback);
+						GoToCallback<T>(result, asynchRequestState.ErrorCallback);
 					}
 					_channelInternetStatus[channel] = false;
 					
@@ -2403,7 +2403,7 @@ namespace PubNubMessaging.Core
                                                 PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[activeChannel] as PubnubChannelCallback<T>;
                                                 if (currentPubnubCallback != null && currentPubnubCallback.ConnectCallback != null)
                                                 {
-                                                    GoToCallback<T>(internetStatus, currentPubnubCallback.ConnectCallback);
+                                                    GoToCallback<T>(internetStatus, currentPubnubCallback.ErrorCallback);
                                                 }
                                             }
                                         }
@@ -3099,19 +3099,19 @@ namespace PubNubMessaging.Core
 			}
 			else if (type == ResponseType.Publish)
 			{
-				PublishExceptionHandler<T>(channels[0], requestTimeout, userCallback);
+				PublishExceptionHandler<T>(channels[0], requestTimeout, errorCallback);
 			}
 			else if (type == ResponseType.Here_Now)
 			{
-				HereNowExceptionHandler<T>(channels[0], requestTimeout, userCallback);
+                HereNowExceptionHandler<T>(channels[0], requestTimeout, errorCallback);
 			}
 			else if (type == ResponseType.DetailedHistory)
 			{
-				DetailedHistoryExceptionHandler<T>(channels[0], requestTimeout, userCallback);
+                DetailedHistoryExceptionHandler<T>(channels[0], requestTimeout, errorCallback);
 			}
 			else if (type == ResponseType.Time)
 			{
-				TimeExceptionHandler<T>(requestTimeout, userCallback);
+                TimeExceptionHandler<T>(requestTimeout, errorCallback);
 			}
 			else if (type == ResponseType.Leave)
 			{
@@ -3259,7 +3259,7 @@ namespace PubNubMessaging.Core
                             PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[activeChannel] as PubnubChannelCallback<T>;
                             if (currentPubnubCallback != null && currentPubnubCallback.Callback != null)
                             {
-                                GoToCallback<T>(errorResult, currentPubnubCallback.Callback);
+                                GoToCallback<T>(errorResult, currentPubnubCallback.ErrorCallback);
                             }
                         }
 
@@ -3282,7 +3282,7 @@ namespace PubNubMessaging.Core
                             PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[activeChannel] as PubnubChannelCallback<T>;
                             if (currentPubnubCallback != null && currentPubnubCallback.Callback != null)
                             {
-                                GoToCallback<T>(errorResult, currentPubnubCallback.Callback);
+                                GoToCallback<T>(errorResult, currentPubnubCallback.ErrorCallback);
                             }
                         }
 
@@ -3309,43 +3309,43 @@ namespace PubNubMessaging.Core
 			}
 		}
 		
-		private void PublishExceptionHandler<T>(string channelName, bool requestTimeout, Action<T> userCallback)
+		private void PublishExceptionHandler<T>(string channelName, bool requestTimeout, Action<T> errorCallback)
 		{
 			List<object> result = new List<object>();
 			string jsonString = (requestTimeout) ? "[0, \"Operation Timeout\"]" : "[0, \"Network connnect error\"]";
 			result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
 			result.Add(channelName);
 			LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON publish response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
-			GoToCallback<T>(result, userCallback);
+			GoToCallback<T>(result, errorCallback);
 		}
 		
-		private void HereNowExceptionHandler<T>(string channelName, bool requestTimeout, Action<T> userCallback)
+		private void HereNowExceptionHandler<T>(string channelName, bool requestTimeout, Action<T> errorCallback)
 		{
 			List<object> result = new List<object>();
 			string jsonString = (requestTimeout) ? "[0, \"Operation Timeout\"]" : "[0, \"Network connnect error\"]";
 			result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
 			result.Add(channelName);
 			LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON here_now response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
-			GoToCallback<T>(result, userCallback);
+            GoToCallback<T>(result, errorCallback);
 		}
 		
-		private void DetailedHistoryExceptionHandler<T>(string channelName, bool requestTimeout, Action<T> userCallback)
+		private void DetailedHistoryExceptionHandler<T>(string channelName, bool requestTimeout, Action<T> errorCallback)
 		{
 			List<object> result = new List<object>();
 			string jsonString = (requestTimeout) ? "[0, \"Operation Timeout\"]" : "[0, \"Network connnect error\"]";
 			result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
 			result.Add(channelName);
 			LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON detailedHistoryExceptionHandler response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
-			GoToCallback<T>(result, userCallback);
+			GoToCallback<T>(result, errorCallback);
 		}
 		
-		private void TimeExceptionHandler<T>(bool requestTimeout, Action<T> userCallback)
+		private void TimeExceptionHandler<T>(bool requestTimeout, Action<T> errorCallback)
 		{
 			List<object> result = new List<object>();
 			string jsonString = (requestTimeout) ? "[0, \"Operation Timeout\"]" : "[0, \"Network connnect error\"]";
 			result = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
 			LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON timeExceptionHandler response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
-			GoToCallback<T>(result, userCallback);
+			GoToCallback<T>(result, errorCallback);
 		}
 		
 		/// <summary>
@@ -3746,6 +3746,25 @@ namespace PubNubMessaging.Core
 
         }
 
+        public bool GrantPresenceAccess<T>(string channel, bool read, bool write, Action<T> userCallback, Action<T> errorCallback)
+        {
+            return GrantPresenceAccess(channel, read, write, -1, userCallback, errorCallback);
+        }
+
+        public bool GrantPresenceAccess<T>(string channel, bool read, bool write, int ttl, Action<T> userCallback, Action<T> errorCallback)
+        {
+            string[] multiChannels = channel.Split(',');
+            if (multiChannels.Length > 0)
+            {
+                for (int index = 0; index < multiChannels.Length; index++)
+                {
+                    multiChannels[index] = string.Format("{0}-pnpres", multiChannels[index]);
+                }
+            }
+            string presenceChannel = string.Join(",", multiChannels);
+            return GrantAccess(presenceChannel, read, write, ttl, userCallback, errorCallback);
+        }
+
         public void AuditAccess<T>(Action<T> userCallback, Action<T> errorCallback)
         {
             AuditAccess("", userCallback, errorCallback);
@@ -3768,7 +3787,20 @@ namespace PubNubMessaging.Core
             UrlProcessRequest<T>(request, requestState);
         }
 
-	}
+        public void AuditPresenceAccess<T>(string channel, Action<T> userCallback, Action<T> errorCallback)
+        {
+            string[] multiChannels = channel.Split(',');
+            if (multiChannels.Length > 0)
+            {
+                for (int index = 0; index < multiChannels.Length; index++)
+                {
+                    multiChannels[index] = string.Format("{0}-pnpres", multiChannels[index]);
+                }
+            }
+            string presenceChannel = string.Join(",", multiChannels);
+            AuditAccess(presenceChannel, userCallback, errorCallback);
+        }
+    }
 	
 	/// <summary>
 	/// MD5 Service provider

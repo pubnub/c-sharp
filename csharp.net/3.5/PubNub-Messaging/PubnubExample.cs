@@ -287,7 +287,10 @@ namespace PubNubMessaging.Core
             Console.WriteLine("ENTER 12 FOR Grant Access");
             Console.WriteLine("ENTER 13 FOR Audit Access");
             Console.WriteLine("ENTER 14 FOR Revoke Access");
-            Console.WriteLine("ENTER 15 FOR Change/Update Auth Key");
+            Console.WriteLine("ENTER 15 FOR Grant Access for Presence Channel");
+            Console.WriteLine("ENTER 16 FOR Audit Access for Presence Channel");
+            Console.WriteLine("ENTER 17 FOR Revoke Access for Presence Channel");
+            Console.WriteLine("ENTER 18 FOR Change/Update Auth Key");
             Console.WriteLine("ENTER 99 FOR EXIT OR QUIT");
 
             bool exitFlag = false;
@@ -467,7 +470,7 @@ namespace PubNubMessaging.Core
                         pubnub.DisableSimulateNetworkFailForTestingOnly();
                         break;
                     case "12":
-                        Console.WriteLine("Enter CHANNEL name for PAM Grant. For Presence explict -pnpres needs to be appended for channel.");
+                        Console.WriteLine("Enter CHANNEL name for PAM Grant. For Presence, Select Option 15.");
                         channel = Console.ReadLine();
                         Console.WriteLine("Read Access? Enter Y for Yes (default), N for No.");
                         string readAccess = Console.ReadLine();
@@ -492,11 +495,6 @@ namespace PubNubMessaging.Core
 
                         Console.WriteLine("Running PamGrant()");
                         pubnub.GrantAccess<string>(channel, read, write, grantTimeLimitInSeconds, DisplayReturnMessage, DisplayErrorMessage);
-                        //if (!string.IsNullOrEmpty(channel))
-                        //{
-                        //    Console.WriteLine("Running PamGrant() for presence as well **WORKAROUND UNTIL SERVER CODE FIX**");
-                        //    pubnub.GrantAccess<string>(channel + "-pnpres", read, true, grantTimeLimitInSeconds, DisplayReturnMessage, DisplayErrorMessage);
-                        //}
                         break;
                     case "13":
                         Console.WriteLine("Enter CHANNEL name for PAM Audit");
@@ -523,6 +521,57 @@ namespace PubNubMessaging.Core
                         pubnub.GrantAccess<string>(channel, false,false, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "15":
+                        Console.WriteLine("Enter CHANNEL name for PAM Grant Presence.");
+                        channel = Console.ReadLine();
+                        Console.WriteLine("Read Access? Enter Y for Yes (default), N for No.");
+                        string readPresenceAccess = Console.ReadLine();
+                        bool readPresence = (readPresenceAccess.ToLower() == "n") ? false : true;
+                        Console.WriteLine("Write Access? Enter Y for Yes (default), N for No.");
+                        string writePresenceAccess = Console.ReadLine();
+                        bool writePresence = (writePresenceAccess.ToLower() == "n") ? false : true;
+                        Console.WriteLine("How many minutes do you want to allow Grant Presence Access? Enter the number of minutes.");
+                        Console.WriteLine("Default = 1440 minutes (24 hours). Press ENTER now to accept default value.");
+                        string grantPresenceTimeLimit = Console.ReadLine();
+                        int grantPresenceTimeLimitInSeconds;
+                        Int32.TryParse(grantPresenceTimeLimit, out grantPresenceTimeLimitInSeconds);
+                        if (grantPresenceTimeLimitInSeconds == 0) grantTimeLimitInSeconds = 1440;
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}", channel));
+                        Console.WriteLine(string.Format("Read Access = {0}", readPresence.ToString()));
+                        Console.WriteLine(string.Format("Write Access = {0}", writePresence.ToString()));
+                        Console.WriteLine(string.Format("Grant Access Time Limit = {0}", grantPresenceTimeLimitInSeconds.ToString()));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
+                        Console.WriteLine("Running PAM GrantPresenceAccess()");
+                        pubnub.GrantPresenceAccess<string>(channel, readPresence, writePresence, grantPresenceTimeLimitInSeconds, DisplayReturnMessage, DisplayErrorMessage);
+                        break;
+                    case "16":
+                        Console.WriteLine("Enter CHANNEL name for PAM Presence Audit");
+                        channel = Console.ReadLine();
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}", channel));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
+                        Console.WriteLine("Running PAM Presence Audit()");
+                        pubnub.AuditPresenceAccess<string>(channel, DisplayReturnMessage, DisplayErrorMessage);
+                        break;
+                    case "17":
+                        Console.WriteLine("Enter CHANNEL name for PAM Presence Revoke");
+                        channel = Console.ReadLine();
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}", channel));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
+                        Console.WriteLine("Running PAM Presence Revoke()");
+                        pubnub.GrantPresenceAccess<string>(channel, false, false, DisplayReturnMessage, DisplayErrorMessage);
+                        break;
+                    case "18":
                         Console.WriteLine("Enter Auth Key. Use comma to enter multiple Auth Keys.");
                         Console.WriteLine("If you don't want to use Auth Key, Press ENTER Key");
                         authKey = Console.ReadLine();
