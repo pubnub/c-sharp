@@ -5,16 +5,18 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-    <title>PubNub Demo Example for ASP.NET (NET 4.0)</title>
+    <title>PubNub Demo Example for ASP.NET (NET 4.0/4.5)</title>
     <style type="text/css">
         body
         {
             font-family: Verdana;
             font-size: small;
+            margin:0;
         }
         table.mainContainer
         {
             border: 1px #000000 solid;
+            vertical-align:top;
         }
         
         col.mainContainerColgroupCol1
@@ -110,7 +112,7 @@
                 <col class="mainContainerColgroupCol2" />
             </colgroup>
             <tr>
-                <td>
+                <td valign="top">
                     <asp:UpdatePanel ID="UpdatePanelLeft" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional">
                         <Triggers>
                             <asp:AsyncPostBackTrigger ControlID="btnReset" />
@@ -126,10 +128,10 @@
                         </Triggers>
                         <ContentTemplate>
                             <fieldset>
-                                <table>
+                                <table border="0" cellpadding="0" cellspacing="0">
                                     <tr>
-                                        <td>
-                                            <table width="100%">
+                                        <td valign="top">
+                                            <table width="100%" border="0" cellpadding="0" cellspacing="0">
                                                 <tr>
                                                     <td align="right">
                                                         <asp:Button ID="btnReset" runat="server" Text="Reset Pubnub Instance" Enabled="false"
@@ -151,8 +153,8 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>
-                                            <table>
+                                        <td valign="top">
+                                            <table border="0" cellpadding="0" cellspacing="0">
                                                 <tr>
                                                     <td>
                                                         Cipher Key
@@ -166,7 +168,7 @@
                                                         Secret Key
                                                     </td>
                                                     <td>
-                                                        <asp:TextBox ID="txtSecret" runat="server" Text="" Width="150" AutoPostBack="false" />
+                                                        <asp:TextBox ID="txtSecret" runat="server" Text="sec-c-YjFmNzYzMGMtYmI3NC00NzJkLTlkYzYtY2MwMzI4YTJhNDVh" Width="150" AutoPostBack="false" />
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -175,6 +177,14 @@
                                                     </td>
                                                     <td>
                                                         <asp:TextBox ID="txtUUID" runat="server" Text="" Width="150" AutoPostBack="false" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        Auth Key
+                                                    </td>
+                                                    <td>
+                                                        <asp:TextBox ID="txtAuthKey" runat="server" Text="" Width="150" AutoPostBack="false" />
                                                     </td>
                                                 </tr>
                                             </table>
@@ -277,20 +287,32 @@
                                                 </tr>
                                                 <tr>
                                                     <td>
+                                                        <asp:Button ID="btnGrant" runat="server" Text="Grant Access" Width="138px"
+                                                            CommandName="GrantAccess" OnCommand="btnGrant_Command" />
+                                                    </td>
+                                                    <td>
+                                                        <asp:Button ID="btnRevoke" runat="server" Text="RevokeAccess" Width="138px" CommandName="RevokeAccess"
+                                                            OnCommand="btnRevoke_Command" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <asp:Button ID="btnAudit" runat="server" Text="Audit Access" Width="138px"
+                                                            CommandName="AuditAccess" OnCommand="btnAudit_Command" />
+                                                    </td>
+                                                    <td>
+                                                        <asp:Button ID="btnDisconnectAndRetry" runat="server" Text="Disconnect/Retry" Width="138px"
+                                                            CommandName="DisconnectAndRetry" OnCommand="btnDisconnectAndRetry_Command" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
                                                         <asp:Button ID="btnDisableNetwork" runat="server" Text="Disable Network" Width="138px"
                                                             CommandName="DisableNetwork" OnCommand="btnDisableNetwork_Command" />
                                                     </td>
                                                     <td>
                                                         <asp:Button ID="btnEnableNetwork" runat="server" Text="Enable Network" Width="138px"
                                                             CommandName="EnableNetwork" OnCommand="btnEnableNetwork_Command" />
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <asp:Button ID="btnDisconnectAndRetry" runat="server" Text="Disconnect/Retry" Width="138px"
-                                                            CommandName="DisconnectAndRetry" OnCommand="btnDisconnectAndRetry_Command" />
-                                                    </td>
-                                                    <td>
                                                     </td>
                                                 </tr>
                                                 <tr>

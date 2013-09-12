@@ -94,6 +94,15 @@ namespace PubNubMessaging {
         protected global::System.Web.UI.WebControls.TextBox txtUUID;
         
         /// <summary>
+        /// txtAuthKey control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtAuthKey;
+        
+        /// <summary>
         /// txtSubscribeTimeout control.
         /// </summary>
         /// <remarks>
@@ -220,6 +229,42 @@ namespace PubNubMessaging {
         protected global::System.Web.UI.WebControls.Button btnTime;
         
         /// <summary>
+        /// btnGrant control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnGrant;
+        
+        /// <summary>
+        /// btnRevoke control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnRevoke;
+        
+        /// <summary>
+        /// btnAudit control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnAudit;
+        
+        /// <summary>
+        /// btnDisconnectAndRetry control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnDisconnectAndRetry;
+        
+        /// <summary>
         /// btnDisableNetwork control.
         /// </summary>
         /// <remarks>
@@ -236,15 +281,6 @@ namespace PubNubMessaging {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnEnableNetwork;
-        
-        /// <summary>
-        /// btnDisconnectAndRetry control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnDisconnectAndRetry;
         
         /// <summary>
         /// publishModalPopupExtender control.

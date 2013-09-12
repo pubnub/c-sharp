@@ -20,6 +20,7 @@ namespace PubNubMessaging
         static string secretKey = "";
         static string cipherKey = "";
         static string uuid = "";
+        static string authKey = "";
         static bool resumeOnReconnect = false;
 
         static int subscribeTimeoutInSeconds = 0;
@@ -62,6 +63,7 @@ namespace PubNubMessaging
             secretKey = txtSecret.Text;
             cipherKey = txtCipher.Text;
             uuid = txtUUID.Text;
+            authKey = txtAuthKey.Text;
             resumeOnReconnect = chkResumeOnReconnect.Checked;
 
             Int32.TryParse(txtSubscribeTimeout.Text, out subscribeTimeoutInSeconds);
@@ -81,7 +83,7 @@ namespace PubNubMessaging
 
             if (pubnub == null)
             {
-                pubnub = new Pubnub("demo", "demo", secretKey, cipherKey, ssl);
+                pubnub = new Pubnub("pub-c-a2650a22-deb1-44f5-aa87-1517049411d5", "sub-c-a478dd2a-c33d-11e2-883f-02ee2ddab7fe", secretKey, cipherKey, ssl);
                 txtSecret.Enabled = false;
                 txtCipher.Enabled = false;
                 txtUUID.Enabled = false;
@@ -97,6 +99,7 @@ namespace PubNubMessaging
                 btnReset.Enabled = true;
             }
             pubnub.SessionUUID = uuid;
+            pubnub.AuthenticationKey = authKey;
             pubnub.SubscribeTimeout = subscribeTimeoutInSeconds;
             pubnub.NonSubscribeTimeout = operationTimeoutInSeconds;
             pubnub.NetworkCheckMaxRetries = networkMaxRetries;
@@ -210,6 +213,21 @@ namespace PubNubMessaging
             ProcessPubnubRequest(e.CommandName);
         }
 
+        protected void btnGrant_Command(object sender, CommandEventArgs e)
+        {
+            ProcessPubnubRequest(e.CommandName);
+        }
+
+        protected void btnRevoke_Command(object sender, CommandEventArgs e)
+        {
+            ProcessPubnubRequest(e.CommandName);
+        }
+
+        protected void btnAudit_Command(object sender, CommandEventArgs e)
+        {
+            ProcessPubnubRequest(e.CommandName);
+        }
+
         void ProcessPubnubRequest(string requestType)
         {
             CheckUserInputs();
@@ -245,6 +263,15 @@ namespace PubNubMessaging
                 case "time":
                     pubnub.Time<string>(DisplayUserCallbackMessage, DisplayErrorMessage);
                     break;
+                case "grantaccess":
+                    pubnub.GrantAccess<string>(channel, true, true, 60, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    break;
+                case "revokeaccess":
+                    pubnub.GrantAccess<string>(channel, false, false, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    break;
+                case "auditaccess":
+                    pubnub.AuditAccess<string>(channel, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    break;
                 case "disablenetwork":
                     pubnub.EnableSimulateNetworkFailForTestingOnly();
                     break;
@@ -269,10 +296,17 @@ namespace PubNubMessaging
             string recordTest;
             if (_recordQueue.TryPeek(out recordTest))
             {
+                if (txtMessage.Text.Length > 1000)
+                {
+                    string trucatedMessage = "..(truncated)..." + txtMessage.Text.Substring(txtMessage.Text.Length - 300);
+                    txtMessage.Text = trucatedMessage;
+                }
+
                 string currentRecord;
                 while (_recordQueue.TryDequeue(out currentRecord))
                 {
                     txtMessage.Text += string.Format("{0}{1}", currentRecord, Environment.NewLine);
+                    System.Diagnostics.Debug.WriteLine(currentRecord);
                 }
             }
 
@@ -320,6 +354,7 @@ namespace PubNubMessaging
             }
             UpdatePanelLeft.Update();
         }
+
 
 
     }

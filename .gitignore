@@ -10,11 +10,12 @@
 /windows-phone-7/*/*/bin/*
 /windows-phone-7/*/*/obj/*
 /windows-phone-7/*/*.suo
-/iis/3.4/*/bin/*
-/iis/3.4/*/obj/*
-/iis/3.4/*/*.sln
-/iis/3.4/*/*.suo
-/iis/3.4/*/*.csproj.user
+/iis/*/PubNubExampleASPNET*/bin/*
+/iis/*/PubNubExampleASPNET*/obj/*
+/iis/*/PubNubExampleASPNET*/obj/debug/*
+/iis/*/PubNubExampleASPNET*/*.sln
+/iis/*/PubNubExampleASPNET*/*.suo
+/iis/*/PubNubExampleASPNET*/*.csproj.user
 /unity/*/*/PubnubUnity/Library/*
 /unity/*/*/PubnubUnity/Temp/*
 /unity/*/*/PubnubUnity/ProjectSettings/*
