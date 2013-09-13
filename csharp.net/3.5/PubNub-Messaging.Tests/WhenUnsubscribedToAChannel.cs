@@ -63,7 +63,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
 
-            pubnub.Unsubscribe<string>(channel, DummyMethodNoExistChannelUnsubscribeChannelUserCallback, DummyMethodNoExistChannelUnsubscribeChannelConnectCallback, DummyMethodNoExistChannelUnsubscribeChannelDisconnectCallback1, DummyErrorCallback);
+            pubnub.Unsubscribe<string>(channel, DummyMethodNoExistChannelUnsubscribeChannelUserCallback, DummyMethodNoExistChannelUnsubscribeChannelConnectCallback, DummyMethodNoExistChannelUnsubscribeChannelDisconnectCallback1, NoExistChannelErrorCallback);
 
             meNotSubscribed.WaitOne();
 
@@ -156,11 +156,6 @@ namespace PubNubMessaging.Tests
 
         private void DummyMethodNoExistChannelUnsubscribeChannelUserCallback(string result)
         {
-            if (result.Contains("not subscribed"))
-            {
-                receivedNotSubscribedMessage = true;
-            }
-            meNotSubscribed.Set();
         }
 
         private void DummyMethodNoExistChannelUnsubscribeChannelConnectCallback(string result)
@@ -173,6 +168,15 @@ namespace PubNubMessaging.Tests
 
         private void DummyErrorCallback(string result)
         {
+        }
+
+        private void NoExistChannelErrorCallback(string result)
+        {
+            if (result.Contains("not subscribed"))
+            {
+                receivedNotSubscribedMessage = true;
+            }
+            meNotSubscribed.Set();
         }
     }
 }

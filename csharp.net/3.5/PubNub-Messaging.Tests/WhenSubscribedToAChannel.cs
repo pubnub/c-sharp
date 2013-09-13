@@ -159,8 +159,8 @@ namespace PubNubMessaging.Tests
 
             pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback1, DummyMethodDuplicateChannelConnectCallback, DummyErrorCallback);
             Thread.Sleep(100);
-            
-            pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback2, DummyMethodDuplicateChannelConnectCallback, DummyErrorCallback);
+
+            pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback2, DummyMethodDuplicateChannelConnectCallback, DuplicateChannelErrorCallback);
             meAlreadySubscribed.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests();
@@ -291,11 +291,6 @@ namespace PubNubMessaging.Tests
 
         private void DummyMethodDuplicateChannelUserCallback2(string result)
         {
-            if (result.Contains("already subscribed"))
-            {
-                receivedAlreadySubscribedMessage = true;
-            }
-            meAlreadySubscribed.Set();
         }
 
         private void DummyMethodDuplicateChannelConnectCallback(string result)
@@ -351,6 +346,15 @@ namespace PubNubMessaging.Tests
         private void DummyErrorCallback(string result)
         {
             Console.WriteLine("DummyErrorCallback result = " + result);
+        }
+
+        private void DuplicateChannelErrorCallback(string result)
+        {
+            if (result.Contains("already subscribed"))
+            {
+                receivedAlreadySubscribedMessage = true;
+            }
+            meAlreadySubscribed.Set();
         }
 
         private void dummyUnsubscribeCallback(string result)
