@@ -1,4 +1,4 @@
-﻿//Build Date: September 12, 2013
+﻿//Build Date: September 13, 2013
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
 #define USE_JSONFX
 #endif
@@ -3578,8 +3578,15 @@ namespace PubNubMessaging.Core
 				}
                 else
                 {
-                    string escapeChar = System.Uri.EscapeDataString(ch.ToString());
-                    o.Append(escapeChar);
+                    if (ch == ',' && ignoreComma)
+                    {
+                        o.Append(ch.ToString());
+                    }
+                    else
+                    {
+                        string escapeChar = System.Uri.EscapeDataString(ch.ToString());
+                        o.Append(escapeChar);
+                    }
                 }
 			}
 			encodedUri = o.ToString();
