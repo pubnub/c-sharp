@@ -268,7 +268,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
             object message = new PubnubDemoObject();
-            messageComplexObjectForPublish = JsonConvert.SerializeObject(message);
+            messageComplexObjectForPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
 
             pubnub.Publish<string>(channel, message, ReturnSuccessComplexObjectPublishCodeCallback, DummyErrorCallback);
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
@@ -465,7 +465,7 @@ namespace PubNubMessaging.Tests
                 if (deserializedMessage is object[])
                 {
                     JArray message = deserializedMessage[0] as JArray;
-                    if (message != null && message[0].ToString() == messageForUnencryptPublish)
+                    if (message != null && message.Count > 0 && message[0].ToString() == messageForUnencryptPublish)
                     {
                         isUnencryptDetailedHistory = true;
                     }
@@ -483,7 +483,7 @@ namespace PubNubMessaging.Tests
                 if (deserializedMessage is object[])
                 {
                     JArray message = deserializedMessage[0] as JArray;
-                    if (message != null && message[0].ToString(Formatting.None) == messageObjectForUnencryptPublish)
+                    if (message != null && message.Count > 0 && message[0].ToString(Formatting.None) == messageObjectForUnencryptPublish)
                     {
                         isUnencryptObjectDetailedHistory = true;
                     }
@@ -501,7 +501,7 @@ namespace PubNubMessaging.Tests
                 if (deserializedMessage is object[])
                 {
                     JArray message = deserializedMessage[0] as JArray;
-                    if (message != null && message[0].ToString(Formatting.None) == messageObjectForEncryptPublish)
+                    if (message != null && message.Count > 0 && message[0].ToString(Formatting.None) == messageObjectForEncryptPublish)
                     {
                         isEncryptObjectDetailedHistory = true;
                     }
@@ -519,7 +519,7 @@ namespace PubNubMessaging.Tests
                 if (deserializedMessage is object[])
                 {
                     JArray message = deserializedMessage[0] as JArray;
-                    if (message != null && message[0].ToString() == messageForEncryptPublish)
+                    if (message != null && message.Count > 0 && message[0].ToString() == messageForEncryptPublish)
                     {
                         isEncryptDetailedHistory = true;
                     }
@@ -537,7 +537,7 @@ namespace PubNubMessaging.Tests
                 if (deserializedResult is object[])
                 {
                     JArray message = deserializedResult[0] as JArray;
-                    if (message != null && message[0].ToString() == messageForSecretEncryptPublish)
+                    if (message != null && message.Count > 0 && message[0].ToString() == messageForSecretEncryptPublish)
                     {
                         isSecretEncryptDetailedHistory = true;
                     }
@@ -577,7 +577,7 @@ namespace PubNubMessaging.Tests
                 if (deserializedMessage is object[])
                 {
                     JArray message = deserializedMessage[0] as JArray;
-                    if (message != null && message[0].ToString(Formatting.None) == messageComplexObjectForPublish)
+                    if (message != null && message.Count > 0 && message[0].ToString(Formatting.None) == messageComplexObjectForPublish)
                     {
                         isComplexObjectDetailedHistory = true;
                     }
@@ -589,19 +589,35 @@ namespace PubNubMessaging.Tests
 
         private void ReturnPublishMessageTooLargeErrorCallback(string result)
         {
-            if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
+            Console.WriteLine(result);
+            #if (USE_JSONFX)
+            JsonFXDotNet jsonLibParser = new JsonFXDotNet();
+            #elif (USE_DOTNET_SERIALIZATION)
+            JscriptSerializer jsonLibParser = new JscriptSerializer();
+            #else
+            NewtonsoftJsonDotNet jsonLibParser = new NewtonsoftJsonDotNet();
+            #endif
+            PubnubClientError pubnubError = jsonLibParser.DeserializeToObject<PubnubClientError>(result) as PubnubClientError;
+            if (pubnubError != null)
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                if (pubnubError.Message.ToLower().IndexOf("message too large") >= 0)
                 {
-                    long statusCode = Int64.Parse(deserializedMessage[0].ToString().Trim());
-                    string statusMessage = (string)deserializedMessage[1];
-                    if (statusCode == 0 && statusMessage.ToLower() == "message too large")
-                    {
-                        isLargeMessagePublished = true;
-                    }
+                    isLargeMessagePublished = true;
                 }
             }
+            //if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
+            //{
+            //    object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+            //    if (deserializedMessage is object[])
+            //    {
+            //        long statusCode = Int64.Parse(deserializedMessage[0].ToString().Trim());
+            //        string statusMessage = (string)deserializedMessage[1];
+            //        if (statusCode == 0 && statusMessage.ToLower() == "message too large")
+            //        {
+            //            isLargeMessagePublished = true;
+            //        }
+            //    }
+            //}
             mreLaregMessagePublish.Set();
         }
 
@@ -742,7 +758,7 @@ namespace PubNubMessaging.Tests
                 if (deserializedMessage is object[])
                 {
                     JArray message = deserializedMessage[0] as JArray;
-                    if (message != null && message[0].ToString(Formatting.None) == serializedObjectMessageForPublish)
+                    if (message != null && message.Count > 0 && message[0].ToString(Formatting.None) == serializedObjectMessageForPublish)
                     {
                         isSerializedObjectMessageDetailedHistory = true;
                     }
@@ -755,7 +771,7 @@ namespace PubNubMessaging.Tests
 
         private void DummyErrorCallback(string result)
         {
-
+            Console.WriteLine(result);
         }
 
 

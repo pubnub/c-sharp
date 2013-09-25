@@ -172,7 +172,7 @@ namespace PubNubMessaging.Tests
 
         private void NoExistChannelErrorCallback(string result)
         {
-            if (result.Contains("not subscribed"))
+            if (result.ToLower().Contains("not subscribed"))
             {
                 receivedNotSubscribedMessage = true;
             }

@@ -350,7 +350,7 @@ namespace PubNubMessaging.Tests
 
         private void DuplicateChannelErrorCallback(string result)
         {
-            if (result.Contains("already subscribed"))
+            if (result.ToLower().Contains("already subscribed"))
             {
                 receivedAlreadySubscribedMessage = true;
             }
