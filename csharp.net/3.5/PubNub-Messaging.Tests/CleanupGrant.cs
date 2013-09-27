@@ -138,22 +138,31 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void ErrorCallbackForCleanUpAccessAtUserLevel(string receivedMessage)
+        void ErrorCallbackForCleanUpAccessAtUserLevel(PubnubClientError receivedMessage)
         {
-            Console.WriteLine(receivedMessage);
+            if (receivedMessage != null)
+            {
+                Console.WriteLine(receivedMessage);
+            }
             auditManualEvent.Set();
         }
 
         void UserCallbackForRevokeAccess(string receivedMessage)
         {
-            Console.WriteLine(receivedMessage);
-            receivedRevokeMessage = true;
+            if (receivedMessage != null)
+            {
+                Console.WriteLine(receivedMessage);
+                receivedRevokeMessage = true;
+            }
             revokeManualEvent.Set();
         }
 
-        void ErrorCallbackForRevokeAccess(string receivedMessage)
+        void ErrorCallbackForRevokeAccess(PubnubClientError receivedMessage)
         {
-            Console.WriteLine(receivedMessage);
+            if (receivedMessage != null)
+            {
+                Console.WriteLine(receivedMessage);
+            }
             revokeManualEvent.Set();
         }
 
@@ -215,9 +224,12 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void ErrorCallbackForCleanUpAccessAtChannelLevel(string receivedMessage)
+        void ErrorCallbackForCleanUpAccessAtChannelLevel(PubnubClientError receivedMessage)
         {
-            Console.WriteLine(receivedMessage);
+            if (receivedMessage != null)
+            {
+                Console.WriteLine(receivedMessage.Message);
+            }
             auditManualEvent.Set();
         }
 

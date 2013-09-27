@@ -343,14 +343,17 @@ namespace PubNubMessaging.Tests
             mePublish.Set();
         }
 
-        private void DummyErrorCallback(string result)
+        private void DummyErrorCallback(PubnubClientError result)
         {
-            Console.WriteLine("DummyErrorCallback result = " + result);
+            if (result != null)
+            {
+                Console.WriteLine("DummyErrorCallback result = " + result.Message);
+            }
         }
 
-        private void DuplicateChannelErrorCallback(string result)
+        private void DuplicateChannelErrorCallback(PubnubClientError result)
         {
-            if (result.ToLower().Contains("already subscribed"))
+            if (result != null && result.Message.ToLower().Contains("already subscribed"))
             {
                 receivedAlreadySubscribedMessage = true;
             }

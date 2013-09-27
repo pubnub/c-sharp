@@ -73,9 +73,12 @@ namespace PubNubMessaging.Tests
             grantManualEvent.Set();
         }
 
-        void ErrorCallbackForSampleGrantAtUserLevel(string receivedMessage)
+        void ErrorCallbackForSampleGrantAtUserLevel(PubnubClientError receivedMessage)
         {
-            Console.WriteLine(receivedMessage);
+            if (receivedMessage != null)
+            {
+                Console.WriteLine(receivedMessage);
+            }
             grantManualEvent.Set();
         }
 
@@ -86,9 +89,12 @@ namespace PubNubMessaging.Tests
             grantManualEvent.Set();
         }
 
-        void ErrorCallbackForSampleGrantAtChannelLevel(string receivedMessage)
+        void ErrorCallbackForSampleGrantAtChannelLevel(PubnubClientError receivedMessage)
         {
-            Console.WriteLine(receivedMessage);
+            if (receivedMessage != null)
+            {
+                Console.WriteLine(receivedMessage);
+            }
             grantManualEvent.Set();
         }
 

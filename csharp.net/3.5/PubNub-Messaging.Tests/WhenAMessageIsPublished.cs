@@ -587,17 +587,9 @@ namespace PubNubMessaging.Tests
             mreComplexObjectDetailedHistory.Set();
         }
 
-        private void ReturnPublishMessageTooLargeErrorCallback(string result)
+        private void ReturnPublishMessageTooLargeErrorCallback(PubnubClientError pubnubError)
         {
-            Console.WriteLine(result);
-            #if (USE_JSONFX)
-            JsonFXDotNet jsonLibParser = new JsonFXDotNet();
-            #elif (USE_DOTNET_SERIALIZATION)
-            JscriptSerializer jsonLibParser = new JscriptSerializer();
-            #else
-            NewtonsoftJsonDotNet jsonLibParser = new NewtonsoftJsonDotNet();
-            #endif
-            PubnubClientError pubnubError = jsonLibParser.DeserializeToObject<PubnubClientError>(result) as PubnubClientError;
+            Console.WriteLine(pubnubError);
             if (pubnubError != null)
             {
                 if (pubnubError.Message.ToLower().IndexOf("message too large") >= 0)
@@ -769,9 +761,12 @@ namespace PubNubMessaging.Tests
         }
 
 
-        private void DummyErrorCallback(string result)
+        private void DummyErrorCallback(PubnubClientError result)
         {
-            Console.WriteLine(result);
+            if (result != null)
+            {
+                Console.WriteLine(result.Message);
+            }
         }
 
 

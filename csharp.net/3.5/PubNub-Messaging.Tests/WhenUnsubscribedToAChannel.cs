@@ -166,13 +166,13 @@ namespace PubNubMessaging.Tests
         {
         }
 
-        private void DummyErrorCallback(string result)
+        private void DummyErrorCallback(PubnubClientError result)
         {
         }
 
-        private void NoExistChannelErrorCallback(string result)
+        private void NoExistChannelErrorCallback(PubnubClientError result)
         {
-            if (result.ToLower().Contains("not subscribed"))
+            if (result != null && result.Message.ToLower().Contains("not subscribed"))
             {
                 receivedNotSubscribedMessage = true;
             }

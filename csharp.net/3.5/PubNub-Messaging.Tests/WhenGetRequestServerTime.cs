@@ -122,7 +122,7 @@ namespace PubNubMessaging.Tests
             Assert.AreEqual(expectedDate, actualDate);
         }
 
-        void DummyErrorCallback(string result)
+        void DummyErrorCallback(PubnubClientError result)
         {
         }
 

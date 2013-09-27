@@ -959,8 +959,8 @@ namespace PubNubMessaging.Tests
                 revokeManualEvent.Set();
             }
         }
-        
-        private void DummyErrorCallback(string result)
+
+        private void DummyErrorCallback(PubnubClientError result)
         {
 
         }

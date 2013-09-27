@@ -238,7 +238,7 @@ namespace PubNubMessaging.Tests
             mrePublishStartReverseTrue.Set();
         }
 
-        private void DummyErrorCallback(string result)
+        private void DummyErrorCallback(PubnubClientError result)
         {
 
         }
