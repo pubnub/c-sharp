@@ -5775,6 +5775,9 @@ namespace PubNubMessaging.Core
                 case WebExceptionStatus.ProtocolError:
                     ret = PubnubErrorCode.ProtocolError;
                     break;
+                case WebExceptionStatus.ServerProtocolViolation:
+                    ret = PubnubErrorCode.ServerProtocolViolation;
+                    break;
                 default:
                     Console.WriteLine("ATTENTION: webExceptionStatus = " + webExceptionStatus.ToString());
                     break;
@@ -5839,7 +5842,8 @@ namespace PubNubMessaging.Core
         DuplicateChannel = 111,
         AlreadySubscribed = 112,
         PubnubCryptographicException = 113,
-        ProtocolError = 114
+        ProtocolError = 114,
+        ServerProtocolViolation = 115
     }
 
     internal static class PubnubErrorCodeDescription
@@ -5872,6 +5876,7 @@ namespace PubNubMessaging.Core
             dictionaryCodes.Add("112ALREADYSUBSCRIBED", "Channel Already Subscribed/Presence Subscribed. Duplicate channel subscription not allowed");
             dictionaryCodes.Add("113PUBNUBCRYPTOGRAPHICEXCEPTION", "Please verify your cipher key");
             dictionaryCodes.Add("114PROTOCOLERROR", "Protocol Error. Please contact PubNub with error details.");
+            dictionaryCodes.Add("115SERVERPROTOCOLVIOLATION", "ServerProtocolViolation. Please contact PubNub with error details.");
             dictionaryCodes.Add("0NONE", "**** NEED INVESTIGATION *****");
         }
 
