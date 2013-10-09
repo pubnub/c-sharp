@@ -13,7 +13,7 @@ namespace PubNubMessaging.Core
 
         static public bool deliveryStatus = false;
         static public string channel = "";
-        static public bool showErrorCallbackMessages = true;
+        static public bool showErrorMessageSegments = false;
         static public bool showDebugMessages = false;
         static public string authKey = "";
 
@@ -273,18 +273,18 @@ namespace PubNubMessaging.Core
             Console.WriteLine();
 
             Console.WriteLine("Display ErrorCallback messages? Enter Y for Yes, Else N for No.");
-            Console.WriteLine("Default = Y  ");
+            Console.WriteLine("Default = N  ");
             string displayErrMessage = Console.ReadLine();
             Console.ForegroundColor = ConsoleColor.Blue;
-            if (displayErrMessage.Trim().ToLower() == "n" )
+            if (displayErrMessage.Trim().ToLower() == "y" )
             {
-                showErrorCallbackMessages = false;
-                Console.WriteLine("ErrorCallback messages will NOT be displayed.");
+                showErrorMessageSegments = true;
+                Console.WriteLine("ErrorCallback messages will  be displayed");
             }
             else
             {
-                showErrorCallbackMessages = true;
-                Console.WriteLine("ErrorCallback messages will  be displayed");
+                showErrorMessageSegments = false;
+                Console.WriteLine("ErrorCallback messages will NOT be displayed.");
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -359,7 +359,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine();
 
                         Console.WriteLine("Running subscribe()");
-                        pubnub.Subscribe<string>(channel, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeErrorMessage);
+                        pubnub.Subscribe<string>(channel, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
 
                         break;
                     case "2":
@@ -436,7 +436,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine();
 
                         Console.WriteLine("Running presence()");
-                        pubnub.Presence<string>(channel, DisplayPresenceReturnMessage, DisplayPresenceConnectStatusMessage, DisplayPresenceErrorMessage);
+                        pubnub.Presence<string>(channel, DisplayPresenceReturnMessage, DisplayPresenceConnectStatusMessage, DisplayErrorMessage);
 
                         break;
                     case "4":
@@ -712,125 +712,44 @@ namespace PubNubMessaging.Core
         /// <param name="result"></param>
         static void DisplayErrorMessage(PubnubClientError result)
         {
-            if (showErrorCallbackMessages)
+            Console.WriteLine("Code = {0}", result.StatusCode);
+            Console.WriteLine("Description = {0}", result.Description);
+
+            switch (result.StatusCode)
             {
-                DisplayErrorMessageSegments("ERROR CALLBACK:", result);
+                case 400:
+                    break;
+                default:
+                    break;
+            }
+            if (showErrorMessageSegments)
+            {
+                DisplayErrorMessageSegments(result);
                 Console.WriteLine();
             }
         }
 
-        static void DisplaySubscribeErrorMessage(PubnubClientError pubnubError)
+
+        static void DisplayErrorMessageSegments(PubnubClientError pubnubError)
         {
-            try
+            Console.WriteLine("<STATUS CODE>: {0}", pubnubError.StatusCode);
+            if (pubnubError.DetailedDotNetException != null)
             {
-                if (showErrorCallbackMessages)
-                {
-                    DisplayErrorMessageSegments("SUBSCRIBE ERROR CALLBACK:", pubnubError);
-                    Console.WriteLine();
-                }
+                Console.WriteLine("<DEBUG MESSAGE>: {0}", pubnubError.DetailedDotNetException.ToString());
             }
-            catch (Exception ex)
+            Console.WriteLine("<MESSAGE SOURCE>: {0}", pubnubError.MessageSource);
+            if (pubnubError.PubnubWebRequest != null)
             {
-                Console.WriteLine(ex.ToString());
+                Console.WriteLine("<HTTP WEB REQUEST>: {0}", pubnubError.PubnubWebRequest.RequestUri.ToString());
+                Console.WriteLine("<HTTP WEB REQUEST - HEADERS>: {0}", pubnubError.PubnubWebRequest.Headers.ToString());
             }
-        }
+            if (pubnubError.PubnubWebResponse != null)
+            {
+                Console.WriteLine("<HTTP WEB RESPONSE - HEADERS>: {0}", pubnubError.PubnubWebResponse.Headers.ToString());
+            }
+            Console.WriteLine("<DESCRIPTION>: {0}", pubnubError.Description);
+            Console.WriteLine("<CHANNEL>: {0}", pubnubError.Channel);
 
-        static void DisplayPresenceErrorMessage(PubnubClientError result)
-        {
-            try
-            {
-                if (showErrorCallbackMessages)
-                {
-                    DisplayErrorMessageSegments("PRESENCE ERROR CALLBACK:",result);
-                    Console.WriteLine();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-        }
-
-        static void DisplayErrorMessageSegments(string callerTitle, PubnubClientError pubnubError)
-        {
-            bool ignoreMessage = false;
-            //Console.WriteLine(result);
-            if (pubnubError != null)
-            {
-                Console.WriteLine("Code = {0}",pubnubError.StatusCode);
-                Console.WriteLine("Description = {0}",pubnubError.Description);
-                //Console.WriteLine("Error Message = {0}",pubnubError.Message);
-                if (pubnubError.StatusCode == 0)
-                {
-                    switch (pubnubError.Category)
-                    {
-                        case PubnubErrorCategory.Debug:
-                            if (pubnubError.Message.IndexOf("Length of the data to decrypt is invalid") == 0 ||
-                                    pubnubError.Message.IndexOf("The input is not a valid Base-64 string as it contains a non-base 64 character, more than two padding characters, or an illegal character among the padding characters") == 0
-                                )
-                            {
-                                ignoreMessage = true;
-                            }
-
-                            if (!ignoreMessage && showDebugMessages)
-                            {
-                                Console.WriteLine(callerTitle);
-                                Console.WriteLine("<STATUS CODE>: {0}", pubnubError.StatusCode);
-                                Console.WriteLine("<DEBUG MESSAGE>: {0}", pubnubError.DetailedDotNetException.ToString());
-                                Console.WriteLine("<MESSAGE SOURCE>: {0}", pubnubError.MessageSource);
-                                if (pubnubError.PubnubWebRequest != null)
-                                {
-                                    Console.WriteLine("<HTTP WEB REQUEST>: {0}", pubnubError.PubnubWebRequest.RequestUri.ToString());
-                                    Console.WriteLine("<HTTP WEB REQUEST - HEADERS>: {0}", pubnubError.PubnubWebRequest.Headers.ToString());
-                                }
-                                if (pubnubError.PubnubWebResponse != null)
-                                {
-                                    Console.WriteLine("<HTTP WEB RESPONSE - HEADERS>: {0}", pubnubError.PubnubWebResponse.Headers.ToString());
-                                }
-                                Console.WriteLine("<DESCRIPTION>: {0}", pubnubError.Description);
-                                Console.WriteLine("<CHANNEL>: {0}", pubnubError.Channel);
-                            }
-                            break;
-                        case PubnubErrorCategory.Informational:
-                            Console.WriteLine(callerTitle);
-                            Console.WriteLine("<STATUS CODE>: {0}", pubnubError.StatusCode);
-                            Console.WriteLine("<INFORMATIONAL MESSAGE>: {0}", pubnubError.Message);
-                            Console.WriteLine("<MESSAGE SOURCE>: {0}", pubnubError.MessageSource);
-                            if (pubnubError.PubnubWebRequest != null)
-                            {
-                                Console.WriteLine("<HTTP WEB REQUEST>: {0}", pubnubError.PubnubWebRequest.RequestUri.ToString());
-                                Console.WriteLine("<HTTP WEB REQUEST - HEADERS>: {0}", pubnubError.PubnubWebRequest.Headers.ToString());
-                            }
-                            if (pubnubError.PubnubWebResponse != null)
-                            {
-                                Console.WriteLine("<HTTP WEB RESPONSE - HEADERS>: {0}", pubnubError.PubnubWebResponse.Headers.ToString());
-                            }
-                            Console.WriteLine("<DESCRIPTION>: {0}", pubnubError.Description);
-                            Console.WriteLine("<CHANNEL>: {0}", pubnubError.Channel);
-                            break;
-                        case PubnubErrorCategory.Warning:
-                            Console.WriteLine(callerTitle);
-                            Console.WriteLine("<STATUS CODE>: {0}", pubnubError.StatusCode);
-                            Console.WriteLine("<WARNING MESSAGE(REVEIW OR TAKE ACTION)>: {0}", pubnubError.Message);
-                            Console.WriteLine("<MESSAGE SOURCE>: {0}", pubnubError.MessageSource);
-                            if (pubnubError.PubnubWebRequest != null)
-                            {
-                                Console.WriteLine("<HTTP WEB REQUEST>: {0}", pubnubError.PubnubWebRequest.RequestUri.ToString());
-                                Console.WriteLine("<HTTP WEB REQUEST - HEADERS>: {0}", pubnubError.PubnubWebRequest.Headers.ToString());
-                            }
-                            if (pubnubError.PubnubWebResponse != null)
-                            {
-                                Console.WriteLine("<HTTP WEB RESPONSE - HEADERS>: {0}", pubnubError.PubnubWebResponse.Headers.ToString());
-                            }
-                            Console.WriteLine("<DESCRIPTION>: {0}", pubnubError.Description);
-                            Console.WriteLine("<CHANNEL>: {0}", pubnubError.Channel);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-            }
         }
     }
 }
