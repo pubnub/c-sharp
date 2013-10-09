@@ -712,12 +712,74 @@ namespace PubNubMessaging.Core
         /// <param name="result"></param>
         static void DisplayErrorMessage(PubnubClientError result)
         {
-            Console.WriteLine("Code = {0}", result.StatusCode);
-            Console.WriteLine("Description = {0}", result.Description);
+            Console.WriteLine();
+            Console.WriteLine(result.Description);
+            Console.WriteLine();
 
             switch (result.StatusCode)
             {
-                case 400:
+                case 103:
+                    //Warning: Verify origin host name and internet connectivity
+                    break;
+                case 104:
+                    //Critical: Verify your cipher key
+                    break;
+                case 106:
+                    //Warning: Check network/internet connection
+                    break;
+                case 108:
+                    //Warning: Check network/internet connection
+                    break;
+                case 109:
+                    //Warning: No network/internet connection. Please check network/internet connection
+                    break;
+                case 110:
+                    //Informational: Network/internet connection is back. Active subscriber/presence channels will be restored.
+                    break;
+                case 111:
+                    //Informational: Duplicate channel subscription is not allowed. Internally Pubnub API removes the duplicates before processing.
+                    break;
+                case 112:
+                    //Informational: Channel Already Subscribed/Presence Subscribed. Duplicate channel subscription not allowed
+                    break;
+                case 113:
+                    //Warning: Verify your cipher key
+                    break;
+                case 114:
+                    //Warning: Protocol Error. Please contact PubNub with error details.
+                    break;
+                case 115:
+                    //Warning: ServerProtocolViolation. Please contact PubNub with error details.
+                    break;
+                case 4000:
+                    //Warning: Message too large. Your message was not sent. Try to send this again smaller sized
+                    break;
+                case 4001:
+                    //Warning: Bad Request. Please check the entered inputs or web request URL
+                    break;
+                case 4010:
+                    //Critical: Please provide correct subscribe key. This corresponds to a 401 on the server due to a bad sub key
+                    break;
+                case 4030:
+                    //Warning: Not authorized. Check the permimissions on the channel. Also verify authentication key, to check access.
+                    break;
+                case 4031:
+                    //Warning: Incorrect public key or secret key.
+                    break;
+                case 4140:
+                    //Warning: Length of the URL is too long. Reduce the length by reducing subscription/presence channels or grant/revoke/audit channels/auth key list
+                    break;
+                case 5000:
+                    //Critical: Internal Server Error. Unexpected error occured at PubNub Server. Please try again. If same problem persists, please contact PubNub support
+                    break;
+                case 5020:
+                    //Critical: Bad Gateway. Unexpected error occured at PubNub Server. Please try again. If same problem persists, please contact PubNub support
+                    break;
+                case 5040:
+                    //Critical: Gateway Timeout. No response from server due to PubNub server timeout. Please try again. If same problem persists, please contact PubNub support
+                    break;
+                case 0:
+                    //Undocumented error. Contact PubNub support with full error object property details.
                     break;
                 default:
                     break;
@@ -735,7 +797,7 @@ namespace PubNubMessaging.Core
             Console.WriteLine("<STATUS CODE>: {0}", pubnubError.StatusCode);
             if (pubnubError.DetailedDotNetException != null)
             {
-                Console.WriteLine("<DEBUG MESSAGE>: {0}", pubnubError.DetailedDotNetException.ToString());
+                Console.WriteLine("<DETAILED DOT.NET EXCEPTION>: {0}", pubnubError.DetailedDotNetException.ToString());
             }
             Console.WriteLine("<MESSAGE SOURCE>: {0}", pubnubError.MessageSource);
             if (pubnubError.PubnubWebRequest != null)
