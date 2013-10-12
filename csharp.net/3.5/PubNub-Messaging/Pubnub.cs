@@ -71,7 +71,8 @@ namespace PubNubMessaging.Core
 		bool _enableResumeOnReconnect = true;
 		bool overrideTcpKeepAlive = true;
 		bool _enableJsonEncodingForPublish = true;
-		const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Error;
+		const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Off;
+        const PubnubErrorFilter.Level errorLevel = PubnubErrorFilter.Level.Info;
 		
 #if (!SILVERLIGHT && !WINDOWS_PHONE)
 		bool pubnubEnableProxyConfig = true;
@@ -338,6 +339,17 @@ namespace PubNubMessaging.Core
 			{
 				LoggingMethod.LogLevel = (LoggingMethod.Level)logLevelValue;
 			}
+
+            string configuredErrorFilter = ConfigurationManager.AppSettings["PubnubMessaging.PubnubErrorFilterLevel"];
+            int errorFilterValue;
+            if (!Int32.TryParse(configuredErrorFilter, out errorFilterValue))
+            {
+                PubnubErrorFilter.Level = errorFilterValue;
+            }
+            else
+            {
+                PubnubErrorFilter.Level = (PubnubErrorFilter.Level)errorFilterValue;
+            }
 #endif
 			
 #if (SILVERLIGHT || WINDOWS_PHONE)
@@ -3642,26 +3654,12 @@ namespace PubNubMessaging.Core
         {
             if (Callback != null && error != null)
             {
-                if (error.StatusCode != 107 && error.StatusCode != 105)
+                if ((int)error.Severity <= (int)errorLevel) //Checks whether the error serverity falls in the range of error filter level
                 {
-                    //TODO:
-                    //Switch statement to include custom message related to error/status code for developer
-                    //switch (error.StatusCode)
-                    //{
-                    //    case 1:
-                    //        //error.AdditionalMessage = MyCustomErrorMessageRetrieverBasedOnStatusCode(error.StatusCode);
-                    //        break;
-                    //    case 112:
-                    //        error.AdditionalMessage = "Bad Auth Key";
-                    //        break;
-                    //    case 113:
-                    //        error.AdditionalMessage = "Need to set Auth Key";
-                    //        break;
-                    //    default:
-                    //        break;
-                    //}
-                    //Console.WriteLine(error.ToString());
-                    Callback(error);
+                    if (error.StatusCode != 107 && error.StatusCode != 105) //Error Code that should not go out
+                    {
+                        Callback(error);
+                    }
                 }
             }
         }
@@ -5582,9 +5580,9 @@ namespace PubNubMessaging.Core
 
     public enum PubnubErrorSeverity
     {
-        Info,
-        Warn,
-        Critical
+        Critical = 1,
+        Warn = 2,
+        Info = 3
     }
 
     public enum PubnubMessageSource
@@ -5757,6 +5755,55 @@ namespace PubNubMessaging.Core
 
             return errorBuilder.ToString();
         }
+    }
+
+    public class PubnubErrorFilter
+    {
+
+        private static int errorLevel = 0;
+        public static Level ErrorLevel
+        {
+            get
+            {
+                return (Level)errorLevel;
+            }
+            set
+            {
+                errorLevel = (int)value;
+            }
+        }
+
+        public enum Level
+        {
+            Critical =1,
+            Warning = 2,
+            Info = 3
+        }
+
+        public static bool Critical
+        {
+            get
+            {
+                return (int)errorLevel >= 1;
+            }
+        }
+
+        public static bool Warn
+        {
+            get
+            {
+                return (int)errorLevel >= 2;
+            }
+        }
+        public static bool Info
+        {
+            get
+            {
+                return (int)errorLevel >= 3;
+            }
+        }
+
+
     }
 
     internal static class PubnubErrorCodeHelper
@@ -6187,34 +6234,6 @@ namespace PubNubMessaging.Core
 			return result;
 		}
 
-        //public T DeserializeToObject<T>(string jsonString)
-        //{
-        //    T result = default(T);
-        //    object deserializedMessage = JsonConvert.DeserializeObject<object>(jsonString, new JsonSerializerSettings { Formatting = Newtonsoft.Json.Formatting.None });
-        //    if (deserializedMessage != null)
-        //    {
-        //        if (typeof(T) == typeof(PubnubClientError) && (deserializedMessage.GetType().ToString() == "Newtonsoft.Json.Linq.JObject"))
-        //        {
-        //            JObject errorObject = deserializedMessage as JObject;
-        //            int httpStatusCode = errorObject.Value<int>("HttpStatusCode");
-        //            PubnubMessageSource source = (PubnubMessageSource)Enum.Parse(typeof(PubnubMessageSource), errorObject["MessageSource"].ToString());
-        //            PubnubErrorCategory category = (PubnubErrorCategory)Enum.Parse(typeof(PubnubErrorCategory), errorObject["Category"].ToString());
-        //            bool isDotNetException = Boolean.Parse(errorObject["IsDotNetException"].ToString());
-        //            string message = errorObject["Message"].ToString();
-        //            string detailedDotNetException = errorObject["DetailedDotNetException"].ToString();
-        //            string channel = errorObject["Channel"].ToString();
-        //            PubnubClientError clientError;
-        //            clientError = new PubnubClientError(httpStatusCode, category, isDotNetException, message, detailedDotNetException, source, channel);
-        //            result = (T)Convert.ChangeType(clientError, typeof(T));
-        //        }
-        //        else if (typeof(T) == typeof(object))
-        //        {
-        //            result = (T)deserializedMessage;
-        //        }
-        //    }
-        //    return result;
-        //}
-		
 		public Dictionary<string, object> DeserializeToDictionaryOfObject(string jsonString)
 		{
 			return JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
