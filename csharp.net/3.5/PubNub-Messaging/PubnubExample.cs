@@ -17,8 +17,16 @@ namespace PubNubMessaging.Core
         static public bool showDebugMessages = false;
         static public string authKey = "";
 
+        static void UnhandledExceptionTrapper(object sender, UnhandledExceptionEventArgs e)
+        {
+            Console.WriteLine("Unhandled exception occured inside Pubnub C# API. Exiting the application. Please try again.");
+            //Console.WriteLine(e.ExceptionObject.ToString());
+            Environment.Exit(1);
+        }
         static public void Main()
         {
+            AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionTrapper;
+
             PubnubProxy proxy = null;
             
             Console.WriteLine("HINT: TO TEST RE-CONNECT AND CATCH-UP,");

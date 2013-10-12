@@ -1,4 +1,4 @@
-﻿//Build Date: October 10, 2013
+﻿//Build Date: October 12, 2013
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
 #define USE_JSONFX
 #endif
@@ -344,11 +344,11 @@ namespace PubNubMessaging.Core
             int errorFilterValue;
             if (!Int32.TryParse(configuredErrorFilter, out errorFilterValue))
             {
-                PubnubErrorFilter.Level = errorFilterValue;
+                PubnubErrorFilter.ErrorLevel = errorLevel;
             }
             else
             {
-                PubnubErrorFilter.Level = (PubnubErrorFilter.Level)errorFilterValue;
+                PubnubErrorFilter.ErrorLevel = (PubnubErrorFilter.Level)errorFilterValue;
             }
 #endif
 			
@@ -4888,8 +4888,8 @@ namespace PubNubMessaging.Core
 			Action<bool> callback = state.Callback;
 			Action<PubnubClientError> errorCallback = state.ErrorCallback;
 			string[] channels = state.Channels;
-			try
-			{
+            try
+            {
 #if (SILVERLIGHT || WINDOWS_PHONE)
 				using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
 				{
@@ -4904,29 +4904,29 @@ namespace PubNubMessaging.Core
 					socket.Close();
 				}
 #else
-				using (UdpClient udp = new UdpClient("pubsub.pubnub.com", 80))
-				{
-					IPAddress localAddress = ((IPEndPoint)udp.Client.LocalEndPoint).Address;
-					EndPoint remotepoint = udp.Client.RemoteEndPoint;
-					string remoteAddress = (remotepoint != null) ? remotepoint.ToString() : "";
-					udp.Close();
-					
-					LoggingMethod.WriteToLog(string.Format("DateTime {0} checkInternetStatus LocalIP: {1}, RemoteEndPoint:{2}", DateTime.Now.ToString(), localAddress.ToString(), remoteAddress), LoggingMethod.LevelVerbose);
-					callback(true);
-				}
+                using (UdpClient udp = new UdpClient("pubsub.pubnub.com", 80))
+                {
+                    IPAddress localAddress = ((IPEndPoint)udp.Client.LocalEndPoint).Address;
+                    EndPoint remotepoint = udp.Client.RemoteEndPoint;
+                    string remoteAddress = (remotepoint != null) ? remotepoint.ToString() : "";
+                    udp.Close();
+
+                    LoggingMethod.WriteToLog(string.Format("DateTime {0} checkInternetStatus LocalIP: {1}, RemoteEndPoint:{2}", DateTime.Now.ToString(), localAddress.ToString(), remoteAddress), LoggingMethod.LevelVerbose);
+                    callback(true);
+                }
 #endif
-			}
-			catch (Exception ex)
-			{
+            }
+            catch (Exception ex)
+            {
                 PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(ex);
                 int statusCode = (int)errorType;
                 string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(errorType);
                 PubnubClientError error = new PubnubClientError(statusCode, PubnubErrorSeverity.Warn, true, ex.Message, ex, PubnubMessageSource.Client, null, null, errorDescription, string.Join(",", channels));
                 GoToCallback(error, errorCallback);
-				
-				LoggingMethod.WriteToLog(string.Format("DateTime {0} checkInternetStatus Error. {1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelError);
-				callback(false);
-			}
+
+                LoggingMethod.WriteToLog(string.Format("DateTime {0} checkInternetStatus Error. {1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelError);
+                callback(false);
+            }
 			mres.Set();
 		}
 
@@ -5058,8 +5058,12 @@ namespace PubNubMessaging.Core
 #elif (UNITY_STANDALONE || UNITY_WEBPLAYER)
 				print(logText);
 #else
-                Trace.WriteLine(logText);
-                Trace.Flush();
+                try
+                {
+                    Trace.WriteLine(logText);
+                    Trace.Flush();
+                }
+                catch { }
 #endif
 			}
 		}
@@ -5598,7 +5602,7 @@ namespace PubNubMessaging.Core
         bool _isDotNetException;
         PubnubMessageSource _messageSource;
         string _message = "";
-        string _channel;
+        string _channel = "";
         Exception _detailedDotNetException = null;
         PubnubWebRequest _pubnubWebRequest = null;
         PubnubWebResponse _pubnubWebResponse = null;
@@ -5867,6 +5871,10 @@ namespace PubNubMessaging.Core
             {
                 ret = PubnubErrorCode.PubnubCryptographicException;
             }
+            else if (errorType == "System.Runtime.InteropServices.SEHException" && errorMessage == "External component has thrown an exception.")
+            {
+                ret = PubnubErrorCode.PubnubInterOpSEHException;
+            }
             else
             {
                 Console.WriteLine("ATTENTION: Error Type = " + errorType);
@@ -5956,6 +5964,7 @@ namespace PubNubMessaging.Core
         HereNowOperationTimeout = 126,
         DetailedHistoryOperationTimeout = 127,
         TimeOperationTimeout = 128,
+        PubnubInterOpSEHException = 129,
 
         MessageTooLarge = 4000,
         BadRequest = 4001,
@@ -6012,6 +6021,7 @@ namespace PubNubMessaging.Core
             dictionaryCodes.Add(126, "HereNow operation timeout occured.");
             dictionaryCodes.Add(127, "Detailed History operation timeout occured.");
             dictionaryCodes.Add(128, "Time operation timeout occured.");
+            dictionaryCodes.Add(129, "Error occured in external component. Please contact PubNub support with full error object details for further investigation");
             dictionaryCodes.Add(0, "Undocumented error. Please contact PubNub support with full error object details for further investigation");
         }
 
