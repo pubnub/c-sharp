@@ -630,13 +630,13 @@ namespace PubNubMessaging.Tests
             }
             else
             {
-                stubResponse = "!! Stub Response Not Assigned !!";
+                stubResponse = "[]";
             }
-            if (stubResponse == "!! Stub Response Not Assigned !!")
-            {
-                System.Diagnostics.Debug.WriteLine("requestUri.AbsolutePath = " + requestUri.AbsolutePath);
-                System.Diagnostics.Debug.WriteLine("stubResponse = " + stubResponse);
-            }
+            //if (stubResponse == "!! Stub Response Not Assigned !!")
+            //{
+            //    System.Diagnostics.Debug.WriteLine("requestUri.AbsolutePath = " + requestUri.AbsolutePath);
+            //    System.Diagnostics.Debug.WriteLine("stubResponse = " + stubResponse);
+            //}
             return stubResponse;
         }
 

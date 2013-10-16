@@ -332,6 +332,8 @@ namespace PubNubMessaging.Core
             Console.WriteLine("ENTER 16 FOR Audit Access for Presence Channel");
             Console.WriteLine("ENTER 17 FOR Revoke Access for Presence Channel");
             Console.WriteLine("ENTER 18 FOR Change/Update Auth Key");
+            Console.WriteLine("ENTER 19 TO Simulate Machine Sleep Mode");
+            Console.WriteLine("ENTER 20 TO Simulate Machine Awake Mode");
             Console.WriteLine("ENTER 99 FOR EXIT OR QUIT");
 
             bool exitFlag = false;
@@ -633,6 +635,20 @@ namespace PubNubMessaging.Core
                         Console.ResetColor();
                         Console.WriteLine();
 
+                        break;
+                    case "19":
+                        Console.WriteLine("Enabling simulation of Sleep/Suspend Mode");  
+                        pubnub.EnableMachineSleepModeForTestingOnly();
+                        Console.ForegroundColor = ConsoleColor.Red;  
+                        Console.WriteLine("Machine Sleep Mode simulation activated");
+                        Console.ResetColor();  
+                        break;
+                    case "20":
+                        Console.WriteLine("Disabling simulation of Sleep/Suspend Mode");  
+                        pubnub.DisableMachineSleepModeForTestingOnly();
+                        Console.ForegroundColor = ConsoleColor.Red;  
+                        Console.WriteLine("Simulation going to awake mode");  
+                        Console.ResetColor();  
                         break;
                     default:
                         Console.WriteLine("INVALID CHOICE. ENTER 99 FOR EXIT OR QUIT");
