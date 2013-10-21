@@ -6087,20 +6087,20 @@ namespace PubNubMessaging.Core
         static PubnubErrorCodeDescription()
         {
             //HTTP ERROR CODES and PubNub Context description
-            dictionaryCodes.Add(4000, "For Publish, 1800 characters is the message size after we urlencode including http and host name. If you need to send larger messages, which may be >1.8KB after urlencoding, you can enable elastic message size in the admin to support this. For pricing information, please contact PubNub support");
+            dictionaryCodes.Add(4000, "If you must publish a message greater than the default of max message size of 1.8K (post-URLEncoded) please enable the elastic message size feature from your admin portal at admin.pubnub.com.");
             dictionaryCodes.Add(4001, "Bad Request. Please check the entered inputs or web request URL");
-            dictionaryCodes.Add(4002, "Invalid Key. Please verify the publish key");
-            dictionaryCodes.Add(4010, "Please provide correct subscribe key");
-            dictionaryCodes.Add(4020, "PAM is not enabled. Please contact PubNub support");
-            dictionaryCodes.Add(4030, "Not authorized to access. Please ensure that the channel has permissions using PAM. Please check your authentication key value also for access. For assistance on PAM credentials, please contact PubNub support. Once the permission issue is resolved, Unsubscribe/Presence-Unsubscribe the channel and subscribe/presence again accordingly.");
-            dictionaryCodes.Add(4031, "Please verify publish key and secret key. For assistance, contact PubNub support");
-            dictionaryCodes.Add(4140, "URL request too long. Reduce the length by reducing subscription/presence channels or grant/revoke/audit channels/auth key list");
-            dictionaryCodes.Add(5000, "Internal Server Error. Unexpected error occured at PubNub Server. Please try again. If same problem persists, please contact PubNub support");
-            dictionaryCodes.Add(5020, "Bad Gateway. Unexpected error occured at PubNub Server. Please try again. If same problem persists, please contact PubNub support");
-            dictionaryCodes.Add(5040, "Gateway Timeout. No response from server due to PubNub server timeout. Please try again. If same problem persists, please contact PubNub support");
+            dictionaryCodes.Add(4002, "Invalid Key. Please verify your pub and sub keys");
+            dictionaryCodes.Add(4010, "Please provide a valid subscribe key");
+            dictionaryCodes.Add(4020, "PAM is not enabled for this keyset. Please contact PubNub support for instructions on enabling PAM.");
+            dictionaryCodes.Add(4030, "Not authorized. Please ensure that the channel has the correct PAM permission, your authentication key is set correctly, then try again via unsub and re-sub. For further assistance, contact PubNub support.");
+            dictionaryCodes.Add(4031, "Please verify pub, sub, and secret keys. For assistance, contact PubNub support");
+            dictionaryCodes.Add(4140, "The URL request too long. Reduce the length by reducing subscription/presence channels or grant/revoke/audit channels/auth key list. Hint: You may spread the load across multiple PubNub instances to prevent this message.");
+            dictionaryCodes.Add(5000, "Internal Server Error. Please try again. If the issue continues, please contact PubNub support");
+            dictionaryCodes.Add(5020, "Bad Gateway. Please try again. If the issue continues, please contact PubNub support");
+            dictionaryCodes.Add(5040, "Gateway Timeout. Please try again. If the issue continues, please contact PubNub support");
 
             //PubNub API ERROR CODES and PubNub Context description
-            dictionaryCodes.Add(103, "Please verify origin host name and internet connectivity");
+            dictionaryCodes.Add(103, "Please verify origin, host name, and internet connectivity");
             dictionaryCodes.Add(104, "Please verify your cipher key");
             dictionaryCodes.Add(105, "Web Request was cancelled due to change in subsciber/presence channel list or cancelled for object cleaning at the end of Pubnub object session");
             dictionaryCodes.Add(106, "Please check network/internet connection");
@@ -6112,7 +6112,7 @@ namespace PubNubMessaging.Core
             dictionaryCodes.Add(112, "Channel Already Subscribed. Duplicate channel subscription not allowed");
             dictionaryCodes.Add(113, "Channel Already Presence-Subscribed. Duplicate channel presence-subscription not allowed");
             dictionaryCodes.Add(114, "Please verify your cipher key");
-            dictionaryCodes.Add(115, "Protocol Error. Please contact PubNub with error details.");
+            dictionaryCodes.Add(115, "Protocol Error. Please contact PubNub with log, use-case, and error details.");
             dictionaryCodes.Add(116, "ServerProtocolViolation. Please contact PubNub with error details.");
             dictionaryCodes.Add(117, "Input contains invalid channel name");
             dictionaryCodes.Add(118, "Channel not subscribed yet");
