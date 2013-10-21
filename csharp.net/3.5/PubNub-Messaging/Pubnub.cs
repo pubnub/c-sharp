@@ -1,4 +1,4 @@
-﻿//Build Date: October 16, 2013
+﻿//Build Date: October 21, 2013
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
 #define USE_JSONFX
 #endif
@@ -271,8 +271,8 @@ namespace PubNubMessaging.Core
 		private static long lastSubscribeTimetoken = 0;
 		
 		// Pubnub Core API implementation
-		//private string _origin = "pubsub.pubnub.com";
-        private string _origin = "pam-beta.pubnub.com"; //"pres-beta.pubnub.com";//"50.112.215.116";//"pam-beta.pubnub.com"; //;"uls-test.pubnub.co"; //"pam-beta.pubnub.com";
+		private string _origin = "pubsub.pubnub.com";
+        //private string _origin = "pam-beta.pubnub.com"; //"pres-beta.pubnub.com";//"50.112.215.116";//"pam-beta.pubnub.com"; //;"uls-test.pubnub.co"; //"pam-beta.pubnub.com";
         public string Origin
         {
             get
@@ -364,11 +364,11 @@ namespace PubNubMessaging.Core
 			
 			VerifyOrSetSessionUUID();
 			
-			// SSL is ON?
-			if (this.ssl)
-				this._origin = "https://" + this._origin;
-			else
-				this._origin = "http://" + this._origin;
+            //// SSL is ON?
+            //if (this.ssl)
+            //    this._origin = "https://" + this._origin;
+            //else
+            //    this._origin = "http://" + this._origin;
 			
 #if(UNITY_ANDROID)
 			ServicePointManager.ServerCertificateValidationCallback = ValidatorUnity;
@@ -3102,7 +3102,17 @@ namespace PubNubMessaging.Core
 		{
 			StringBuilder url = new StringBuilder();
 			
-			// Add Origin To The Request
+			// Add http or https based on SSL flag
+            if (this.ssl)
+            {
+                url.Append("https://");
+            }
+            else
+            {
+                url.Append("http://");
+            }
+
+            // Add Origin To The Request
 			url.Append(this._origin);
 			
 			// Generate URL with UTF-8 Encoding
@@ -5975,6 +5985,10 @@ namespace PubNubMessaging.Core
                     {
                         ret = PubnubErrorCode.MessageTooLarge;
                     }
+                    else if (httpErrorCodeMessage.ToUpper() == "INVALID KEY")
+                    {
+                        ret = PubnubErrorCode.InvalidKey;
+                    }
                     else if (httpErrorCodeMessage.ToUpper() == "BADREQUEST")
                     {
                         ret = PubnubErrorCode.BadRequest;
@@ -5982,6 +5996,12 @@ namespace PubNubMessaging.Core
                     break;
                 case 401:
                     ret = PubnubErrorCode.InvalidSubscribeKey;
+                    break;
+                case 402:
+                    if (httpErrorCodeMessage.ToUpper() == "NOT ENABLED")
+                    {
+                        ret = PubnubErrorCode.PamNotEnabled;
+                    }
                     break;
                 case 403:
                     if (httpErrorCodeMessage.ToUpper() == "FORBIDDEN")
@@ -6049,7 +6069,9 @@ namespace PubNubMessaging.Core
 
         MessageTooLarge = 4000,
         BadRequest = 4001,
+        InvalidKey = 4002,
         InvalidSubscribeKey = 4010,
+        PamNotEnabled = 4020,
         Forbidden = 4030,
         SignatureDoesNotMatch = 4031,
         RequestUriTooLong = 4140,
@@ -6067,7 +6089,9 @@ namespace PubNubMessaging.Core
             //HTTP ERROR CODES and PubNub Context description
             dictionaryCodes.Add(4000, "For Publish, 1800 characters is the message size after we urlencode including http and host name. If you need to send larger messages, which may be >1.8KB after urlencoding, you can enable elastic message size in the admin to support this. For pricing information, please contact PubNub support");
             dictionaryCodes.Add(4001, "Bad Request. Please check the entered inputs or web request URL");
+            dictionaryCodes.Add(4002, "Invalid Key. Please verify the publish key");
             dictionaryCodes.Add(4010, "Please provide correct subscribe key");
+            dictionaryCodes.Add(4020, "PAM is not enabled. Please contact PubNub support");
             dictionaryCodes.Add(4030, "Not authorized to access. Please ensure that the channel has permissions using PAM. Please check your authentication key value also for access. For assistance on PAM credentials, please contact PubNub support. Once the permission issue is resolved, Unsubscribe/Presence-Unsubscribe the channel and subscribe/presence again accordingly.");
             dictionaryCodes.Add(4031, "Please verify publish key and secret key. For assistance, contact PubNub support");
             dictionaryCodes.Add(4140, "URL request too long. Reduce the length by reducing subscription/presence channels or grant/revoke/audit channels/auth key list");

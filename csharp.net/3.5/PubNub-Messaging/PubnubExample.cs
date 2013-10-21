@@ -19,10 +19,11 @@ namespace PubNubMessaging.Core
 
         static void UnhandledExceptionTrapper(object sender, UnhandledExceptionEventArgs e)
         {
-            Console.WriteLine("Unhandled exception occured inside Pubnub C# API. Exiting the application. Please try again.");
             //Console.WriteLine(e.ExceptionObject.ToString());
+            Console.WriteLine("Unhandled exception occured inside Pubnub C# API. Exiting the application. Please try again.");
             Environment.Exit(1);
         }
+
         static public void Main()
         {
             AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionTrapper;
@@ -43,6 +44,7 @@ namespace PubNubMessaging.Core
             Console.ForegroundColor = ConsoleColor.Blue;
             if (origin.Trim() == "")
             {
+                origin = "pubsub.pubnub.com";
                 Console.WriteLine("Default Origin selected");
             }
             else
@@ -81,6 +83,38 @@ namespace PubNubMessaging.Core
             Console.ResetColor();
             Console.WriteLine();
 
+            Console.WriteLine("ENTER subscribe key.");
+            Console.WriteLine("If you want to accept default demo subscribe key, press ENTER.");
+            string subscribeKey = Console.ReadLine();
+            Console.ForegroundColor = ConsoleColor.Blue;
+            if (subscribeKey.Trim().Length > 0)
+            {
+                Console.WriteLine("Subscribe key provided.");
+            }
+            else
+            {
+                Console.WriteLine("Default demo subscribe key provided");
+                subscribeKey = "demo";
+            }
+            Console.ResetColor();
+            Console.WriteLine();
+
+            Console.WriteLine("ENTER publish key.");
+            Console.WriteLine("If you want to accept default demo publish key, press ENTER.");
+            string publishKey = Console.ReadLine();
+            Console.ForegroundColor = ConsoleColor.Blue;
+            if (publishKey.Trim().Length > 0)
+            {
+                Console.WriteLine("Publish key provided.");
+            }
+            else
+            {
+                Console.WriteLine("Default demo publish key provided");
+                publishKey = "demo";
+            }
+            Console.ResetColor();
+            Console.WriteLine();
+
             Console.WriteLine("ENTER secret key.");
             Console.WriteLine("If you don't want to avail at this time, press ENTER.");
             string secretKey = Console.ReadLine();
@@ -92,14 +126,16 @@ namespace PubNubMessaging.Core
             else
             {
                 Console.WriteLine("No Secret key provided");
-                secretKey = "sec-c-YjFmNzYzMGMtYmI3NC00NzJkLTlkYzYtY2MwMzI4YTJhNDVh";
+                //secretKey = "sec-c-YjFmNzYzMGMtYmI3NC00NzJkLTlkYzYtY2MwMzI4YTJhNDVh";
             }
             Console.ResetColor();
             Console.WriteLine();
 
-            //pubnub = new Pubnub("demo", "demo", secretKey, cipherKey,
-            pubnub = new Pubnub("pub-c-a2650a22-deb1-44f5-aa87-1517049411d5", "sub-c-a478dd2a-c33d-11e2-883f-02ee2ddab7fe", secretKey, cipherKey,
+            pubnub = new Pubnub(publishKey, subscribeKey, secretKey, cipherKey,
+            //pubnub = new Pubnub("pub-c-a2650a22-deb1-44f5-aa87-1517049411d5", "sub-c-a478dd2a-c33d-11e2-883f-02ee2ddab7fe", secretKey, cipherKey,
                 (enableSSL.Trim().ToLower() == "y") ? true : false);
+
+            pubnub.Origin = origin;
 
             Console.WriteLine("Use Custom Session UUID? ENTER Y for Yes, else N");
             string enableCustomUUID = Console.ReadLine();
@@ -820,8 +856,14 @@ namespace PubNubMessaging.Core
                 case 4001:
                     //Warning: Bad Request. Please check the entered inputs or web request URL
                     break;
+                case 4002:
+                    //Warning: Invalid Key. Please verify the publish key
+                    break;
                 case 4010:
                     //Critical: Please provide correct subscribe key. This corresponds to a 401 on the server due to a bad sub key
+                    break;
+                case 4020:
+                    // PAM is not enabled. Please contact PubNub support
                     break;
                 case 4030:
                     //Warning: Not authorized. Check the permimissions on the channel. Also verify authentication key, to check access.
