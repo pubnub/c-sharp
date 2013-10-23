@@ -33,6 +33,7 @@ Pubnub pubnub = new Pubnub(publishKey="demo", subscribeKey="demo", secretKey, ci
 
 ```
 
+
 ### Code snippet to grant PAM access for subscribe channel
 
 ```
@@ -46,8 +47,9 @@ pubnub.GrantAccess<string>(channel="mychannel", read=true, write=true, grantTime
 pubnub.AuthenticationKey = authKey;
 pubnub.GrantAccess<string>(channel="mychannel", read=true, write=true, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
 
-
+NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
+
 
 ### Code snippet to grant PAM access for presence channel
 
@@ -62,7 +64,9 @@ pubnub.GrantPresenceAccess<string>(channel="mychannel", read=true, write=true, g
 pubnub.AuthenticationKey = authKey;
 pubnub.GrantPresenceAccess<string>(channel="mychannel", read=true, write=true, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
 
+NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
+
 
 ### Code snippet to revoke PAM access for subscribe channel
 
@@ -74,8 +78,9 @@ pubnub.GrantAccess<string>(channel="mychannel", read=false, write=false, Display
 //Revoke Access at channel level. Any auth keys exist for a given channel shall be revoked before revoking access at channel level.
 pubnub.GrantAccess<string>(channel="mychannel", read=false, write=false, DisplayReturnMessage, DisplayErrorMessage);
 
-
+NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
+
 
 ### Code snippet to revoke PAM access for presence channel
 
@@ -87,7 +92,7 @@ pubnub.GrantPresenceAccess<string>(channel="mychannel", read=false, write=false,
 //Revoke Access at channel level. Any auth keys exist for a given channel shall be revoked before revoking access at channel level.
 pubnub.GrantPresenceAccess<string>(channel="mychannel", read=false, write=false, DisplayReturnMessage, DisplayErrorMessage);
 
-
+NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
 
 ### Code snippet to audit PAM access for subscribe channels
@@ -103,7 +108,7 @@ pubnub.AuditAccess<string>(channel="mychannel",DisplayReturnMessage, DisplayErro
 pubnub.AuthenticationKey = authKey;
 pubnub.AuditAccess<string>(channel="mychannel",DisplayReturnMessage, DisplayErrorMessage);
 
-
+NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
 
 ### Code snippet to audit PAM access for presence channels
@@ -119,6 +124,7 @@ pubnub.AuditPresenceAccess<string>(channel="mychannel",DisplayReturnMessage, Dis
 pubnub.AuthenticationKey = authKey;
 pubnub.AuditPresenceAccess<string>(channel="mychannel",DisplayReturnMessage, DisplayErrorMessage);
 
+NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
 
 ### Code snippet to subscribe to a channel
@@ -126,6 +132,7 @@ pubnub.AuditPresenceAccess<string>(channel="mychannel",DisplayReturnMessage, Dis
 ```
 pubnub.Subscribe<string>(channel="mychannel", DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
 
+NOTE: DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage and DisplayErrorMessage are callback methods
 ```
 
 ### Code snippet to subscribe to presence channel
@@ -133,6 +140,7 @@ pubnub.Subscribe<string>(channel="mychannel", DisplaySubscribeReturnMessage, Dis
 ```
 pubnub.Presence<string>(channel="mychannel", DisplayPresenceReturnMessage, DisplayPresenceConnectStatusMessage, DisplayErrorMessage);
 
+NOTE: DisplayPresenceReturnMessage, DisplayPresenceConnectStatusMessage and DisplayErrorMessage are callback methods
 ```
 
 ### Code snippet to publish a message
@@ -140,6 +148,7 @@ pubnub.Presence<string>(channel="mychannel", DisplayPresenceReturnMessage, Displ
 ```
 pubnub.Publish<string>(channel="mychannel", publishMsg="My favorite message", DisplayReturnMessage, DisplayErrorMessage);
 
+NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
 
 ### Code snippet for detailed history
@@ -149,8 +158,9 @@ pubnub.Publish<string>(channel="mychannel", publishMsg="My favorite message", Di
 pubnub.DetailedHistory<string>(channel="mychannel", recordCountToRetrieve=100, DisplayReturnMessage, DisplayErrorMessage);
 
 //Detailed History from a specific time old to new messages. Max no. of records we can get = 100
-pubnub.DetailedHistory<string>(pubnubChannel, starttime=13557486057035336, PollResultsRegularCallback, PollResultsErrorCallback, reverse=true);
+pubnub.DetailedHistory<string>(pubnubChannel, starttime=13557486057035336, DisplayReturnMessage, DisplayErrorMessage, reverse=true);
 
+NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
 
 ### Code snippet to HereNow
@@ -158,6 +168,7 @@ pubnub.DetailedHistory<string>(pubnubChannel, starttime=13557486057035336, PollR
 ```
 pubnub.HereNow<string>(channel="mychannel", DisplayReturnMessage, DisplayErrorMessage);
 
+NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
 
 ### Code snippet to unsubscribe a channel
@@ -165,6 +176,7 @@ pubnub.HereNow<string>(channel="mychannel", DisplayReturnMessage, DisplayErrorMe
 ```
 pubnub.Unsubscribe<string>(channel="mychannel", DisplayReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeDisconnectStatusMessage, DisplayErrorMessage);
 
+NOTE: DisplayReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeDisconnectStatusMessage and DisplayErrorMessage are callback methods
 ```
 
 ### Code snippet to presence-unsubscribe a channel
@@ -172,6 +184,7 @@ pubnub.Unsubscribe<string>(channel="mychannel", DisplayReturnMessage, DisplaySub
 ```
 pubnub.PresenceUnsubscribe<string>(channel="mychannel", DisplayReturnMessage, DisplayPresenceConnectStatusMessage, DisplayPresenceDisconnectStatusMessage, DisplayErrorMessage);
 
+NOTE: DisplayReturnMessage, DisplayPresenceConnectStatusMessage, DisplayPresenceDisconnectStatusMessage and DisplayErrorMessage are callback methods
 ```
 
 
@@ -180,7 +193,114 @@ pubnub.PresenceUnsubscribe<string>(channel="mychannel", DisplayReturnMessage, Di
 ```
 pubnub.Time<string>(DisplayReturnMessage, DisplayErrorMessage);
 
+NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
+
+### Code snippet for error callback
+
+```
+static void DisplayErrorMessage(PubnubClientError pubnubError)
+{
+  Console.WriteLine(pubnubError.StatusCode)
+  
+  //Based on the severity of the error, we can filter out errors for handling or logging.
+  switch (pubnubError.Severity)
+  {
+    case PubnubErrorSeverity.Critical:
+      //This type of error needs to be handled.
+      break;
+    case PubnubErrorSeverity.Warn:
+      //This type of error needs to be handled
+      break;
+    case PubnubErrorSeverity.Info:
+      //This type of error can be ignored
+      break;
+    default:
+      break;
+  }
+
+  Console.WriteLine(pubnubError.StatusCode); //Unique ID of the error
+
+  Console.WriteLine(pubnubError.Message); //Message received from client or server. From client, it could be from .NET exception.
+
+  if (pubnubError.DetailedDotNetException != null)
+  {
+    Console.WriteLine(pubnubError.IsDotNetException); // Boolean flag to check .NET exception
+    Console.WriteLine(pubnubError.DetailedDotNetException.ToString()); // Full Details of .NET exception
+  }
+
+  Console.WriteLine(pubnubError.MessageSource); // Did this originate from Server or Client-side logic
+
+  if (pubnubError.PubnubWebRequest != null)
+  {
+    //Captured Web Request details
+    Console.WriteLine(pubnubError.PubnubWebRequest.RequestUri.ToString()); 
+    Console.WriteLine(pubnubError.PubnubWebRequest.Headers.ToString()); 
+  }
+
+  if (pubnubError.PubnubWebResponse != null)
+  {
+    //Captured Web Response details
+    Console.WriteLine(pubnubError.PubnubWebResponse.Headers.ToString());
+  }
+
+  Console.WriteLine(pubnubError.Description); // Useful for logging and troubleshooting and support
+  Console.WriteLine(pubnubError.Channel); //Channel name(s) at the time of error
+  Console.WriteLine(pubnubError.ErrorDateTimeGMT); //GMT time of error
+
+}
+```
+
+### Code snippet to check the status of published message
+
+```
+private static void DisplayReturnMessage(string publishResult)
+{
+  if (!string.IsNullOrEmpty(publishResult) && !string.IsNullOrEmpty(publishResult.Trim()))
+  {
+    object[] deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToObject(publishResult) as object[];
+    if (deserializedMessage is object[] && deserializedMessage.Length == 3)
+    {
+      long statusCode = Int64.Parse(deserializedMessage[0].ToString());
+      string statusMessage = (string)deserializedMessage[1];
+      string channelName = (string)deserializedMessage[2];
+
+      if (statusCode == 1 && statusMessage.ToLower() == "sent")
+      {
+        Console.WriteLine("Cool. Messaage Published");
+      }
+      else
+      {
+        Console.WriteLine("Oops. Some problem."); 
+      }
+    }
+  }
+}
+```
+
+
+### Code snippet to check the subscribe connect status
+
+```
+private static void DisplaySubscribeConnectStatusMessage(string result)
+{
+  if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
+  {
+    object[] deserializedResult = pubnub.JsonPluggableLibrary.DeserializeToObject(result) as object[];
+    if (deserializedResult is object[])
+    {
+      int statusCode = Int32.Parse(deserializedResult[0].ToString());
+      string statusMessage = (string)deserializedResult[1];
+      string channel = (string)deserializedResult[2];
+      if (statusCode == 1 && statusMessage.ToLower() == "connected")
+      {
+        Console.WriteLine("Now we are good to receive published messages");
+      }
+    }
+  }
+}
+```
+
 
 ## Running the Interactive Demo App
 
