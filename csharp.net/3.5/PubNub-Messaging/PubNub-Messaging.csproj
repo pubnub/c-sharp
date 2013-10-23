@@ -161,6 +161,7 @@
   <ItemGroup>
     <Compile Include="PubnubExample.cs" />
     <Compile Include="Pubnub.cs" />
+    <Compile Include="PubnubMultiChannel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="v4.0\" />
