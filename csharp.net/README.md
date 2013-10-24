@@ -1,5 +1,5 @@
-# PubNub 3.5 Web Data Push Cloud-Hosted API
-# C# for .net 4.0/4.5 and 3.5
+# PubNub 3.5 for C Sharp (C#)
+## Supporting .net 3.5, 4.0, and 4.5
 
 Open 3.5/PubNub-Messaging/PubNub-Messaging.sln, and the example files Pubnub_Example.cs and PubnubMultiChannel.cs should demonstrate all functionality, asyncronously using delegates.
 You can also view and inspect the tests for additional insight. 
@@ -300,5 +300,122 @@ NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 5. Set Target Framework to 3.5 or 4
 6. Save the project
 7. CTRL-F5 or F5 to run it
+
+## Variables Reference
+
+```c#
+overrideTcpKeepAlive = false 
+```
+
+This variable default value is set to false to consider "request.ServicePoint.SetTcpKeepAlive()" method in the code. For mono framework 2.10.9 stable release, SetTcpKeepAlive() is not supported. To support Mono, set the value of "overrideTcpKeepAlive" to true
+ 
+```c# 
+_pubnubWebRequestCallbackIntervalInSeconds = 310 
+```
+
+This variable sets the time limit in seconds for the web request to run. Applies to subscribe and presence web requests. In the example, we terminate HTTP requests after 310 seconds of not hearing back from the server.
+
+```c#
+_pubnubOperationTimeoutIntervalInSeconds = 15
+```
+
+This variable sets the time limit in seconds for the web request to run. Applies to regular operation requests like time, publish, "here now" and detailed history. In the example, we terminate HTTP requests after 15 seconds of not hearing back from the server.
+
+```c#
+_pubnubNetworkTcpCheckIntervalInSeconds = 15 
+```
+
+This variable sets the time interval(heart-beat) to check internet/network/tcp connection for HTTP requests when an active request is initiated. In the example, we check network/tcp connection every 15 seconds. It is also used for re-connect interval when "overrideTcpKeepAlive" = true (for Mono framework 2.10.9). Re-connect applies only for subscribe and presence.
+
+```c#
+_pubnubNetworkCheckRetries = 50 
+```
+
+This variable is to set the maximum number of re-tries for re-connect to check internet/network connection for subscribe and presence. In the example, we attempt 50 times to check connection.
+
+```c# 
+_pubnubWebRequestRetryIntervalInSeconds = 10 
+```
+
+This variable is to set the wait time for re-subscribe and re-presence, if the previous subscribe or presence fail. This variable is valid only when "overrideTcpKeepAlive" = false
+ 
+If there is no internet/network connection after "pubnubNetworkCheckRetries" attempts for subscribe, "Unsubscribed after 50 failed retries" message will be sent and unsubscribe occurs automatically. Similary for presence, "Presence-unsubscribed after 50 failed retries"
+ 
+For publish, here_now, detailed history and time, there is no attempt to re-connect. If the request fails due to http web request timeout, "Operation timeout" error be sent. If there is network/internet disconnect, error message "Network connect error" will be sent. 
+
+```c#
+_enableResumeOnReconnect = true
+```
+
+This variable default value is set to true for retry subscribe and presence to use last timetoken(before this with timetoken = 0). If the variable is set to false, retry subscribe and presence will use timetoken = 0.
+
+```c#
+pubnubEnableProxyConfig = false
+```
+
+This variable default value is set to false assuming Pubnub code don't need internet access through proxy. If proxy access is needed due to corporate policy, set the value of "pubnubEnableProxyConfig" to true and set the Pubnub property "Proxy" to the type PubnubProxy similar to the following code snippet.
+          PubnubProxy proxy = new PubnubProxy();
+          proxy.ProxyServer = <<Proxy Host or Server Name>>;
+          proxy.ProxyPort = <<Proxy Port Number>>;
+          proxy.ProxyUserName = << User Name of the proxy server account holder >>;
+          proxy.ProxyPassword = << Password of the proxy server account holder >>;
+          pubnub.Proxy = proxy;
+At this time, Proxy feature is not supported for windows phone 7.1.
+
+```c#
+pubnubLogLevel = LoggingMethod.Level.Off
+```
+
+This variable default value is set to LoggingMethod.Level.Off. This is used to log any trace/error message that occur in the application. Other available log level options are LoggingMethod.Level.Error, LoggingMethod.Level.Info, LoggingMethod.Level.Verbose and LoggingMethod.Level.Warning. This variable is for troubleshooting purposes only.
+
+```c#
+errorLevel = PubnubErrorFilter.Level.Info
+```
+
+This variable default value is set to PubnubErrorFilter.Level.Info. This is used to filter out error messages that go to Error Callback. Other available options are Warning, Critical
+
+```c#
+IPubnubUnitTest PubnubUnitTest
+```
+
+PubnubUnitTest is a public property which is of type IPubnubUnitTest interface. This property is used to perform unit tests with stubs. The IPubnubUnitTest interface needs to be implemented and passed to PubnubUnitTest property.
+
+```c#
+IJsonPluggableLibrary JsonPluggableLibrary
+```
+
+JsonPluggableLibrary is a public property which is of type IJsonPluggableLibrary interface. This property is used to customize the JSON library usage within Pubnub API.
+
+```c#
+_enableJsonEncodingForPublish = true
+```
+
+This variable default value is set to true. It can be set to false only when already serialized string is published as message for Publish.
+
+```c#
+string AuthenticationKey
+```
+
+AuthenticationKey is a public property used to set authentication key for PAM.
+
+```c#
+string Origin
+```
+
+Origin is a public property used to set PubNub origin. Default value is set to "pubsub.pubnub.com" through _origin. The default value may change for production purposes. Please check with PubNub support on the origin value.
+
+```c#
+string SessionUUID
+```
+
+SessionUUID is a public property used to set custom UUID for subscribe/presence sessions. If there is no custom value, PubNub by default uses random GUID value.
+
+```c#
+domainName = "pubsub.pubnub.com"
+```
+
+This variable default value is set to "pubsub.pubnub.com". This variable is used only for mono runtime. This variable value will be same as "_origin"
+
+** NOTE: ** Some variable values needs to be passed to Pubnub constructor for setup and configuration of PubNub C# API. The variables that needs to be setup are publishKey, subscribeKey, secretKey, cipherKey.
 
 Report an issue, or email us at support if there are any additional questions or comments.
