@@ -12,193 +12,96 @@ For best performance after completion of all intended operations, please call th
 of the Pubnub instance, and assign it to null. This will help ensure speedy resources cleanup when you are done
 with the object.
 
-### Important Change in PubNub 3.5 
-1. Error Callback method signature changed. PubnubClientError object will be passed to error callback with error details. So all operations/non-operation method signatures,which are using error callback method, were modified.
+### Important Changes in PubNub 3.5 
+1. The Error Callback method signature has changed. Now, instead of a string, a PubnubClientError object will be passed to a callback of choice with error details (via the error object). To support this, all operation method signatures are modified.
 2. PubNub Access Manager (PAM) to grant/revoke/audit access to channels.
+3. Fixed bug where sometimes when machine would sleep/resume it would create a bad presence state.
 
-### Note
+### Generic method type support
 Currently all the generic methods support string and object types only. Strong types will be supported in future.
 
-### Code snippet to instantiate Pubnub instance
+## Sample Code
+A completel running demo app which includes the sample code below is available in the PubNub Message project [by way of the 
+PubnubExample.cs](3.5/PubNub-Messaging/PubnubExample.cs) file.  [The tests](3.5/PubNub-Messaging.Tests) are also a great reference.
 
-```
+### Instantiate a Pubnub instance
+
+```c#
 //Basic usage for subscribe and publish
 Pubnub pubnub = new Pubnub(publishKey="demo", subscribeKey="demo");
 
-//optional secret key to publish.
+//optionally, with secret key
 Pubnub pubnub = new Pubnub(publishKey="demo", subscribeKey="demo", secretKey);
 
-//optional cipher key to encrypt and decrypt the messages. enableSSL is boolean flag to indicate https request or not.
+//optionally, with SSL and cipher key. This would enable encryption/decryption. enableSSL is boolean to toggle HTTP(S).
 Pubnub pubnub = new Pubnub(publishKey="demo", subscribeKey="demo", secretKey, cipherKey, enableSSL);
 
 ```
 
+### Subscribe to a channel
 
-### Code snippet to grant PAM access for subscribe channel
-
-```
-//Grant Access at sub-key level. At sub-key, no channel will be given.
-pubnub.GrantAccess<string>("", read=true, write=true, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
-
-//Grant Access at channel level.
-pubnub.GrantAccess<string>(channel="mychannel", read=true, write=true, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
-
-//Grant Access at user level. At user level, auth key will be provided.
-pubnub.AuthenticationKey = authKey;
-pubnub.GrantAccess<string>(channel="mychannel", read=true, write=true, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
-
-NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
-```
-
-
-### Code snippet to grant PAM access for presence channel
-
-```
-//Grant Access at sub-key level. At sub-key, no channel will be given.
-pubnub.GrantPresenceAccess<string>("", read=true, write=true, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
-
-//Grant Access at channel level.
-pubnub.GrantPresenceAccess<string>(channel="mychannel", read=true, write=true, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
-
-//Grant Access at user level. At user level, auth key will be provided.
-pubnub.AuthenticationKey = authKey;
-pubnub.GrantPresenceAccess<string>(channel="mychannel", read=true, write=true, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
-
-NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
-```
-
-
-### Code snippet to revoke PAM access for subscribe channel
-
-```
-//Revoke Access at user level. At user level, auth key will be provided.
-pubnub.AuthenticationKey = authKey;
-pubnub.GrantAccess<string>(channel="mychannel", read=false, write=false, DisplayReturnMessage, DisplayErrorMessage);
-
-//Revoke Access at channel level. Any auth keys exist for a given channel shall be revoked before revoking access at channel level.
-pubnub.GrantAccess<string>(channel="mychannel", read=false, write=false, DisplayReturnMessage, DisplayErrorMessage);
-
-NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
-```
-
-
-### Code snippet to revoke PAM access for presence channel
-
-```
-//Revoke Access at user level. At user level, auth key will be provided.
-pubnub.AuthenticationKey = authKey;
-pubnub.GrantPresenceAccess<string>(channel="mychannel", read=false, write=false, DisplayReturnMessage, DisplayErrorMessage);
-
-//Revoke Access at channel level. Any auth keys exist for a given channel shall be revoked before revoking access at channel level.
-pubnub.GrantPresenceAccess<string>(channel="mychannel", read=false, write=false, DisplayReturnMessage, DisplayErrorMessage);
-
-NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
-```
-
-### Code snippet to audit PAM access for subscribe channels
-
-```
-//Audit Access at sub-key level. At sub-key, no channel will be given. Here both subscribe and presence channels will be listed.
-pubnub.AuditAccess<string>("",DisplayReturnMessage, DisplayErrorMessage);
-
-//Audit Access at channel level.
-pubnub.AuditAccess<string>(channel="mychannel",DisplayReturnMessage, DisplayErrorMessage);
-
-//Audit Access at user level. At user level, auth key will be provided.
-pubnub.AuthenticationKey = authKey;
-pubnub.AuditAccess<string>(channel="mychannel",DisplayReturnMessage, DisplayErrorMessage);
-
-NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
-```
-
-### Code snippet to audit PAM access for presence channels
-
-```
-//Audit Access at sub-key level. At sub-key, no channel will be given. Here both subscribe and presence channels will be listed.
-pubnub.AuditPresenceAccess<string>("",DisplayReturnMessage, DisplayErrorMessage);
-
-//Audit Access at channel level.
-pubnub.AuditPresenceAccess<string>(channel="mychannel",DisplayReturnMessage, DisplayErrorMessage);
-
-//Audit Access at user level. At user level, auth key will be provided.
-pubnub.AuthenticationKey = authKey;
-pubnub.AuditPresenceAccess<string>(channel="mychannel",DisplayReturnMessage, DisplayErrorMessage);
-
-NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
-```
-
-### Code snippet to subscribe to a channel
-
-```
+```c#
 pubnub.Subscribe<string>(channel="mychannel", DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
-
-NOTE: DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage and DisplayErrorMessage are callback methods
+// NOTE: DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage and DisplayErrorMessage are callback methods
 ```
 
-### Code snippet to subscribe to presence channel
+### Subscribe to presence channel
 
-```
+```c#
 pubnub.Presence<string>(channel="mychannel", DisplayPresenceReturnMessage, DisplayPresenceConnectStatusMessage, DisplayErrorMessage);
-
-NOTE: DisplayPresenceReturnMessage, DisplayPresenceConnectStatusMessage and DisplayErrorMessage are callback methods
+// NOTE: DisplayPresenceReturnMessage, DisplayPresenceConnectStatusMessage and DisplayErrorMessage are callback methods
 ```
 
-### Code snippet to publish a message
+### Publish a message
 
-```
+```c#
 pubnub.Publish<string>(channel="mychannel", publishMsg="My favorite message", DisplayReturnMessage, DisplayErrorMessage);
-
-NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
+// NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
 
-### Code snippet for detailed history
+### Get history
 
-```
-//Detailed History for previously published messages. Max no. of records at a time we can get = 100
+```c#
+// Detailed History for previously published messages. Maximum records returned per request is = 100
 pubnub.DetailedHistory<string>(channel="mychannel", recordCountToRetrieve=100, DisplayReturnMessage, DisplayErrorMessage);
 
-//Detailed History from a specific time old to new messages. Max no. of records we can get = 100
+// Detailed History from a specific time, ordered old to new messages.
 pubnub.DetailedHistory<string>(pubnubChannel, starttime=13557486057035336, DisplayReturnMessage, DisplayErrorMessage, reverse=true);
 
-NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
+// NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
 
-### Code snippet to HereNow
+### Who is Here, Now on this channel (HereNow)
 
-```
+```c#
 pubnub.HereNow<string>(channel="mychannel", DisplayReturnMessage, DisplayErrorMessage);
-
-NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
+// NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
 
-### Code snippet to unsubscribe a channel
+### Unsubscribe from a channel
 
-```
+```c#
 pubnub.Unsubscribe<string>(channel="mychannel", DisplayReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeDisconnectStatusMessage, DisplayErrorMessage);
-
-NOTE: DisplayReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeDisconnectStatusMessage and DisplayErrorMessage are callback methods
+// NOTE: DisplayReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeDisconnectStatusMessage and DisplayErrorMessage are callback methods
 ```
 
-### Code snippet to presence-unsubscribe a channel
+### Unsubscribe from a Presence channel
 
-```
+```c#
 pubnub.PresenceUnsubscribe<string>(channel="mychannel", DisplayReturnMessage, DisplayPresenceConnectStatusMessage, DisplayPresenceDisconnectStatusMessage, DisplayErrorMessage);
-
-NOTE: DisplayReturnMessage, DisplayPresenceConnectStatusMessage, DisplayPresenceDisconnectStatusMessage and DisplayErrorMessage are callback methods
+// NOTE: DisplayReturnMessage, DisplayPresenceConnectStatusMessage, DisplayPresenceDisconnectStatusMessage and DisplayErrorMessage are callback methods
 ```
 
+### PubNub system Time
 
-### Code snippet for time
-
-```
+```c#
 pubnub.Time<string>(DisplayReturnMessage, DisplayErrorMessage);
-
-NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
+// NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
 
-### Code snippet for error callback
+### Filtering / Detecting state from within your error callback
 
-```
+```c#
 static void DisplayErrorMessage(PubnubClientError pubnubError)
 {
   Console.WriteLine(pubnubError.StatusCode)
@@ -251,9 +154,9 @@ static void DisplayErrorMessage(PubnubClientError pubnubError)
 }
 ```
 
-### Code snippet to check the status of published message
+### Checking the status of a published message via the callback
 
-```
+```c#
 private static void DisplayReturnMessage(string publishResult)
 {
   if (!string.IsNullOrEmpty(publishResult) && !string.IsNullOrEmpty(publishResult.Trim()))
@@ -279,7 +182,7 @@ private static void DisplayReturnMessage(string publishResult)
 ```
 
 
-### Code snippet to check the subscribe connect status
+### Check the subscribe status via the callback
 
 ```
 private static void DisplaySubscribeConnectStatusMessage(string result)
@@ -299,6 +202,77 @@ private static void DisplaySubscribeConnectStatusMessage(string result)
     }
   }
 }
+```
+
+### PAM: Grant and revoke access for subscribes
+
+```c#
+// At the sub-key level (no channel is given)
+// Grant
+pubnub.GrantAccess<string>("", read=true, write=true, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
+// Revoke
+pubnub.GrantAccess<string>("", read=false, write=false, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
+
+// At the channel level
+// Grant
+pubnub.GrantAccess<string>(channel="mychannel", read=true, write=true, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
+// Revoke
+pubnub.GrantAccess<string>(channel="mychannel", read=false, write=false, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
+
+
+// At the user level. User is ID'ed via the auth key parameter.
+pubnub.AuthenticationKey = authKey;
+// Grant
+pubnub.GrantAccess<string>(channel="mychannel", read=true, write=true, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
+// Revoke
+pubnub.GrantAccess<string>(channel="mychannel", read=false, write=false, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
+
+// NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
+```
+
+
+### PAM: Grant and revoke access for Presence
+
+```c#
+// At the sub-key level (no channel is given)
+// Grant
+pubnub.GrantPresenceAccess<string>("", read=true, write=true, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
+// Revoke
+pubnub.GrantPresenceAccess<string>("", read=false, write=false, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
+
+// At the channel level
+// Grant
+pubnub.GrantPresenceAccess<string>(channel="mychannel", read=true, write=true, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
+// Revoke
+pubnub.GrantPresenceAccess<string>(channel="mychannel", read=false, write=false, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
+
+// At the user level. User is ID'ed via the auth key parameter.
+pubnub.AuthenticationKey = authKey;
+// Grant
+pubnub.GrantPresenceAccess<string>(channel="mychannel", read=true, write=true, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
+// Revoke
+pubnub.GrantPresenceAccess<string>(channel="mychannel", read=true, write=true, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
+
+// NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
+```
+
+### Code snippet to audit PAM access for subscribe and presence channels
+
+```
+// Audit access at the sub-key level (no channel is given)
+pubnub.AuditAccess<string>("",DisplayReturnMessage, DisplayErrorMessage);
+pubnub.AuditPresenceAccess<string>("",DisplayReturnMessage, DisplayErrorMessage);
+
+//Audit Access at the channel level
+pubnub.AuditAccess<string>(channel="mychannel",DisplayReturnMessage, DisplayErrorMessage);
+pubnub.AuditPresenceAccess<string>(channel="mychannel",DisplayReturnMessage, DisplayErrorMessage);
+
+//Audit Access at the user level. User is ID'ed via the auth key parameter.
+pubnub.AuthenticationKey = authKey;
+pubnub.AuditAccess<string>(channel="mychannel",DisplayReturnMessage, DisplayErrorMessage);
+pubnub.AuditPresenceAccess<string>(channel="mychannel",DisplayReturnMessage, DisplayErrorMessage);
+
+NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
 
 
