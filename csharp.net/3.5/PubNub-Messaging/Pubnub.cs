@@ -729,7 +729,7 @@ namespace PubNubMessaging.Core
 		/**
          * Detailed History
          */
-		public bool DetailedHistory(string channel, long start, long end, int count, bool reverse, Action<object> userCallback, Action<object> errorCallback)
+        public bool DetailedHistory(string channel, long start, long end, int count, bool reverse, Action<object> userCallback, Action<PubnubClientError> errorCallback)
 		{
 			return DetailedHistory<object>(channel, start, end, count, reverse, userCallback, errorCallback);
 		}
@@ -765,8 +765,8 @@ namespace PubNubMessaging.Core
 			
 			return UrlProcessRequest<T>(request, requestState);
 		}
-		
-		public bool DetailedHistory(string channel, long start, Action<object> userCallback, Action<object> errorCallback, bool reverse)
+
+        public bool DetailedHistory(string channel, long start, Action<object> userCallback, Action<PubnubClientError> errorCallback, bool reverse)
 		{
 			return DetailedHistory<object>(channel, start, -1, -1, reverse, userCallback, errorCallback);
 		}
@@ -775,8 +775,8 @@ namespace PubNubMessaging.Core
 		{
 			return DetailedHistory<T>(channel, start, -1, -1, reverse, userCallback, errorCallback);
 		}
-		
-		public bool DetailedHistory(string channel, int count, Action<object> userCallback, Action<object> errorCallback)
+
+        public bool DetailedHistory(string channel, int count, Action<object> userCallback, Action<PubnubClientError> errorCallback)
 		{
 			return DetailedHistory<object>(channel, -1, -1, count, false, userCallback, errorCallback);
 		}
@@ -794,7 +794,7 @@ namespace PubNubMessaging.Core
 		/// <param name="message"></param>
 		/// <param name="userCallback"></param>
 		/// <returns></returns>
-		public bool Publish(string channel, object message, Action<object> userCallback, Action<object> errorCallback)
+        public bool Publish(string channel, object message, Action<object> userCallback, Action<PubnubClientError> errorCallback)
 		{
 			return Publish<object>(channel, message, userCallback, errorCallback);
 		}
@@ -921,7 +921,7 @@ namespace PubNubMessaging.Core
 		/// <param name="channel"></param>
 		/// <param name="userCallback"></param>
 		/// <param name="connectCallback"></param>
-		public void Subscribe(string channel, Action<object> userCallback, Action<object> connectCallback, Action<object> errorCallback)
+        public void Subscribe(string channel, Action<object> userCallback, Action<object> connectCallback, Action<PubnubClientError> errorCallback)
 		{
 			Subscribe<object>(channel, userCallback, connectCallback, errorCallback);
 		}
@@ -1389,7 +1389,7 @@ namespace PubNubMessaging.Core
 		/// <param name="connectCallback"></param>
 		/// <param name="disconnectCallback"></param>
 		/// <param name="errorCallback"></param>
-		public void Unsubscribe(string channel, Action<object> userCallback, Action<object> connectCallback, Action<object> disconnectCallback, Action<object> errorCallback)
+        public void Unsubscribe(string channel, Action<object> userCallback, Action<object> connectCallback, Action<object> disconnectCallback, Action<PubnubClientError> errorCallback)
 		{
 			Unsubscribe<object>(channel, userCallback, connectCallback, disconnectCallback, errorCallback);
 		}
@@ -1546,7 +1546,7 @@ namespace PubNubMessaging.Core
 		/// <param name="userCallback"></param>
 		/// <param name="connectCallback"></param>
 		/// <param name="errorCallback"></param>
-		public void Presence(string channel, Action<object> userCallback, Action<object> connectCallback, Action<object> errorCallback)
+        public void Presence(string channel, Action<object> userCallback, Action<object> connectCallback, Action<PubnubClientError> errorCallback)
 		{
 			Presence<object>(channel, userCallback, connectCallback, errorCallback);
 		}
@@ -1574,8 +1574,8 @@ namespace PubNubMessaging.Core
 			
 			MultiChannelSubscribeInit<T>(ResponseType.Presence, channel, userCallback, connectCallback, errorCallback);
 		}
-		
-		public void PresenceUnsubscribe(string channel, Action<object> userCallback, Action<object> connectCallback, Action<object> disconnectCallback, Action<object> errorCallback)
+
+        public void PresenceUnsubscribe(string channel, Action<object> userCallback, Action<object> connectCallback, Action<object> disconnectCallback, Action<PubnubClientError> errorCallback)
 		{
 			PresenceUnsubscribe<object>(channel, userCallback, connectCallback, disconnectCallback, errorCallback);
 		}
@@ -1610,8 +1610,8 @@ namespace PubNubMessaging.Core
 			LoggingMethod.WriteToLog(string.Format("DateTime {0}, requested presence-unsubscribe for channel(s)={1}", DateTime.Now.ToString(), channel), LoggingMethod.LevelInfo);
 			MultiChannelUnSubscribeInit<T>(ResponseType.PresenceUnsubscribe, channel, userCallback, connectCallback, disconnectCallback, errorCallback);
 		}
-		
-		public bool HereNow(string channel, Action<object> userCallback, Action<object> errorCallback)
+
+        public bool HereNow(string channel, Action<object> userCallback, Action<PubnubClientError> errorCallback)
 		{
 			return HereNow<object>(channel, userCallback, errorCallback);
 		}
@@ -1742,7 +1742,7 @@ namespace PubNubMessaging.Core
 					{
 						// Deserialize the result
 						string jsonString = streamReader.ReadToEnd();
-						Action<object> dummyCallback = obj => { };
+                        Action<PubnubClientError> dummyCallback = obj => { };
 						WrapResultBasedOnResponseType<string>(type, jsonString, new string[] { channelName }, false, 0, dummyCallback);
 					}
 				}), request
