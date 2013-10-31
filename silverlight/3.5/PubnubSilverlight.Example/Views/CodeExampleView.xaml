@@ -14,7 +14,7 @@
             <ColumnDefinition Width="335*" />
         </Grid.ColumnDefinitions>
 
-        <StackPanel HorizontalAlignment="Left" Margin="10,10,0,-41" Width="295">
+        <StackPanel HorizontalAlignment="Left" Margin="10,5,0,-41" Width="295">
             <StackPanel Orientation="Vertical">
                 <Button Name="btnReset" Content="Reset Pubnub Instance" IsEnabled="False" VerticalAlignment="Center" HorizontalAlignment="Right" FontFamily="Verdana" FontSize="10" Click="btnReset_Click" />
             </StackPanel>
@@ -24,7 +24,7 @@
                 <CheckBox Name="chkResumeOnReconnect" Content="Resume On Reconnect" IsChecked="True" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
             </StackPanel>
             <StackPanel Orientation="Vertical">
-                <Grid  Margin="0 20 0 0">
+                <Grid  Margin="0 10 0 0">
 
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="100" />
@@ -33,25 +33,40 @@
 
                     <Grid.RowDefinitions>
                         <RowDefinition />
-                        <RowDefinition Height="5" />
+                        <RowDefinition Height="3" />
                         <RowDefinition />
-                        <RowDefinition Height="5" />
+                        <RowDefinition Height="3" />
                         <RowDefinition />
-                        <RowDefinition Height="5" />
+                        <RowDefinition Height="3" />
+                        <RowDefinition />
+                        <RowDefinition Height="3" />
+                        <RowDefinition />
+                        <RowDefinition Height="3" />
+                        <RowDefinition />
+                        <RowDefinition Height="4" />
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Column="0" Grid.Row="0" Name="lblCipher" Text="Cipher Key" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
-                    <TextBox Grid.Column="1" Grid.Row="0" Name="txtCipher" Text="" Width="150" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" />
+                    <TextBlock Grid.Column="0" Grid.Row="0" Name="lblSubKey" Text="Sub Key" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
+                    <TextBox Grid.Column="1" Grid.Row="0" Name="txtSubKey" Text="demo" Width="150" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" />
 
-                    <TextBlock Grid.Column="0" Grid.Row="2" Name="lblSecret" Text="Secret Key" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
-                    <TextBox Grid.Column="1" Grid.Row="2" Name="txtSecret" Text="" Width="150" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" />
+                    <TextBlock Grid.Column="0" Grid.Row="2" Name="lblPubKey" Text="Pub Key" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
+                    <TextBox Grid.Column="1" Grid.Row="2" Name="txtPubKey" Text="demo" Width="150" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" />
 
-                    <TextBlock Grid.Column="0" Grid.Row="4" Name="lblUUID" Text="UUID" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
-                    <TextBox Grid.Column="1" Grid.Row="4" Name="txtUUID" Text="" Width="150" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" />
+                    <TextBlock Grid.Column="0" Grid.Row="4" Name="lblCipher" Text="Cipher Key" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
+                    <TextBox Grid.Column="1" Grid.Row="4" Name="txtCipher" Text="" Width="150" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" />
+
+                    <TextBlock Grid.Column="0" Grid.Row="6" Name="lblSecret" Text="Secret Key" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
+                    <TextBox Grid.Column="1" Grid.Row="6" Name="txtSecret" Text="" Width="150" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" />
+
+                    <TextBlock Grid.Column="0" Grid.Row="8" Name="lblUUID" Text="UUID" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
+                    <TextBox Grid.Column="1" Grid.Row="8" Name="txtUUID" Text="" Width="150" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" />
+
+                    <TextBlock Grid.Column="0" Grid.Row="10" Name="lblAuthKey" Text="Auth Key" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
+                    <TextBox Grid.Column="1" Grid.Row="10" Name="txtAuthKey" Text="" Width="150" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" />
                 </Grid>
             </StackPanel>
             
-                <Grid  Margin="0 10 0 0">
+                <Grid  Margin="0 5 0 0">
 
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="230" />
@@ -59,11 +74,11 @@
                 </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
-                    <RowDefinition /> <RowDefinition Height="5" />
-                    <RowDefinition /> <RowDefinition Height="5" />
-                    <RowDefinition /> <RowDefinition Height="5" />
-                    <RowDefinition /> <RowDefinition Height="5" />
-                    <RowDefinition /> <RowDefinition Height="5" />
+                    <RowDefinition /> <RowDefinition Height="3" />
+                    <RowDefinition /> <RowDefinition Height="3" />
+                    <RowDefinition /> <RowDefinition Height="3" />
+                    <RowDefinition /> <RowDefinition Height="3" />
+                    <RowDefinition /> <RowDefinition Height="3" />
                 </Grid.RowDefinitions>
 
 
@@ -85,22 +100,23 @@
 
             <StackPanel Orientation="Horizontal"   Margin="0 10 0 0">
                 <TextBlock Text="Channel Name : " VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
-                <TextBox Name="txtChannel" Text="my/channel" VerticalAlignment="Center" Width="150" FontFamily="Verdana" FontSize="12"/>
+                <TextBox Name="txtChannel" Text="hello_my_channel" VerticalAlignment="Center" Width="150" FontFamily="Verdana" FontSize="12"/>
             </StackPanel>
 
-            <Grid  Margin="0 20 0 0">
+            <Grid  Margin="0 10 0 0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="145" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 
                 <Grid.RowDefinitions>
-                    <RowDefinition /> <RowDefinition Height="5" />
-                    <RowDefinition /> <RowDefinition Height="5" />
-                    <RowDefinition /> <RowDefinition Height="5" />
-                    <RowDefinition /> <RowDefinition Height="5" />
-                    <RowDefinition /> <RowDefinition Height="5" />
-                    <RowDefinition /> <RowDefinition Height="5" />
+                    <RowDefinition /> <RowDefinition Height="4" />
+                    <RowDefinition /> <RowDefinition Height="4" />
+                    <RowDefinition /> <RowDefinition Height="4" />
+                    <RowDefinition /> <RowDefinition Height="4" />
+                    <RowDefinition /> <RowDefinition Height="4" />
+                    <RowDefinition /> <RowDefinition Height="4" />
+                    <RowDefinition /> <RowDefinition Height="4" />
                 </Grid.RowDefinitions>
 
                 <Button  Grid.Column="0" Grid.Row="0" Name="btnSubscribe" Content="Subscribe" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="Subscribe_Click" />
@@ -119,12 +135,16 @@
                 <Button Grid.Column="1" Grid.Row="8" Name="btnEnableNetwork" Content="Enable Network" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="btnEnableNetwork_Click" />
 
                 <Button Grid.Column="0" Grid.Row="10" Name="btnDisconnectRetry" Content="Disconnect/Retry" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="btnDisconnectRetry_Click" />
+                <Button Grid.Column="1" Grid.Row="10" Name="btnGrant" Content="Grant" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="btnGrant_Click" />
+
+                <Button Grid.Column="0" Grid.Row="12" Name="btnRevoke" Content="Revoke" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="btnRevoke_Click" />
+                <Button Grid.Column="1" Grid.Row="12" Name="btnAudit" Content="Audit" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="btnAudit_Click" />
             </Grid>
         </StackPanel>
 
         <ScrollViewer Grid.Column="1" Background="Black">
 
-            <TextBlock x:Name="ConsoleContainer" Foreground="Aqua" />
+            <TextBlock x:Name="ConsoleContainer" Foreground="Aqua" TextWrapping="Wrap" />
 
         </ScrollViewer>
 

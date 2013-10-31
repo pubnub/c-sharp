@@ -30,28 +30,85 @@ namespace PubnubSilverlight.UnitTest
 
         //bool subscribeConnected = false;
         bool subscribeConnectedBeforeDuplicate = false;
+        bool receivedGrantMessage = false;
+        bool grantInitCallbackInvoked = false;
+
+        [ClassInitialize, Asynchronous]
+        public void Init()
+        {
+            if (!PubnubCommon.PAMEnabled)
+            {
+                EnqueueTestComplete();
+                return;
+            }
+
+            receivedGrantMessage = false;
+
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "GrantRequestUnitTest";
+            unitTest.TestCaseName = "Init";
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channel = "hello_my_channel,hello_my_channel1,hello_my_channel2";
+
+            EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, true, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback));
+            //Thread.Sleep(1000);
+
+            EnqueueConditional(() => grantInitCallbackInvoked);
+
+            EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenSubscribedToAChannel Grant access failed."));
+            EnqueueTestComplete();
+        }
+
+        [Asynchronous]
+        void ThenSubscribeInitializeShouldReturnGrantMessage(string receivedMessage)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                {
+                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
+                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    var status = dictionary["status"].ToString();
+                    if (status == "200")
+                    {
+                        receivedGrantMessage = true;
+                    }
+                }
+            }
+            catch { }
+            finally
+            {
+                grantInitCallbackInvoked = true;
+            }
+        }
+
 
         [TestMethod, Asynchronous]
         public void ThenSubscribeShouldReturnReceivedMessage()
         {
             receivedSubscribeMessage = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-            string channel = "hello_my_channel";
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenSubscribedToAChannel";
-            unitTest.TestCaseName = "ThenSubscribeShouldReturnReceivedMessage";
-            pubnub.PubnubUnitTest = unitTest;
+                    string channel = "hello_my_channel";
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenSubscribedToAChannel";
+                    unitTest.TestCaseName = "ThenSubscribeShouldReturnReceivedMessage";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            EnqueueCallback(() => pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback, DummyErrorCallback));
-            EnqueueConditional(() => receivedSubscribeMessage);
-            //EnqueueConditional(() => subscribeConnected);
-            EnqueueCallback(() => pubnub.Publish<string>(channel, "Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage", dummyPublishCallback, DummyErrorCallback));
-            EnqueueConditional(() => publishInCallback);
-            //EnqueueConditional(() => receivedMessageInCallback);
-            EnqueueCallback(() => pubnub.EndPendingRequests());
-            EnqueueCallback(() => Assert.IsTrue(receivedSubscribeMessage, "WhenSubscribedToAChannel --> ThenItShouldReturnReceivedMessage Failed"));
-
+                    EnqueueCallback(() => pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback, DummyErrorCallback));
+                    EnqueueConditional(() => receivedSubscribeMessage);
+                    //EnqueueConditional(() => subscribeConnected);
+                    EnqueueCallback(() => pubnub.Publish<string>(channel, "Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage", dummyPublishCallback, DummyErrorCallback));
+                    EnqueueConditional(() => publishInCallback);
+                    //EnqueueConditional(() => receivedMessageInCallback);
+                    EnqueueCallback(() => pubnub.EndPendingRequests());
+                    EnqueueCallback(() => Assert.IsTrue(receivedSubscribeMessage, "WhenSubscribedToAChannel --> ThenItShouldReturnReceivedMessage Failed"));
+                });
             EnqueueTestComplete();
         }
 
@@ -61,7 +118,7 @@ namespace PubnubSilverlight.UnitTest
         public void ThenSubscribeShouldReturnConnectStatus()
         {
             receivedConnectMessage = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannel";
@@ -88,7 +145,7 @@ namespace PubnubSilverlight.UnitTest
             receivedChannel2ConnectMessage = false;
             ThreadPool.QueueUserWorkItem((s) =>
             {
-                Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+                Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
                 PubnubUnitTest unitTest = new PubnubUnitTest();
                 unitTest.TestClassName = "WhenSubscribedToAChannel";
@@ -119,7 +176,7 @@ namespace PubnubSilverlight.UnitTest
         {
             subscribeConnectedBeforeDuplicate = false;
             receivedAlreadySubscribedMessage = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannel";
@@ -132,7 +189,7 @@ namespace PubnubSilverlight.UnitTest
             EnqueueConditional(() => subscribeConnectedBeforeDuplicate);
             EnqueueCallback(() => Thread.Sleep(100));
 
-            EnqueueCallback(() => pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback2, DummyMethodDuplicateChannelConnectCallback, DummyErrorCallback));
+            EnqueueCallback(() => pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback2, DummyMethodDuplicateChannelConnectCallback, DuplicateChannelErrorCallback2));
             //receivedAlreadySubscribedMessage = true;
             EnqueueConditional(() => receivedAlreadySubscribedMessage);
             EnqueueCallback(() => Thread.Sleep(100));
@@ -147,29 +204,28 @@ namespace PubnubSilverlight.UnitTest
         public void ThenSubscriberShouldBeAbleToReceiveManyMessages()
         {
             receivedManyMessages = false;
-
             ThreadPool.QueueUserWorkItem((s) =>
-            {
-                Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-                PubnubUnitTest unitTest = new PubnubUnitTest();
-                unitTest.TestClassName = "WhenSubscribedToAChannel";
-                unitTest.TestCaseName = "ThenSubscriberShouldBeAbleToReceiveManyMessages";
-                pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenSubscribedToAChannel";
+                    unitTest.TestCaseName = "ThenSubscriberShouldBeAbleToReceiveManyMessages";
+                    pubnub.PubnubUnitTest = unitTest;
 
-                string channel = "hello_my_channel";
+                    string channel = "hello_my_channel";
 
-                EnqueueCallback(() => pubnub.Subscribe<string>(channel, SubscriberDummyMethodForManyMessagesUserCallback, SubscribeDummyMethodForManyMessagesConnectCallback, DummyErrorCallback));
-                //EnqueueCallback(() => Thread.Sleep(1000));
-                Thread.Sleep(1000);
-                //meSubscriberManyMessages.WaitOne();
-                EnqueueConditional(() => receivedManyMessages);
+                    EnqueueCallback(() => pubnub.Subscribe<string>(channel, SubscriberDummyMethodForManyMessagesUserCallback, SubscribeDummyMethodForManyMessagesConnectCallback, DummyErrorCallback));
+                    //EnqueueCallback(() => Thread.Sleep(1000));
 
-                EnqueueCallback(() => pubnub.EndPendingRequests());
+                    //meSubscriberManyMessages.WaitOne();
+                    EnqueueConditional(() => receivedManyMessages);
 
-                Assert.IsTrue(receivedManyMessages, "WhenSubscribedToAChannel --> ThenSubscriberShouldBeAbleToReceiveManyMessages Failed");
-                EnqueueTestComplete();
-            });
+                    EnqueueCallback(() => pubnub.EndPendingRequests());
+
+                    EnqueueCallback(() => Assert.IsTrue(receivedManyMessages, "WhenSubscribedToAChannel --> ThenSubscriberShouldBeAbleToReceiveManyMessages Failed"));
+                });
+            EnqueueTestComplete();
         }
 
         [Asynchronous]
@@ -239,6 +295,18 @@ namespace PubnubSilverlight.UnitTest
             if (result.Contains("already subscribed"))
             {
                 receivedAlreadySubscribedMessage = true;
+            }
+        }
+
+        [Asynchronous]
+        private void DuplicateChannelErrorCallback2(PubnubClientError result)
+        {
+            if (result != null && result.StatusCode > 0)
+            {
+                if (result.Message.ToLower().Contains("already subscribed"))
+                {
+                    receivedAlreadySubscribedMessage = true;
+                }
             }
         }
 
@@ -333,7 +401,7 @@ namespace PubnubSilverlight.UnitTest
         }
 
         [Asynchronous]
-        private void DummyErrorCallback(string result)
+        private void DummyErrorCallback(PubnubClientError result)
         {
         }
 

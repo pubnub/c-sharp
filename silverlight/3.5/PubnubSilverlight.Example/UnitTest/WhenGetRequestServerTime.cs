@@ -24,7 +24,7 @@ namespace PubnubSilverlight.UnitTest
         [Asynchronous]
         public void ThenItShouldReturnTimeStamp()
         {
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGetRequestServerTime";
             unitTest.TestCaseName = "ThenItShouldReturnTimeStamp";
@@ -55,7 +55,7 @@ namespace PubnubSilverlight.UnitTest
         }
 
         [Asynchronous]
-        private void DummyErrorCallback(string result)
+        private void DummyErrorCallback(PubnubClientError result)
         {
         }
 

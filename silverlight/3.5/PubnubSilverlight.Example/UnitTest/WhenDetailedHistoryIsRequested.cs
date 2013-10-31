@@ -28,25 +28,80 @@ namespace PubnubSilverlight.UnitTest
         bool detailedHistoryCount10ReverseCallbackInvoked = false;
         bool isDetailedHistoryStartReverseTrue = false;
         bool detailedHistoryPublishCallbackInvoked = false;
+        bool receivedGrantMessage = false;
+        bool grantInitCallbackInvoked = false;
+
+        [ClassInitialize, Asynchronous]
+        public void Init()
+        {
+            grantInitCallbackInvoked = false;
+
+            if (!PubnubCommon.PAMEnabled)
+            {
+                EnqueueTestComplete();
+                return;
+            }
+
+            receivedGrantMessage = false;
+
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "GrantRequestUnitTest";
+            unitTest.TestCaseName = "Init";
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channel = "hello_my_channel";
+
+            EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, true, 20, ThenDetailedHistoryInitializeShouldReturnGrantMessage, DummyErrorCallback));
+            //Thread.Sleep(1000);
+            EnqueueConditional(() => grantInitCallbackInvoked);
+            EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenDetailedHistoryIsRequested Grant access failed."));
+            EnqueueTestComplete();
+        }
+
+        [Asynchronous]
+        void ThenDetailedHistoryInitializeShouldReturnGrantMessage(string receivedMessage)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                {
+                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
+                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    var status = dictionary["status"].ToString();
+                    if (status == "200")
+                    {
+                        receivedGrantMessage = true;
+                    }
+                }
+            }
+            catch { }
+            finally
+            {
+                grantInitCallbackInvoked = true;
+            }
+        }
 
         [TestMethod]
         [Asynchronous]
         public void DetailHistoryCount10ReturnsRecords()
         {
             message10Received = false;
+            //ThreadPool.QueueUserWorkItem((s) =>
+            //    {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+                    string channel = "hello_my_channel";
 
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-            string channel = "hello_my_channel";
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
+                    unitTest.TestCaseName = "DetailHistoryCount10ReturnsRecords";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailHistoryCount10ReturnsRecords";
-            pubnub.PubnubUnitTest = unitTest;
-
-            EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, 10, DetailedHistoryCount10Callback, DummyErrorCallback));
-            EnqueueConditional(() => detailedHistoryCount10CallbackInvoked);
-            EnqueueCallback(() => Assert.IsTrue(message10Received, "Detailed History Failed"));
-
+                    EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, 10, DetailedHistoryCount10Callback, DummyErrorCallback));
+                    EnqueueConditional(() => detailedHistoryCount10CallbackInvoked);
+                    EnqueueCallback(() => Assert.IsTrue(message10Received, "Detailed History Failed"));
+            //    });
             EnqueueTestComplete();
         }
 
@@ -77,19 +132,20 @@ namespace PubnubSilverlight.UnitTest
         public void DetailHistoryCount10ReverseTrueReturnsRecords()
         {
             message10ReverseTrueReceived = false;
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+                    string channel = "hello_my_channel";
 
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-            string channel = "hello_my_channel";
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
+                    unitTest.TestCaseName = "DetailHistoryCount10ReverseTrueReturnsRecords";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailHistoryCount10ReverseTrueReturnsRecords";
-            pubnub.PubnubUnitTest = unitTest;
-
-            EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, -1, 10, true, DetailedHistoryCount10ReverseTrueCallback, DummyErrorCallback));
-            EnqueueConditional(() => detailedHistoryCount10ReverseCallbackInvoked);
-            EnqueueCallback(() => Assert.IsTrue(message10ReverseTrueReceived, "Detailed History Failed"));
-
+                    EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, -1, 10, true, DetailedHistoryCount10ReverseTrueCallback, DummyErrorCallback));
+                    EnqueueConditional(() => detailedHistoryCount10ReverseCallbackInvoked);
+                    EnqueueCallback(() => Assert.IsTrue(message10ReverseTrueReceived, "Detailed History Failed"));
+                });
             EnqueueTestComplete();
         }
 
@@ -115,13 +171,15 @@ namespace PubnubSilverlight.UnitTest
             detailedHistoryCount10ReverseCallbackInvoked = true;
         }
 
-        [TestMethod]
-        [Asynchronous]
+        //[TestMethod, Asynchronous]
         public void DetailedHistoryStartWithReverseTrue()
         {
+            detailedHistoryPublishCallbackInvoked = false;
+            isDetailedHistoryStartReverseTrue = false;
+
             expectedCountAtStartTimeWithReverseTrue = 0;
             messageStartReverseTrue = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
@@ -131,22 +189,33 @@ namespace PubnubSilverlight.UnitTest
             string channel = "hello_my_channel";
             startTimeWithReverseTrue = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(DateTime.UtcNow);
 
-            EnqueueCallback(() =>
-            {
-                for (int index = 0; index < 10; index++)
-                {
-                    pubnub.Publish<string>(channel,
-                                        string.Format("DetailedHistoryStartTimeWithReverseTrue {0}", index),
-                                        DetailedHistorySamplePublishCallback, DummyErrorCallback);
-                    Thread.Sleep(100);
-                    EnqueueConditional(() => detailedHistoryPublishCallbackInvoked);
-                }
-            });
+            //ThreadPool.QueueUserWorkItem((s) =>
+            //    {
+                    //EnqueueCallback(() =>
+                    //{
+                    //    for (int index = 0; index < 10; index++)
+                    //    {
+                    //        pubnub.Publish<string>(channel,
+                    //                            string.Format("DetailedHistoryStartTimeWithReverseTrue {0}", index),
+                    //                            DetailedHistorySamplePublishCallback, DummyErrorCallback);
+                    //        Thread.Sleep(100);
+                    //        EnqueueConditional(() => detailedHistoryPublishCallbackInvoked);
+                    //    }
+                    //});
+                    for (int index = 0; index < 10; index++)
+                    {
+                        EnqueueCallback(() => pubnub.Publish<string>(channel,
+                                            string.Format("DetailedHistoryStartTimeWithReverseTrue {0}", index),
+                                            DetailedHistorySamplePublishCallback, DummyErrorCallback));
+                        EnqueueCallback(() => Thread.Sleep(100));
+                        EnqueueConditional(() => detailedHistoryPublishCallbackInvoked);
+                    }
 
-            EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, startTimeWithReverseTrue, DetailedHistoryStartWithReverseTrueCallback, DummyErrorCallback, true));
-            EnqueueConditional(() => isDetailedHistoryStartReverseTrue);
-            EnqueueCallback(() => Assert.IsTrue(messageStartReverseTrue, "Detailed History with Start and Reverse True Failed"));
 
+                    EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, startTimeWithReverseTrue, DetailedHistoryStartWithReverseTrueCallback, DummyErrorCallback, true));
+                    EnqueueConditional(() => isDetailedHistoryStartReverseTrue);
+                    EnqueueCallback(() => Assert.IsTrue(messageStartReverseTrue, "Detailed History with Start and Reverse True Failed"));
+              //  });
             EnqueueTestComplete();
         }
 
@@ -202,8 +271,14 @@ namespace PubnubSilverlight.UnitTest
         }
 
         [Asynchronous]
-        private void DummyErrorCallback(string result)
+        private void DummyErrorCallback(PubnubClientError result)
         {
+            detailedHistoryPublishCallbackInvoked = true;
+            isDetailedHistoryStartReverseTrue = true;
+            if (result != null)
+            {
+                Console.WriteLine(result.Description);
+            }
         }
 
     }

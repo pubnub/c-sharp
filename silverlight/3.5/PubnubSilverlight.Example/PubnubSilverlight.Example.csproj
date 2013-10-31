@@ -102,12 +102,16 @@
     <Compile Include="UnitTest\CustomClass.cs" />
     <Compile Include="UnitTest\EncryptionTests.cs" />
     <Compile Include="UnitTest\Main.cs" />
+    <Compile Include="UnitTest\PubnubCommon.cs" />
+    <Compile Include="UnitTest\PubnubUnitTest.cs" />
     <Compile Include="UnitTest\WhenAClientIsPresented.cs" />
     <Compile Include="UnitTest\WhenAMessageIsPublished.cs" />
-    <Compile Include="UnitTest\PubnubUnitTest.cs" />
-    <Compile Include="UnitTest\WhenGetRequestServerTime.cs" />
-    <Compile Include="UnitTest\WhenSubscribedToAChannel.cs" />
+    <Compile Include="UnitTest\WhenAuditIsRequested.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="UnitTest\WhenDetailedHistoryIsRequested.cs" />
+    <Compile Include="UnitTest\WhenGetRequestServerTime.cs" />
+    <Compile Include="UnitTest\WhenGrantIsRequested.cs" />
     <Compile Include="Views\CodeExampleView.xaml.cs">
       <DependentUpon>CodeExampleView.xaml</DependentUpon>
     </Compile>
@@ -117,6 +121,8 @@
     <Compile Include="Views\ErrorWindow.xaml.cs">
       <DependentUpon>ErrorWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UnitTest\WhenSubscribedToAChannel.cs" />
+    <Compile Include="UnitTest\WhenUnsubscribedToAChannel.cs" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">

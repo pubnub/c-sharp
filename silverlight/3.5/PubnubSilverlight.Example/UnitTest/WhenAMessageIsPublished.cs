@@ -69,13 +69,68 @@ namespace PubnubSilverlight.UnitTest
         bool isPublishMessageTooLargeCheck = false;
         bool isCheck2 = false;
         bool isCheck3 = false;
+        bool receivedGrantMessage = false;
+        bool grantInitCallbackInvoked = false;
+
+        [ClassInitialize, Asynchronous]
+        public void Init()
+        {
+            if (!PubnubCommon.PAMEnabled)
+            {
+                EnqueueTestComplete();
+                return;
+            }
+
+            receivedGrantMessage = false;
+
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "GrantRequestUnitTest";
+            unitTest.TestCaseName = "Init";
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channel = "hello_my_channel";
+
+            EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, true, 20, ThenPublishInitializeShouldReturnGrantMessage, DummyErrorCallback));
+            //Thread.Sleep(1000);
+
+            EnqueueConditional(() => grantInitCallbackInvoked);
+
+            EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed."));
+
+            EnqueueTestComplete();
+        }
+
+        [Asynchronous]
+        void ThenPublishInitializeShouldReturnGrantMessage(string receivedMessage)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                {
+                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
+                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    var status = dictionary["status"].ToString();
+                    if (status == "200")
+                    {
+                        receivedGrantMessage = true;
+                    }
+                }
+            }
+            catch { }
+            finally
+            {
+                grantInitCallbackInvoked = true;
+            }
+        }
 
         [TestMethod]
         [Asynchronous]
         public void ThenUnencryptPublishShouldReturnSuccessCodeAndInfo()
         {
             isUnencryptPublished = false;
-            Pubnub pubnub = new Pubnub("demo","demo","","",false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey,"","",false);
             string channel = "hello_my_channel";
             string message = messageForUnencryptPublish;
 
@@ -148,7 +203,7 @@ namespace PubnubSilverlight.UnitTest
         public void ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo()
         {
             isUnencryptObjectPublished = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
             string channel = "hello_my_channel";
 
             object message = new CustomClass();
@@ -223,7 +278,7 @@ namespace PubnubSilverlight.UnitTest
         public void ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo()
         {
             isEncryptObjectPublished = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "enigma", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "enigma", false);
             string channel = "hello_my_channel";
             object message = new SecretCustomClass();
             messageObjectForEncryptPublish = JsonConvert.SerializeObject(message);
@@ -297,7 +352,7 @@ namespace PubnubSilverlight.UnitTest
         public void ThenEncryptPublishShouldReturnSuccessCodeAndInfo()
         {
             isEncryptPublished = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "enigma", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "enigma", false);
             string channel = "hello_my_channel";
             string message = messageForEncryptPublish;
 
@@ -370,7 +425,7 @@ namespace PubnubSilverlight.UnitTest
         public void ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo()
         {
             isSecretEncryptPublished = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "key", "enigma", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "key", "enigma", false);
             string channel = "hello_my_channel";
             string message = messageForSecretEncryptPublish;
 
@@ -441,7 +496,7 @@ namespace PubnubSilverlight.UnitTest
         [TestMethod]
         public void ThenPubnubShouldGenerateUniqueIdentifier()
         {
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             Assert.IsNotNull(pubnub.GenerateGuid());
         }
@@ -450,7 +505,7 @@ namespace PubnubSilverlight.UnitTest
         [ExpectedException(typeof(MissingFieldException))]
         public void ThenPublishKeyShouldNotBeEmpty()
         {
-            Pubnub pubnub = new Pubnub("", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub("", PubnubCommon.SubscribeKey, "", "", false);
 
             string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
@@ -463,7 +518,7 @@ namespace PubnubSilverlight.UnitTest
         public void ThenOptionalSecretKeyShouldBeProvidedInConstructor()
         {
             isPublished2 = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "key");
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "key");
             string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
 
@@ -503,7 +558,7 @@ namespace PubnubSilverlight.UnitTest
         public void IfSSLNotProvidedThenDefaultShouldBeFalse()
         {
             isPublished3 = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "");
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "");
             string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
 
@@ -543,7 +598,7 @@ namespace PubnubSilverlight.UnitTest
         public void ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo()
         {
             isComplexObjectPublished = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -620,7 +675,7 @@ namespace PubnubSilverlight.UnitTest
         public void ThenDisableJsonEncodeShouldSendSerializedObjectMessage()
         {
             isSerializedObjectMessagePublished = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
             pubnub.EnableJsonEncodingForPublish = false;
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -696,7 +751,7 @@ namespace PubnubSilverlight.UnitTest
         public void ThenLargeMessageShoudFailWithMessageTooLargeInfo()
         {
             isLargeMessagePublished = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", true);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", true);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -705,7 +760,7 @@ namespace PubnubSilverlight.UnitTest
 
             string channel = "hello_my_channel";
             string message = messageLarge2K.Substring(0,1320);
-            EnqueueCallback(() => pubnub.Publish<string>(channel, message, ReturnPublishMessageTooLargeInfoCallback, DummyErrorCallback));
+            EnqueueCallback(() => pubnub.Publish<string>(channel, message, DummyPublishMessageTooLargeInfoCallback, PublishMessageTooLargeErrorCallback));
             EnqueueConditional(() => isPublishMessageTooLargeCheck);
             EnqueueCallback(() => Assert.IsTrue(isLargeMessagePublished, "Message Too Large is not failing as expected."));
 
@@ -713,11 +768,17 @@ namespace PubnubSilverlight.UnitTest
         }
 
         [Asynchronous]
-        private void ReturnPublishMessageTooLargeInfoCallback(string result)
+        private void DummyPublishMessageTooLargeInfoCallback(string result)
         {
-            if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
+        }
+
+        [Asynchronous]
+        private void PublishMessageTooLargeErrorCallback(PubnubClientError result)
+        {
+            if (result != null && result.StatusCode > 0)
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                string message = result.Message;
+                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(message);
                 if (deserializedMessage is object[])
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
@@ -732,7 +793,7 @@ namespace PubnubSilverlight.UnitTest
         }
 
         [Asynchronous]
-        private void DummyErrorCallback(string result)
+        private void DummyErrorCallback(PubnubClientError result)
         {
         }
 
