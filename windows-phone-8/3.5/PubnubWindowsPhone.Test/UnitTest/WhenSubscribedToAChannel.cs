@@ -32,6 +32,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
         ManualResetEvent meChannel2SubscribeConnect = new ManualResetEvent(false);
         ManualResetEvent meSubscriberManyMessages = new ManualResetEvent(false);
         ManualResetEvent subscribeEvent = new ManualResetEvent(false);
+        ManualResetEvent grantManualEvent = new ManualResetEvent(false);
 
         bool receivedMessage = false;
         bool receivedConnectMessage = false;
@@ -39,179 +40,195 @@ namespace PubnubWindowsPhone.Test.UnitTest
         bool receivedChannel1ConnectMessage = false;
         bool receivedChannel2ConnectMessage = false;
         bool receivedManyMessages = false;
+        bool receivedGrantMessage = false;
 
         int numberOfReceivedMessages = 0;
 
-        [TestMethod, Asynchronous]
+        [ClassInitialize]
+        public void Init()
+        {
+            if (!PubnubCommon.PAMEnabled)
+            {
+                Assert.Inconclusive("WhenAClientIsPresent Grant access failed.");
+                return;
+            }
+
+            receivedGrantMessage = false;
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "GrantRequestUnitTest";
+            unitTest.TestCaseName = "Init";
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channel = "hello_my_channel";
+
+            pubnub.GrantAccess<string>(channel, true, true, 20, ThenSubscriberInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            //Thread.Sleep(1000);
+
+            grantManualEvent.WaitOne();
+
+            Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed.");
+        }
+
+        [Asynchronous]
+        void ThenSubscriberInitializeShouldReturnGrantMessage(string receivedMessage)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                {
+                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
+                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    var status = dictionary["status"].ToString();
+                    if (status == "200")
+                    {
+                        receivedGrantMessage = true;
+                    }
+                }
+            }
+            catch { }
+            finally
+            {
+                grantManualEvent.Set();
+            }
+        }
+
+        [TestMethod]
         public void ThenSubscribeShouldReturnReceivedMessage()
         {
             receivedMessage = false;
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-                    string channel = "hello_my_channel";
+            string channel = "hello_my_channel";
 
-                    PubnubUnitTest unitTest = new PubnubUnitTest();
-                    unitTest.TestClassName = "WhenSubscribedToAChannel";
-                    unitTest.TestCaseName = "ThenSubscribeShouldReturnReceivedMessage";
-                    pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenSubscribedToAChannel";
+            unitTest.TestCaseName = "ThenSubscribeShouldReturnReceivedMessage";
+            pubnub.PubnubUnitTest = unitTest;
 
-                    pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
-                    subscribeEvent.WaitOne(30 * 1000);
-                    //Thread.Sleep(500);
-                    pubnub.Publish<string>(channel, "Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage", dummyPublishCallback, DummyErrorCallback);
-                    mePublish.WaitOne(310 * 1000);
-                    //Thread.Sleep(500);
-                    meSubscribeNoConnect.WaitOne(310 * 1000);
-                    pubnub.Unsubscribe<string>(channel, dummyUnsubscribeCallback, SubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
-                    Thread.Sleep(500);
-                    meUnsubscribe.WaitOne(310 * 1000);
+            pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
+            subscribeEvent.WaitOne(30 * 1000);
+            //Thread.Sleep(500);
+            pubnub.Publish<string>(channel, "Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage", dummyPublishCallback, DummyErrorCallback);
+            mePublish.WaitOne(310 * 1000);
+            //Thread.Sleep(500);
+            meSubscribeNoConnect.WaitOne(310 * 1000);
+            pubnub.Unsubscribe<string>(channel, dummyUnsubscribeCallback, SubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+            Thread.Sleep(500);
+            meUnsubscribe.WaitOne(310 * 1000);
 
-                    Thread.Sleep(1000);
-                    pubnub.EndPendingRequests();
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenItShouldReturnReceivedMessage Failed");
-                            TestComplete();
-                        });
-                });
+            Thread.Sleep(1000);
+            pubnub.EndPendingRequests();
+            Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenItShouldReturnReceivedMessage Failed");
         }
 
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void ThenSubscribeShouldReturnConnectStatus()
         {
             receivedConnectMessage = false;
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-                    PubnubUnitTest unitTest = new PubnubUnitTest();
-                    unitTest.TestClassName = "WhenSubscribedToAChannel";
-                    unitTest.TestCaseName = "ThenSubscribeShouldReturnConnectStatus";
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenSubscribedToAChannel";
+            unitTest.TestCaseName = "ThenSubscribeShouldReturnConnectStatus";
 
-                    pubnub.PubnubUnitTest = unitTest;
+            pubnub.PubnubUnitTest = unitTest;
 
-                    string channel = "hello_my_channel";
+            string channel = "hello_my_channel";
 
-                    pubnub.Subscribe<string>(channel, ReceivedMessageCallbackYesConnect, ConnectStatusCallback, DummyErrorCallback);
-                    meSubscribeYesConnect.WaitOne(310 * 1000);
+            pubnub.Subscribe<string>(channel, ReceivedMessageCallbackYesConnect, ConnectStatusCallback, DummyErrorCallback);
+            meSubscribeYesConnect.WaitOne(310 * 1000);
 
-                    pubnub.EndPendingRequests();
-                    Thread.Sleep(200);
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.IsTrue(receivedConnectMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnConnectStatus Failed");
-                            TestComplete();
-                        });
-                });
+            pubnub.EndPendingRequests();
+            Thread.Sleep(200);
+            Assert.IsTrue(receivedConnectMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnConnectStatus Failed");
         }
 
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void ThenMultiSubscribeShouldReturnConnectStatus()
         {
             receivedChannel1ConnectMessage = false;
             receivedChannel2ConnectMessage = false;
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-                    PubnubUnitTest unitTest = new PubnubUnitTest();
-                    unitTest.TestClassName = "WhenSubscribedToAChannel";
-                    unitTest.TestCaseName = "ThenMultiSubscribeShouldReturnConnectStatus";
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenSubscribedToAChannel";
+            unitTest.TestCaseName = "ThenMultiSubscribeShouldReturnConnectStatus";
 
-                    pubnub.PubnubUnitTest = unitTest;
+            pubnub.PubnubUnitTest = unitTest;
 
 
-                    string channel1 = "hello_my_channel1";
-                    pubnub.Subscribe<string>(channel1, ReceivedChannelUserCallback, ReceivedChannel1ConnectCallback, DummyErrorCallback);
-                    meChannel1SubscribeConnect.WaitOne(310 * 1000);
+            string channel1 = "hello_my_channel1";
+            pubnub.Subscribe<string>(channel1, ReceivedChannelUserCallback, ReceivedChannel1ConnectCallback, DummyErrorCallback);
+            meChannel1SubscribeConnect.WaitOne(310 * 1000);
 
-                    string channel2 = "hello_my_channel2";
-                    pubnub.Subscribe<string>(channel2, ReceivedChannelUserCallback, ReceivedChannel2ConnectCallback, DummyErrorCallback);
-                    meChannel2SubscribeConnect.WaitOne(310 * 1000);
+            string channel2 = "hello_my_channel2";
+            pubnub.Subscribe<string>(channel2, ReceivedChannelUserCallback, ReceivedChannel2ConnectCallback, DummyErrorCallback);
+            meChannel2SubscribeConnect.WaitOne(310 * 1000);
 
-                    Thread.Sleep(500);
+            Thread.Sleep(500);
 
-                    pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests();
 
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.IsTrue(receivedChannel1ConnectMessage && receivedChannel2ConnectMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnConnectStatus Failed");
-                            TestComplete();
-                        });
-                });
+            Assert.IsTrue(receivedChannel1ConnectMessage && receivedChannel2ConnectMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnConnectStatus Failed");
         }
 
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void ThenDuplicateChannelShouldReturnAlreadySubscribed()
         {
             receivedAlreadySubscribedMessage = false;
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-                    PubnubUnitTest unitTest = new PubnubUnitTest();
-                    unitTest.TestClassName = "WhenSubscribedToAChannel";
-                    unitTest.TestCaseName = "ThenDuplicateChannelShouldReturnAlreadySubscribed";
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenSubscribedToAChannel";
+            unitTest.TestCaseName = "ThenDuplicateChannelShouldReturnAlreadySubscribed";
 
-                    pubnub.PubnubUnitTest = unitTest;
+            pubnub.PubnubUnitTest = unitTest;
 
-                    string channel = "hello_my_channel";
+            string channel = "hello_my_channel";
 
-                    pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback1, DummyMethodDuplicateChannelConnectCallback, DummyErrorCallback);
-                    Thread.Sleep(100);
+            pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback1, DummyMethodDuplicateChannelConnectCallback, DummyErrorCallback);
+            Thread.Sleep(100);
 
-                    pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback2, DummyMethodDuplicateChannelConnectCallback, DummyErrorCallback);
-                    meAlreadySubscribed.WaitOne();
+            pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback2, DummyMethodDuplicateChannelConnectCallback, DuplicateChannelErrorCallback);
+            meAlreadySubscribed.WaitOne();
 
-                    pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests();
 
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.IsTrue(receivedAlreadySubscribedMessage, "WhenSubscribedToAChannel --> ThenDuplicateChannelShouldReturnAlreadySubscribed Failed");
-                            TestComplete();
-                        });
-                });
+            Assert.IsTrue(receivedAlreadySubscribedMessage, "WhenSubscribedToAChannel --> ThenDuplicateChannelShouldReturnAlreadySubscribed Failed");
         }
 
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void ThenSubscriberShouldBeAbleToReceiveManyMessages()
         {
             receivedManyMessages = false;
 
-            ThreadPool.QueueUserWorkItem((s) =>
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenSubscribedToAChannel";
+            unitTest.TestCaseName = "ThenSubscriberShouldBeAbleToReceiveManyMessages";
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channel = "hello_my_channel";
+
+            pubnub.Subscribe<string>(channel, SubscriberDummyMethodForManyMessagesUserCallback, SubscribeDummyMethodForManyMessagesConnectCallback, DummyErrorCallback);
+            subscribeEvent.WaitOne(310 * 1000);
+            if (!unitTest.EnableStubTest)
+            {
+                for (int index = 0; index < 10; index++)
                 {
-                    Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+                    pubnub.Publish<string>(channel, index.ToString(), dummyPublishCallback, DummyErrorCallback);
+                    mePublish.WaitOne(10 * 1000);
+                }
+            }
 
-                    PubnubUnitTest unitTest = new PubnubUnitTest();
-                    unitTest.TestClassName = "WhenSubscribedToAChannel";
-                    unitTest.TestCaseName = "ThenSubscriberShouldBeAbleToReceiveManyMessages";
-                    pubnub.PubnubUnitTest = unitTest;
+            meSubscriberManyMessages.WaitOne(310 * 1000);
 
-                    string channel = "hello_my_channel";
+            pubnub.EndPendingRequests();
 
-                    pubnub.Subscribe<string>(channel, SubscriberDummyMethodForManyMessagesUserCallback, SubscribeDummyMethodForManyMessagesConnectCallback, DummyErrorCallback);
-                    subscribeEvent.WaitOne(310 * 1000);
-                    if (!unitTest.EnableStubTest)
-                    {
-                        for (int index = 0; index < 10; index++)
-                        {
-                            pubnub.Publish<string>(channel, index.ToString(), dummyPublishCallback, DummyErrorCallback);
-                            mePublish.WaitOne(10 * 1000);
-                        }
-                    }
-
-                    meSubscriberManyMessages.WaitOne(310 * 1000);
-
-                    pubnub.EndPendingRequests();
-
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.IsTrue(receivedManyMessages, "WhenSubscribedToAChannel --> ThenSubscriberShouldBeAbleToReceiveManyMessages Failed");
-                            TestComplete();
-                        });
-                });
+            Assert.IsTrue(receivedManyMessages, "WhenSubscribedToAChannel --> ThenSubscriberShouldBeAbleToReceiveManyMessages Failed");
         }
 
         [Asynchronous]
@@ -282,7 +299,12 @@ namespace PubnubWindowsPhone.Test.UnitTest
         [Asynchronous]
         private void DummyMethodDuplicateChannelUserCallback2(string result)
         {
-            if (result.Contains("already subscribed"))
+
+        }
+
+        private void DuplicateChannelErrorCallback(PubnubClientError result)
+        {
+            if (result != null && result.Message.ToLower().Contains("already subscribed"))
             {
                 receivedAlreadySubscribedMessage = true;
             }
@@ -363,7 +385,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
         }
 
         [Asynchronous]
-        private void DummyErrorCallback(string result)
+        private void DummyErrorCallback(PubnubClientError result)
         {
         }
 

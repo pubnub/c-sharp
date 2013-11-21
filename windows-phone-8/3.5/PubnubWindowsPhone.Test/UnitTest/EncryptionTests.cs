@@ -25,74 +25,58 @@ namespace PubnubWindowsPhone.Test.UnitTest
 {
 
     [TestClass]
-    public class EncryptionTests:WorkItemTest
+    public class EncryptionTests : WorkItemTest
     {
         /// <summary>
         /// Tests the null encryption.
         /// The input is serialized
         /// </summary>
-        [TestMethod,Asynchronous]
+        [TestMethod]
         public void TestNullEncryption()
         {
 
             bool isExpectedException = false;
 
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    //serialized string
-                    string message = null;
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            //serialized string
+            string message = null;
 
-                    try
-                    {
-                        //Encrypt
-                        string encryptedMessage = pc.Encrypt(message);
-                    }
-                    catch (ArgumentNullException)
-                    {
-                        isExpectedException = true;
-                    }
+            try
+            {
+                //Encrypt
+                string encryptedMessage = pc.Encrypt(message);
+            }
+            catch (ArgumentNullException)
+            {
+                isExpectedException = true;
+            }
 
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.IsTrue(isExpectedException);
-                            TestComplete();
-                        });
-                    
-                });
+            Assert.IsTrue(isExpectedException);
         }
 
         /// <summary>
         /// Tests the null decryption.
         /// Assumes that the input message is  deserialized  
         /// </summary>        
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void TestNullDecryption()
         {
             bool isExpectedException = false;
             string decryptedMessage = "";
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    //deserialized string
-                    string message = null;
-                    try
-                    {
-                        //Decrypt
-                        decryptedMessage = pc.Decrypt(message);
-                    }
-                    catch (ArgumentNullException)
-                    {
-                        isExpectedException = true;
-                    }
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            //deserialized string
+            string message = null;
+            try
+            {
+                //Decrypt
+                decryptedMessage = pc.Decrypt(message);
+            }
+            catch (ArgumentNullException)
+            {
+                isExpectedException = true;
+            }
 
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            //Assert.AreEqual("", dec);
-                            Assert.IsTrue(isExpectedException);
-                            TestComplete();
-                        });
-                });
+            Assert.IsTrue(isExpectedException);
         }
 
         /// <summary>
@@ -100,22 +84,15 @@ namespace PubnubWindowsPhone.Test.UnitTest
         /// Assumes that the input message is deserialized  
         /// Decrypted string should match yay!
         /// </summary>
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void TestYayDecryptionBasic()
         {
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    string message = "q/xJqqN6qbiZMXYmiQC1Fw==";
-                    //Decrypt
-                    string decryptedMessage = pc.Decrypt(message);
-                    //deserialize again
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.AreEqual("yay!", decryptedMessage);
-                            TestComplete();
-                        });
-                });
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            string message = "q/xJqqN6qbiZMXYmiQC1Fw==";
+            //Decrypt
+            string decryptedMessage = pc.Decrypt(message);
+            //deserialize again
+            Assert.AreEqual("yay!", decryptedMessage);
         }
 
         /// <summary>
@@ -123,22 +100,15 @@ namespace PubnubWindowsPhone.Test.UnitTest
         /// The output is not serialized
         /// Encrypted string should match q/xJqqN6qbiZMXYmiQC1Fw==
         /// </summary>
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void TestYayEncryptionBasic()
         {
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    //deserialized string
-                    string message = "yay!";
-                    //Encrypt
-                    string encryptedMessage = pc.Encrypt(message);
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.AreEqual("q/xJqqN6qbiZMXYmiQC1Fw==", encryptedMessage);
-                            TestComplete();
-                        });
-                });
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            //deserialized string
+            string message = "yay!";
+            //Encrypt
+            string encryptedMessage = pc.Encrypt(message);
+            Assert.AreEqual("q/xJqqN6qbiZMXYmiQC1Fw==", encryptedMessage);
         }
 
         /// <summary>
@@ -146,52 +116,38 @@ namespace PubnubWindowsPhone.Test.UnitTest
         /// Assumes that the input message is not deserialized  
         /// Decrypted and Deserialized string should match yay!
         /// </summary>
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void TestYayDecryption()
         {
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    //string strMessage= "\"q/xJqqN6qbiZMXYmiQC1Fw==\"";
-                    //Non deserialized string
-                    string message = "\"Wi24KS4pcTzvyuGOHubiXg==\"";
-                    //Deserialize 
-                    message = JsonConvert.DeserializeObject<string>(message);
-                    //Decrypt
-                    string decryptedMessage = pc.Decrypt(message);
-                    //deserialize again
-                    message = JsonConvert.DeserializeObject<string>(decryptedMessage);
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.AreEqual("yay!", message);
-                            TestComplete();
-                        });
-                });
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            //string strMessage= "\"q/xJqqN6qbiZMXYmiQC1Fw==\"";
+            //Non deserialized string
+            string message = "\"Wi24KS4pcTzvyuGOHubiXg==\"";
+            //Deserialize 
+            message = JsonConvert.DeserializeObject<string>(message);
+            //Decrypt
+            string decryptedMessage = pc.Decrypt(message);
+            //deserialize again
+            message = JsonConvert.DeserializeObject<string>(decryptedMessage);
+            Assert.AreEqual("yay!", message);
         }
         /// <summary>
         /// Tests the yay encryption.
         /// The output is not serialized
         /// Encrypted string should match Wi24KS4pcTzvyuGOHubiXg==
         /// </summary>
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void TestYayEncryption()
         {
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    //deserialized string
-                    string message = "yay!";
-                    //serialize the string
-                    message = JsonConvert.SerializeObject(message);
-                    Console.WriteLine(message);
-                    //Encrypt
-                    string encryptedMessage = pc.Encrypt(message);
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.AreEqual("Wi24KS4pcTzvyuGOHubiXg==", encryptedMessage);
-                            TestComplete();
-                        });
-                });
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            //deserialized string
+            string message = "yay!";
+            //serialize the string
+            message = JsonConvert.SerializeObject(message);
+            Console.WriteLine(message);
+            //Encrypt
+            string encryptedMessage = pc.Encrypt(message);
+            Assert.AreEqual("Wi24KS4pcTzvyuGOHubiXg==", encryptedMessage);
         }
 
         /// <summary>
@@ -199,24 +155,17 @@ namespace PubnubWindowsPhone.Test.UnitTest
         /// The output is not serialized
         /// Encrypted string should match the serialized object
         /// </summary>
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void TestArrayEncryption()
         {
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    //create an empty array object
-                    object[] emptyArray = { };
-                    //serialize
-                    string serializedArray = JsonConvert.SerializeObject(emptyArray);
-                    //Encrypt
-                    string encryptedMessage = pc.Encrypt(serializedArray);
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.AreEqual("Ns4TB41JjT2NCXaGLWSPAQ==", encryptedMessage);
-                            TestComplete();
-                        });
-                });
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            //create an empty array object
+            object[] emptyArray = { };
+            //serialize
+            string serializedArray = JsonConvert.SerializeObject(emptyArray);
+            //Encrypt
+            string encryptedMessage = pc.Encrypt(serializedArray);
+            Assert.AreEqual("Ns4TB41JjT2NCXaGLWSPAQ==", encryptedMessage);
         }
 
         /// <summary>
@@ -225,26 +174,19 @@ namespace PubnubWindowsPhone.Test.UnitTest
         /// And the output message has to been deserialized.
         /// Decrypted string should match the serialized object
         /// </summary>
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void TestArrayDecryption()
         {
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    //Input the deserialized string
-                    string message = "Ns4TB41JjT2NCXaGLWSPAQ==";
-                    //Decrypt
-                    string decryptedMessage = pc.Decrypt(message);
-                    //create a serialized object
-                    object[] emptyArrayObject = { };
-                    string result = JsonConvert.SerializeObject(emptyArrayObject);
-                    //compare the serialized object and the return of the Decrypt method
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.AreEqual(result, decryptedMessage);
-                            TestComplete();
-                        });
-                });
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            //Input the deserialized string
+            string message = "Ns4TB41JjT2NCXaGLWSPAQ==";
+            //Decrypt
+            string decryptedMessage = pc.Decrypt(message);
+            //create a serialized object
+            object[] emptyArrayObject = { };
+            string result = JsonConvert.SerializeObject(emptyArrayObject);
+            //compare the serialized object and the return of the Decrypt method
+            Assert.AreEqual(result, decryptedMessage);
         }
 
         /// <summary>
@@ -252,24 +194,17 @@ namespace PubnubWindowsPhone.Test.UnitTest
         /// The output is not serialized
         /// Encrypted string should match the serialized object
         /// </summary>
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void TestObjectEncryption()
         {
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    //create an object
-                    Object obj = new Object();
-                    //serialize
-                    string serializedObject = JsonConvert.SerializeObject(obj);
-                    //Encrypt
-                    string encryptedMessage = pc.Encrypt(serializedObject);
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.AreEqual("IDjZE9BHSjcX67RddfCYYg==", encryptedMessage);
-                            TestComplete();
-                        });
-                });
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            //create an object
+            Object obj = new Object();
+            //serialize
+            string serializedObject = JsonConvert.SerializeObject(obj);
+            //Encrypt
+            string encryptedMessage = pc.Encrypt(serializedObject);
+            Assert.AreEqual("IDjZE9BHSjcX67RddfCYYg==", encryptedMessage);
         }
         /// <summary>
         /// Tests the object decryption.
@@ -277,78 +212,57 @@ namespace PubnubWindowsPhone.Test.UnitTest
         /// And the output message has to be deserialized.
         /// Decrypted string should match the serialized object
         /// </summary>
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void TestObjectDecryption()
         {
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    //Deserialized
-                    string message = "IDjZE9BHSjcX67RddfCYYg==";
-                    //Decrypt
-                    string decryptedMessage = pc.Decrypt(message);
-                    //create an object
-                    Object obj = new Object();
-                    //Serialize the object
-                    string result = JsonConvert.SerializeObject(obj);
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.AreEqual(result, decryptedMessage);
-                            TestComplete();
-                        });
-                });
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            //Deserialized
+            string message = "IDjZE9BHSjcX67RddfCYYg==";
+            //Decrypt
+            string decryptedMessage = pc.Decrypt(message);
+            //create an object
+            Object obj = new Object();
+            //Serialize the object
+            string result = JsonConvert.SerializeObject(obj);
+            Assert.AreEqual(result, decryptedMessage);
         }
         /// <summary>
         /// Tests my object encryption.
         /// The output is not serialized 
         /// Encrypted string should match the serialized object
         /// </summary>
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void TestMyObjectEncryption()
         {
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    //create an object of the custom class
-                    CustomClass cc = new CustomClass();
-                    //serialize it
-                    string result = JsonConvert.SerializeObject(cc);
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            //create an object of the custom class
+            CustomClass cc = new CustomClass();
+            //serialize it
+            string result = JsonConvert.SerializeObject(cc);
 
-                    //Encrypt it
-                    string encryptedMessage = pc.Encrypt(result);
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.AreEqual("Zbr7pEF/GFGKj1rOstp0tWzA4nwJXEfj+ezLtAr8qqE=", encryptedMessage);
-                            TestComplete();
-                        });
-                });
+            //Encrypt it
+            string encryptedMessage = pc.Encrypt(result);
+            Assert.AreEqual("Zbr7pEF/GFGKj1rOstp0tWzA4nwJXEfj+ezLtAr8qqE=", encryptedMessage);
         }
         /// <summary>
         /// Tests my object decryption.
         /// The output is not deserialized
         /// Decrypted string should match the serialized object
         /// </summary>
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void TestMyObjectDecryption()
         {
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    //Deserialized
-                    string message = "Zbr7pEF/GFGKj1rOstp0tWzA4nwJXEfj+ezLtAr8qqE=";
-                    //Decrypt
-                    string decryptedMessage = pc.Decrypt(message);
-                    //create an object of the custom class
-                    CustomClass cc = new CustomClass();
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            //Deserialized
+            string message = "Zbr7pEF/GFGKj1rOstp0tWzA4nwJXEfj+ezLtAr8qqE=";
+            //Decrypt
+            string decryptedMessage = pc.Decrypt(message);
+            //create an object of the custom class
+            CustomClass cc = new CustomClass();
 
-                    //Serialize it
-                    string result = JsonConvert.SerializeObject(cc);
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.AreEqual(result, decryptedMessage);
-                            TestComplete();
-                        });
-                });
+            //Serialize it
+            string result = JsonConvert.SerializeObject(cc);
+            Assert.AreEqual(result, decryptedMessage);
         }
 
         /// <summary>
@@ -356,25 +270,18 @@ namespace PubnubWindowsPhone.Test.UnitTest
         /// The output is not serialized
         /// Encrypted string should match f42pIQcWZ9zbTbH8cyLwB/tdvRxjFLOYcBNMVKeHS54=
         /// </summary>
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void TestPubNubEncryption2()
         {
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    //Deserialized
-                    string message = "Pubnub Messaging API 2";
-                    //serialize the message
-                    message = JsonConvert.SerializeObject(message);
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            //Deserialized
+            string message = "Pubnub Messaging API 2";
+            //serialize the message
+            message = JsonConvert.SerializeObject(message);
 
-                    //Encrypt
-                    string encryptedMessage = pc.Encrypt(message);
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.AreEqual("f42pIQcWZ9zbTbH8cyLwB/tdvRxjFLOYcBNMVKeHS54=", encryptedMessage);
-                            TestComplete();
-                        });
-                });
+            //Encrypt
+            string encryptedMessage = pc.Encrypt(message);
+            Assert.AreEqual("f42pIQcWZ9zbTbH8cyLwB/tdvRxjFLOYcBNMVKeHS54=", encryptedMessage);
         }
 
         /// <summary>
@@ -382,24 +289,17 @@ namespace PubnubWindowsPhone.Test.UnitTest
         /// Assumes that the input message is deserialized  
         /// Decrypted and Deserialized string should match Pubnub Messaging API 2
         /// </summary>
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void TestPubNubDecryption2()
         {
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    //Deserialized string    
-                    string message = "f42pIQcWZ9zbTbH8cyLwB/tdvRxjFLOYcBNMVKeHS54=";
-                    //Decrypt
-                    string decryptedMessage = pc.Decrypt(message);
-                    //Deserialize
-                    message = JsonConvert.DeserializeObject<string>(decryptedMessage);
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.AreEqual("Pubnub Messaging API 2", message);
-                            TestComplete();
-                        });
-                });
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            //Deserialized string    
+            string message = "f42pIQcWZ9zbTbH8cyLwB/tdvRxjFLOYcBNMVKeHS54=";
+            //Decrypt
+            string decryptedMessage = pc.Decrypt(message);
+            //Deserialize
+            message = JsonConvert.DeserializeObject<string>(decryptedMessage);
+            Assert.AreEqual("Pubnub Messaging API 2", message);
         }
 
         /// <summary>
@@ -407,24 +307,17 @@ namespace PubnubWindowsPhone.Test.UnitTest
         /// The input is not serialized
         /// Encrypted string should match f42pIQcWZ9zbTbH8cyLwByD/GsviOE0vcREIEVPARR0=
         /// </summary>
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void TestPubNubEncryption1()
         {
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    //non serialized string
-                    string message = "Pubnub Messaging API 1";
-                    //serialize
-                    message = JsonConvert.SerializeObject(message);
-                    //Encrypt
-                    string encryptedMessage = pc.Encrypt(message);
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.AreEqual("f42pIQcWZ9zbTbH8cyLwByD/GsviOE0vcREIEVPARR0=", encryptedMessage);
-                            TestComplete();
-                        });
-                });
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            //non serialized string
+            string message = "Pubnub Messaging API 1";
+            //serialize
+            message = JsonConvert.SerializeObject(message);
+            //Encrypt
+            string encryptedMessage = pc.Encrypt(message);
+            Assert.AreEqual("f42pIQcWZ9zbTbH8cyLwByD/GsviOE0vcREIEVPARR0=", encryptedMessage);
         }
 
         /// <summary>
@@ -432,24 +325,17 @@ namespace PubnubWindowsPhone.Test.UnitTest
         /// Assumes that the input message is  deserialized  
         /// Decrypted and Deserialized string should match Pubnub Messaging API 1        
         /// </summary>
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void TestPubNubDecryption1()
         {
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    //deserialized string
-                    string message = "f42pIQcWZ9zbTbH8cyLwByD/GsviOE0vcREIEVPARR0=";
-                    //Decrypt
-                    string decryptedMessage = pc.Decrypt(message);
-                    //deserialize
-                    message = (decryptedMessage != "**DECRYPT ERROR**") ? JsonConvert.DeserializeObject<string>(decryptedMessage) : "";
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.AreEqual("Pubnub Messaging API 1", message);
-                            TestComplete();
-                        });
-                });
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            //deserialized string
+            string message = "f42pIQcWZ9zbTbH8cyLwByD/GsviOE0vcREIEVPARR0=";
+            //Decrypt
+            string decryptedMessage = pc.Decrypt(message);
+            //deserialize
+            message = (decryptedMessage != "**DECRYPT ERROR**") ? JsonConvert.DeserializeObject<string>(decryptedMessage) : "";
+            Assert.AreEqual("Pubnub Messaging API 1", message);
         }
 
         /// <summary>
@@ -457,44 +343,30 @@ namespace PubnubWindowsPhone.Test.UnitTest
         /// The input is serialized
         /// Encrypted string should match zMqH/RTPlC8yrAZ2UhpEgLKUVzkMI2cikiaVg30AyUu7B6J0FLqCazRzDOmrsFsF
         /// </summary>
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void TestStuffCanEncryption()
         {
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    //input serialized string
-                    string message = "{\"this stuff\":{\"can get\":\"complicated!\"}}";
-                    //Encrypt
-                    string encryptedMessage = pc.Encrypt(message);
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.AreEqual("zMqH/RTPlC8yrAZ2UhpEgLKUVzkMI2cikiaVg30AyUu7B6J0FLqCazRzDOmrsFsF", encryptedMessage);
-                            TestComplete();
-                        });
-                });
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            //input serialized string
+            string message = "{\"this stuff\":{\"can get\":\"complicated!\"}}";
+            //Encrypt
+            string encryptedMessage = pc.Encrypt(message);
+            Assert.AreEqual("zMqH/RTPlC8yrAZ2UhpEgLKUVzkMI2cikiaVg30AyUu7B6J0FLqCazRzDOmrsFsF", encryptedMessage);
         }
 
         /// <summary>
         /// Tests the stuffcan decryption.
         /// Assumes that the input message is  deserialized  
         /// </summary>
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void TestStuffcanDecryption()
         {
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    //deserialized string
-                    string message = "zMqH/RTPlC8yrAZ2UhpEgLKUVzkMI2cikiaVg30AyUu7B6J0FLqCazRzDOmrsFsF";
-                    //Decrypt
-                    string decryptedMessage = pc.Decrypt(message);
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.AreEqual("{\"this stuff\":{\"can get\":\"complicated!\"}}", decryptedMessage);
-                            TestComplete();
-                        });
-                });
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            //deserialized string
+            string message = "zMqH/RTPlC8yrAZ2UhpEgLKUVzkMI2cikiaVg30AyUu7B6J0FLqCazRzDOmrsFsF";
+            //Decrypt
+            string decryptedMessage = pc.Decrypt(message);
+            Assert.AreEqual("{\"this stuff\":{\"can get\":\"complicated!\"}}", decryptedMessage);
         }
 
         /// <summary>
@@ -502,68 +374,47 @@ namespace PubnubWindowsPhone.Test.UnitTest
         /// The input is serialized
         /// Encrypted string should match GsvkCYZoYylL5a7/DKhysDjNbwn+BtBtHj2CvzC4Y4g=
         /// </summary>
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void TestHashEncryption()
         {
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    //serialized string
-                    string message = "{\"foo\":{\"bar\":\"foobar\"}}";
-                    //Encrypt
-                    string encryptedMessage = pc.Encrypt(message);
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.AreEqual("GsvkCYZoYylL5a7/DKhysDjNbwn+BtBtHj2CvzC4Y4g=", encryptedMessage);
-                            TestComplete();
-                        });
-                });
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            //serialized string
+            string message = "{\"foo\":{\"bar\":\"foobar\"}}";
+            //Encrypt
+            string encryptedMessage = pc.Encrypt(message);
+            Assert.AreEqual("GsvkCYZoYylL5a7/DKhysDjNbwn+BtBtHj2CvzC4Y4g=", encryptedMessage);
         }
 
         /// <summary>
         /// Tests the hash decryption.
         /// Assumes that the input message is  deserialized  
         /// </summary>        
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void TestHashDecryption()
         {
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    //deserialized string
-                    string message = "GsvkCYZoYylL5a7/DKhysDjNbwn+BtBtHj2CvzC4Y4g=";
-                    //Decrypt
-                    string decryptedMessage = pc.Decrypt(message);
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.AreEqual("{\"foo\":{\"bar\":\"foobar\"}}", decryptedMessage);
-                            TestComplete();
-                        });
-                });
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            //deserialized string
+            string message = "GsvkCYZoYylL5a7/DKhysDjNbwn+BtBtHj2CvzC4Y4g=";
+            //Decrypt
+            string decryptedMessage = pc.Decrypt(message);
+            Assert.AreEqual("{\"foo\":{\"bar\":\"foobar\"}}", decryptedMessage);
         }
 
         /// <summary>
         /// Tests the unicode chars encryption.
         /// The input is not serialized
         /// </summary>
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void TestUnicodeCharsEncryption()
         {
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    string message = "漢語";
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            string message = "漢語";
 
-                    message = JsonConvert.SerializeObject(message);
-                    Console.WriteLine(message);
-                    string encryptedMessage = pc.Encrypt(message);
-                    Console.WriteLine(encryptedMessage);
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.AreEqual("+BY5/miAA8aeuhVl4d13Kg==", encryptedMessage);
-                            TestComplete();
-                        });
-                });
+            message = JsonConvert.SerializeObject(message);
+            Console.WriteLine(message);
+            string encryptedMessage = pc.Encrypt(message);
+            Console.WriteLine(encryptedMessage);
+            Assert.AreEqual("+BY5/miAA8aeuhVl4d13Kg==", encryptedMessage);
         }
 
         /// <summary>
@@ -571,24 +422,17 @@ namespace PubnubWindowsPhone.Test.UnitTest
         /// Assumes that the input message is  deserialized  
         /// Decrypted and Deserialized string should match the unicode chars       
         /// </summary>
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void TestUnicodeCharsDecryption()
         {
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    string message = "+BY5/miAA8aeuhVl4d13Kg==";
-                    //JavaScriptSerializer js = new JavaScriptSerializer();
-                    //Decrypt
-                    string decryptedMessage = pc.Decrypt(message);
-                    //deserialize
-                    message = (decryptedMessage != "**DECRYPT ERROR**") ? JsonConvert.DeserializeObject<string>(decryptedMessage) : "";
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.AreEqual("漢語", message);
-                            TestComplete();
-                        });
-                });
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            string message = "+BY5/miAA8aeuhVl4d13Kg==";
+            //JavaScriptSerializer js = new JavaScriptSerializer();
+            //Decrypt
+            string decryptedMessage = pc.Decrypt(message);
+            //deserialize
+            message = (decryptedMessage != "**DECRYPT ERROR**") ? JsonConvert.DeserializeObject<string>(decryptedMessage) : "";
+            Assert.AreEqual("漢語", message);
         }
 
         /// <summary>
@@ -596,46 +440,32 @@ namespace PubnubWindowsPhone.Test.UnitTest
         /// Assumes that the input message is  deserialized  
         /// Decrypted and Deserialized string should match the unicode chars  
         /// </summary>
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void TestGermanCharsDecryption()
         {
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    string message = "stpgsG1DZZxb44J7mFNSzg==";
-                    //Decrypt
-                    string decryptedMessage = pc.Decrypt(message);
-                    //deserialize
-                    message = (decryptedMessage != "**DECRYPT ERROR**") ? JsonConvert.DeserializeObject<string>(decryptedMessage) : "";
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.AreEqual("ÜÖ", message);
-                            TestComplete();
-                        });
-                });
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            string message = "stpgsG1DZZxb44J7mFNSzg==";
+            //Decrypt
+            string decryptedMessage = pc.Decrypt(message);
+            //deserialize
+            message = (decryptedMessage != "**DECRYPT ERROR**") ? JsonConvert.DeserializeObject<string>(decryptedMessage) : "";
+            Assert.AreEqual("ÜÖ", message);
         }
         /// <summary>
         /// Tests the german encryption.
         /// The input is not serialized
         /// </summary>
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void TestGermanCharsEncryption()
         {
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    PubnubCrypto pc = new PubnubCrypto("enigma");
-                    string message = "ÜÖ";
+            PubnubCrypto pc = new PubnubCrypto("enigma");
+            string message = "ÜÖ";
 
-                    message = JsonConvert.SerializeObject(message);
-                    Console.WriteLine(message);
-                    string encryptedMessage = pc.Encrypt(message);
-                    Console.WriteLine(encryptedMessage);
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.AreEqual("stpgsG1DZZxb44J7mFNSzg==", encryptedMessage);
-                            TestComplete();
-                        });
-                });
+            message = JsonConvert.SerializeObject(message);
+            Console.WriteLine(message);
+            string encryptedMessage = pc.Encrypt(message);
+            Console.WriteLine(encryptedMessage);
+            Assert.AreEqual("stpgsG1DZZxb44J7mFNSzg==", encryptedMessage);
         }
 
         /// <summary>

@@ -104,13 +104,32 @@
       <DependentUpon>AppResources.resx</DependentUpon>
     </Compile>
     <Compile Include="UnitTest\CustomClass.cs" />
-    <Compile Include="UnitTest\EncryptionTests.cs" />
+    <Compile Include="UnitTest\EncryptionTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UnitTest\PubnubCommon.cs" />
     <Compile Include="UnitTest\PubnubUnitTest.cs" />
-    <Compile Include="UnitTest\WhenAClientIsPresented.cs" />
-    <Compile Include="UnitTest\WhenAMessageIsPublished.cs" />
-    <Compile Include="UnitTest\WhenDetailedHistoryIsRequested.cs" />
-    <Compile Include="UnitTest\WhenGetRequestServerTime.cs" />
-    <Compile Include="UnitTest\WhenSubscribedToAChannel.cs" />
+    <Compile Include="UnitTest\WhenAClientIsPresented.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UnitTest\WhenAMessageIsPublished.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UnitTest\WhenAuditIsRequested.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UnitTest\WhenDetailedHistoryIsRequested.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UnitTest\WhenGetRequestServerTime.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UnitTest\WhenGrantIsRequested.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UnitTest\WhenSubscribedToAChannel.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">

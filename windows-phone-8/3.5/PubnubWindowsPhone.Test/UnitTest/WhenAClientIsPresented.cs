@@ -34,87 +34,127 @@ namespace PubnubWindowsPhone.Test.UnitTest
         ManualResetEvent presenceUnsubscribeEvent = new ManualResetEvent(false);
         ManualResetEvent presenceUnsubscribeUUIDEvent = new ManualResetEvent(false);
 
+        ManualResetEvent grantManualEvent = new ManualResetEvent(false);
+
         static bool receivedPresenceMessage = false;
         static bool receivedHereNowMessage = false;
         static bool receivedCustomUUID = false;
+        static bool receivedGrantMessage = false;
 
         string customUUID = "mylocalmachine.mydomain.com";
 
-        [TestMethod, Asynchronous]
+        [ClassInitialize]
+        public void Init()
+        {
+            if (!PubnubCommon.PAMEnabled)
+            {
+                Assert.Inconclusive("WhenAClientIsPresent Grant access failed");
+                //TestComplete();
+                return;
+            }
+
+            receivedGrantMessage = false;
+            //receivedGrantMessage2 = false;
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "GrantRequestUnitTest";
+            unitTest.TestCaseName = "Init2";
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channel = "hello_my_channel,hello_my_channel-pnpres";
+            pubnub.GrantAccess<string>(channel, true, true, 20, ThenPresenceInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            Thread.Sleep(1000);
+            grantManualEvent.WaitOne();
+
+            Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed");
+            //TestComplete();
+        }
+
+        [TestMethod]
         public void ThenPresenceShouldReturnReceivedMessage()
         {
             receivedPresenceMessage = false;
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-                    string channel = "hello_my_channel";
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            string channel = "hello_my_channel";
 
-                    PubnubUnitTest unitTest = new PubnubUnitTest();
-                    unitTest.TestClassName = "WhenAClientIsPresented";
-                    unitTest.TestCaseName = "ThenPresenceShouldReturnReceivedMessage";
-                    pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "ThenPresenceShouldReturnReceivedMessage";
+            pubnub.PubnubUnitTest = unitTest;
 
-                    pubnub.Presence<string>(channel, ThenPresenceShouldReturnMessage, PresenceDummyMethodForConnectCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
+            pubnub.Presence<string>(channel, ThenPresenceShouldReturnMessage, PresenceDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
 
-                    //since presence expects from stimulus from sub/unsub...
-                    pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
-                    subscribeManualEvent.WaitOne(2000);
+            //since presence expects from stimulus from sub/unsub...
+            pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            subscribeManualEvent.WaitOne(2000);
 
-                    //pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
-                    //Thread.Sleep(1000);
-                    //unsubscribeManualEvent.WaitOne(2000);
+            //pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+            //Thread.Sleep(1000);
+            //unsubscribeManualEvent.WaitOne(2000);
 
-                    presenceManualEvent.WaitOne(310 * 1000);
+            presenceManualEvent.WaitOne(310 * 1000);
 
-                    pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests();
 
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                       {
-                           Assert.IsTrue(receivedPresenceMessage, "Presence message not received");
-                           TestComplete();
-                       });
-                });
+            Assert.IsTrue(receivedPresenceMessage, "Presence message not received");
         }
 
-        [TestMethod, Asynchronous]
+        [TestMethod]
         public void ThenPresenceShouldReturnCustomUUID()
         {
             receivedCustomUUID = false;
-            ThreadPool.QueueUserWorkItem((s) =>
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "ThenPresenceShouldReturnCustomUUID";
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channel = "hello_my_channel";
+
+            pubnub.Presence<string>(channel, ThenPresenceWithCustomUUIDShouldReturnMessage, PresenceUUIDDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+
+            //since presence expects from stimulus from sub/unsub...
+            pubnub.SessionUUID = customUUID;
+            pubnub.Subscribe<string>(channel, DummyMethodForSubscribeUUID, SubscribeUUIDDummyMethodForConnectCallback, DummyErrorCallback);
+            subscribeUUIDManualEvent.WaitOne();
+            Thread.Sleep(1000);
+
+            //pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribeUUID, UnsubscribeUUIDDummyMethodForConnectCallback, UnsubscribeUUIDDummyMethodForDisconnectCallback, DummyErrorCallback);
+            //Thread.Sleep(1000);
+            //unsubscribeUUIDManualEvent.WaitOne(2000);
+
+            presenceUUIDManualEvent.WaitOne();
+            pubnub.EndPendingRequests();
+
+            Assert.IsTrue(receivedCustomUUID, "Custom UUID not received");
+        }
+
+        [Asynchronous]
+        void ThenPresenceInitializeShouldReturnGrantMessage(string receivedMessage)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-
-                    PubnubUnitTest unitTest = new PubnubUnitTest();
-                    unitTest.TestClassName = "WhenAClientIsPresented";
-                    unitTest.TestCaseName = "ThenPresenceShouldReturnCustomUUID";
-                    pubnub.PubnubUnitTest = unitTest;
-
-                    string channel = "hello_my_channel";
-
-                    pubnub.Presence<string>(channel, ThenPresenceWithCustomUUIDShouldReturnMessage, PresenceUUIDDummyMethodForConnectCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
-
-                    //since presence expects from stimulus from sub/unsub...
-                    pubnub.SessionUUID = customUUID;
-                    pubnub.Subscribe<string>(channel, DummyMethodForSubscribeUUID, SubscribeUUIDDummyMethodForConnectCallback, DummyErrorCallback);
-                    subscribeUUIDManualEvent.WaitOne();
-                    Thread.Sleep(1000);
-
-                    //pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribeUUID, UnsubscribeUUIDDummyMethodForConnectCallback, UnsubscribeUUIDDummyMethodForDisconnectCallback, DummyErrorCallback);
-                    //Thread.Sleep(1000);
-                    //unsubscribeUUIDManualEvent.WaitOne(2000);
-
-                    presenceUUIDManualEvent.WaitOne();
-                    pubnub.EndPendingRequests();
-
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.IsTrue(receivedCustomUUID, "Custom UUID not received");
-                            TestComplete();
-                        });
-                });
+                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
+                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    var status = dictionary["status"].ToString();
+                    if (status == "200")
+                    {
+                        receivedGrantMessage = true;
+                    }
+                }
+            }
+            catch { }
+            finally
+            {
+                grantManualEvent.Set();
+            }
         }
 
         [Asynchronous]
@@ -122,19 +162,16 @@ namespace PubnubWindowsPhone.Test.UnitTest
         {
             try
             {
-                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                if (!string.IsNullOrWhiteSpace(receivedMessage))
+                {
+                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
+                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    var uuid = dictionary["uuid"].ToString();
+                    if (uuid != null)
                     {
-                        if (!string.IsNullOrWhiteSpace(receivedMessage))
-                        {
-                            object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                            JContainer dictionary = serializedMessage[0] as JContainer;
-                            var uuid = dictionary["uuid"].ToString();
-                            if (uuid != null)
-                            {
-                                receivedPresenceMessage = true;
-                            }
-                        }
-                    });
+                        receivedPresenceMessage = true;
+                    }
+                }
             }
             catch { }
             finally
@@ -148,19 +185,16 @@ namespace PubnubWindowsPhone.Test.UnitTest
         {
             try
             {
-                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                {
+                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
+                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    var uuid = dictionary["uuid"].ToString();
+                    if (uuid != null && uuid.Contains(customUUID))
                     {
-                        if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
-                        {
-                            object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                            JContainer dictionary = serializedMessage[0] as JContainer;
-                            var uuid = dictionary["uuid"].ToString();
-                            if (uuid != null && uuid.Contains(customUUID))
-                            {
-                                receivedCustomUUID = true;
-                            }
-                        }
-                    });
+                        receivedCustomUUID = true;
+                    }
+                }
             }
             catch { }
             finally
@@ -169,28 +203,21 @@ namespace PubnubWindowsPhone.Test.UnitTest
             }
         }
 
-        [TestMethod,Asynchronous]
+        [TestMethod]
         public void IfHereNowIsCalledThenItShouldReturnInfo()
         {
             receivedHereNowMessage = false;
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-                    string channel = "hello_my_channel";
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            string channel = "hello_my_channel";
 
-                    PubnubUnitTest unitTest = new PubnubUnitTest();
-                    unitTest.TestClassName = "WhenAClientIsPresented";
-                    unitTest.TestCaseName = "IfHereNowIsCalledThenItShouldReturnInfo";
-                    pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "IfHereNowIsCalledThenItShouldReturnInfo";
+            pubnub.PubnubUnitTest = unitTest;
 
-                    pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback);
-                    hereNowManualEvent.WaitOne();
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                       {
-                           Assert.IsTrue(receivedHereNowMessage, "here_now message not received");
-                           TestComplete();
-                       });
-                });
+            pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback);
+            hereNowManualEvent.WaitOne();
+            Assert.IsTrue(receivedHereNowMessage, "here_now message not received");
         }
 
         [Asynchronous]
@@ -198,21 +225,18 @@ namespace PubnubWindowsPhone.Test.UnitTest
         {
             try
             {
-                Deployment.Current.Dispatcher.BeginInvoke(() =>
-                       {
-                           if (!string.IsNullOrWhiteSpace(receivedMessage))
-                           {
-                               object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                               if (serializedMessage != null && serializedMessage.Length > 0)
-                               {
-                                   var dictionary = ((JContainer)serializedMessage[0])["uuids"];
-                                   if (dictionary != null)
-                                   {
-                                       receivedHereNowMessage = true;
-                                   }
-                               }
-                           }
-                       });
+                if (!string.IsNullOrWhiteSpace(receivedMessage))
+                {
+                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Length > 0)
+                    {
+                        var dictionary = ((JContainer)serializedMessage[0])["uuids"];
+                        if (dictionary != null)
+                        {
+                            receivedHereNowMessage = true;
+                        }
+                    }
+                }
             }
             catch { }
             finally
@@ -226,19 +250,16 @@ namespace PubnubWindowsPhone.Test.UnitTest
         {
             try
             {
-                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                if (!string.IsNullOrWhiteSpace(receivedMessage))
                 {
-                    if (!string.IsNullOrWhiteSpace(receivedMessage))
+                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
+                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    var uuid = dictionary["uuid"].ToString();
+                    if (uuid != null)
                     {
-                        object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                        JContainer dictionary = serializedMessage[0] as JContainer;
-                        var uuid = dictionary["uuid"].ToString();
-                        if (uuid != null)
-                        {
-                            receivedPresenceMessage = true;
-                        }
+                        receivedPresenceMessage = true;
                     }
-                });
+                }
             }
             catch { }
             finally
@@ -251,23 +272,20 @@ namespace PubnubWindowsPhone.Test.UnitTest
         [Asynchronous]
         void DummyMethodForSubscribeUUID(string receivedMessage)
         {
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
             {
-                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
+                JContainer dictionary = serializedMessage[0] as JContainer;
+                if (dictionary != null)
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
-                    if (dictionary != null)
+                    var uuid = dictionary["uuid"];
+                    if (uuid != null)
                     {
-                        var uuid = dictionary["uuid"];
-                        if (uuid != null)
-                        {
-                            receivedCustomUUID = true;
-                            presenceUUIDManualEvent.Set();
-                        }
+                        receivedCustomUUID = true;
+                        presenceUUIDManualEvent.Set();
                     }
                 }
-            });
+            }
             //Dummary callback method for subscribe and unsubscribe to test presence
         }
 
@@ -328,7 +346,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
         }
 
         [Asynchronous]
-        private void DummyErrorCallback(string result)
+        private void DummyErrorCallback(PubnubClientError result)
         {
         }
 

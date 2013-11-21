@@ -71,7 +71,7 @@ namespace PubNubMessaging.Core
 		bool _enableResumeOnReconnect = true;
 		bool overrideTcpKeepAlive = true;
 		bool _enableJsonEncodingForPublish = true;
-		const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Off;
+		const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Error;
         const PubnubErrorFilter.Level errorLevel = PubnubErrorFilter.Level.Info;
 		
 #if (!SILVERLIGHT && !WINDOWS_PHONE)
@@ -3100,6 +3100,7 @@ namespace PubNubMessaging.Core
 		
 		private Uri BuildRestApiRequest<T>(List<string> urlComponents, ResponseType type)
 		{
+            bool queryParamExist = false;
 			StringBuilder url = new StringBuilder();
 			
 			// Add http or https based on SSL flag
@@ -3133,6 +3134,7 @@ namespace PubNubMessaging.Core
 			VerifyOrSetSessionUUID();
 			if (type == ResponseType.Presence || type == ResponseType.Subscribe || type == ResponseType.Leave)
 			{
+                queryParamExist = true;
 				url.AppendFormat("?uuid={0}",this.sessionUUID);
                 if (!string.IsNullOrEmpty(_authenticationKey))
                 {
@@ -3142,6 +3144,7 @@ namespace PubNubMessaging.Core
 
             if ((type == ResponseType.Here_Now || type == ResponseType.Publish) && (!string.IsNullOrEmpty(_authenticationKey)))
             {
+                queryParamExist = true;
                 url.AppendFormat("?auth={0}", EncodeUricomponent(_authenticationKey, type, false));
             }
 			
@@ -3149,8 +3152,12 @@ namespace PubNubMessaging.Core
 				url.Append(parameters);
 			
 #if (WINDOWS_PHONE)
-				url.Append("&nocache=");
-				url.Append(Guid.NewGuid().ToString());
+            if (type != ResponseType.GrantAccess && type != ResponseType.AuditAccess && type != ResponseType.RevokeAccess)
+            {
+                url.AppendFormat("{0}nocache={1}", (queryParamExist) ? "&" : "?", Guid.NewGuid().ToString());
+                //url.Append("&nocache=");
+                //url.Append(Guid.NewGuid().ToString());
+            }
 #endif
 
             Uri requestUri = new Uri(url.ToString());

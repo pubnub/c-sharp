@@ -26,52 +26,41 @@ namespace PubnubWindowsPhone.Test.UnitTest
         bool timeReceived = false;
 
         [TestMethod]
-        [Asynchronous]
         [Description("Gets the Server Time in Unix time nanosecond format")]
         public void ThenItShouldReturnTimeStamp()
         {
-            ThreadPool.QueueUserWorkItem((s) =>
-                {
-                    Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-                    PubnubUnitTest unitTest = new PubnubUnitTest();
-                    unitTest.TestClassName = "WhenGetRequestServerTime";
-                    unitTest.TestCaseName = "ThenItShouldReturnTimeStamp";
-                    pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenGetRequestServerTime";
+            unitTest.TestCaseName = "ThenItShouldReturnTimeStamp";
+            pubnub.PubnubUnitTest = unitTest;
 
-                    pubnub.Time<string>(ReturnTimeStampCallback, DummyErrorCallback);
-                    mreTime.WaitOne(310 * 1000);
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Assert.IsTrue(timeReceived, "time() Failed");
-                            TestComplete();
-                        });
-                });
+            pubnub.Time<string>(ReturnTimeStampCallback, DummyErrorCallback);
+            mreTime.WaitOne(310 * 1000);
+            Assert.IsTrue(timeReceived, "time() Failed");
         }
 
         [Asynchronous]
         private void ReturnTimeStampCallback(string result)
         {
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            if (!string.IsNullOrWhiteSpace(result))
+            {
+                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                if (deserializedMessage is object[])
                 {
-                    if (!string.IsNullOrWhiteSpace(result))
+                    string time = deserializedMessage[0].ToString();
+                    if (time.Length > 0)
                     {
-                        object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                        if (deserializedMessage is object[])
-                        {
-                            string time = deserializedMessage[0].ToString();
-                            if (time.Length > 0)
-                            {
-                                timeReceived = true;
-                            }
-                        }
+                        timeReceived = true;
                     }
-                });
+                }
+            }
             mreTime.Set();
         }
 
         [Asynchronous]
-        private void DummyErrorCallback(string result)
+        private void DummyErrorCallback(PubnubClientError result)
         {
         }
 

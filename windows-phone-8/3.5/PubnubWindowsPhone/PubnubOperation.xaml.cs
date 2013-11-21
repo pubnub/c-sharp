@@ -21,11 +21,15 @@ namespace PubnubWindowsPhone
         Pubnub pubnub;
         string channel = "";
         bool ssl = false;
+        string origin = "";
+        string publishKey = "";
+        string subscribeKey = "";
         string secretKey = "";
         string cipherKey = "";
         string uuid = "";
         bool resumeOnReconnect = false;
         bool hideErrorCallbackMsg = true;
+        string authKey = "";
 
         int subscribeTimeoutInSeconds;
         int operationTimeoutInSeconds;
@@ -42,7 +46,8 @@ namespace PubnubWindowsPhone
 
         private void PhoneApplicationPage_Loaded(object sender, RoutedEventArgs e)
         {
-            pubnub = new Pubnub("demo", "demo", secretKey, cipherKey, ssl);
+            pubnub = new Pubnub(publishKey, subscribeKey, secretKey, cipherKey, ssl);
+            pubnub.Origin = origin;
             pubnub.SessionUUID = uuid;
             pubnub.SubscribeTimeout = subscribeTimeoutInSeconds;
             pubnub.NonSubscribeTimeout = operationTimeoutInSeconds;
@@ -50,15 +55,20 @@ namespace PubnubWindowsPhone
             pubnub.NetworkCheckRetryInterval = networkRetryIntervalInSeconds;
             pubnub.HeartbeatInterval = heartbeatIntervalInSeconds;
             pubnub.EnableResumeOnReconnect = resumeOnReconnect;
+            pubnub.AuthenticationKey = authKey;
         }
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
             ssl = Boolean.Parse(NavigationContext.QueryString["ssl"].ToString());
+            origin = NavigationContext.QueryString["origin"].ToString();
+            publishKey = NavigationContext.QueryString["publishKey"].ToString();
+            subscribeKey = NavigationContext.QueryString["subscribeKey"].ToString();
             cipherKey = NavigationContext.QueryString["cipherkey"].ToString();
             secretKey = NavigationContext.QueryString["secretkey"].ToString();
             uuid = NavigationContext.QueryString["uuid"].ToString();
+            authKey = NavigationContext.QueryString["authKey"].ToString();
 
             subscribeTimeoutInSeconds = Convert.ToInt32(NavigationContext.QueryString["subtimeout"]);
             operationTimeoutInSeconds = Convert.ToInt32(NavigationContext.QueryString["optimeout"]);
@@ -132,7 +142,7 @@ namespace PubnubWindowsPhone
                 );
         }
 
-        private void PubnubDisplayErrorMessage(string result)
+        private void PubnubDisplayErrorMessage(PubnubClientError result)
         {
             if (!hideErrorCallbackMsg)
             {
@@ -141,7 +151,9 @@ namespace PubnubWindowsPhone
                     {
                         TextBlock textBlock = new TextBlock();
                         textBlock.TextWrapping = TextWrapping.Wrap;
-                        textBlock.Text = string.Format("ERROR CALLBACK: {0}", result);
+                        //textBlock.Text = string.Format("ERROR CALLBACK: {0}", result.Description);
+                        textBlock.Text = string.Format("ERROR CALLBACK: {0}; {1}; {2}", result.Description, result.DetailedDotNetException, result.Message);
+                        LoggingMethod.WriteToLog(result.PubnubWebRequest.RequestUri.ToString(), true);
                         messageStackPanel.Children.Add(textBlock);
                         scrollViewerResult.UpdateLayout();
                         scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
@@ -255,6 +267,36 @@ namespace PubnubWindowsPhone
         private void btnDisconnectRetry_Click(object sender, RoutedEventArgs e)
         {
             pubnub.TerminateCurrentSubscriberRequest();
+        }
+
+        private void btnGrant_Click(object sender, RoutedEventArgs e)
+        {
+            channel = txtChannel.Text;
+            pubnub.GrantAccess<string>(channel, true, true, PubnubCallbackResult, PubnubDisplayErrorMessage);
+        }
+
+        private void btnRevoke_Click(object sender, RoutedEventArgs e)
+        {
+            channel = txtChannel.Text;
+            pubnub.GrantAccess<string>(channel, false, false, PubnubCallbackResult, PubnubDisplayErrorMessage);
+        }
+
+        private void btnAudit_Click(object sender, RoutedEventArgs e)
+        {
+            channel = txtChannel.Text;
+            pubnub.AuditAccess<string>(channel, PubnubCallbackResult, PubnubDisplayErrorMessage);
+        }
+
+        private void btnGrantPresence_Click(object sender, RoutedEventArgs e)
+        {
+            channel = txtChannel.Text;
+            pubnub.GrantPresenceAccess<string>(channel, true, true, PubnubCallbackResult, PubnubDisplayErrorMessage);
+        }
+
+        private void btnAuditPresence_Click(object sender, RoutedEventArgs e)
+        {
+            channel = txtChannel.Text;
+            pubnub.AuditPresenceAccess<string>(channel,PubnubCallbackResult, PubnubDisplayErrorMessage);
         }
 
     }
