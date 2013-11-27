@@ -17,6 +17,9 @@ namespace PubNubMessaging
 
         static string channel = "";
         static bool ssl = false;
+        static string origin = "";
+        static string publishKey = "";
+        static string subscriberKey = "";
         static string secretKey = "";
         static string cipherKey = "";
         static string uuid = "";
@@ -60,6 +63,9 @@ namespace PubNubMessaging
         private void CheckUserInputs()
         {
             ssl = chkSSL.Checked;
+            origin = txtOrigin.Text;
+            publishKey = txtPubKey.Text;
+            subscriberKey = txtSubKey.Text;
             secretKey = txtSecret.Text;
             cipherKey = txtCipher.Text;
             uuid = txtUUID.Text;
@@ -83,7 +89,11 @@ namespace PubNubMessaging
 
             if (pubnub == null)
             {
-                pubnub = new Pubnub("pub-c-a2650a22-deb1-44f5-aa87-1517049411d5", "sub-c-a478dd2a-c33d-11e2-883f-02ee2ddab7fe", secretKey, cipherKey, ssl);
+                pubnub = new Pubnub(publishKey, subscriberKey, secretKey, cipherKey, ssl);
+                pubnub.Origin = origin;
+                txtOrigin.Enabled = false;
+                txtPubKey.Enabled = false;
+                txtSubKey.Enabled = false;
                 txtSecret.Enabled = false;
                 txtCipher.Enabled = false;
                 txtUUID.Enabled = false;
@@ -428,6 +438,9 @@ namespace PubNubMessaging
                 pubnub.EndPendingRequests();
                 pubnub = null;
             }
+            txtOrigin.Enabled = true;
+            txtPubKey.Enabled = true;
+            txtSubKey.Enabled = true;
             txtSecret.Enabled = true;
             txtCipher.Enabled = true;
             txtUUID.Enabled = true;

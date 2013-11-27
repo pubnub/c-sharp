@@ -157,6 +157,30 @@
                                             <table border="0" cellpadding="0" cellspacing="0">
                                                 <tr>
                                                     <td>
+                                                        Origin
+                                                    </td>
+                                                    <td>
+                                                        <asp:TextBox ID="txtOrigin" runat="server" Text="pubsub.pubnub.com" Width="150" AutoPostBack="false" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        Publish Key
+                                                    </td>
+                                                    <td>
+                                                        <asp:TextBox ID="txtPubKey" runat="server" Text="demo" Width="150" AutoPostBack="false" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        Subscriber Key
+                                                    </td>
+                                                    <td>
+                                                        <asp:TextBox ID="txtSubKey" runat="server" Text="demo" Width="150" AutoPostBack="false" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
                                                         Cipher Key
                                                     </td>
                                                     <td>
@@ -168,7 +192,7 @@
                                                         Secret Key
                                                     </td>
                                                     <td>
-                                                        <asp:TextBox ID="txtSecret" runat="server" Text="sec-c-YjFmNzYzMGMtYmI3NC00NzJkLTlkYzYtY2MwMzI4YTJhNDVh" Width="150" AutoPostBack="false" />
+                                                        <asp:TextBox ID="txtSecret" runat="server" Text="" Width="150" AutoPostBack="false" />
                                                     </td>
                                                 </tr>
                                                 <tr>

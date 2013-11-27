@@ -67,6 +67,33 @@ namespace PubNubMessaging {
         protected global::System.Web.UI.WebControls.CheckBox chkResumeOnReconnect;
         
         /// <summary>
+        /// txtOrigin control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtOrigin;
+        
+        /// <summary>
+        /// txtPubKey control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtPubKey;
+        
+        /// <summary>
+        /// txtSubKey control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtSubKey;
+        
+        /// <summary>
         /// txtCipher control.
         /// </summary>
         /// <remarks>
