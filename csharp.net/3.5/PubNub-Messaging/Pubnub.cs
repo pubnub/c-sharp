@@ -1,4 +1,4 @@
-﻿//Build Date: October 21, 2013
+﻿//Build Date: November 26, 2013
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
 #define USE_JSONFX
 #endif
@@ -3100,6 +3100,7 @@ namespace PubNubMessaging.Core
 		
 		private Uri BuildRestApiRequest<T>(List<string> urlComponents, ResponseType type)
 		{
+            bool queryParamExist = false;
 			StringBuilder url = new StringBuilder();
 			
 			// Add http or https based on SSL flag
@@ -3133,6 +3134,7 @@ namespace PubNubMessaging.Core
 			VerifyOrSetSessionUUID();
 			if (type == ResponseType.Presence || type == ResponseType.Subscribe || type == ResponseType.Leave)
 			{
+                queryParamExist = true;
 				url.AppendFormat("?uuid={0}",this.sessionUUID);
                 if (!string.IsNullOrEmpty(_authenticationKey))
                 {
@@ -3142,6 +3144,7 @@ namespace PubNubMessaging.Core
 
             if ((type == ResponseType.Here_Now || type == ResponseType.Publish) && (!string.IsNullOrEmpty(_authenticationKey)))
             {
+                queryParamExist = true;
                 url.AppendFormat("?auth={0}", EncodeUricomponent(_authenticationKey, type, false));
             }
 			
@@ -3149,8 +3152,12 @@ namespace PubNubMessaging.Core
 				url.Append(parameters);
 			
 #if (WINDOWS_PHONE)
-				url.Append("&nocache=");
-				url.Append(Guid.NewGuid().ToString());
+            if (type != ResponseType.GrantAccess && type != ResponseType.AuditAccess && type != ResponseType.RevokeAccess)
+            {
+                url.AppendFormat("{0}nocache={1}", (queryParamExist) ? "&" : "?", Guid.NewGuid().ToString());
+                //url.Append("&nocache=");
+                //url.Append(Guid.NewGuid().ToString());
+            }
 #endif
 
             Uri requestUri = new Uri(url.ToString());
@@ -5153,55 +5160,59 @@ namespace PubNubMessaging.Core
 		
 		string GetStubResponse(HttpWebRequest request);
 	}
-	
-	internal class PubnubWebRequestCreator : IWebRequestCreate
-	{
-		private IPubnubUnitTest pubnubUnitTest = null;
-		public PubnubWebRequestCreator()
-		{
-		}
-		
-		public PubnubWebRequestCreator(IPubnubUnitTest pubnubUnitTest)
-		{
-			this.pubnubUnitTest = pubnubUnitTest;
-		}
-		
-		public WebRequest Create(Uri uri)
-		{
-			HttpWebRequest req = (HttpWebRequest)WebRequest.Create(uri);
+
+    internal class PubnubWebRequestCreator : IWebRequestCreate
+    {
+        private IPubnubUnitTest pubnubUnitTest = null;
+        public PubnubWebRequestCreator()
+        {
+        }
+
+        public PubnubWebRequestCreator(IPubnubUnitTest pubnubUnitTest)
+        {
+            this.pubnubUnitTest = pubnubUnitTest;
+        }
+
+        public WebRequest Create(Uri uri)
+        {
+            HttpWebRequest req = (HttpWebRequest)WebRequest.Create(uri);
             OperatingSystem userOS = System.Environment.OSVersion;
+#if (SILVERLIGHT || WINDOWS_PHONE)
+            req.Headers["UserAgent"] = string.Format("ua_string=({0} {1}) PubNub-csharp/3.5", userOS.Platform.ToString(), userOS.Version.ToString());
+#else
             req.UserAgent = string.Format("ua_string=({0}) PubNub-csharp/3.5", userOS.VersionString);
+#endif
             if (this.pubnubUnitTest is IPubnubUnitTest)
-			{
-				return new PubnubWebRequest(req, pubnubUnitTest);
-			}
-			else
-			{
-				return new PubnubWebRequest(req);
-			}
-		}
-	}
+            {
+                return new PubnubWebRequest(req, pubnubUnitTest);
+            }
+            else
+            {
+                return new PubnubWebRequest(req);
+            }
+        }
+    }
 
     public class PubnubWebRequest : WebRequest
-	{
-		private IPubnubUnitTest pubnubUnitTest = null;
-		private static bool simulateNetworkFailForTesting = false;
+    {
+        private IPubnubUnitTest pubnubUnitTest = null;
+        private static bool simulateNetworkFailForTesting = false;
         private static bool machineSuspendMode = false;
         private bool terminated = false;
-		
-		HttpWebRequest request;
+
+        HttpWebRequest request;
 
         internal static bool SimulateNetworkFailForTesting
-		{
-			get
-			{
-				return simulateNetworkFailForTesting;
-			}
-			set
-			{
-				simulateNetworkFailForTesting = value;
-			}
-		}
+        {
+            get
+            {
+                return simulateNetworkFailForTesting;
+            }
+            set
+            {
+                simulateNetworkFailForTesting = value;
+            }
+        }
 
         internal static bool MachineSuspendMode
         {
@@ -5214,7 +5225,7 @@ namespace PubNubMessaging.Core
                 machineSuspendMode = value;
             }
         }
-		
+
 #if (!SILVERLIGHT && !WINDOWS_PHONE)
 		private int _timeout;
         public override int Timeout
@@ -5256,147 +5267,156 @@ namespace PubNubMessaging.Core
 				request.PreAuthenticate = value;
 			}
 		}
-#endif
-		
-#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE)
-        public ServicePoint ServicePoint;
-#endif
-		
-		public PubnubWebRequest(HttpWebRequest request)
-		{
-			this.request = request;
-#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE)
-			this.ServicePoint = this.request.ServicePoint;
-#endif
-		}
-		public PubnubWebRequest(HttpWebRequest request, IPubnubUnitTest pubnubUnitTest)
-		{
-			this.request = request;
-			this.pubnubUnitTest = pubnubUnitTest;
-#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE)
-			this.ServicePoint = this.request.ServicePoint;
-#endif
-		}
-		
-		public override void Abort()
-		{
-			if (request != null)
-			{
-                terminated = true;
-                request.Abort();
-			}
-		}
 
-        public override WebHeaderCollection Headers
-		{
-			get
-			{
-				return request.Headers;
-			}
-			set
-			{
-				request.Headers = value;
-			}
-		}
-
-        public override string Method
-		{
-			get
-			{
-				return request.Method;
-			}
-			set
-			{
-				request.Method = value;
-			}
-		}
-
-        public override string ContentType
-		{
-			get
-			{
-				return request.ContentType;
-			}
-			set
-			{
-				request.ContentType = value;
-			}
-		}
-
-        public override ICredentials Credentials
-		{
-			get
-			{
-				return request.Credentials;
-			}
-			set
-			{
-				request.Credentials = value;
-			}
-		}
-		
-		public override IAsyncResult BeginGetRequestStream(AsyncCallback callback, object state)
-		{
-			return request.BeginGetRequestStream(callback, state);
-		}
-		
-		public override Stream EndGetRequestStream(IAsyncResult asyncResult)
-		{
-			return request.EndGetRequestStream(asyncResult);
-		}
-		
-		public override IAsyncResult BeginGetResponse(AsyncCallback callback, object state)
-		{
-			if (pubnubUnitTest is IPubnubUnitTest && pubnubUnitTest.EnableStubTest)
-			{
-				return new PubnubWebAsyncResult(callback, state);
-			}
-            else if (machineSuspendMode)
+        public override System.Net.Cache.RequestCachePolicy CachePolicy
+        {
+            get
             {
-                return new PubnubWebAsyncResult(callback, state);
+                return request.CachePolicy;
             }
-            else
-			{
-				return request.BeginGetResponse(callback, state);
-			}
-		}
-		
-		public override WebResponse EndGetResponse(IAsyncResult asyncResult)
-		{
-			if (pubnubUnitTest is IPubnubUnitTest && pubnubUnitTest.EnableStubTest)
-			{
-				string stubResponse = pubnubUnitTest.GetStubResponse(request);
-				return new PubnubWebResponse(new MemoryStream(Encoding.UTF8.GetBytes(stubResponse)));
-			}
-            else if (machineSuspendMode)
-            {
-                WebException simulateException = new WebException("Machine suspend mode enabled. No request will be processed.", WebExceptionStatus.Pending);
-                throw simulateException;
-            }
-            else if (simulateNetworkFailForTesting)
-			{
-				WebException simulateException = new WebException("For simulating network fail, the remote name could not be resolved", WebExceptionStatus.ConnectFailure);
-				throw simulateException;
-			}
-			else
-			{
-				return new PubnubWebResponse(request.EndGetResponse(asyncResult));
-			}
-		}
-
-        public override Uri RequestUri
-		{
-			get
-			{
-				return request.RequestUri;
-			}
-		}
+        }
 
         public override string ConnectionGroupName
         {
             get
             {
                 return request.ConnectionGroupName;
+            }
+        }
+
+#endif
+
+#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE)
+        public ServicePoint ServicePoint;
+#endif
+
+        public PubnubWebRequest(HttpWebRequest request)
+        {
+            this.request = request;
+#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE)
+			this.ServicePoint = this.request.ServicePoint;
+#endif
+        }
+        public PubnubWebRequest(HttpWebRequest request, IPubnubUnitTest pubnubUnitTest)
+        {
+            this.request = request;
+            this.pubnubUnitTest = pubnubUnitTest;
+#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE)
+			this.ServicePoint = this.request.ServicePoint;
+#endif
+        }
+
+        public override void Abort()
+        {
+            if (request != null)
+            {
+                terminated = true;
+                request.Abort();
+            }
+        }
+
+        public override WebHeaderCollection Headers
+        {
+            get
+            {
+                return request.Headers;
+            }
+            set
+            {
+                request.Headers = value;
+            }
+        }
+
+        public override string Method
+        {
+            get
+            {
+                return request.Method;
+            }
+            set
+            {
+                request.Method = value;
+            }
+        }
+
+        public override string ContentType
+        {
+            get
+            {
+                return request.ContentType;
+            }
+            set
+            {
+                request.ContentType = value;
+            }
+        }
+
+        public override ICredentials Credentials
+        {
+            get
+            {
+                return request.Credentials;
+            }
+            set
+            {
+                request.Credentials = value;
+            }
+        }
+
+        public override IAsyncResult BeginGetRequestStream(AsyncCallback callback, object state)
+        {
+            return request.BeginGetRequestStream(callback, state);
+        }
+
+        public override Stream EndGetRequestStream(IAsyncResult asyncResult)
+        {
+            return request.EndGetRequestStream(asyncResult);
+        }
+
+        public override IAsyncResult BeginGetResponse(AsyncCallback callback, object state)
+        {
+            if (pubnubUnitTest is IPubnubUnitTest && pubnubUnitTest.EnableStubTest)
+            {
+                return new PubnubWebAsyncResult(callback, state);
+            }
+            else if (machineSuspendMode)
+            {
+                return new PubnubWebAsyncResult(callback, state);
+            }
+            else
+            {
+                return request.BeginGetResponse(callback, state);
+            }
+        }
+
+        public override WebResponse EndGetResponse(IAsyncResult asyncResult)
+        {
+            if (pubnubUnitTest is IPubnubUnitTest && pubnubUnitTest.EnableStubTest)
+            {
+                string stubResponse = pubnubUnitTest.GetStubResponse(request);
+                return new PubnubWebResponse(new MemoryStream(Encoding.UTF8.GetBytes(stubResponse)));
+            }
+            else if (machineSuspendMode)
+            {
+                WebException simulateException = new WebException("Machine suspend mode enabled. No request will be processed.", WebExceptionStatus.Pending);
+                throw simulateException;
+            }
+            else if (simulateNetworkFailForTesting)
+            {
+                WebException simulateException = new WebException("For simulating network fail, the remote name could not be resolved", WebExceptionStatus.ConnectFailure);
+                throw simulateException;
+            }
+            else
+            {
+                return new PubnubWebResponse(request.EndGetResponse(asyncResult));
+            }
+        }
+
+        public override Uri RequestUri
+        {
+            get
+            {
+                return request.RequestUri;
             }
         }
 
@@ -5416,14 +5436,6 @@ namespace PubNubMessaging.Core
             }
         }
 
-        public override System.Net.Cache.RequestCachePolicy CachePolicy
-        {
-            get
-            {
-                return request.CachePolicy;
-            }
-        }
-
         public bool Terminated
         {
             get
@@ -5434,48 +5446,48 @@ namespace PubNubMessaging.Core
     }
 
     public class PubnubWebResponse : WebResponse
-	{
-		WebResponse response;
-		readonly Stream _responseStream;
-		HttpStatusCode httpStatusCode;
-		
-		public PubnubWebResponse(WebResponse response)
-		{
-			this.response = response;
-		}
-		
-		public PubnubWebResponse(WebResponse response, HttpStatusCode statusCode)
-		{
-			this.response = response;
-			this.httpStatusCode = statusCode;
-		}
-		
-		public PubnubWebResponse(Stream responseStream)
-		{
-			_responseStream = responseStream;
-		}
-		
-		public PubnubWebResponse(Stream responseStream, HttpStatusCode statusCode)
-		{
-			_responseStream = responseStream;
-			this.httpStatusCode = statusCode;
-		}
-		
-		public override Stream GetResponseStream()
-		{
-			if (response != null)
-				return response.GetResponseStream();
-			else
-				return _responseStream;
-		}
-		
-		public override void Close()
-		{
-			if (response != null)
-			{
-				response.Close();
-			}
-		}
+    {
+        WebResponse response;
+        readonly Stream _responseStream;
+        HttpStatusCode httpStatusCode;
+
+        public PubnubWebResponse(WebResponse response)
+        {
+            this.response = response;
+        }
+
+        public PubnubWebResponse(WebResponse response, HttpStatusCode statusCode)
+        {
+            this.response = response;
+            this.httpStatusCode = statusCode;
+        }
+
+        public PubnubWebResponse(Stream responseStream)
+        {
+            _responseStream = responseStream;
+        }
+
+        public PubnubWebResponse(Stream responseStream, HttpStatusCode statusCode)
+        {
+            _responseStream = responseStream;
+            this.httpStatusCode = statusCode;
+        }
+
+        public override Stream GetResponseStream()
+        {
+            if (response != null)
+                return response.GetResponseStream();
+            else
+                return _responseStream;
+        }
+
+        public override void Close()
+        {
+            if (response != null)
+            {
+                response.Close();
+            }
+        }
 
         public override WebHeaderCollection Headers
         {
@@ -5486,54 +5498,38 @@ namespace PubNubMessaging.Core
         }
 
         public override long ContentLength
-		{
-			get
-			{
-				return response.ContentLength;
-			}
-		}
+        {
+            get
+            {
+                return response.ContentLength;
+            }
+        }
 
         public override string ContentType
-		{
-			get
-			{
-				return response.ContentType;
-			}
-		}
+        {
+            get
+            {
+                return response.ContentType;
+            }
+        }
 
         public override Uri ResponseUri
-		{
-			get
-			{
-				return response.ResponseUri;
-			}
-		}
+        {
+            get
+            {
+                return response.ResponseUri;
+            }
+        }
 
         public HttpStatusCode HttpStatusCode
-		{
-			get
-			{
-				return httpStatusCode;
-			}
-		}
-
-        public override bool IsFromCache
         {
             get
             {
-                return response.IsFromCache;
+                return httpStatusCode;
             }
         }
 
-        public override bool IsMutuallyAuthenticated
-        {
-            get
-            {
-                return response.IsMutuallyAuthenticated;
-            }
-        }
-
-	}
+    }
 	
 	internal class PubnubWebAsyncResult : IAsyncResult
 	{
@@ -5902,20 +5898,22 @@ namespace PubNubMessaging.Core
             PubnubErrorCode ret = PubnubErrorCode.None;
             switch (webExceptionStatus)
             {
+#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE)
                 case WebExceptionStatus.NameResolutionFailure:
                     ret = PubnubErrorCode.NameResolutionFailure;
-                    break;
-                case WebExceptionStatus.RequestCanceled:
-                    ret = PubnubErrorCode.WebRequestCanceled;
-                    break;
-                case WebExceptionStatus.ConnectFailure:
-                    ret = PubnubErrorCode.ConnectFailure;
                     break;
                 case WebExceptionStatus.ProtocolError:
                     ret = PubnubErrorCode.ProtocolError;
                     break;
                 case WebExceptionStatus.ServerProtocolViolation:
                     ret = PubnubErrorCode.ServerProtocolViolation;
+                    break;
+#endif
+                case WebExceptionStatus.RequestCanceled:
+                    ret = PubnubErrorCode.WebRequestCanceled;
+                    break;
+                case WebExceptionStatus.ConnectFailure:
+                    ret = PubnubErrorCode.ConnectFailure;
                     break;
                 case WebExceptionStatus.Pending:
                     if (webExceptionMessage == "Machine suspend mode enabled. No request will be processed.")
