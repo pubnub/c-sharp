@@ -34,11 +34,46 @@ namespace PubnubWindowsPhone.Test.UnitTest
         ManualResetEvent presenceUnsubscribeEvent = new ManualResetEvent(false);
         ManualResetEvent presenceUnsubscribeUUIDEvent = new ManualResetEvent(false);
 
+        ManualResetEvent grantManualEvent = new ManualResetEvent(false);
+
         static bool receivedPresenceMessage = false;
         static bool receivedHereNowMessage = false;
         static bool receivedCustomUUID = false;
+        static bool receivedGrantMessage = false;
 
         string customUUID = "mylocalmachine.mydomain.com";
+
+        [ClassInitialize]
+        public void Init()
+        {
+            receivedGrantMessage = false;
+
+            if (!PubnubCommon.PAMEnabled)
+            {
+                Assert.Inconclusive("WhenAClientIsPresent Grant access failed");
+                return;
+            }
+
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "GrantRequestUnitTest";
+                    unitTest.TestCaseName = "Init2";
+                    pubnub.PubnubUnitTest = unitTest;
+
+                    string channel = "hello_my_channel,hello_my_channel-pnpres";
+                    pubnub.GrantAccess<string>(channel, true, true, 20, ThenPresenceInitializeShouldReturnGrantMessage, DummyErrorCallback);
+                    Thread.Sleep(1000);
+                    grantManualEvent.WaitOne();
+
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                        {
+                            Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed");
+                        });
+                });
+        }
 
         [TestMethod, Asynchronous]
         public void ThenPresenceShouldReturnReceivedMessage()
@@ -46,7 +81,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             receivedPresenceMessage = false;
             ThreadPool.QueueUserWorkItem((s) =>
                 {
-                    Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
                     string channel = "hello_my_channel";
 
                     PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -84,7 +119,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             receivedCustomUUID = false;
             ThreadPool.QueueUserWorkItem((s) =>
                 {
-                    Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
                     PubnubUnitTest unitTest = new PubnubUnitTest();
                     unitTest.TestClassName = "WhenAClientIsPresented";
@@ -115,6 +150,32 @@ namespace PubnubWindowsPhone.Test.UnitTest
                             TestComplete();
                         });
                 });
+        }
+
+        [Asynchronous]
+        void ThenPresenceInitializeShouldReturnGrantMessage(string receivedMessage)
+        {
+            try
+            {
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                        {
+                            object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
+                            JContainer dictionary = serializedMessage[0] as JContainer;
+                            var status = dictionary["status"].ToString();
+                            if (status == "200")
+                            {
+                                receivedGrantMessage = true;
+                            }
+                        }
+                    });
+            }
+            catch { }
+            finally
+            {
+                grantManualEvent.Set();
+            }
         }
 
         [Asynchronous]
@@ -175,7 +236,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             receivedHereNowMessage = false;
             ThreadPool.QueueUserWorkItem((s) =>
                 {
-                    Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
                     string channel = "hello_my_channel";
 
                     PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -325,7 +386,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
         }
 
         [Asynchronous]
-        private void DummyErrorCallback(string result)
+        private void DummyErrorCallback(PubnubClientError result)
         {
         }
 

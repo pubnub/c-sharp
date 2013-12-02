@@ -42,7 +42,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             message10Received = false;
             ThreadPool.QueueUserWorkItem((s) =>
                 {
-                    Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
                     string channel = "hello_my_channel";
 
                     PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -88,7 +88,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             message10ReverseTrueReceived = false;
             ThreadPool.QueueUserWorkItem((s) =>
                 {
-                    Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
                     string channel = "hello_my_channel";
 
                     PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -135,7 +135,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             messageStartReverseTrue = false;
             ThreadPool.QueueUserWorkItem((s) =>
                 {
-                    Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
                     PubnubUnitTest unitTest = new PubnubUnitTest();
                     unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
@@ -215,7 +215,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
         }
 
         [Asynchronous]
-        private void DummyErrorCallback(string result)
+        private void DummyErrorCallback(PubnubClientError result)
         {
         }
 

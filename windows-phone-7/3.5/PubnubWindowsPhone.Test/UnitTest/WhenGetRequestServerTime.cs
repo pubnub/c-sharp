@@ -32,7 +32,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
         {
             ThreadPool.QueueUserWorkItem((s) =>
                 {
-                    Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
                     PubnubUnitTest unitTest = new PubnubUnitTest();
                     unitTest.TestClassName = "WhenGetRequestServerTime";
@@ -71,7 +71,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
         }
 
         [Asynchronous]
-        private void DummyErrorCallback(string result)
+        private void DummyErrorCallback(PubnubClientError result)
         {
         }
 

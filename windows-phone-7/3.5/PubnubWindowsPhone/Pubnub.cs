@@ -1,4 +1,4 @@
-﻿//Build Date: November 26, 2013
+﻿//Build Date: November 30, 2013
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
 #define USE_JSONFX
 #endif
@@ -71,7 +71,7 @@ namespace PubNubMessaging.Core
 		bool _enableResumeOnReconnect = true;
 		bool overrideTcpKeepAlive = true;
 		bool _enableJsonEncodingForPublish = true;
-		const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Off;
+		const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Verbose;
         const PubnubErrorFilter.Level errorLevel = PubnubErrorFilter.Level.Info;
 		
 #if (!SILVERLIGHT && !WINDOWS_PHONE)
@@ -2578,7 +2578,7 @@ namespace PubNubMessaging.Core
                                 else if (_jsonPluggableLibrary.IsDictionaryCompatible(jsonString))
                                 {
                                     Dictionary<string, object> deserializeStatus = _jsonPluggableLibrary.DeserializeToDictionaryOfObject(jsonString);
-                                    string statusMessage = deserializeStatus["message"].ToString();
+                                    string statusMessage = deserializeStatus.ContainsKey("message") ? deserializeStatus["message"].ToString() : jsonString;
                                     PubnubErrorCode pubnubErrorType = PubnubErrorCodeHelper.GetErrorType((int)currentHttpStatusCode, statusMessage);
                                     pubnubStatusCode = (int)pubnubErrorType;
                                     errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(pubnubErrorType);
@@ -3147,9 +3147,12 @@ namespace PubNubMessaging.Core
                 queryParamExist = true;
                 url.AppendFormat("?auth={0}", EncodeUricomponent(_authenticationKey, type, false));
             }
-			
-			if (type == ResponseType.DetailedHistory || type == ResponseType.GrantAccess || type == ResponseType.AuditAccess || type == ResponseType.RevokeAccess)
-				url.Append(parameters);
+
+            if (type == ResponseType.DetailedHistory || type == ResponseType.GrantAccess || type == ResponseType.AuditAccess || type == ResponseType.RevokeAccess)
+            {
+                url.Append(parameters);
+                queryParamExist = true;
+            }
 			
 #if (WINDOWS_PHONE)
             if (type != ResponseType.GrantAccess && type != ResponseType.AuditAccess && type != ResponseType.RevokeAccess)
@@ -5420,6 +5423,7 @@ namespace PubNubMessaging.Core
             }
         }
 
+#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE)
         public override long ContentLength
         {
             get
@@ -5427,7 +5431,7 @@ namespace PubNubMessaging.Core
                 return request.ContentLength;
             }
         }
-
+#endif
         public override bool UseDefaultCredentials
         {
             get

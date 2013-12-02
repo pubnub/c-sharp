@@ -47,7 +47,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             receivedMessage = false;
             ThreadPool.QueueUserWorkItem((s) =>
                 {
-                    Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
                     string channel = "hello_my_channel";
 
@@ -82,7 +82,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             receivedConnectMessage = false;
             ThreadPool.QueueUserWorkItem((s) =>
                 {
-                    Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
                     PubnubUnitTest unitTest = new PubnubUnitTest();
                     unitTest.TestClassName = "WhenSubscribedToAChannel";
@@ -112,7 +112,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             receivedChannel2ConnectMessage = false;
             ThreadPool.QueueUserWorkItem((s) =>
                 {
-                    Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
                     PubnubUnitTest unitTest = new PubnubUnitTest();
                     unitTest.TestClassName = "WhenSubscribedToAChannel";
@@ -147,7 +147,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             receivedAlreadySubscribedMessage = false;
             ThreadPool.QueueUserWorkItem((s) =>
                 {
-                    Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
                     PubnubUnitTest unitTest = new PubnubUnitTest();
                     unitTest.TestClassName = "WhenSubscribedToAChannel";
@@ -160,7 +160,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback1, DummyMethodDuplicateChannelConnectCallback, DummyErrorCallback);
                     Thread.Sleep(100);
 
-                    pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback2, DummyMethodDuplicateChannelConnectCallback, DummyErrorCallback);
+                    pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback2, DummyMethodDuplicateChannelConnectCallback, DuplicateChannelErrorCallback);
                     meAlreadySubscribed.WaitOne();
 
                     pubnub.EndPendingRequests();
@@ -180,7 +180,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
 
             ThreadPool.QueueUserWorkItem((s) =>
                 {
-                    Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
                     PubnubUnitTest unitTest = new PubnubUnitTest();
                     unitTest.TestClassName = "WhenSubscribedToAChannel";
@@ -270,7 +270,12 @@ namespace PubnubWindowsPhone.Test.UnitTest
         [Asynchronous]
         private void DummyMethodDuplicateChannelUserCallback2(string result)
         {
-            if (result.Contains("already subscribed"))
+        }
+
+        [Asynchronous]
+        private void DuplicateChannelErrorCallback(PubnubClientError result)
+        {
+            if (result != null && result.Message.ToLower().Contains("already subscribed"))
             {
                 receivedAlreadySubscribedMessage = true;
             }
@@ -350,7 +355,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
         }
 
         [Asynchronous]
-        private void DummyErrorCallback(string result)
+        private void DummyErrorCallback(PubnubClientError result)
         {
         }
 

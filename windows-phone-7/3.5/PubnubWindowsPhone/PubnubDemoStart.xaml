@@ -30,30 +30,46 @@
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Margin="12,142,12,0" Grid.RowSpan="2">
             <StackPanel Orientation="Horizontal" Margin="20,3,19,0" Name="spnlInput1" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="72">
-                <CheckBox Content="SSL" Height="65" Name="chkSSL" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
+                <CheckBox Content="SSL" Height="65" Name="chkSSL" VerticalAlignment="Center" Background="Gray" HorizontalAlignment="Stretch" />
                 <Line Name="separatorCheck" X1="0" Y1="45" StrokeThickness="3" Stroke="White" VerticalAlignment="Center"></Line>
-                <CheckBox Content="Resume On Reconnect" Height="65" Name="chkResumeOnReconnect" VerticalAlignment="Center" HorizontalAlignment="Stretch" IsChecked="True" />
+                <CheckBox Content="Resume On Reconnect" Height="65" Name="chkResumeOnReconnect" VerticalAlignment="Center" HorizontalAlignment="Stretch" Background="Gray" IsChecked="True" />
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="20,78,19,0" Name="spnlInput2" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+            <StackPanel Orientation="Horizontal" Margin="20,70,19,0" Name="spnlInput2" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <TextBlock Name="lblPubKey" VerticalAlignment="Center" Text="Publish Key"></TextBlock>
+                <TextBox x:Name="txtPubKey" Text="pub-c-668503f1-1fae-4018-b75b-44ebf7cd7f38" Width="270"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="20,130,19,0" Name="spnlInput3" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <TextBlock Name="lblSubKey" VerticalAlignment="Center" Text="Subscribe Key"></TextBlock>
+                <TextBox x:Name="txtSubKey" Text="sub-c-624fbcc6-c274-11e2-ba80-02ee2ddab7fe" Width="250"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="20,190,19,0" Name="spnlInput4" HorizontalAlignment="Stretch" VerticalAlignment="Top">
                 <TextBlock Name="lblCipher" VerticalAlignment="Center" Text="Cipher Key"></TextBlock>
                 <TextBox Name="txtCipher" Text="" Width="236"></TextBox>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="20,152,19,0" Name="spnlInput3" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+            <StackPanel Orientation="Horizontal" Margin="20,250,19,0" Name="spnlInput5" HorizontalAlignment="Stretch" VerticalAlignment="Top">
                 <TextBlock Name="lblSecret" VerticalAlignment="Center" Text="Secret Key"></TextBlock>
-                <TextBox Name="txtSecret" Text="" Width="236"></TextBox>
+                <TextBox Name="txtSecret" Text="sec-c-YzE1YmMzZGYtNDFmMS00ZDY2LTgyZGMtMGY0YjEzZGY2YzUw" Width="236"></TextBox>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="20,228,19,0" Name="spnlInput4" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+            <StackPanel Orientation="Horizontal" Margin="20,310,19,0" Name="spnlInput6" HorizontalAlignment="Stretch" VerticalAlignment="Top">
                 <TextBlock Name="lblUUID" VerticalAlignment="Center" Text="Session UUID"></TextBlock>
                 <TextBox Name="txtUUID" Text="" Width="236"></TextBox>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="20,304,19,0" Name="spnlInput5" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="70">
-                <CheckBox Content="Hide Error Callback Messages" Height="70" Name="chkHideErrCallbackMsg" VerticalAlignment="Center" HorizontalAlignment="Stretch" IsChecked="True" />
+            <StackPanel Orientation="Horizontal" Margin="20,370,19,0" Name="spnlInput7" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <TextBlock Name="lblOrigin" VerticalAlignment="Center" Text="Origin"></TextBlock>
+                <TextBox Name="txtOrigin" Text="pubsub.pubnub.com" Width="300"></TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="20,430,19,0" Name="spnlInput8" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <TextBlock Name="lblAuthKey" VerticalAlignment="Center" Text="Auth Key"></TextBlock>
+                <TextBox Name="txtAuthKey" Text="" Width="300"></TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="20,490,19,0" Name="spnlInput9" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="70">
+                <CheckBox Content="Hide Error Callback Messages" Height="70" x:Name="chkHideErrCallbackMsg" VerticalAlignment="Center" HorizontalAlignment="Stretch" IsChecked="True" />
             </StackPanel>
             <!--<StackPanel Height="65" HorizontalAlignment="Stretch" Margin="20,376,19,0" Name="spnlInput6" Orientation="Horizontal" VerticalAlignment="Top">
             </StackPanel>
             <StackPanel Height="65" HorizontalAlignment="Stretch" Margin="20,444,19,0" Name="spnlInput7" Orientation="Horizontal" VerticalAlignment="Top">
             </StackPanel>-->
-            <Button Content="Continue" Height="72" HorizontalAlignment="Stretch" Margin="277,387,19,0" Name="btnContinue" VerticalAlignment="Top" Width="160" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Center" Click="btnContinue_Click" />
+            <Button Content="Continue" Height="72" HorizontalAlignment="Stretch" Margin="277,545,19,0" Name="btnContinue" VerticalAlignment="Top" Width="160" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Center" Click="btnContinue_Click" />
         </Grid>
     </Grid>
 
