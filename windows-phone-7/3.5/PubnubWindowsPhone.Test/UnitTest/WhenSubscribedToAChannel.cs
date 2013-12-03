@@ -31,6 +31,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
         ManualResetEvent meChannel1SubscribeConnect = new ManualResetEvent(false);
         ManualResetEvent meChannel2SubscribeConnect = new ManualResetEvent(false);
         ManualResetEvent meSubscriberManyMessages = new ManualResetEvent(false);
+        ManualResetEvent grantManualEvent = new ManualResetEvent(false);
 
         bool receivedMessage = false;
         bool receivedConnectMessage = false;
@@ -38,9 +39,65 @@ namespace PubnubWindowsPhone.Test.UnitTest
         bool receivedChannel1ConnectMessage = false;
         bool receivedChannel2ConnectMessage = false;
         bool receivedManyMessages = false;
+        bool receivedGrantMessage = false;
 
         int numberOfReceivedMessages = 0;
 
+        [ClassInitialize]
+        public void Init()
+        {
+            if (!PubnubCommon.PAMEnabled)
+            {
+                Assert.Inconclusive("WhenAClientIsPresent Grant access failed.");
+                return;
+            }
+
+            receivedGrantMessage = false;
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "GrantRequestUnitTest";
+                    unitTest.TestCaseName = "Init";
+                    pubnub.PubnubUnitTest = unitTest;
+
+                    string channel = "hello_my_channel";
+
+                    pubnub.GrantAccess<string>(channel, true, true, 20, ThenSubscriberInitializeShouldReturnGrantMessage, DummyErrorCallback);
+                    //Thread.Sleep(1000);
+
+                    grantManualEvent.WaitOne();
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                        {
+                            Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed.");
+                        });
+                });
+        }
+
+        [Asynchronous]
+        void ThenSubscriberInitializeShouldReturnGrantMessage(string receivedMessage)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                {
+                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
+                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    var status = dictionary["status"].ToString();
+                    if (status == "200")
+                    {
+                        receivedGrantMessage = true;
+                    }
+                }
+            }
+            catch { }
+            finally
+            {
+                grantManualEvent.Set();
+            }
+        }
+        
         [TestMethod, Asynchronous]
         public void ThenSubscribeShouldReturnReceivedMessage()
         {
