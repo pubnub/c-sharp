@@ -1409,7 +1409,7 @@ namespace PubNubMessaging.Core
                     && (currentState.Type == ResponseType.Subscribe || currentState.Type == ResponseType.Presence)
                     && overrideTcpKeepAlive)
                 {
-                    networkConnection = ClientNetworkStatus.CheckInternetStatusUnity(_pubnetSystemActive, currentState.ErrorCallback, currentState.Channels, HeartbeatInterval);
+                    networkConnection = ClientNetworkStatus.CheckInternetStatusUnity<T>(_pubnetSystemActive, currentState.ErrorCallback, currentState.Channels, HeartbeatInterval);
                 }
                 _channelInternetStatus[channel] = networkConnection;
 
@@ -2287,7 +2287,7 @@ namespace PubNubMessaging.Core
                     }else if (cea.isError) {
                         UrlRequestCommonExceptionHandler<T>(cea.pubnubRequestState.Type, cea.pubnubRequestState.Channels, false, cea.pubnubRequestState.UserCallback, cea.pubnubRequestState.ConnectCallback, cea.pubnubRequestState.ErrorCallback, false);
                     } else {
-                        var result = WrapResultBasedOnResponseType (cea.pubnubRequestState.Type, cea.message, cea.pubnubRequestState.Channels, cea.pubnubRequestState.Reconnect, cea.pubnubRequestState.Timetoken, cea.pubnubRequestState.ErrorCallback);
+                        var result = WrapResultBasedOnResponseType<T> (cea.pubnubRequestState.Type, cea.message, cea.pubnubRequestState.Channels, cea.pubnubRequestState.Reconnect, cea.pubnubRequestState.Timetoken, cea.pubnubRequestState.ErrorCallback);
 
                         ProcessResponseCallbacks<T> (result, cea.pubnubRequestState);            
                     }
@@ -2858,7 +2858,7 @@ namespace PubNubMessaging.Core
 
                         if (jsonString != "[]")
                         {
-                            result = WrapResultBasedOnResponseType(requestState.Type, jsonString, requestState.Channels, requestState.Reconnect, requestState.Timetoken, requestState.ErrorCallback);
+                            result = WrapResultBasedOnResponseType<T>(requestState.Type, jsonString, requestState.Channels, requestState.Reconnect, requestState.Timetoken, requestState.ErrorCallback);
                         }
                         ProcessResponseCallbacks<T>(result, requestState);
                         if (requestState.Type == ResponseType.Subscribe || requestState.Type == ResponseType.Presence)
@@ -2897,17 +2897,21 @@ namespace PubNubMessaging.Core
 
                             if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(activeChannel))
                             {
-                                List<object> errorResult = new List<object>();
+                                /*List<object> errorResult = new List<object>();
                                 string jsonString = string.Format("[2, \"{0}\"]", ex.ToString().Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\""));
 
                                 errorResult = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
 
-                                errorResult.Add(activeChannel);
-
-                                PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[activeChannel] as PubnubChannelCallback<T>;
+                                errorResult.Add(activeChannel);*/
+								PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[activeChannel] as PubnubChannelCallback<T>;
+								PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(ex);
+								int statusCode = (int)errorType;
+								string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(errorType);
+								PubnubClientError error = new PubnubClientError(statusCode, PubnubErrorSeverity.Critical, true, ex.Message, ex, PubnubMessageSource.Client, requestState.Request, requestState.Response, errorDescription, channel);
+                                
                                 if (currentPubnubCallback != null && currentPubnubCallback.ErrorCallback != null)
                                 {
-                                    GoToCallback<T>(errorResult, currentPubnubCallback.ErrorCallback);
+                                    GoToCallback(error, currentPubnubCallback.ErrorCallback);
                                 }
                             }
                         }
@@ -2915,11 +2919,17 @@ namespace PubNubMessaging.Core
                     else
                     {
                         //TODO: Identify refactoring
-                        List<object> errorResult = new List<object>();
+                        /*List<object> errorResult = new List<object>();
                         string jsonString = string.Format("[2, \"{0}\"]", ex.ToString().Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\""));
                         errorResult = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
-                        errorResult.Add(channel);
-                        GoToCallback<T>(errorResult, requestState.ErrorCallback);
+                        errorResult.Add(channel);*/
+						PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(ex);
+						int statusCode = (int)errorType;
+						string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(errorType);
+						PubnubClientError error = new PubnubClientError(statusCode, PubnubErrorSeverity.Critical, true, ex.Message, ex, PubnubMessageSource.Client, requestState.Request, requestState.Response, errorDescription, channel);
+
+
+                        GoToCallback(error, requestState.ErrorCallback);
                     }
 
                 }
@@ -5462,7 +5472,7 @@ namespace PubNubMessaging.Core
                 _machineSuspendMode = value;
             }
         }
-        #if(__MonoCS__)
+		#if(__MonoCS__ && !UNITY_IOS && !UNITY_ANDROID)
         static UdpClient udp;
         #endif
 
@@ -6839,14 +6849,27 @@ namespace PubNubMessaging.Core
 #if (USE_JSONFX)
     public class JsonFXDotNet : IJsonPluggableLibrary
     {
+		public bool IsArrayCompatible(string jsonString){
+			return false;
+		}
+		public bool IsDictionaryCompatible(string jsonString){
+			return false;
+		}
+
         public string SerializeToJsonString(object objectToSerialize)
         {
+			#if(__MonoCS__)
+			var writer = new JsonFx.Json.JsonWriter();
+			string json = writer.Write(objectToSerialize);
+			return json;
+			#else
             string json = "";
             var resolver = new CombinedResolverStrategy(new DataContractResolverStrategy());
             DataWriterSettings dataWriterSettings = new DataWriterSettings(resolver);
             var writer = new JsonFx.Json.JsonWriter(dataWriterSettings, new string[] { "PubnubClientError" });
             json = writer.Write(objectToSerialize);
             return json;
+			#endif
         }
 
         public List<object> DeserializeToListOfObject(string jsonString)
@@ -6906,6 +6929,13 @@ namespace PubNubMessaging.Core
 #elif (USE_DOTNET_SERIALIZATION)
     public class JscriptSerializer : IJsonPluggableLibrary
     {
+		public bool IsArrayCompatible(string jsonString){
+			return false;
+		}
+		public bool IsDictionaryCompatible(string jsonString){
+			return false;
+		}
+
         public string SerializeToJsonString(object objectToSerialize)
         {
             JavaScriptSerializer jS = new JavaScriptSerializer();
@@ -6964,6 +6994,13 @@ namespace PubNubMessaging.Core
 #elif (USE_MiniJSON)
     public class MiniJSONObjectSerializer : IJsonPluggableLibrary
     {
+		public bool IsArrayCompatible(string jsonString){
+			return false;
+		}
+		public bool IsDictionaryCompatible(string jsonString){
+			return false;
+		}
+
         public string SerializeToJsonString(object objectToSerialize)
         {
             return Json.Serialize(objectToSerialize);
@@ -6987,6 +7024,12 @@ namespace PubNubMessaging.Core
 #elif (USE_JSONFX_FOR_UNITY)
     public class JsonFxUnitySerializer : IJsonPluggableLibrary
     {
+		public bool IsArrayCompatible(string jsonString){
+			return false;
+		}
+		public bool IsDictionaryCompatible(string jsonString){
+			return false;
+		}
         public string SerializeToJsonString(object objectToSerialize)
         {
             return JsonWriter.Serialize(objectToSerialize);
