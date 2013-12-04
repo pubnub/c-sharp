@@ -1,4 +1,4 @@
-﻿//Build Date: November 28, 2013
+﻿//Build Date: December 4, 2013
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX
 #elif (UNITY_IOS)
@@ -2174,7 +2174,7 @@ namespace PubNubMessaging.Core
                                         }
                                         else 
                                         {
-                                            result = WrapResultBasedOnResponseType (cea.pubnubRequestState.Type, cea.message, cea.pubnubRequestState.Channels, cea.pubnubRequestState.Reconnect, cea.pubnubRequestState.Timetoken, cea.pubnubRequestState.ErrorCallback);
+											result = WrapResultBasedOnResponseType<T> (cea.pubnubRequestState.Type, cea.message, cea.pubnubRequestState.Channels, cea.pubnubRequestState.Reconnect, cea.pubnubRequestState.Timetoken, cea.pubnubRequestState.ErrorCallback);
                                             ProcessResponseCallbacks<T> (result, cea.pubnubRequestState);            
                                         }
                                         LoggingMethod.WriteToLog(string.Format("DateTime {0}, Response:{1}", DateTime.Now.ToString(), responseFromServer), LoggingMethod.LevelVerbose);
@@ -2477,7 +2477,7 @@ namespace PubNubMessaging.Core
                     PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(webEx);
                     int statusCode = (int)errorType;
                     string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(errorType);
-                    PubnubClientError error = new PubnubClientError(statusCode, PubnubErrorSeverity.Warn, true, webEx.Message, webEx, PubnubMessageSource.Client, null, null, errorDescription, string.Join(",", channels));
+					PubnubClientError error = new PubnubClientError(statusCode, PubnubErrorSeverity.Warn, true, webEx.Message, webEx, PubnubMessageSource.Client, null, null, errorDescription, channels);
                     Action<PubnubClientError> errorCallback = asynchRequestState.ErrorCallback;
                     GoToCallback(error, errorCallback);
                 }
@@ -2490,7 +2490,7 @@ namespace PubNubMessaging.Core
                     PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(ex);
                     int statusCode = (int)errorType;
                     string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(errorType);
-                    PubnubClientError error = new PubnubClientError(statusCode, PubnubErrorSeverity.Warn, true, ex.Message, ex, PubnubMessageSource.Client, null, null, errorDescription, string.Join(",", channels));
+					PubnubClientError error = new PubnubClientError(statusCode, PubnubErrorSeverity.Warn, true, ex.Message, ex, PubnubMessageSource.Client, null, null, errorDescription, channels);
                     Action<PubnubClientError> errorCallback = asynchRequestState.ErrorCallback;
                     GoToCallback(error, errorCallback);
                 }
@@ -2549,7 +2549,7 @@ namespace PubNubMessaging.Core
                     PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(webEx);
                     int statusCode = (int)errorType;
                     string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(errorType);
-                    PubnubClientError error = new PubnubClientError(statusCode, PubnubErrorSeverity.Warn, true, webEx.Message, webEx, PubnubMessageSource.Client, null, null, errorDescription, string.Join(",", channels));
+					PubnubClientError error = new PubnubClientError(statusCode, PubnubErrorSeverity.Warn, true, webEx.Message, webEx, PubnubMessageSource.Client, null, null, errorDescription, channels);
                     Action<PubnubClientError> errorCallback = asynchRequestState.ErrorCallback;
                     GoToCallback(error, errorCallback);
                 }
@@ -2562,7 +2562,7 @@ namespace PubNubMessaging.Core
                     PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(ex);
                     int statusCode = (int)errorType;
                     string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(errorType);
-                    PubnubClientError error = new PubnubClientError(statusCode, PubnubErrorSeverity.Warn, true, ex.Message, ex, PubnubMessageSource.Client, null, null, errorDescription, string.Join(",", channels));
+					PubnubClientError error = new PubnubClientError(statusCode, PubnubErrorSeverity.Warn, true, ex.Message, ex, PubnubMessageSource.Client, null, null, errorDescription, channels);
                     Action<PubnubClientError> errorCallback = asynchRequestState.ErrorCallback;
                     GoToCallback(error, errorCallback);
                 }
