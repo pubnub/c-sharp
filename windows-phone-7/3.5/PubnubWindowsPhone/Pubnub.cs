@@ -1,4 +1,4 @@
-﻿//Build Date: November 30, 2013
+﻿//Build Date: December 05, 2013
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
 #define USE_JSONFX
 #endif
@@ -71,7 +71,7 @@ namespace PubNubMessaging.Core
 		bool _enableResumeOnReconnect = true;
 		bool overrideTcpKeepAlive = true;
 		bool _enableJsonEncodingForPublish = true;
-		const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Verbose;
+		const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Off;
         const PubnubErrorFilter.Level errorLevel = PubnubErrorFilter.Level.Info;
 		
 #if (!SILVERLIGHT && !WINDOWS_PHONE)
