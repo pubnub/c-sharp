@@ -4431,8 +4431,8 @@ namespace PubNubMessaging.Core
         }
 
         public void EnableMachineSleepModeForTestingOnly()
-        {
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !MONODROID && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
+		{ 
+			#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH &&!__IOS__ && !MONODROID && !__ANDROID__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
             PowerModeChangedEventArgs powerChangeEvent = new PowerModeChangedEventArgs(PowerModes.Suspend);
             SystemEvents_PowerModeChanged(null, powerChangeEvent);
 #endif
@@ -4443,7 +4443,7 @@ namespace PubNubMessaging.Core
 
         public void DisableMachineSleepModeForTestingOnly()
         {
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !MONODROID && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
+			#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH &&!__IOS__&& !MONODROID && !__ANDROID__&& !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID) 
             PowerModeChangedEventArgs powerChangeEvent = new PowerModeChangedEventArgs(PowerModes.Resume);
             SystemEvents_PowerModeChanged(null, powerChangeEvent);
 #endif
