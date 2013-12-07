@@ -1,4 +1,4 @@
-﻿//Build Date: December 4, 2013
+﻿//Build Date: December 7, 2013
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX
 #elif (UNITY_IOS)
@@ -114,7 +114,7 @@ namespace PubNubMessaging.Core
         ConcurrentDictionary<string, int> _channelInternetRetry = new ConcurrentDictionary<string, int>();
         ConcurrentDictionary<string, Timer> _channelReconnectTimer = new ConcurrentDictionary<string, Timer>();
         ConcurrentDictionary<Uri, Timer> _channelHeartbeatTimer = new ConcurrentDictionary<Uri, Timer>();
-        ConcurrentDictionary<string, object> _channelCallbacks = new ConcurrentDictionary<string, object>();
+        ConcurrentDictionary<PubnubChannelCallbackKey, object> _channelCallbacks = new ConcurrentDictionary<PubnubChannelCallbackKey, object>();
         
         internal int SubscribeTimeout
         {
@@ -449,9 +449,13 @@ namespace PubNubMessaging.Core
 
                                     string message = string.Format("Detected internet connection problem. Retrying connection attempt {0} of {1}", _channelInternetRetry[channel], _pubnubNetworkCheckRetries);
 
-                                    if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(activeChannel))
+                                    PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
+                                    callbackKey.Channel = activeChannel;
+                                    callbackKey.Type = netState.Type;
+
+                                    if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(callbackKey))
                                     {
-                                        PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[activeChannel] as PubnubChannelCallback<T>;
+                                        PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[callbackKey] as PubnubChannelCallback<T>;
                                         if (currentPubnubCallback != null && currentPubnubCallback.ErrorCallback != null)
                                         {
                                             PubnubErrorCode errorType = PubnubErrorCode.NoInternet;
@@ -686,8 +690,8 @@ namespace PubNubMessaging.Core
 
         private void RemoveChannelCallback()
         {
-            ICollection<string> channelCollection = _channelCallbacks.Keys;
-            foreach(string keyChannel in channelCollection)
+            ICollection<PubnubChannelCallbackKey> channelCollection = _channelCallbacks.Keys;
+            foreach (PubnubChannelCallbackKey keyChannel in channelCollection)
             {
                 if (_channelCallbacks.ContainsKey(keyChannel))
                 {
@@ -1141,6 +1145,10 @@ namespace PubNubMessaging.Core
                 {
                     string currentLoopChannel = validChannels[index].ToString();
                     _multiChannelSubscribe.GetOrAdd(currentLoopChannel, 0);
+
+                    PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
+                    callbackKey.Channel = currentLoopChannel;
+                    callbackKey.Type = type;
                     
                     PubnubChannelCallback<T> channelCallbacks = new PubnubChannelCallback<T>();
                     //channelCallbacks.Type = type;
@@ -1148,7 +1156,7 @@ namespace PubNubMessaging.Core
                     channelCallbacks.ConnectCallback = connectCallback;
                     channelCallbacks.ErrorCallback = errorCallback;
 
-                    _channelCallbacks.AddOrUpdate(currentLoopChannel, channelCallbacks, (key, oldValue) => channelCallbacks);
+                    _channelCallbacks.AddOrUpdate(callbackKey, channelCallbacks, (key, oldValue) => channelCallbacks);
                 }
                 
                 //Get all the channels
@@ -2535,6 +2543,7 @@ namespace PubNubMessaging.Core
             StateObject<T> state = asynchronousResult.AsyncState as StateObject<T>;
             RequestState<T> asynchRequestState = state.RequestState;
             string channels = "";
+
             if (asynchRequestState != null && asynchRequestState.Channels != null)
             {
                 channels = string.Join(",", asynchRequestState.Channels);
@@ -2974,10 +2983,14 @@ namespace PubNubMessaging.Core
 
                                             string status = "Internet connection available";
 
-                                            if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(activeChannel))
+                                            PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
+                                            callbackKey.Channel = activeChannel;
+                                            callbackKey.Type = asynchRequestState.Type;
+
+                                            if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(callbackKey))
                                             {
                                                 object callbackObject;
-                                                bool channelAvailable = _channelCallbacks.TryGetValue(activeChannel, out callbackObject);
+                                                bool channelAvailable = _channelCallbacks.TryGetValue(callbackKey, out callbackObject);
                                                 PubnubChannelCallback<T> currentPubnubCallback = null;
                                                 if (channelAvailable)
                                                 {
@@ -3104,7 +3117,7 @@ namespace PubNubMessaging.Core
                                 else if (_jsonPluggableLibrary.IsDictionaryCompatible(jsonString))
                                 {
                                     Dictionary<string, object> deserializeStatus = _jsonPluggableLibrary.DeserializeToDictionaryOfObject(jsonString);
-                                    string statusMessage = deserializeStatus["message"].ToString();
+                                    string statusMessage = deserializeStatus.ContainsKey("message") ? deserializeStatus["message"].ToString() : jsonString;
                                     PubnubErrorCode pubnubErrorType = PubnubErrorCodeHelper.GetErrorType((int)currentHttpStatusCode, statusMessage);
                                     pubnubStatusCode = (int)pubnubErrorType;
                                     errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(pubnubErrorType);
@@ -3147,10 +3160,14 @@ namespace PubNubMessaging.Core
                                 for (int index = 0; index < asynchRequestState.Channels.Length; index++)
                                 {
                                     string activeChannel = asynchRequestState.Channels[index].ToString();
-                                    if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(activeChannel))
+                                    PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
+                                    callbackKey.Channel = activeChannel;
+                                    callbackKey.Type = asynchRequestState.Type;
+
+                                    if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(callbackKey))
                                     {
                                         object callbackObject;
-                                        bool channelAvailable = _channelCallbacks.TryGetValue(activeChannel, out callbackObject);
+                                        bool channelAvailable = _channelCallbacks.TryGetValue(callbackKey, out callbackObject);
                                         PubnubChannelCallback<T> currentPubnubCallback = null;
                                         if (channelAvailable)
                                         {
@@ -3190,10 +3207,14 @@ namespace PubNubMessaging.Core
                             {
                                 string activeChannel = asynchRequestState.Channels[index].ToString();
 
-                                if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(activeChannel))
+                                PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
+                                callbackKey.Channel = activeChannel;
+                                callbackKey.Type = asynchRequestState.Type;
+
+                                if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(callbackKey))
                                 {
                                     object callbackObject;
-                                    bool channelAvailable = _channelCallbacks.TryGetValue(activeChannel, out callbackObject);
+                                    bool channelAvailable = _channelCallbacks.TryGetValue(callbackKey, out callbackObject);
                                     PubnubChannelCallback<T> currentPubnubCallback = null;
                                     if (channelAvailable)
                                     {
@@ -3373,9 +3394,13 @@ namespace PubNubMessaging.Core
                         connectResult = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
                         connectResult.Add(channel);
 
-                        if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(channel))
+                        PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
+                        callbackKey.Channel = channel;
+                        callbackKey.Type = type;
+
+                        if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(callbackKey))
                         {
-                            PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[channel] as PubnubChannelCallback<T>;
+                            PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[callbackKey] as PubnubChannelCallback<T>;
                             if (currentPubnubCallback != null && currentPubnubCallback.ConnectCallback != null)
                             {
                                 GoToCallback<T>(connectResult, currentPubnubCallback.ConnectCallback);
@@ -3387,9 +3412,13 @@ namespace PubNubMessaging.Core
                         connectResult = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
                         connectResult.Add(channel.Replace("-pnpres", ""));
 
-                        if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(channel))
-                        {
-                            PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[channel] as PubnubChannelCallback<T>;
+                        PubnubChannelCallbackKey pCallbackKey = new PubnubChannelCallbackKey();
+                        pCallbackKey.Channel = channel;
+                        pCallbackKey.Type = type;
+
+                        if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(pCallbackKey))
+                                              {
+                            PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[pCallbackKey] as PubnubChannelCallback<T>;
                             if (currentPubnubCallback != null && currentPubnubCallback.ConnectCallback != null)
                             {
                                 GoToCallback<T>(connectResult, currentPubnubCallback.ConnectCallback);
@@ -3674,9 +3703,12 @@ namespace PubNubMessaging.Core
                 queryParamExist = true;
                 url.AppendFormat("?auth={0}", EncodeUricomponent(_authenticationKey, type, false));
             }
-            
+
             if (type == ResponseType.DetailedHistory || type == ResponseType.GrantAccess || type == ResponseType.AuditAccess || type == ResponseType.RevokeAccess)
+            {
                 url.Append(parameters);
+                queryParamExist = true;
+            }
             
 #if (WINDOWS_PHONE)
             if (type != ResponseType.GrantAccess && type != ResponseType.AuditAccess && type != ResponseType.RevokeAccess)
@@ -3803,13 +3835,31 @@ namespace PubNubMessaging.Core
                             }
                             itemMessage.Add(messages[1].ToString());
                             itemMessage.Add(currentChannel.Replace("-pnpres", ""));
-                            if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(currentChannel))
+                            
+                            PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
+                            callbackKey.Channel = currentChannel;
+                            callbackKey.Type = type;
+
+                            if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(callbackKey))
                             {
-                                PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[currentChannel] as PubnubChannelCallback<T>;
-                                if (currentPubnubCallback != null && currentPubnubCallback.Callback != null)
+                                if ((typeof(T) == typeof(string) && _channelCallbacks[callbackKey].GetType().Name.Contains("[System.String]")) ||
+                                    (typeof(T) == typeof(object) && _channelCallbacks[callbackKey].GetType().Name.Contains("[System.Object]")))
                                 {
-                                    GoToCallback<T>(itemMessage, currentPubnubCallback.Callback);
+                                    PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[callbackKey] as PubnubChannelCallback<T>;
+                                    if (currentPubnubCallback != null && currentPubnubCallback.Callback != null)
+                                    {
+                                        GoToCallback<T>(itemMessage, currentPubnubCallback.Callback);
+                                    }
                                 }
+                                else if (_channelCallbacks[callbackKey].GetType().FullName.Contains("[System.String"))
+                                {
+                                    PubnubChannelCallback<string> retryPubnubCallback = _channelCallbacks[callbackKey] as PubnubChannelCallback<string>;
+                                    if (retryPubnubCallback != null && retryPubnubCallback.Callback != null)
+                                    {
+                                        GoToCallback(itemMessage, retryPubnubCallback.Callback);
+                                    }
+                                }
+
                             }
                         }
                     }
@@ -3912,9 +3962,13 @@ namespace PubNubMessaging.Core
                         int statusCode = (int)errorType;
                         string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(errorType);
 
-                        if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(activeChannel))
+                        PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
+                        callbackKey.Channel = activeChannel;
+                        callbackKey.Type = type;
+
+                        if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(callbackKey))
                         {
-                            PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[activeChannel] as PubnubChannelCallback<T>;
+                            PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[callbackKey] as PubnubChannelCallback<T>;
                             if (currentPubnubCallback != null && currentPubnubCallback.Callback != null)
                             {
                                 PubnubClientError error = new PubnubClientError(statusCode, PubnubErrorSeverity.Critical, message, PubnubMessageSource.Client, null, null, errorDescription, activeChannel);
@@ -3940,9 +3994,13 @@ namespace PubNubMessaging.Core
                         int statusCode = (int)errorType;
                         string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(errorType);
 
-                        if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(activeChannel))
+                        PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
+                        callbackKey.Channel = activeChannel;
+                        callbackKey.Type = type;
+
+                        if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(callbackKey))
                         {
-                            PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[activeChannel] as PubnubChannelCallback<T>;
+                            PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[callbackKey] as PubnubChannelCallback<T>;
                             if (currentPubnubCallback != null && currentPubnubCallback.Callback != null)
                             {
                                 PubnubClientError error = new PubnubClientError(statusCode, PubnubErrorSeverity.Critical, message, PubnubMessageSource.Client, null, null, errorDescription, activeChannel);
@@ -4184,9 +4242,13 @@ namespace PubNubMessaging.Core
                         for (int index = 0; index < channels.Length; index++)
                         {
                             string activeChannel = channels[index].ToString();
-                            if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(activeChannel))
+                            PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
+                            callbackKey.Channel = activeChannel;
+                            callbackKey.Type = type;
+
+                            if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(callbackKey))
                             {
-                                PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[activeChannel] as PubnubChannelCallback<T>;
+                                PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[callbackKey] as PubnubChannelCallback<T>;
                                 if (currentPubnubCallback != null && currentPubnubCallback.ErrorCallback != null)
                                 {
                                     PubnubClientError error = new PubnubClientError(statusCode, PubnubErrorSeverity.Critical, true, ex.Message, ex, PubnubMessageSource.Client, null, null, errorDescription, activeChannel);
@@ -4220,6 +4282,22 @@ namespace PubNubMessaging.Core
                 {
                     Callback((T)(object)result);
                 }
+            }
+        }
+
+        private void GoToCallback(object result, Action<string> Callback)
+        {
+            if (Callback != null)
+            {
+                JsonResponseToCallback(result, Callback);
+            }
+        }
+
+        private void GoToCallback(object result, Action<object> Callback)
+        {
+            if (Callback != null)
+            {
+                Callback(result);
             }
         }
 
@@ -4432,7 +4510,8 @@ namespace PubNubMessaging.Core
 
         public void EnableMachineSleepModeForTestingOnly()
         {
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !MONODROID && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
+
             PowerModeChangedEventArgs powerChangeEvent = new PowerModeChangedEventArgs(PowerModes.Suspend);
             SystemEvents_PowerModeChanged(null, powerChangeEvent);
 #endif
@@ -4443,7 +4522,7 @@ namespace PubNubMessaging.Core
 
         public void DisableMachineSleepModeForTestingOnly()
         {
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !MONODROID && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
             PowerModeChangedEventArgs powerChangeEvent = new PowerModeChangedEventArgs(PowerModes.Resume);
             SystemEvents_PowerModeChanged(null, powerChangeEvent);
 #endif
@@ -5391,6 +5470,12 @@ namespace PubNubMessaging.Core
         }
     }
 
+    internal struct PubnubChannelCallbackKey
+    {
+        public string Channel;
+        public ResponseType Type;
+    }
+
     internal class PubnubChannelCallback<T>
     {
         public Action<T> Callback;
@@ -6129,6 +6214,7 @@ namespace PubNubMessaging.Core
             }
         }
 
+        #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE)
         public override long ContentLength
         {
             get
@@ -6136,6 +6222,7 @@ namespace PubNubMessaging.Core
                 return request.ContentLength;
             }
         }
+        #endif
 
         public override bool UseDefaultCredentials
         {
