@@ -616,9 +616,35 @@ namespace PubNubMessaging.Core
                 try{
                     state.Request.Abort();
                     LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminatePendingWebRequest {1}", DateTime.Now.ToString(), state.Request.RequestUri.ToString()), LoggingMethod.LevelInfo);
-                } catch (WebException wex) {
-                    LoggingMethod.WriteToLog (string.Format("DateTime {0} TerminatePendingWebRequest {1}, Abort wex: {2}", DateTime.Now.ToString(), state.Request.RequestUri.ToString(), wex.ToString()), LoggingMethod.LevelError);
-                } catch (Exception ex) {
+                } 
+                catch (Exception ex) 
+                {
+                    if (state.Channels != null && state.Channels.Length > 0)
+                    {
+                        string activeChannel = state.Channels[0].ToString(); //Assuming one channel exist, else will refactor later
+                        PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
+                        callbackKey.Channel = (state.Type == ResponseType.Subscribe) ? activeChannel.Replace("-pnpres", "") : activeChannel;
+                        callbackKey.Type = state.Type;
+
+                        if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(callbackKey))
+                        {
+                            object callbackObject;
+                            bool channelAvailable = _channelCallbacks.TryGetValue(callbackKey, out callbackObject);
+                            PubnubChannelCallback<T> currentPubnubCallback = null;
+                            if (channelAvailable)
+                            {
+                                currentPubnubCallback = callbackObject as PubnubChannelCallback<T>;
+                            }
+                            if (currentPubnubCallback != null && currentPubnubCallback.ErrorCallback != null)
+                            {
+                                PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(ex);
+                                int statusCode = (int)errorType;
+                                string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(errorType);
+                                PubnubClientError error = new PubnubClientError(statusCode, PubnubErrorSeverity.Critical, true, ex.Message, ex, PubnubMessageSource.Client, state.Request, state.Response, errorDescription, activeChannel);
+                                GoToCallback(error, currentPubnubCallback.ErrorCallback);
+                            }
+                        }
+                    }
                     LoggingMethod.WriteToLog (string.Format("DateTime {0} TerminatePendingWebRequest {1}, Abort ex: {2}", DateTime.Now.ToString(), state.Request.RequestUri.ToString(), ex.ToString()), LoggingMethod.LevelError);
                 }
             }
@@ -630,13 +656,30 @@ namespace PubNubMessaging.Core
                     PubnubWebRequest currentRequest = _channelRequest[key];
                     if (currentRequest != null)
                     {
-                        try {
-                            currentRequest.Abort();
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminatePendingWebRequest {1}", DateTime.Now.ToString(), currentRequest.RequestUri.ToString()), LoggingMethod.LevelInfo);
-                        }catch (Exception ex) {
-                            LoggingMethod.WriteToLog (string.Format("DateTime {0} TerminatePendingWebRequest currentRequest {1}, Abort ex: {2}", DateTime.Now.ToString(), state.Request.RequestUri.ToString(), ex.ToString()), LoggingMethod.LevelError);
-                        }
+                        TerminatePendingWebRequest(currentRequest, state.ErrorCallback);
                     }
+                }
+            }
+        }
+
+        private void TerminatePendingWebRequest(PubnubWebRequest request, Action<PubnubClientError> errorCallback)
+        {
+            try
+            {
+                if (request != null)
+                {
+                    request.Abort();
+                }
+            }
+            catch (Exception ex)
+            {
+                if (errorCallback != null)
+                {
+                    PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(ex);
+                    int statusCode = (int)errorType;
+                    string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(errorType);
+                    PubnubClientError error = new PubnubClientError(statusCode, PubnubErrorSeverity.Critical, true, ex.Message, ex, PubnubMessageSource.Client, request, null, errorDescription, "");
+                    GoToCallback(error, errorCallback);
                 }
             }
         }
@@ -1104,34 +1147,25 @@ namespace PubNubMessaging.Core
                     if (_channelRequest.ContainsKey(multiChannelName))
                     {
                         LoggingMethod.WriteToLog(string.Format("DateTime {0}, Aborting previous subscribe/presence requests having channel(s)={1}", DateTime.Now.ToString(), multiChannelName), LoggingMethod.LevelInfo);
-                        try{
-                            PubnubWebRequest webRequest = _channelRequest[multiChannelName];
-                            _channelRequest[multiChannelName] = null;
+                        PubnubWebRequest webRequest = _channelRequest[multiChannelName];
+                        _channelRequest[multiChannelName] = null;
 
-                            if(webRequest != null)
-                                TerminateHeartbeatTimer(webRequest.RequestUri);
-                            
-                            PubnubWebRequest removedRequest;
-                            _channelRequest.TryRemove(multiChannelName, out removedRequest);
-                            bool removedChannel = _channelRequest.TryRemove(multiChannelName, out removedRequest);
-                            if (removedChannel)
-                            {
-                                LoggingMethod.WriteToLog(string.Format("DateTime {0}, Success to remove channel(s)={1} from _channelRequest (MultiChannelSubscribeInit).", DateTime.Now.ToString(), multiChannelName), LoggingMethod.LevelInfo);
-                            }
-                            else
-                            {
-                                LoggingMethod.WriteToLog(string.Format("DateTime {0}, Unable to remove channel(s)={1} from _channelRequest (MultiChannelSubscribeInit).", DateTime.Now.ToString(), multiChannelName), LoggingMethod.LevelInfo);
-                            }
-                            if(webRequest != null)
-                                webRequest.Abort();
-                        }
-                        catch(WebException wex)
+                        if (webRequest != null)
+                            TerminateHeartbeatTimer(webRequest.RequestUri);
+
+                        PubnubWebRequest removedRequest;
+                        _channelRequest.TryRemove(multiChannelName, out removedRequest);
+                        bool removedChannel = _channelRequest.TryRemove(multiChannelName, out removedRequest);
+                        if (removedChannel)
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0}, WebException in MultiChannelSubscribeInit to abort request: ", DateTime.Now.ToString(), wex.ToString()), LoggingMethod.LevelError);
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0}, Success to remove channel(s)={1} from _channelRequest (MultiChannelSubscribeInit).", DateTime.Now.ToString(), multiChannelName), LoggingMethod.LevelInfo);
                         }
-                        catch (Exception ex){
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0}, Exception in MultiChannelSubscribeInit to abort request: ", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelError);
+                        else
+                        {
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0}, Unable to remove channel(s)={1} from _channelRequest (MultiChannelSubscribeInit).", DateTime.Now.ToString(), multiChannelName), LoggingMethod.LevelInfo);
                         }
+                        if (webRequest != null)
+                            TerminatePendingWebRequest(webRequest, errorCallback);
                     }
                     else
                     {
@@ -1231,32 +1265,26 @@ namespace PubNubMessaging.Core
                     if (_channelRequest.ContainsKey(multiChannelName))
                     {
                         LoggingMethod.WriteToLog(string.Format("DateTime {0}, Aborting previous subscribe/presence requests having channel(s)={1}", DateTime.Now.ToString(), multiChannelName), LoggingMethod.LevelInfo);
-                        try
-                        {
-                            PubnubWebRequest webRequest = _channelRequest[multiChannelName];
-                            _channelRequest[multiChannelName] = null;
+                        PubnubWebRequest webRequest = _channelRequest[multiChannelName];
+                        _channelRequest[multiChannelName] = null;
 
-                            if (webRequest != null)
-                            {
-                                TerminateHeartbeatTimer(webRequest.RequestUri);
-                            }
-                            
-                            PubnubWebRequest removedRequest;
-                            bool removedChannel = _channelRequest.TryRemove(multiChannelName, out removedRequest);
-                            if (removedChannel)
-                            {
-                                LoggingMethod.WriteToLog(string.Format("DateTime {0}, Success to remove channel(s)={1} from _channelRequest (MultiChannelUnSubscribeInit).", DateTime.Now.ToString(), multiChannelName), LoggingMethod.LevelInfo);
-                            }
-                            else
-                            {
-                                LoggingMethod.WriteToLog(string.Format("DateTime {0}, Unable to remove channel(s)={1} from _channelRequest (MultiChannelUnSubscribeInit).", DateTime.Now.ToString(), multiChannelName), LoggingMethod.LevelInfo);
-                            }
-                            if(webRequest != null)
-                                webRequest.Abort();
+                        if (webRequest != null)
+                        {
+                            TerminateHeartbeatTimer(webRequest.RequestUri);
                         }
-                        catch (Exception ex){
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0}, Exception in MultiChannelUnSubscribeInit to abort request: ", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelError);
+
+                        PubnubWebRequest removedRequest;
+                        bool removedChannel = _channelRequest.TryRemove(multiChannelName, out removedRequest);
+                        if (removedChannel)
+                        {
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0}, Success to remove channel(s)={1} from _channelRequest (MultiChannelUnSubscribeInit).", DateTime.Now.ToString(), multiChannelName), LoggingMethod.LevelInfo);
                         }
+                        else
+                        {
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0}, Unable to remove channel(s)={1} from _channelRequest (MultiChannelUnSubscribeInit).", DateTime.Now.ToString(), multiChannelName), LoggingMethod.LevelInfo);
+                        }
+                        if (webRequest != null)
+                            TerminatePendingWebRequest(webRequest, errorCallback);
                     }
                     else
                     {
@@ -2752,17 +2780,12 @@ namespace PubNubMessaging.Core
         {
             bool reconnect = false;
             LoggingMethod.WriteToLog(string.Format("DateTime {0}, WebException: {1}", DateTime.Now.ToString(), webEx.ToString()), LoggingMethod.LevelError);
-            try{    
-                if(asynchRequestState!=null){
-                    if (asynchRequestState.Response != null) asynchRequestState.Response.Close();
-                    if (asynchRequestState.Request != null) asynchRequestState.Request.Abort();
-                }
-            }
-            catch(Exception ex)
+            if (asynchRequestState != null)
             {
-                LoggingMethod.WriteToLog(string.Format("DateTime {0}, Aborting request: {1} for URL: {2}", DateTime.Now.ToString(), ex.ToString(), asynchRequestState.Request.RequestUri.ToString()), LoggingMethod.LevelInfo);
+                if (asynchRequestState.Response != null) asynchRequestState.Response.Close();
+                if (asynchRequestState.Request != null) TerminatePendingWebRequest(asynchRequestState);
             }
-            #if(UNITY_IOS || UNITY_ANDROID)
+#if(UNITY_IOS || UNITY_ANDROID)
             if ((webEx.Status == WebExceptionStatus.NameResolutionFailure //No network
                  || webEx.Status == WebExceptionStatus.ConnectFailure //Sending Keep-alive packet failed (No network)/Server is down.
                  || webEx.Status == WebExceptionStatus.ServerProtocolViolation//Problem with proxy or ISP
@@ -3743,12 +3766,7 @@ namespace PubNubMessaging.Core
             if (currentState != null && currentState.Response == null && currentState.Request != null)
             {
                 currentState.Timeout = true;
-                try{
-                    currentState.Request.Abort();
-                }
-                catch (Exception ex){
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0}, Exception in OnPubnubWebRequestTimeout to abort request: ", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelError);
-                }
+                TerminatePendingWebRequest(currentState);
                 LoggingMethod.WriteToLog(string.Format("DateTime: {0}, **WP7 OnPubnubWebRequestTimeout**", DateTime.Now.ToString()), LoggingMethod.LevelError);
             }
         }
@@ -3837,7 +3855,7 @@ namespace PubNubMessaging.Core
                             itemMessage.Add(currentChannel.Replace("-pnpres", ""));
                             
                             PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
-                            callbackKey.Channel = currentChannel;
+                            callbackKey.Channel = (type == ResponseType.Subscribe) ? currentChannel.Replace("-pnpres", "") : currentChannel;
                             callbackKey.Type = type;
 
                             if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(callbackKey))
@@ -4454,15 +4472,11 @@ namespace PubNubMessaging.Core
         
         public void EndPendingRequests()
         {
-            try{
-                RemoveChannelDictionary();
-                TerminatePendingWebRequest();
-                TerminateHeartbeatTimer();
-                TerminateReconnectTimer();
-                RemoveChannelCallback();
-            } catch (Exception ex) {
-                LoggingMethod.WriteToLog (string.Format("EndPendingRequests Exception: {0} ", ex.ToString()), LoggingMethod.LevelError);
-            }
+            RemoveChannelDictionary();
+            TerminatePendingWebRequest();
+            TerminateHeartbeatTimer();
+            TerminateReconnectTimer();
+            RemoveChannelCallback();
         }
         
         public void TerminateCurrentSubscriberRequest()
@@ -6068,44 +6082,17 @@ namespace PubNubMessaging.Core
 #endif
         }
 
-        #if (UNITY_IOS)
-        public override WebResponse GetResponse ()
+        public override WebResponse GetResponse()
         {
-            try {
-                if(request != null){
-                    request.KeepAlive = true;
-                    request.ContentType = "application/json";
-                    return (HttpWebResponse)request.GetResponse ();
-                } else{
-                    throw new WebException("Request Aborted");
-                }
-            } catch (WebException wex) {
-                LoggingMethod.WriteToLog(string.Format("DateTime {0}, GetResponse WebException: {1} ", DateTime.Now.ToString(), wex.ToString()), LoggingMethod.LevelError);
-                throw new Exception(wex.ToString());
-            } catch (Exception ex) {
-                LoggingMethod.WriteToLog(string.Format("DateTime {0}, GetResponse Exception: {1} ", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelError);
-                throw new Exception(ex.ToString());
-            }
+            return request.GetResponse();
         }
-        #endif
         
         public override void Abort()
         {
             if (request != null)
             {
                 terminated = true;
-                try {
-                    if (request != null)
-                    {
-                        request.Abort();
-                    }
-                } catch (WebException wex) {
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0}, Abort WebException: {1} ", DateTime.Now.ToString(), wex.ToString()), LoggingMethod.LevelError);
-                    throw new WebException(wex.ToString());
-                } catch (Exception ex) {
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0}, Abort Exception: {1} ", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelError);
-                    throw new Exception(ex.ToString());
-                }
+                request.Abort();
             }
         }
 
