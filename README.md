@@ -37,3 +37,6 @@ PubNub for Unity 3D
 #### windows-phone-7
 PubNub for WP7
 
+ windows-phone-8
+
+PubNub for WP8
