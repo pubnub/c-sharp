@@ -23,14 +23,24 @@ public class PubnubExample : MonoBehaviour {
         PresenceUnsubscribe,
         DisconnectRetry,
         EnableNetwork,
-        DisableNetwork
+        DisableNetwork,
+		GrantAccess,
+		AuditAccess,
+		RevokeAccess,
+		PresenceGrantAccess,
+		PresenceAuditAccess,
+		PresenceRevokeAccess
     }
 
     bool ssl = false;
     bool resumeOnReconnect = true;
 
-    string cipherKey = "";
+    string origin = "pubsub.pubnub.com";
+	string publishKey = "demo";
+	string subscribeKey = "demo";
+	string cipherKey = "";
     string secretKey = "";
+	string authenticationKey = "";
     string uuid = Guid.NewGuid().ToString();
 
     string subscribeTimeoutInSeconds = "310";
@@ -78,60 +88,71 @@ public class PubnubExample : MonoBehaviour {
 
         ssl = GUI.Toggle(new Rect(10,10,200,25), ssl," Enable SSL ");
 
-        resumeOnReconnect = GUI.Toggle(new Rect(10,30,200,25), resumeOnReconnect," Resume On Reconnect ");
+        resumeOnReconnect = GUI.Toggle(new Rect(10,25,200,25), resumeOnReconnect," Resume On Reconnect ");
 
-        GUI.Label(new Rect(10,70,70,25), "Cipher Key");
-        cipherKey = GUI.TextField(new Rect(80,70,150,25),cipherKey);
+        GUI.Label(new Rect(10,50,70,25), "Origin");
+        origin = GUI.TextField(new Rect(80,50,200,25), origin);
 
-        GUI.Label(new Rect(10,100,70,25), "Secret Key");
-        secretKey = GUI.TextField(new Rect(80,100,150,25),secretKey);
+        GUI.Label(new Rect(10,80,70,25), "Pub Key");
+        publishKey = GUI.TextField(new Rect(80,80,150,25), publishKey);
 
-        GUI.Label(new Rect(10,130,70,25), "UUID");
-        uuid = GUI.TextField(new Rect(80,130,200,25),uuid);
+        GUI.Label(new Rect(10,110,70,25), "Sub Key");
+        subscribeKey = GUI.TextField(new Rect(80,110,150,25), subscribeKey);
+		
+		GUI.Label(new Rect(10,140,70,25), "Cipher Key");
+        cipherKey = GUI.TextField(new Rect(80,140,150,25), cipherKey);
 
-        GUI.Label(new Rect(10,170,200,25), "Subscriber Timeout (in sec)");
-        subscribeTimeoutInSeconds = GUI.TextField(new Rect(200,170,50,25),subscribeTimeoutInSeconds,6);
+        GUI.Label(new Rect(10,170,70,25), "Secret Key");
+        secretKey = GUI.TextField(new Rect(80,170,150,25), secretKey);
+
+        GUI.Label(new Rect(10,200,70,25), "Auth Key");
+        authenticationKey = GUI.TextField(new Rect(80,200,150,25), authenticationKey);
+
+        GUI.Label(new Rect(10,230,70,25), "UUID");
+        uuid = GUI.TextField(new Rect(80,230,150,25),uuid);
+		
+        GUI.Label(new Rect(10,260,200,25), "Subscriber Timeout (in sec)");
+        subscribeTimeoutInSeconds = GUI.TextField(new Rect(200,260,50,25),subscribeTimeoutInSeconds,6);
         subscribeTimeoutInSeconds = Regex.Replace(subscribeTimeoutInSeconds, "[^0-9]", "");
 
-        GUI.Label(new Rect(10,200,200,25), "Non Subscribe Timeout (in sec)");
-        operationTimeoutInSeconds = GUI.TextField(new Rect(200,200,50,25),operationTimeoutInSeconds,6);
+        GUI.Label(new Rect(10,290,200,25), "Non Subscribe Timeout (in sec)");
+        operationTimeoutInSeconds = GUI.TextField(new Rect(200,290,50,25),operationTimeoutInSeconds,6);
         operationTimeoutInSeconds = Regex.Replace(operationTimeoutInSeconds, "[^0-9]", "");
 
-        GUI.Label(new Rect(10,230,200,25), "Number of MAX retries");
-        networkMaxRetries = GUI.TextField(new Rect(200,230,50,25),networkMaxRetries,6);
+        GUI.Label(new Rect(10,320,200,25), "Number of MAX retries");
+        networkMaxRetries = GUI.TextField(new Rect(200,320,50,25),networkMaxRetries,6);
         networkMaxRetries = Regex.Replace(networkMaxRetries, "[^0-9]", "");
 
-        GUI.Label(new Rect(10,260,200,25), "Retry Interval (in sec)");
-        networkRetryIntervalInSeconds = GUI.TextField(new Rect(200,260,50,25),networkRetryIntervalInSeconds,6);
+        GUI.Label(new Rect(10,350,200,25), "Retry Interval (in sec)");
+        networkRetryIntervalInSeconds = GUI.TextField(new Rect(200,350,50,25),networkRetryIntervalInSeconds,6);
         networkRetryIntervalInSeconds = Regex.Replace(networkRetryIntervalInSeconds, "[^0-9]", "");
 
-        GUI.Label(new Rect(10,290,200,25), "Heartbeat Interval (in sec)");
-        heartbeatIntervalInSeconds = GUI.TextField(new Rect(200,290,50,25),heartbeatIntervalInSeconds,6);
+        GUI.Label(new Rect(10,380,200,25), "Heartbeat Interval (in sec)");
+        heartbeatIntervalInSeconds = GUI.TextField(new Rect(200,380,50,25),heartbeatIntervalInSeconds,6);
         heartbeatIntervalInSeconds = Regex.Replace(heartbeatIntervalInSeconds, "[^0-9]", "");
 
         GUI.enabled = true;
 
-        GUI.Label(new Rect(10,330,100,25), "Channel Name");
-        channel = GUI.TextField(new Rect(100,330,150,25),channel,100);
+        GUI.Label(new Rect(10,410,100,25), "Channel Name");
+        channel = GUI.TextField(new Rect(100,410,150,25),channel,100);
 
-        if (GUI.Button(new Rect(10,370,120,25), "Presence"))
+        if (GUI.Button(new Rect(730,10,120,25), "Presence"))
         {
             InstantiatePubnub();
             AsyncOrNonAsyncCall (PubnubState.Presence);
         }
-        if (GUI.Button(new Rect(140,370,120,25), "Subscribe"))
+        if (GUI.Button(new Rect(860,10,120,25), "Subscribe"))
         {
             InstantiatePubnub();
             AsyncOrNonAsyncCall (PubnubState.Subscribe);
         }
 
-        if (GUI.Button(new Rect(10,400,120,25), "Detailed History"))
+        if (GUI.Button(new Rect(730,40,120,25), "Detailed History"))
         {
             InstantiatePubnub();
             AsyncOrNonAsyncCall (PubnubState.DetailedHistory);
         }
-
-        if (GUI.Button(new Rect(140,400,120,25), "Publish"))
+        if (GUI.Button(new Rect(860,40,120,25), "Publish"))
         {
             InstantiatePubnub();
             allowUserSettingsChange = false;
@@ -143,47 +164,193 @@ public class PubnubExample : MonoBehaviour {
             publishWindowRect = GUI.ModalWindow(0, publishWindowRect, DoPublishWindow, "Message Publish");
             GUI.backgroundColor = new Color(1,1,1,1);
         }
-
-        if (GUI.Button(new Rect(10,430,120,25), "Unsubscribe"))
+		
+        if (GUI.Button(new Rect(730,70,120,25), "Unsubscribe"))
         {
             InstantiatePubnub();
             AsyncOrNonAsyncCall (PubnubState.Unsubscribe);
         }
 
-        if (GUI.Button(new Rect(140,430,120,25), "Here Now"))
+        if (GUI.Button(new Rect(860,70,120,25), "Here Now"))
         {
             InstantiatePubnub();
             AsyncOrNonAsyncCall (PubnubState.HereNow);
         }
 
-        if (GUI.Button(new Rect(10,460,120,25), "Presence-Unsub"))
+        if (GUI.Button(new Rect(730,100,120,25), "Presence-Unsub"))
         {
             InstantiatePubnub();
             AsyncOrNonAsyncCall (PubnubState.PresenceUnsubscribe);
         }
-        if (GUI.Button(new Rect(140,460,120,25), "Time"))
+        if (GUI.Button(new Rect(860,100,120,25), "Time"))
         {
             InstantiatePubnub();
             AsyncOrNonAsyncCall (PubnubState.Time);
         }
 
-        if (GUI.Button(new Rect(10,490,120,25), "Disable Network"))
+        if (GUI.Button(new Rect(730,130,120,25), "Disable Network"))
         {
             InstantiatePubnub();
             AsyncOrNonAsyncCall (PubnubState.DisableNetwork);
         }
-        if (GUI.Button(new Rect(140,490,120,25), "Enable Network"))
+        if (GUI.Button(new Rect(860,130,120,25), "Enable Network"))
         {
             InstantiatePubnub();
             AsyncOrNonAsyncCall (PubnubState.EnableNetwork);
         }
 
-        if (GUI.Button(new Rect(10,520,120,25), "Disconnect/Retry"))
+        if (GUI.Button(new Rect(730,160,120,25), "Disconnect/Retry"))
         {
             InstantiatePubnub();
 			AsyncOrNonAsyncCall (PubnubState.DisconnectRetry);
         }
+        if (GUI.Button(new Rect(860,160,120,25), "Grant Access"))
+        {
+            InstantiatePubnub();
+            AsyncOrNonAsyncCall (PubnubState.GrantAccess);
+        }
 
+        if (GUI.Button(new Rect(730,190,120,25), "Audit Access"))
+        {
+            InstantiatePubnub();
+			AsyncOrNonAsyncCall (PubnubState.AuditAccess);
+        }
+        if (GUI.Button(new Rect(860,190,120,25), "Revoke Access"))
+        {
+            InstantiatePubnub();
+            AsyncOrNonAsyncCall (PubnubState.RevokeAccess);
+        }
+
+        if (GUI.Button(new Rect(730,220,120,25), "Presence Grant"))
+        {
+            InstantiatePubnub();
+			AsyncOrNonAsyncCall (PubnubState.PresenceGrantAccess);
+        }
+        if (GUI.Button(new Rect(860,220,120,25), "Presence Audit"))
+        {
+            InstantiatePubnub();
+            AsyncOrNonAsyncCall (PubnubState.PresenceAuditAccess);
+        }
+
+        if (GUI.Button(new Rect(730,250,120,25), "Presence Revoke"))
+        {
+            InstantiatePubnub();
+			AsyncOrNonAsyncCall (PubnubState.PresenceRevokeAccess);
+        }
+		
+//		if (GUI.Button(new Rect(10,440,120,25), "Presence"))
+//        {
+//            InstantiatePubnub();
+//            AsyncOrNonAsyncCall (PubnubState.Presence);
+//        }
+//        if (GUI.Button(new Rect(140,440,120,25), "Subscribe"))
+//        {
+//            InstantiatePubnub();
+//            AsyncOrNonAsyncCall (PubnubState.Subscribe);
+//        }
+
+//        if (GUI.Button(new Rect(10,470,120,25), "Detailed History"))
+//        {
+//            InstantiatePubnub();
+//            AsyncOrNonAsyncCall (PubnubState.DetailedHistory);
+//        }
+//
+//        if (GUI.Button(new Rect(140,470,120,25), "Publish"))
+//        {
+//            InstantiatePubnub();
+//            allowUserSettingsChange = false;
+//            showPublishPopupWindow = true;
+//        }
+//        if (showPublishPopupWindow)
+//        {
+//            GUI.backgroundColor = Color.black;
+//            publishWindowRect = GUI.ModalWindow(0, publishWindowRect, DoPublishWindow, "Message Publish");
+//            GUI.backgroundColor = new Color(1,1,1,1);
+//        }
+
+//        if (GUI.Button(new Rect(10,500,120,25), "Unsubscribe"))
+//        {
+//            InstantiatePubnub();
+//            AsyncOrNonAsyncCall (PubnubState.Unsubscribe);
+//        }
+//
+//        if (GUI.Button(new Rect(140,500,120,25), "Here Now"))
+//        {
+//            InstantiatePubnub();
+//            AsyncOrNonAsyncCall (PubnubState.HereNow);
+//        }
+//
+//        if (GUI.Button(new Rect(10,530,120,25), "Presence-Unsub"))
+//        {
+//            InstantiatePubnub();
+//            AsyncOrNonAsyncCall (PubnubState.PresenceUnsubscribe);
+//        }
+//        if (GUI.Button(new Rect(140,530,120,25), "Time"))
+//        {
+//            InstantiatePubnub();
+//            AsyncOrNonAsyncCall (PubnubState.Time);
+//        }
+//
+//        if (GUI.Button(new Rect(10,560,120,25), "Disable Network"))
+//        {
+//            InstantiatePubnub();
+//            AsyncOrNonAsyncCall (PubnubState.DisableNetwork);
+//        }
+//        if (GUI.Button(new Rect(140,560,120,25), "Enable Network"))
+//        {
+//            InstantiatePubnub();
+//            AsyncOrNonAsyncCall (PubnubState.EnableNetwork);
+//        }
+//
+//        if (GUI.Button(new Rect(10,590,120,25), "Disconnect/Retry"))
+//        {
+//            InstantiatePubnub();
+//			AsyncOrNonAsyncCall (PubnubState.DisconnectRetry);
+//        }
+//        if (GUI.Button(new Rect(140,590,120,25), "Grant Access"))
+//        {
+//            InstantiatePubnub();
+//            AsyncOrNonAsyncCall (PubnubState.GrantAccess);
+//        }
+
+//        if (GUI.Button(new Rect(10,620,120,25), "Audit Access"))
+//        {
+//            InstantiatePubnub();
+//			AsyncOrNonAsyncCall (PubnubState.AuditAccess);
+//        }
+//        if (GUI.Button(new Rect(140,620,120,25), "Revoke Access"))
+//        {
+//            InstantiatePubnub();
+//            AsyncOrNonAsyncCall (PubnubState.RevokeAccess);
+//        }
+//
+//        if (GUI.Button(new Rect(300,630,120,25), "Presence Grant"))
+//        {
+//            InstantiatePubnub();
+//			AsyncOrNonAsyncCall (PubnubState.PresenceGrantAccess);
+//        }
+//        if (GUI.Button(new Rect(430,630,120,25), "Presence Audit"))
+//        {
+//            InstantiatePubnub();
+//            AsyncOrNonAsyncCall (PubnubState.PresenceAuditAccess);
+//        }
+//
+//        if (GUI.Button(new Rect(300,660,120,25), "Presence Revoke"))
+//        {
+//            InstantiatePubnub();
+//			AsyncOrNonAsyncCall (PubnubState.PresenceRevokeAccess);
+//        }
+//        if (GUI.Button(new Rect(730,10,120,25), "?????"))
+//        {
+//            InstantiatePubnub();
+//            AsyncOrNonAsyncCall (PubnubState.Time);
+//        }
+//        if (GUI.Button(new Rect(860,10,120,25), "?????"))
+//        {
+//            InstantiatePubnub();
+//            AsyncOrNonAsyncCall (PubnubState.Time);
+//        }
+		
         if (showPublishPopupWindow)
         {
             scrollPosition = GUI.BeginScrollView(new Rect(300,10,415,200), scrollPosition, new Rect(0,0,250,500),false, true);
@@ -226,6 +393,7 @@ public class PubnubExample : MonoBehaviour {
 
     private void DoAction (object pubnubState)
     {
+		//TODO: Need to refactor. Write switch..case instead of if..else
         try
         {
             if ((PubnubState)pubnubState == PubnubState.Presence) {
@@ -266,7 +434,37 @@ public class PubnubExample : MonoBehaviour {
                 AddToPubnubResultContainer ("Running Disconnect Retry");
                 pubnub.TerminateCurrentSubscriberRequest();
 				requestInProcess = false;
-            }
+            } else if ((PubnubState)pubnubState == PubnubState.GrantAccess) {
+                AddToPubnubResultContainer ("Running Grant Access");
+				allowUserSettingsChange = false;
+                pubnub.GrantAccess<string>(channel, true, true, DisplayReturnMessage, DisplayErrorMessage);
+				requestInProcess = false;
+            } else if ((PubnubState)pubnubState == PubnubState.AuditAccess) {
+                AddToPubnubResultContainer ("Running Audit Access");
+				//allowUserSettingsChange = false;
+                pubnub.AuditAccess<string>(channel, DisplayReturnMessage, DisplayErrorMessage);
+				requestInProcess = false;
+            } else if ((PubnubState)pubnubState == PubnubState.RevokeAccess) {
+                AddToPubnubResultContainer ("Running Revoke Access");
+				allowUserSettingsChange = false;
+                pubnub.GrantAccess<string>(channel, false, false, DisplayReturnMessage, DisplayErrorMessage);
+				requestInProcess = false;
+            } else if ((PubnubState)pubnubState == PubnubState.PresenceGrantAccess) {
+                AddToPubnubResultContainer ("Running Grant Presence Access");
+				allowUserSettingsChange = false;
+                pubnub.GrantPresenceAccess<string>(channel, true, true, DisplayReturnMessage, DisplayErrorMessage);
+				requestInProcess = false;
+            } else if ((PubnubState)pubnubState == PubnubState.PresenceAuditAccess) {
+                AddToPubnubResultContainer ("Running Audit Presence Access");
+				//allowUserSettingsChange = false;
+                pubnub.AuditPresenceAccess<string>(channel, DisplayReturnMessage, DisplayErrorMessage);
+				requestInProcess = false;
+            } else if ((PubnubState)pubnubState == PubnubState.PresenceRevokeAccess) {
+                AddToPubnubResultContainer ("Running Revoke Access");
+				allowUserSettingsChange = false;
+                pubnub.GrantPresenceAccess<string>(channel, false, false, DisplayReturnMessage, DisplayErrorMessage);
+				requestInProcess = false;
+			}
         }
         catch (Exception ex)
         {
@@ -278,8 +476,9 @@ public class PubnubExample : MonoBehaviour {
     {
         if (pubnub == null)
         {
-            pubnub = new Pubnub("demo","demo",secretKey,cipherKey,ssl);
-
+            pubnub = new Pubnub(publishKey,subscribeKey,secretKey,cipherKey,ssl);
+			pubnub.Origin = origin;
+			pubnub.AuthenticationKey = authenticationKey;
             pubnub.SessionUUID = uuid;
             pubnub.SubscribeTimeout = int.Parse(subscribeTimeoutInSeconds);
             pubnub.NonSubscribeTimeout = int.Parse(operationTimeoutInSeconds);
@@ -435,10 +634,10 @@ public class PubnubExample : MonoBehaviour {
         AddToPubnubResultContainer(string.Format("DISCONNECT CALLBACK: {0}",result));
     }
 
-    void DisplayErrorMessage(string result)
+    void DisplayErrorMessage(PubnubClientError result)
     {
-        print(result);
-        AddToPubnubResultContainer(string.Format("ERROR CALLBACK: {0}",result));
+        print(result.Description);
+        AddToPubnubResultContainer(string.Format("ERROR CALLBACK: {0}",result.Description));
     }
 
     void AddToPubnubResultContainer(string result)
