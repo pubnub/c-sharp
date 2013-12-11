@@ -1,4 +1,4 @@
-﻿//Build Date: December 10, 2013
+//Build Date: December 10, 2013
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX
 #elif (UNITY_IOS)
@@ -1034,8 +1034,10 @@ namespace PubNubMessaging.Core
             }
             else
             {
-                #if(__MonoCS__)
-                networkConnection = ClientNetworkStatus.CheckInternetStatusUnity<T>(_pubnetSystemActive, errorCallback, rawChannels, HeartbeatInterval);
+				#if(UNITY_IOS)
+				networkConnection = ClientNetworkStatus.GetInternetStatus();
+				#elif(__MonoCS__)
+				networkConnection = ClientNetworkStatus.CheckInternetStatusUnity<T>(_pubnetSystemActive, errorCallback, rawChannels, HeartbeatInterval);
                 #else
                 networkConnection = ClientNetworkStatus.CheckInternetStatus<T>(_pubnetSystemActive, errorCallback, rawChannels);
                 #endif
@@ -2900,8 +2902,12 @@ namespace PubNubMessaging.Core
                         for (int index = 0; index < requestState.Channels.Length; index++)
                         {
                             string activeChannel = requestState.Channels[index].ToString();
+							PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
+							callbackKey.Channel = activeChannel;
+							callbackKey.Type = requestState.Type;
 
-                            if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(activeChannel))
+
+							if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(callbackKey))
                             {
                                 /*List<object> errorResult = new List<object>();
                                 string jsonString = string.Format("[2, \"{0}\"]", ex.ToString().Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\""));
@@ -2909,7 +2915,7 @@ namespace PubNubMessaging.Core
                                 errorResult = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
 
                                 errorResult.Add(activeChannel);*/
-								PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[activeChannel] as PubnubChannelCallback<T>;
+								PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[callbackKey] as PubnubChannelCallback<T>;
 								PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(ex);
 								int statusCode = (int)errorType;
 								string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(errorType);
@@ -4574,7 +4580,14 @@ namespace PubNubMessaging.Core
             {
                 for (int index = 0; index < multiChannels.Length; index++)
                 {
-                    multiChannels[index] = string.Format("{0}-pnpres", multiChannels[index]);
+                    if (!string.IsNullOrEmpty(multiChannels[index]) && multiChannels[index].Trim().Length > 0)
+                    {
+                        multiChannels[index] = string.Format("{0}-pnpres", multiChannels[index]);
+                    }
+                    else
+                    {
+                        throw new InvalidDataException("Invalid channel");
+                    }
                 }
             }
             string presenceChannel = string.Join(",", multiChannels);
