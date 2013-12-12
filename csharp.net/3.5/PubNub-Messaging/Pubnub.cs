@@ -2169,7 +2169,6 @@ namespace PubNubMessaging.Core
             cea.pubnubRequestState = pubnubRequestState;
             try{
                 if(request!= null){
-                    request.KeepAlive = true;
                     request.ContentType = "application/json";
                     using(WebResponse response = request.GetResponse ()){
                         List<object> result = new List<object>();
@@ -5652,7 +5651,6 @@ namespace PubNubMessaging.Core
                 request = (HttpWebRequest)WebRequest.Create("http://pubsub.pubnub.com");
                 if(request!= null){
                     request.Timeout = HeartbeatInterval * 1000;
-                    request.KeepAlive = true;
                     request.ContentType = "application/json";
                     response = request.GetResponse ();
                     if(response != null){
@@ -5923,28 +5921,29 @@ namespace PubNubMessaging.Core
         
         string GetStubResponse(HttpWebRequest request);
     }
-    
+
     internal class PubnubWebRequestCreator : IWebRequestCreate
     {
         private IPubnubUnitTest pubnubUnitTest = null;
         public PubnubWebRequestCreator()
         {
         }
-        
+
         public PubnubWebRequestCreator(IPubnubUnitTest pubnubUnitTest)
         {
             this.pubnubUnitTest = pubnubUnitTest;
         }
-        
-        public WebRequest Create(Uri uri)
+
+        private WebRequest CreateRequest(Uri uri, bool keepAliveRequest)
         {
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create(uri);
+            req.KeepAlive = keepAliveRequest;
             OperatingSystem userOS = System.Environment.OSVersion;
-            #if (SILVERLIGHT || WINDOWS_PHONE)
+#if (SILVERLIGHT || WINDOWS_PHONE)
             req.Headers["UserAgent"] = string.Format("ua_string=({0} {1}) PubNub-csharp/3.5", userOS.Platform.ToString(), userOS.Version.ToString());
-            #else
+#else
             req.UserAgent = string.Format("ua_string=({0}) PubNub-csharp/3.5", userOS.VersionString);
-            #endif
+#endif
             if (this.pubnubUnitTest is IPubnubUnitTest)
             {
                 return new PubnubWebRequest(req, pubnubUnitTest);
@@ -5953,6 +5952,15 @@ namespace PubNubMessaging.Core
             {
                 return new PubnubWebRequest(req);
             }
+        }
+
+        public WebRequest Create(Uri uri)
+        {
+            return CreateRequest(uri, true);
+        }
+        public WebRequest Create(Uri uri, bool keepAliveRequest)
+        {
+            return CreateRequest(uri, keepAliveRequest);
         }
     }
 
