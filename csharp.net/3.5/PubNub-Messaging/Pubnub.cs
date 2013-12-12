@@ -2169,6 +2169,8 @@ namespace PubNubMessaging.Core
             cea.pubnubRequestState = pubnubRequestState;
             try{
                 if(request!= null){
+                    request.KeepAlive = true;
+                    request.ContentType = "application/json";
                     using(WebResponse response = request.GetResponse ()){
                         List<object> result = new List<object>();
                         if(response != null){
@@ -5648,9 +5650,10 @@ namespace PubNubMessaging.Core
                 }
                 #elif (UNITY_IOS || UNITY_ANDROID)
                 request = (HttpWebRequest)WebRequest.Create("http://pubsub.pubnub.com");
-                request.ContentType = "application/json";
-                request.Timeout = HeartbeatInterval * 1000;
                 if(request!= null){
+                    request.Timeout = HeartbeatInterval * 1000;
+                    request.KeepAlive = true;
+                    request.ContentType = "application/json";
                     response = request.GetResponse ();
                     if(response != null){
                         if(((HttpWebResponse)response).ContentLength <= 0){
@@ -5670,7 +5673,7 @@ namespace PubNubMessaging.Core
                         }
                     } 
                 }
-                #elif(__MonoCS__)
+#elif(__MonoCS__)
                 udp = new UdpClient("pubsub.pubnub.com", 80);
                 IPAddress localAddress = ((IPEndPoint)udp.Client.LocalEndPoint).Address;
                 if(udp != null && udp.Client != null){
@@ -5680,7 +5683,7 @@ namespace PubNubMessaging.Core
                     _status =true;
                     callback(true);
                 }
-                #else
+#else
                 using (UdpClient udp = new UdpClient("pubsub.pubnub.com", 80))
                 {
                     IPAddress localAddress = ((IPEndPoint)udp.Client.LocalEndPoint).Address;
