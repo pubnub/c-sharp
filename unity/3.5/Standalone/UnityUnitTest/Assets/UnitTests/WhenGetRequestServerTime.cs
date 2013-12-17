@@ -21,7 +21,7 @@ namespace PubNubMessaging.Tests
         public void ThenItShouldReturnTimeStamp()
         {
 			Debug.Log("Running ThenItShouldReturnTimeStamp()");
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 			
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGetRequestServerTime";
@@ -71,9 +71,9 @@ namespace PubNubMessaging.Tests
             UUnitAssert.Equals(expectedDate.ToString(), actualDate.ToString());
         }
     
-        void DummyErrorCallback(string result)
+        void DummyErrorCallback(PubnubClientError result)
         {
-			Debug.Log("WhenGetRequestServerTime ErrorCallback = " + result);
+			Debug.Log("WhenGetRequestServerTime ErrorCallback = " + result.Description);
         }
 	}
 }

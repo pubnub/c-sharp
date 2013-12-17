@@ -31,7 +31,7 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running DetailHistoryCount10ReturnsRecords()");
             message10Received = false;
 
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
@@ -69,7 +69,7 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running DetailHistoryCount10ReverseTrueReturnsRecords()");
             message10ReverseTrueReceived = false;
 
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
@@ -111,7 +111,7 @@ namespace PubNubMessaging.Tests
 			bool enableLocalStubTest = false;
             expectedCountAtStartTimeWithReverseTrue = 0;
             messageStartReverseTrue = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
@@ -194,7 +194,7 @@ namespace PubNubMessaging.Tests
             mrePublishStartReverseTrue.Set();
         }
 		
-        void DummyErrorCallback(string result)
+        void DummyErrorCallback(PubnubClientError result)
         {
 			Debug.Log("WhenDetailedHistoryIsRequested ErrorCallback = " + result);
         }

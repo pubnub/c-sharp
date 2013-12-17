@@ -1,4 +1,4 @@
-﻿//Build Date: December 10, 2013
+//Build Date: December 12, 2013
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX
 #elif (UNITY_IOS)
@@ -1034,8 +1034,10 @@ namespace PubNubMessaging.Core
             }
             else
             {
-                #if(__MonoCS__)
-                networkConnection = ClientNetworkStatus.CheckInternetStatusUnity<T>(_pubnetSystemActive, errorCallback, rawChannels, HeartbeatInterval);
+				#if(UNITY_IOS)
+				networkConnection = ClientNetworkStatus.GetInternetStatus();
+				#elif(__MonoCS__)
+				networkConnection = ClientNetworkStatus.CheckInternetStatusUnity<T>(_pubnetSystemActive, errorCallback, rawChannels, HeartbeatInterval);
                 #else
                 networkConnection = ClientNetworkStatus.CheckInternetStatus<T>(_pubnetSystemActive, errorCallback, rawChannels);
                 #endif
@@ -2167,6 +2169,7 @@ namespace PubNubMessaging.Core
             cea.pubnubRequestState = pubnubRequestState;
             try{
                 if(request!= null){
+                    request.ContentType = "application/json";
                     using(WebResponse response = request.GetResponse ()){
                         List<object> result = new List<object>();
                         if(response != null){
@@ -2900,8 +2903,12 @@ namespace PubNubMessaging.Core
                         for (int index = 0; index < requestState.Channels.Length; index++)
                         {
                             string activeChannel = requestState.Channels[index].ToString();
+							PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
+							callbackKey.Channel = activeChannel;
+							callbackKey.Type = requestState.Type;
 
-                            if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(activeChannel))
+
+							if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(callbackKey))
                             {
                                 /*List<object> errorResult = new List<object>();
                                 string jsonString = string.Format("[2, \"{0}\"]", ex.ToString().Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\""));
@@ -2909,7 +2916,7 @@ namespace PubNubMessaging.Core
                                 errorResult = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
 
                                 errorResult.Add(activeChannel);*/
-								PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[activeChannel] as PubnubChannelCallback<T>;
+								PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[callbackKey] as PubnubChannelCallback<T>;
 								PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(ex);
 								int statusCode = (int)errorType;
 								string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(errorType);
@@ -4574,7 +4581,14 @@ namespace PubNubMessaging.Core
             {
                 for (int index = 0; index < multiChannels.Length; index++)
                 {
-                    multiChannels[index] = string.Format("{0}-pnpres", multiChannels[index]);
+                    if (!string.IsNullOrEmpty(multiChannels[index]) && multiChannels[index].Trim().Length > 0)
+                    {
+                        multiChannels[index] = string.Format("{0}-pnpres", multiChannels[index]);
+                    }
+                    else
+                    {
+                        throw new InvalidDataException("Invalid channel");
+                    }
                 }
             }
             string presenceChannel = string.Join(",", multiChannels);
@@ -5635,9 +5649,9 @@ namespace PubNubMessaging.Core
                 }
                 #elif (UNITY_IOS || UNITY_ANDROID)
                 request = (HttpWebRequest)WebRequest.Create("http://pubsub.pubnub.com");
-                request.ContentType = "application/json";
-                request.Timeout = HeartbeatInterval * 1000;
                 if(request!= null){
+                    request.Timeout = HeartbeatInterval * 1000;
+                    request.ContentType = "application/json";
                     response = request.GetResponse ();
                     if(response != null){
                         if(((HttpWebResponse)response).ContentLength <= 0){
@@ -5657,7 +5671,7 @@ namespace PubNubMessaging.Core
                         }
                     } 
                 }
-                #elif(__MonoCS__)
+#elif(__MonoCS__)
                 udp = new UdpClient("pubsub.pubnub.com", 80);
                 IPAddress localAddress = ((IPEndPoint)udp.Client.LocalEndPoint).Address;
                 if(udp != null && udp.Client != null){
@@ -5667,7 +5681,7 @@ namespace PubNubMessaging.Core
                     _status =true;
                     callback(true);
                 }
-                #else
+#else
                 using (UdpClient udp = new UdpClient("pubsub.pubnub.com", 80))
                 {
                     IPAddress localAddress = ((IPEndPoint)udp.Client.LocalEndPoint).Address;
@@ -5907,28 +5921,29 @@ namespace PubNubMessaging.Core
         
         string GetStubResponse(HttpWebRequest request);
     }
-    
+
     internal class PubnubWebRequestCreator : IWebRequestCreate
     {
         private IPubnubUnitTest pubnubUnitTest = null;
         public PubnubWebRequestCreator()
         {
         }
-        
+
         public PubnubWebRequestCreator(IPubnubUnitTest pubnubUnitTest)
         {
             this.pubnubUnitTest = pubnubUnitTest;
         }
-        
-        public WebRequest Create(Uri uri)
+
+        private WebRequest CreateRequest(Uri uri, bool keepAliveRequest)
         {
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create(uri);
+            req.KeepAlive = keepAliveRequest;
             OperatingSystem userOS = System.Environment.OSVersion;
-            #if (SILVERLIGHT || WINDOWS_PHONE)
+#if (SILVERLIGHT || WINDOWS_PHONE)
             req.Headers["UserAgent"] = string.Format("ua_string=({0} {1}) PubNub-csharp/3.5", userOS.Platform.ToString(), userOS.Version.ToString());
-            #else
+#else
             req.UserAgent = string.Format("ua_string=({0}) PubNub-csharp/3.5", userOS.VersionString);
-            #endif
+#endif
             if (this.pubnubUnitTest is IPubnubUnitTest)
             {
                 return new PubnubWebRequest(req, pubnubUnitTest);
@@ -5937,6 +5952,15 @@ namespace PubNubMessaging.Core
             {
                 return new PubnubWebRequest(req);
             }
+        }
+
+        public WebRequest Create(Uri uri)
+        {
+            return CreateRequest(uri, true);
+        }
+        public WebRequest Create(Uri uri, bool keepAliveRequest)
+        {
+            return CreateRequest(uri, keepAliveRequest);
         }
     }
 

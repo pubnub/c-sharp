@@ -10,7 +10,7 @@ using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
 {
-    public class WhenUnsubscribedToAChannel: UUnitTestCase
+    public class WhenUnsubscribedToAChannel//: UUnitTestCase
     {
         ManualResetEvent meNotSubscribed = new ManualResetEvent(false);
         ManualResetEvent meChannelSubscribed = new ManualResetEvent(false);
@@ -29,7 +29,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
 
-            pubnub.Unsubscribe<string>(channel, DummyMethodNoExistChannelUnsubscribeChannelUserCallback, DummyMethodNoExistChannelUnsubscribeChannelConnectCallback, DummyMethodNoExistChannelUnsubscribeChannelDisconnectCallback1, DummyErrorCallback);
+            pubnub.Unsubscribe<string>(channel, DummyMethodNoExistChannelUnsubscribeChannelUserCallback, DummyMethodNoExistChannelUnsubscribeChannelConnectCallback, DummyMethodNoExistChannelUnsubscribeChannelDisconnectCallback1, NoExistChannelErrorCallback);
 
             meNotSubscribed.WaitOne();
 
@@ -115,9 +115,18 @@ namespace PubNubMessaging.Tests
         {
         }
 
-        void DummyErrorCallback(string result)
+        void DummyErrorCallback(PubnubClientError result)
         {
 			Debug.Log("WhenUnsubscribedToAChannel ErrorCallback = " + result);
         }
-    }
+
+        private void NoExistChannelErrorCallback(PubnubClientError result)
+        {
+            if (result != null && result.Message.ToLower().Contains("not subscribed"))
+            {
+                receivedNotSubscribedMessage = true;
+            }
+            meNotSubscribed.Set();
+        }
+	}
 }

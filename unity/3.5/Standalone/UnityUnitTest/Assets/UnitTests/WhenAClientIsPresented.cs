@@ -36,7 +36,7 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running ThenPresenceShouldReturnReceivedMessage()");
             receivedPresenceMessage = false;
 
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAClientIsPresented";
@@ -66,7 +66,7 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running ThenPresenceShouldReturnCustomUUID()");
             receivedCustomUUID = false;
 
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAClientIsPresented";
@@ -97,7 +97,7 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running IfHereNowIsCalledThenItShouldReturnInfo()");
             receivedHereNowMessage = false;
 
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 			
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAClientIsPresented";
@@ -280,9 +280,9 @@ namespace PubNubMessaging.Tests
             unsubscribeUUIDManualEvent.Set();
         }
 
-        void DummyErrorCallback(string result)
+        void DummyErrorCallback(PubnubClientError result)
         {
-			Debug.Log("WhenAClientIsPresented ErrorCallback : " + result);
+			Debug.Log("WhenAClientIsPresented ErrorCallback : " + result.Description);
         }
     }
 }

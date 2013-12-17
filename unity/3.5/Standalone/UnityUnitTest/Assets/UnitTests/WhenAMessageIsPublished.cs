@@ -74,7 +74,7 @@ namespace PubNubMessaging.Tests
         {
 			Debug.Log("Running ThenUnencryptPublishShouldReturnSuccessCodeAndInfo()");
             isUnencryptPublished = false;
-            Pubnub pubnub = new Pubnub("demo","demo","","",false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey,"","",false);
 			
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -105,7 +105,7 @@ namespace PubNubMessaging.Tests
         {
 			Debug.Log("Running ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo()");
             isUnencryptObjectPublished = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 			
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -136,7 +136,7 @@ namespace PubNubMessaging.Tests
         {
 			Debug.Log("Running ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo()");
             isEncryptObjectPublished = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "enigma", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "enigma", false);
 			
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -168,7 +168,7 @@ namespace PubNubMessaging.Tests
         {
 			Debug.Log("Running ThenEncryptPublishShouldReturnSuccessCodeAndInfo()");
             isEncryptPublished = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "enigma", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "enigma", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -199,7 +199,7 @@ namespace PubNubMessaging.Tests
         {
 			Debug.Log("Running ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo()");
             isSecretEncryptPublished = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "key", "enigma", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "enigma", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -230,7 +230,7 @@ namespace PubNubMessaging.Tests
         {
 			Debug.Log("Running ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo()");
             isComplexObjectPublished = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 			
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -268,7 +268,7 @@ namespace PubNubMessaging.Tests
         {
 			Debug.Log("Running ThenDisableJsonEncodeShouldSendSerializedObjectMessage()");
             isSerializedObjectMessagePublished = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
             pubnub.EnableJsonEncodingForPublish = false;
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -301,7 +301,7 @@ namespace PubNubMessaging.Tests
         {
 			Debug.Log("Running ThenLargeMessageShoudFailWithMessageTooLargeInfo()");
             isLargeMessagePublished = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 			
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -580,7 +580,7 @@ namespace PubNubMessaging.Tests
         public void ThenPubnubShouldGenerateUniqueIdentifier()
         {
 			Debug.Log("Running ThenPubnubShouldGenerateUniqueIdentifier()");
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 			
             UUnitAssert.NotNull(pubnub.GenerateGuid());
         }
@@ -591,7 +591,7 @@ namespace PubNubMessaging.Tests
 			Debug.Log("Running ThenPublishKeyShouldNotBeEmpty()");
 			bool isExpectedException = false;
 			
-            Pubnub pubnub = new Pubnub("", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub("", PubnubCommon.SubscribeKey, "", "", false);
 			
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -625,7 +625,7 @@ namespace PubNubMessaging.Tests
         {
 			Debug.Log("Running ThenOptionalSecretKeyShouldBeProvidedInConstructor()");
             isPublished2 = false;
-            Pubnub pubnub = new Pubnub("demo","demo","key");
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey,PubnubCommon.SecretKey);
 			
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -644,6 +644,7 @@ namespace PubNubMessaging.Tests
 
         private void ReturnSecretKeyPublishCallback(string result)
         {
+			Debug.Log(result);
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
                 object[] deserializedResult = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
@@ -665,7 +666,7 @@ namespace PubNubMessaging.Tests
         {
 			Debug.Log("Running IfSSLNotProvidedThenDefaultShouldBeFalse()");
             isPublished3 = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "");
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "");
 			
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -739,9 +740,9 @@ namespace PubNubMessaging.Tests
             mreSerializedMessagePublishDetailedHistory.Set();
         }
 
-        void DummyErrorCallback(string result)
+        void DummyErrorCallback(PubnubClientError result)
         {
-			Debug.Log("WhenAMessageIsPublished ErrorCallback : " + result);
+			Debug.Log("WhenAMessageIsPublished ErrorCallback : " + result.Description);
         }
     }
 }

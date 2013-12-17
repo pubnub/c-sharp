@@ -10,7 +10,7 @@ using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
 {
-    public class WhenSubscribedToAChannel: UUnitTestCase
+    public class WhenSubscribedToAChannel//: UUnitTestCase
     {
         ManualResetEvent meSubscribeNoConnect = new ManualResetEvent(false);
         ManualResetEvent meSubscribeYesConnect = new ManualResetEvent(false);
@@ -125,7 +125,7 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback1, DummyMethodDuplicateChannelConnectCallback, DummyErrorCallback);
             Thread.Sleep(100);
             
-            pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback2, DummyMethodDuplicateChannelConnectCallback, DummyErrorCallback);
+            pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback2, DummyMethodDuplicateChannelConnectCallback, DuplicateChannelErrorCallback);
             meAlreadySubscribed.WaitOne();
 
             pubnub.EndPendingRequests();
@@ -249,9 +249,19 @@ namespace PubNubMessaging.Tests
             meUnsubscribe.Set();
         }
 
-        void DummyErrorCallback(string result)
+        void DummyErrorCallback(PubnubClientError result)
         {
 			//Debug.Log("WhenSubscribedToAChannel ErrorCallback" + result);
         }
+		
+        private void DuplicateChannelErrorCallback(PubnubClientError result)
+        {
+            if (result != null && result.Message.ToLower().Contains("already subscribed"))
+            {
+                receivedAlreadySubscribedMessage = true;
+            }
+            meAlreadySubscribed.Set();
+        }
+		
     }
 }
