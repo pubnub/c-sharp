@@ -48,7 +48,7 @@ public class PubnubExample : MonoBehaviour {
     string heartbeatIntervalInSeconds = "10";
 	static public bool showErrorMessageSegments = true;
 
-    string channel = "hello_world";
+    string channel = "hello_my_channel";
     string publishedMessage = "";
 	string authKey = "";
 
