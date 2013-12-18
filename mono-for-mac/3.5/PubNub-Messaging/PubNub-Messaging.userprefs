@@ -1,18 +1,22 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="PubNub-Console/PubnubExample.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="PubNub-Console/Pubnub.cs">
     <Files>
-      <File FileName="PubNub-Console/PubnubExample.cs" Line="131" Column="15" />
+      <File FileName="PubNub-Console/PubnubExample.cs" Line="145" Column="31" />
       <File FileName="PubNubTest/EncryptionTests.cs" Line="1" Column="1" />
       <File FileName="PubNubTest/PubnubCommon.cs" Line="1" Column="1" />
       <File FileName="PubNubTest/WhenGrantIsRequested.cs" Line="1" Column="1" />
-      <File FileName="PubNub-Console/Pubnub.cs" Line="4477" Column="1" />
+      <File FileName="PubNub-Console/Pubnub.cs" Line="540" Column="49" />
+      <File FileName="PubNubTest/GenerateSampleGrant.cs" Line="1" Column="1" />
+      <File FileName="PubNubTest/CleanupGrant.cs" Line="1" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="PubNub-Messaging" expanded="True">
-            <Node name="PubnubExample.cs" selected="True" />
+            <Node name="References" expanded="True" />
+            <Node name="Library" expanded="True" />
+            <Node name="Pubnub.cs" selected="True" />
           </Node>
           <Node name="PubNub-Messaging.Tests" expanded="True" />
         </State>
@@ -24,15 +28,7 @@
         <State />
       </Pad>
       <Pad Id="MonoDevelop.NUnit.TestPad">
-        <State expanded="True">
-          <Node name="PubNub-Messaging.Tests" expanded="True">
-            <Node name="PubNubMessaging" expanded="True">
-              <Node name="Tests" expanded="True" selected="True">
-                <Node name="WhenAClientIsPresented" expanded="True" />
-              </Node>
-            </Node>
-          </Node>
-        </State>
+        <State expanded="True" selected="True" />
       </Pad>
       <Pad Id="ConnectionManagerPad">
         <State selected="True" />

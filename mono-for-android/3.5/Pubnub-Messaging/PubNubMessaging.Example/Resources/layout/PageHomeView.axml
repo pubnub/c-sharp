@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:local="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
+    android:padding="2dip"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+<!-- The main content view -->
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:padding="10dip"
+        android:stretchColumns="*">
+        <TableRow>
+            <TextView
+                android:layout_column="0"
+                android:layout_span="3"
+                android:text="@string/channelinfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:layout_column="0"
+                android:text="@string/newchannel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+            <EditText
+                android:layout_column="1"
+                android:layout_span="2"
+                android:id="@+id/newChannels"
+                android:background="#FFF"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </TableRow>
+        <TableRow>
+            <ScrollView
+                android:layout_column="0"
+                android:layout_span="3"
+                android:id="@+id/scroll"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="vertical"
+                android:fillViewport="true">
+                <TextView
+                    android:id="@+id/txtViewLog"
+                    android:layout_width="wrap_content"
+                    android:layout_height="200dp"
+                    android:layout_weight="1" />
+            </ScrollView>
+        </TableRow>
+    </TableLayout>
+<!-- The navigation drawer -->
+    <ListView
+        android:id="@+id/left_drawer"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
+        android:choiceMode="singleChoice"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="#111" />
+</android.support.v4.widget.DrawerLayout>
