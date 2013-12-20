@@ -246,7 +246,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             object message = new PubnubDemoObject();
 			messageComplexObjectForPublish = new JsonFXDotNet().SerializeToJsonString(message);
-			Debug.Log("messageComplexObjectForPublish = " + messageComplexObjectForPublish);
+			//Debug.Log("messageComplexObjectForPublish = " + messageComplexObjectForPublish);
             pubnub.Publish<string>(channel, message, ReturnSuccessComplexObjectPublishCodeCallback, DummyErrorCallback);
             mreComplexObjectPublish.WaitOne(310 * 1000);
 			Thread.Sleep(1000);
@@ -644,7 +644,6 @@ namespace PubNubMessaging.Tests
 
         private void ReturnSecretKeyPublishCallback(string result)
         {
-			Debug.Log(result);
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
                 object[] deserializedResult = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
