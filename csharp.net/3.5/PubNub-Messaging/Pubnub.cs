@@ -1,4 +1,4 @@
-//Build Date: December 12, 2013
+//Build Date: December 17, 2013
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX
 #elif (UNITY_IOS)
@@ -79,7 +79,7 @@ namespace PubNubMessaging.Core
         bool overrideTcpKeepAlive = true;
         bool _enableJsonEncodingForPublish = true;
         const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Off;
-        const PubnubErrorFilter.Level errorLevel = PubnubErrorFilter.Level.Info;
+		const PubnubErrorFilter.Level errorLevel = PubnubErrorFilter.Level.Info;
         
         #if (!SILVERLIGHT && !WINDOWS_PHONE)
         bool pubnubEnableProxyConfig = true;
@@ -1034,10 +1034,9 @@ namespace PubNubMessaging.Core
             }
             else
             {
-				#if(UNITY_IOS)
+				#if(__MonoCS__ || UNITY_IOS || UNITY_ANDROID)
 				networkConnection = ClientNetworkStatus.GetInternetStatus();
-				#elif(__MonoCS__)
-				networkConnection = ClientNetworkStatus.CheckInternetStatusUnity<T>(_pubnetSystemActive, errorCallback, rawChannels, HeartbeatInterval);
+				//networkConnection = ClientNetworkStatus.CheckInternetStatusUnity<T>(_pubnetSystemActive, errorCallback, rawChannels, HeartbeatInterval);
                 #else
                 networkConnection = ClientNetworkStatus.CheckInternetStatus<T>(_pubnetSystemActive, errorCallback, rawChannels);
                 #endif
@@ -1398,7 +1397,7 @@ namespace PubNubMessaging.Core
             _channelInternetRetry.AddOrUpdate (channel, 1, (key, oldValue) => oldValue + 1);
             string retryMessage = string.Format ("[0, \"Detected internet connection problem. Retrying connection attempt {0} of {1}\"]", _channelInternetRetry [channel], _pubnubNetworkCheckRetries);
             LoggingMethod.WriteToLog (string.Format("DateTime {0} {1} channel = {2} _urlRequest - Internet connection retry {3} of {4}", DateTime.Now.ToString(), currentState.Type, string.Join(",", currentState.Channels), _channelInternetRetry[channel], _pubnubNetworkCheckRetries), LoggingMethod.LevelError);
-            CallCallback (currentState, retryMessage);
+			CallCallback<T> (currentState, retryMessage);
         }
         void CallCallback<T>(RequestState<T> currentState, string message)
         {
@@ -2893,6 +2892,57 @@ namespace PubNubMessaging.Core
                     LoggingMethod.WriteToLog(string.Format("DateTime {0}, Request aborted for channel={1}", DateTime.Now.ToString(), requestState.Channels), LoggingMethod.LevelInfo);
                 }
             }
+			catch (WebException webEx)
+			{
+
+				//TODO:fetch response code
+				PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(webEx.Status, webEx.Message);
+				int statusCode = (int)errorType;
+				string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(errorType);
+				if (requestState.Channels != null || requestState.Type == ResponseType.Time)
+				{
+						if (requestState.Type == ResponseType.Subscribe
+								|| requestState.Type == ResponseType.Presence)
+						{
+								if (webEx.Message.IndexOf("The request was aborted: The request was canceled") == -1
+										|| webEx.Message.IndexOf("Machine suspend mode enabled. No request will be processed.") == -1)
+								{
+										for (int index = 0; index < requestState.Channels.Length; index++)
+										{
+												string activeChannel = requestState.Channels[index].ToString();
+												PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
+												callbackKey.Channel = activeChannel;
+												callbackKey.Type = requestState.Type;
+
+												if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(callbackKey))
+												{
+														object callbackObject;
+														bool channelAvailable = _channelCallbacks.TryGetValue(callbackKey, out callbackObject);
+														PubnubChannelCallback<T> currentPubnubCallback = null;
+														if (channelAvailable)
+														{
+																currentPubnubCallback = callbackObject as PubnubChannelCallback<T>;
+														}
+														if (currentPubnubCallback != null && currentPubnubCallback.ErrorCallback != null)
+														{
+																PubnubClientError error = new PubnubClientError(statusCode, PubnubErrorSeverity.Warn, true, webEx.Message, webEx, PubnubMessageSource.Client, requestState.Request, requestState.Response, errorDescription, activeChannel);
+																LoggingMethod.WriteToLog(string.Format("DateTime {0}, PubnubClientError = {1}", DateTime.Now.ToString(), error.ToString()), LoggingMethod.LevelInfo);
+																GoToCallback(error, currentPubnubCallback.ErrorCallback);
+														}
+												}
+
+										}
+								}
+						}
+						else
+						{
+								PubnubClientError error = new PubnubClientError(statusCode, PubnubErrorSeverity.Warn, true, webEx.Message, webEx, PubnubMessageSource.Client, requestState.Request, requestState.Response, errorDescription, channel);
+								LoggingMethod.WriteToLog(string.Format("DateTime {0}, PubnubClientError = {1}", DateTime.Now.ToString(), error.ToString()), LoggingMethod.LevelInfo);
+								GoToCallback(error, requestState.ErrorCallback);
+						}
+				}
+				ProcessResponseCallbackWebExceptionHandler<T>(webEx, requestState, channel);
+			}
             catch (Exception ex)
             {
                 if (requestState.Channels != null)
@@ -2910,12 +2960,6 @@ namespace PubNubMessaging.Core
 
 							if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(callbackKey))
                             {
-                                /*List<object> errorResult = new List<object>();
-                                string jsonString = string.Format("[2, \"{0}\"]", ex.ToString().Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\""));
-
-                                errorResult = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
-
-                                errorResult.Add(activeChannel);*/
 								PubnubChannelCallback<T> currentPubnubCallback = _channelCallbacks[callbackKey] as PubnubChannelCallback<T>;
 								PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(ex);
 								int statusCode = (int)errorType;
@@ -2931,11 +2975,6 @@ namespace PubNubMessaging.Core
                     }
                     else
                     {
-                        //TODO: Identify refactoring
-                        /*List<object> errorResult = new List<object>();
-                        string jsonString = string.Format("[2, \"{0}\"]", ex.ToString().Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\""));
-                        errorResult = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
-                        errorResult.Add(channel);*/
 						PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(ex);
 						int statusCode = (int)errorType;
 						string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(errorType);
@@ -4587,7 +4626,7 @@ namespace PubNubMessaging.Core
                     }
                     else
                     {
-                        throw new InvalidDataException("Invalid channel");
+						throw new MissingFieldException("Invalid channel");
                     }
                 }
             }
@@ -5896,8 +5935,8 @@ namespace PubNubMessaging.Core
                 catch { }
                 #endif
             }
+		}
         }
-    }
     
     public interface IPubnubUnitTest
     {
