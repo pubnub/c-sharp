@@ -1,4 +1,4 @@
-//Build Date: December 17, 2013
+//Build Date: December 20, 2013
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX
 #elif (UNITY_IOS)
@@ -5976,7 +5976,9 @@ namespace PubNubMessaging.Core
         private WebRequest CreateRequest(Uri uri, bool keepAliveRequest)
         {
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create(uri);
+#if (!SILVERLIGHT && !WINDOWS_PHONE)
             req.KeepAlive = keepAliveRequest;
+#endif
             OperatingSystem userOS = System.Environment.OSVersion;
 #if (SILVERLIGHT || WINDOWS_PHONE)
             req.Headers["UserAgent"] = string.Format("ua_string=({0} {1}) PubNub-csharp/3.5", userOS.Platform.ToString(), userOS.Version.ToString());
@@ -6115,11 +6117,13 @@ namespace PubNubMessaging.Core
 #endif
         }
 
+#if (!SILVERLIGHT && !WINDOWS_PHONE)
         public override WebResponse GetResponse()
         {
             return request.GetResponse();
         }
-        
+#endif
+
         public override void Abort()
         {
             if (request != null)
