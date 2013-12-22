@@ -1,4 +1,4 @@
-//Build Date: December 20, 2013
+//Build Date: December 21, 2013
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX
 #elif (UNITY_IOS)
@@ -3876,7 +3876,7 @@ namespace PubNubMessaging.Core
                             
                             PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
                             callbackKey.Channel = (type == ResponseType.Subscribe) ? currentChannel.Replace("-pnpres", "") : currentChannel;
-                            callbackKey.Type = type;
+                            callbackKey.Type = (type == ResponseType.Presence && currentChannel.LastIndexOf("-pnpres") == -1) ? ResponseType.Subscribe : type;
 
                             if (_channelCallbacks.Count > 0 && _channelCallbacks.ContainsKey(callbackKey))
                             {
