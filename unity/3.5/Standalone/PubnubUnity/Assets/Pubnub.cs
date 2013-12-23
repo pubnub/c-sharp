@@ -1,4 +1,4 @@
-//Build Date: December 21, 2013
+//Build Date: December 23, 2013
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX
 #elif (UNITY_IOS)
@@ -138,7 +138,7 @@ namespace PubNubMessaging.Core
             
             set
             {
-                _pubnubOperationTimeoutIntervalInSeconds = value;
+                _pubnubOperationTimeoutIntervalInSeconds    = value;
             }
         }
         
@@ -5765,7 +5765,9 @@ namespace PubNubMessaging.Core
                     request = null;
                 }
                 #elif(__MonoCS__)
-                udp.Close();
+                if(udp!=null){
+                    udp.Close();
+                }
                 #endif
                 #if(UNITY_IOS)
                 GC.Collect();
