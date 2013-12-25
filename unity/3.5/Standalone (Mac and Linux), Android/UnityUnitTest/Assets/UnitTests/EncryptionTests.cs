@@ -39,7 +39,7 @@ namespace PubNubMessaging.Tests
         public Person[] SampleXml = new DemoRoot().Person.ToArray();
     }
 
-    public class PubnubDemoMessage
+	public class PubnubDemoMessage
     {
         public string DefaultMessage = "~!@#$%^&*()_+ `1234567890-= qwertyuiop[]\\ {}| asdfghjkl;' :\" zxcvbnm,./ <>? ";
 
@@ -51,86 +51,86 @@ namespace PubNubMessaging.Tests
         {
             DefaultMessage = message;
         }
-        
+		
     }
-    
-    public class DemoRoot
-    {
-        public List<Person> Person
-        {
-            get
-            {
-                List<Person> ret = new List<Person>();
-                Person p1= new Person();
-                p1.ID = "ABCD123";
-                //PersonID id1 = new PersonID(); id1.ID = "ABCD123" ;
-                //p1.ID = id1;
-                Name n1 = new Name();
-                n1.First = "John";
-                n1.Middle = "P.";
-                n1.Last = "Doe";
-                p1.Name = n1;
-            
-                Address a1 = new Address();
-                a1.Street = "123 Duck Street";
-                a1.City = "New City";
-                a1.State = "New York";
-                a1.Country = "United States";
-                p1.Address = a1;
-                
-                ret.Add(p1);
-            
-                Person p2= new Person();
-                p2.ID = "ABCD456";
-                //PersonID id2 = new PersonID(); id2.ID = "ABCD123" ;
-                //p2.ID = id2;
-                Name n2 = new Name();
-                n2.First = "Peter";
-                n2.Middle = "Z.";
-                n2.Last = "Smith";
-                p2.Name = n2;
-            
-                Address a2 = new Address();
-                a2.Street = "12 Hollow Street";
-                a2.City = "Philadelphia";
-                a2.State = "Pennsylvania";
-                a2.Country = "United States";
-                p2.Address = a2;
-            
-                ret.Add(p2);
-            
-                return ret;
-                
-            }
-        }
-    }
-    
-    public class Person
-    {
-        public string ID { get; set; }
-        
-        public Name   Name;
-        
-        public Address  Address;
-    }
+	
+	public class DemoRoot
+	{
+		public List<Person> Person
+		{
+			get
+			{
+				List<Person> ret = new List<Person>();
+				Person p1= new Person();
+				p1.ID = "ABCD123";
+				//PersonID id1 = new PersonID(); id1.ID = "ABCD123" ;
+				//p1.ID = id1;
+				Name n1 = new Name();
+				n1.First = "John";
+				n1.Middle = "P.";
+				n1.Last = "Doe";
+				p1.Name = n1;
+			
+				Address a1 = new Address();
+				a1.Street = "123 Duck Street";
+				a1.City = "New City";
+				a1.State = "New York";
+				a1.Country = "United States";
+				p1.Address = a1;
+				
+				ret.Add(p1);
+			
+				Person p2= new Person();
+				p2.ID = "ABCD456";
+				//PersonID id2 = new PersonID(); id2.ID = "ABCD123" ;
+				//p2.ID = id2;
+				Name n2 = new Name();
+				n2.First = "Peter";
+				n2.Middle = "Z.";
+				n2.Last = "Smith";
+				p2.Name = n2;
+			
+				Address a2 = new Address();
+				a2.Street = "12 Hollow Street";
+				a2.City = "Philadelphia";
+				a2.State = "Pennsylvania";
+				a2.Country = "United States";
+				p2.Address = a2;
+			
+				ret.Add(p2);
+			
+	            return ret;
+				
+			}
+		}
+	}
+	
+	public class Person
+	{
+		public string ID { get; set; }
+		
+	    public Name   Name;
+		
+		public Address  Address;
+	}
 
-    public class Name
-    {
-        public string First { get; set; }
-        public string Middle { get; set; }
-        public string Last { get; set; }
-    }
-    
-    public class Address
-    {
-        public string Street { get; set; }
-        public string City { get; set; }
-        public string State { get; set; }
-        public string Country { get; set; }
-    }
-    
-    
-    /*
+	public class Name
+	{
+		public string First { get; set; }
+		public string Middle { get; set; }
+		public string Last { get; set; }
+	}
+	
+	public class Address
+	{
+		public string Street { get; set; }
+		public string City { get; set; }
+		public string State { get; set; }
+		public string Country { get; set; }
+	}
+	
+	
+	/*
     public class PubnubDemoObject
     {
         public double VersionID = 3.4;
@@ -142,7 +142,7 @@ namespace PubNubMessaging.Tests
         public XmlDocument SampleXml = (XmlDocument)(new PubnubDemoMessage()).TryXmlDemo();
     }
 
-    public class PubnubDemoMessage
+	public class PubnubDemoMessage
     {
         public string DefaultMessage = "~!@#$%^&*()_+ `1234567890-= qwertyuiop[]\\ {}| asdfghjkl;' :\" zxcvbnm,./ <>? ";
 
@@ -154,8 +154,8 @@ namespace PubNubMessaging.Tests
         {
             DefaultMessage = message;
         }
-        
-        public XmlDocument TryXmlDemo()
+		
+		public XmlDocument TryXmlDemo()
         {
             XmlDocument xmlDocument = new XmlDocument();
             xmlDocument.LoadXml("<DemoRoot><Person ID='ABCD123'><Name><First>John</First><Middle>P.</Middle><Last>Doe</Last></Name><Address><Street>123 Duck Street</Street><City>New City</City><State>New York</State><Country>United States</Country></Address></Person><Person ID='ABCD456'><Name><First>Peter</First><Middle>Z.</Middle><Last>Smith</Last></Name><Address><Street>12 Hollow Street</Street><City>Philadelphia</City><State>Pennsylvania</State><Country>United States</Country></Address></Person></DemoRoot>");
@@ -163,7 +163,7 @@ namespace PubNubMessaging.Tests
         }
     }
     */
-    
+	
 
     public class EncryptionTests: UUnitTestCase
     {
@@ -174,9 +174,9 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestNullEncryption()
         {
-            Debug.Log("Running TestNullEncryption()");
-            bool isExpectedException = false;
-            
+			Debug.Log("Running TestNullEncryption()");
+			bool isExpectedException = false;
+			
             PubnubCrypto pc = new PubnubCrypto("enigma");
             //serialized string
             string message = null;
@@ -202,10 +202,10 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestNullDecryption()
         {
-            Debug.Log("Running TestNullDecryption()");
+			Debug.Log("Running TestNullDecryption()");
             bool isExpectedException = false;
 
-            PubnubCrypto pc = new PubnubCrypto("enigma");
+			PubnubCrypto pc = new PubnubCrypto("enigma");
             //deserialized string
             string message = null;
             try
@@ -229,7 +229,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestYayDecryptionBasic()
         {
-            Debug.Log("Running TestYayDecryptionBasic()");
+			Debug.Log("Running TestYayDecryptionBasic()");
             PubnubCrypto pc = new PubnubCrypto("enigma");
             string message = "q/xJqqN6qbiZMXYmiQC1Fw==";
             //decrypt
@@ -246,7 +246,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestYayEncryptionBasic()
         {
-            Debug.Log("Running TestYayEncryptionBasic()");
+			Debug.Log("Running TestYayEncryptionBasic()");
             PubnubCrypto pc = new PubnubCrypto("enigma");
             //deserialized string
             string message = "yay!";
@@ -263,19 +263,17 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestYayDecryption()
         {
-            Debug.Log("Running TestYayDecryption()");
+			Debug.Log("Running TestYayDecryption()");
             PubnubCrypto pc = new PubnubCrypto("enigma");
             //string strMessage= "\"q/xJqqN6qbiZMXYmiQC1Fw==\"";
             //Non deserialized string
             string message = "\"Wi24KS4pcTzvyuGOHubiXg==\"";
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-            
             //Deserialize
-            message = pubnub.JsonPluggableLibrary.DeserializeToObject(message) as string; //JsonConvert.DeserializeObject<string>(message);
+            message = new JsonFXDotNet().DeserializeToObject(message) as string; //JsonConvert.DeserializeObject<string>(message);
             //decrypt
             string decryptedMessage = pc.Decrypt(message);
             //deserialize again
-            message =  pubnub.JsonPluggableLibrary.DeserializeToObject(decryptedMessage) as string; //JsonConvert.DeserializeObject<string>(decryptedMessage);
+            message =  new JsonFXDotNet().DeserializeToObject(decryptedMessage) as string; //JsonConvert.DeserializeObject<string>(decryptedMessage);
             UUnitAssert.Equals("yay!", message);
         }
         /// <summary>
@@ -286,13 +284,12 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestYayEncryption()
         {
-            Debug.Log("Running TestYayEncryption()");
+			Debug.Log("Running TestYayEncryption()");
             PubnubCrypto pc = new PubnubCrypto("enigma");
             //deserialized string
             string message = "yay!";
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
             //serialize the string
-            message = pubnub.JsonPluggableLibrary.SerializeToJsonString(message); //JsonConvert.SerializeObject(message);
+            message = new JsonFXDotNet().SerializeToJsonString(message); //JsonConvert.SerializeObject(message);
             Console.WriteLine(message);
             //Encrypt
             string enc = pc.Encrypt(message);
@@ -307,13 +304,12 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestArrayEncryption()
         {
-            Debug.Log("Running TestArrayEncryption()");
+			Debug.Log("Running TestArrayEncryption()");
             PubnubCrypto pc = new PubnubCrypto("enigma");
             //create an empty array object
             object[] emptyArray = { };
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
             //serialize
-            string serializedArray = pubnub.JsonPluggableLibrary.SerializeToJsonString(emptyArray); //JsonConvert.SerializeObject(emptyArray);
+            string serializedArray = new JsonFXDotNet().SerializeToJsonString(emptyArray); //JsonConvert.SerializeObject(emptyArray);
             //Encrypt
             string encryptedMessage = pc.Encrypt(serializedArray);
 
@@ -329,7 +325,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestArrayDecryption()
         {
-            Debug.Log("Running TestArrayDecryption()");
+			Debug.Log("Running TestArrayDecryption()");
             PubnubCrypto pc = new PubnubCrypto("enigma");
             //Input the deserialized string
             string message = "Ns4TB41JjT2NCXaGLWSPAQ==";
@@ -337,8 +333,7 @@ namespace PubNubMessaging.Tests
             string decryptedMessage = pc.Decrypt(message);
             //create a serialized object
             object[] emptyArrayObject = { };
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-            string result = pubnub.JsonPluggableLibrary.SerializeToJsonString(emptyArrayObject); //JsonConvert.SerializeObject(emptyArrayObject);
+            string result = new JsonFXDotNet().SerializeToJsonString(emptyArrayObject); //JsonConvert.SerializeObject(emptyArrayObject);
             //compare the serialized object and the return of the Decrypt method
             UUnitAssert.Equals(result, decryptedMessage);
         }
@@ -351,17 +346,15 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestObjectEncryption()
         {
-            Debug.Log("Running TestObjectEncryption()");
+			Debug.Log("Running TestObjectEncryption()");
             PubnubCrypto pc = new PubnubCrypto("enigma");
             //create an object
             System.Object obj = new System.Object();
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
             //serialize
-            string serializedObject = pubnub.JsonPluggableLibrary.SerializeToJsonString(obj);//JsonConvert.SerializeObject(obj);
-            
-            //encrypt 
+            string serializedObject = new JsonFXDotNet().SerializeToJsonString(obj);//JsonConvert.SerializeObject(obj);
+            //encrypt
             string encryptedMessage = pc.Encrypt(serializedObject);
-            
+
             UUnitAssert.Equals("IDjZE9BHSjcX67RddfCYYg==", encryptedMessage);
         }
         /// <summary>
@@ -373,7 +366,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestObjectDecryption()
         {
-            Debug.Log("Running TestObjectDecryption()");
+			Debug.Log("Running TestObjectDecryption()");
             PubnubCrypto pc = new PubnubCrypto("enigma");
             //Deserialized
             string message = "IDjZE9BHSjcX67RddfCYYg==";
@@ -381,9 +374,8 @@ namespace PubNubMessaging.Tests
             string decryptedMessage = pc.Decrypt(message);
             //create an object
             System.Object obj = new System.Object();
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
             //Serialize the object
-            string result = pubnub.JsonPluggableLibrary.SerializeToJsonString(obj); //JsonConvert.SerializeObject(obj);
+            string result = new JsonFXDotNet().SerializeToJsonString(obj); //JsonConvert.SerializeObject(obj);
 
             UUnitAssert.Equals(result, decryptedMessage);
         }
@@ -395,15 +387,13 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestMyObjectEncryption()
         {
-            Debug.Log("Running TestMyObjectEncryption()");
+			Debug.Log("Running TestMyObjectEncryption()");
             PubnubCrypto pc = new PubnubCrypto("enigma");
             //create an object of the custom class
             CustomClass cc = new CustomClass();
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
             //serialize it
-            string result = pubnub.JsonPluggableLibrary.SerializeToJsonString(cc);  //JsonConvert.SerializeObject(cc);
+            string result = new JsonFXDotNet().SerializeToJsonString(cc);  //JsonConvert.SerializeObject(cc);
             //encrypt it
-            Debug.Log("result:"+ result);
             string encryptedMessage = pc.Encrypt(result);
 
             UUnitAssert.Equals("Zbr7pEF/GFGKj1rOstp0tWzA4nwJXEfj+ezLtAr8qqE=", encryptedMessage);
@@ -416,7 +406,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestMyObjectDecryption()
         {
-            Debug.Log("Running TestMyObjectDecryption()");
+			Debug.Log("Running TestMyObjectDecryption()");
             PubnubCrypto pc = new PubnubCrypto("enigma");
             //Deserialized
             string message = "Zbr7pEF/GFGKj1rOstp0tWzA4nwJXEfj+ezLtAr8qqE=";
@@ -424,9 +414,8 @@ namespace PubNubMessaging.Tests
             string decryptedMessage = pc.Decrypt(message);
             //create an object of the custom class
             CustomClass cc = new CustomClass();
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
             //Serialize it
-            string result = pubnub.JsonPluggableLibrary.SerializeToJsonString(cc); //JsonConvert.SerializeObject(cc);
+            string result = new JsonFXDotNet().SerializeToJsonString(cc); //JsonConvert.SerializeObject(cc);
 
             UUnitAssert.Equals(result, decryptedMessage);
         }
@@ -439,13 +428,12 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestPubNubEncryption2()
         {
-            Debug.Log("Running TestPubNubEncryption2()");
+			Debug.Log("Running TestPubNubEncryption2()");
             PubnubCrypto pc = new PubnubCrypto("enigma");
             //Deserialized
             string message = "Pubnub Messaging API 2";
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
             //serialize the message
-            message = pubnub.JsonPluggableLibrary.SerializeToJsonString(message); //JsonConvert.SerializeObject(message);
+            message = new JsonFXDotNet().SerializeToJsonString(message); //JsonConvert.SerializeObject(message);
             //encrypt
             string encryptedMessage = pc.Encrypt(message);
 
@@ -460,15 +448,14 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestPubNubDecryption2()
         {
-            Debug.Log("Running TestPubNubDecryption2()");
+			Debug.Log("Running TestPubNubDecryption2()");
             PubnubCrypto pc = new PubnubCrypto("enigma");
             //Deserialized string    
             string message = "f42pIQcWZ9zbTbH8cyLwB/tdvRxjFLOYcBNMVKeHS54=";
             //Decrypt
             string decryptedMessage = pc.Decrypt(message);
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
             //Deserialize
-            message = pubnub.JsonPluggableLibrary.DeserializeToObject(decryptedMessage) as string; //JsonConvert.DeserializeObject<string>(decryptedMessage);
+            message = new JsonFXDotNet().DeserializeToObject(decryptedMessage) as string; //JsonConvert.DeserializeObject<string>(decryptedMessage);
             UUnitAssert.Equals("Pubnub Messaging API 2", message);
         }
 
@@ -480,13 +467,12 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestPubNubEncryption1()
         {
-            Debug.Log("Running TestPubNubEncryption1()");
+			Debug.Log("Running TestPubNubEncryption1()");
             PubnubCrypto pc = new PubnubCrypto("enigma");
             //non serialized string
             string message = "Pubnub Messaging API 1";
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
             //serialize
-            message = pubnub.JsonPluggableLibrary.SerializeToJsonString(message); //JsonConvert.SerializeObject(message);
+            message = new JsonFXDotNet().SerializeToJsonString(message); //JsonConvert.SerializeObject(message);
             //encrypt
             string encryptedMessage = pc.Encrypt(message);
 
@@ -501,16 +487,15 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestPubNubDecryption1()
         {
-            Debug.Log("Running TestPubNubDecryption1()");
+			Debug.Log("Running TestPubNubDecryption1()");
             PubnubCrypto pc = new PubnubCrypto("enigma");
             //deserialized string
             string message = "f42pIQcWZ9zbTbH8cyLwByD/GsviOE0vcREIEVPARR0=";
             //decrypt
             string decryptedMessage = pc.Decrypt(message);
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
             //deserialize
             //message = (decryptedMessage != "**DECRYPT ERROR**") ? JsonConvert.DeserializeObject<string>(decryptedMessage) : "";
-            message = (decryptedMessage != "**DECRYPT ERROR**") ? (string)(pubnub.JsonPluggableLibrary.DeserializeToObject(decryptedMessage)) : "";
+			message = (decryptedMessage != "**DECRYPT ERROR**") ? (string)(new JsonFXDotNet().DeserializeToObject(decryptedMessage)) : "";
             UUnitAssert.Equals("Pubnub Messaging API 1", message);
         }
 
@@ -522,7 +507,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestStuffCanEncryption()
         {
-            Debug.Log("Running TestStuffCanEncryption()");
+			Debug.Log("Running TestStuffCanEncryption()");
             PubnubCrypto pc = new PubnubCrypto("enigma");
             //input serialized string
             string message = "{\"this stuff\":{\"can get\":\"complicated!\"}}";
@@ -539,7 +524,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestStuffcanDecryption()
         {
-            Debug.Log("Running TestStuffcanDecryption()");
+			Debug.Log("Running TestStuffcanDecryption()");
             PubnubCrypto pc = new PubnubCrypto("enigma");
             //deserialized string
             string message = "zMqH/RTPlC8yrAZ2UhpEgLKUVzkMI2cikiaVg30AyUu7B6J0FLqCazRzDOmrsFsF";
@@ -557,7 +542,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestHashEncryption()
         {
-            Debug.Log("Running TestHashEncryption()");
+			Debug.Log("Running TestHashEncryption()");
             PubnubCrypto pc = new PubnubCrypto("enigma");
             //serialized string
             string message = "{\"foo\":{\"bar\":\"foobar\"}}";
@@ -574,7 +559,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestHashDecryption()
         {
-            Debug.Log("Running TestHashDecryption()");
+			Debug.Log("Running TestHashDecryption()");
             PubnubCrypto pc = new PubnubCrypto("enigma");
             //deserialized string
             string message = "GsvkCYZoYylL5a7/DKhysDjNbwn+BtBtHj2CvzC4Y4g=";
@@ -591,11 +576,11 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestUnicodeCharsEncryption()
         {
-            Debug.Log("Running TestUnicodeCharsEncryption()");
+			Debug.Log("Running TestUnicodeCharsEncryption()");
             PubnubCrypto pc = new PubnubCrypto("enigma");
             string message = "漢語";
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-            message = pubnub.JsonPluggableLibrary.SerializeToJsonString(message); //JsonConvert.SerializeObject(message);
+
+            message = new JsonFXDotNet().SerializeToJsonString(message); //JsonConvert.SerializeObject(message);
             
             string encryptedMessage = pc.Encrypt(message);
             
@@ -610,15 +595,14 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestUnicodeCharsDecryption()
         {
-            Debug.Log("Running TestUnicodeCharsDecryption()");
+			Debug.Log("Running TestUnicodeCharsDecryption()");
             PubnubCrypto pc = new PubnubCrypto("enigma");
             string message = "+BY5/miAA8aeuhVl4d13Kg==";
             //decrypt
             string decryptedMessage = pc.Decrypt(message);
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
             //deserialize
             //message = (decryptedMessage != "**DECRYPT ERROR**") ? JsonConvert.DeserializeObject<string>(decryptedMessage) : "";
-            message = (decryptedMessage != "**DECRYPT ERROR**") ? (string)(pubnub.JsonPluggableLibrary.DeserializeToObject(decryptedMessage)) : "";
+			message = (decryptedMessage != "**DECRYPT ERROR**") ? (string)(new JsonFXDotNet().DeserializeToObject(decryptedMessage)) : "";
 
             UUnitAssert.Equals("漢語", message);
         }
@@ -631,16 +615,15 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestGermanCharsDecryption()
         {
-            Debug.Log("Running TestGermanCharsDecryption()");
+			Debug.Log("Running TestGermanCharsDecryption()");
             PubnubCrypto pc = new PubnubCrypto("enigma");
             string message = "stpgsG1DZZxb44J7mFNSzg==";
             
             //decrypt
             string decryptedMessage = pc.Decrypt(message);
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
             //deserialize
             //message = (decryptedMessage != "**DECRYPT ERROR**") ? JsonConvert.DeserializeObject<string>(decryptedMessage) : "";
-            message = (decryptedMessage != "**DECRYPT ERROR**") ? (string)(pubnub.JsonPluggableLibrary.DeserializeToObject(decryptedMessage)) : "";
+			message = (decryptedMessage != "**DECRYPT ERROR**") ? (string)(new JsonFXDotNet().DeserializeToObject(decryptedMessage)) : "";
 
             UUnitAssert.Equals("ÜÖ", message);
         }
@@ -652,11 +635,11 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TestGermanCharsEncryption()
         {
-            Debug.Log("Running TestGermanCharsEncryption()");
+			Debug.Log("Running TestGermanCharsEncryption()");
             PubnubCrypto pc = new PubnubCrypto("enigma");
             string message = "ÜÖ";
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-            string serializedMessage = (pubnub.JsonPluggableLibrary.SerializeToJsonString(message)).ToString(); //JsonConvert.SerializeObject(message);
+
+            string serializedMessage = (new JsonFXDotNet().SerializeToJsonString(message)).ToString(); //JsonConvert.SerializeObject(message);
             
             string encryptedMessage = pc.Encrypt(serializedMessage);
             

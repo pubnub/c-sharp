@@ -28,10 +28,10 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void DetailHistoryCount10ReturnsRecords()
         {
-            Debug.Log("Running DetailHistoryCount10ReturnsRecords()");
+			Debug.Log("Running DetailHistoryCount10ReturnsRecords()");
             message10Received = false;
 
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
@@ -49,8 +49,7 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-                object[] deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result).ToArray();
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
                     object[] messages = deserializedMessage[0] as object[];
@@ -67,10 +66,10 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void DetailHistoryCount10ReverseTrueReturnsRecords()
         {
-            Debug.Log("Running DetailHistoryCount10ReverseTrueReturnsRecords()");
+			Debug.Log("Running DetailHistoryCount10ReverseTrueReturnsRecords()");
             message10ReverseTrueReceived = false;
 
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
@@ -88,11 +87,10 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-                object[] deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result).ToArray();
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
-                    object[] messages = deserializedMessage[0] as object[];
+	                object[] messages = deserializedMessage[0] as object[];
                     if (messages != null)
                     {
                         if (messages.Length >= 0)
@@ -109,32 +107,32 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void DetailedHistoryStartWithReverseTrue()
         {
-            Debug.Log("Running DetailedHistoryStartWithReverseTrue()");
-            bool enableLocalStubTest = false;
+			Debug.Log("Running DetailedHistoryStartWithReverseTrue()");
+			bool enableLocalStubTest = false;
             expectedCountAtStartTimeWithReverseTrue = 0;
             messageStartReverseTrue = false;
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
             unitTest.TestCaseName = "DetailedHistoryStartWithReverseTrue";
             pubnub.PubnubUnitTest = unitTest;
-            if (pubnub.PubnubUnitTest is IPubnubUnitTest && pubnub.PubnubUnitTest.EnableStubTest)
-            {
-                enableLocalStubTest = true;
-            }
+			if (pubnub.PubnubUnitTest is IPubnubUnitTest && pubnub.PubnubUnitTest.EnableStubTest)
+			{
+				enableLocalStubTest = true;
+			}
 
             string channel = "hello_my_channel";
-            if (enableLocalStubTest)
-            {
-                startTimeWithReverseTrue = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(new DateTime(2012,12,1));
-            }
-            else
-            {
-                startTimeWithReverseTrue = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(DateTime.UtcNow);
-            }
+			if (enableLocalStubTest)
+			{
+            	startTimeWithReverseTrue = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(new DateTime(2012,12,1));
+			}
+			else
+			{
+				startTimeWithReverseTrue = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(DateTime.UtcNow);
+			}
             
-            for (int index = 0; index < 10; index++)
+			for (int index = 0; index < 10; index++)
             {
                 pubnub.Publish<string>(channel, 
                     string.Format("DetailedHistoryStartTimeWithReverseTrue {0}", index), 
@@ -155,9 +153,7 @@ namespace PubNubMessaging.Tests
             int actualCountAtStartTimeWithReverseFalse = 0;
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-
-                object[] deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result).ToArray();
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
                     object[] messages = deserializedMessage[0] as object[];
@@ -184,8 +180,7 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-                object[] deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result).ToArray();
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
                     int statusCode = Int32.Parse(deserializedMessage[0].ToString());
@@ -198,10 +193,10 @@ namespace PubNubMessaging.Tests
             }
             mrePublishStartReverseTrue.Set();
         }
-        
-        void DummyErrorCallback(string result)
+		
+        void DummyErrorCallback(PubnubClientError result)
         {
-            Debug.Log("WhenDetailedHistoryIsRequested ErrorCallback = " + result);
+			Debug.Log("WhenDetailedHistoryIsRequested ErrorCallback = " + result);
         }
     }
 }

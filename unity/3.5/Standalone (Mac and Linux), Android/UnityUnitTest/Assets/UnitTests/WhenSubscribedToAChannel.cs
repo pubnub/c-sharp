@@ -10,7 +10,7 @@ using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
 {
-    public class WhenSubscribedToAChannel: UUnitTestCase
+    public class WhenSubscribedToAChannel//: UUnitTestCase
     {
         ManualResetEvent meSubscribeNoConnect = new ManualResetEvent(false);
         ManualResetEvent meSubscribeYesConnect = new ManualResetEvent(false);
@@ -33,7 +33,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void ThenSubscribeShouldReturnReceivedMessage()
         {
-            Debug.Log("Running ThenSubscribeShouldReturnReceivedMessage()");
+			Debug.Log("Running ThenSubscribeShouldReturnReceivedMessage()");
             receivedMessage = false;
             Pubnub pubnub = new Pubnub("demo","demo","","",false);
 
@@ -62,7 +62,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void ThenSubscribeShouldReturnConnectStatus()
         {
-            Debug.Log("Running ThenSubscribeShouldReturnConnectStatus()");
+			Debug.Log("Running ThenSubscribeShouldReturnConnectStatus()");
             receivedConnectMessage = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 
@@ -84,7 +84,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void ThenMultiSubscribeShouldReturnConnectStatus()
         {
-            Debug.Log("Running ThenMultiSubscribeShouldReturnConnectStatus()");
+			Debug.Log("Running ThenMultiSubscribeShouldReturnConnectStatus()");
             receivedChannel1ConnectMessage = false;
             receivedChannel2ConnectMessage = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
@@ -111,7 +111,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void ThenDuplicateChannelShouldReturnAlreadySubscribed()
         {
-            Debug.Log("Running ThenDuplicateChannelShouldReturnAlreadySubscribed()");
+			Debug.Log("Running ThenDuplicateChannelShouldReturnAlreadySubscribed()");
             receivedAlreadySubscribedMessage = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 
@@ -125,7 +125,7 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback1, DummyMethodDuplicateChannelConnectCallback, DummyErrorCallback);
             Thread.Sleep(100);
             
-            pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback2, DummyMethodDuplicateChannelConnectCallback, DummyErrorCallback);
+            pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback2, DummyMethodDuplicateChannelConnectCallback, DuplicateChannelErrorCallback);
             meAlreadySubscribed.WaitOne();
 
             pubnub.EndPendingRequests();
@@ -141,8 +141,7 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-                object[] deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result).ToArray();
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
@@ -160,8 +159,7 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-                object[] deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result).ToArray();
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
@@ -196,8 +194,7 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-                object[] deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result).ToArray();
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
                     object subscribedObject = (object)deserializedMessage[0];
@@ -219,8 +216,7 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-                object[] deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result).ToArray();
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
@@ -253,9 +249,19 @@ namespace PubNubMessaging.Tests
             meUnsubscribe.Set();
         }
 
-        void DummyErrorCallback(string result)
+        void DummyErrorCallback(PubnubClientError result)
         {
-            //Debug.Log("WhenSubscribedToAChannel ErrorCallback" + result);
+			//Debug.Log("WhenSubscribedToAChannel ErrorCallback" + result);
         }
+		
+        private void DuplicateChannelErrorCallback(PubnubClientError result)
+        {
+            if (result != null && result.Message.ToLower().Contains("already subscribed"))
+            {
+                receivedAlreadySubscribedMessage = true;
+            }
+            meAlreadySubscribed.Set();
+        }
+		
     }
 }

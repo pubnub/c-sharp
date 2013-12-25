@@ -20,9 +20,9 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void ThenItShouldReturnTimeStamp()
         {
-            Debug.Log("Running ThenItShouldReturnTimeStamp()");
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-            
+			Debug.Log("Running ThenItShouldReturnTimeStamp()");
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+			
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGetRequestServerTime";
             unitTest.TestCaseName = "ThenItShouldReturnTimeStamp";
@@ -37,8 +37,7 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
-                object[] deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result).ToArray();
+                object[] deserializedMessage = new JsonFXDotNet().DeserializeToListOfObject(result).ToArray();
                 if (deserializedMessage is object[])
                 {
                     string time = deserializedMessage[0].ToString();
@@ -55,7 +54,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TranslateDateTimeToUnixTime()
         {
-            Debug.Log("Running TranslateDateTimeToUnixTime()");
+			Debug.Log("Running TranslateDateTimeToUnixTime()");
             //Test for 26th June 2012 GMT
             DateTime dt = new DateTime(2012,6,26,0,0,0,DateTimeKind.Utc);
             long nanoSecondTime = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(dt);
@@ -65,16 +64,16 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void TranslateUnixTimeToDateTime()
         {
-            Debug.Log("Running TranslateUnixTimeToDateTime()");
+			Debug.Log("Running TranslateUnixTimeToDateTime()");
             //Test for 26th June 2012 GMT
             DateTime expectedDate = new DateTime(2012, 6, 26, 0, 0, 0, DateTimeKind.Utc);
             DateTime actualDate = Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(13406688000000000);
             UUnitAssert.Equals(expectedDate.ToString(), actualDate.ToString());
         }
     
-        void DummyErrorCallback(string result)
+        void DummyErrorCallback(PubnubClientError result)
         {
-            Debug.Log("WhenGetRequestServerTime ErrorCallback = " + result);
+			Debug.Log("WhenGetRequestServerTime ErrorCallback = " + result.Description);
         }
-    }
+	}
 }

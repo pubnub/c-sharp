@@ -10,7 +10,7 @@ using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
 {
-    public class WhenUnsubscribedToAChannel: UUnitTestCase
+    public class WhenUnsubscribedToAChannel//: UUnitTestCase
     {
         ManualResetEvent meNotSubscribed = new ManualResetEvent(false);
         ManualResetEvent meChannelSubscribed = new ManualResetEvent(false);
@@ -23,13 +23,13 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void ThenNoExistChannelShouldReturnNotSubscribed()
         {
-            Debug.Log("Running ThenNoExistChannelShouldReturnNotSubscribed()");
+			Debug.Log("Running ThenNoExistChannelShouldReturnNotSubscribed()");
             receivedNotSubscribedMessage = false;
             Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
 
             string channel = "hello_my_channel";
 
-            pubnub.Unsubscribe<string>(channel, DummyMethodNoExistChannelUnsubscribeChannelUserCallback, DummyMethodNoExistChannelUnsubscribeChannelConnectCallback, DummyMethodNoExistChannelUnsubscribeChannelDisconnectCallback1, DummyErrorCallback);
+            pubnub.Unsubscribe<string>(channel, DummyMethodNoExistChannelUnsubscribeChannelUserCallback, DummyMethodNoExistChannelUnsubscribeChannelConnectCallback, DummyMethodNoExistChannelUnsubscribeChannelDisconnectCallback1, NoExistChannelErrorCallback);
 
             meNotSubscribed.WaitOne();
 
@@ -41,7 +41,7 @@ namespace PubNubMessaging.Tests
         [UUnitTest]
         public void ThenShouldReturnUnsubscribedMessage()
         {
-            Debug.Log("Running ThenShouldReturnUnsubscribedMessage()");
+			Debug.Log("Running ThenShouldReturnUnsubscribedMessage()");
             receivedChannelConnectedMessage = false;
             receivedUnsubscribedMessage = false;
 
@@ -115,9 +115,18 @@ namespace PubNubMessaging.Tests
         {
         }
 
-        void DummyErrorCallback(string result)
+        void DummyErrorCallback(PubnubClientError result)
         {
-            Debug.Log("WhenUnsubscribedToAChannel ErrorCallback = " + result);
+			Debug.Log("WhenUnsubscribedToAChannel ErrorCallback = " + result);
         }
-    }
+
+        private void NoExistChannelErrorCallback(PubnubClientError result)
+        {
+            if (result != null && result.Message.ToLower().Contains("not subscribed"))
+            {
+                receivedNotSubscribedMessage = true;
+            }
+            meNotSubscribed.Set();
+        }
+	}
 }
