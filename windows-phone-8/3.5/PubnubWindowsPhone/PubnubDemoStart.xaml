@@ -56,7 +56,7 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="20,370,19,0" Name="spnlInput7" HorizontalAlignment="Stretch" VerticalAlignment="Top">
                 <TextBlock Name="lblOrigin" VerticalAlignment="Center" Text="Origin"></TextBlock>
-                <TextBox Name="txtOrigin" Text="pam-beta.pubnub.com" Width="300"></TextBox>
+                <TextBox Name="txtOrigin" Text="pubsub.pubnub.com" Width="300"></TextBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="20,430,19,0" Name="spnlInput8" HorizontalAlignment="Stretch" VerticalAlignment="Top">
                 <TextBlock Name="lblAuthKey" VerticalAlignment="Center" Text="Auth Key"></TextBlock>
