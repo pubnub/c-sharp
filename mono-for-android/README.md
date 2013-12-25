@@ -1,12 +1,12 @@
-# PubNub 3.4 Web Data Push Cloud-Hosted API - C# Mono 2.10.9 
+# PubNub 3.5 Web Data Push Cloud-Hosted API - C# Mono 3.2.5
 ##PubNub C Sharp (MonoForAndroid Usage)
 
 You can checkout the video overview here: https://vimeo.com/56720927
 
-Open 3.4/PubNub-Messaging/Pubnub_Messaging/PubNub_Messaging.csproj. 
+Open 3.5/PubNub-Messaging/Pubnub_Messaging/PubNub_Messaging.csproj. 
 Run the project in the emulator to see a working example. The main functionality lies in the pubnub.cs file.
 
-3.4/PubNub-Messaging/Andr.Unit contains the Unit test cases. Run the project to see the unit test results,
+3.5/PubNub-Messaging/Andr.Unit contains the Unit test cases. Run the project to see the unit test results,
 
 Please ensure that in order to run on Mono the constant in the pubnub.cs file should be set to "true"
 overrideTcpKeepAlive = true;
@@ -24,10 +24,11 @@ Limitations of Newtonsoft.Json: Newtonsoft.Json doesn't support the serializatio
 System.Runtime.Serialization.Json/System.Web.Script.Serialization libraries are activated  by using the pre-compiler directive USE_DOTNET_SERIALIZATION. The use of this library is NOT recommended for pubnub client created on mono platform as this causes issues in "talking" to pubnub clients developed for other platforms.
 
 Dev environment setup:
-- MAC OS X 10.7.5 (Lion)
-- Xamarin.Android 4.6.7
-- Xamarin Studio 4.0.8
-- Mono 2.10.12 
+- MAC OS X 10.8.5 
+- Xamarin.Android 4.10.1
+- Xamarin Studio 4.2.2
+- Mono 3.2.5
+- Android 4.1
 
 Report an issue, or email us at support if there are any additional questions or comments.
 

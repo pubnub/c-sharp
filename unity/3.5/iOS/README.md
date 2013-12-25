@@ -1,4 +1,4 @@
-## PubNub 3.4 Web Data Push Cloud-Hosted API for Unity 4
+## PubNub 3.5 Web Data Push Cloud-Hosted API for Unity 4
 ### This read me is for Unity-iOS client. For other platforms please refer to folder named  Unity Standalone, Android, PC, Linux
 
 ### View this First!
@@ -42,19 +42,18 @@ NOTE: The callback methods DisplayReturnMessage, DisplayConnectStatusMessage and
    
 #### iOS (requires Xcode to be installed)
 
-1. Open up the Unity Project from Standalone\PubnubUnity folder present in the PubNub github repo.
+1. Open up the Unity Project from iOS\PubnubUnity folder present in the PubNub github repo.
 2. Ensure "Pubnub Example" is added as component to Main Camera.
 3. Goto File menu -> Build Settings.
 4. In the dialog the opens select iOS under the platform and click "Switch Platform".
 5. Click "Build and Run"
 6. This will run the PubNub example in the iPad simulator
-7. You may get an error SystemException: System.Net.Sockets are supported only on Unity Pro. Referenced from assembly 'Assembly-CSharp'. If so you need to use the Unity3d pro.
-8. The code uses the pre-compiler flag UNITY_IOS to distinguish between other platforms.
-9. Target iOS version 4.0 and above. 
+7. The code uses the pre-compiler flag UNITY_IOS to distinguish between other platforms.
+8. Target iOS version 4.0 and above. 
 
 #### Running the Tests
 
-1. Open up the Unity Project from Standalone\UnityUnitTest folder.
+1. Open up the Unity Project from iOS\UnityUnitTest folder.
 2. Click "UUnit" menu to run unit tests. NOTE: If "UUnit" menu item is not showing up, ensure that /Assets/Standard Assets/Editor/UUnit/UUnitTestRunner.cs file exists.
 3. Make Console tab as active tab and then Click UUnit so that unit test results will be visible in console.
 
