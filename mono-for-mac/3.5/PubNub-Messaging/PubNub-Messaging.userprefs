@@ -1,0 +1,44 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="PubNub-Console/Pubnub.cs">
+    <Files>
+      <File FileName="PubNub-Console/PubnubExample.cs" Line="145" Column="31" />
+      <File FileName="PubNubTest/EncryptionTests.cs" Line="1" Column="1" />
+      <File FileName="PubNubTest/PubnubCommon.cs" Line="1" Column="1" />
+      <File FileName="PubNubTest/WhenGrantIsRequested.cs" Line="1" Column="1" />
+      <File FileName="PubNub-Console/Pubnub.cs" Line="540" Column="49" />
+      <File FileName="PubNubTest/GenerateSampleGrant.cs" Line="1" Column="1" />
+      <File FileName="PubNubTest/CleanupGrant.cs" Line="1" Column="1" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="PubNub-Messaging" expanded="True">
+            <Node name="References" expanded="True" />
+            <Node name="Library" expanded="True" />
+            <Node name="Pubnub.cs" selected="True" />
+          </Node>
+          <Node name="PubNub-Messaging.Tests" expanded="True" />
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State expanded="True" selected="True" />
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
+      </Pad>
+      <Pad Id="MonoDevelop.NUnit.TestPad">
+        <State expanded="True" selected="True" />
+      </Pad>
+      <Pad Id="ConnectionManagerPad">
+        <State selected="True" />
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches>
+    <Watch file="../../3.4/PubNub-Messaging/PubNub-Console/PubnubExample.cs" line="436" offsetX="693" offsetY="6525" expression="lst" liveUpdate="False" />
+  </MonoDevelop.Ide.DebuggingService.PinnedWatches>
+</Properties>

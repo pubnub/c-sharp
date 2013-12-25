@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="200dp"
+    android:layout_height="170dp"
+    android:padding="2dip"
+    android:background="#FFF"
+    android:stretchColumns="*">
+    <TableRow
+        android:background="#000">
+        <TextView
+            android:id="@+id/tvGrantLabel"
+            android:gravity="center_horizontal"
+            android:layout_column="0"
+            android:layout_span="2"
+            android:text="@string/grant"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+    </TableRow>
+    <TableRow
+        android:background="#000">
+        <TextView
+            android:layout_column="0"
+            android:gravity="center_horizontal"
+            android:text="@string/grantread"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+        <ToggleButton
+            android:id="@+id/tbRead"
+            android:layout_column="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textOn="@string/on"
+            android:textOff="@string/off" />
+    </TableRow>
+    <TableRow
+        android:background="#000">
+        <TextView
+            android:layout_column="0"
+            android:gravity="center_horizontal"
+            android:text="@string/grantwrite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+        <ToggleButton
+            android:id="@+id/tbWrite"
+            android:layout_column="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textOn="@string/on"
+            android:textOff="@string/off" />
+    </TableRow>
+    <TableRow
+        android:background="#000">
+        <TextView
+            android:layout_column="0"
+            android:text="@string/ttl"
+            android:gravity="center_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+        <EditText
+            android:layout_column="1"
+            android:id="@+id/txtttl"
+            android:inputType="number"
+            android:background="#FFF"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </TableRow>
+    <TableRow
+        android:background="#000">
+        <View
+            android:layout_span="2"
+            android:layout_height="2dip" />
+    </TableRow>
+    <TableRow
+        android:background="#000">
+        <Button
+            android:layout_column="0"
+            android:gravity="center_horizontal"
+            android:padding="2dip"
+            android:id="@+id/btnGrant"
+            android:layout_height="30dp"
+            android:layout_width="100dp"
+            android:text="@string/btngrant" />
+        <Button
+            android:layout_column="1"
+            android:gravity="center_horizontal"
+            android:padding="2dip"
+            android:id="@+id/btnCancel"
+            android:layout_height="30dp"
+            android:layout_width="100dp"
+            android:text="@string/btncancel" />
+    </TableRow>
+</TableLayout>
