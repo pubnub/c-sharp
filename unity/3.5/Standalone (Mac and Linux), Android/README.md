@@ -1,5 +1,5 @@
 ## PubNub 3.5 Web Data Push Cloud-Hosted API for Unity 4
-### Supports PC, Mac, Linux, and Android
+### This read me is for Standalone (Mac and Linux), Android client. To run on windows standalone please refer to folder named Standalone (Windows) and for iOS please refer to the folder iOS
 
 ### View this First!
 We've made a [screencast](https://vimeo.com/69591819) that will walk you through the general setup. 

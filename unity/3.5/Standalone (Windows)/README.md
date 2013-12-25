@@ -1,5 +1,5 @@
 ## PubNub 3.5 Web Data Push Cloud-Hosted API for Unity 4
-### Supports PC, Mac, Linux, and Android
+### This read me is for Standalone (Windows) client. To run on iOS please refer to folder named iOS and for Android/Standalone (Mac and Linux) please refer to the folder Standalone (Mac and Linux), Android
 
 ### View this First!
 We've made a [screencast](https://vimeo.com/69591819) that will walk you through the general setup. 
@@ -41,31 +41,6 @@ NOTE: The callback methods DisplayReturnMessage, DisplayConnectStatusMessage and
 4. Go to File menu --> Build Settings --> Select "PC, Linux Standalone" or "Android" Platform.
    Click "Switch Platform" if it is enabled. (NOTE: It will be enabled if there is change in Platform settings)
 5. Click Build and Run. 
-
-#### Running the Demo App on Mac, Linux and Android
-####Common Steps:
-
-1. Open up the Unity Project from Standalone (Mac and Linux), Android\PubnubUnity folder present in the PubNub github repo.
-2. Ensure "Pubnub Example" is added as component to Main Camera.
-3. Goto File menu -> Build Settings.
-
-##### Mac 
-
-1. Follow the 3 steps listed under Common Steps for Running the Demo App on Mac, Linux and Android.
-2. In the dialog that opens select PC, Mac, Linux Standalone under the platform and click "Switch Platform".
-3. On the right side of the same dialog select Mac under "Target Platform".
-4. Click "Build and Run"
-5. This will run the PubNub example in the unity standalone player for Mac
-
-##### Android (requires Android development environment to be set)
-
-1. Follow the 3 steps listed under Common Steps for Running the Demo App on Mac.
-2. In the dialog the opens select Android under the platform and click "Switch Platform".
-3. Click "Build and Run". This button may be disabled or you may get an error that no devices are found. To resolve this please ensure that the android emulator is running.
-4. This will run the PubNub example in the Android emulator. 
-5. The code uses the pre-compiler flag UNITY_ANDROID to distinguish between other platforms.
-6. If running on the emulator please enable GPU emulation.
-7. Target Android version 4 (Ice cream sandwich) and above.
 
 #### Running the Tests
 
