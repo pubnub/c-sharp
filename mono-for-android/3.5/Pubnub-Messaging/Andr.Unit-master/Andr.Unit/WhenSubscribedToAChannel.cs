@@ -29,7 +29,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenSubscribedToAChannel", "ThenItShouldReturnReceivedMessageForComplexMessage");
 
-            pubnub.Subscribe (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
+            pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
             Thread.Sleep(3000);
 
             CustomClass message = new CustomClass();
@@ -40,7 +40,7 @@ namespace PubNubMessaging.Tests
             common.WaitForResponse();
 
             if (common.Response != null) {
-                IList<object> fields = common.Response as IList<object>;
+                object[] fields = Common.Deserialize<object[]>(common.Response.ToString());
 
                 if (fields [0] != null)
                 {
@@ -107,7 +107,7 @@ namespace PubNubMessaging.Tests
 
             CustomClass message = new CustomClass();
 
-            pubnub.Subscribe (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
+            pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
             Thread.Sleep(3000);
 
             pubnub.Publish (channel, (object)message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
@@ -115,7 +115,7 @@ namespace PubNubMessaging.Tests
             common.WaitForResponse();
 
             if (common.Response != null) {
-                IList<object> fields = common.Response as IList<object>;
+                object[] fields = Common.Deserialize<object[]>(common.Response.ToString());
 
                 if (fields [0] != null)
                 {
@@ -181,7 +181,7 @@ namespace PubNubMessaging.Tests
 
           pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenSubscribedToAChannel", "ThenSubscribeShouldReturnReceivedMessage");
 
-          pubnub.Subscribe (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
+          pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
           Thread.Sleep(3000);
 
           string message = "Test Message";
@@ -191,11 +191,11 @@ namespace PubNubMessaging.Tests
           //cm.deliveryStatus = false;
           common.WaitForResponse();
           if (common.Response != null) {
-            IList<object> fields = common.Response as IList<object>;
+            object[] deserializedMessage = Common.Deserialize<object[]>(common.Response.ToString());
 
-            if (fields [0] != null)
+            if (deserializedMessage [0] != null)
             {
-                var myObjectArray = (from item in fields select item as object).ToArray ();
+                var myObjectArray = (from item in deserializedMessage select item as object).ToArray ();
                 Console.WriteLine ("Response:" + myObjectArray[0].ToString ());
 			    Assert.True ((message).Equals(myObjectArray[0].ToString()));
             }
@@ -230,7 +230,7 @@ namespace PubNubMessaging.Tests
 
           string message = "Test Message";
 
-          pubnub.Subscribe (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
+          pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
           Thread.Sleep(3000);
 
           pubnub.Publish (channel, message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
@@ -239,11 +239,11 @@ namespace PubNubMessaging.Tests
           
           if (common.Response != null) 
           {
-            IList<object> fields = common.Response as IList<object>;
+                object[] deserializedMessage = Common.Deserialize<object[]>(common.Response.ToString());
             
-            if (fields [0] != null)
+            if (deserializedMessage [0] != null)
             {
-              var myObjectArray = (from item in fields select item as object).ToArray ();
+              var myObjectArray = (from item in deserializedMessage select item as object).ToArray ();
               Console.WriteLine ("Response:" + myObjectArray[0].ToString ());
 			  Assert.True((message).Equals(myObjectArray[0].ToString()));
               /*var myObjectArray = (from item in fields select item as object).ToArray ();

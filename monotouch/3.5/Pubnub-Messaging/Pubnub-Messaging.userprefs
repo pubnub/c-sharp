@@ -1,11 +1,9 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPad.7.0" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Pubnub-Messaging/Pubnub_MessagingMain.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhoneRetina.7.0" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Pubnub-Messaging.Tests/WhenSubscribedToAChannel.cs">
     <Files>
-      <File FileName="Pubnub-Messaging/Pubnub.cs" Line="60" Column="16" />
-      <File FileName="Pubnub-Messaging/Pubnub_MessagingSub.cs" Line="577" Column="1" />
-      <File FileName="Pubnub-Messaging/Pubnub_MessagingMain.cs" Line="152" Column="9" />
-      <File FileName="Pubnub-Messaging.Tests/WhenAClientIsPresented.cs" Line="165" Column="35" />
+      <File FileName="Pubnub-Messaging.Tests/WhenAClientIsPresented.cs" Line="36" Column="43" />
+      <File FileName="Pubnub-Messaging.Tests/WhenSubscribedToAChannel.cs" Line="26" Column="42" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

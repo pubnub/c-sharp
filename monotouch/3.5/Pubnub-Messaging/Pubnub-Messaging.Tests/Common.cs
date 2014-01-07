@@ -22,16 +22,16 @@ namespace PubNubMessaging.Tests
 {
   public class Common
   {
-      public object Response { get; set; }
-      public bool DeliveryStatus  { get; set; }
+        public object Response { get; set; }
+        public bool DeliveryStatus  { get; set; }
 
-      /// <summary>
-      /// Blocks the current thread unit the response is received
-      /// or timeout occurs
-      /// </summary>
-      /// <param name="countdownSeconds">seconds to timeout</param>
-      public void WaitForResponse(int countdownSeconds = 30)
-      {
+        /// <summary>
+        /// Blocks the current thread unit the response is received
+        /// or timeout occurs
+        /// </summary>
+        /// <param name="countdownSeconds">seconds to timeout</param>
+        public void WaitForResponse(int countdownSeconds = 30)
+        {
           Timer timer = new Timer();
           DateTime start = DateTime.UtcNow; 
           DateTime endTime = start.AddSeconds(countdownSeconds); 
@@ -47,30 +47,40 @@ namespace PubNubMessaging.Tests
          };
          while (!DeliveryStatus);
          timer.Stop();
-      }
+        }
 
-      public PubnubUnitTest CreateUnitTestInstance(string testClassName, string testCaseName)
-      {
+        public PubnubUnitTest CreateUnitTestInstance(string testClassName, string testCaseName)
+        {
         PubnubUnitTest unitTest = new PubnubUnitTest();
         unitTest.TestClassName = testClassName;
         unitTest.TestCaseName = testCaseName;
         return unitTest;
-      }
+        }
       
-      public void DisplayReturnMessageDummy(object result)
-      {
-        //deliveryStatus = true;
-        //Response = result;
-      }
+        public void DisplayErrorMessage(PubnubClientError result)
+        {
+            //Response = result;
+        }
 
-      public void DisplayReturnMessage(object result)
-      {
-          DeliveryStatus = true;
-          Response = result;
-      }
+        public void DisplayReturnMessageDummy(object result)
+        {
+            //deliveryStatus = true;
+            //Response = result;
+        }
 
-      public long Timestamp(Pubnub pubnub)
-      {
+        public void DisplayReturnMessage(object result)
+        {
+            DeliveryStatus = true;
+            Response = result;
+        }
+        public void DisplayReturnMessage(string result)
+        {
+            DeliveryStatus = true;
+            Response = (object)result;
+        }
+
+        public long Timestamp(Pubnub pubnub)
+        {
           DeliveryStatus = false;
 
           pubnub.Time(DisplayReturnMessage, DisplayReturnMessage);
@@ -78,14 +88,14 @@ namespace PubNubMessaging.Tests
 
           IList<object> fields = Response as IList<object>;
           return Convert.ToInt64(fields[0].ToString());
-      }
-      /// <summary>
-      /// Deserialize the specified message using either JSONFX or NEWTONSOFT.JSON.
-      /// The functionality is based on the pre-compiler flag
-      /// </summary>
-      /// <param name="message">Message.</param>
-      public static T Deserialize<T>(string message)
-      {
+        }
+        /// <summary>
+        /// Deserialize the specified message using either JSONFX or NEWTONSOFT.JSON.
+        /// The functionality is based on the pre-compiler flag
+        /// </summary>
+        /// <param name="message">Message.</param>
+        public static T Deserialize<T>(string message)
+        {
         object retMessage;
         #if (USE_JSONFX)
         var reader = new JsonFx.Json.JsonReader();
@@ -94,15 +104,15 @@ namespace PubNubMessaging.Tests
         retMessage = JsonConvert.DeserializeObject<T>(message);
         #endif
         return (T)retMessage;
-      }
+        }
 
-      /// <summary>
-      /// Serialize the specified message using either JSONFX or NEWTONSOFT.JSON.
-      /// The functionality is based on the pre-compiler flag
-      /// </summary>
-      /// <param name="message">Message.</param>
-      public static string Serialize(object message)
-      {
+        /// <summary>
+        /// Serialize the specified message using either JSONFX or NEWTONSOFT.JSON.
+        /// The functionality is based on the pre-compiler flag
+        /// </summary>
+        /// <param name="message">Message.</param>
+        public static string Serialize(object message)
+        {
         string retMessage;
         #if (USE_JSONFX)
         var writer = new JsonFx.Json.JsonWriter();
@@ -112,14 +122,14 @@ namespace PubNubMessaging.Tests
         retMessage = JsonConvert.SerializeObject(message);
         #endif
         return retMessage;
-      }
+        }
 
-      /// <summary>
-      /// Converts the upper case hex to lower case hex.
-      /// </summary>
-      /// <returns>The lower case hex.</returns>
-      /// <param name="value">Hex Value.</param>
-      private static string ConvertHexToUnicodeChars( string value ) {
+        /// <summary>
+        /// Converts the upper case hex to lower case hex.
+        /// </summary>
+        /// <returns>The lower case hex.</returns>
+        /// <param name="value">Hex Value.</param>
+        private static string ConvertHexToUnicodeChars( string value ) {
         //if(;
         return Regex.Replace(
           value,
@@ -128,7 +138,7 @@ namespace PubNubMessaging.Tests
           return ((char) int.Parse( m.Groups["Value"].Value, NumberStyles.HexNumber )).ToString();
         }     
         );
-      }
+     }
   }
 
   /// <summary>

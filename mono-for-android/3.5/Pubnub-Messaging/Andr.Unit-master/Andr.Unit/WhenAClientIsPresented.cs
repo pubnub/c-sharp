@@ -3,6 +3,9 @@ using PubNubMessaging.Core;
 using NUnit.Framework;
 using System.ComponentModel;
 using System.Collections.Generic;
+using System.Threading;
+
+
 #if (USE_JSONFX)
 using JsonFx.Json;
 #elif (USE_DOTNET_SERIALIZATION)
@@ -28,31 +31,33 @@ namespace PubNubMessaging.Tests
               "",
               false
               );
-            string channel = "hello_world";
-            Common commonPresence = new Common();
-            commonPresence.DeliveryStatus = false;
-            commonPresence.Response = null;
-            
-            pubnub.PubnubUnitTest = commonPresence.CreateUnitTestInstance("WhenAClientIsPresented", "ThenPresenceShouldReturnReceivedMessage");
-            
-            pubnub.Presence(channel, commonPresence.DisplayReturnMessage, commonPresence.DisplayReturnMessageDummy, commonPresence.DisplayReturnMessageDummy);
-            
+            string channel = "hello_world2";
+            Common common = new Common();
+            common.DeliveryStatus = false;
+            common.Response = null;
+
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenAClientIsPresented", "ThenPresenceShouldReturnReceivedMessage");
+
+            pubnub.Presence<string>(channel, common.DisplayReturnMessage, common.DisplayReturnMessage, common.DisplayErrorMessage);
+            Thread.Sleep(3000);
             Common commonSubscribe = new Common();
+            common.DeliveryStatus = false;
+            common.Response = null;
+
+            pubnub.Subscribe<string>(channel, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayErrorMessage);
+
             commonSubscribe.DeliveryStatus = false;
             commonSubscribe.Response = null;
-            
-            pubnub.Subscribe(channel, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessageDummy, commonPresence.DisplayReturnMessageDummy);
-            //while (!commonSubscribe.DeliveryStatus) ;
-            
-            commonPresence.WaitForResponse(30);
+
+            common.WaitForResponse(30);
             
             string response = "";
-            if (commonPresence.Response == null) {
+            if (common.Response == null) {
               Assert.Fail("Null response");
             }
             else
             {
-              IList<object> responseFields = commonPresence.Response as IList<object>;
+                IList<object> responseFields = common.Response as IList<object>;
               foreach (object item in responseFields)
               {
                 response = item.ToString();

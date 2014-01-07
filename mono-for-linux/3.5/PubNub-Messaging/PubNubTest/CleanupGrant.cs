@@ -12,7 +12,7 @@ using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
 {
-    [TestFixture]
+    //[TestFixture]
     public class CleanupGrant
     {
         ManualResetEvent auditManualEvent = new ManualResetEvent(false);
@@ -20,7 +20,7 @@ namespace PubNubMessaging.Tests
         bool receivedAuditMessage = false;
         bool receivedRevokeMessage = false;
 
-        [Test]
+        //[Test]
         public void AtUserLevel()
         {
             if (!PubnubCommon.EnableStubTest)
@@ -39,7 +39,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        [Test]
+        //[Test]
         public void AtChannelLevel()
         {
             if (!PubnubCommon.EnableStubTest)

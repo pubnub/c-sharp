@@ -2,12 +2,30 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="PubNubMessaging.Example/LaunchScreen.cs">
     <Files>
-      <File FileName="PubNubMessaging.Example/MainActivity.cs" Line="678" Column="64" />
+      <File FileName="PubNubMessaging.Example/MainActivity.cs" Line="1" Column="1" />
       <File FileName="PubNubMessaging.Example/GrantDialogFragment.cs" Line="1" Column="1" />
       <File FileName="PubNubMessaging.Example/AuthDialogFragment.cs" Line="1" Column="1" />
       <File FileName="PubNubMessaging/Pubnub.cs" Line="1" Column="1" />
-      <File FileName="PubNubMessaging.Example/LaunchScreen.cs" Line="229" Column="98" />
+      <File FileName="PubNubMessaging.Example/LaunchScreen.cs" Line="229" Column="96" />
     </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="PubNubMessaging.Example" expanded="True">
+            <Node name="Jars" selected="True" />
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State expanded="True" selected="True" />
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
+      </Pad>
+      <Pad Id="ConnectionManagerPad">
+        <State selected="True" />
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
@@ -15,6 +33,6 @@
   <MonoDevelop.Ide.DebuggingService.PinnedWatches>
     <Watch file="PubNub_Messaging/Pubnub.cs" line="1526" offsetX="915" offsetY="22880" expression="cert" liveUpdate="False" />
   </MonoDevelop.Ide.DebuggingService.PinnedWatches>
-  <MonoDevelop.Ide.ItemProperties.Andr.Unit AndroidDeviceId-Debug="emulator-5554" AndroidDeviceId-Release="emulator-5554" />
   <MonoDevelop.Ide.ItemProperties.PubNubMessaging.Example MonoForAntroid.PreferredDevice="3.7in WVGA (Nexus One)" AndroidDeviceId-Debug="YT910F2NYE" />
+  <MonoDevelop.Ide.ItemProperties.Andr.Unit AndroidDeviceId-Debug="emulator-5554" AndroidDeviceId-Release="emulator-5554" />
 </Properties>
