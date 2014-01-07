@@ -45,6 +45,7 @@ namespace PubNubMessaging.Tests
                   DeliveryStatus = true;
               }
          };
+         
          while (!DeliveryStatus);
          timer.Stop();
       }
@@ -56,17 +57,29 @@ namespace PubNubMessaging.Tests
         unitTest.TestCaseName = testCaseName;
         return unitTest;
       }
+
+      public void DisplayErrorMessage(PubnubClientError result)
+      {
+        //Response = result;
+          Console.WriteLine(result.ToString());
+      }
       
       public void DisplayReturnMessageDummy(object result)
       {
         //deliveryStatus = true;
         //Response = result;
+        Console.WriteLine(result.ToString());
       }
 
       public void DisplayReturnMessage(object result)
       {
-          DeliveryStatus = true;
-          Response = result;
+        DeliveryStatus = true;
+        Response = result;
+      }
+      public void DisplayReturnMessage(string result)
+      {
+        DeliveryStatus = true;
+        Response = (object)result;
       }
 
       public long Timestamp(Pubnub pubnub)

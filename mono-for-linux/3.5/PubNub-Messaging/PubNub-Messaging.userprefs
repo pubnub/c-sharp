@@ -2,13 +2,9 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
   <MonoDevelop.Ide.Workbench ActiveDocument="PubNub-Console/Pubnub.cs">
     <Files>
-      <File FileName="PubNub-Console/PubnubExample.cs" Line="1" Column="1" />
-      <File FileName="PubNubTest/EncryptionTests.cs" Line="1" Column="1" />
-      <File FileName="PubNubTest/PubnubCommon.cs" Line="1" Column="1" />
-      <File FileName="PubNubTest/WhenGrantIsRequested.cs" Line="1" Column="1" />
-      <File FileName="PubNub-Console/Pubnub.cs" Line="5942" Column="14" />
-      <File FileName="PubNubTest/GenerateSampleGrant.cs" Line="1" Column="1" />
-      <File FileName="PubNubTest/CleanupGrant.cs" Line="1" Column="1" />
+      <File FileName="PubNub-Console/PubnubExample.cs" Line="126" Column="16" />
+      <File FileName="PubNub-Console/Pubnub.cs" Line="6" Column="7" />
+      <File FileName="PubNubTest/WhenSubscribedToAChannel.cs" Line="225" Column="40" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -26,19 +22,7 @@
         <State />
       </Pad>
       <Pad Id="MonoDevelop.NUnit.TestPad">
-        <State expanded="True">
-          <Node name="PubNub-Messaging.Tests" expanded="True">
-            <Node name="PubNubMessaging" expanded="True">
-              <Node name="Tests" expanded="True">
-                <Node name="CleanupGrant" expanded="True" />
-                <Node name="WhenDetailedHistoryIsRequested" expanded="True" selected="True" />
-              </Node>
-            </Node>
-          </Node>
-        </State>
-      </Pad>
-      <Pad Id="ConnectionManagerPad">
-        <State selected="True" />
+        <State expanded="True" selected="True" />
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>

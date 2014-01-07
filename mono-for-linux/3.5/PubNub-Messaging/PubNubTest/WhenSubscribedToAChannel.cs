@@ -29,7 +29,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenSubscribedToAChannel", "ThenItShouldReturnReceivedMessageForComplexMessage");
 
-            pubnub.Subscribe (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
+            pubnub.Subscribe<string>(channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
             Thread.Sleep(3000);
 
             CustomClass message = new CustomClass();
@@ -40,7 +40,8 @@ namespace PubNubMessaging.Tests
             common.WaitForResponse();
 
             if (common.Response != null) {
-                IList<object> fields = common.Response as IList<object>;
+                //IList<object> fields = common.Response as IList<object>;
+                object[] fields = Common.Deserialize<object[]>(common.Response.ToString());
 
                 if (fields [0] != null)
                 {
@@ -107,7 +108,7 @@ namespace PubNubMessaging.Tests
 
             CustomClass message = new CustomClass();
 
-            pubnub.Subscribe (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
+            pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
             Thread.Sleep(3000);
 
             pubnub.Publish (channel, (object)message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
@@ -115,7 +116,7 @@ namespace PubNubMessaging.Tests
             common.WaitForResponse();
 
             if (common.Response != null) {
-                IList<object> fields = common.Response as IList<object>;
+                object[] fields = Common.Deserialize<object[]>(common.Response.ToString());
 
                 if (fields [0] != null)
                 {
@@ -181,23 +182,20 @@ namespace PubNubMessaging.Tests
 
           pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenSubscribedToAChannel", "ThenSubscribeShouldReturnReceivedMessage");
 
-          pubnub.Subscribe (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
+          pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayErrorMessage); 
           Thread.Sleep(3000);
 
           string message = "Test Message";
 
-          pubnub.Publish (channel, message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
+          pubnub.Publish (channel, message, common.DisplayReturnMessageDummy, common.DisplayErrorMessage);
 
           //cm.deliveryStatus = false;
           common.WaitForResponse();
           if (common.Response != null) {
-            IList<object> fields = common.Response as IList<object>;
-
-            if (fields [0] != null)
+            object[] deserializedMessage = Common.Deserialize<object[]>(common.Response.ToString());
+            if (deserializedMessage != null)
             {
-                var myObjectArray = (from item in fields select item as object).ToArray ();
-                Console.WriteLine ("Response:" + myObjectArray[0].ToString ());
-                Assert.AreEqual(message, myObjectArray[0].ToString());
+                Assert.AreEqual(message, deserializedMessage[0].ToString());
             }
             else
             {
@@ -230,7 +228,7 @@ namespace PubNubMessaging.Tests
 
           string message = "Test Message";
 
-          pubnub.Subscribe (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
+          pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
           Thread.Sleep(3000);
 
           pubnub.Publish (channel, message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
@@ -239,30 +237,39 @@ namespace PubNubMessaging.Tests
           
           if (common.Response != null) 
           {
-            IList<object> fields = common.Response as IList<object>;
-            
-            if (fields [0] != null)
-            {
-              var myObjectArray = (from item in fields select item as object).ToArray ();
-              Console.WriteLine ("Response:" + myObjectArray[0].ToString ());
-              Assert.AreEqual(message, myObjectArray[0].ToString());
-              /*var myObjectArray = (from item in fields select item as object).ToArray ();
-              
-              IList<object> enumerable = myObjectArray [0] as IList<object>;
-              if ((enumerable != null) && (enumerable.Count > 0))
-              {
-                  Console.WriteLine ("Response:" + enumerable[0].ToString ());
-                  Assert.AreEqual(message, enumerable[0].ToString());
-              }
-              else
-              {
-                Assert.Fail("Test not successful");
-              }*/
-            }
-            else
-            {
-              Assert.Fail("Test not successful");
-            }
+                object[] deserializedMessage = Common.Deserialize<object[]>(common.Response.ToString());
+                if (deserializedMessage != null)
+                {
+                  Assert.AreEqual(message, deserializedMessage[0].ToString());
+                }
+                else
+                {
+                    Assert.Fail("Test not successful");
+                }
+//            IList<object> fields = common.Response as IList<object>;
+//            
+//            if (fields [0] != null)
+//            {
+//              var myObjectArray = (from item in fields select item as object).ToArray ();
+//              Console.WriteLine ("Response:" + myObjectArray[0].ToString ());
+//              Assert.AreEqual(message, myObjectArray[0].ToString());
+//              /*var myObjectArray = (from item in fields select item as object).ToArray ();
+//              
+//              IList<object> enumerable = myObjectArray [0] as IList<object>;
+//              if ((enumerable != null) && (enumerable.Count > 0))
+//              {
+//                  Console.WriteLine ("Response:" + enumerable[0].ToString ());
+//                  Assert.AreEqual(message, enumerable[0].ToString());
+//              }
+//              else
+//              {
+//                Assert.Fail("Test not successful");
+//              }*/
+//            }
+//            else
+//            {
+//              Assert.Fail("Test not successful");
+//            }
           }
           else
           {
@@ -374,10 +381,11 @@ namespace PubNubMessaging.Tests
           pubnub.Subscribe<string>(channel, common.DisplayReturnMessageDummy,  common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
           Thread.Sleep(100);
               
-          pubnub.Subscribe<string>(channel,  common.DisplayReturnMessage,  common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
+          pubnub.Subscribe<string>(channel,  common.DisplayReturnMessageDummy,  common.DisplayReturnMessageDummy, common.DisplayReturnMessage);
           common.WaitForResponse();  
 
-          if(common.Response.ToString().Contains("already subscribed"))
+          Console.WriteLine("Response:" + common.Response);
+          if(common.Response.ToString().ToLower().Contains("already subscribed"))
           {
             Assert.Pass("Test passed");
           }

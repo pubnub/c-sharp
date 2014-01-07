@@ -12,14 +12,14 @@ using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
 {
-    [TestFixture]
+    //[TestFixture]
     public class GenerateSampleGrant
     {
         ManualResetEvent grantManualEvent = new ManualResetEvent(false);
         bool receivedGrantMessage = false;
         int sampleCount = 100;
         
-        [Test]
+        //[Test]
         public void AtUserLevel()
         {
             if (!PubnubCommon.EnableStubTest)
@@ -43,7 +43,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        [Test]
+        //[Test]
         public void AtChannelLevel()
         {
             if (!PubnubCommon.EnableStubTest)

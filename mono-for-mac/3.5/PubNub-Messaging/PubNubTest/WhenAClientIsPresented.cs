@@ -3,6 +3,9 @@ using PubNubMessaging.Core;
 using NUnit.Framework;
 using System.ComponentModel;
 using System.Collections.Generic;
+using System.Threading;
+
+
 #if (USE_JSONFX)
 using JsonFx.Json;
 #elif (USE_DOTNET_SERIALIZATION)
@@ -28,40 +31,88 @@ namespace PubNubMessaging.Tests
               "",
               false
               );
-            string channel = "hello_world";
-            Common commonPresence = new Common();
-            commonPresence.DeliveryStatus = false;
-            commonPresence.Response = null;
+            string channel = "hello_world2";
+            Common common = new Common();
+            common.DeliveryStatus = false;
+            common.Response = null;
             
-            pubnub.PubnubUnitTest = commonPresence.CreateUnitTestInstance("WhenAClientIsPresented", "ThenPresenceShouldReturnReceivedMessage");
-            
-            pubnub.Presence(channel, commonPresence.DisplayReturnMessage, commonPresence.DisplayReturnMessageDummy, commonPresence.DisplayReturnMessageDummy);
-            
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenAClientIsPresented", "ThenPresenceShouldReturnReceivedMessage");
+
+            pubnub.Presence<string>(channel, common.DisplayReturnMessage, common.DisplayReturnMessage, common.DisplayErrorMessage);
+            Thread.Sleep(3000);
             Common commonSubscribe = new Common();
+            common.DeliveryStatus = false;
+            common.Response = null;
+            
+            pubnub.Subscribe<string>(channel, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayErrorMessage);
+
             commonSubscribe.DeliveryStatus = false;
             commonSubscribe.Response = null;
-            
-            pubnub.Subscribe(channel, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessageDummy, commonPresence.DisplayReturnMessageDummy);
-            //while (!commonSubscribe.DeliveryStatus) ;
-            
-            commonPresence.WaitForResponse(30);
+
+
+            common.WaitForResponse(30);
             
             string response = "";
-            if (commonPresence.Response == null) {
-              Assert.Fail("Null response");
+            if (common.Response == null) {
+                Assert.Fail("Null response");
             }
-            else
+            else   
             {
-              IList<object> responseFields = commonPresence.Response as IList<object>;
-              foreach (object item in responseFields)
-              {
-                response = item.ToString();
-                Console.WriteLine("Response:" + response);
-                //Assert.IsNotEmpty(strResponse);
-              }
-              Assert.AreEqual("hello_world", responseFields[2]);
+                //IList<object> responseFields = common.Response as IList<object>;
+                object[] responseFields = Common.Deserialize<object[]>(common.Response.ToString());
+                foreach (object item in responseFields)
+                {
+                  response = item.ToString();
+                  Console.WriteLine("Response:" + response);
+                }
+                Assert.AreEqual(channel, responseFields[2]);
             }
         }
+
+    /// <summary>
+    /// Callback method captures the response in JSON string format for Subscribe
+    /// </summary>
+    /// <param name="result"></param>
+    static void DisplaySubscribeReturnMessage(string result)
+    {
+      Console.WriteLine("SUBSCRIBE REGULAR CALLBACK:");
+      Console.WriteLine(result);
+      Console.WriteLine();
+    }
+
+    /// <summary>
+    /// Callback method captures the response in JSON string format for Presence
+    /// </summary>
+    /// <param name="result"></param>
+    static void DisplayPresenceReturnMessage(string result)
+    {
+      Console.WriteLine("PRESENCE REGULAR CALLBACK:");
+      Console.WriteLine(result);
+      Console.WriteLine();
+    }
+
+    /// <summary>
+    /// Callback method to provide the connect status of Subscribe call
+    /// </summary>
+    /// <param name="result"></param>
+    static void DisplaySubscribeConnectStatusMessage(string result)
+    {
+      Console.WriteLine("SUBSCRIBE CONNECT CALLBACK:");
+      Console.WriteLine(result);
+      Console.WriteLine();
+    }
+
+    /// <summary>
+    /// Callback method to provide the connect status of Presence call
+    /// </summary>
+    /// <param name="result"></param>
+    static void DisplayPresenceConnectStatusMessage(string result)
+    {
+      Console.WriteLine("PRESENCE CONNECT CALLBACK:");
+      Console.WriteLine(result);
+      Console.WriteLine();
+    }
+
 
         [Test]
         public void IfHereNowIsCalledThenItShouldReturnInfo()
@@ -72,7 +123,7 @@ namespace PubNubMessaging.Tests
                "",
                "",
                false
-           );
+            );
             Common common = new Common();
             common.DeliveryStatus = false;
             common.Response = null;
@@ -86,14 +137,14 @@ namespace PubNubMessaging.Tests
         void HereNow(Pubnub pubnub, string unitTestCaseName, 
                                             Action<object> userCallback)
         {
-          string channel = "hello_world";
+            string channel = "hello_world";
 
-          PubnubUnitTest unitTest = new PubnubUnitTest();
-          unitTest.TestClassName = "WhenAClientIsPresented";
-          unitTest.TestCaseName = unitTestCaseName;
-          pubnub.PubnubUnitTest = unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = unitTestCaseName;
+            pubnub.PubnubUnitTest = unitTest;
 
-          pubnub.HereNow(channel, userCallback, userCallback);
+            pubnub.HereNow(channel, userCallback, userCallback);
         }
 
         public void ParseResponse(object commonResponse)
