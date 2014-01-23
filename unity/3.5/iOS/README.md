@@ -92,4 +92,56 @@ Resolution: This error may occur when the Unity example was run with SSL enabled
 
 * NOTE: "/" (slash) being part of channel name will not work. So it is recommeded to avoid using "/" in channel names.
 
+5) SSL errors: You may encounter issues when connecting using SSL. This has to do with the way mono handles security, http://www.mono-project.com/UsingTrustedRootsRespectfully. To resolve this please include the code below (lines 620 - 667 from PubnubExample.cs file) in your custom implementation.
+
+```
+void Start() 
+{ 
+    System.Net.ServicePointManager.ServerCertificateValidationCallback = ValidateServerCertificate; 
+}
+
+private static bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) 
+{ 
+    if (sslPolicyErrors == SslPolicyErrors.None) 
+    return true;
+
+    if ((sslPolicyErrors & SslPolicyErrors.RemoteCertificateChainErrors) != 0) 
+    { 
+        if (chain != null && chain.ChainStatus != null) 
+        { 
+            X509Certificate2 cert2 = new X509Certificate2(certificate); 
+            chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck; 
+            //chain.ChainPolicy.RevocationFlag = X509RevocationFlag.EntireChain; 
+            //chain.ChainPolicy.UrlRetrievalTimeout = new TimeSpan(1000); 
+            //chain.ChainPolicy.VerificationFlags = X509VerificationFlags.AllFlags; 
+            //chain.ChainPolicy.VerificationTime = DateTime.Now; 
+            chain.Build(cert2);
+
+            foreach (System.Security.Cryptography.X509Certificates.X509ChainStatus status in chain.ChainStatus) 
+            { 
+                if ((certificate.Subject == certificate.Issuer) && (status.Status == System.Security.Cryptography.X509Certificates.X509ChainStatusFlags.UntrustedRoot)) 
+                { 
+                    // Self-signed certificates with an untrusted root are valid. 
+                    continue;         
+                } 
+                else 
+                { 
+                    if (status.Status != System.Security.Cryptography.X509Certificates.X509ChainStatusFlags.NoError) 
+                    { 
+                        // If there are any other errors in the certificate chain, the certificate is invalid, 
+                        // so the method returns false. 
+                        return false;         
+                    }     
+                } 
+            } 
+        }
+
+        return true; 
+    }
+
+    // Do not allow this client to communicate with unauthenticated servers. 
+    return false; 
+}
+```
+
 Report an issue, or email us at support if there are any additional questions or comments.
