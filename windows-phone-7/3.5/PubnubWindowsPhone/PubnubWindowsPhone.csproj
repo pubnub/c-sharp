@@ -68,11 +68,17 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ClientNetworkStatus.cs" />
+    <Compile Include="LoggingMethod.cs" />
     <Compile Include="MainPage.cs" />
+    <Compile Include="MD5.cs" />
+    <Compile Include="Pubnub.cs" />
+    <Compile Include="PubnubCore.cs" />
     <Compile Include="PubnubDemoStart.xaml.cs">
       <DependentUpon>PubnubDemoStart.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pubnub.cs" />
+    <Compile Include="PubnubWin.cs" />
+    <Compile Include="ReconnectState.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>

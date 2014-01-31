@@ -159,8 +159,14 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PubnubExample.cs" />
+    <Compile Include="ClientNetworkStatus.cs" />
+    <Compile Include="LoggingMethod.cs" />
+    <Compile Include="MD5.cs" />
     <Compile Include="Pubnub.cs" />
+    <Compile Include="PubnubCore.cs" />
+    <Compile Include="PubnubExample.cs" />
+    <Compile Include="PubnubWin.cs" />
+    <Compile Include="ReconnectState.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="v4.0\" />

@@ -91,7 +91,13 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Core\ClientNetworkStatus.cs" />
+    <Compile Include="Core\LoggingMethod.cs" />
+    <Compile Include="Core\MD5.cs" />
     <Compile Include="Core\Pubnub.cs" />
+    <Compile Include="Core\PubnubCore.cs" />
+    <Compile Include="Core\PubnubWin.cs" />
+    <Compile Include="Core\ReconnectState.cs" />
     <Compile Include="MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
     </Compile>

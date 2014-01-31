@@ -93,17 +93,23 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ClientNetworkStatus.cs" />
     <Compile Include="LocalizedStrings.cs" />
+    <Compile Include="LoggingMethod.cs" />
     <Compile Include="MainPage.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MD5.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PublishMessageUserControl.xaml.cs" />
     <Compile Include="Pubnub.cs" />
+    <Compile Include="PubnubCore.cs" />
     <Compile Include="PubnubDemoStart.xaml.cs" />
     <Compile Include="PubnubOperation.xaml.cs" />
     <Compile Include="PubnubTimeoutSettings.xaml.cs" />
+    <Compile Include="PubnubWin.cs" />
+    <Compile Include="ReconnectState.cs" />
     <Compile Include="Resources\AppResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

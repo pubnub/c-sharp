@@ -128,6 +128,12 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\ClientNetworkStatus.cs" />
+    <Compile Include="Core\LoggingMethod.cs" />
+    <Compile Include="Core\MD5.cs" />
+    <Compile Include="Core\PubnubCore.cs" />
+    <Compile Include="Core\PubnubWin.cs" />
+    <Compile Include="Core\ReconnectState.cs" />
     <Compile Include="PubnubExampleNET35.aspx.cs">
       <DependentUpon>PubnubExampleNET35.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
