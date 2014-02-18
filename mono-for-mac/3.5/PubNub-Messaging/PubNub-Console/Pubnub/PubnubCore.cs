@@ -23,26 +23,13 @@ using System.Text.RegularExpressions;
 
 #if (USE_JSONFX)
 using JsonFx.Json;
-
 #elif (USE_DOTNET_SERIALIZATION)
 using System.Runtime.Serialization.Json;
 using System.Web.Script.Serialization;
-
-
-
-
 #elif (USE_MiniJSON)
 using MiniJSON;
-
-
-
-
 #elif (USE_JSONFX_FOR_UNITY)
 using Pathfinding.Serialization.JsonFx;
-    
-    
-
-
 #else
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -334,7 +321,7 @@ namespace PubNubMessaging.Core
                             channelInternetRetry.AddOrUpdate (channel, 0, (key, oldValue) => 0);
                         } else {
                             channelInternetRetry.AddOrUpdate (channel, 1, (key, oldValue) => oldValue + 1);
-                            LoggingMethod.WriteToLog (string.Format ("DateTime {0}, {1} {2} reconnectNetworkCallback. Retry {3} of {4}", DateTime.Now.ToString (), channel, netState.Type, channelInternetRetry [channel], _pubnubNetworkCheckRetries), LoggingMethod.LevelInfo);
+							LoggingMethod.WriteToLog (string.Format ("DateTime {0}, {1} {2} reconnectNetworkCallback. Retry {3} of {4}", DateTime.Now.ToString (), channel, netState.Type, channelInternetRetry [channel], _pubnubNetworkCheckRetries), LoggingMethod.LevelInfo);
 
                             if (netState.Channels != null) {
                                 for (int index = 0; index < netState.Channels.Length; index++) {
@@ -2954,11 +2941,7 @@ namespace PubNubMessaging.Core
         }
 
         protected abstract PubnubWebRequest SetServicePointSetTcpKeepAlive (PubnubWebRequest request);
-        /*{
-            #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE)
-            request.ServicePoint.SetTcpKeepAlive(true, _pubnubNetworkTcpCheckIntervalInSeconds * 1000, 1000);
-            #endif
-        }*/
+
         protected virtual void SendRequestAndGetResult<T> (Uri requestUri, RequestState<T> pubnubRequestState, PubnubWebRequest request)
         {
             IAsyncResult asyncResult = request.BeginGetResponse (new AsyncCallback (UrlProcessResponseCallback<T>), pubnubRequestState);
@@ -3540,16 +3523,10 @@ namespace PubNubMessaging.Core
 
         public string SerializeToJsonString (object objectToSerialize)
         {
-            
-
-
 #if(__MonoCS__)
             var writer = new JsonFx.Json.JsonWriter ();
             string json = writer.Write (objectToSerialize);
             return json;
-            
-
-
 #else
             string json = "";
             var resolver = new CombinedResolverStrategy(new DataContractResolverStrategy());
@@ -3580,38 +3557,8 @@ namespace PubNubMessaging.Core
             var output = reader.Read<Dictionary<string, object>> (jsonString);
             return output;
         }
-        //public T DeserializeToObject<T>(string jsonString)
-        //{
-        //    T result = default(T);
-        //    JsonReader reader;
-        //    PubnubClientError clientError = null;
-        //    if (typeof(T) == typeof(PubnubClientError))
-        //    {
-        //        reader = new JsonFx.Json.JsonReader();
-        //        Dictionary<string, object> pubnubErrorMessage = reader.Read(jsonString) as Dictionary<string, object>;
-        //        if (pubnubErrorMessage != null)
-        //        {
-        //            int httpStatusCode = (int)pubnubErrorMessage["HttpStatusCode"];
-        //            PubnubMessageSource source = (PubnubMessageSource)Enum.Parse(typeof(PubnubMessageSource), pubnubErrorMessage["MessageSource"].ToString());
-        //            PubnubErrorCategory category = (PubnubErrorCategory)Enum.Parse(typeof(PubnubErrorCategory), pubnubErrorMessage["Category"].ToString());
-        //            bool isDotNetException = Boolean.Parse(pubnubErrorMessage["IsDotNetException"].ToString());
-        //            string message = pubnubErrorMessage["Message"].ToString();
-        //            string detailedDotNetException = pubnubErrorMessage["DetailedDotNetException"].ToString();
-        //            string channel = pubnubErrorMessage["Channel"].ToString();
-        //            clientError = new PubnubClientError(httpStatusCode, category, isDotNetException, message, detailedDotNetException, source, channel);
-        //            result = (T)Convert.ChangeType(clientError, typeof(T));
-        //        }
-        //    }
-        //    else if (typeof(T) == typeof(object))
-        //    {
-        //        reader = new JsonFx.Json.JsonReader();
-        //        object deserializedMessage = reader.Read<object>(jsonString);
-        //        result = (T)deserializedMessage;
-        //    }
-        //    return result;
-        //}
     }
-    #elif (USE_DOTNET_SERIALIZATION)
+#elif (USE_DOTNET_SERIALIZATION)
     public class JscriptSerializer : IJsonPluggableLibrary
     {
         public bool IsArrayCompatible(string jsonString){
@@ -3644,42 +3591,7 @@ namespace PubNubMessaging.Core
             JavaScriptSerializer jS = new JavaScriptSerializer();
             return (Dictionary<string, object>)jS.Deserialize<Dictionary<string, object>>(jsonString);
         }
-
-        //public T DeserializeToObject<T>(string jsonString)
-        //{
-        //    T result = default(T);
-
-        //    PubnubClientError clientError = null;
-        //    JavaScriptSerializer jS = new JavaScriptSerializer();
-
-        //    if (typeof(T) == typeof(PubnubClientError))
-        //    {
-        //        Dictionary<string, object> pubnubErrorMessage = jS.Deserialize<Dictionary<string, object>>(jsonString);
-        //        if (pubnubErrorMessage != null)
-        //        {
-        //            PubnubMessageSource source = (PubnubMessageSource)Enum.Parse(typeof(PubnubMessageSource), pubnubErrorMessage["MessageSource"].ToString());
-        //            PubnubErrorCategory category = (PubnubErrorCategory)Enum.Parse(typeof(PubnubErrorCategory), pubnubErrorMessage["Category"].ToString());
-        //            bool isDotNetException = Boolean.Parse(pubnubErrorMessage["IsDotNetException"].ToString());
-        //            string message = pubnubErrorMessage["Message"].ToString();
-        //            string detailedDotNetException = pubnubErrorMessage["DetailedDotNetException"].ToString();
-        //            string channel = pubnubErrorMessage["Channel"].ToString();
-
-        //            clientError = new PubnubClientError(category, isDotNetException, message, detailedDotNetException, source, channel);
-        //            result = (T)Convert.ChangeType(clientError, typeof(T));
-        //        }
-        //    }
-        //    else if (typeof(T) == typeof(object))
-        //    {
-        //        object deserializedResult = jS.Deserialize<object>(jsonString);
-        //        result = (T)deserializedResult;
-        //    }
-        //    return result;
-        //}
     }
-    
-
-
-
 #elif (USE_MiniJSON)
     public class MiniJSONObjectSerializer : IJsonPluggableLibrary
     {
@@ -3710,10 +3622,6 @@ namespace PubNubMessaging.Core
             return Json.Deserialize(jsonString) as Dictionary<string, object>;
         }
     }
-    
-
-
-
 #elif (USE_JSONFX_FOR_UNITY)
     public class JsonFxUnitySerializer : IJsonPluggableLibrary
     {
@@ -3747,17 +3655,12 @@ namespace PubNubMessaging.Core
             return output;
         }
     }
-    
-
-
-
 #else
     public class NewtonsoftJsonDotNet : IJsonPluggableLibrary
     {
 
-        
-#region IJsonPlugableLibrary methods implementation
-    
+        #region IJsonPlugableLibrary methods implementation
+
         public bool IsArrayCompatible (string jsonString)
         {
             bool ret = false;
@@ -3831,9 +3734,8 @@ namespace PubNubMessaging.Core
             return JsonConvert.DeserializeObject<Dictionary<string, object>> (jsonString);
         }
 
-        
-#endregion
-    
+        #endregion
+
     }
     #endif
     #endregion

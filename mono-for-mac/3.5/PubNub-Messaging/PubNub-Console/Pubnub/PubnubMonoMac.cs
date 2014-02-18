@@ -9,7 +9,7 @@ using Microsoft.Win32;
 using System.Threading;
 using System.Security.Cryptography;
 using System.Configuration;
-
+    
 namespace PubNubMessaging.Core
 {
     internal class PubnubMonoMac : PubnubCore
@@ -17,7 +17,7 @@ namespace PubNubMessaging.Core
 
         #region "Constants"
 
-		const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Verbose;
+        const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Verbose;
         const PubnubErrorFilter.Level errorLevel = PubnubErrorFilter.Level.Info;
         protected bool pubnubEnableProxyConfig = true;
         protected string _domainName = "pubsub.pubnub.com";
@@ -79,9 +79,9 @@ namespace PubNubMessaging.Core
         {
             bool reconnect = false;
             if ((webEx.Status == WebExceptionStatus.NameResolutionFailure//No network
-                || webEx.Status == WebExceptionStatus.ConnectFailure//Sending Keep-alive packet failed (No network)/Server is down.
-                || webEx.Status == WebExceptionStatus.ServerProtocolViolation//Problem with proxy or ISP
-                || webEx.Status == WebExceptionStatus.ProtocolError) && (!overrideTcpKeepAlive)) {
+                         || webEx.Status == WebExceptionStatus.ConnectFailure//Sending Keep-alive packet failed (No network)/Server is down.
+                         || webEx.Status == WebExceptionStatus.ServerProtocolViolation//Problem with proxy or ISP
+                         || webEx.Status == WebExceptionStatus.ProtocolError) && (!overrideTcpKeepAlive)) {
                 //internet connection problem.
                 LoggingMethod.WriteToLog (string.Format ("DateTime {0}, _urlRequest - Internet connection problem", DateTime.Now.ToString ()), LoggingMethod.LevelError);
                 if (base.channelInternetStatus.ContainsKey (channel) && (asynchRequestState.Type == ResponseType.Subscribe || asynchRequestState.Type == ResponseType.Presence)) {
@@ -179,11 +179,11 @@ namespace PubNubMessaging.Core
         {
 
             #if (USE_JSONFX)
-                        LoggingMethod.WriteToLog("Using USE_JSONFX", LoggingMethod.LevelInfo);
-                        this.JsonPluggableLibrary = new JsonFXDotNet();
+            LoggingMethod.WriteToLog("Using USE_JSONFX", LoggingMethod.LevelInfo);
+            this.JsonPluggableLibrary = new JsonFXDotNet();
             #elif (USE_DOTNET_SERIALIZATION)
-                        LoggingMethod.WriteToLog("Using USE_DOTNET_SERIALIZATION", LoggingMethod.LevelInfo);
-                        this.JsonPluggableLibrary = new JscriptSerializer();   
+            LoggingMethod.WriteToLog("Using USE_DOTNET_SERIALIZATION", LoggingMethod.LevelInfo);
+            this.JsonPluggableLibrary = new JscriptSerializer();   
             #else
             LoggingMethod.WriteToLog ("Using NewtonsoftJsonDotNet", LoggingMethod.LevelInfo);
             base.JsonPluggableLibrary = new NewtonsoftJsonDotNet ();
@@ -246,89 +246,85 @@ namespace PubNubMessaging.Core
         protected override sealed void SendRequestAndGetResult<T> (Uri requestUri, RequestState<T> pubnubRequestState, PubnubWebRequest request)
         {
             #if (UNITY_IOS || UNITY_ANDROID)
-                        if((pubnubRequestState.Type == ResponseType.Publish) && (RequestIsUnsafe(requestUri)))
-                        {
-                                SendRequestUsingUnityWww<T>(requestUri, pubnubRequestState);
+            if((pubnubRequestState.Type == ResponseType.Publish) && (RequestIsUnsafe(requestUri)))
+            {
+                    SendRequestUsingUnityWww<T>(requestUri, pubnubRequestState);
+            }
+            else
+            {
+                #if (UNITY_ANDROID)
+                if (pubnubRequestState.Type == ResponseType.Subscribe || pubnubRequestState.Type == ResponseType.Presence){
+                        if(asyncResultSubscribe != null){
+                                CloseOpenRequest<T>(asyncResultSubscribe);
                         }
-                        else
-                        {
-            #if (UNITY_ANDROID)
-                                if (pubnubRequestState.Type == ResponseType.Subscribe || pubnubRequestState.Type == ResponseType.Presence){
-                                        if(asyncResultSubscribe != null){
-                                                CloseOpenRequest<T>(asyncResultSubscribe);
-                                        }
-                                        asyncResultSubscribe = request.BeginGetResponse(new AsyncCallback(UrlProcessResponseCallback<T>), pubnubRequestState);
-                                        if (!asyncResultSubscribe.AsyncWaitHandle.WaitOne(GetTimeoutInSecondsForResponseType(pubnubRequestState.Type) * 1000)){
-                                                OnPubnubWebRequestTimeout<T>(pubnubRequestState, true);
-                                        }
-                                } else {
-                                        if(asyncResultNonSubscribe != null){
-                                                CloseOpenRequest<T>(asyncResultNonSubscribe);
-                                        }
-                                        asyncResultNonSubscribe = request.BeginGetResponse(new AsyncCallback(UrlProcessResponseCallback<T>), pubnubRequestState);
-                                        if (!asyncResultNonSubscribe.AsyncWaitHandle.WaitOne(GetTimeoutInSecondsForResponseType(pubnubRequestState.Type) * 1000)){
-                                                OnPubnubWebRequestTimeout<T>(pubnubRequestState, true);
-                                        }
-                                }
-            #elif (UNITY_IOS)
-                                if (pubnubRequestState.Type == ResponseType.Subscribe || pubnubRequestState.Type == ResponseType.Presence){
-                                        if(subscribeRequestThread != null && subscribeRequestThread.IsAlive){
-                                                //AbortOpenRequest(subscribeWebRequest);
-                                                subscribeRequestThread.Join (1);
-                                        }
-                                        //subscribeWebRequest = request;
-                                        subscribeRequestThread = new Thread(delegate (object state){
-                                                SendRequestUnityiOS<T>(pubnubRequestState, request);
-                                        });
-                                        subscribeRequestThread.Name= "subscribeRequestThread";
-                                        subscribeRequestThread.Start ();
-                                        StartTimeoutThread <T>(pubnubRequestState, true);
-                                }
-                                else
-                                {
-                                        if(nonSubscribeRequestThread != null && nonSubscribeRequestThread.IsAlive){    
-                                                //AbortOpenRequest(nonSubscribeWebRequest);
-                                                nonSubscribeRequestThread.Join (1);
-                                        }
-                                        //nonSubscribeWebRequest = request;
-                                        nonSubscribeRequestThread = new Thread(delegate (object state){
-                                                SendRequestUnityiOS<T>(pubnubRequestState, request);
-                                        });
-                                        nonSubscribeRequestThread.Name= "nonSubscribeRequestThread";
-                                        nonSubscribeRequestThread.Start ();
-                                        StartTimeoutThread <T>(pubnubRequestState, false);
-                                }
-
-            #endif
+                        asyncResultSubscribe = request.BeginGetResponse(new AsyncCallback(UrlProcessResponseCallback<T>), pubnubRequestState);
+                        if (!asyncResultSubscribe.AsyncWaitHandle.WaitOne(GetTimeoutInSecondsForResponseType(pubnubRequestState.Type) * 1000)){
+                                OnPubnubWebRequestTimeout<T>(pubnubRequestState, true);
                         }
+                } else {
+                        if(asyncResultNonSubscribe != null){
+                                CloseOpenRequest<T>(asyncResultNonSubscribe);
+                        }
+                        asyncResultNonSubscribe = request.BeginGetResponse(new AsyncCallback(UrlProcessResponseCallback<T>), pubnubRequestState);
+                        if (!asyncResultNonSubscribe.AsyncWaitHandle.WaitOne(GetTimeoutInSecondsForResponseType(pubnubRequestState.Type) * 1000)){
+                                OnPubnubWebRequestTimeout<T>(pubnubRequestState, true);
+                        }
+                }
+                #elif (UNITY_IOS)
+                if (pubnubRequestState.Type == ResponseType.Subscribe || pubnubRequestState.Type == ResponseType.Presence){
+                        if(subscribeRequestThread != null && subscribeRequestThread.IsAlive){
+                                //AbortOpenRequest(subscribeWebRequest);
+                                subscribeRequestThread.Join (1);
+                        }
+                        //subscribeWebRequest = request;
+                        subscribeRequestThread = new Thread(delegate (object state){
+                                SendRequestUnityiOS<T>(pubnubRequestState, request);
+                        });
+                        subscribeRequestThread.Name= "subscribeRequestThread";
+                        subscribeRequestThread.Start ();
+                        StartTimeoutThread <T>(pubnubRequestState, true);
+                }
+                else
+                {
+                        if(nonSubscribeRequestThread != null && nonSubscribeRequestThread.IsAlive){    
+                                //AbortOpenRequest(nonSubscribeWebRequest);
+                                nonSubscribeRequestThread.Join (1);
+                        }
+                        //nonSubscribeWebRequest = request;
+                        nonSubscribeRequestThread = new Thread(delegate (object state){
+                                SendRequestUnityiOS<T>(pubnubRequestState, request);
+                        });
+                        nonSubscribeRequestThread.Name= "nonSubscribeRequestThread";
+                        nonSubscribeRequestThread.Start ();
+                        StartTimeoutThread <T>(pubnubRequestState, false);
+                }
+                #endif
+            }
             #elif(__MonoCS__)
             if ((pubnubRequestState.Type == ResponseType.Publish) && (RequestIsUnsafe (requestUri))) {
                 SendRequestUsingTcpClient<T> (requestUri, pubnubRequestState);
             } else {
-                //Console.WriteLine (request.RequestUri);
                 IAsyncResult asyncResult = request.BeginGetResponse (new AsyncCallback (UrlProcessResponseCallback<T>), pubnubRequestState);
                 if (!asyncResult.AsyncWaitHandle.WaitOne (GetTimeoutInSecondsForResponseType (pubnubRequestState.Type) * 1000)) {
                     OnPubnubWebRequestTimeout<T> (pubnubRequestState, true);
                 }
             }
             #elif (SILVERLIGHT || WINDOWS_PHONE)
-                        //For WP7, Ensure that the RequestURI length <= 1599
-                        //For SL, Ensure that the RequestURI length <= 1482 for Large Text Message. If RequestURI Length < 1343, Successful Publish occurs
-                        IAsyncResult asyncResult = request.BeginGetResponse(new AsyncCallback(UrlProcessResponseCallback<T>), pubnubRequestState);
-                        Timer webRequestTimer = new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.Type) * 1000, Timeout.Infinite);
+            //For WP7, Ensure that the RequestURI length <= 1599
+            //For SL, Ensure that the RequestURI length <= 1482 for Large Text Message. If RequestURI Length < 1343, Successful Publish occurs
+            IAsyncResult asyncResult = request.BeginGetResponse(new AsyncCallback(UrlProcessResponseCallback<T>), pubnubRequestState);
+            Timer webRequestTimer = new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.Type) * 1000, Timeout.Infinite);
             #else
-                        IAsyncResult asyncResult = request.BeginGetResponse(new AsyncCallback(UrlProcessResponseCallback<T>), pubnubRequestState);
-                        ThreadPool.RegisterWaitForSingleObject(asyncResult.AsyncWaitHandle, new WaitOrTimerCallback(OnPubnubWebRequestTimeout<T>), pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.Type) * 1000, true);
+            IAsyncResult asyncResult = request.BeginGetResponse(new AsyncCallback(UrlProcessResponseCallback<T>), pubnubRequestState);
+            ThreadPool.RegisterWaitForSingleObject(asyncResult.AsyncWaitHandle, new WaitOrTimerCallback(OnPubnubWebRequestTimeout<T>), pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.Type) * 1000, true);
             #endif
         }
 
         protected override void TimerWhenOverrideTcpKeepAlive<T> (Uri requestUri, RequestState<T> pubnubRequestState)
         {
-            if (heartBeatTimer != null) {
-                heartBeatTimer.Dispose ();
-            }
             heartBeatTimer = new Timer (new TimerCallback (OnPubnubHeartBeatTimeoutCallback<T>), pubnubRequestState, 0,
-                base.HeartbeatInterval * 1000);
+                             base.HeartbeatInterval * 1000);
+
             base.channelHeartbeatTimer.AddOrUpdate (requestUri, heartBeatTimer, (key, oldState) => heartBeatTimer);
         }
 
@@ -410,7 +406,7 @@ namespace PubNubMessaging.Core
                 }
             }
             foreach (char ch in requestMessage.ToString().ToCharArray()) {
-			    if (" ~`!@#$^&*()+=[]\\{}|;':\"./<>?".IndexOf (ch) >= 0) {
+                if (" ~`!@#$^&*()+=[]\\{}|;':\"./<>?".IndexOf (ch) >= 0) {
                     isUnsafe = true;
                     break;
                 }
@@ -423,7 +419,7 @@ namespace PubNubMessaging.Core
         {
             StringBuilder requestBuilder = new StringBuilder ();
             requestBuilder.Append ("GET ");
-			requestBuilder.Append (requestUri.OriginalString);
+            requestBuilder.Append (requestUri.OriginalString);
 
             if (ssl) {
                 requestBuilder.Append (string.Format (" HTTP/1.1\r\nConnection: close\r\nHost: {0}:443\r\n\r\n", this._domainName));
@@ -548,12 +544,12 @@ namespace PubNubMessaging.Core
         void SendSslRequest<T> (NetworkStream netStream, TcpClient tcpClient, RequestState<T> pubnubRequestState, string requestString)
         {
             #if(MONODROID || __ANDROID__)
-                        SslStream sslStream = new SslStream(netStream, true, Validator, null);
+            SslStream sslStream = new SslStream(netStream, true, Validator, null);
             #elif(UNITY_ANDROID|| MONOTOUCH || __IOS__)
-                        ServicePointManager.ServerCertificateValidationCallback = ValidatorUnity;
-                        SslStream sslStream = new SslStream(netStream, true, ValidatorUnity, null);
+            ServicePointManager.ServerCertificateValidationCallback = ValidatorUnity;
+            SslStream sslStream = new SslStream(netStream, true, ValidatorUnity, null);
             #else
-		    SslStream sslStream = new SslStream (netStream);
+            SslStream sslStream = new SslStream (netStream);
             #endif
             StateObject<T> state = new StateObject<T> ();
             state.tcpClient = tcpClient;
@@ -567,7 +563,7 @@ namespace PubNubMessaging.Core
         void AfterAuthentication<T> (StateObject<T> state)
         {
             SslStream sslStream = state.sslns;
-		//Console.WriteLine ("state.requestString:" + state.requestString);
+            //Console.WriteLine ("state.requestString:" + state.requestString);
             byte[] sendBuffer = UTF8Encoding.UTF8.GetBytes (state.requestString);
 
             sslStream.Write (sendBuffer);
@@ -616,7 +612,7 @@ namespace PubNubMessaging.Core
             state.tcpClient = tcpClient;
             state.netStream = netStream;
             state.RequestState = pubnubRequestState;
-		//Console.WriteLine ("requestString:" + requestString);
+            //Console.WriteLine ("requestString:" + requestString);
             System.IO.StreamWriter streamWriter = new System.IO.StreamWriter (netStream);
             streamWriter.Write (requestString);
             streamWriter.Flush ();
@@ -730,80 +726,80 @@ namespace PubNubMessaging.Core
             string json = "";
             int pos = responseString.LastIndexOf ('\n');
             if ((responseString.StartsWith ("HTTP/1.1 ") || responseString.StartsWith ("HTTP/1.0 "))
-                && (pos != -1) && responseString.Length >= pos + 1) {
+                         && (pos != -1) && responseString.Length >= pos + 1) {
                 json = responseString.Substring (pos + 1);
             }
             return json;
         }
         #endif
-		#if(UNITY_ANDROID || MONOTOUCH || __IOS__)
-                /// <summary>
-                /// Workaround for the bug described here 
-                /// https://bugzilla.xamarin.com/show_bug.cgi?id=6501
-                /// </summary>
-                /// <param name="sender">Sender.</param>
-                /// <param name="certificate">Certificate.</param>
-                /// <param name="chain">Chain.</param>
-                /// <param name="sslPolicyErrors">Ssl policy errors.</param>
-                static bool ValidatorUnity (object sender,
-                                            System.Security.Cryptography.X509Certificates.X509Certificate
-                                            certificate,
-                                            System.Security.Cryptography.X509Certificates.X509Chain chain,
-                                            System.Net.Security.SslPolicyErrors sslPolicyErrors)
-                {
-                        //TODO:
+        #if(UNITY_ANDROID || MONOTOUCH || __IOS__)
+        /// <summary>
+        /// Workaround for the bug described here 
+        /// https://bugzilla.xamarin.com/show_bug.cgi?id=6501
+        /// </summary>
+        /// <param name="sender">Sender.</param>
+        /// <param name="certificate">Certificate.</param>
+        /// <param name="chain">Chain.</param>
+        /// <param name="sslPolicyErrors">Ssl policy errors.</param>
+        static bool ValidatorUnity (object sender,
+                                    System.Security.Cryptography.X509Certificates.X509Certificate
+                                    certificate,
+                                    System.Security.Cryptography.X509Certificates.X509Chain chain,
+                                    System.Net.Security.SslPolicyErrors sslPolicyErrors)
+        {
+                //TODO:
+                return true;
+        }
+        #endif
+        #if(MONODROID || __ANDROID__)
+        /// <summary>
+        /// Workaround for the bug described here 
+        /// https://bugzilla.xamarin.com/show_bug.cgi?id=6501
+        /// </summary>
+        /// <param name="sender">Sender.</param>
+        /// <param name="certificate">Certificate.</param>
+        /// <param name="chain">Chain.</param>
+        /// <param name="sslPolicyErrors">Ssl policy errors.</param>
+        static bool Validator (object sender,
+                               System.Security.Cryptography.X509Certificates.X509Certificate
+                               certificate,
+                               System.Security.Cryptography.X509Certificates.X509Chain chain,
+                               System.Net.Security.SslPolicyErrors sslPolicyErrors)
+        {
+                var sslTrustManager = (IX509TrustManager) typeof (AndroidEnvironment)
+                        .GetField ("sslTrustManager",
+                                   System.Reflection.BindingFlags.NonPublic |
+                                   System.Reflection.BindingFlags.Static)
+                                .GetValue (null);
+
+                Func<Java.Security.Cert.CertificateFactory,
+                System.Security.Cryptography.X509Certificates.X509Certificate,
+                Java.Security.Cert.X509Certificate> c = (f, v) =>
+                        f.GenerateCertificate (
+                                new System.IO.MemoryStream (v.GetRawCertData ()))
+                                .JavaCast<Java.Security.Cert.X509Certificate>();
+                var cFactory = Java.Security.Cert.CertificateFactory.GetInstance (Javax.Net.Ssl.TrustManagerFactory.DefaultAlgorithm);
+                var certs = new List<Java.Security.Cert.X509Certificate>(
+                        chain.ChainElements.Count + 1);
+                certs.Add (c (cFactory, certificate));
+                foreach (var ce in chain.ChainElements) {
+                        if (certificate.Equals (ce.Certificate))
+                                continue;
+                        certificate = ce.Certificate;
+                        certs.Add (c (cFactory, certificate));
+                }
+                try {
+                        //had to comment this out as sslTrustManager was returning null
+                        //working on the fix or a workaround
+                        //sslTrustManager.CheckServerTrusted (certs.ToArray (),
+                        //                                  Javax.Net.Ssl.TrustManagerFactory.DefaultAlgorithm);
                         return true;
                 }
-                #endif
-		#if(MONODROID || __ANDROID__)
-                /// <summary>
-                /// Workaround for the bug described here 
-                /// https://bugzilla.xamarin.com/show_bug.cgi?id=6501
-                /// </summary>
-                /// <param name="sender">Sender.</param>
-                /// <param name="certificate">Certificate.</param>
-                /// <param name="chain">Chain.</param>
-                /// <param name="sslPolicyErrors">Ssl policy errors.</param>
-                static bool Validator (object sender,
-                                       System.Security.Cryptography.X509Certificates.X509Certificate
-                                       certificate,
-                                       System.Security.Cryptography.X509Certificates.X509Chain chain,
-                                       System.Net.Security.SslPolicyErrors sslPolicyErrors)
-                {
-                        var sslTrustManager = (IX509TrustManager) typeof (AndroidEnvironment)
-                                .GetField ("sslTrustManager",
-                                           System.Reflection.BindingFlags.NonPublic |
-                                           System.Reflection.BindingFlags.Static)
-                                        .GetValue (null);
-
-                        Func<Java.Security.Cert.CertificateFactory,
-                        System.Security.Cryptography.X509Certificates.X509Certificate,
-                        Java.Security.Cert.X509Certificate> c = (f, v) =>
-                                f.GenerateCertificate (
-                                        new System.IO.MemoryStream (v.GetRawCertData ()))
-                                        .JavaCast<Java.Security.Cert.X509Certificate>();
-                        var cFactory = Java.Security.Cert.CertificateFactory.GetInstance (Javax.Net.Ssl.TrustManagerFactory.DefaultAlgorithm);
-                        var certs = new List<Java.Security.Cert.X509Certificate>(
-                                chain.ChainElements.Count + 1);
-                        certs.Add (c (cFactory, certificate));
-                        foreach (var ce in chain.ChainElements) {
-                                if (certificate.Equals (ce.Certificate))
-                                        continue;
-                                certificate = ce.Certificate;
-                                certs.Add (c (cFactory, certificate));
-                        }
-                        try {
-                                //had to comment this out as sslTrustManager was returning null
-                                //working on the fix or a workaround
-                                //sslTrustManager.CheckServerTrusted (certs.ToArray (),
-                                //                                  Javax.Net.Ssl.TrustManagerFactory.DefaultAlgorithm);
-                                return true;
-                        }
-                        catch (Exception e) {
-                                throw new Exception("SSL error");
-                        }
+                catch (Exception e) {
+                        throw new Exception("SSL error");
                 }
-                #endif
+        }
+        #endif
         #endregion
 
         #region "Nested Classes"
@@ -841,12 +837,8 @@ namespace PubNubMessaging.Core
 
         protected override HttpWebRequest SetUserAgent (HttpWebRequest req, bool keepAliveRequest, OperatingSystem userOS)
         {
-            #if (SILVERLIGHT || WINDOWS_PHONE)
-                        req.Headers["UserAgent"] = string.Format("ua_string=({0} {1}) PubNub-csharp/3.5", userOS.Platform.ToString(), userOS.Version.ToString());
-            #else
             req.KeepAlive = keepAliveRequest;
             req.UserAgent = string.Format ("ua_string=({0}) PubNub-csharp/3.5", userOS.VersionString);
-            #endif
             return req;
         }
     }
@@ -855,14 +847,14 @@ namespace PubNubMessaging.Core
     public class PubnubWebRequest : PubnubWebRequestBase
     {
         #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE)
-                public override long ContentLength
+        public override long ContentLength
+        {
+                get
                 {
-                        get
-                        {
-                                return request.ContentLength;
-                        }
+                        return request.ContentLength;
                 }
-                #endif
+        }
+        #endif
         #if (!SILVERLIGHT && !WINDOWS_PHONE)
         private int _timeout;
 
@@ -909,8 +901,8 @@ namespace PubNubMessaging.Core
         }
         #endif
         #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE)
-                public ServicePoint ServicePoint;
-                #endif
+        public ServicePoint ServicePoint;
+        #endif
         #if (!SILVERLIGHT && !WINDOWS_PHONE)
         public override WebResponse GetResponse ()
         {
@@ -920,7 +912,7 @@ namespace PubNubMessaging.Core
         public PubnubWebRequest (HttpWebRequest request) : base (request)
         {
             #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE)
-                        this.ServicePoint = this.request.ServicePoint;
+            this.ServicePoint = this.request.ServicePoint;
             #endif
         }
 
@@ -928,7 +920,7 @@ namespace PubNubMessaging.Core
                         : base (request, pubnubUnitTest)
         {
             #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE)
-                        this.ServicePoint = this.request.ServicePoint;
+            this.ServicePoint = this.request.ServicePoint;
             #endif
         }
     }
@@ -944,17 +936,12 @@ namespace PubNubMessaging.Core
         protected override string ComputeHashRaw (string input)
         {
             #if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || __IOS__ || MONODROID || __ANDROID__ || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
-                        HashAlgorithm algorithm = new System.Security.Cryptography.SHA256Managed();
+            HashAlgorithm algorithm = new System.Security.Cryptography.SHA256Managed();
             #else
             HashAlgorithm algorithm = new SHA256CryptoServiceProvider ();
             #endif
 
-            #if (SILVERLIGHT || WINDOWS_PHONE)
-                        Byte[] inputBytes = System.Text.Encoding.UTF8.GetBytes(input);
-            #else
-            //Byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
             Byte[] inputBytes = System.Text.Encoding.UTF8.GetBytes (input);
-            #endif
             Byte[] hashedBytes = algorithm.ComputeHash (inputBytes);
             return BitConverter.ToString (hashedBytes);
         }
@@ -962,14 +949,6 @@ namespace PubNubMessaging.Core
         protected override string EncryptOrDecrypt (bool type, string plainStr)
         {
             {
-                #if (SILVERLIGHT || WINDOWS_PHONE)
-                                AesManaged aesEncryption = new AesManaged();
-                                aesEncryption.KeySize = 256;
-                                aesEncryption.BlockSize = 128;
-                                //get ASCII bytes of the string
-                                aesEncryption.IV = System.Text.Encoding.UTF8.GetBytes("0123456789012345");
-                                aesEncryption.Key = System.Text.Encoding.UTF8.GetBytes(GetEncryptionKey());
-                #else
                 RijndaelManaged aesEncryption = new RijndaelManaged ();
                 aesEncryption.KeySize = 256;
                 aesEncryption.BlockSize = 128;
@@ -980,17 +959,11 @@ namespace PubNubMessaging.Core
                 //get ASCII bytes of the string
                 aesEncryption.IV = System.Text.Encoding.ASCII.GetBytes ("0123456789012345");
                 aesEncryption.Key = System.Text.Encoding.ASCII.GetBytes (GetEncryptionKey ());
-                #endif
 
                 if (type) {
                     ICryptoTransform crypto = aesEncryption.CreateEncryptor ();
                     plainStr = EncodeNonAsciiCharacters (plainStr);
-                    #if (SILVERLIGHT || WINDOWS_PHONE)
-                                        byte[] plainText = Encoding.UTF8.GetBytes(plainStr);
-                    #else
-                    //byte[] plainText = Encoding.ASCII.GetBytes(plainStr);
                     byte[] plainText = Encoding.UTF8.GetBytes (plainStr);
-                    #endif
 
                     //encrypt
                     byte[] cipherText = crypto.TransformFinalBlock (plainText, 0, plainText.Length);
@@ -1001,21 +974,13 @@ namespace PubNubMessaging.Core
                         //decode
                         byte[] decryptedBytes = Convert.FromBase64CharArray (plainStr.ToCharArray (), 0, plainStr.Length);
 
-                        //decrypt
-                        #if (SILVERLIGHT || WINDOWS_PHONE)
-                                                var data = decrypto.TransformFinalBlock(decryptedBytes, 0, decryptedBytes.Length);
-                                                string decrypted = Encoding.UTF8.GetString(data, 0, data.Length);
-                        #else
                         //string decrypted = System.Text.Encoding.ASCII.GetString(decrypto.TransformFinalBlock(decryptedBytes, 0, decryptedBytes.Length));
                         string decrypted = System.Text.Encoding.UTF8.GetString (decrypto.TransformFinalBlock (decryptedBytes, 0, decryptedBytes.Length));
-                        #endif
 
                         return decrypted;
                     } catch (Exception ex) {
                         LoggingMethod.WriteToLog (string.Format ("DateTime {0} Decrypt Error. {1}", DateTime.Now.ToString (), ex.ToString ()), LoggingMethod.LevelVerbose);
                         throw ex;
-                        //LoggingMethod.WriteToLog(string.Format("DateTime {0} Decrypt Error. {1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelVerbose);
-                        //return "**DECRYPT ERROR**";
                     }
                 }
             }
