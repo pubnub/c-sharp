@@ -72,10 +72,41 @@ namespace PubNubMessaging.Core
 			return pubnub.HereNow(channel, userCallback, errorCallback);
 		}
 
+        public bool HereNow(string channel, bool showUUIDList, bool includeMetadata, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return pubnub.HereNow(channel, showUUIDList, includeMetadata, userCallback, errorCallback);
+        }
+
 		public bool HereNow<T>(string channel, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
 			return pubnub.HereNow<T>(channel, userCallback, errorCallback);
 		}
+
+        public bool HereNow<T>(string channel, bool showUUIDList, bool includeMetadata, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return pubnub.HereNow<T>(channel, showUUIDList, includeMetadata, userCallback, errorCallback);
+        }
+
+        public void GlobalHereNow(bool showUUIDList, bool includeMetadata, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.GlobalHereNow(showUUIDList, includeMetadata, userCallback, errorCallback);
+        }
+
+        public bool GlobalHereNow<T>(bool showUUIDList, bool includeMetadata, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return pubnub.GlobalHereNow<T>(showUUIDList, includeMetadata, userCallback, errorCallback);
+        }
+
+        public void WhereNow(string uuid, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.WhereNow(uuid, userCallback, errorCallback);
+        }
+
+        public void WhereNow<T>(string uuid, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.WhereNow<T>(uuid, userCallback, errorCallback);
+        }
+
 
 		public void Unsubscribe<T>(string channel, Action<T> userCallback, Action<T> connectCallback, Action<T> disconnectCallback, Action<PubnubClientError> errorCallback)
 		{
@@ -141,7 +172,52 @@ namespace PubNubMessaging.Core
 		{
             return pubnub.GrantPresenceAccess(channel, read, write, ttl, userCallback, errorCallback);
 		}
-		#endregion
+
+        public void SetUserMetadata<T>(string channel, string uuid, string jsonMetadata, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.SetUserMetadata<T>(channel, uuid, jsonMetadata, userCallback, errorCallback);
+        }
+
+        public void SetUserMetadata<T>(string channel, string jsonMetadata, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.SetUserMetadata<T>(channel,"", jsonMetadata, userCallback, errorCallback);
+        }
+
+        public void GetUserMetadata<T>(string channel, string uuid, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.GetUserMetadata<T>(channel, uuid, userCallback, errorCallback);
+        }
+
+        public void GetUserMetadata<T>(string channel, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.GetUserMetadata<T>(channel, "", userCallback, errorCallback);
+        }
+
+        public string SetLocalMetadata(string channel, string metadataKey, int metadataValue)
+        {
+            return pubnub.SetLocalMetadata(channel, metadataKey, metadataValue);
+        }
+
+        public string SetLocalMetadata(string channel, string metadataKey, double metadataValue)
+        {
+            return pubnub.SetLocalMetadata(channel, metadataKey, metadataValue);
+        }
+
+        public string SetLocalMetadata(string channel, string metadataKey, string metadataValue)
+        {
+            return pubnub.SetLocalMetadata(channel, metadataKey, metadataValue);
+        }
+
+        public string GetLocalMetadata(string channel)
+        {
+            return pubnub.GetLocalMetadata(channel);
+        }
+
+        public string GetLocalMetadata(string[] channels)
+        {
+            return pubnub.GetLocalMetadata(channels);
+        }
+        #endregion
 
 		#region "PubNub API Other Methods"
 		public void TerminateCurrentSubscriberRequest()
@@ -237,6 +313,18 @@ namespace PubNubMessaging.Core
 			get {return pubnub.Origin;}
 			set {pubnub.Origin = value;}
 		}
+
+        public int PresenceExpiry
+        {
+            get
+            {
+                return pubnub.PresenceExpiry;
+            }
+            set
+            {
+                pubnub.PresenceExpiry = value;
+            }
+        }
 
 		public IPubnubUnitTest PubnubUnitTest
 		{

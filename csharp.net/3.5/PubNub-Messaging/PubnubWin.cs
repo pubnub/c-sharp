@@ -239,7 +239,23 @@ namespace PubNubMessaging.Core
             IAsyncResult asyncResult = request.BeginGetResponse(new AsyncCallback(UrlProcessResponseCallback<T>), pubnubRequestState);
             ThreadPool.RegisterWaitForSingleObject(asyncResult.AsyncWaitHandle, new WaitOrTimerCallback(OnPubnubWebRequestTimeout<T>), pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.Type) * 1000, true);
 #endif
-            //throw new NotImplementedException();
+            if (pubnubRequestState.Type == ResponseType.Presence || pubnubRequestState.Type == ResponseType.Subscribe)
+            {
+                if (presenceHeartbeatTimer != null)
+                {
+                    presenceHeartbeatTimer.Dispose();
+                    presenceHeartbeatTimer = null;
+                }
+                if (pubnubRequestState.Channels != null && pubnubRequestState.Channels.Length > 0)
+                {
+                    RequestState<T> presenceHeartbeatState = new RequestState<T>();
+                    presenceHeartbeatState.Channels = pubnubRequestState.Channels;
+                    presenceHeartbeatState.Type = ResponseType.PresenceHeartbeat;
+                    presenceHeartbeatState.ErrorCallback = pubnubRequestState.ErrorCallback;
+                    
+                    presenceHeartbeatTimer = new Timer(OnPresenceHeartbeatIntervalTimeout<T>, presenceHeartbeatState, base.PresenceHeartbeatInterval * 1000, base.PresenceHeartbeatInterval * 1000);
+                }
+            }
         }
 
 		protected override void TimerWhenOverrideTcpKeepAlive<T> (Uri requestUri, RequestState<T> pubnubRequestState)
