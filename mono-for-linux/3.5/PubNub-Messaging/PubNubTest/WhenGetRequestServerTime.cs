@@ -14,18 +14,19 @@ namespace PubNubMessaging.Tests
         public void ThenItShouldReturnTimeStamp()
         {
             Pubnub pubnub = new Pubnub(
-                "demo",
-                "demo",
-                "",
-                "",
-                false
-            );
+                                "demo",
+                                "demo",
+                                "",
+                                "",
+                                false
+                            );
 
             Common common = new Common();
             common.DeliveryStatus = false;
             common.Response = null;
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenGetRequestServerTime", "ThenItShouldReturnTimeStamp");;
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenGetRequestServerTime", "ThenItShouldReturnTimeStamp");
+            ;
             
             string response = "";
 
@@ -34,9 +35,39 @@ namespace PubNubMessaging.Tests
             common.WaitForResponse();
 
             IList<object> fields = common.Response as IList<object>;
-            response = fields[0].ToString();
+            response = fields [0].ToString();
             Console.WriteLine("Response:" + response);
-            Assert.AreNotEqual("0",response);
+            Assert.AreNotEqual("0", response);
+        }
+
+        [Test]
+        public void ThenItShouldReturnTimeStampSSL()
+        {
+            Pubnub pubnub = new Pubnub(
+                "demo",
+                "demo",
+                "",
+                "",
+                true
+            );
+
+            Common common = new Common();
+            common.DeliveryStatus = false;
+            common.Response = null;
+
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenGetRequestServerTime", "ThenItShouldReturnTimeStamp");
+            ;
+
+            string response = "";
+
+            pubnub.Time(common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+
+            common.WaitForResponse();
+
+            IList<object> fields = common.Response as IList<object>;
+            response = fields [0].ToString();
+            Console.WriteLine("Response:" + response);
+            Assert.AreNotEqual("0", response);
         }
     }
 }
