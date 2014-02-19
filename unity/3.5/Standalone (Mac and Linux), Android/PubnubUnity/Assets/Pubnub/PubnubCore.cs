@@ -68,13 +68,13 @@ namespace PubNubMessaging.Core
         bool _enableJsonEncodingForPublish = true;
         LoggingMethod.Level _pubnubLogLevel = LoggingMethod.Level.Off;
         PubnubErrorFilter.Level _errorLevel = PubnubErrorFilter.Level.Info;
-        ConcurrentDictionary<string, long> _multiChannelSubscribe = new ConcurrentDictionary<string, long> ();
+		protected ConcurrentDictionary<string, long> _multiChannelSubscribe = new ConcurrentDictionary<string, long> ();
         ConcurrentDictionary<string, PubnubWebRequest> _channelRequest = new ConcurrentDictionary<string, PubnubWebRequest> ();
         protected ConcurrentDictionary<string, bool> channelInternetStatus = new ConcurrentDictionary<string, bool> ();
         protected ConcurrentDictionary<string, int> channelInternetRetry = new ConcurrentDictionary<string, int> ();
         ConcurrentDictionary<string, Timer> _channelReconnectTimer = new ConcurrentDictionary<string, Timer> ();
         protected ConcurrentDictionary<Uri, Timer> channelHeartbeatTimer = new ConcurrentDictionary<Uri, Timer> ();
-        ConcurrentDictionary<PubnubChannelCallbackKey, object> _channelCallbacks = new ConcurrentDictionary<PubnubChannelCallbackKey, object> ();
+		protected ConcurrentDictionary<PubnubChannelCallbackKey, object> _channelCallbacks = new ConcurrentDictionary<PubnubChannelCallbackKey, object> ();
         protected System.Threading.Timer heartBeatTimer;
         protected static bool pubnetSystemActive = true;
         // History of Messages (Obsolete)
@@ -1723,7 +1723,7 @@ namespace PubNubMessaging.Core
 
         #region "Exception handlers"
 
-        private void UrlRequestCommonExceptionHandler<T> (ResponseType type, string[] channels, bool requestTimeout, Action<T> userCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback, bool resumeOnReconnect)
+		protected void UrlRequestCommonExceptionHandler<T> (ResponseType type, string[] channels, bool requestTimeout, Action<T> userCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback, bool resumeOnReconnect)
         {
             if (type == ResponseType.Subscribe || type == ResponseType.Presence) {
                 MultiplexExceptionHandler<T> (type, channels, userCallback, connectCallback, errorCallback, false, resumeOnReconnect);
@@ -1909,7 +1909,7 @@ namespace PubNubMessaging.Core
         /// <param name="userCallback"></param>
         /// <param name="connectCallback"></param>
         /// <param name="errorCallback"></param>
-        private void MultiplexInternalCallback<T> (ResponseType type, object multiplexResult, Action<T> userCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback)
+		protected void MultiplexInternalCallback<T> (ResponseType type, object multiplexResult, Action<T> userCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback)
         {
             List<object> message = multiplexResult as List<object>;
             string[] channels = null;
