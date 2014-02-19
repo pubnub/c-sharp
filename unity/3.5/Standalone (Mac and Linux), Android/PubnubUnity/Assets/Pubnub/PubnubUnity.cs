@@ -19,7 +19,7 @@ namespace PubNubMessaging.Core
 
 				#region "Constants and Globals"
 
-				const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Off;
+				const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Error;
 				const PubnubErrorFilter.Level errorLevel = PubnubErrorFilter.Level.Info;
 				protected bool pubnubEnableProxyConfig = true;
 				protected string _domainName = "pubsub.pubnub.com";
@@ -88,7 +88,7 @@ namespace PubNubMessaging.Core
 						 ) && (overrideTcpKeepAlive)) {
 								LoggingMethod.WriteToLog (string.Format ("DateTime {0}, _urlRequest - Internet connection problem", DateTime.Now.ToString ()), LoggingMethod.LevelError);
 						}
-						Thread.Sleep (NetworkCheckRetryInterval * 1000);
+						Thread.Sleep (base.NetworkCheckRetryInterval * 1000);
 						return false;
 				}
 
@@ -138,6 +138,8 @@ namespace PubNubMessaging.Core
 										o.Append ('%');
 										o.Append (ToHex (ch / 16));
 										o.Append (ToHex (ch % 16));
+										//UnityEngine.Debug.Log("message1:" + ch.ToString());
+
 								} else {
 										if (ch == ',' && ignoreComma) {
 												o.Append (ch.ToString ());
@@ -146,6 +148,7 @@ namespace PubNubMessaging.Core
 												o.Append (ch);
 										} else {
 												string escapeChar = System.Uri.EscapeDataString (ch.ToString ());
+												//UnityEngine.Debug.Log("message2:" + ch.ToString() + escapeChar.ToString());
 												o.Append (escapeChar);
 										}
 								}
@@ -172,23 +175,8 @@ namespace PubNubMessaging.Core
 						#endif
 
 						LoggingMethod.LogLevel = pubnubLogLevel;
-
-						//TODO:
-						/*string configuredLogLevel = ConfigurationManager.AppSettings ["PubnubMessaging.LogLevel"];
-						int logLevelValue;
-						if (!Int32.TryParse (configuredLogLevel, out logLevelValue)) {
 						base.PubnubLogLevel = pubnubLogLevel;
-						} else {
-						base.PubnubLogLevel = (LoggingMethod.Level)logLevelValue;
-						}
-
-						string configuredErrorFilter = ConfigurationManager.AppSettings ["PubnubMessaging.PubnubErrorFilterLevel"];
-						int errorFilterValue;
-						if (!Int32.TryParse (configuredErrorFilter, out errorFilterValue)) {
 						base.PubnubErrorLevel = errorLevel;
-						} else {
-						base.PubnubErrorLevel = (PubnubErrorFilter.Level)errorFilterValue;
-						}*/
 
 						base.publishKey = publishKey;
 						base.subscribeKey = subscribeKey;
@@ -198,7 +186,7 @@ namespace PubNubMessaging.Core
 
 						base.VerifyOrSetSessionUUID ();
 
-						PubnubWebRequest.ServicePointConnectionLimit = 500;
+						PubnubWebRequest.ServicePointConnectionLimit = 200;
 				}
 
 				protected override bool InternetConnectionStatus<T> (string channel, Action<PubnubClientError> errorCallback, string[] rawChannels)
@@ -327,11 +315,11 @@ namespace PubNubMessaging.Core
 						                           _pubnubNetworkTcpCheckIntervalInSeconds * 1000);
 						_channelHeartbeatTimer.AddOrUpdate(requestUri, heartBeatTimer, (key, oldState) => heartBeatTimer);
 						#else
-						if (heartBeatTimer != null) {
+				/*if (heartBeatTimer != null) {
 								heartBeatTimer.Dispose ();
-						}
+						}*/
 						heartBeatTimer = new Timer (new TimerCallback (OnPubnubHeartBeatTimeoutCallback<T>), pubnubRequestState, 0,
-								NetworkCheckRetryInterval * 1000);
+										HeartbeatInterval * 1000);
 						base.channelHeartbeatTimer.AddOrUpdate (requestUri, heartBeatTimer, (key, oldState) => heartBeatTimer);
 						#endif
 				}
@@ -1203,12 +1191,8 @@ namespace PubNubMessaging.Core
 
 				protected override HttpWebRequest SetUserAgent (HttpWebRequest req, bool keepAliveRequest, OperatingSystem userOS)
 				{
-						#if (SILVERLIGHT || WINDOWS_PHONE)
-                        req.Headers["UserAgent"] = string.Format("ua_string=({0} {1}) PubNub-csharp/3.5", userOS.Platform.ToString(), userOS.Version.ToString());
-						#else
 						req.KeepAlive = keepAliveRequest;
 						req.UserAgent = string.Format ("ua_string=({0}) PubNub-csharp/3.5", userOS.VersionString);
-						#endif
 						return req;
 				}
 		}
@@ -1319,12 +1303,8 @@ namespace PubNubMessaging.Core
 						HashAlgorithm algorithm = new SHA256CryptoServiceProvider ();
 						#endif
 
-						#if (SILVERLIGHT || WINDOWS_PHONE)
-                        Byte[] inputBytes = System.Text.Encoding.UTF8.GetBytes(input);
-						#else
 						//Byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
 						Byte[] inputBytes = System.Text.Encoding.UTF8.GetBytes (input);
-						#endif
 						Byte[] hashedBytes = algorithm.ComputeHash (inputBytes);
 						return BitConverter.ToString (hashedBytes);
 				}
@@ -1332,14 +1312,6 @@ namespace PubNubMessaging.Core
 				protected override string EncryptOrDecrypt (bool type, string plainStr)
 				{
 						{
-								#if (SILVERLIGHT || WINDOWS_PHONE)
-                                AesManaged aesEncryption = new AesManaged();
-                                aesEncryption.KeySize = 256;
-                                aesEncryption.BlockSize = 128;
-                                //get ASCII bytes of the string
-                                aesEncryption.IV = System.Text.Encoding.UTF8.GetBytes("0123456789012345");
-                                aesEncryption.Key = System.Text.Encoding.UTF8.GetBytes(GetEncryptionKey());
-								#else
 								RijndaelManaged aesEncryption = new RijndaelManaged ();
 								aesEncryption.KeySize = 256;
 								aesEncryption.BlockSize = 128;
@@ -1350,17 +1322,11 @@ namespace PubNubMessaging.Core
 								//get ASCII bytes of the string
 								aesEncryption.IV = System.Text.Encoding.ASCII.GetBytes ("0123456789012345");
 								aesEncryption.Key = System.Text.Encoding.ASCII.GetBytes (GetEncryptionKey ());
-								#endif
 
 								if (type) {
 										ICryptoTransform crypto = aesEncryption.CreateEncryptor ();
 										plainStr = EncodeNonAsciiCharacters (plainStr);
-										#if (SILVERLIGHT || WINDOWS_PHONE)
-                                        byte[] plainText = Encoding.UTF8.GetBytes(plainStr);
-										#else
-										//byte[] plainText = Encoding.ASCII.GetBytes(plainStr);
 										byte[] plainText = Encoding.UTF8.GetBytes (plainStr);
-										#endif
 
 										//encrypt
 										byte[] cipherText = crypto.TransformFinalBlock (plainText, 0, plainText.Length);
@@ -1372,13 +1338,8 @@ namespace PubNubMessaging.Core
 												byte[] decryptedBytes = Convert.FromBase64CharArray (plainStr.ToCharArray (), 0, plainStr.Length);
 
 												//decrypt
-												#if (SILVERLIGHT || WINDOWS_PHONE)
-                                                var data = decrypto.TransformFinalBlock(decryptedBytes, 0, decryptedBytes.Length);
-                                                string decrypted = Encoding.UTF8.GetString(data, 0, data.Length);
-												#else
 												//string decrypted = System.Text.Encoding.ASCII.GetString(decrypto.TransformFinalBlock(decryptedBytes, 0, decryptedBytes.Length));
 												string decrypted = System.Text.Encoding.UTF8.GetString (decrypto.TransformFinalBlock (decryptedBytes, 0, decryptedBytes.Length));
-												#endif
 
 												return decrypted;
 										} catch (Exception ex) {
