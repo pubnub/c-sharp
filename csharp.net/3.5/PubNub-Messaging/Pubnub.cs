@@ -72,9 +72,9 @@ namespace PubNubMessaging.Core
 			return pubnub.HereNow(channel, userCallback, errorCallback);
 		}
 
-        public bool HereNow(string channel, bool showUUIDList, bool includeMetadata, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        public bool HereNow(string channel, bool showUUIDList, bool includeUserState, Action<object> userCallback, Action<PubnubClientError> errorCallback)
         {
-            return pubnub.HereNow(channel, showUUIDList, includeMetadata, userCallback, errorCallback);
+            return pubnub.HereNow(channel, showUUIDList, includeUserState, userCallback, errorCallback);
         }
 
 		public bool HereNow<T>(string channel, Action<T> userCallback, Action<PubnubClientError> errorCallback)
@@ -82,19 +82,19 @@ namespace PubNubMessaging.Core
 			return pubnub.HereNow<T>(channel, userCallback, errorCallback);
 		}
 
-        public bool HereNow<T>(string channel, bool showUUIDList, bool includeMetadata, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        public bool HereNow<T>(string channel, bool showUUIDList, bool includeUserState, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
-            return pubnub.HereNow<T>(channel, showUUIDList, includeMetadata, userCallback, errorCallback);
+            return pubnub.HereNow<T>(channel, showUUIDList, includeUserState, userCallback, errorCallback);
         }
 
-        public void GlobalHereNow(bool showUUIDList, bool includeMetadata, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        public void GlobalHereNow(bool showUUIDList, bool includeUserState, Action<object> userCallback, Action<PubnubClientError> errorCallback)
         {
-            pubnub.GlobalHereNow(showUUIDList, includeMetadata, userCallback, errorCallback);
+            pubnub.GlobalHereNow(showUUIDList, includeUserState, userCallback, errorCallback);
         }
 
-        public bool GlobalHereNow<T>(bool showUUIDList, bool includeMetadata, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        public bool GlobalHereNow<T>(bool showUUIDList, bool includeUserState, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
-            return pubnub.GlobalHereNow<T>(showUUIDList, includeMetadata, userCallback, errorCallback);
+            return pubnub.GlobalHereNow<T>(showUUIDList, includeUserState, userCallback, errorCallback);
         }
 
         public void WhereNow(string uuid, Action<object> userCallback, Action<PubnubClientError> errorCallback)
@@ -173,49 +173,49 @@ namespace PubNubMessaging.Core
             return pubnub.GrantPresenceAccess(channel, read, write, ttl, userCallback, errorCallback);
 		}
 
-        public void SetUserMetadata<T>(string channel, string uuid, string jsonMetadata, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        public void SetUserState<T>(string channel, string uuid, string jsonUserState, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
-            pubnub.SetUserMetadata<T>(channel, uuid, jsonMetadata, userCallback, errorCallback);
+            pubnub.SetUserState<T>(channel, uuid, jsonUserState, userCallback, errorCallback);
         }
 
-        public void SetUserMetadata<T>(string channel, string jsonMetadata, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        public void SetUserState<T>(string channel, string jsonUserState, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
-            pubnub.SetUserMetadata<T>(channel,"", jsonMetadata, userCallback, errorCallback);
+            pubnub.SetUserState<T>(channel,"", jsonUserState, userCallback, errorCallback);
         }
 
-        public void GetUserMetadata<T>(string channel, string uuid, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        public void GetUserState<T>(string channel, string uuid, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
-            pubnub.GetUserMetadata<T>(channel, uuid, userCallback, errorCallback);
+            pubnub.GetUserState<T>(channel, uuid, userCallback, errorCallback);
         }
 
-        public void GetUserMetadata<T>(string channel, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        public void GetUserState<T>(string channel, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
-            pubnub.GetUserMetadata<T>(channel, "", userCallback, errorCallback);
+            pubnub.GetUserState<T>(channel, "", userCallback, errorCallback);
         }
 
-        public string SetLocalMetadata(string channel, string metadataKey, int metadataValue)
+        public string SetLocalUserState(string channel, string userStateKey, int userStateValue)
         {
-            return pubnub.SetLocalMetadata(channel, metadataKey, metadataValue);
+            return pubnub.SetLocalUserState(channel, userStateKey, userStateValue);
         }
 
-        public string SetLocalMetadata(string channel, string metadataKey, double metadataValue)
+        public string SetLocalUserState(string channel, string userStateKey, double userStateValue)
         {
-            return pubnub.SetLocalMetadata(channel, metadataKey, metadataValue);
+            return pubnub.SetLocalUserState(channel, userStateKey, userStateValue);
         }
 
-        public string SetLocalMetadata(string channel, string metadataKey, string metadataValue)
+        public string SetLocalUserState(string channel, string userStateKey, string userStateValue)
         {
-            return pubnub.SetLocalMetadata(channel, metadataKey, metadataValue);
+            return pubnub.SetLocalUserState(channel, userStateKey, userStateValue);
         }
 
-        public string GetLocalMetadata(string channel)
+        public string GetLocalUserState(string channel)
         {
-            return pubnub.GetLocalMetadata(channel);
+            return pubnub.GetLocalUserState(channel);
         }
 
-        public string GetLocalMetadata(string[] channels)
+        public string GetLocalUserState(string[] channels)
         {
-            return pubnub.GetLocalMetadata(channels);
+            return pubnub.GetLocalUserState(channels);
         }
         #endregion
 
@@ -274,9 +274,9 @@ namespace PubNubMessaging.Core
 			set {pubnub.AuthenticationKey = value;}
 		}
 
-		public int HeartbeatInterval {
-			get {return pubnub.HeartbeatInterval;}
-			set {pubnub.HeartbeatInterval = value;}
+		public int LocalClientHeartbeatInterval {
+			get {return pubnub.LocalClientHeartbeatInterval;}
+			set {pubnub.LocalClientHeartbeatInterval = value;}
 		}
 
 		public int NetworkCheckRetryInterval {
@@ -314,19 +314,31 @@ namespace PubNubMessaging.Core
 			set {pubnub.Origin = value;}
 		}
 
-        public int PresenceExpiry
+        public int PresenceHeartbeat
         {
             get
             {
-                return pubnub.PresenceExpiry;
+                return pubnub.PresenceHeartbeat;
             }
             set
             {
-                pubnub.PresenceExpiry = value;
+                pubnub.PresenceHeartbeat = value;
             }
         }
 
-		public IPubnubUnitTest PubnubUnitTest
+        public int PresenceHeartbeatInterval
+        {
+            get
+            {
+                return pubnub.PresenceHeartbeatInterval;
+            }
+            set
+            {
+                pubnub.PresenceHeartbeatInterval = value;
+            }
+        }
+        
+        public IPubnubUnitTest PubnubUnitTest
 		{
 			get
 			{

@@ -94,7 +94,7 @@ namespace PubNubMessaging.Core
 		protected override PubnubWebRequest SetServicePointSetTcpKeepAlive (PubnubWebRequest request)
 		{
 #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE)
-            request.ServicePoint.SetTcpKeepAlive(true, base.HeartbeatInterval * 1000, 1000);
+            request.ServicePoint.SetTcpKeepAlive(true, base.LocalClientHeartbeatInterval * 1000, 1000);
 #endif
 			//do nothing for mono
 			return request;
@@ -260,12 +260,12 @@ namespace PubNubMessaging.Core
 
 		protected override void TimerWhenOverrideTcpKeepAlive<T> (Uri requestUri, RequestState<T> pubnubRequestState)
 		{
-			if(heartBeatTimer != null){
-				heartBeatTimer.Dispose();
+			if(localClientHeartBeatTimer != null){
+				localClientHeartBeatTimer.Dispose();
 			}
-			heartBeatTimer = new Timer(new TimerCallback(OnPubnubHeartBeatTimeoutCallback<T>), pubnubRequestState, 0,
-                                       base.HeartbeatInterval * 1000);
-			channelHeartbeatTimer.AddOrUpdate(requestUri, heartBeatTimer, (key, oldState) => heartBeatTimer);
+			localClientHeartBeatTimer = new Timer(new TimerCallback(OnPubnubLocalClientHeartBeatTimeoutCallback<T>), pubnubRequestState, 0,
+                                       base.LocalClientHeartbeatInterval * 1000);
+			channelLocalClientHeartbeatTimer.AddOrUpdate(requestUri, localClientHeartBeatTimer, (key, oldState) => localClientHeartBeatTimer);
 		}
 
         protected override bool HandleWebException<T>(WebException webEx, RequestState<T> asynchRequestState, string channel)
@@ -343,9 +343,9 @@ namespace PubNubMessaging.Core
 				ClientNetworkStatus.MachineSuspendMode = true;
 				PubnubWebRequest.MachineSuspendMode = true;
 				TerminatePendingWebRequest();
-                if (overrideTcpKeepAlive && heartBeatTimer != null)
+                if (overrideTcpKeepAlive && localClientHeartBeatTimer != null)
 				{
-					heartBeatTimer.Change(Timeout.Infinite, Timeout.Infinite);
+					localClientHeartBeatTimer.Change(Timeout.Infinite, Timeout.Infinite);
 				}
 
 				LoggingMethod.WriteToLog(string.Format("DateTime {0}, System entered into Suspend Mode.", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
@@ -360,13 +360,13 @@ namespace PubNubMessaging.Core
 				pubnetSystemActive = true;
 				ClientNetworkStatus.MachineSuspendMode = false;
 				PubnubWebRequest.MachineSuspendMode = false;
-                if (overrideTcpKeepAlive && heartBeatTimer != null)
+                if (overrideTcpKeepAlive && localClientHeartBeatTimer != null)
 				{
 					try
 					{
-						heartBeatTimer.Change(
-                            (-1 == base.HeartbeatInterval) ? -1 : base.HeartbeatInterval * 1000,
-                            (-1 == base.HeartbeatInterval) ? -1 : base.HeartbeatInterval * 1000);
+						localClientHeartBeatTimer.Change(
+                            (-1 == base.LocalClientHeartbeatInterval) ? -1 : base.LocalClientHeartbeatInterval * 1000,
+                            (-1 == base.LocalClientHeartbeatInterval) ? -1 : base.LocalClientHeartbeatInterval * 1000);
 					}
 					catch { }
 				}

@@ -62,7 +62,7 @@ namespace PubNubMessaging.Core
 		int _pubnubNetworkTcpCheckIntervalInSeconds = 15;
 		int _pubnubNetworkCheckRetries = 50;
 		int _pubnubWebRequestRetryIntervalInSeconds = 10;
-        int _pubnubPresenceExpiryInSeconds = 0;
+        int _pubnubPresenceHeartbeatInSeconds = 0;
 		bool _enableResumeOnReconnect = true;
 		protected bool overrideTcpKeepAlive = true;
 		bool _enableJsonEncodingForPublish = true;
@@ -74,11 +74,11 @@ namespace PubNubMessaging.Core
 		protected ConcurrentDictionary<string, bool> channelInternetStatus = new ConcurrentDictionary<string, bool>();
 		protected ConcurrentDictionary<string, int> channelInternetRetry = new ConcurrentDictionary<string, int>();
 		ConcurrentDictionary<string, Timer> _channelReconnectTimer = new ConcurrentDictionary<string, Timer>();
-		protected ConcurrentDictionary<Uri, Timer> channelHeartbeatTimer = new ConcurrentDictionary<Uri, Timer>();
+		protected ConcurrentDictionary<Uri, Timer> channelLocalClientHeartbeatTimer = new ConcurrentDictionary<Uri, Timer>();
 		ConcurrentDictionary<PubnubChannelCallbackKey, object> _channelCallbacks = new ConcurrentDictionary<PubnubChannelCallbackKey, object>();
-        ConcurrentDictionary<string, Dictionary<string, object>> _channelMetadata = new ConcurrentDictionary<string, Dictionary<string, object>>();
+        ConcurrentDictionary<string, Dictionary<string, object>> _channelUserState = new ConcurrentDictionary<string, Dictionary<string, object>>();
 
-		protected System.Threading.Timer heartBeatTimer;
+		protected System.Threading.Timer localClientHeartBeatTimer;
         protected System.Threading.Timer presenceHeartbeatTimer = null;
 
 		protected static bool pubnetSystemActive = true;
@@ -103,7 +103,7 @@ namespace PubNubMessaging.Core
         private string subscribeParameters = "";
         private string presenceHeartbeatParameters = "";
         private string hereNowParameters = "";
-        private string setUserMetadataparameters = "";
+        private string setUserStateparameters = "";
         private string globalHereNowParameters = "";
 
 		#endregion
@@ -161,7 +161,7 @@ namespace PubNubMessaging.Core
 			}
 		}
 
-		internal int HeartbeatInterval
+		internal int LocalClientHeartbeatInterval
 		{
 			get
 			{
@@ -276,23 +276,23 @@ namespace PubNubMessaging.Core
         /// This property sets presence expiry timeout.
         /// Presence expiry value in seconds.
         /// </summary>
-        internal int PresenceExpiry
+        internal int PresenceHeartbeat
         {
             get
             {
-                return _pubnubPresenceExpiryInSeconds;
+                return _pubnubPresenceHeartbeatInSeconds;
             }
             set
             {
                 if (value <= 0 || value > 320)
                 {
-                    _pubnubPresenceExpiryInSeconds = 0;
+                    _pubnubPresenceHeartbeatInSeconds = 0;
                 }
                 else
                 {
-                    _pubnubPresenceExpiryInSeconds = value;
+                    _pubnubPresenceHeartbeatInSeconds = value;
                 }
-                _presenceHeartbeatIntervalInSeconds = _pubnubPresenceExpiryInSeconds - 3;
+                _presenceHeartbeatIntervalInSeconds = _pubnubPresenceHeartbeatInSeconds - 3;
             }
         }
 
@@ -306,9 +306,9 @@ namespace PubNubMessaging.Core
             set
             {
                 _presenceHeartbeatIntervalInSeconds = value;
-                if (_presenceHeartbeatIntervalInSeconds > _pubnubPresenceExpiryInSeconds - 3)
+                if (_presenceHeartbeatIntervalInSeconds > _pubnubPresenceHeartbeatInSeconds - 3)
                 {
-                    _presenceHeartbeatIntervalInSeconds = _pubnubPresenceExpiryInSeconds - 3;
+                    _presenceHeartbeatIntervalInSeconds = _pubnubPresenceHeartbeatInSeconds - 3;
                 }
             }
         }
@@ -763,18 +763,18 @@ namespace PubNubMessaging.Core
 			}
 		}
 
-		protected virtual void TerminateHeartbeatTimer()
+		protected virtual void TerminateLocalClientHeartbeatTimer()
 		{
-			TerminateHeartbeatTimer(null);
+			TerminateLocalClientHeartbeatTimer(null);
 		}
 
-		protected virtual void TerminateHeartbeatTimer(Uri requestUri)
+		protected virtual void TerminateLocalClientHeartbeatTimer(Uri requestUri)
 		{
 			if (requestUri != null)
 			{
-				if (channelHeartbeatTimer.ContainsKey(requestUri))
+				if (channelLocalClientHeartbeatTimer.ContainsKey(requestUri))
 				{
-					Timer requestHeatbeatTimer = channelHeartbeatTimer[requestUri];
+					Timer requestHeatbeatTimer = channelLocalClientHeartbeatTimer[requestUri];
 					if (requestHeatbeatTimer != null)
 					{
 						try
@@ -786,37 +786,37 @@ namespace PubNubMessaging.Core
 						}
 						catch (ObjectDisposedException ex)
 						{
-							LoggingMethod.WriteToLog(string.Format("DateTime {0} Error while accessing requestHeatbeatTimer object in TerminateHeartbeatTimer {1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelInfo);
+							LoggingMethod.WriteToLog(string.Format("DateTime {0} Error while accessing requestHeatbeatTimer object in TerminateLocalClientHeartbeatTimer {1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelInfo);
 						}
 
 						Timer removedTimer = null;
-						bool removed = channelHeartbeatTimer.TryRemove(requestUri, out removedTimer);
+						bool removed = channelLocalClientHeartbeatTimer.TryRemove(requestUri, out removedTimer);
 						if (removed)
 						{
-							LoggingMethod.WriteToLog(string.Format("DateTime {0} Remove heartbeat reference from collection for {1}", DateTime.Now.ToString(), requestUri.ToString()), LoggingMethod.LevelInfo);
+							LoggingMethod.WriteToLog(string.Format("DateTime {0} Remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString(), requestUri.ToString()), LoggingMethod.LevelInfo);
 						}
 						else
 						{
-							LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to remove heartbeat reference from collection for {1}", DateTime.Now.ToString(), requestUri.ToString()), LoggingMethod.LevelInfo);
+							LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString(), requestUri.ToString()), LoggingMethod.LevelInfo);
 						}
 					}
 				}
 			}
 			else
 			{
-				ConcurrentDictionary<Uri, Timer> timerCollection = channelHeartbeatTimer;
+				ConcurrentDictionary<Uri, Timer> timerCollection = channelLocalClientHeartbeatTimer;
 				ICollection<Uri> keyCollection = timerCollection.Keys;
 				foreach (Uri key in keyCollection)
 				{
-					if (channelHeartbeatTimer.ContainsKey(key))
+					if (channelLocalClientHeartbeatTimer.ContainsKey(key))
 					{
-						Timer currentTimer = channelHeartbeatTimer[key];
+						Timer currentTimer = channelLocalClientHeartbeatTimer[key];
 						currentTimer.Dispose();
 						Timer removedTimer = null;
-						bool removed = channelHeartbeatTimer.TryRemove(key, out removedTimer);
+						bool removed = channelLocalClientHeartbeatTimer.TryRemove(key, out removedTimer);
 						if (!removed)
 						{
-							LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateHeartbeatTimer(null) - Unable to remove heartbeat reference from collection for {1}", DateTime.Now.ToString(), key.ToString()), LoggingMethod.LevelInfo);
+							LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateLocalClientHeartbeatTimer(null) - Unable to remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString(), key.ToString()), LoggingMethod.LevelInfo);
 						}
 					}
 				}
@@ -872,7 +872,7 @@ namespace PubNubMessaging.Core
 		{
 			RemoveChannelDictionary();
 			TerminatePendingWebRequest();
-			TerminateHeartbeatTimer();
+			TerminateLocalClientHeartbeatTimer();
 			TerminateReconnectTimer();
 			RemoveChannelCallback();
 		}
@@ -1473,7 +1473,7 @@ namespace PubNubMessaging.Core
 						_channelRequest[multiChannelName] = null;
 
 						if (webRequest != null)
-							TerminateHeartbeatTimer(webRequest.RequestUri);
+							TerminateLocalClientHeartbeatTimer(webRequest.RequestUri);
 
 						PubnubWebRequest removedRequest;
 						_channelRequest.TryRemove(multiChannelName, out removedRequest);
@@ -1616,7 +1616,7 @@ namespace PubNubMessaging.Core
 		}
 		private Uri BuildMultiChannelSubscribeRequest(string[] channels, object timetoken)
 		{
-            subscribeParameters = string.Format("&metadata={0}", EncodeUricomponent(BuildJsonMetadata(channels), ResponseType.Subscribe, false));
+            subscribeParameters = string.Format("&state={0}", EncodeUricomponent(BuildJsonUserState(channels), ResponseType.Subscribe, false));
 
 			List<string> url = new List<string>();
 			url.Add("subscribe");
@@ -1726,7 +1726,7 @@ namespace PubNubMessaging.Core
 
 						if (webRequest != null)
 						{
-							TerminateHeartbeatTimer(webRequest.RequestUri);
+							TerminateLocalClientHeartbeatTimer(webRequest.RequestUri);
 						}
 
 						PubnubWebRequest removedRequest;
@@ -1780,7 +1780,7 @@ namespace PubNubMessaging.Core
 						LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
 						GoToCallback<T>(result, disconnectCallback);
 
-                        DeleteLocalMetadata(channelToBeRemoved);
+                        DeleteLocalUserState(channelToBeRemoved);
 					}
 					else
 					{
@@ -1914,7 +1914,7 @@ namespace PubNubMessaging.Core
             return HereNow<T>(channel, true, false, userCallback, errorCallback);
 		}
 
-        internal bool HereNow<T>(string channel, bool showUUIDList, bool includeMetadata, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        internal bool HereNow<T>(string channel, bool showUUIDList, bool includeUserState, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()))
             {
@@ -1933,7 +1933,7 @@ namespace PubNubMessaging.Core
                 throw new NullReferenceException("Missing Json Pluggable Library for Pubnub Instance");
             }
 
-            Uri request = BuildHereNowRequest(channel, showUUIDList, includeMetadata);
+            Uri request = BuildHereNowRequest(channel, showUUIDList, includeUserState);
 
             RequestState<T> requestState = new RequestState<T>();
             requestState.Channels = new string[] { channel };
@@ -1945,11 +1945,11 @@ namespace PubNubMessaging.Core
             return UrlProcessRequest<T>(request, requestState);
         }
 
-		private Uri BuildHereNowRequest(string channel, bool showUUIDList, bool includeMetadata)
+		private Uri BuildHereNowRequest(string channel, bool showUUIDList, bool includeUserState)
 		{
             int disableUUID = (showUUIDList) ? 0 : 1;
-            int metadata = (includeMetadata) ? 1 : 0;
-            hereNowParameters = string.Format("?disable_uuids={0}&metadata={1}", disableUUID, metadata);
+            int userState = (includeUserState) ? 1 : 0;
+            hereNowParameters = string.Format("?disable_uuids={0}&state={1}", disableUUID, userState);
 
 			List<string> url = new List<string>();
 
@@ -1965,7 +1965,7 @@ namespace PubNubMessaging.Core
 
         private Uri BuildPresenceHeartbeatRequest(string[] channels)
         {
-            presenceHeartbeatParameters = string.Format("&metadata={0}", EncodeUricomponent(BuildJsonMetadata(channels), ResponseType.PresenceHeartbeat, false));
+            presenceHeartbeatParameters = string.Format("&state={0}", EncodeUricomponent(BuildJsonUserState(channels), ResponseType.PresenceHeartbeat, false));
 
             List<string> url = new List<string>();
             
@@ -1992,7 +1992,7 @@ namespace PubNubMessaging.Core
             return GlobalHereNow<T>(true, false, userCallback, errorCallback);
         }
 
-        internal bool GlobalHereNow<T>(bool showUUIDList, bool includeMetadata, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        internal bool GlobalHereNow<T>(bool showUUIDList, bool includeUserState, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (userCallback == null)
             {
@@ -2007,7 +2007,7 @@ namespace PubNubMessaging.Core
                 throw new NullReferenceException("Missing Json Pluggable Library for Pubnub Instance");
             }
 
-            Uri request = BuildGlobalHereNowRequest(showUUIDList, includeMetadata);
+            Uri request = BuildGlobalHereNowRequest(showUUIDList, includeUserState);
 
             RequestState<T> requestState = new RequestState<T>();
             requestState.Channels = null;
@@ -2019,11 +2019,11 @@ namespace PubNubMessaging.Core
             return UrlProcessRequest<T>(request, requestState);
         }
 
-        private Uri BuildGlobalHereNowRequest(bool showUUIDList, bool includeMetadata)
+        private Uri BuildGlobalHereNowRequest(bool showUUIDList, bool includeUserState)
         {
             int disableUUID = (showUUIDList) ? 0 : 1;
-            int metadata = (includeMetadata) ? 1 : 0;
-            globalHereNowParameters = string.Format("?disable_uuids={0}&metadata={1}", disableUUID, metadata);
+            int userState = (includeUserState) ? 1 : 0;
+            globalHereNowParameters = string.Format("?disable_uuids={0}&state={1}", disableUUID, userState);
 
             List<string> url = new List<string>();
 
@@ -2141,67 +2141,67 @@ namespace PubNubMessaging.Core
 
 		#endregion
 
-        #region "User Metadata"
-        private string AddOrUpdateOrDeleteLocalMetadata(string channel, string metadataKey, object metadataValue)
+        #region "User State"
+        private string AddOrUpdateOrDeleteLocalUserState(string channel, string userStateKey, object userStateValue)
         {
-            Dictionary<string, object> metadataDictionary = null;
+            Dictionary<string, object> userStateDictionary = null;
 
-            if (_channelMetadata.ContainsKey(channel))
+            if (_channelUserState.ContainsKey(channel))
             {
-                metadataDictionary = _channelMetadata[channel];
-                if (metadataDictionary != null)
+                userStateDictionary = _channelUserState[channel];
+                if (userStateDictionary != null)
                 {
-                    if (metadataDictionary.ContainsKey(metadataKey))
+                    if (userStateDictionary.ContainsKey(userStateKey))
                     {
-                        if (metadataValue != null)
+                        if (userStateValue != null)
                         {
-                            metadataDictionary[metadataKey] = metadataValue;
+                            userStateDictionary[userStateKey] = userStateValue;
                         }
                         else
                         {
-                            metadataDictionary.Remove(metadataKey);
+                            userStateDictionary.Remove(userStateKey);
                         }
                     }
                     else
                     {
-                        if (metadataValue != null)
+                        if (userStateValue != null)
                         {
-                            metadataDictionary.Add(metadataKey, metadataValue);
+                            userStateDictionary.Add(userStateKey, userStateValue);
                         }
                     }
                 }
                 else
                 {
-                    metadataDictionary = new Dictionary<string, object>();
-                    metadataDictionary.Add(metadataKey, metadataValue);
+                    userStateDictionary = new Dictionary<string, object>();
+                    userStateDictionary.Add(userStateKey, userStateValue);
                 }
 
-                _channelMetadata.AddOrUpdate(channel, metadataDictionary, (oldData, newData) => metadataDictionary);
+                _channelUserState.AddOrUpdate(channel, userStateDictionary, (oldData, newData) => userStateDictionary);
             }
             else
             {
-                if (metadataValue != null)
+                if (userStateValue != null)
                 {
-                    metadataDictionary = new Dictionary<string, object>();
-                    metadataDictionary.Add(metadataKey, metadataValue);
+                    userStateDictionary = new Dictionary<string, object>();
+                    userStateDictionary.Add(userStateKey, userStateValue);
 
-                    _channelMetadata.AddOrUpdate(channel, metadataDictionary, (oldData, newData) => metadataDictionary);
+                    _channelUserState.AddOrUpdate(channel, userStateDictionary, (oldData, newData) => userStateDictionary);
                 }
             }
-            return BuildJsonMetadata(channel);
+            return BuildJsonUserState(channel);
         }
 
-        private bool DeleteLocalMetadata(string channel)
+        private bool DeleteLocalUserState(string channel)
         {
-            bool metadataDeleted = false;
+            bool userStateDeleted = false;
 
-            if (_channelMetadata.ContainsKey(channel))
+            if (_channelUserState.ContainsKey(channel))
             {
-                Dictionary<string, object> returnedMetadata = null;
-                metadataDeleted = _channelMetadata.TryRemove(channel, out returnedMetadata);
+                Dictionary<string, object> returnedUserState = null;
+                userStateDeleted = _channelUserState.TryRemove(channel, out returnedUserState);
             }
 
-            return metadataDeleted;
+            return userStateDeleted;
         }
 
         //private bool DeleteLocalMetadata(string[] channels)
@@ -2221,102 +2221,102 @@ namespace PubNubMessaging.Core
         //    return metadataDeleted;
         //}
 
-        private string BuildJsonMetadata(string channel)
+        private string BuildJsonUserState(string channel)
         {
-            Dictionary<string, object> metadataDictionary = null;
+            Dictionary<string, object> userStateDictionary = null;
 
-            if (_channelMetadata.ContainsKey(channel))
+            if (_channelUserState.ContainsKey(channel))
             {
-                metadataDictionary = _channelMetadata[channel];
+                userStateDictionary = _channelUserState[channel];
             }
 
-            StringBuilder jsonMetaBuilder = new StringBuilder();
-            jsonMetaBuilder.AppendFormat("\"{0}\":", channel);
-            jsonMetaBuilder.Append("{");
+            StringBuilder jsonStateBuilder = new StringBuilder();
+            jsonStateBuilder.AppendFormat("\"{0}\":", channel);
+            jsonStateBuilder.Append("{");
 
-            if (metadataDictionary != null)
+            if (userStateDictionary != null)
             {
-                string[] metadataKeys = metadataDictionary.Keys.ToArray<string>();
+                string[] userStateKeys = userStateDictionary.Keys.ToArray<string>();
 
-                for (int keyIndex = 0; keyIndex < metadataKeys.Length; keyIndex++)
+                for (int keyIndex = 0; keyIndex < userStateKeys.Length; keyIndex++)
                 {
-                    string metaKey = metadataKeys[keyIndex];
-                    object metaValue = metadataDictionary[metaKey];
-                    jsonMetaBuilder.AppendFormat("\"{0}\":{1}", metaKey, (metaValue.GetType().ToString() == "System.String") ? string.Format("\"{0}\"",metaValue) : metaValue);
-                    if (keyIndex < metadataKeys.Length - 1)
+                    string useStateKey = userStateKeys[keyIndex];
+                    object userStateValue = userStateDictionary[useStateKey];
+                    jsonStateBuilder.AppendFormat("\"{0}\":{1}", useStateKey, (userStateValue.GetType().ToString() == "System.String") ? string.Format("\"{0}\"",userStateValue) : userStateValue);
+                    if (keyIndex < userStateKeys.Length - 1)
                     {
-                        jsonMetaBuilder.Append(",");
+                        jsonStateBuilder.Append(",");
                     }
                 }
             }
 
-            jsonMetaBuilder.Append("}");
-            return jsonMetaBuilder.ToString();
+            jsonStateBuilder.Append("}");
+            return jsonStateBuilder.ToString();
         }
 
-        private string BuildJsonMetadata(string[] channels)
+        private string BuildJsonUserState(string[] channels)
         {
-            StringBuilder jsonMetaBuilder = new StringBuilder();
-            jsonMetaBuilder.Append("{");
+            StringBuilder jsonStateBuilder = new StringBuilder();
+            jsonStateBuilder.Append("{");
 
             if (channels != null)
             {
                 for (int index = 0; index < channels.Length; index++)
                 {
-                    jsonMetaBuilder.Append(BuildJsonMetadata(channels[index].ToString()));
+                    jsonStateBuilder.Append(BuildJsonUserState(channels[index].ToString()));
                     if (index < channels.Length-1)
                     {
-                        jsonMetaBuilder.Append(",");
+                        jsonStateBuilder.Append(",");
                     }
                 }
             }
 
-            jsonMetaBuilder.Append("}");
-            return jsonMetaBuilder.ToString();
+            jsonStateBuilder.Append("}");
+            return jsonStateBuilder.ToString();
         }
 
-        internal string SetLocalMetadata(string channel, string metadataKey, int metadataValue)
+        internal string SetLocalUserState(string channel, string userStateKey, int userStateValue)
         {
-            return AddOrUpdateOrDeleteLocalMetadata(channel, metadataKey, metadataValue);
+            return AddOrUpdateOrDeleteLocalUserState(channel, userStateKey, userStateValue);
         }
 
-        internal string SetLocalMetadata(string channel, string metadataKey, double metadataValue)
+        internal string SetLocalUserState(string channel, string userStateKey, double userStateValue)
         {
-            return AddOrUpdateOrDeleteLocalMetadata(channel, metadataKey, metadataValue);
+            return AddOrUpdateOrDeleteLocalUserState(channel, userStateKey, userStateValue);
         }
 
-        internal string SetLocalMetadata(string channel, string metadataKey, string metadataValue)
+        internal string SetLocalUserState(string channel, string userStateKey, string userStateValue)
         {
-            return AddOrUpdateOrDeleteLocalMetadata(channel, metadataKey, metadataValue);
+            return AddOrUpdateOrDeleteLocalUserState(channel, userStateKey, userStateValue);
         }
 
-        internal string GetLocalMetadata(string channel)
+        internal string GetLocalUserState(string channel)
         {
             StringBuilder builder = new StringBuilder();
             builder.Append("{");
-            builder.Append(BuildJsonMetadata(channel));
+            builder.Append(BuildJsonUserState(channel));
             builder.Append("}");
             return builder.ToString();
         }
 
-        internal string GetLocalMetadata(string[] channels)
+        internal string GetLocalUserState(string[] channels)
         {
             StringBuilder builder = new StringBuilder();
             builder.Append("{");
-            builder.Append(BuildJsonMetadata(channels));
+            builder.Append(BuildJsonUserState(channels));
             builder.Append("}");
             return builder.ToString();
         }
 
-        internal void SetUserMetadata<T>(string channel, string uuid, string jsonMetadata, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        internal void SetUserState<T>(string channel, string uuid, string jsonUserState, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()))
             {
                 throw new ArgumentException("Missing Channel");
             }
-            if (string.IsNullOrEmpty(jsonMetadata) || string.IsNullOrEmpty(jsonMetadata.Trim()))
+            if (string.IsNullOrEmpty(jsonUserState) || string.IsNullOrEmpty(jsonUserState.Trim()))
             {
-                throw new ArgumentException("Missing Metadata");
+                throw new ArgumentException("Missing User State");
             }
             if (userCallback == null)
             {
@@ -2331,16 +2331,16 @@ namespace PubNubMessaging.Core
                 throw new NullReferenceException("Missing Json Pluggable Library for Pubnub Instance");
             }
 
-            if (!_jsonPluggableLibrary.IsDictionaryCompatible(jsonMetadata))
+            if (!_jsonPluggableLibrary.IsDictionaryCompatible(jsonUserState))
             {
-                throw new MissingFieldException("Missing json format metadata");
+                throw new MissingFieldException("Missing json format for user state");
             }
             else
             {
-                Dictionary<string, object> deserializeMetadata = _jsonPluggableLibrary.DeserializeToDictionaryOfObject(jsonMetadata);
-                if (deserializeMetadata == null)
+                Dictionary<string, object> deserializeUserState = _jsonPluggableLibrary.DeserializeToDictionaryOfObject(jsonUserState);
+                if (deserializeUserState == null)
                 {
-                    throw new MissingFieldException("Missing json format metadata");
+                    throw new MissingFieldException("Missing json format user state");
                 }
             }
 
@@ -2348,12 +2348,12 @@ namespace PubNubMessaging.Core
             {
                 uuid = this.sessionUUID;
             }
-            
-            Uri request = BuildSetUserMetadataRequest(channel, uuid, jsonMetadata);
+
+            Uri request = BuildSetUserStateRequest(channel, uuid, jsonUserState);
 
             RequestState<T> requestState = new RequestState<T>();
             requestState.Channels = new string[] { channel }; ;
-            requestState.Type = ResponseType.SetUserMetadata;
+            requestState.Type = ResponseType.SetUserState;
             requestState.UserCallback = userCallback;
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
@@ -2361,7 +2361,7 @@ namespace PubNubMessaging.Core
             UrlProcessRequest<T>(request, requestState);
         }
 
-        internal void GetUserMetadata<T>(string channel, string uuid, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        internal void GetUserState<T>(string channel, string uuid, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()))
             {
@@ -2385,11 +2385,11 @@ namespace PubNubMessaging.Core
                 uuid = this.sessionUUID;
             }
 
-            Uri request = BuildGetUserMetadataRequest(channel, uuid);
+            Uri request = BuildGetUserStateRequest(channel, uuid);
 
             RequestState<T> requestState = new RequestState<T>();
             requestState.Channels = new string[] { channel }; ;
-            requestState.Type = ResponseType.GetUserMetadata;
+            requestState.Type = ResponseType.GetUserState;
             requestState.UserCallback = userCallback;
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
@@ -2397,9 +2397,9 @@ namespace PubNubMessaging.Core
             UrlProcessRequest<T>(request, requestState);
         }
 
-        private Uri BuildSetUserMetadataRequest(string channel, string uuid, string jsonMetadata)
+        private Uri BuildSetUserStateRequest(string channel, string uuid, string jsonUserState)
         {
-            setUserMetadataparameters = string.Format("?metadata={0}", EncodeUricomponent(jsonMetadata, ResponseType.SetUserMetadata, false));
+            setUserStateparameters = string.Format("?state={0}", EncodeUricomponent(jsonUserState, ResponseType.SetUserState, false));
 
             List<string> url = new List<string>();
 
@@ -2413,10 +2413,10 @@ namespace PubNubMessaging.Core
             url.Add(uuid);
             url.Add("data");
 
-            return BuildRestApiRequest<Uri>(url, ResponseType.SetUserMetadata);
+            return BuildRestApiRequest<Uri>(url, ResponseType.SetUserState);
         }
 
-        private Uri BuildGetUserMetadataRequest(string channel, string uuid)
+        private Uri BuildGetUserStateRequest(string channel, string uuid)
         {
             List<string> url = new List<string>();
 
@@ -2429,7 +2429,7 @@ namespace PubNubMessaging.Core
             url.Add("uuid");
             url.Add(uuid);
 
-            return BuildRestApiRequest<Uri>(url, ResponseType.GetUserMetadata);
+            return BuildRestApiRequest<Uri>(url, ResponseType.GetUserState);
         }
         #endregion
 
@@ -2468,13 +2468,13 @@ namespace PubNubMessaging.Core
             else if (type == ResponseType.GrantAccess || type == ResponseType.AuditAccess || type == ResponseType.RevokeAccess)
             {
             }
-            else if (type == ResponseType.GetUserMetadata)
+            else if (type == ResponseType.GetUserState)
             {
-                GetUserMetadataExceptionHandler<T>(channels[0], requestTimeout, errorCallback);
+                GetUserStateExceptionHandler<T>(channels[0], requestTimeout, errorCallback);
             }
-            else if (type == ResponseType.SetUserMetadata)
+            else if (type == ResponseType.SetUserState)
             {
-                SetUserMetadataExceptionHandler<T>(channels[0], requestTimeout, errorCallback);
+                SetUserStateExceptionHandler<T>(channels[0], requestTimeout, errorCallback);
             }
             else if (type == ResponseType.GlobalHere_Now)
             {
@@ -2670,31 +2670,31 @@ namespace PubNubMessaging.Core
 			}
 		}
 
-        private void SetUserMetadataExceptionHandler<T>(string channelName, bool requestTimeout, Action<PubnubClientError> errorCallback)
+        private void SetUserStateExceptionHandler<T>(string channelName, bool requestTimeout, Action<PubnubClientError> errorCallback)
         {
             if (requestTimeout)
             {
                 string message = (requestTimeout) ? "Operation Timeout" : "Network connnect error";
 
-                LoggingMethod.WriteToLog(string.Format("DateTime {0}, SetUserMetadataExceptionHandler response={1}", DateTime.Now.ToString(), message), LoggingMethod.LevelInfo);
+                LoggingMethod.WriteToLog(string.Format("DateTime {0}, SetUserStateExceptionHandler response={1}", DateTime.Now.ToString(), message), LoggingMethod.LevelInfo);
 
                 CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
                                    channelName, errorCallback, message,
-                                   PubnubErrorCode.SetUserMetadataTimeout, null, null);
+                                   PubnubErrorCode.SetUserStateTimeout, null, null);
             }
         }
         
-        private void GetUserMetadataExceptionHandler<T>(string channelName, bool requestTimeout, Action<PubnubClientError> errorCallback)
+        private void GetUserStateExceptionHandler<T>(string channelName, bool requestTimeout, Action<PubnubClientError> errorCallback)
         {
             if (requestTimeout)
             {
                 string message = (requestTimeout) ? "Operation Timeout" : "Network connnect error";
 
-                LoggingMethod.WriteToLog(string.Format("DateTime {0}, GetUserMetadataExceptionHandler response={1}", DateTime.Now.ToString(), message), LoggingMethod.LevelInfo);
+                LoggingMethod.WriteToLog(string.Format("DateTime {0}, GetUserStateExceptionHandler response={1}", DateTime.Now.ToString(), message), LoggingMethod.LevelInfo);
 
                 CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
                                    channelName, errorCallback, message,
-                                   PubnubErrorCode.GetUserMetadataTimeout, null, null);
+                                   PubnubErrorCode.GetUserStateTimeout, null, null);
             }
         }
         #endregion
@@ -2741,7 +2741,7 @@ namespace PubNubMessaging.Core
 
         }
 
-        protected void OnPubnubHeartBeatTimeoutCallback<T>(System.Object heartbeatState)
+        protected void OnPubnubLocalClientHeartBeatTimeoutCallback<T>(System.Object heartbeatState)
 		{
 			RequestState<T> currentState = heartbeatState as RequestState<T>;
 			if (currentState != null)
@@ -2764,7 +2764,7 @@ namespace PubNubMessaging.Core
 
 					channelInternetStatus[channel] = networkConnection;
 
-					LoggingMethod.WriteToLog(string.Format("DateTime: {0}, OnPubnubHeartBeatTimeoutCallback - Internet connection = {1}", DateTime.Now.ToString(), networkConnection), LoggingMethod.LevelVerbose);
+					LoggingMethod.WriteToLog(string.Format("DateTime: {0}, OnPubnubLocalClientHeartBeatTimeoutCallback - Internet connection = {1}", DateTime.Now.ToString(), networkConnection), LoggingMethod.LevelVerbose);
 					if (!networkConnection)
 					{
 						TerminatePendingWebRequest(currentState);
@@ -2978,7 +2978,7 @@ namespace PubNubMessaging.Core
 
 							if (overrideTcpKeepAlive)
 							{
-								TerminateHeartbeatTimer(asyncWebRequest.RequestUri);
+								TerminateLocalClientHeartbeatTimer(asyncWebRequest.RequestUri);
 							}
 
                             if (asynchRequestState.Type == ResponseType.PresenceHeartbeat)
@@ -3066,7 +3066,7 @@ namespace PubNubMessaging.Core
 
 							if (overrideTcpKeepAlive)
 							{
-								TerminateHeartbeatTimer(asyncWebRequest.RequestUri);
+								TerminateLocalClientHeartbeatTimer(asyncWebRequest.RequestUri);
 							}
 
 							if ((int)currentHttpStatusCode < 200 || (int)currentHttpStatusCode >= 300)
@@ -3348,8 +3348,8 @@ namespace PubNubMessaging.Core
 				case ResponseType.GrantAccess:
 				case ResponseType.AuditAccess:
 				case ResponseType.RevokeAccess:
-                case ResponseType.GetUserMetadata:
-                case ResponseType.SetUserMetadata:
+                case ResponseType.GetUserState:
+                case ResponseType.SetUserState:
 				    if (result != null && result.Count > 0)
 				    {
 					    GoToCallback<T>(result, userCallback);
@@ -3957,11 +3957,11 @@ namespace PubNubMessaging.Core
 							result.Add(grantDictionary);
 							result.Add(multiChannel);
 							break;
-                            case ResponseType.GetUserMetadata:
-                            case ResponseType.SetUserMetadata:
-							    Dictionary<string, object> metadataDictionary = _jsonPluggableLibrary.DeserializeToDictionaryOfObject(jsonString);
+                            case ResponseType.GetUserState:
+                            case ResponseType.SetUserState:
+							    Dictionary<string, object> userStateDictionary = _jsonPluggableLibrary.DeserializeToDictionaryOfObject(jsonString);
 							    result = new List<object>();
-                                result.Add(metadataDictionary);
+                                result.Add(userStateDictionary);
 							    result.Add(multiChannel);
                             break;
 							default:
@@ -4029,10 +4029,10 @@ namespace PubNubMessaging.Core
 	
 		protected virtual void TimerWhenOverrideTcpKeepAlive<T> (Uri requestUri, RequestState<T> pubnubRequestState){
 			//Eventhough heart-beat is disabled, run one time to check internet connection by setting dueTime=0
-			heartBeatTimer = new System.Threading.Timer(
-				new TimerCallback(OnPubnubHeartBeatTimeoutCallback<T>), pubnubRequestState, 0,
+			localClientHeartBeatTimer = new System.Threading.Timer(
+				new TimerCallback(OnPubnubLocalClientHeartBeatTimeoutCallback<T>), pubnubRequestState, 0,
 				(-1 == _pubnubNetworkTcpCheckIntervalInSeconds) ? Timeout.Infinite : _pubnubNetworkTcpCheckIntervalInSeconds * 1000);
-			channelHeartbeatTimer.AddOrUpdate(requestUri, heartBeatTimer, (key, oldState) => heartBeatTimer);
+			channelLocalClientHeartbeatTimer.AddOrUpdate(requestUri, localClientHeartBeatTimer, (key, oldState) => localClientHeartBeatTimer);
 		}
 
 		protected abstract PubnubWebRequest SetServicePointSetTcpKeepAlive (PubnubWebRequest request);
@@ -4151,9 +4151,9 @@ namespace PubNubMessaging.Core
 				{
 					url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false));
 				}
-                if (_pubnubPresenceExpiryInSeconds != 0)
+                if (_pubnubPresenceHeartbeatInSeconds != 0)
                 {
-                    url.AppendFormat("&pnexpires={0}", _pubnubPresenceExpiryInSeconds);
+                    url.AppendFormat("&heartbeat={0}", _pubnubPresenceHeartbeatInSeconds);
                 }
 			}
 
@@ -4163,10 +4163,10 @@ namespace PubNubMessaging.Core
                 url.AppendFormat("?uuid={0}", this.sessionUUID);
                 url.Append(presenceHeartbeatParameters);
             }
-            if (type == ResponseType.SetUserMetadata)
+            if (type == ResponseType.SetUserState)
             {
                 queryParamExist = true;
-                url.Append(setUserMetadataparameters);
+                url.Append(setUserStateparameters);
             }
 
             if (type == ResponseType.Here_Now)
@@ -5079,8 +5079,8 @@ namespace PubNubMessaging.Core
 		AuditAccess,
 		RevokeAccess,
         PresenceHeartbeat,
-        SetUserMetadata,
-        GetUserMetadata,
+        SetUserState,
+        GetUserState,
         Where_Now,
         GlobalHere_Now
 	}

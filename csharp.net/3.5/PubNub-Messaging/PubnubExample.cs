@@ -16,7 +16,8 @@ namespace PubNubMessaging.Core
         static public bool showErrorMessageSegments = false;
         static public bool showDebugMessages = false;
         static public string authKey = "";
-        static public int pnExpiry = 0;
+        static public int presenceHeartbeat = 0;
+        static public int presenceHeartbeatInterval = 0;
 
         static void UnhandledExceptionTrapper(object sender, UnhandledExceptionEventArgs e)
         {
@@ -241,19 +242,19 @@ namespace PubNubMessaging.Core
             Console.ResetColor();
             Console.WriteLine();
 
-            Console.WriteLine("Heartbeat Interval = 15 seconds (default). Enter the value to change, else press ENTER");
+            Console.WriteLine("Local Client Heartbeat Interval = 15 seconds (default). Enter the value to change, else press ENTER");
             string heartbeatIntervalEntry = Console.ReadLine();
-            int heartbeatInterval;
-            Int32.TryParse(heartbeatIntervalEntry, out heartbeatInterval);
+            int localClientHeartbeatInterval;
+            Int32.TryParse(heartbeatIntervalEntry, out localClientHeartbeatInterval);
             Console.ForegroundColor = ConsoleColor.Blue;
-            if (heartbeatInterval > 0)
+            if (localClientHeartbeatInterval > 0)
             {
-                Console.WriteLine("Heartbeat Interval = {0} seconds", heartbeatInterval);
-                pubnub.HeartbeatInterval = heartbeatInterval;
+                Console.WriteLine("Heartbeat Interval = {0} seconds", localClientHeartbeatInterval);
+                pubnub.LocalClientHeartbeatInterval = localClientHeartbeatInterval;
             }
             else
             {
-                Console.WriteLine("Heartbeat Interval = {0} seconds (default)", pubnub.HeartbeatInterval);
+                Console.WriteLine("Heartbeat Interval = {0} seconds (default)", pubnub.LocalClientHeartbeatInterval);
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -371,14 +372,15 @@ namespace PubNubMessaging.Core
             Console.WriteLine("ENTER 18 FOR Change/Update Auth Key");
             Console.WriteLine("ENTER 19 TO Simulate Machine Sleep Mode");
             Console.WriteLine("ENTER 20 TO Simulate Machine Awake Mode");
-            Console.WriteLine("ENTER 21 TO Set Presence Expiry");
-            Console.WriteLine("Enter 22 TO Add/Modify Local Metadata");
-            Console.WriteLine("Enter 23 TO Delete Local Metadata");
-            Console.WriteLine("Enter 24 TO View/Get Local Metadata");
-            Console.WriteLine("Enter 25 TO Set User Metadata");
-            Console.WriteLine("Enter 26 TO Get User Metadata");
-            Console.WriteLine("Enter 27 FOR WhereNow");
-            Console.WriteLine("Enter 28 FOR GlobalHere_Now");
+            Console.WriteLine("ENTER 21 TO Set Presence Heartbeat");
+            Console.WriteLine("ENTER 22 TO Set Presence Heartbeat Interval");
+            Console.WriteLine("Enter 23 TO Add/Modify Local User State");
+            Console.WriteLine("Enter 24 TO Delete Local User State");
+            Console.WriteLine("Enter 25 TO View/Get Local User State");
+            Console.WriteLine("Enter 26 TO Set User State");
+            Console.WriteLine("Enter 27 TO Get User State");
+            Console.WriteLine("Enter 28 FOR WhereNow");
+            Console.WriteLine("Enter 29 FOR GlobalHere_Now");
             Console.WriteLine("ENTER 99 FOR EXIT OR QUIT");
 
             bool exitFlag = false;
@@ -508,7 +510,7 @@ namespace PubNubMessaging.Core
                         break;
                     case "5":
                         bool showUUID = true;
-                        bool includeMetadata = false;
+                        bool includeUserState = false;
 
                         Console.WriteLine("Enter CHANNEL name for HereNow");
                         channel = Console.ReadLine();
@@ -529,19 +531,19 @@ namespace PubNubMessaging.Core
                         Console.ResetColor();
                         Console.WriteLine();
 
-                        Console.WriteLine("Include Metadata? Y or N? Default is N. Press Y for Yes Else press ENTER");
-                        string userChoiceIncludeMetadata = Console.ReadLine();
-                        if (userChoiceIncludeMetadata.ToLower() == "y")
+                        Console.WriteLine("Include User State? Y or N? Default is N. Press Y for Yes Else press ENTER");
+                        string userChoiceIncludeUserState = Console.ReadLine();
+                        if (userChoiceIncludeUserState.ToLower() == "y")
                         {
-                            includeMetadata = true;
+                            includeUserState = true;
                         }
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Include Metadata = {0}", includeMetadata));
+                        Console.WriteLine(string.Format("Include User State = {0}", includeUserState));
                         Console.ResetColor();
                         Console.WriteLine();
 
                         Console.WriteLine("Running Here_Now()");
-                        pubnub.HereNow<string>(channel, showUUID, includeMetadata, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.HereNow<string>(channel, showUUID, includeUserState, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "6":
                         Console.WriteLine("Enter CHANNEL name for Unsubscribe. Use comma to enter multiple channels.");
@@ -721,144 +723,153 @@ namespace PubNubMessaging.Core
                         Console.ResetColor();  
                         break;
                     case "21":
-                        Console.WriteLine("Enter Presence Expiry in seconds");
-                        string pnExpiryInput = Console.ReadLine();
-                        Int32.TryParse(pnExpiryInput, out pnExpiry);
-                        pubnub.PresenceExpiry = pnExpiry;
+                        Console.WriteLine("Enter Presence Heartbeat in seconds");
+                        string pnHeartbeatInput = Console.ReadLine();
+                        Int32.TryParse(pnHeartbeatInput, out presenceHeartbeat);
+                        pubnub.PresenceHeartbeat = presenceHeartbeat;
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Presence Expiry = {0}", pnExpiry));
+                        Console.WriteLine(string.Format("Presence Heartbeat = {0}", presenceHeartbeat));
                         Console.ResetColor();
                         break;
                     case "22":
-                        Console.WriteLine("Enter channel name");
-                        string metadataChannel = Console.ReadLine();
+                        Console.WriteLine("Enter Presence Heartbeat Interval in seconds");
+                        string pnHeartbeatIntervalInput = Console.ReadLine();
+                        Int32.TryParse(pnHeartbeatIntervalInput, out presenceHeartbeatInterval);
+                        pubnub.PresenceHeartbeatInterval = presenceHeartbeatInterval;
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", metadataChannel));
+                        Console.WriteLine(string.Format("Presence Heartbeat Interval = {0}", presenceHeartbeatInterval));
+                        Console.ResetColor();
+                        break;
+                    case "23":
+                        Console.WriteLine("Enter channel name");
+                        string userStateChannel = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}", userStateChannel));
                         Console.ResetColor();
 
-                        Console.WriteLine("Metadata will be accepted as dictionary key:value pair");
+                        Console.WriteLine("User State will be accepted as dictionary key:value pair");
                         while (true)
                         {
                             Console.WriteLine("Enter key. ");
-                            string keyMetadata = Console.ReadLine();
-                            if (string.IsNullOrEmpty(keyMetadata.Trim()))
+                            string keyUserState = Console.ReadLine();
+                            if (string.IsNullOrEmpty(keyUserState.Trim()))
                             {
                                 Console.WriteLine("dictionary key:value pair entry completed.");
                                 break;
                             }
                             Console.WriteLine("Enter value");
-                            string valueMetadata = Console.ReadLine();
+                            string valueUserState = Console.ReadLine();
                             int valueInt;
                             double valueDouble;
-                            string currentMetadata = "";
-                            if (Int32.TryParse(valueMetadata, out valueInt))
+                            string currentUserState = "";
+                            if (Int32.TryParse(valueUserState, out valueInt))
                             {
-                                currentMetadata = pubnub.SetLocalMetadata(metadataChannel, keyMetadata, valueInt);
+                                currentUserState = pubnub.SetLocalUserState(userStateChannel, keyUserState, valueInt);
                             }
-                            else if (Double.TryParse(valueMetadata, out valueDouble))
+                            else if (Double.TryParse(valueUserState, out valueDouble))
                             {
-                                currentMetadata = pubnub.SetLocalMetadata(metadataChannel, keyMetadata, valueDouble);
+                                currentUserState = pubnub.SetLocalUserState(userStateChannel, keyUserState, valueDouble);
                             }
                             else
                             {
-                                currentMetadata = pubnub.SetLocalMetadata(metadataChannel, keyMetadata, valueMetadata);
+                                currentUserState = pubnub.SetLocalUserState(userStateChannel, keyUserState, valueUserState);
                             }
 
                             Console.ForegroundColor = ConsoleColor.Blue;
-                            if (!string.IsNullOrEmpty(currentMetadata))
+                            if (!string.IsNullOrEmpty(currentUserState))
                             {
-                                Console.WriteLine("Current Metadata = {0}", currentMetadata);
+                                Console.WriteLine("Current User State = {0}", currentUserState);
                             }
                             else
                             {
-                                Console.Write("No Metadata Exists");
+                                Console.Write("No User State Exists");
                             }
                             Console.ResetColor();
                         }
                         break;
 
-                    case "23":
-                        Console.WriteLine("Enter channel name");
-                        string deleteMetadataChannel = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", deleteMetadataChannel));
-                        Console.ResetColor();
-
-                        Console.WriteLine("Enter key of the local metadata to be deleted");
-                        string deleteKeyMetadata = Console.ReadLine();
-                        string currentMetadataAfterDelete = pubnub.SetLocalMetadata(deleteMetadataChannel, deleteKeyMetadata, null);
-
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        if (!string.IsNullOrEmpty(currentMetadataAfterDelete))
-                        {
-                            Console.WriteLine("Current Metadata = {0}", currentMetadataAfterDelete);
-                        }
-                        else
-                        {
-                            Console.Write("No Metadata Exists");
-                        }
-                        Console.ResetColor();
-                        break;
                     case "24":
                         Console.WriteLine("Enter channel name");
-                        string getMetadataChannel = Console.ReadLine();
+                        string deleteUserStateChannel = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", getMetadataChannel));
+                        Console.WriteLine(string.Format("Channel = {0}", deleteUserStateChannel));
                         Console.ResetColor();
 
-                        string currentMetadataView = pubnub.GetLocalMetadata(getMetadataChannel);
+                        Console.WriteLine("Enter key of the local user state to be deleted");
+                        string deleteKeyUserState = Console.ReadLine();
+                        string currentUserStateAfterDelete = pubnub.SetLocalUserState(deleteUserStateChannel, deleteKeyUserState, null);
 
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        if (!string.IsNullOrEmpty(currentMetadataView))
+                        if (!string.IsNullOrEmpty(currentUserStateAfterDelete))
                         {
-                            Console.WriteLine("Current Metadata = {0}", currentMetadataView);
+                            Console.WriteLine("Current User State = {0}", currentUserStateAfterDelete);
                         }
                         else
                         {
-                            Console.Write("No Metadata Exists");
+                            Console.Write("No User State Exists");
                         }
                         Console.ResetColor();
                         break;
                     case "25":
-                        Console.WriteLine("NOTE: Hopefully you added local metadata. Else please do that before doing this.");
                         Console.WriteLine("Enter channel name");
-                        string setUserMetadataChannel = Console.ReadLine();
+                        string getUserStateChannel = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", setUserMetadataChannel));
+                        Console.WriteLine(string.Format("Channel = {0}", getUserStateChannel));
+                        Console.ResetColor();
+
+                        string currentUserStateView = pubnub.GetLocalUserState(getUserStateChannel);
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        if (!string.IsNullOrEmpty(currentUserStateView))
+                        {
+                            Console.WriteLine("Current User State = {0}", currentUserStateView);
+                        }
+                        else
+                        {
+                            Console.Write("No User State Exists");
+                        }
+                        Console.ResetColor();
+                        break;
+                    case "26":
+                        Console.WriteLine("NOTE: Hopefully you added local user state. Else please do that before doing this.");
+                        Console.WriteLine("Enter channel name");
+                        string setUserStateChannel = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}", setUserStateChannel));
                         Console.ResetColor();
 
                         Console.WriteLine("Enter UUID. (Optional. Press ENTER to skip it)");
                         string uuid = Console.ReadLine();
                         if (string.IsNullOrEmpty(uuid))
                         {
-                            string jsonMetadata = pubnub.GetLocalMetadata(setUserMetadataChannel);
-                            pubnub.SetUserMetadata<string>(setUserMetadataChannel, jsonMetadata, DisplayReturnMessage, DisplayErrorMessage);
+                            string jsonUserState = pubnub.GetLocalUserState(setUserStateChannel);
+                            pubnub.SetUserState<string>(setUserStateChannel, jsonUserState, DisplayReturnMessage, DisplayErrorMessage);
                         }
                         else
                         {
-                            string jsonMetadata = pubnub.GetLocalMetadata(setUserMetadataChannel);
-                            pubnub.SetUserMetadata<string>(setUserMetadataChannel, uuid, jsonMetadata, DisplayReturnMessage, DisplayErrorMessage);
+                            string jsonUserState = pubnub.GetLocalUserState(setUserStateChannel);
+                            pubnub.SetUserState<string>(setUserStateChannel, uuid, jsonUserState, DisplayReturnMessage, DisplayErrorMessage);
                         }
                         break;
-                    case "26":
+                    case "27":
                         Console.WriteLine("Enter channel name");
-                        string getUserMetadataChannel = Console.ReadLine();
+                        string getUserStateChannel2 = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", getUserMetadataChannel));
+                        Console.WriteLine(string.Format("Channel = {0}", getUserStateChannel2));
                         Console.ResetColor();
 
                         Console.WriteLine("Enter UUID. (Optional. Press ENTER to skip it)");
                         string uuid2 = Console.ReadLine();
                         if (string.IsNullOrEmpty(uuid2))
                         {
-                            pubnub.GetUserMetadata<string>(getUserMetadataChannel, DisplayReturnMessage, DisplayErrorMessage);
+                            pubnub.GetUserState<string>(getUserStateChannel2, DisplayReturnMessage, DisplayErrorMessage);
                         }
                         else
                         {
-                            pubnub.GetUserMetadata<string>(getUserMetadataChannel, uuid2, DisplayReturnMessage, DisplayErrorMessage);
+                            pubnub.GetUserState<string>(getUserStateChannel2, uuid2, DisplayReturnMessage, DisplayErrorMessage);
                         }
                         break;
-                    case "27":
+                    case "28":
                         Console.WriteLine("Enter uuid for WhereNow. To consider SessionUUID, just press ENTER");
                         string whereNowUuid = Console.ReadLine();
 
@@ -870,9 +881,9 @@ namespace PubNubMessaging.Core
                         Console.WriteLine("Running Where_Now()");
                         pubnub.WhereNow<string>(whereNowUuid, DisplayReturnMessage, DisplayErrorMessage);
                         break;
-                    case "28":
+                    case "29":
                         bool globalHereNowShowUUID = true;
-                        bool globalHereNowIncludeMetadata = false;
+                        bool globalHereNowIncludeUserState = false;
 
                         Console.WriteLine("Show UUID List? Y or N? Default is Y. Press N for No Else press ENTER");
                         string userChoiceGlobalHereNowShowUUID = Console.ReadLine();
@@ -885,19 +896,19 @@ namespace PubNubMessaging.Core
                         Console.ResetColor();
                         Console.WriteLine();
 
-                        Console.WriteLine("Include Metadata? Y or N? Default is N. Press Y for Yes Else press ENTER");
-                        string userChoiceGlobalHereNowIncludeMetadata = Console.ReadLine();
-                        if (userChoiceGlobalHereNowIncludeMetadata.ToLower() == "y")
+                        Console.WriteLine("Include User State? Y or N? Default is N. Press Y for Yes Else press ENTER");
+                        string userChoiceGlobalHereNowIncludeUserState = Console.ReadLine();
+                        if (userChoiceGlobalHereNowIncludeUserState.ToLower() == "y")
                         {
-                            globalHereNowIncludeMetadata = true;
+                            globalHereNowIncludeUserState = true;
                         }
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Include Metadata = {0}", globalHereNowIncludeMetadata));
+                        Console.WriteLine(string.Format("Include User State = {0}", globalHereNowIncludeUserState));
                         Console.ResetColor();
                         Console.WriteLine();
 
                         Console.WriteLine("Running Global HereNow()");
-                        pubnub.GlobalHereNow<string>(globalHereNowShowUUID, globalHereNowIncludeMetadata,DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.GlobalHereNow<string>(globalHereNowShowUUID, globalHereNowIncludeUserState,DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     default:
                         Console.WriteLine("INVALID CHOICE. ENTER 99 FOR EXIT OR QUIT");
