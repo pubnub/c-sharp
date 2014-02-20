@@ -136,10 +136,18 @@ namespace PubNubMessaging.Core
                     socket.Close();
                 }
                 #elif (UNITY_IOS || UNITY_ANDROID)
+                if(request!=null){
+                        request.Abort();
+						request = null;
+                }
                 request = (HttpWebRequest)WebRequest.Create("http://pubsub.pubnub.com");
                 if(request!= null){
                     request.Timeout = HeartbeatInterval * 1000;
                     request.ContentType = "application/json";
+                    if(response!=null){
+                        response.Close();
+                        response = null;
+                    }
                     response = request.GetResponse ();
                     if(response != null){
                         if(((HttpWebResponse)response).ContentLength <= 0){

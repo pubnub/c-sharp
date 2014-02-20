@@ -171,6 +171,12 @@ namespace PubNubMessaging.Core
 						#elif (USE_DOTNET_SERIALIZATION)
 						LoggingMethod.WriteToLog("Using USE_DOTNET_SERIALIZATION", LoggingMethod.LevelInfo);
 						this.JsonPluggableLibrary = new JscriptSerializer();   
+						#elif (USE_MiniJSON)
+						LoggingMethod.WriteToLog("USE_MiniJSON", LoggingMethod.LevelInfo);
+						this.JsonPluggableLibrary = new MiniJSONObjectSerializer();
+						#elif (USE_JSONFX_FOR_UNITY)
+						LoggingMethod.WriteToLog("USE_JSONFX_FOR_UNITY", LoggingMethod.LevelInfo);
+						this.JsonPluggableLibrary = new JsonFxUnitySerializer();
 						#else
 						LoggingMethod.WriteToLog("Using NewtonsoftJsonDotNet", LoggingMethod.LevelInfo);
 						base.JsonPluggableLibrary = new NewtonsoftJsonDotNet();
@@ -311,11 +317,11 @@ namespace PubNubMessaging.Core
 						base.channelHeartbeatTimer.AddOrUpdate (requestUri, heartBeatTimer, (key, oldState) => heartBeatTimer);
 						#elif (UNITY_IOS)
 						if(heartBeatTimer != null){
-						heartBeatTimer.Dispose();
+						    heartBeatTimer.Dispose();
 						}
 						heartBeatTimer = new Timer(new TimerCallback(OnPubnubHeartBeatTimeoutCallbackUnity<T>), pubnubRequestState, 0,
-						                           _pubnubNetworkTcpCheckIntervalInSeconds * 1000);
-						_channelHeartbeatTimer.AddOrUpdate(requestUri, heartBeatTimer, (key, oldState) => heartBeatTimer);
+								HeartbeatInterval * 1000);
+						base.channelHeartbeatTimer.AddOrUpdate(requestUri, heartBeatTimer, (key, oldState) => heartBeatTimer);
 						#else
 						heartBeatTimer = new Timer (new TimerCallback (OnPubnubHeartBeatTimeoutCallback<T>), pubnubRequestState, 0,
 										HeartbeatInterval * 1000);

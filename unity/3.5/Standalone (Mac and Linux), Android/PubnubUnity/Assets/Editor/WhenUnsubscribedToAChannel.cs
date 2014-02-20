@@ -96,7 +96,7 @@ namespace PubNubMessaging.Tests
                     }    
                 }
 
-                [Test]
+				//[Test]
                 public void TestUnsubscribePresence()
                 {
                     Pubnub pubnub = new Pubnub(
@@ -115,7 +115,7 @@ namespace PubNubMessaging.Tests
 
                     pubnub.Presence<string>(channel, common.DisplayReturnMessage, common.DisplayReturnMessage, common.DisplayErrorMessage);
                         //Thread.Sleep(13000);
-                    common.WaitForResponse(45);
+					common.WaitForResponse();
                     Common commonSubscribe = new Common();
                     common.DeliveryStatus = false;
                     common.Response = null;
@@ -125,7 +125,7 @@ namespace PubNubMessaging.Tests
                     commonSubscribe.DeliveryStatus = false;
                     commonSubscribe.Response = null;
 
-                    common.WaitForResponse(45);
+                    common.WaitForResponse();
 
                     string response = "";
                     if (common.Response == null)
@@ -155,7 +155,7 @@ namespace PubNubMessaging.Tests
                     common.Response = null;
                     pubnub.Unsubscribe<string>(channel, commonUnsubscribe.DisplayReturnMessageDummy, commonUnsubscribe.DisplayReturnMessageDummy, commonUnsubscribe.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-                    common.WaitForResponse(30);
+                    common.WaitForResponse();
                     string response = "";
                     if (common.Response == null)
                     {
@@ -177,7 +177,7 @@ namespace PubNubMessaging.Tests
                     }
                 }
 
-                [Test]
+				//[Test]
                 public void TestUnsubscribePresenceSSL()
                 {
                     Pubnub pubnub = new Pubnub(
@@ -195,7 +195,7 @@ namespace PubNubMessaging.Tests
                     pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenAClientIsPresented", "ThenPresenceShouldReturnReceivedMessage");
 
                     pubnub.Presence<string>(channel, common.DisplayReturnMessage, common.DisplayReturnMessage, common.DisplayErrorMessage);
-                    Thread.Sleep(13000);
+					common.WaitForResponse();
                     Common commonSubscribe = new Common();
                     common.DeliveryStatus = false;
                     common.Response = null;
@@ -206,7 +206,7 @@ namespace PubNubMessaging.Tests
                     commonSubscribe.Response = null;
 
 
-                    common.WaitForResponse(30);
+                    common.WaitForResponse();
 
                     string response = "";
                     if (common.Response == null)
