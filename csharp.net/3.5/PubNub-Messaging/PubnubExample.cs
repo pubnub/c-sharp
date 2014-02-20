@@ -352,53 +352,49 @@ namespace PubNubMessaging.Core
             Console.ResetColor();
             Console.WriteLine();
 
-            Console.WriteLine("ENTER 1 FOR Subscribe");
-            Console.WriteLine("ENTER 2 FOR Publish");
-            Console.WriteLine("ENTER 3 FOR Presence");
-            Console.WriteLine("ENTER 4 FOR Detailed History");
-            Console.WriteLine("ENTER 5 FOR Here_Now");
-            Console.WriteLine("ENTER 6 FOR Unsubscribe");
-            Console.WriteLine("ENTER 7 FOR Presence-Unsubscribe");
-            Console.WriteLine("ENTER 8 FOR Time");
-            Console.WriteLine("ENTER 9 FOR Disconnect/Reconnect existing Subscriber(s) (when internet is available)");
-            Console.WriteLine("ENTER 10 TO Disable Network Connection (no internet)");
-            Console.WriteLine("ENTER 11 TO Enable Network Connection (yes internet)");
-            Console.WriteLine("ENTER 12 FOR Grant Access");
-            Console.WriteLine("ENTER 13 FOR Audit Access");
-            Console.WriteLine("ENTER 14 FOR Revoke Access");
-            Console.WriteLine("ENTER 15 FOR Grant Access for Presence Channel");
-            Console.WriteLine("ENTER 16 FOR Audit Access for Presence Channel");
-            Console.WriteLine("ENTER 17 FOR Revoke Access for Presence Channel");
-            Console.WriteLine("ENTER 18 FOR Change/Update Auth Key");
-            Console.WriteLine("ENTER 19 TO Simulate Machine Sleep Mode");
-            Console.WriteLine("ENTER 20 TO Simulate Machine Awake Mode");
-            Console.WriteLine("ENTER 21 TO Set Presence Heartbeat");
-            Console.WriteLine("ENTER 22 TO Set Presence Heartbeat Interval");
-            Console.WriteLine("Enter 23 TO Add/Modify Local User State");
-            Console.WriteLine("Enter 24 TO Delete Local User State");
-            Console.WriteLine("Enter 25 TO View/Get Local User State");
-            Console.WriteLine("Enter 26 TO Set User State");
-            Console.WriteLine("Enter 27 TO Get User State");
-            Console.WriteLine("Enter 28 FOR WhereNow");
-            Console.WriteLine("Enter 29 FOR GlobalHere_Now");
-            Console.WriteLine("ENTER 99 FOR EXIT OR QUIT");
 
             bool exitFlag = false;
             string channel="";
-
+            int currentUserChoice = 0;
+            string userinput = "";
             Console.WriteLine("");
             while (!exitFlag)
             {
-                string userinput = Console.ReadLine();
-                if (userinput.ToLower() == "show debug on")
+                if (currentUserChoice < 1 || (currentUserChoice > 30 && currentUserChoice != 99))
                 {
-                    showDebugMessages = true;
-                    continue;
-                }
-                else if (userinput.ToLower() == "show debug off")
-                {
-                    showDebugMessages = false;
-                    continue;
+                    Console.WriteLine("ENTER 1 FOR Subscribe");
+                    Console.WriteLine("ENTER 2 FOR Publish");
+                    Console.WriteLine("ENTER 3 FOR Presence");
+                    Console.WriteLine("ENTER 4 FOR Detailed History");
+                    Console.WriteLine("ENTER 5 FOR Here_Now");
+                    Console.WriteLine("ENTER 6 FOR Unsubscribe");
+                    Console.WriteLine("ENTER 7 FOR Presence-Unsubscribe");
+                    Console.WriteLine("ENTER 8 FOR Time");
+                    Console.WriteLine("ENTER 9 FOR Disconnect/Reconnect existing Subscriber(s) (when internet is available)");
+                    Console.WriteLine("ENTER 10 TO Disable Network Connection (no internet)");
+                    Console.WriteLine("ENTER 11 TO Enable Network Connection (yes internet)");
+                    Console.WriteLine("ENTER 12 FOR Grant Access");
+                    Console.WriteLine("ENTER 13 FOR Audit Access");
+                    Console.WriteLine("ENTER 14 FOR Revoke Access");
+                    Console.WriteLine("ENTER 15 FOR Grant Access for Presence Channel");
+                    Console.WriteLine("ENTER 16 FOR Audit Access for Presence Channel");
+                    Console.WriteLine("ENTER 17 FOR Revoke Access for Presence Channel");
+                    Console.WriteLine("ENTER 18 FOR Change/Update Auth Key (Current value = {0})", pubnub.AuthenticationKey);
+                    Console.WriteLine("ENTER 19 TO Simulate Machine Sleep Mode");
+                    Console.WriteLine("ENTER 20 TO Simulate Machine Awake Mode");
+                    Console.WriteLine("ENTER 21 TO Set Presence Heartbeat (Current value = {0} sec)", pubnub.PresenceHeartbeat);
+                    Console.WriteLine("ENTER 22 TO Set Presence Heartbeat Interval (Current value = {0} sec)", pubnub.PresenceHeartbeatInterval);
+                    Console.WriteLine("Enter 23 TO Add/Modify Local User State");
+                    Console.WriteLine("Enter 24 TO Delete Local User State");
+                    Console.WriteLine("Enter 25 TO View/Get Local User State");
+                    Console.WriteLine("Enter 26 TO Set User State");
+                    Console.WriteLine("Enter 27 TO Get User State");
+                    Console.WriteLine("Enter 28 FOR WhereNow");
+                    Console.WriteLine("Enter 29 FOR GlobalHere_Now");
+                    Console.WriteLine("Enter 30 TO enter/change UUID. (Current value = {0})", pubnub.SessionUUID);
+                    Console.WriteLine("ENTER 99 FOR EXIT OR QUIT");
+
+                    userinput = Console.ReadLine();
                 }
                 switch (userinput)
                 {
@@ -733,6 +729,7 @@ namespace PubNubMessaging.Core
                         break;
                     case "22":
                         Console.WriteLine("Enter Presence Heartbeat Interval in seconds");
+                        Console.WriteLine("NOTE: Ensure that it is less than Presence Heartbeat-3 seconds");
                         string pnHeartbeatIntervalInput = Console.ReadLine();
                         Int32.TryParse(pnHeartbeatIntervalInput, out presenceHeartbeatInterval);
                         pubnub.PresenceHeartbeatInterval = presenceHeartbeatInterval;
@@ -910,9 +907,24 @@ namespace PubNubMessaging.Core
                         Console.WriteLine("Running Global HereNow()");
                         pubnub.GlobalHereNow<string>(globalHereNowShowUUID, globalHereNowIncludeUserState,DisplayReturnMessage, DisplayErrorMessage);
                         break;
-                    default:
-                        Console.WriteLine("INVALID CHOICE. ENTER 99 FOR EXIT OR QUIT");
+                    case "30":
+                        Console.WriteLine("ENTER UUID.");
+                        string sessionUUID = Console.ReadLine();
+                        pubnub.SessionUUID = sessionUUID;
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine("UUID = {0}",pubnub.SessionUUID);
+                        Console.ResetColor();
                         break;
+                    default:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("INVALID CHOICE. ENTER 99 FOR EXIT OR QUIT");
+                        Console.ResetColor();
+                        break;
+                }
+                if (!exitFlag)
+                {
+                    userinput = Console.ReadLine();
+                    Int32.TryParse(userinput, out currentUserChoice);
                 }
             }
 
