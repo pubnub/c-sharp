@@ -2342,6 +2342,19 @@ namespace PubNubMessaging.Core
                 {
                     throw new MissingFieldException("Missing json format user state");
                 }
+                else
+                {
+                    string channelInState = deserializeUserState.Keys.First<string>();
+                    string jsonState = (deserializeUserState[channelInState] != null) ? deserializeUserState[channelInState].ToString() : "";
+                    if (_jsonPluggableLibrary.IsDictionaryCompatible(jsonState))
+                    {
+                        Dictionary<string, object> stateDictionary = _jsonPluggableLibrary.DeserializeToDictionaryOfObject(jsonState);
+                        if (stateDictionary != null)
+                        {
+                            _channelUserState.AddOrUpdate(channelInState, stateDictionary, (oldState, newState) => stateDictionary);
+                        }
+                    }
+                }
             }
 
             if (string.IsNullOrEmpty(uuid))

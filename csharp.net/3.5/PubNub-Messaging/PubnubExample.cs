@@ -828,23 +828,34 @@ namespace PubNubMessaging.Core
                         Console.ResetColor();
                         break;
                     case "26":
-                        Console.WriteLine("NOTE: Hopefully you added local user state. Else please do that before doing this.");
                         Console.WriteLine("Enter channel name");
                         string setUserStateChannel = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", setUserStateChannel));
                         Console.ResetColor();
 
+                        Console.WriteLine("NOTE: Hopefully you added local user state.");
+                        Console.WriteLine("If you want to consider already created local user state, press ENTER");
+                        Console.WriteLine("Else enter user state in json format (Eg. {\"channel\":{\"key1\":\"value1\",\"key2\":\"value2\"}}");
+                        string manualJsonUserState = Console.ReadLine();
+
+                        string jsonUserState = "";
+                        if (string.IsNullOrEmpty(manualJsonUserState))
+                        {
+                            jsonUserState = pubnub.GetLocalUserState(setUserStateChannel);
+                        }
+                        else
+                        {
+                            jsonUserState = manualJsonUserState;
+                        }
                         Console.WriteLine("Enter UUID. (Optional. Press ENTER to skip it)");
                         string uuid = Console.ReadLine();
                         if (string.IsNullOrEmpty(uuid))
                         {
-                            string jsonUserState = pubnub.GetLocalUserState(setUserStateChannel);
                             pubnub.SetUserState<string>(setUserStateChannel, jsonUserState, DisplayReturnMessage, DisplayErrorMessage);
                         }
                         else
                         {
-                            string jsonUserState = pubnub.GetLocalUserState(setUserStateChannel);
                             pubnub.SetUserState<string>(setUserStateChannel, uuid, jsonUserState, DisplayReturnMessage, DisplayErrorMessage);
                         }
                         break;
