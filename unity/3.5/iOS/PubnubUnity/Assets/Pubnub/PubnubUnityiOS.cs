@@ -1,6 +1,7 @@
 //ver3.5.1
 //Build Date: February 21, 2014
 #define USE_JSONFX_FOR_UNITY
+//#define USE_MiniJSON
 using System;
 using System.Text;
 using System.Net.Security;

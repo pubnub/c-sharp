@@ -4,6 +4,7 @@
 #define USE_JSONFX
 #elif (UNITY_IOS)
 #define USE_JSONFX_FOR_UNITY
+//#define USE_MiniJSON
 #endif
 using System;
 using System.IO;
@@ -59,7 +60,7 @@ namespace PubNubMessaging.Core
         #region "Class variables"
 
         int _pubnubWebRequestCallbackIntervalInSeconds = 310;
-		int _pubnubOperationTimeoutIntervalInSeconds = 45;
+        int _pubnubOperationTimeoutIntervalInSeconds = 15;
         int _pubnubNetworkTcpCheckIntervalInSeconds = 15;
         int _pubnubNetworkCheckRetries = 50;
         int _pubnubWebRequestRetryIntervalInSeconds = 10;
@@ -569,7 +570,7 @@ namespace PubNubMessaging.Core
             }
         }
 
-		private void RemoveChannelDictionary ()
+        private void RemoveChannelDictionary ()
         {
             RemoveChannelDictionary<object> (null);
         }
@@ -604,7 +605,7 @@ namespace PubNubMessaging.Core
             }
         }
 
-		private void RemoveChannelCallback ()
+        private void RemoveChannelCallback ()
         {
             ICollection<PubnubChannelCallbackKey> channelCollection = _channelCallbacks.Keys;
             foreach (PubnubChannelCallbackKey keyChannel in channelCollection) {
@@ -666,7 +667,7 @@ namespace PubNubMessaging.Core
             }
         }
 
-		private void TerminateReconnectTimer ()
+        private void TerminateReconnectTimer ()
         {
             TerminateReconnectTimer (null);
         }
@@ -703,7 +704,7 @@ namespace PubNubMessaging.Core
             }
         }
 
-		public void EndPendingRequests ()
+        public void EndPendingRequests ()
         {
             RemoveChannelDictionary ();
             TerminatePendingWebRequest ();
@@ -3525,7 +3526,8 @@ namespace PubNubMessaging.Core
 #if(__MonoCS__)
             var writer = new JsonFx.Json.JsonWriter ();
             string json = writer.Write (objectToSerialize);
-            return json;
+
+			return PubnubCryptoBase.ConvertHexToUnicodeChars(json);
 #else
             string json = "";
             var resolver = new CombinedResolverStrategy(new DataContractResolverStrategy());
@@ -3603,7 +3605,8 @@ namespace PubNubMessaging.Core
 
         public string SerializeToJsonString(object objectToSerialize)
         {
-            return Json.Serialize(objectToSerialize);
+			string json =  Json.Serialize(objectToSerialize);
+		    return PubnubCryptoBase.ConvertHexToUnicodeChars(json);
         }
 
         public List<object> DeserializeToListOfObject(string jsonString)
@@ -3632,7 +3635,9 @@ namespace PubNubMessaging.Core
         }
         public string SerializeToJsonString(object objectToSerialize)
         {
-            return JsonWriter.Serialize(objectToSerialize);
+
+			string json =  JsonWriter.Serialize(objectToSerialize); 
+			return PubnubCryptoBase.ConvertHexToUnicodeChars(json);
         }
 
         public List<object> DeserializeToListOfObject(string jsonString)

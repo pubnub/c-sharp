@@ -27,7 +27,7 @@ NOTE: The callback methods DisplayReturnMessage, DisplayConnectStatusMessage and
 2.2 MiniJson: A small class, with no additional dependencies. But this class can only serialize arrays, strings, Chars, hashtables, Dictionary, arraylist and some more but not custom classes and objects. If you want to use this you need to 
 - open the project in MonoDevelop and remove the reference of JsonFx.Json.dll from the references. Delete the JsonFx.Json.dll from the assets folder.
 - add MiniJson to the project. This can be done by going to the Solution Explorer, ctrl-clicking Assets -> Add -> Add Files and select the file MiniJson.cs from the Assets folder.
-- In the pubnub.cs file uncomment the line which says #define USE_MiniJSON and comment the line #define USE_JSONFX_FOR_UNITY
+- In the PubnubCore.cs file uncomment the line which says #define USE_MiniJSON and comment the line #define USE_JSONFX_FOR_UNITY
 ```
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX
@@ -36,6 +36,7 @@ NOTE: The callback methods DisplayReturnMessage, DisplayConnectStatusMessage and
 //#define USE_JSONFX_FOR_UNITY
 #endif
 ```
+- Similarly you need to uncomment the line which says #define USE_MiniJSON and comment the line #define USE_JSONFX_FOR_UNITY in the file PubnubUnityiOS.cs
 
 #### To run the unit tests, in addition to the above, you need to 
 1. Import UnityTestTools package (this is already present in the Pubnub client code under the path PubnubUnity/Assets/UnityTestTools) into your Assets. (https://www.assetstore.unity3d.com/#/content/13802)
