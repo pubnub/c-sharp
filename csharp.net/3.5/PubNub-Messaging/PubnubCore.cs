@@ -1,4 +1,4 @@
-//Build Date: January 28, 2014
+//Build Date: February 24, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX
@@ -4175,6 +4175,10 @@ namespace PubNubMessaging.Core
                 queryParamExist = true;
                 url.AppendFormat("?uuid={0}", this.sessionUUID);
                 url.Append(presenceHeartbeatParameters);
+                if (_pubnubPresenceHeartbeatInSeconds != 0)
+                {
+                    url.AppendFormat("&heartbeat={0}", _pubnubPresenceHeartbeatInSeconds);
+                }
             }
             if (type == ResponseType.SetUserState)
             {

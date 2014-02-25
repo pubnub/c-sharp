@@ -24,6 +24,8 @@ namespace PubNubMessaging.Tests
         ManualResetEvent unsubscribeUUIDManualEvent = new ManualResetEvent(false);
 
         ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
+        ManualResetEvent globalHereNowManualEvent = new ManualResetEvent(false);
+        ManualResetEvent whereNowManualEvent = new ManualResetEvent(false);
         ManualResetEvent presenceUnsubscribeEvent = new ManualResetEvent(false);
         ManualResetEvent presenceUnsubscribeUUIDEvent = new ManualResetEvent(false);
 
@@ -31,6 +33,8 @@ namespace PubNubMessaging.Tests
 
         static bool receivedPresenceMessage = false;
         static bool receivedHereNowMessage = false;
+        static bool receivedGlobalHereNowMessage = false;
+        static bool receivedWhereNowMessage = false;
         static bool receivedCustomUUID = false;
         static bool receivedGrantMessage = false;
 
@@ -150,6 +154,37 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedHereNowMessage, "here_now message not received");
         }
 
+        [Test]
+        public void IfGlobalHereNowIsCalledThenItShouldReturnInfo()
+        {
+            receivedGlobalHereNowMessage = false;
+
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "IfGlobalHereNowIsCalledThenItShouldReturnInfo";
+            pubnub.PubnubUnitTest = unitTest;
+            pubnub.GlobalHereNow<string>(true, true, ThenGlobalHereNowShouldReturnMessage, DummyErrorCallback);
+            globalHereNowManualEvent.WaitOne();
+            Assert.IsTrue(receivedGlobalHereNowMessage, "global_here_now message not received");
+        }
+
+        [Test]
+        public void IfWhereNowIsCalledThenItShouldReturnInfo()
+        {
+            receivedWhereNowMessage = false;
+
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "IfWhereNowIsCalledThenItShouldReturnInfo";
+            pubnub.PubnubUnitTest = unitTest;
+            string uuid = "hello_my_uuid";
+            pubnub.WhereNow<string>(uuid, ThenWhereNowShouldReturnMessage, DummyErrorCallback);
+            whereNowManualEvent.WaitOne();
+            Assert.IsTrue(receivedWhereNowMessage, "where_now message not received");
+        }
+
         void ThenPresenceInitializeShouldReturnGrantMessage(string receivedMessage)
         {
             try
@@ -235,6 +270,69 @@ namespace PubNubMessaging.Tests
             finally
             {
                 hereNowManualEvent.Set();
+            }
+        }
+
+        void ThenGlobalHereNowShouldReturnMessage(string receivedMessage)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                {
+                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
+                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    var payload = dictionary.Value<JContainer>("payload");
+                    if (payload != null)
+                    {
+                        var channels = payload.Value<JContainer>("channels");
+                        if (channels != null && channels.Count > 0)
+                        {
+                            var channelsContainer = channels["hello_my_channel"];
+                            if (channelsContainer != null)
+                            {
+                                var uuids = channelsContainer.Value<JArray>("uuids");
+                                if (uuids != null && uuids.Count > 0)
+                                {
+                                    receivedGlobalHereNowMessage = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+            finally
+            {
+                globalHereNowManualEvent.Set();
+            }
+        }
+
+        void ThenWhereNowShouldReturnMessage(string receivedMessage)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                {
+                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
+                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    var payload = dictionary.Value<JContainer>("payload");
+                    if (payload != null)
+                    {
+                        var channels = payload.Value<JContainer>("channels");
+                        if (channels != null && channels.Count > 0)
+                        {
+                            if (channels[0].ToString() == "hello_my_channel")
+                            {
+                                receivedWhereNowMessage = true;
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+            finally
+            {
+                whereNowManualEvent.Set();
             }
         }
 
