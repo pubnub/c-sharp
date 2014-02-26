@@ -5,181 +5,339 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using System.Threading;
 
-
 #if (USE_JSONFX)
 using JsonFx.Json;
+
 #elif (USE_DOTNET_SERIALIZATION)
 using System.Runtime.Serialization.Json;
 using System.Web.Script.Serialization;
+
 #else
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 #endif
-
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
-    public class WhenAClientIsPresented 
+    public class WhenAClientIsPresented
     {
         [Test]
-        public void ThenItShouldReturnReceivedMessage()
+        public void ThenItShouldReturnReceivedMessage ()
         {
-            Pubnub pubnub = new Pubnub(
-              "demo",
-              "demo",
-              "",
-              "",
-              false
-              );
+            Pubnub pubnub = new Pubnub (
+                                "demo",
+                                "demo",
+                                "",
+                                "",
+                                false
+                            );
             string channel = "hello_world2";
-            Common common = new Common();
+            Common common = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenAClientIsPresented", "ThenPresenceShouldReturnReceivedMessage");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenAClientIsPresented", "ThenPresenceShouldReturnReceivedMessage");
 
-            pubnub.Presence<string>(channel, common.DisplayReturnMessage, common.DisplayReturnMessage, common.DisplayErrorMessage);
-            Thread.Sleep(3000);
-            Common commonSubscribe = new Common();
+            pubnub.Presence<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessage, common.DisplayErrorMessage);
+            Thread.Sleep (1000);
+            Common commonSubscribe = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;
 
-            pubnub.Subscribe<string>(channel, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayErrorMessage);
+            pubnub.Subscribe<string> (channel, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayErrorMessage);
 
             commonSubscribe.DeliveryStatus = false;
             commonSubscribe.Response = null;
 
-            common.WaitForResponse(30);
+            common.WaitForResponse (30);
             
             string response = "";
             if (common.Response == null) {
-              Assert.Fail("Null response");
-            }
-            else
-            {
-                IList<object> responseFields = common.Response as IList<object>;
-              foreach (object item in responseFields)
-              {
-                response = item.ToString();
-                Console.WriteLine("Response:" + response);
-                //Assert.IsNotEmpty(strResponse);
-              }
-			  Assert.True (("hello_world").Equals(responseFields[2]));
+                Assert.Fail ("Null response");
+            } else {
+                //IList<object> responseFields = common.Response as IList<object>;
+                object[] serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject (common.Response.ToString ()).ToArray ();
+                /*foreach (object item in responseFields) {
+                    response = item.ToString ();
+                    Console.WriteLine ("Response:" + response);
+                    //Assert.IsNotEmpty(strResponse);
+                }
+                Assert.True (("hello_world").Equals (responseFields [2]));*/
+                Assert.True (("hello_world2").Equals (serializedMessage [2]));
             }
         }
 
         [Test]
-        public void IfHereNowIsCalledThenItShouldReturnInfo()
+        public void ThenItShouldReturnReceivedMessageSSL ()
         {
-            Pubnub pubnub = new Pubnub(
-               "demo",
-               "demo",
-               "",
-               "",
-               false
-           );
-            Common common = new Common();
+            Pubnub pubnub = new Pubnub (
+                                "demo",
+                                "demo",
+                                "",
+                                "",
+                                true
+                            );
+            string channel = "hello_world2";
+            Common common = new Common ();
+            common.DeliveryStatus = false;
+            common.Response = null;
+
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenAClientIsPresented", "ThenPresenceShouldReturnReceivedMessage");
+
+            pubnub.Presence<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessage, common.DisplayErrorMessage);
+            Thread.Sleep (1000);
+            Common commonSubscribe = new Common ();
+            common.DeliveryStatus = false;
+            common.Response = null;
+
+            pubnub.Subscribe<string> (channel, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayErrorMessage);
+
+            commonSubscribe.DeliveryStatus = false;
+            commonSubscribe.Response = null;
+
+            common.WaitForResponse (30);
+
+            string response = "";
+            if (common.Response == null) {
+                Assert.Fail ("Null response");
+            } else {
+                object[] serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject (common.Response.ToString ()).ToArray ();
+                Assert.True (("hello_world2").Equals (serializedMessage [2]));
+            }
+        }
+
+        [Test]
+        public void IfHereNowIsCalledThenItShouldReturnInfo ()
+        {
+            Pubnub pubnub = new Pubnub (
+                                "demo",
+                                "demo",
+                                "",
+                                "",
+                                false
+                            );
+            Common common = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;
             
-            HereNow(pubnub, "IfHereNowIsCalledThenItShouldReturnInfo", common.DisplayReturnMessage);
-            common.WaitForResponse();
+            HereNow (pubnub, "IfHereNowIsCalledThenItShouldReturnInfo", common.DisplayErrorMessage, common.DisplayReturnMessage);
+            common.WaitForResponse ();
 
-            ParseResponse(common.Response);
+            ParseResponse (common.Response);
         }
 
-        void HereNow(Pubnub pubnub, string unitTestCaseName, 
-                                            Action<object> userCallback)
+        [Test]
+        public void IfHereNowIsCalledThenItShouldReturnInfoCipher ()
         {
-          string channel = "hello_world";
+            Pubnub pubnub = new Pubnub (
+                                "demo",
+                                "demo",
+                                "",
+                                "enigma",
+                                false
+                            );
+            Common common = new Common ();
+            common.DeliveryStatus = false;
+            common.Response = null;
 
-          PubnubUnitTest unitTest = new PubnubUnitTest();
-          unitTest.TestClassName = "WhenAClientIsPresented";
-          unitTest.TestCaseName = unitTestCaseName;
-          pubnub.PubnubUnitTest = unitTest;
+            HereNow (pubnub, "IfHereNowIsCalledThenItShouldReturnInfo", common.DisplayReturnMessage, common.DisplayReturnMessage);
+            common.WaitForResponse ();
 
-          pubnub.HereNow(channel, userCallback, userCallback);
+            ParseResponse (common.Response);
         }
 
-        public void ParseResponse(object commonResponse)
+        [Test]
+        public void IfHereNowIsCalledThenItShouldReturnInfoCipherSecret ()
         {
-          string response = "";
-          if (commonResponse.Equals (null)) {
-            Assert.Fail("Null response");
-          }
-          else
-          {
-            IList<object> responseFields = commonResponse as IList<object>;
-            foreach(object item in responseFields)
-            {
-              response = item.ToString();
-              Console.WriteLine("Response:" + response);
-              Assert.NotNull(response);
-            }
-            Dictionary<string, object> message = (Dictionary<string, object>)responseFields[0];
-            foreach(KeyValuePair<String, object> entry in message)
-            {
-              Console.WriteLine("value:" + entry.Value + "  " + "key:" + entry.Key);
-            }
+            Pubnub pubnub = new Pubnub (
+                                "demo",
+                                "demo",
+                                "secret",
+                                "enigma",
+                                false
+                            );
+            Common common = new Common ();
+            common.DeliveryStatus = false;
+            common.Response = null;
+
+            HereNow (pubnub, "IfHereNowIsCalledThenItShouldReturnInfo", common.DisplayReturnMessage, common.DisplayReturnMessage);
+            common.WaitForResponse ();
+
+            ParseResponse (common.Response);
+        }
+
+        [Test]
+        public void IfHereNowIsCalledThenItShouldReturnInfoCipherSecretSSL ()
+        {
+            Pubnub pubnub = new Pubnub (
+                                "demo",
+                                "demo",
+                                "secret",
+                                "enigma",
+                                false
+                            );
+            Common common = new Common ();
+            common.DeliveryStatus = false;
+            common.Response = null;
+
+            HereNow (pubnub, "IfHereNowIsCalledThenItShouldReturnInfo", common.DisplayReturnMessage, common.DisplayReturnMessage);
+            common.WaitForResponse ();
+
+            ParseResponse (common.Response);
+        }
+
+        [Test]
+        public void IfHereNowIsCalledThenItShouldReturnInfoCipherSSL ()
+        {
+            Pubnub pubnub = new Pubnub (
+                                "demo",
+                                "demo",
+                                "",
+                                "enigma",
+                                true
+                            );
+            Common common = new Common ();
+            common.DeliveryStatus = false;
+            common.Response = null;
+
+            HereNow (pubnub, "IfHereNowIsCalledThenItShouldReturnInfo", common.DisplayReturnMessage, common.DisplayReturnMessage);
+            common.WaitForResponse ();
+
+            ParseResponse (common.Response);
+        }
+
+        [Test]
+        public void IfHereNowIsCalledThenItShouldReturnInfoSecret ()
+        {
+            Pubnub pubnub = new Pubnub (
+                                "demo",
+                                "demo",
+                                "secret",
+                                "",
+                                false
+                            );
+            Common common = new Common ();
+            common.DeliveryStatus = false;
+            common.Response = null;
+
+            HereNow (pubnub, "IfHereNowIsCalledThenItShouldReturnInfo", common.DisplayReturnMessage, common.DisplayReturnMessage);
+            common.WaitForResponse ();
+
+            ParseResponse (common.Response);
+        }
+
+        [Test]
+        public void IfHereNowIsCalledThenItShouldReturnInfoSecretSSL ()
+        {
+            Pubnub pubnub = new Pubnub (
+                                "demo",
+                                "demo",
+                                "secret",
+                                "",
+                                true
+                            );
+            Common common = new Common ();
+            common.DeliveryStatus = false;
+            common.Response = null;
+
+            HereNow (pubnub, "IfHereNowIsCalledThenItShouldReturnInfo", common.DisplayReturnMessage, common.DisplayReturnMessage);
+            common.WaitForResponse ();
+
+            ParseResponse (common.Response);
+        }
+
+        [Test]
+        public void IfHereNowIsCalledThenItShouldReturnInfoSSL ()
+        {
+            Pubnub pubnub = new Pubnub (
+                                "demo",
+                                "demo",
+                                "",
+                                "",
+                                true
+                            );
+            Common common = new Common ();
+            common.DeliveryStatus = false;
+            common.Response = null;
+
+            HereNow (pubnub, "IfHereNowIsCalledThenItShouldReturnInfo", common.DisplayReturnMessage, common.DisplayReturnMessage);
+            common.WaitForResponse ();
+
+            ParseResponse (common.Response);
+        }
+
+        void HereNow (Pubnub pubnub, string unitTestCaseName, 
+                      Action<PubnubClientError> errorCallback, Action<object> userCallback)
+        {
+            string channel = "hello_world";
+
+            PubnubUnitTest unitTest = new PubnubUnitTest ();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = unitTestCaseName;
+            pubnub.PubnubUnitTest = unitTest;
+
+            pubnub.HereNow (channel, userCallback, errorCallback);
+        }
+
+        public void ParseResponse (object commonResponse)
+        {
+            string response = "";
+            if (commonResponse.Equals (null)) {
+                Assert.Fail ("Null response");
+            } else {
+                IList<object> responseFields = commonResponse as IList<object>;
+                foreach (object item in responseFields) {
+                    response = item.ToString ();
+                    Console.WriteLine ("Response:" + response);
+                    Assert.NotNull (response);
+                }
+                Dictionary<string, object> message = (Dictionary<string, object>)responseFields [0];
+                foreach (KeyValuePair<String, object> entry in message) {
+                    Console.WriteLine ("value:" + entry.Value + "  " + "key:" + entry.Key);
+                }
             
-            /*object[] objUuid = (object[])message["uuids"];
+                /*object[] objUuid = (object[])message["uuids"];
                     foreach (object obj in objUuid)
                     {
                         Console.WriteLine(obj.ToString()); 
                     }*/
-            //Assert.AreNotEqual(0, message["occupancy"]);
-          }
+                //Assert.AreNotEqual(0, message["occupancy"]);
+            }
         }
 
         [Test]
-        public void IfHereNowIsCalledWithCipherThenItShouldReturnInfo()
+        public void ThenPresenceShouldReturnCustomUUID ()
         {
-            Pubnub pubnub = new Pubnub(
-               "demo",
-               "demo",
-               "",
-               "enigma",
-               false
-            );
-            Common common = new Common();
-            common.DeliveryStatus = false;
-            common.Response = null;
-            
-            HereNow(pubnub, "IfHereNowIsCalledThenItShouldReturnInfo", common.DisplayReturnMessage);
-            common.WaitForResponse();
-
-            ParseResponse(common.Response);
-        }
-
-        [Test]
-        public void ThenPresenceShouldReturnCustomUUID()
-        {
-          Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub ("demo", "demo", "", "", false);
           
-          Common commonHereNow = new Common();
-          commonHereNow.DeliveryStatus = false;
-          commonHereNow.Response = null;
+            Common commonHereNow = new Common ();
+            commonHereNow.DeliveryStatus = false;
+            commonHereNow.Response = null;
 
-          Common commonSubscribe = new Common();
-          commonSubscribe.DeliveryStatus = false;
-          commonSubscribe.Response = null;
+            Common commonSubscribe = new Common ();
+            commonSubscribe.DeliveryStatus = false;
+            commonSubscribe.Response = null;
 
-          pubnub.PubnubUnitTest = commonHereNow.CreateUnitTestInstance("WhenAClientIsPresented", "ThenPresenceShouldReturnCustomUUID");;
-          pubnub.SessionUUID = "CustomSessionUUIDTest";
+            pubnub.PubnubUnitTest = commonHereNow.CreateUnitTestInstance ("WhenAClientIsPresented", "ThenPresenceShouldReturnCustomUUID");
+            ;
+            pubnub.SessionUUID = "CustomSessionUUIDTest";
           
-          string channel = "hello_world";
+            string channel = "hello_world3";
+            pubnub.Unsubscribe<string> (channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessage);
+            commonSubscribe.WaitForResponse (30);
 
-          pubnub.Subscribe(channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessage);
-            
-          //while (!commonSubscribe.DeliveryStatus);
-          commonSubscribe.WaitForResponse();
+            pubnub.Subscribe<string> (channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessage);
+            commonSubscribe.WaitForResponse (30);
+            Thread.Sleep (10000);
 
-          pubnub.HereNow<string>(channel, commonHereNow.DisplayReturnMessage, commonHereNow.DisplayReturnMessage);
+            //while (!commonSubscribe.DeliveryStatus);
+            commonSubscribe.WaitForResponse (30);
 
-          //while (!commonHereNow.DeliveryStatus);
-          commonHereNow.WaitForResponse();
-          if (commonHereNow.Response!= null)
-          {
+            pubnub.HereNow<string> (channel, commonHereNow.DisplayReturnMessage, commonHereNow.DisplayReturnMessage);
+
+            //while (!commonHereNow.DeliveryStatus);
+            commonHereNow.WaitForResponse ();
+            if (commonHereNow.Response != null) {
 #if (USE_JSONFX)
               IList<object> fields = new JsonFXDotNet ().DeserializeToObject (commonHereNow.Response.ToString ()) as IList<object>;
               if (fields [0] != null)
@@ -207,19 +365,18 @@ namespace PubNubMessaging.Tests
                 Assert.Fail("Null response");
               }
 #else
-              object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(commonHereNow.Response.ToString());
-              JContainer dictionary = serializedMessage[0] as JContainer;
-              var uuid = dictionary["uuids"].ToString();
-              if (uuid != null)
-              {
-                  Assert.True(uuid.Contains(pubnub.SessionUUID));
-              } else {
-                  Assert.Fail("Custom uuid not found.");
-              }
+                object[] serializedMessage = JsonConvert.DeserializeObject<object[]> (commonHereNow.Response.ToString ());
+                JContainer dictionary = serializedMessage [0] as JContainer;
+                var uuid = dictionary ["uuids"].ToString ();
+                if (uuid != null) {
+                    Assert.True (uuid.Contains (pubnub.SessionUUID));
+                } else {
+                    Assert.Fail ("Custom uuid not found.");
+                }
 #endif
-          } else {
-              Assert.Fail("Null response");
-          }
+            } else {
+                Assert.Fail ("Null response");
+            }
 
         }
     }

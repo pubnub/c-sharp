@@ -17,7 +17,7 @@ namespace PubNubMessaging.Tests
     {
         ManualResetEvent grantManualEvent = new ManualResetEvent(false);
         bool receivedGrantMessage = false;
-        int sampleCount = 100;
+        int sampleCount = 10;
         
         [Test]
         public void AtUserLevel()
@@ -35,7 +35,7 @@ namespace PubNubMessaging.Tests
                     grantManualEvent.WaitOne();
                 }
 
-                Assert.IsTrue(receivedGrantMessage, "GenerateSampleGrant -> AtUserLevel failed.");
+                Assert.True(receivedGrantMessage, "GenerateSampleGrant -> AtUserLevel failed.");
             }
             else
             {
@@ -58,7 +58,7 @@ namespace PubNubMessaging.Tests
                     grantManualEvent.WaitOne();
                 }
 
-                Assert.IsTrue(receivedGrantMessage, "GenerateSampleGrant -> AtChannelLevel failed.");
+                Assert.True(receivedGrantMessage, "GenerateSampleGrant -> AtChannelLevel failed.");
             }
             else
             {

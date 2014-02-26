@@ -62,6 +62,9 @@
     <Compile Include="WhenAMessageIsPublished.cs" />
     <Compile Include="PubnubUnitTest.cs" />
     <Compile Include="WhenUnsubscribedToAChannel.cs" />
+    <Compile Include="GenerateSampleGrant.cs" />
+    <Compile Include="PubnubCommon.cs" />
+    <Compile Include="WhenSubscribedToAChannel2.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

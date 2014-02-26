@@ -30,6 +30,10 @@ namespace Andr.Unit {
         {
             // tests can be inside the main assembly
             Add (Assembly.GetExecutingAssembly ());
+            //Runner.Writer = new TcpTextWriter ("172.16.192.139", 16384);
+            //Runner.AutoStart = true;
+            //Runner.TerminateAfterExecution = true;
+
             // or in any reference assemblies            
             //Add (typeof (PubNubMessaging.Core.EncryptionTests).Assembly);
             // or in any assembly that you load (since JIT is available)
