@@ -10,12 +10,12 @@ using System.Collections.Generic;
 using Microsoft.Win32;
 using System.Threading;
 using System.Security.Cryptography;
-using Javax.Net.Ssl;
-using Android.Runtime;
+using System.Configuration;
+using System.Collections;
 
 namespace PubNubMessaging.Core
 {
-    internal class PubnubXamarinAndroid : PubnubCore
+    internal class PubnubXamariniOS : PubnubCore
     {
 
         #region "Constants and Globals"
@@ -52,17 +52,17 @@ namespace PubNubMessaging.Core
 
         #region "Constructors and destructors"
 
-        public PubnubXamarinAndroid (string publishKey, string subscribeKey) : 
+        public PubnubXamariniOS (string publishKey, string subscribeKey) : 
             base (publishKey, subscribeKey)
         {
         }
 
-        public PubnubXamarinAndroid (string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn) : 
+        public PubnubXamariniOS (string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn) : 
             base (publishKey, subscribeKey, secretKey, cipherKey, sslOn)
         {
         }
 
-        public PubnubXamarinAndroid (string publishKey, string subscribeKey, string secretKey) :
+        public PubnubXamariniOS (string publishKey, string subscribeKey, string secretKey) :
             base (publishKey, subscribeKey, secretKey)
         {
         }
@@ -75,9 +75,9 @@ namespace PubNubMessaging.Core
         {
             bool reconnect = false;
             if ((webEx.Status == WebExceptionStatus.NameResolutionFailure//No network
-            || webEx.Status == WebExceptionStatus.ConnectFailure//Sending Keep-alive packet failed (No network)/Server is down.
-            || webEx.Status == WebExceptionStatus.ServerProtocolViolation//Problem with proxy or ISP
-            || webEx.Status == WebExceptionStatus.ProtocolError
+                || webEx.Status == WebExceptionStatus.ConnectFailure//Sending Keep-alive packet failed (No network)/Server is down.
+                || webEx.Status == WebExceptionStatus.ServerProtocolViolation//Problem with proxy or ISP
+                || webEx.Status == WebExceptionStatus.ProtocolError
             ) && (overrideTcpKeepAlive)) {
                 //LoggingMethod.WriteToLog (string.Format ("DateTime {0}, _urlRequest - Internet connection problem", DateTime.Now.ToString ()), LoggingMethod.LevelError);
                 //internet connection problem.
@@ -280,7 +280,7 @@ namespace PubNubMessaging.Core
 						return true;
 				}
 		#endif
-       
+
         #if (__MonoCS__)
         bool RequestIsUnsafe (Uri requestUri)
         {

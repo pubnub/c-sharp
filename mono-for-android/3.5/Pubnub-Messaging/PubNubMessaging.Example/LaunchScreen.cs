@@ -11,10 +11,12 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using PubNubMessaging.Core;
+using Android.Content.PM;
 
 namespace PubNubMessaging.Example
 {
-    [Activity (Label = "PubNubMessaging", MainLauncher = true)]            
+    [Activity (Label = "PubNubMessaging", MainLauncher = true, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.KeyboardHidden,
+        ScreenOrientation = ScreenOrientation.Portrait)]            
     public class LaunchScreen : Activity
     {
         Dialog dialog;

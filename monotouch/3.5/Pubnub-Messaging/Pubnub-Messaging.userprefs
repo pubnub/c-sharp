@@ -1,13 +1,19 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhoneRetina.7.0" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Pubnub-Messaging.Tests/WhenSubscribedToAChannel.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhone" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneDeviceTarget.Iph" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="PubnubMessaging.Tests/WhenSubscribedToAChannel3.cs">
     <Files>
-      <File FileName="Pubnub-Messaging.Tests/WhenAClientIsPresented.cs" Line="36" Column="43" />
-      <File FileName="Pubnub-Messaging.Tests/WhenSubscribedToAChannel.cs" Line="26" Column="42" />
+      <File FileName="PubnubMessagingExample/Pubnub_MessagingMain.cs" Line="1" Column="1" />
+      <File FileName="PubnubMessaging.Tests/WhenSubscribedToAChannel2.cs" Line="367" Column="1" />
+      <File FileName="PubnubMessaging.Tests/WhenSubscribedToAChannel3.cs" Line="41" Column="14" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/Users/rajat-ml/Projects/Xamarin.iOS/3.5/Pubnub-Messaging-modified-tests/Launcher/Program.cs" line="15" column="1" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.ItemProperties.Touch.Unit>
+    <MonoDevelop.MacDev.AppleDevelopmentTeam DeveloperId="NK6E38LY64" TeamId="Y9X42V6EK7" />
+  </MonoDevelop.Ide.ItemProperties.Touch.Unit>
 </Properties>
