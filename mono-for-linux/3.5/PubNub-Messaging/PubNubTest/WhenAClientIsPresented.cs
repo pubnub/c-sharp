@@ -1,4 +1,3 @@
-//#define USE_JSONFX
 using System;
 using PubNubMessaging.Core;
 using NUnit.Framework;

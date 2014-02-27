@@ -637,11 +637,11 @@ namespace PubNubMessaging.Core
             return obj.ComputeHash(data);
         }*/
         /// <summary>
-        /// Converts the upper case hex to lower case hex.
-        /// </summary>
+        /// Converts the upper case hex to lower case hex.  
+        /// </summary>  
         /// <returns>The lower case hex.</returns>
         /// <param name="value">Hex Value.</param>
-        private string ConvertHexToUnicodeChars (string value)
+        public static string ConvertHexToUnicodeChars (string value)
         {
             //if(;
             return Regex.Replace (

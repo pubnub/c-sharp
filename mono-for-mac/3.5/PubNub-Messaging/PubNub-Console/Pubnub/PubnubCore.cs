@@ -1,9 +1,10 @@
-//Build Date: February 12, 2014
+//Build Date: February 25, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX
 #elif (UNITY_IOS)
 #define USE_JSONFX_FOR_UNITY
+//#define USE_MiniJSON
 #endif
 using System;
 using System.IO;
@@ -68,13 +69,13 @@ namespace PubNubMessaging.Core
         bool _enableJsonEncodingForPublish = true;
         LoggingMethod.Level _pubnubLogLevel = LoggingMethod.Level.Off;
         PubnubErrorFilter.Level _errorLevel = PubnubErrorFilter.Level.Info;
-        ConcurrentDictionary<string, long> _multiChannelSubscribe = new ConcurrentDictionary<string, long> ();
+		protected ConcurrentDictionary<string, long> _multiChannelSubscribe = new ConcurrentDictionary<string, long> ();
         ConcurrentDictionary<string, PubnubWebRequest> _channelRequest = new ConcurrentDictionary<string, PubnubWebRequest> ();
         protected ConcurrentDictionary<string, bool> channelInternetStatus = new ConcurrentDictionary<string, bool> ();
         protected ConcurrentDictionary<string, int> channelInternetRetry = new ConcurrentDictionary<string, int> ();
         ConcurrentDictionary<string, Timer> _channelReconnectTimer = new ConcurrentDictionary<string, Timer> ();
         protected ConcurrentDictionary<Uri, Timer> channelHeartbeatTimer = new ConcurrentDictionary<Uri, Timer> ();
-        ConcurrentDictionary<PubnubChannelCallbackKey, object> _channelCallbacks = new ConcurrentDictionary<PubnubChannelCallbackKey, object> ();
+		protected ConcurrentDictionary<PubnubChannelCallbackKey, object> _channelCallbacks = new ConcurrentDictionary<PubnubChannelCallbackKey, object> ();
         protected System.Threading.Timer heartBeatTimer;
         protected static bool pubnetSystemActive = true;
         // History of Messages (Obsolete)
@@ -1723,7 +1724,7 @@ namespace PubNubMessaging.Core
 
         #region "Exception handlers"
 
-        private void UrlRequestCommonExceptionHandler<T> (ResponseType type, string[] channels, bool requestTimeout, Action<T> userCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback, bool resumeOnReconnect)
+		protected void UrlRequestCommonExceptionHandler<T> (ResponseType type, string[] channels, bool requestTimeout, Action<T> userCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback, bool resumeOnReconnect)
         {
             if (type == ResponseType.Subscribe || type == ResponseType.Presence) {
                 MultiplexExceptionHandler<T> (type, channels, userCallback, connectCallback, errorCallback, false, resumeOnReconnect);
@@ -1909,7 +1910,7 @@ namespace PubNubMessaging.Core
         /// <param name="userCallback"></param>
         /// <param name="connectCallback"></param>
         /// <param name="errorCallback"></param>
-        private void MultiplexInternalCallback<T> (ResponseType type, object multiplexResult, Action<T> userCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback)
+		protected void MultiplexInternalCallback<T> (ResponseType type, object multiplexResult, Action<T> userCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback)
         {
             List<object> message = multiplexResult as List<object>;
             string[] channels = null;
@@ -3057,7 +3058,6 @@ namespace PubNubMessaging.Core
             if ((type == ResponseType.Publish || type == ResponseType.Subscribe || type == ResponseType.Presence)) {
                 ForceCanonicalPathAndQuery (requestUri);
             }
-
             return requestUri;
 
         }
@@ -3526,7 +3526,8 @@ namespace PubNubMessaging.Core
 #if(__MonoCS__)
             var writer = new JsonFx.Json.JsonWriter ();
             string json = writer.Write (objectToSerialize);
-            return json;
+
+			return PubnubCryptoBase.ConvertHexToUnicodeChars(json);
 #else
             string json = "";
             var resolver = new CombinedResolverStrategy(new DataContractResolverStrategy());
@@ -3604,7 +3605,8 @@ namespace PubNubMessaging.Core
 
         public string SerializeToJsonString(object objectToSerialize)
         {
-            return Json.Serialize(objectToSerialize);
+			string json =  Json.Serialize(objectToSerialize);
+		    return PubnubCryptoBase.ConvertHexToUnicodeChars(json);
         }
 
         public List<object> DeserializeToListOfObject(string jsonString)
@@ -3633,7 +3635,9 @@ namespace PubNubMessaging.Core
         }
         public string SerializeToJsonString(object objectToSerialize)
         {
-            return JsonWriter.Serialize(objectToSerialize);
+
+			string json =  JsonWriter.Serialize(objectToSerialize); 
+			return PubnubCryptoBase.ConvertHexToUnicodeChars(json);
         }
 
         public List<object> DeserializeToListOfObject(string jsonString)

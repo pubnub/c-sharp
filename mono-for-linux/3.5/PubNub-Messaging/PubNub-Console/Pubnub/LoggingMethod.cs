@@ -1,3 +1,6 @@
+#if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
+#define TRACE
+#endif
 using System;
 using System.Diagnostics;
 using System.Text;

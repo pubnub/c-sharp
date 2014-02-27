@@ -1,3 +1,5 @@
+//ver3.5.1
+//Build Date: February 20, 2014
 using System;
 using System.Text;
 using System.Net.Security;
@@ -78,10 +80,14 @@ namespace PubNubMessaging.Core
         protected override bool HandleWebException<T> (WebException webEx, RequestState<T> asynchRequestState, string channel)
         {
             bool reconnect = false;
-            if ((webEx.Status == WebExceptionStatus.NameResolutionFailure//No network
-                         || webEx.Status == WebExceptionStatus.ConnectFailure//Sending Keep-alive packet failed (No network)/Server is down.
-                         || webEx.Status == WebExceptionStatus.ServerProtocolViolation//Problem with proxy or ISP
-                         || webEx.Status == WebExceptionStatus.ProtocolError) && (!overrideTcpKeepAlive)) {
+			if (((webEx.Status == WebExceptionStatus.NameResolutionFailure //No network
+				|| webEx.Status == WebExceptionStatus.ConnectFailure //Sending Keep-alive packet failed (No network)/Server is down.
+				|| webEx.Status == WebExceptionStatus.ServerProtocolViolation //Problem with proxy or ISP
+                         || webEx.Status == WebExceptionStatus.ProtocolError) && (!overrideTcpKeepAlive)) 
+				|| (webEx.Status == WebExceptionStatus.ConnectFailure)
+				|| (webEx.Status == WebExceptionStatus.SendFailure)
+			)
+			{
                 //internet connection problem.
                 LoggingMethod.WriteToLog (string.Format ("DateTime {0}, _urlRequest - Internet connection problem", DateTime.Now.ToString ()), LoggingMethod.LevelError);
                 if (base.channelInternetStatus.ContainsKey (channel) && (asynchRequestState.Type == ResponseType.Subscribe || asynchRequestState.Type == ResponseType.Presence)) {
@@ -98,8 +104,8 @@ namespace PubNubMessaging.Core
                     }
                     base.channelInternetStatus [channel] = false;
                 }
-                Thread.Sleep (base.NetworkCheckRetryInterval * 1000);
             }
+			Thread.Sleep (base.NetworkCheckRetryInterval * 1000);
             return reconnect;
         }
 
