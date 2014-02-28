@@ -205,7 +205,8 @@ namespace PubNubMessaging.Core
 				protected override bool InternetConnectionStatus<T> (string channel, Action<PubnubClientError> errorCallback, string[] rawChannels)
 				{
 						bool networkConnection;
-						networkConnection = ClientNetworkStatus.GetInternetStatus ();
+						//networkConnection = ClientNetworkStatus.GetInternetStatus ();
+						networkConnection = ClientNetworkStatus.CheckInternetStatusUnity<T> (PubnubCore.pubnetSystemActive, errorCallback, rawChannels, HeartbeatInterval);
 						return networkConnection;
 				}
 

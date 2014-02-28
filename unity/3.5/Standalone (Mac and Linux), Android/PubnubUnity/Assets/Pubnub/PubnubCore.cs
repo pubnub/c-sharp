@@ -1,9 +1,10 @@
-//Build Date: February 12, 2014
+//Build Date: February 25, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX
 #elif (UNITY_IOS)
 #define USE_JSONFX_FOR_UNITY
+//#define USE_MiniJSON
 #endif
 using System;
 using System.IO;
@@ -3525,7 +3526,8 @@ namespace PubNubMessaging.Core
 #if(__MonoCS__)
             var writer = new JsonFx.Json.JsonWriter ();
             string json = writer.Write (objectToSerialize);
-            return json;
+
+			return PubnubCryptoBase.ConvertHexToUnicodeChars(json);
 #else
             string json = "";
             var resolver = new CombinedResolverStrategy(new DataContractResolverStrategy());
@@ -3603,7 +3605,8 @@ namespace PubNubMessaging.Core
 
         public string SerializeToJsonString(object objectToSerialize)
         {
-            return Json.Serialize(objectToSerialize);
+			string json =  Json.Serialize(objectToSerialize);
+		    return PubnubCryptoBase.ConvertHexToUnicodeChars(json);
         }
 
         public List<object> DeserializeToListOfObject(string jsonString)
@@ -3632,7 +3635,9 @@ namespace PubNubMessaging.Core
         }
         public string SerializeToJsonString(object objectToSerialize)
         {
-            return JsonWriter.Serialize(objectToSerialize);
+
+			string json =  JsonWriter.Serialize(objectToSerialize); 
+			return PubnubCryptoBase.ConvertHexToUnicodeChars(json);
         }
 
         public List<object> DeserializeToListOfObject(string jsonString)
