@@ -42,7 +42,7 @@ namespace PubnubSilverlight
         static int networkRetryIntervalInSeconds = 0;
         static int heartbeatIntervalInSeconds = 0;
 
-        static bool showErrorMessageSegments = false;
+        static bool showErrorMessageSegments = true;
        
         #endregion
 
