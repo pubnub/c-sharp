@@ -1,5 +1,5 @@
 # PubNub 3.5 Web Data Push Cloud-Hosted API
-# Works with Silverlight 5.
+## Works with Silverlight 5.
 
 For a video walkthrough, check out https://vimeo.com/57495830 !
 
