@@ -1,4 +1,4 @@
-//Build Date: January 27, 2014
+//Build Date: March 4, 2014
 using System;
 using System.Text;
 //using System.Net.Security;
@@ -11,6 +11,7 @@ using System.Threading;
 using System.Reflection;
 using System.Configuration;
 using System.Security.Cryptography;
+using System.Linq;
 
 #if (SILVERLIGHT || WINDOWS_PHONE)
 using System.Windows.Threading;
@@ -246,7 +247,7 @@ namespace PubNubMessaging.Core
                     presenceHeartbeatTimer.Dispose();
                     presenceHeartbeatTimer = null;
                 }
-                if (pubnubRequestState.Channels != null && pubnubRequestState.Channels.Length > 0)
+                if (pubnubRequestState.Channels != null && pubnubRequestState.Channels.Length > 0 && pubnubRequestState.Channels.Where(s => s.Contains("-pnpres") == false).ToArray().Length > 0)
                 {
                     RequestState<T> presenceHeartbeatState = new RequestState<T>();
                     presenceHeartbeatState.Channels = pubnubRequestState.Channels;

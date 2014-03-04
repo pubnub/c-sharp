@@ -1,4 +1,4 @@
-//Build Date: February 24, 2014
+//Build Date: March 4, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX
@@ -2172,7 +2172,7 @@ namespace PubNubMessaging.Core
                     }
                     else
                     {
-                        if (userStateValue != null)
+                        if (!string.IsNullOrEmpty(userStateKey) && userStateKey.Trim().Length > 0 && userStateValue != null)
                         {
                             userStateDictionary.Add(userStateKey, userStateValue);
                         }
@@ -2188,7 +2188,7 @@ namespace PubNubMessaging.Core
             }
             else
             {
-                if (userStateValue != null)
+                if (!string.IsNullOrEmpty(userStateKey) && userStateKey.Trim().Length > 0 && userStateValue != null)
                 {
                     userStateDictionary = new Dictionary<string, object>();
                     userStateDictionary.Add(userStateKey, userStateValue);
@@ -2414,6 +2414,7 @@ namespace PubNubMessaging.Core
 
             if (string.IsNullOrEmpty(uuid))
             {
+                VerifyOrSetSessionUUID();
                 uuid = this.sessionUUID;
             }
 
@@ -2742,7 +2743,7 @@ namespace PubNubMessaging.Core
         {
             //Make presence heartbeat call
             RequestState<T> currentState = presenceHeartbeatState as RequestState<T>;
-            if (currentState != null)
+            if (currentState != null && currentState.Channels != null)
             {
                 string channel = (currentState.Channels != null) ? string.Join(",", currentState.Channels) : "";
 
@@ -2756,16 +2757,21 @@ namespace PubNubMessaging.Core
                     networkConnection = CheckInternetConnectionStatus<T>(pubnetSystemActive, currentState.ErrorCallback, currentState.Channels);
                     if (networkConnection)
                     {
-                        Uri request = BuildPresenceHeartbeatRequest(currentState.Channels);
+                        string[] subscriberChannels = currentState.Channels.Where(s => s.Contains("-pnpres") == false).ToArray();
 
-                        RequestState<T> requestState = new RequestState<T>();
-                        requestState.Channels = currentState.Channels;
-                        requestState.Type = ResponseType.PresenceHeartbeat;
-                        requestState.UserCallback = null;
-                        requestState.ErrorCallback = currentState.ErrorCallback;
-                        requestState.Reconnect = false;
+                        if (subscriberChannels != null && subscriberChannels.Length > 0)
+                        {
+                            Uri request = BuildPresenceHeartbeatRequest(subscriberChannels);
 
-                        UrlProcessRequest<T>(request, requestState);
+                            RequestState<T> requestState = new RequestState<T>();
+                            requestState.Channels = currentState.Channels;
+                            requestState.Type = ResponseType.PresenceHeartbeat;
+                            requestState.UserCallback = null;
+                            requestState.ErrorCallback = currentState.ErrorCallback;
+                            requestState.Reconnect = false;
+
+                            UrlProcessRequest<T>(request, requestState);
+                        }
                     }
                 }
 
