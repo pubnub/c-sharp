@@ -18,7 +18,8 @@ using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Example
 {
-    [Activity (Label = "PubNubMessaging")]
+    [Activity (Label = "PubNubMessaging", ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.KeyboardHidden,
+        ScreenOrientation = ScreenOrientation.Portrait)]
     public class MainActivity : FragmentActivity
     {
         Pubnub pubnub;

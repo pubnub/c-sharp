@@ -50,6 +50,12 @@
   <ItemGroup>
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Pubnub.cs" />
+    <Compile Include="ClientNetworkStatus.cs" />
+    <Compile Include="LoggingMethod.cs" />
+    <Compile Include="MD5.cs" />
+    <Compile Include="PubnubCore.cs" />
+    <Compile Include="PubnubXamarinAndroid.cs" />
+    <Compile Include="ReconnectState.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

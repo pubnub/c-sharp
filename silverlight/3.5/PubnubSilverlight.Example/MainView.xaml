@@ -39,11 +39,11 @@
                 
                 <StackPanel x:Name="LinksStackPanel" Style="{StaticResource LinksStackPanelStyle}">
 
-                    <HyperlinkButton x:Name="Link1" Style="{StaticResource LinkStyle}" NavigateUri="/CodeExampleView" TargetName="ContentFrame" Content="Example"/>
+                    <!-- <HyperlinkButton x:Name="Link1" Style="{StaticResource LinkStyle}" NavigateUri="/CodeExampleView" TargetName="ContentFrame" Content="Example"/>
 
                     <Rectangle x:Name="Divider1" Style="{StaticResource DividerStyle}"/>
 
-                    <HyperlinkButton x:Name="Link2" Style="{StaticResource LinkStyle}" NavigateUri="/CodeUnitTestView" TargetName="ContentFrame" Content="Unit Test"/>
+                    <HyperlinkButton x:Name="Link2" Style="{StaticResource LinkStyle}" NavigateUri="/CodeUnitTestView" TargetName="ContentFrame" Content="Unit Test"/> -->
 
                 </StackPanel>
                 

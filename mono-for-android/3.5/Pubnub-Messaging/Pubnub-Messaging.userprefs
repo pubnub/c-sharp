@@ -1,31 +1,11 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="PubNubMessaging.Example/LaunchScreen.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="PubNubMessaging/PubnubXamarinAndroid.cs">
     <Files>
-      <File FileName="PubNubMessaging.Example/MainActivity.cs" Line="1" Column="1" />
-      <File FileName="PubNubMessaging.Example/GrantDialogFragment.cs" Line="1" Column="1" />
-      <File FileName="PubNubMessaging.Example/AuthDialogFragment.cs" Line="1" Column="1" />
-      <File FileName="PubNubMessaging/Pubnub.cs" Line="1" Column="1" />
-      <File FileName="PubNubMessaging.Example/LaunchScreen.cs" Line="229" Column="96" />
+      <File FileName="PubNubMessaging/PubnubXamarinAndroid.cs" Line="86" Column="25" />
+      <File FileName="PubNubMessaging/PubnubCore.cs" Line="1" Column="1" />
+      <File FileName="../../../../../../Volumes/VMware Shared Folders/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNub-Console/Pubnub/PubnubMonoMac.cs" Line="16" Column="2" />
     </Files>
-    <Pads>
-      <Pad Id="ProjectPad">
-        <State expanded="True">
-          <Node name="PubNubMessaging.Example" expanded="True">
-            <Node name="Jars" selected="True" />
-          </Node>
-        </State>
-      </Pad>
-      <Pad Id="ClassPad">
-        <State expanded="True" selected="True" />
-      </Pad>
-      <Pad Id="MonoDevelop.Debugger.WatchPad">
-        <State />
-      </Pad>
-      <Pad Id="ConnectionManagerPad">
-        <State selected="True" />
-      </Pad>
-    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

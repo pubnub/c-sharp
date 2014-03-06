@@ -14,7 +14,6 @@ using System.Diagnostics;
 using System.ComponentModel;
 using System.IO;
 using System.Threading;
-using Microsoft.Silverlight.Testing;
 
 namespace PubnubSilverlight
 {

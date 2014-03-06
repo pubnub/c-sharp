@@ -27,9 +27,10 @@ NOTE: The callback methods DisplayReturnMessage, DisplayConnectStatusMessage and
 2. For Unity, JSONFX is needed for the serialization library. 
 3. To use JSONFX we have defined a pre-compiler variable USE_JSONFX. The other serialization libraries used in the pubnub.cs class are the default from the builtin .NET class (activated when the pre-compiler directive USE_DOTNET_SERIALIZATION is used) and Newtonsoft.Json (activated when neither USE_JSONFX nor USE_DOTNET_SERIALIZATION is defined). Both of these libraries won't work with UNITY. So you need to be sure the pre-compiler variable USE_JSONFX is "defined" at the top of the pubnub.cs class (default behavior).
 3. The unit tests for unity also require JSONFX library for serialization.
+4. For unity windows project we have added a scripting define symbols ```__MonoCS__``` under player settings -> configuration. This is useful if we build the project under VS.
 
 #### To run the unit test code (under UnityUnitTest folder of Standalone), in addition to the above step, you need to 
-1. Import UUnit unity package from http://uunit.googlecode.com/files/UUnit_0.4.unitypackage into your Assets (Updates on this pacakage can be obtained from http://wiki.unity3d.com/index.php?title=UUnit). After import, please delete TestCaseDummy.cs and TestCaseTest.cs files from /Assets/Standard Assets/UUnit/UUnitSelfTest folder to avoid unintended test case runs.
+1. Import UnityTestTools package (this is already present in the Pubnub client code under the path PubnubUnity/Assets/UnityTestTools) into your Assets. (https://www.assetstore.unity3d.com/#/content/13802)  
    
 
 #### Running the Demo App on PC
@@ -44,9 +45,10 @@ NOTE: The callback methods DisplayReturnMessage, DisplayConnectStatusMessage and
 
 #### Running the Tests
 
-1. Open up the Unity Project from Standalone (Mac and Linux), Android\UnityUnitTest or Standalone (Windows)\UnityUnitTest folder.
-2. Click "UUnit" menu to run unit tests. NOTE: If "UUnit" menu item is not showing up, ensure that /Assets/Standard Assets/Editor/UUnit/UUnitTestRunner.cs file exists.
-3. Make Console tab as active tab and then Click UUnit so that unit test results will be visible in console.
+1. Open up the Unity Project from Standalone (Windows)\UnityUnitTest folder.
+2. From the "Unity test tools" menu select the "Unit test runner" option.
+3. Run the tests by clicking the "play" button or by selecting the individual tests.
+
 
 #### Potential Errors and their resolutions:
 

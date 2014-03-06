@@ -1,16 +1,19 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="PubNub-Console/Pubnub.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="PubNub-Console/Pubnub/PubnubMonoMac.cs">
     <Files>
-      <File FileName="PubNub-Console/PubnubExample.cs" Line="126" Column="16" />
-      <File FileName="PubNub-Console/Pubnub.cs" Line="6" Column="7" />
-      <File FileName="PubNubTest/WhenSubscribedToAChannel.cs" Line="225" Column="40" />
+      <File FileName="PubNubTest/CleanupGrant.cs" Line="7" Column="24" />
+      <File FileName="PubNubTest/WhenAClientIsPresented.cs" Line="237" Column="66" />
+      <File FileName="PubNub-Console/Pubnub/PubnubCore.cs" Line="1" Column="1" />
+      <File FileName="PubNub-Console/Pubnub/PubnubMonoMac.cs" Line="329" Column="10" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="PubNub-Messaging" expanded="True">
-            <Node name="Pubnub.cs" selected="True" />
+            <Node name="Pubnub" expanded="True">
+              <Node name="PubnubMonoMac.cs" selected="True" />
+            </Node>
           </Node>
           <Node name="PubNub-Messaging.Tests" expanded="True" />
         </State>
@@ -22,7 +25,15 @@
         <State />
       </Pad>
       <Pad Id="MonoDevelop.NUnit.TestPad">
-        <State expanded="True" selected="True" />
+        <State expanded="True">
+          <Node name="PubNub-Messaging.Tests" expanded="True">
+            <Node name="PubNubMessaging" expanded="True">
+              <Node name="Tests" expanded="True">
+                <Node name="WhenUnsubscribedToAChannel" expanded="True" />
+              </Node>
+            </Node>
+          </Node>
+        </State>
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>

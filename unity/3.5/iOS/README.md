@@ -27,7 +27,7 @@ NOTE: The callback methods DisplayReturnMessage, DisplayConnectStatusMessage and
 2.2 MiniJson: A small class, with no additional dependencies. But this class can only serialize arrays, strings, Chars, hashtables, Dictionary, arraylist and some more but not custom classes and objects. If you want to use this you need to 
 - open the project in MonoDevelop and remove the reference of JsonFx.Json.dll from the references. Delete the JsonFx.Json.dll from the assets folder.
 - add MiniJson to the project. This can be done by going to the Solution Explorer, ctrl-clicking Assets -> Add -> Add Files and select the file MiniJson.cs from the Assets folder.
-- In the pubnub.cs file uncomment the line which says #define USE_MiniJSON and comment the line #define USE_JSONFX_FOR_UNITY
+- In the PubnubCore.cs file uncomment the line which says #define USE_MiniJSON and comment the line #define USE_JSONFX_FOR_UNITY
 ```
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX
@@ -36,9 +36,10 @@ NOTE: The callback methods DisplayReturnMessage, DisplayConnectStatusMessage and
 //#define USE_JSONFX_FOR_UNITY
 #endif
 ```
+- Similarly you need to uncomment the line which says #define USE_MiniJSON and comment the line #define USE_JSONFX_FOR_UNITY in the file PubnubUnityiOS.cs
 
-#### To run the unit test code (under UnityUnitTest folder of Standalone), in addition to the above step, you need to 
-1. Import UUnit unity package from http://uunit.googlecode.com/files/UUnit_0.4.unitypackage into your Assets (Updates on this pacakage can be obtained from http://wiki.unity3d.com/index.php?title=UUnit). After import, please delete TestCaseDummy.cs and TestCaseTest.cs files from /Assets/Standard Assets/UUnit/UUnitSelfTest folder to avoid unintended test case runs.
+#### To run the unit tests, in addition to the above, you need to 
+1. Import UnityTestTools package (this is already present in the Pubnub client code under the path PubnubUnity/Assets/UnityTestTools) into your Assets. (https://www.assetstore.unity3d.com/#/content/13802)
    
 #### iOS (requires Xcode to be installed)
 
@@ -53,9 +54,9 @@ NOTE: The callback methods DisplayReturnMessage, DisplayConnectStatusMessage and
 
 #### Running the Tests
 
-1. Open up the Unity Project from iOS\UnityUnitTest folder.
-2. Click "UUnit" menu to run unit tests. NOTE: If "UUnit" menu item is not showing up, ensure that /Assets/Standard Assets/Editor/UUnit/UUnitTestRunner.cs file exists.
-3. Make Console tab as active tab and then Click UUnit so that unit test results will be visible in console.
+1. Open up the Unity Project from iOS folder.
+2. From the "Unity test tools" menu select the "Unit test runner" option.
+3. Run the tests by clicking the "play" button or by selecting the individual tests.
 
 #### Potential Errors and their resolutions:
 

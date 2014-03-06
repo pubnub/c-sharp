@@ -73,10 +73,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Silverlight.Testing, Version=5.0.5.0, Culture=neutral, PublicKeyToken=2c5c654d367bf4a7, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight, Version=5.0.5.0, Culture=neutral, PublicKeyToken=2c5c654d367bf4a7, processorArchitecture=MSIL" />
-    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, processorArchitecture=MSIL" />
-    <Reference Include="System.Threading.Tasks.SL5, Version=3.0.2.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="System.Windows" />
     <Reference Include="mscorlib" />
     <Reference Include="system" />
@@ -91,13 +87,6 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Core\ClientNetworkStatus.cs" />
-    <Compile Include="Core\LoggingMethod.cs" />
-    <Compile Include="Core\MD5.cs" />
-    <Compile Include="Core\Pubnub.cs" />
-    <Compile Include="Core\PubnubCore.cs" />
-    <Compile Include="Core\PubnubWin.cs" />
-    <Compile Include="Core\ReconnectState.cs" />
     <Compile Include="MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
     </Compile>
@@ -105,30 +94,12 @@
     <Compile Include="Dialogs\PublishMessageDialog.xaml.cs">
       <DependentUpon>PublishMessageDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UnitTest\CustomClass.cs" />
-    <Compile Include="UnitTest\EncryptionTests.cs" />
-    <Compile Include="UnitTest\Main.cs" />
-    <Compile Include="UnitTest\PubnubCommon.cs" />
-    <Compile Include="UnitTest\PubnubUnitTest.cs" />
-    <Compile Include="UnitTest\WhenAClientIsPresented.cs" />
-    <Compile Include="UnitTest\WhenAMessageIsPublished.cs" />
-    <Compile Include="UnitTest\WhenAuditIsRequested.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="UnitTest\WhenDetailedHistoryIsRequested.cs" />
-    <Compile Include="UnitTest\WhenGetRequestServerTime.cs" />
-    <Compile Include="UnitTest\WhenGrantIsRequested.cs" />
     <Compile Include="Views\CodeExampleView.xaml.cs">
       <DependentUpon>CodeExampleView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\CodeUnitTestView.xaml.cs">
-      <DependentUpon>CodeUnitTestView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ErrorWindow.xaml.cs">
       <DependentUpon>ErrorWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UnitTest\WhenSubscribedToAChannel.cs" />
-    <Compile Include="UnitTest\WhenUnsubscribedToAChannel.cs" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -160,10 +131,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\CodeUnitTestView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\ErrorWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -175,7 +142,12 @@
     <Content Include="SL5\Newtonsoft.Json.dll" />
     <Content Include="SL5\System.Threading.Tasks.SL5.dll" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\PubnubCore\PubnubCore.csproj">
+      <Project>{6CE10DAA-2130-4E3F-B8C9-2B34DA996B5F}</Project>
+      <Name>PubnubCore</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <Import Condition="$(SilverlightVersion)=='v3.0'" Project="$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\SilverlightToolkit\Tools\v3.0)Microsoft.Silverlight.Toolkit.Build.targets" />
   <Import Condition="$(SilverlightVersion)=='v4.0'" Project="$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\SilverlightToolkit\Tools\v4.0)Microsoft.Silverlight.Toolkit.Build.targets" />
