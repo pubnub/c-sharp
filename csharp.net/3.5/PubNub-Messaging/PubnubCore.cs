@@ -1,4 +1,4 @@
-//Build Date: March 4, 2014
+//Build Date: March 7, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX
@@ -62,8 +62,10 @@ namespace PubNubMessaging.Core
 		int _pubnubNetworkTcpCheckIntervalInSeconds = 15;
 		int _pubnubNetworkCheckRetries = 50;
 		int _pubnubWebRequestRetryIntervalInSeconds = 10;
-        int _pubnubPresenceHeartbeatInSeconds = 0;
-		bool _enableResumeOnReconnect = true;
+        int _pubnubPresenceHeartbeatInSeconds = 63;
+        int _presenceHeartbeatIntervalInSeconds = 60;
+        bool _enableResumeOnReconnect = true;
+        bool _uuidChanged = false;
 		protected bool overrideTcpKeepAlive = true;
 		bool _enableJsonEncodingForPublish = true;
 		LoggingMethod.Level _pubnubLogLevel = LoggingMethod.Level.Off;
@@ -296,7 +298,6 @@ namespace PubNubMessaging.Core
             }
         }
 
-        int _presenceHeartbeatIntervalInSeconds = 0;
         internal int PresenceHeartbeatInterval
         {
             get
@@ -894,8 +895,42 @@ namespace PubNubMessaging.Core
 		}
 		#endregion
 
-		#region "Constructors"
-		/**
+        #region "Change UUID"
+
+        public void ChangeUUID(string newUUID)
+        {
+            if (string.IsNullOrEmpty(newUUID) || sessionUUID == newUUID)
+            {
+                return;
+            }
+            
+            _uuidChanged = true;
+
+            string oldUUID = sessionUUID;
+            
+            sessionUUID = newUUID;
+            
+            string[] channels = GetCurrentSubscriberChannels();
+
+            Uri request = BuildMultiChannelLeaveRequest(channels, oldUUID);
+
+            RequestState<string> requestState = new RequestState<string>();
+            requestState.Channels = channels;
+            requestState.Type = ResponseType.Leave;
+            requestState.UserCallback = null;
+            requestState.ErrorCallback = null;
+            requestState.ConnectCallback = null;
+            requestState.Reconnect = false;
+
+            UrlProcessRequest<string>(request, requestState); // connectCallback = null
+
+            TerminateCurrentSubscriberRequest();
+
+        }
+        #endregion
+
+        #region "Constructors"
+        /**
          * PubNub 3.0 API
          * 
          * Prepare Pubnub messaging class initial state
@@ -1573,9 +1608,10 @@ namespace PubNubMessaging.Core
 				long minimumTimetoken = multiChannelSubscribe.Min(token => token.Value);
 				long maximumTimetoken = multiChannelSubscribe.Max(token => token.Value);
 
-				if (minimumTimetoken == 0 || reconnect)
+                if (minimumTimetoken == 0 || reconnect || _uuidChanged)
 				{
 					lastTimetoken = 0;
+                    _uuidChanged = false;
 				}
 				else
 				{
@@ -1893,19 +1929,25 @@ namespace PubNubMessaging.Core
 
 		private Uri BuildMultiChannelLeaveRequest(string[] channels)
 		{
-			List<string> url = new List<string>();
+            return BuildMultiChannelLeaveRequest(channels, "");
+        }
 
-			url.Add("v2");
-			url.Add("presence");
-			url.Add("sub_key");
-			url.Add(this.subscribeKey);
-			url.Add("channel");
-			url.Add(string.Join(",", channels));
-			url.Add("leave");
+        private Uri BuildMultiChannelLeaveRequest(string[] channels, string uuid)
+        {
+            List<string> url = new List<string>();
 
-			return BuildRestApiRequest<Uri>(url, ResponseType.Leave);
-		}
-		#endregion
+            url.Add("v2");
+            url.Add("presence");
+            url.Add("sub_key");
+            url.Add(this.subscribeKey);
+            url.Add("channel");
+            url.Add(string.Join(",", channels));
+            url.Add("leave");
+
+            return BuildRestApiRequest<Uri>(url, ResponseType.Leave, uuid);
+        }
+
+        #endregion
 
 		#region "HereNow"
 		internal bool HereNow(string channel, Action<object> userCallback, Action<PubnubClientError> errorCallback)
@@ -4146,10 +4188,23 @@ namespace PubNubMessaging.Core
 			}
 		}
 
-		private Uri BuildRestApiRequest<T>(List<string> urlComponents, ResponseType type)
+        private Uri BuildRestApiRequest<T>(List<string> urlComponents, ResponseType type)
+        {
+            VerifyOrSetSessionUUID();
+
+            return BuildRestApiRequest<T>(urlComponents, type, this.sessionUUID);
+        }
+
+		private Uri BuildRestApiRequest<T>(List<string> urlComponents, ResponseType type, string uuid)
 		{
 			bool queryParamExist = false;
 			StringBuilder url = new StringBuilder();
+
+            if (string.IsNullOrEmpty(uuid))
+            {
+                VerifyOrSetSessionUUID();
+                uuid = this.sessionUUID;
+            }
 
 			// Add http or https based on SSL flag
 			if (this.ssl)
@@ -4179,11 +4234,10 @@ namespace PubNubMessaging.Core
 				}
 			}
 
-			VerifyOrSetSessionUUID();
 			if (type == ResponseType.Presence || type == ResponseType.Subscribe || type == ResponseType.Leave)
 			{
 				queryParamExist = true;
-				url.AppendFormat("?uuid={0}",this.sessionUUID);
+                url.AppendFormat("?uuid={0}", uuid);
                 url.Append(subscribeParameters);
 				if (!string.IsNullOrEmpty(_authenticationKey))
 				{
@@ -4198,7 +4252,7 @@ namespace PubNubMessaging.Core
             if (type == ResponseType.PresenceHeartbeat)
             {
                 queryParamExist = true;
-                url.AppendFormat("?uuid={0}", this.sessionUUID);
+                url.AppendFormat("?uuid={0}", uuid);
                 url.Append(presenceHeartbeatParameters);
                 if (_pubnubPresenceHeartbeatInSeconds != 0)
                 {

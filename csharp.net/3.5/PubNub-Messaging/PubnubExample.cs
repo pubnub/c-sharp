@@ -391,7 +391,7 @@ namespace PubNubMessaging.Core
                     Console.WriteLine("Enter 27 TO Get User State");
                     Console.WriteLine("Enter 28 FOR WhereNow");
                     Console.WriteLine("Enter 29 FOR GlobalHere_Now");
-                    Console.WriteLine("Enter 30 TO enter/change UUID. (Current value = {0})", pubnub.SessionUUID);
+                    Console.WriteLine("Enter 30 TO change UUID. (Current value = {0})", pubnub.SessionUUID);
                     Console.WriteLine("ENTER 99 FOR EXIT OR QUIT");
 
                     userinput = Console.ReadLine();
@@ -921,7 +921,7 @@ namespace PubNubMessaging.Core
                     case "30":
                         Console.WriteLine("ENTER UUID.");
                         string sessionUUID = Console.ReadLine();
-                        pubnub.SessionUUID = sessionUUID;
+                        pubnub.ChangeUUID(sessionUUID);
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine("UUID = {0}",pubnub.SessionUUID);
                         Console.ResetColor();

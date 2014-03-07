@@ -255,6 +255,11 @@ namespace PubNubMessaging.Core
 			return pubnub.GenerateGuid();
 		}
 
+        public void ChangeUUID(string newUUID)
+        {
+            pubnub.ChangeUUID(newUUID);
+        }
+
         public static long TranslateDateTimeToPubnubUnixNanoSeconds(DateTime dotNetUTCDateTime)
         {
             return PubnubWin.TranslateDateTimeToPubnubUnixNanoSeconds(dotNetUTCDateTime);
