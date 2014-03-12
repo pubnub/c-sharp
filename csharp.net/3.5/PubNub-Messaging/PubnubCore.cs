@@ -92,8 +92,8 @@ namespace PubNubMessaging.Core
 		private static long lastSubscribeTimetoken = 0;
 
 		// Pubnub Core API implementation
-		//private string _origin = "pubsub.pubnub.com";
-        private string _origin = "presence-beta.pubnub.com"; //"pres-beta.pubnub.com";//"50.112.215.116";//"pam-beta.pubnub.com"; //;"uls-test.pubnub.co"; //"pam-beta.pubnub.com";
+		private string _origin = "pubsub.pubnub.com";
+        //private string _origin = "presence-beta.pubnub.com"; //"pres-beta.pubnub.com";//"50.112.215.116";//"pam-beta.pubnub.com"; //;"uls-test.pubnub.co"; //"pam-beta.pubnub.com";
 
 		protected string publishKey = "";
 		protected string subscribeKey = "";
