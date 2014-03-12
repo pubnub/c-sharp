@@ -1,4 +1,4 @@
-//Build Date: January 27, 2014
+//Build Date: March 4, 2014
 using System;
 using System.Text;
 //using System.Net.Security;
@@ -11,6 +11,7 @@ using System.Threading;
 using System.Reflection;
 using System.Configuration;
 using System.Security.Cryptography;
+using System.Linq;
 
 #if (SILVERLIGHT || WINDOWS_PHONE)
 using System.Windows.Threading;
@@ -94,7 +95,7 @@ namespace PubNubMessaging.Core
 		protected override PubnubWebRequest SetServicePointSetTcpKeepAlive (PubnubWebRequest request)
 		{
 #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE)
-            request.ServicePoint.SetTcpKeepAlive(true, base.HeartbeatInterval * 1000, 1000);
+            request.ServicePoint.SetTcpKeepAlive(true, base.LocalClientHeartbeatInterval * 1000, 1000);
 #endif
 			//do nothing for mono
 			return request;
@@ -239,17 +240,33 @@ namespace PubNubMessaging.Core
             IAsyncResult asyncResult = request.BeginGetResponse(new AsyncCallback(UrlProcessResponseCallback<T>), pubnubRequestState);
             ThreadPool.RegisterWaitForSingleObject(asyncResult.AsyncWaitHandle, new WaitOrTimerCallback(OnPubnubWebRequestTimeout<T>), pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.Type) * 1000, true);
 #endif
-            //throw new NotImplementedException();
+            if (pubnubRequestState.Type == ResponseType.Presence || pubnubRequestState.Type == ResponseType.Subscribe)
+            {
+                if (presenceHeartbeatTimer != null)
+                {
+                    presenceHeartbeatTimer.Dispose();
+                    presenceHeartbeatTimer = null;
+                }
+                if (pubnubRequestState.Channels != null && pubnubRequestState.Channels.Length > 0 && pubnubRequestState.Channels.Where(s => s.Contains("-pnpres") == false).ToArray().Length > 0)
+                {
+                    RequestState<T> presenceHeartbeatState = new RequestState<T>();
+                    presenceHeartbeatState.Channels = pubnubRequestState.Channels;
+                    presenceHeartbeatState.Type = ResponseType.PresenceHeartbeat;
+                    presenceHeartbeatState.ErrorCallback = pubnubRequestState.ErrorCallback;
+                    
+                    presenceHeartbeatTimer = new Timer(OnPresenceHeartbeatIntervalTimeout<T>, presenceHeartbeatState, base.PresenceHeartbeatInterval * 1000, base.PresenceHeartbeatInterval * 1000);
+                }
+            }
         }
 
 		protected override void TimerWhenOverrideTcpKeepAlive<T> (Uri requestUri, RequestState<T> pubnubRequestState)
 		{
-			if(heartBeatTimer != null){
-				heartBeatTimer.Dispose();
+			if(localClientHeartBeatTimer != null){
+				localClientHeartBeatTimer.Dispose();
 			}
-			heartBeatTimer = new Timer(new TimerCallback(OnPubnubHeartBeatTimeoutCallback<T>), pubnubRequestState, 0,
-                                       base.HeartbeatInterval * 1000);
-			channelHeartbeatTimer.AddOrUpdate(requestUri, heartBeatTimer, (key, oldState) => heartBeatTimer);
+			localClientHeartBeatTimer = new Timer(new TimerCallback(OnPubnubLocalClientHeartBeatTimeoutCallback<T>), pubnubRequestState, 0,
+                                       base.LocalClientHeartbeatInterval * 1000);
+			channelLocalClientHeartbeatTimer.AddOrUpdate(requestUri, localClientHeartBeatTimer, (key, oldState) => localClientHeartBeatTimer);
 		}
 
         protected override bool HandleWebException<T>(WebException webEx, RequestState<T> asynchRequestState, string channel)
@@ -327,9 +344,9 @@ namespace PubNubMessaging.Core
 				ClientNetworkStatus.MachineSuspendMode = true;
 				PubnubWebRequest.MachineSuspendMode = true;
 				TerminatePendingWebRequest();
-                if (overrideTcpKeepAlive && heartBeatTimer != null)
+                if (overrideTcpKeepAlive && localClientHeartBeatTimer != null)
 				{
-					heartBeatTimer.Change(Timeout.Infinite, Timeout.Infinite);
+					localClientHeartBeatTimer.Change(Timeout.Infinite, Timeout.Infinite);
 				}
 
 				LoggingMethod.WriteToLog(string.Format("DateTime {0}, System entered into Suspend Mode.", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
@@ -344,13 +361,13 @@ namespace PubNubMessaging.Core
 				pubnetSystemActive = true;
 				ClientNetworkStatus.MachineSuspendMode = false;
 				PubnubWebRequest.MachineSuspendMode = false;
-                if (overrideTcpKeepAlive && heartBeatTimer != null)
+                if (overrideTcpKeepAlive && localClientHeartBeatTimer != null)
 				{
 					try
 					{
-						heartBeatTimer.Change(
-                            (-1 == base.HeartbeatInterval) ? -1 : base.HeartbeatInterval * 1000,
-                            (-1 == base.HeartbeatInterval) ? -1 : base.HeartbeatInterval * 1000);
+						localClientHeartBeatTimer.Change(
+                            (-1 == base.LocalClientHeartbeatInterval) ? -1 : base.LocalClientHeartbeatInterval * 1000,
+                            (-1 == base.LocalClientHeartbeatInterval) ? -1 : base.LocalClientHeartbeatInterval * 1000);
 					}
 					catch { }
 				}

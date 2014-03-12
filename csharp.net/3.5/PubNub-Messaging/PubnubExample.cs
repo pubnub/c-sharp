@@ -16,6 +16,8 @@ namespace PubNubMessaging.Core
         static public bool showErrorMessageSegments = false;
         static public bool showDebugMessages = false;
         static public string authKey = "";
+        static public int presenceHeartbeat = 0;
+        static public int presenceHeartbeatInterval = 0;
 
         static void UnhandledExceptionTrapper(object sender, UnhandledExceptionEventArgs e)
         {
@@ -44,7 +46,7 @@ namespace PubNubMessaging.Core
             Console.ForegroundColor = ConsoleColor.Blue;
             if (origin.Trim() == "")
             {
-                origin = "pubsub.pubnub.com";
+                origin = "presence-beta.pubnub.com";
                 Console.WriteLine("Default Origin selected");
             }
             else
@@ -132,7 +134,7 @@ namespace PubNubMessaging.Core
             Console.WriteLine();
 
             pubnub = new Pubnub(publishKey, subscribeKey, secretKey, cipherKey,
-            //pubnub = new Pubnub("pub-c-a2650a22-deb1-44f5-aa87-1517049411d5", "sub-c-a478dd2a-c33d-11e2-883f-02ee2ddab7fe", secretKey, cipherKey,
+            //pubnub = new Pubnub("pub-c-a2650a22-deb1-44f5-aa87-1517049411d5", "sub-c-a478dd2a-c33d-11e2-883f-02ee2ddab7fe", "sec-c-YjFmNzYzMGMtYmI3NC00NzJkLTlkYzYtY2MwMzI4YTJhNDVh", cipherKey,
                 (enableSSL.Trim().ToLower() == "y") ? true : false);
 
             pubnub.Origin = origin;
@@ -240,19 +242,19 @@ namespace PubNubMessaging.Core
             Console.ResetColor();
             Console.WriteLine();
 
-            Console.WriteLine("Heartbeat Interval = 15 seconds (default). Enter the value to change, else press ENTER");
+            Console.WriteLine("Local Client Heartbeat Interval = 15 seconds (default). Enter the value to change, else press ENTER");
             string heartbeatIntervalEntry = Console.ReadLine();
-            int heartbeatInterval;
-            Int32.TryParse(heartbeatIntervalEntry, out heartbeatInterval);
+            int localClientHeartbeatInterval;
+            Int32.TryParse(heartbeatIntervalEntry, out localClientHeartbeatInterval);
             Console.ForegroundColor = ConsoleColor.Blue;
-            if (heartbeatInterval > 0)
+            if (localClientHeartbeatInterval > 0)
             {
-                Console.WriteLine("Heartbeat Interval = {0} seconds", heartbeatInterval);
-                pubnub.HeartbeatInterval = heartbeatInterval;
+                Console.WriteLine("Heartbeat Interval = {0} seconds", localClientHeartbeatInterval);
+                pubnub.LocalClientHeartbeatInterval = localClientHeartbeatInterval;
             }
             else
             {
-                Console.WriteLine("Heartbeat Interval = {0} seconds (default)", pubnub.HeartbeatInterval);
+                Console.WriteLine("Heartbeat Interval = {0} seconds (default)", pubnub.LocalClientHeartbeatInterval);
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -350,44 +352,49 @@ namespace PubNubMessaging.Core
             Console.ResetColor();
             Console.WriteLine();
 
-            Console.WriteLine("ENTER 1 FOR Subscribe");
-            Console.WriteLine("ENTER 2 FOR Publish");
-            Console.WriteLine("ENTER 3 FOR Presence");
-            Console.WriteLine("ENTER 4 FOR Detailed History");
-            Console.WriteLine("ENTER 5 FOR Here_Now");
-            Console.WriteLine("ENTER 6 FOR Unsubscribe");
-            Console.WriteLine("ENTER 7 FOR Presence-Unsubscribe");
-            Console.WriteLine("ENTER 8 FOR Time");
-            Console.WriteLine("ENTER 9 FOR Disconnect/Reconnect existing Subscriber(s) (when internet is available)");
-            Console.WriteLine("ENTER 10 TO Disable Network Connection (no internet)");
-            Console.WriteLine("ENTER 11 TO Enable Network Connection (yes internet)");
-            Console.WriteLine("ENTER 12 FOR Grant Access");
-            Console.WriteLine("ENTER 13 FOR Audit Access");
-            Console.WriteLine("ENTER 14 FOR Revoke Access");
-            Console.WriteLine("ENTER 15 FOR Grant Access for Presence Channel");
-            Console.WriteLine("ENTER 16 FOR Audit Access for Presence Channel");
-            Console.WriteLine("ENTER 17 FOR Revoke Access for Presence Channel");
-            Console.WriteLine("ENTER 18 FOR Change/Update Auth Key");
-            Console.WriteLine("ENTER 19 TO Simulate Machine Sleep Mode");
-            Console.WriteLine("ENTER 20 TO Simulate Machine Awake Mode");
-            Console.WriteLine("ENTER 99 FOR EXIT OR QUIT");
 
             bool exitFlag = false;
             string channel="";
-
+            int currentUserChoice = 0;
+            string userinput = "";
             Console.WriteLine("");
             while (!exitFlag)
             {
-                string userinput = Console.ReadLine();
-                if (userinput.ToLower() == "show debug on")
+                if (currentUserChoice < 1 || (currentUserChoice > 30 && currentUserChoice != 99))
                 {
-                    showDebugMessages = true;
-                    continue;
-                }
-                else if (userinput.ToLower() == "show debug off")
-                {
-                    showDebugMessages = false;
-                    continue;
+                    Console.WriteLine("ENTER 1 FOR Subscribe");
+                    Console.WriteLine("ENTER 2 FOR Publish");
+                    Console.WriteLine("ENTER 3 FOR Presence");
+                    Console.WriteLine("ENTER 4 FOR Detailed History");
+                    Console.WriteLine("ENTER 5 FOR Here_Now");
+                    Console.WriteLine("ENTER 6 FOR Unsubscribe");
+                    Console.WriteLine("ENTER 7 FOR Presence-Unsubscribe");
+                    Console.WriteLine("ENTER 8 FOR Time");
+                    Console.WriteLine("ENTER 9 FOR Disconnect/Reconnect existing Subscriber(s) (when internet is available)");
+                    Console.WriteLine("ENTER 10 TO Disable Network Connection (no internet)");
+                    Console.WriteLine("ENTER 11 TO Enable Network Connection (yes internet)");
+                    Console.WriteLine("ENTER 12 FOR Grant Access");
+                    Console.WriteLine("ENTER 13 FOR Audit Access");
+                    Console.WriteLine("ENTER 14 FOR Revoke Access");
+                    Console.WriteLine("ENTER 15 FOR Grant Access for Presence Channel");
+                    Console.WriteLine("ENTER 16 FOR Audit Access for Presence Channel");
+                    Console.WriteLine("ENTER 17 FOR Revoke Access for Presence Channel");
+                    Console.WriteLine("ENTER 18 FOR Change/Update Auth Key (Current value = {0})", pubnub.AuthenticationKey);
+                    Console.WriteLine("ENTER 19 TO Simulate Machine Sleep Mode");
+                    Console.WriteLine("ENTER 20 TO Simulate Machine Awake Mode");
+                    Console.WriteLine("ENTER 21 TO Set Presence Heartbeat (Current value = {0} sec)", pubnub.PresenceHeartbeat);
+                    Console.WriteLine("ENTER 22 TO Set Presence Heartbeat Interval (Current value = {0} sec)", pubnub.PresenceHeartbeatInterval);
+                    Console.WriteLine("Enter 23 TO Add/Modify Local User State");
+                    Console.WriteLine("Enter 24 TO Delete Local User State");
+                    Console.WriteLine("Enter 25 TO View/Get Local User State");
+                    Console.WriteLine("Enter 26 TO Set User State");
+                    Console.WriteLine("Enter 27 TO Get User State");
+                    Console.WriteLine("Enter 28 FOR WhereNow");
+                    Console.WriteLine("Enter 29 FOR GlobalHere_Now");
+                    Console.WriteLine("Enter 30 TO change UUID. (Current value = {0})", pubnub.SessionUUID);
+                    Console.WriteLine("ENTER 99 FOR EXIT OR QUIT");
+
+                    userinput = Console.ReadLine();
                 }
                 switch (userinput)
                 {
@@ -498,6 +505,9 @@ namespace PubNubMessaging.Core
                         pubnub.DetailedHistory<string>(channel, 100, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "5":
+                        bool showUUID = true;
+                        bool includeUserState = false;
+
                         Console.WriteLine("Enter CHANNEL name for HereNow");
                         channel = Console.ReadLine();
 
@@ -506,8 +516,30 @@ namespace PubNubMessaging.Core
                         Console.ResetColor();
                         Console.WriteLine();
 
+                        Console.WriteLine("Show UUID List? Y or N? Default is Y. Press N for No Else press ENTER");
+                        string userChoiceShowUUID = Console.ReadLine();
+                        if (userChoiceShowUUID.ToLower() == "n")
+                        {
+                            showUUID = false;
+                        }
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Show UUID = {0}",showUUID));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
+                        Console.WriteLine("Include User State? Y or N? Default is N. Press Y for Yes Else press ENTER");
+                        string userChoiceIncludeUserState = Console.ReadLine();
+                        if (userChoiceIncludeUserState.ToLower() == "y")
+                        {
+                            includeUserState = true;
+                        }
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Include User State = {0}", includeUserState));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
                         Console.WriteLine("Running Here_Now()");
-                        pubnub.HereNow<string>(channel, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.HereNow<string>(channel, showUUID, includeUserState, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "6":
                         Console.WriteLine("Enter CHANNEL name for Unsubscribe. Use comma to enter multiple channels.");
@@ -686,9 +718,224 @@ namespace PubNubMessaging.Core
                         Console.WriteLine("Simulation going to awake mode");  
                         Console.ResetColor();  
                         break;
-                    default:
-                        Console.WriteLine("INVALID CHOICE. ENTER 99 FOR EXIT OR QUIT");
+                    case "21":
+                        Console.WriteLine("Enter Presence Heartbeat in seconds");
+                        string pnHeartbeatInput = Console.ReadLine();
+                        Int32.TryParse(pnHeartbeatInput, out presenceHeartbeat);
+                        pubnub.PresenceHeartbeat = presenceHeartbeat;
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Presence Heartbeat = {0}", presenceHeartbeat));
+                        Console.ResetColor();
                         break;
+                    case "22":
+                        Console.WriteLine("Enter Presence Heartbeat Interval in seconds");
+                        Console.WriteLine("NOTE: Ensure that it is less than Presence Heartbeat-3 seconds");
+                        string pnHeartbeatIntervalInput = Console.ReadLine();
+                        Int32.TryParse(pnHeartbeatIntervalInput, out presenceHeartbeatInterval);
+                        pubnub.PresenceHeartbeatInterval = presenceHeartbeatInterval;
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Presence Heartbeat Interval = {0}", presenceHeartbeatInterval));
+                        Console.ResetColor();
+                        break;
+                    case "23":
+                        Console.WriteLine("Enter channel name");
+                        string userStateChannel = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}", userStateChannel));
+                        Console.ResetColor();
+
+                        Console.WriteLine("User State will be accepted as dictionary key:value pair");
+                        while (true)
+                        {
+                            Console.WriteLine("Enter key. ");
+                            string keyUserState = Console.ReadLine();
+                            if (string.IsNullOrEmpty(keyUserState.Trim()))
+                            {
+                                Console.WriteLine("dictionary key:value pair entry completed.");
+                                break;
+                            }
+                            Console.WriteLine("Enter value");
+                            string valueUserState = Console.ReadLine();
+                            int valueInt;
+                            double valueDouble;
+                            string currentUserState = "";
+                            if (Int32.TryParse(valueUserState, out valueInt))
+                            {
+                                currentUserState = pubnub.SetLocalUserState(userStateChannel, keyUserState, valueInt);
+                            }
+                            else if (Double.TryParse(valueUserState, out valueDouble))
+                            {
+                                currentUserState = pubnub.SetLocalUserState(userStateChannel, keyUserState, valueDouble);
+                            }
+                            else
+                            {
+                                currentUserState = pubnub.SetLocalUserState(userStateChannel, keyUserState, valueUserState);
+                            }
+
+                            Console.ForegroundColor = ConsoleColor.Blue;
+                            if (!string.IsNullOrEmpty(currentUserState))
+                            {
+                                Console.WriteLine("Current User State = {0}", currentUserState);
+                            }
+                            else
+                            {
+                                Console.Write("No User State Exists");
+                            }
+                            Console.ResetColor();
+                        }
+                        break;
+
+                    case "24":
+                        Console.WriteLine("Enter channel name");
+                        string deleteUserStateChannel = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}", deleteUserStateChannel));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter key of the local user state to be deleted");
+                        string deleteKeyUserState = Console.ReadLine();
+                        string currentUserStateAfterDelete = pubnub.SetLocalUserState(deleteUserStateChannel, deleteKeyUserState, null);
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        if (!string.IsNullOrEmpty(currentUserStateAfterDelete))
+                        {
+                            Console.WriteLine("Current User State = {0}", currentUserStateAfterDelete);
+                        }
+                        else
+                        {
+                            Console.Write("No User State Exists");
+                        }
+                        Console.ResetColor();
+                        break;
+                    case "25":
+                        Console.WriteLine("Enter channel name");
+                        string getUserStateChannel = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}", getUserStateChannel));
+                        Console.ResetColor();
+
+                        string currentUserStateView = pubnub.GetLocalUserState(getUserStateChannel);
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        if (!string.IsNullOrEmpty(currentUserStateView))
+                        {
+                            Console.WriteLine("Current User State = {0}", currentUserStateView);
+                        }
+                        else
+                        {
+                            Console.Write("No User State Exists");
+                        }
+                        Console.ResetColor();
+                        break;
+                    case "26":
+                        Console.WriteLine("Enter channel name");
+                        string setUserStateChannel = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}", setUserStateChannel));
+                        Console.ResetColor();
+
+                        Console.WriteLine("NOTE: Hopefully you added local user state.");
+                        Console.WriteLine("If you want to consider already created local user state, press ENTER");
+                        Console.WriteLine("Else enter user state in json format (Eg. {\"channel\":{\"key1\":\"value1\",\"key2\":\"value2\"}}");
+                        string manualJsonUserState = Console.ReadLine();
+
+                        string jsonUserState = "";
+                        if (string.IsNullOrEmpty(manualJsonUserState))
+                        {
+                            jsonUserState = pubnub.GetLocalUserState(setUserStateChannel);
+                        }
+                        else
+                        {
+                            jsonUserState = manualJsonUserState;
+                        }
+                        Console.WriteLine("Enter UUID. (Optional. Press ENTER to skip it)");
+                        string uuid = Console.ReadLine();
+                        if (string.IsNullOrEmpty(uuid))
+                        {
+                            pubnub.SetUserState<string>(setUserStateChannel, jsonUserState, DisplayReturnMessage, DisplayErrorMessage);
+                        }
+                        else
+                        {
+                            pubnub.SetUserState<string>(setUserStateChannel, uuid, jsonUserState, DisplayReturnMessage, DisplayErrorMessage);
+                        }
+                        break;
+                    case "27":
+                        Console.WriteLine("Enter channel name");
+                        string getUserStateChannel2 = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}", getUserStateChannel2));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter UUID. (Optional. Press ENTER to skip it)");
+                        string uuid2 = Console.ReadLine();
+                        if (string.IsNullOrEmpty(uuid2))
+                        {
+                            pubnub.GetUserState<string>(getUserStateChannel2, DisplayReturnMessage, DisplayErrorMessage);
+                        }
+                        else
+                        {
+                            pubnub.GetUserState<string>(getUserStateChannel2, uuid2, DisplayReturnMessage, DisplayErrorMessage);
+                        }
+                        break;
+                    case "28":
+                        Console.WriteLine("Enter uuid for WhereNow. To consider SessionUUID, just press ENTER");
+                        string whereNowUuid = Console.ReadLine();
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("uuid = {0}", whereNowUuid));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
+                        Console.WriteLine("Running Where_Now()");
+                        pubnub.WhereNow<string>(whereNowUuid, DisplayReturnMessage, DisplayErrorMessage);
+                        break;
+                    case "29":
+                        bool globalHereNowShowUUID = true;
+                        bool globalHereNowIncludeUserState = false;
+
+                        Console.WriteLine("Show UUID List? Y or N? Default is Y. Press N for No Else press ENTER");
+                        string userChoiceGlobalHereNowShowUUID = Console.ReadLine();
+                        if (userChoiceGlobalHereNowShowUUID.ToLower() == "n")
+                        {
+                            globalHereNowShowUUID = false;
+                        }
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Show UUID = {0}", globalHereNowShowUUID));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
+                        Console.WriteLine("Include User State? Y or N? Default is N. Press Y for Yes Else press ENTER");
+                        string userChoiceGlobalHereNowIncludeUserState = Console.ReadLine();
+                        if (userChoiceGlobalHereNowIncludeUserState.ToLower() == "y")
+                        {
+                            globalHereNowIncludeUserState = true;
+                        }
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Include User State = {0}", globalHereNowIncludeUserState));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
+                        Console.WriteLine("Running Global HereNow()");
+                        pubnub.GlobalHereNow<string>(globalHereNowShowUUID, globalHereNowIncludeUserState,DisplayReturnMessage, DisplayErrorMessage);
+                        break;
+                    case "30":
+                        Console.WriteLine("ENTER UUID.");
+                        string sessionUUID = Console.ReadLine();
+                        pubnub.ChangeUUID(sessionUUID);
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine("UUID = {0}",pubnub.SessionUUID);
+                        Console.ResetColor();
+                        break;
+                    default:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("INVALID CHOICE. ENTER 99 FOR EXIT OR QUIT");
+                        Console.ResetColor();
+                        break;
+                }
+                if (!exitFlag)
+                {
+                    userinput = Console.ReadLine();
+                    Int32.TryParse(userinput, out currentUserChoice);
                 }
             }
 

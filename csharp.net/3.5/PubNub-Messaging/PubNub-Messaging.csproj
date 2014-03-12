@@ -175,10 +175,6 @@
     <Content Include="v3.5\Notes.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="JsonFx, Version=2.0.1209.2800, Culture=neutral, PublicKeyToken=315052dd637f8a52, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\JsonFx.dll</HintPath>
-    </Reference>
     <Reference Include="System.Configuration" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web.Extensions" />

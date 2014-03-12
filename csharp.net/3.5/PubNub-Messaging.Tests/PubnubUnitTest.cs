@@ -67,6 +67,20 @@ namespace PubNubMessaging.Tests
             return data;
         }
 
+        private Dictionary<string, string> LoadWhenAClientIsPresentedIfGlobalHereNowIsCalledThenItShouldReturnInfo()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/v2/presence/sub_key/demo", "{\"status\":200,\"message\":\"OK\",\"payload\":{\"channels\":{\"hello_my_channel\":{\"uuids\":[{\"uuid\":\"2417aac2-813f-4f2c-899e-f388033d77fd\"}],\"occupancy\":1}},\"total_channels\":1,\"total_occupancy\":1},\"service\":\"Presence\"}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenAClientIsPresentedIfWhereNowIsCalledThenItShouldReturnInfo()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/v2/presence/sub_key/demo/uuid/hello_my_uuid", "{\"status\":200,\"message\":\"OK\",\"payload\":{\"channels\":[\"hello_my_channel\"]},\"service\":\"Presence\"}");
+            return data;
+        }
+
         private Dictionary<string, string> LoadWhenAMessageIsPublishedThenUnencryptPublishShouldReturnSuccessCodeAndInfo()
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
@@ -445,6 +459,12 @@ namespace PubNubMessaging.Tests
                             break;
                         case "IfHereNowIsCalledThenItShouldReturnInfo":
                             responseDictionary = LoadWhenAClientIsPresentedIfHereNowIsCalledThenItShouldReturnInfo();
+                            break;
+                        case "IfGlobalHereNowIsCalledThenItShouldReturnInfo":
+                            responseDictionary = LoadWhenAClientIsPresentedIfGlobalHereNowIsCalledThenItShouldReturnInfo();
+                            break;
+                        case "IfWhereNowIsCalledThenItShouldReturnInfo":
+                            responseDictionary = LoadWhenAClientIsPresentedIfWhereNowIsCalledThenItShouldReturnInfo();
                             break;
                         default:
                             break;
