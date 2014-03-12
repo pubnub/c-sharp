@@ -46,7 +46,7 @@ namespace PubNubMessaging.Core
             Console.ForegroundColor = ConsoleColor.Blue;
             if (origin.Trim() == "")
             {
-                origin = "presence-beta.pubnub.com";
+                origin = "pubsub.pubnub.com";
                 Console.WriteLine("Default Origin selected");
             }
             else
