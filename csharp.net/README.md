@@ -1,7 +1,7 @@
-# PubNub 3.5 for C Sharp (C#)
+# PubNub 3.6 for C Sharp (C#)
 ## Supporting .net 3.5, 4.0, and 4.5
 
-Open 3.5/PubNub-Messaging/PubNub-Messaging.sln, and the example files Pubnub_Example.cs and PubnubMultiChannel.cs should demonstrate all functionality, asyncronously using delegates.
+Open PubNub-Messaging/PubNub-Messaging.csproj, and the example file PubnubExample.cs should demonstrate all functionality, asyncronously using delegates.
 You can also view and inspect the tests for additional insight. 
 
 NuGet usage and example screencast is also available here: https://vimeo.com/pubnub/videos/search:.net/sort:date/format:detail
@@ -11,6 +11,14 @@ NuGet usage and example screencast is also available here: https://vimeo.com/pub
 For best performance after completion of all intended operations, please call the EndPendingRequests() method
 of the Pubnub instance, and assign it to null. This will help ensure speedy resources cleanup when you are done
 with the object.
+
+### Important Changes in PubNub 3.6 
+1. Renamed property name HeartbeatInterval to LocalClientHeartbeatInterval.
+2. New properties PresenceHeartbeat, PresenceHeartbeatInterval were added.
+3. Additional optional parameters showUUIDList, includeUserState for HereNow method.
+4. New methods GlobalHereNow, WhereNow, SetUserState, GetUserState, SetLocalUserState, GetLocalUserState and ChangeUUID
+5. UserState data in the response format of presence events.
+
 
 ### Important Changes in PubNub 3.5 
 1. The Error Callback method signature has changed. Now, instead of a string, a PubnubClientError object will be passed to a callback of choice with error details (via the error object). To support this, all operation method signatures are modified.
@@ -22,7 +30,7 @@ Currently all the generic methods support string and object types only. Strong t
 
 ## Sample Code
 A completel running demo app which includes the sample code below is available in the PubNub Message project [by way of the 
-PubnubExample.cs](3.5/PubNub-Messaging/PubnubExample.cs) file.  [The tests](3.5/PubNub-Messaging.Tests) are also a great reference.
+PubnubExample.cs](PubNub-Messaging/PubnubExample.cs) file.  [The tests](/PubNub-Messaging.Tests) are also a great reference.
 
 ### Instantiate a Pubnub instance
 
@@ -75,6 +83,45 @@ pubnub.DetailedHistory<string>(pubnubChannel, starttime=13557486057035336, Displ
 
 ```c#
 pubnub.HereNow<string>(channel="mychannel", DisplayReturnMessage, DisplayErrorMessage);
+
+pubnub.HereNow<string>(channel="mychannel", showUUID=true, includeUserState=true, DisplayReturnMessage, DisplayErrorMessage);
+
+// NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
+```
+
+### Set the state of the user on this channel (SetUserState)
+
+```c# (new)
+pubnub.SetUserState<string>(channel="mychannel", jsonUserState="{mychannel:{"key1":"value1"}}", DisplayReturnMessage, DisplayErrorMessage);
+
+pubnub.SetUserState<string>(channel="mychannel", uuid="myuuid", jsonUserState="{mychannel:{"key1":"value1"}}", DisplayReturnMessage, DisplayErrorMessage);
+
+// NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
+```
+
+### Get the state of the user on this channel (SetUserState)
+
+```c#  (new)
+pubnub.GetUserState<string>(channel="mychannel", DisplayReturnMessage, DisplayErrorMessage);
+
+pubnub.GetUserState<string>(channel="mychannel", uuid="myAlternateUUID", DisplayReturnMessage, DisplayErrorMessage);
+
+// NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
+```
+
+### Current channels for the given subscriber (WhereNow)
+
+```c# (new)
+pubnub.WhereNow<string>(whereNowUuid="myuuid"", DisplayReturnMessage, DisplayErrorMessage);
+
+// NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
+```
+
+### Current subscriber list for subkey (GlobalHereNow)
+
+```c# (new)
+pubnub.GlobalHereNow<string>(showUUID=true, includeUserState=true,DisplayReturnMessage, DisplayErrorMessage);
+
 // NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
 
@@ -342,6 +389,19 @@ This variable is to set the wait time for re-subscribe and re-presence, if the p
 If there is no internet/network connection after "pubnubNetworkCheckRetries" attempts for subscribe, "Unsubscribed after 50 failed retries" message will be sent and unsubscribe occurs automatically. Similary for presence, "Presence-unsubscribed after 50 failed retries"
  
 For publish, here_now, detailed history and time, there is no attempt to re-connect. If the request fails due to http web request timeout, "Operation timeout" error be sent. If there is network/internet disconnect, error message "Network connect error" will be sent. 
+
+```c# (new)
+_pubnubPresenceHeartbeatInSeconds = 63
+```
+
+This variable is to set the heartbeat for the subscribed channel for presence before expiry. In the example, we indicate that subsciber can expire after 63 seconds if no heartbeat request is received by server.
+
+```c# (new)
+_presenceHeartbeatIntervalInSeconds = 60
+```
+
+This variable is to set the heartbeat interval for the subscribed channel for presence before expiry. In the example, we attempt to  that subsciber can expire after 63 seconds if no heartbeat request is received by server.
+
 
 ```c#
 _enableResumeOnReconnect = true
