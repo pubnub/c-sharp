@@ -1,0 +1,20 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/PubnubExample.cs">
+    <Files>
+      <File FileName="Assets/Pubnub/LoggingMethod.cs" Line="1" Column="1" />
+      <File FileName="Assets/Pubnub/PubnubUnity.cs" Line="1048" Column="11" />
+      <File FileName="Assets/Pubnub/Pubnub.cs" Line="1" Column="1" />
+      <File FileName="../../../../../../../../../../../../Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass-jsonfx/PubNub-Console/Pubnub/PubnubMonoMac.cs" Line="1" Column="1" />
+      <File FileName="Assets/PubnubExample.cs" Line="510" Column="4" />
+      <File FileName="Assets/Editor/EncryptionTests.cs" Line="1" Column="1" />
+      <File FileName="Assets/Pubnub/PubnubCore.cs" Line="1" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches>
+    <Watch file="../../../../../../../../../../../../Users/rajat/Projects/3.4/PubNub-Messaging/PubNub-Console/PubnubExample.cs" line="436" offsetX="693" offsetY="6525" expression="lst" liveUpdate="False" />
+  </MonoDevelop.Ide.DebuggingService.PinnedWatches>
+</Properties>
