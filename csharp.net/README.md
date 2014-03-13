@@ -91,7 +91,7 @@ pubnub.HereNow<string>(channel="mychannel", showUUID=true, includeUserState=true
 
 ### Set the state of the user on this channel (SetUserState)
 
-```c# (new)
+```c#
 pubnub.SetUserState<string>(channel="mychannel", jsonUserState="{mychannel:{"key1":"value1"}}", DisplayReturnMessage, DisplayErrorMessage);
 
 pubnub.SetUserState<string>(channel="mychannel", uuid="myuuid", jsonUserState="{mychannel:{"key1":"value1"}}", DisplayReturnMessage, DisplayErrorMessage);
@@ -101,7 +101,7 @@ pubnub.SetUserState<string>(channel="mychannel", uuid="myuuid", jsonUserState="{
 
 ### Get the state of the user on this channel (SetUserState)
 
-```c#  (new)
+```c#
 pubnub.GetUserState<string>(channel="mychannel", DisplayReturnMessage, DisplayErrorMessage);
 
 pubnub.GetUserState<string>(channel="mychannel", uuid="myAlternateUUID", DisplayReturnMessage, DisplayErrorMessage);
@@ -111,7 +111,7 @@ pubnub.GetUserState<string>(channel="mychannel", uuid="myAlternateUUID", Display
 
 ### Current channels for the given subscriber (WhereNow)
 
-```c# (new)
+```c#
 pubnub.WhereNow<string>(whereNowUuid="myuuid"", DisplayReturnMessage, DisplayErrorMessage);
 
 // NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
@@ -119,7 +119,7 @@ pubnub.WhereNow<string>(whereNowUuid="myuuid"", DisplayReturnMessage, DisplayErr
 
 ### Current subscriber list for subkey (GlobalHereNow)
 
-```c# (new)
+```c#
 pubnub.GlobalHereNow<string>(showUUID=true, includeUserState=true,DisplayReturnMessage, DisplayErrorMessage);
 
 // NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
@@ -390,13 +390,13 @@ If there is no internet/network connection after "pubnubNetworkCheckRetries" att
  
 For publish, here_now, detailed history and time, there is no attempt to re-connect. If the request fails due to http web request timeout, "Operation timeout" error be sent. If there is network/internet disconnect, error message "Network connect error" will be sent. 
 
-```c# (new)
+```c#
 _pubnubPresenceHeartbeatInSeconds = 63
 ```
 
 This variable is to set the heartbeat for the subscribed channel for presence before expiry. In the example, we indicate that subsciber can expire after 63 seconds if no heartbeat request is received by server.
 
-```c# (new)
+```c#
 _presenceHeartbeatIntervalInSeconds = 60
 ```
 
