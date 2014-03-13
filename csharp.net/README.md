@@ -94,7 +94,7 @@ pubnub.HereNow<string>(channel="mychannel", showUUID=true, includeUserState=true
 ```c#
 pubnub.SetUserState<string>(channel="mychannel", jsonUserState="{mychannel:{"key1":"value1"}}", DisplayReturnMessage, DisplayErrorMessage);
 
-pubnub.SetUserState<string>(channel="mychannel", uuid="myuuid", jsonUserState="{mychannel:{"key1":"value1"}}", DisplayReturnMessage, DisplayErrorMessage);
+pubnub.SetUserState<string>(channel="mychannel", uuid="myuuid", jsonUserState='{mychannel:{"key1":"value1"}}', DisplayReturnMessage, DisplayErrorMessage);
 
 // NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
@@ -112,7 +112,7 @@ pubnub.GetUserState<string>(channel="mychannel", uuid="myAlternateUUID", Display
 ### Current channels for the given subscriber (WhereNow)
 
 ```c#
-pubnub.WhereNow<string>(whereNowUuid="myuuid"", DisplayReturnMessage, DisplayErrorMessage);
+pubnub.WhereNow<string>(whereNowUuid="myuuid", DisplayReturnMessage, DisplayErrorMessage);
 
 // NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
