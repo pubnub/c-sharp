@@ -39,3 +39,4 @@
 /silverlight/*/*/obj/Debug/*
 /silverlight/*/*/obj/Release/*
 .DS_Store
+*.cache
