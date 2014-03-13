@@ -1,7 +1,7 @@
-# PubNub 3.4 Web Data Push Cloud-Hosted API
+# PubNub 3.5 Web Data Push Cloud-Hosted API
 # C# for .net 4.0/4.5 and 3.5
 
-Open csharp/iis/3.4/PubNubExampleASPNET/PubNubExampleASPNET.csproj, and the example PubnubExampleNETxx.aspx(xx = 35 or 40 based on target framework) should demonstrate all functionality, asyncronously using delegates.
+Open csharp/iis/PubNubExampleASPNET/PubNubExampleASPNET.csproj, and the example PubnubExampleNETxx.aspx(xx = 35 or 40 based on target framework) should demonstrate all functionality, asyncronously using delegates.
 You can also view and inspect the unit tests on C# Core API at c-sharp/csharp.net/3.4/PubNub-Messaging.Tests for additional insight. 
 
 NuGet usage and example screencast is also available here: https://vimeo.com/pubnub/videos/search:.net/sort:date/format:detail
