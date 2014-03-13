@@ -5,10 +5,10 @@
 /csharp.net/*.suo
 /windows-phone-*/*/packages/*
 /windows-phone-*/*/packages.config
-/windows-phone-*/*/*/bin/*
-/windows-phone-*/*/*/obj/*
-/windows-phone-*/*/*.suo
-/windows-phone-*/*/*/*.user
+/windows-phone-*/*/bin/*
+/windows-phone-*/*/obj/*
+/windows-phone-*/*.suo
+/windows-phone-*/*/*.user
 /iis/PubNubExampleASPNET*/bin/*
 /iis/PubNubExampleASPNET*/obj/*
 /iis/PubNubExampleASPNET*/obj/debug/*
