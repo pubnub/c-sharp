@@ -1,42 +1,37 @@
 ##PubNub 3.6 C-sharp-based APIs
 Learn more at http://www.pubnub.com
 
-## Subdirectory Description
-This repo contains the following platform-specific subdirectories:
+## Nuget
+You can grab the cross-platform 3.5 version of PubNub for C# from Nuget.
 
-#### NugetPkg
-The latest on Nuget
+## Available in this repository
 
-#### csharp.net
-PubNub for MSVS C-Sharp / .net
+### Microsoft Server
 
-#### iis
-PubNub for the IIS web server
+.net (3.6)
 
-#### mono-for-android
-PubNub for Xamarin's Mono for Android
+IIS web server (3.6)
 
-#### monotouch
-PubNub for Xamarin's Mono Touch
+Silverlight (3.6)
 
-#### mono-for-linux
-PubNub for Mono for Linux
+### Microsoft Mobile
+Windows Phone 7 (3.6)
 
-#### GTK+
-PubNub for GTK+ (see the demo made under [mono-for-linux](mono-for-linux/Demo/GTK%2B))
+Windows Phone 8 (3.6)
 
-#### mono-for-mac
-PubNub for Mono for Mac
+### Xamarin, Unity
+Xamarin Mono for Android (3.5)
 
-#### silverlight
-PubNub for Silverlight
+Xamarin Mono Touch (3.5)
 
-#### unity
-PubNub for Unity 3D
+Unity 3D (3.5)
 
-#### windows-phone-7
-PubNub for WP7
+### Misc
+Mono for Linux (3.5)
 
- windows-phone-8
+Mono For Mac (3.5)
 
-PubNub for WP8
+GTK+ (3.5)
+See the demo made under [mono-for-linux](mono-for-linux/Demo/GTK%2B))
+
+
