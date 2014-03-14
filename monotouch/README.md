@@ -3,9 +3,9 @@
 
 For a quick video walkthrough, checkout https://vimeo.com/55630516 !
 
-Open 3.5/PubNub-Messaging/Pubnub-Messaging/PubNub-Messaging.csproj. Run the project in the simulator to see a working example. The main functionality lies in the pubnub.cs file.
+Open Pubnub-Messaging/PubNub-Messaging.csproj. Run the project in the simulator to see a working example. The main functionality lies in the pubnub.cs file.
 
-3.5/PubNub-Messaging/Pubnub-Messaging.Tests contains the Unit test cases. Run the project to see the unit test results,
+Pubnub-Messaging.Tests contains the Unit test cases. Run the project to see the unit test results,
 
 Please ensure that in order to run on Mono the constant in the pubnub.cs file should be set to "true"
 overrideTcpKeepAlive = true;

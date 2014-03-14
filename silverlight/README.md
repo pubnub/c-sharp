@@ -3,7 +3,9 @@
 
 For a video walkthrough, check out https://vimeo.com/57495830 !
 
-Open 3.5/PubNub-Messaging/PubNub-Messaging.sln, and the example Pubnub_Example.cs should demonstrate all functionality, asyncronously using delegates.
+Open PubNubSilverlight.Example.sln, and the example Pubnub_Example.cs should demonstrate all functionality, asyncronously using delegates.
+
+PubnubCore folder contains the Pubnub SDK.
 
 You can also view and inspect the tests for additional insight. 
 

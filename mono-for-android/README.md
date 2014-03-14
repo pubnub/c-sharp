@@ -3,10 +3,10 @@
 
 You can checkout the video overview here: https://vimeo.com/56720927
 
-Open 3.5/PubNub-Messaging/Pubnub_Messaging/PubNub_Messaging.csproj. 
+Open Pubnub_Messaging/PubNub_Messaging.csproj. 
 Run the project in the emulator to see a working example. The main functionality lies in the pubnub.cs file.
 
-3.5/PubNub-Messaging/Andr.Unit contains the Unit test cases. Run the project to see the unit test results,
+Andr.Unit-master contains the Unit test cases. Run the project to see the unit test results,
 
 Please ensure that in order to run on Mono the constant in the pubnub.cs file should be set to "true"
 overrideTcpKeepAlive = true;

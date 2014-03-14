@@ -3,9 +3,9 @@
 
 For a quick video walkthrough, checkout https://vimeo.com/54805916 !
 
-Open 3.5/PubNub-Messaging/PubNub-Console/PubNub-Messaging.csproj, the example Pubnub_Example.cs should demonstrate all functionality, asyncronously using delegates. The main functionality lies in the pubnub.cs file.
+Open PubNub-Console/PubNub-Messaging.csproj, the example Pubnub_Example.cs should demonstrate all functionality, asyncronously using delegates. The main functionality lies in the pubnub.cs file.
 
-3.5/PubNub-Messaging/PubNubTest contains the Unit test cases.
+PubNubTest contains the Unit test cases.
 
 Please ensure that in order to run on Mono the constant in the pubnub.cs file should be set to "true"
 overrideTcpKeepAlive = true;
