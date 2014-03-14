@@ -1,4 +1,4 @@
-##PubNub C-sharp-based APIs
+##PubNub 3.6 C-sharp-based APIs
 Learn more at http://www.pubnub.com
 
 ## Subdirectory Description
