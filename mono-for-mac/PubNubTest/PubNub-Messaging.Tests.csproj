@@ -43,6 +43,7 @@
     <Reference Include="nunit.framework">
       <HintPath>..\PubNub-Console\Library\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
@@ -60,6 +61,8 @@
     <Compile Include="WhenAuditIsRequested.cs" />
     <Compile Include="WhenGrantIsRequested.cs" />
     <Compile Include="PubnubCommon.cs" />
+    <Compile Include="WhenSubscribedToAChannel2.cs" />
+    <Compile Include="WhenSubscribedToAChannel3.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

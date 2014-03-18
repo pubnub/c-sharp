@@ -130,7 +130,7 @@ namespace PubNubMessaging.Tests
                                 "",
                                 false
                             );
-            string channel = "hello_world";
+            string channel = "test";
             object message = new PubnubDemoObject();
             //object message = new CustomClass2();
 

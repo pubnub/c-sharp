@@ -1,3 +1,4 @@
+//#define USE_JSONFX
 using System;
 using PubNubMessaging.Core;
 using System.Collections.Generic;
@@ -11,6 +12,11 @@ using JsonFx.Json;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Converters;
+using System.Text;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+
+
 namespace PubNubMessaging.Tests
 {
     public class Common
@@ -116,6 +122,18 @@ namespace PubNubMessaging.Tests
             return (T)retMessage;
         }
 
+        private static byte[] ObjectToByteArray(Object obj)
+        {
+            if(obj == null)
+                return null;
+            BinaryFormatter bf = new BinaryFormatter();
+            using (MemoryStream ms = new MemoryStream())
+                {
+                    bf.Serialize(ms, obj);
+                    return ms.ToArray();
+                }
+        }
+
         /// <summary>
         /// Serialize the specified message using either JSONFX or NEWTONSOFT.JSON.
         /// The functionality is based on the pre-compiler flag
@@ -125,9 +143,38 @@ namespace PubNubMessaging.Tests
         {
             string retMessage;
             #if (USE_JSONFX)
+            //var resolver = new JsonFx.Serialization.Resolvers.CombinedResolverStrategy(new JsonFx.Serialization.Resolvers.DataContractResolverStrategy());
+            //JsonFx.Serialization.DataWriterSettings dataWriterSettings = new JsonFx.Serialization.DataWriterSettings(resolver);
+
+            /*byte[] b = ObjectToByteArray(message);
+            char[] c = System.Text.Encoding.Unicode.GetString(b).ToCharArray();
+            string str = new string(c);
+            StringInfo stri = new StringInfo(str);
+            Console.WriteLine("str:" + stri.String);*/
             var writer = new JsonFx.Json.JsonWriter();
             retMessage = writer.Write(message);
             retMessage = ConvertHexToUnicodeChars(retMessage);
+            /*var readerSettings = new JsonFx.Serialization.DataReaderSettings(); 
+            JsonFx.Serialization.DataWriterSettings dataWriterSettings = new JsonFx.Serialization.DataWriterSettings(readerSettings);
+
+            var writer = new JsonFx.Json.JsonWriter(dataWriterSettings);
+
+            retMessage = writer.Write(message);
+            retMessage = ConvertHexToUnicodeChars(retMessage);*/
+            /*StringBuilder builder = new StringBuilder();
+            //using (TextWriter textWriter = new EncodingStringWriter(builder, Encoding.Unicode))
+            //{
+                //var readerSettings = new JsonFx.Serialization.DataReaderSettings(); 
+                //JsonFx.Serialization.DataWriterSettings dataWriterSettings = new JsonFx.Serialization.DataWriterSettings(readerSettings);
+
+
+            TextWriter textWriter = new EncodingStringWriter(builder, Encoding.UTF8);
+                var writer = new JsonFx.Json.JsonWriter ();
+
+                writer.Write (message, textWriter);
+
+            return PubnubCryptoBase.ConvertHexToUnicodeChars(builder.ToString());*/
+            //}
             #else
             retMessage = JsonConvert.SerializeObject(message);
             #endif
@@ -138,8 +185,18 @@ namespace PubNubMessaging.Tests
         {
             string retMessage;
             var writer = new JsonFx.Json.JsonWriter();
+
             retMessage = writer.Write(message);
             retMessage = ConvertHexToUnicodeChars(retMessage);
+            /*StringBuilder builder = new StringBuilder();
+            using (TextWriter textWriter = new EncodingStringWriter(builder, Encoding.UTF8))
+            {
+                var writer = new JsonFx.Json.JsonWriter ();
+
+                writer.Write (message, textWriter);
+
+                return PubnubCryptoBase.ConvertHexToUnicodeChars("");
+            }*/
             return retMessage;
         }
 
@@ -170,6 +227,7 @@ namespace PubNubMessaging.Tests
         public int[] bar = { 1, 2, 3, 4, 5 };
     }
 
+    [Serializable]
     class PubnubDemoObject
     {
         public double VersionID = 3.4;
@@ -178,9 +236,10 @@ namespace PubNubMessaging.Tests
         public string[] Channels = { "ch1" };
         public PubnubDemoMessage DemoMessage = new PubnubDemoMessage();
         public PubnubDemoMessage CustomMessage = new PubnubDemoMessage("This is a demo message");
-        public XmlDocument SampleXml = new PubnubDemoMessage().TryXmlDemo();
+        //public XmlDocument SampleXml = new PubnubDemoMessage().TryXmlDemo();
     }
 
+    [Serializable]
     class PubnubDemoMessage
     {
         public string DefaultMessage = "~!@#$%^&*()_+ `1234567890-= qwertyuiop[]\\ {}| asdfghjkl;' :\" zxcvbnm,./ <>? ";
@@ -194,13 +253,14 @@ namespace PubNubMessaging.Tests
             DefaultMessage = message;
         }   
     
-        public XmlDocument TryXmlDemo()
+        /*public XmlDocument TryXmlDemo()
         {
             XmlDocument xmlDocument = new XmlDocument();
             xmlDocument.LoadXml("<DemoRoot><Person ID='ABCD123'><Name><First>John</First><Middle>P.</Middle><Last>Doe</Last></Name><Address><Street>123 Duck Street</Street><City>New City</City><State>New York</State><Country>United States</Country></Address></Person><Person ID='ABCD456'><Name><First>Peter</First><Middle>Z.</Middle><Last>Smith</Last></Name><Address><Street>12 Hollow Street</Street><City>Philadelphia</City><State>Pennsylvania</State><Country>United States</Country></Address></Person></DemoRoot>");
 
             return xmlDocument;
-        }
+        }*/
     }
 }
 
+      

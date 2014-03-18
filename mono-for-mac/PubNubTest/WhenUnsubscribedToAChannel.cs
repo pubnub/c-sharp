@@ -137,11 +137,21 @@ namespace PubNubMessaging.Tests
                 } else
                 {
                     //IList<object> responseFields = common.Response as IList<object>;
+
                     object[] responseFields = Common.Deserialize<object[]>(common.Response.ToString());
-                    foreach (object item in responseFields)
+                    Type valueType = responseFields [0].GetType();
+                    var expectedType = typeof(System.Dynamic.ExpandoObject);
+                    if (expectedType.IsAssignableFrom(valueType))
                         {
-                            response = item.ToString();
-                            Console.WriteLine("Response:" + response);
+                            dynamic x = responseFields [0];
+                            Console.WriteLine(x.action);
+                        } else
+                        {
+                            foreach (object item in responseFields)
+                                {
+                                    response = item.ToString();
+                                    Console.WriteLine("Response:" + response);
+                                }
                         }
                     if (channel.Equals(responseFields [2]))
                         {
@@ -166,12 +176,22 @@ namespace PubNubMessaging.Tests
                 } else
                 {
                     object[] responseFields2 = Common.Deserialize<object[]>(common.Response.ToString());
-                    foreach (object item in responseFields2)
+                    Type valueType = responseFields2 [0].GetType();
+                    var expectedType = typeof(System.Dynamic.ExpandoObject);
+                    if (expectedType.IsAssignableFrom(valueType))
                         {
-                            response = item.ToString();
-                            Console.WriteLine("Response:" + response);
+                            dynamic x = responseFields2 [0];
+                            Console.WriteLine(x.action);
+                            Assert.True(channel.Equals(responseFields2 [2]) && x.action.Contains("leave"));
+                        } else
+                        {
+                            foreach (object item in responseFields2)
+                                {
+                                    response = item.ToString();
+                                    Console.WriteLine("Response:" + response);
+                                }
+                            Assert.True(channel.Equals(responseFields2 [2]) && responseFields2 [0].ToString().Contains("leave"));
                         }
-                    Assert.True(channel.Equals(responseFields2 [2]) && responseFields2 [0].ToString().Contains("leave"));
                 }
         }
 

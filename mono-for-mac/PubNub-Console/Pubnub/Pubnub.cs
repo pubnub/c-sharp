@@ -72,10 +72,40 @@ namespace PubNubMessaging.Core
             return pubnub.HereNow (channel, userCallback, errorCallback);
         }
 
+		public bool HereNow(string channel, bool showUUIDList, bool includeUserState, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			return pubnub.HereNow(channel, showUUIDList, includeUserState, userCallback, errorCallback);
+		}
+
         public bool HereNow<T> (string channel, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
             return pubnub.HereNow<T> (channel, userCallback, errorCallback);
         }
+
+		public bool HereNow<T>(string channel, bool showUUIDList, bool includeUserState, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			return pubnub.HereNow<T>(channel, showUUIDList, includeUserState, userCallback, errorCallback);
+		}
+
+		public void GlobalHereNow(bool showUUIDList, bool includeUserState, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			pubnub.GlobalHereNow(showUUIDList, includeUserState, userCallback, errorCallback);
+		}
+
+		public bool GlobalHereNow<T>(bool showUUIDList, bool includeUserState, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			return pubnub.GlobalHereNow<T>(showUUIDList, includeUserState, userCallback, errorCallback);
+		}
+
+		public void WhereNow(string uuid, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			pubnub.WhereNow(uuid, userCallback, errorCallback);
+		}
+
+		public void WhereNow<T>(string uuid, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			pubnub.WhereNow<T>(uuid, userCallback, errorCallback);
+		}
 
         public void Unsubscribe<T> (string channel, Action<T> userCallback, Action<T> connectCallback, Action<T> disconnectCallback, Action<PubnubClientError> errorCallback)
         {
@@ -142,10 +172,53 @@ namespace PubNubMessaging.Core
             return pubnub.GrantPresenceAccess (channel, read, write, ttl, userCallback, errorCallback);
         }
 
+		public void SetUserState<T>(string channel, string uuid, string jsonUserState, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			pubnub.SetUserState<T>(channel, uuid, jsonUserState, userCallback, errorCallback);
+		}
+
+		public void SetUserState<T>(string channel, string jsonUserState, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			pubnub.SetUserState<T>(channel,"", jsonUserState, userCallback, errorCallback);
+		}
+
+		public void GetUserState<T>(string channel, string uuid, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			pubnub.GetUserState<T>(channel, uuid, userCallback, errorCallback);
+		}
+
+		public void GetUserState<T>(string channel, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			pubnub.GetUserState<T>(channel, "", userCallback, errorCallback);
+		}
+
+		public string SetLocalUserState(string channel, string userStateKey, int userStateValue)
+		{
+			return pubnub.SetLocalUserState(channel, userStateKey, userStateValue);
+		}
+
+		public string SetLocalUserState(string channel, string userStateKey, double userStateValue)
+		{
+			return pubnub.SetLocalUserState(channel, userStateKey, userStateValue);
+		}
+
+		public string SetLocalUserState(string channel, string userStateKey, string userStateValue)
+		{
+			return pubnub.SetLocalUserState(channel, userStateKey, userStateValue);
+		}
+
+		public string GetLocalUserState(string channel)
+		{
+			return pubnub.GetLocalUserState(channel);
+		}
+
+		public string GetLocalUserState(string[] channels)
+		{
+			return pubnub.GetLocalUserState(channels);
+		}
         #endregion
 
         #region "PubNub API Other Methods"
-
         public void TerminateCurrentSubscriberRequest ()
         {
             pubnub.TerminateCurrentSubscriberRequest ();
@@ -181,6 +254,11 @@ namespace PubNubMessaging.Core
             return pubnub.GenerateGuid ();
         }
 
+		public void ChangeUUID(string newUUID)
+		{
+			pubnub.ChangeUUID(newUUID);
+		}
+
         public static long TranslateDateTimeToPubnubUnixNanoSeconds (DateTime dotNetUTCDateTime)
         {
             return PubnubMonoMac.TranslateDateTimeToPubnubUnixNanoSeconds (dotNetUTCDateTime);
@@ -201,8 +279,8 @@ namespace PubNubMessaging.Core
         }
 
         public int HeartbeatInterval {
-            get { return pubnub.HeartbeatInterval; }
-            set { pubnub.HeartbeatInterval = value; }
+			get { return pubnub.LocalClientHeartbeatInterval; }
+			set { pubnub.LocalClientHeartbeatInterval = value; }
         }
 
         public int NetworkCheckRetryInterval {
@@ -239,6 +317,30 @@ namespace PubNubMessaging.Core
             get { return pubnub.Origin; }
             set { pubnub.Origin = value; }
         }
+
+		public int PresenceHeartbeat
+		{
+			get
+			{
+				return pubnub.PresenceHeartbeat;
+			}
+			set
+			{
+				pubnub.PresenceHeartbeat = value;
+			}
+		}
+
+		public int PresenceHeartbeatInterval
+		{
+			get
+			{
+				return pubnub.PresenceHeartbeatInterval;
+			}
+			set
+			{
+				pubnub.PresenceHeartbeatInterval = value;
+			}
+		}
 
         public IPubnubUnitTest PubnubUnitTest {
             get {
