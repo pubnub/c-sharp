@@ -113,36 +113,43 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 });
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenPresenceShouldReturnCustomUUID()
         {
-            receivedCustomUUID = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    receivedCustomUUID = false;
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAClientIsPresented";
-            unitTest.TestCaseName = "ThenPresenceShouldReturnCustomUUID";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenAClientIsPresented";
+                    unitTest.TestCaseName = "ThenPresenceShouldReturnCustomUUID";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "hello_my_channel";
+                    string channel = "hello_my_channel";
 
-            pubnub.Presence<string>(channel, ThenPresenceWithCustomUUIDShouldReturnMessage, PresenceUUIDDummyMethodForConnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
+                    pubnub.Presence<string>(channel, ThenPresenceWithCustomUUIDShouldReturnMessage, PresenceUUIDDummyMethodForConnectCallback, DummyErrorCallback);
+                    Thread.Sleep(1000);
 
-            //since presence expects from stimulus from sub/unsub...
-            pubnub.SessionUUID = customUUID;
-            pubnub.Subscribe<string>(channel, DummyMethodForSubscribeUUID, SubscribeUUIDDummyMethodForConnectCallback, DummyErrorCallback);
-            subscribeUUIDManualEvent.WaitOne();
-            Thread.Sleep(1000);
+                    //since presence expects from stimulus from sub/unsub...
+                    pubnub.SessionUUID = customUUID;
+                    pubnub.Subscribe<string>(channel, DummyMethodForSubscribeUUID, SubscribeUUIDDummyMethodForConnectCallback, DummyErrorCallback);
+                    subscribeUUIDManualEvent.WaitOne();
+                    Thread.Sleep(1000);
 
-            //pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribeUUID, UnsubscribeUUIDDummyMethodForConnectCallback, UnsubscribeUUIDDummyMethodForDisconnectCallback, DummyErrorCallback);
-            //Thread.Sleep(1000);
-            //unsubscribeUUIDManualEvent.WaitOne(2000);
+                    //pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribeUUID, UnsubscribeUUIDDummyMethodForConnectCallback, UnsubscribeUUIDDummyMethodForDisconnectCallback, DummyErrorCallback);
+                    //Thread.Sleep(1000);
+                    //unsubscribeUUIDManualEvent.WaitOne(2000);
 
-            presenceUUIDManualEvent.WaitOne();
-            pubnub.EndPendingRequests();
+                    presenceUUIDManualEvent.WaitOne();
+                    pubnub.EndPendingRequests();
 
-            Assert.IsTrue(receivedCustomUUID, "Custom UUID not received");
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                        {
+                            Assert.IsTrue(receivedCustomUUID, "Custom UUID not received");
+                            TestComplete();
+                        });
+                });
         }
 
         [Asynchronous]
@@ -214,7 +221,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             }
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void IfHereNowIsCalledThenItShouldReturnInfo()
         {
             ThreadPool.QueueUserWorkItem((s) =>
@@ -233,13 +240,12 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(receivedHereNowMessage, "here_now message not received");
-                            //TestComplete();
-                            //EnqueueTestComplete();
+                            TestComplete();
                         });
                 });
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void IfGlobalHereNowIsCalledThenItShouldReturnInfo()
         {
             ThreadPool.QueueUserWorkItem((s) =>
@@ -256,11 +262,12 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(receivedGlobalHereNowMessage, "global_here_now message not received");
+                            TestComplete();
                         });
                 });
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void IfWhereNowIsCalledThenItShouldReturnInfo()
         {
             ThreadPool.QueueUserWorkItem((s) =>
@@ -278,6 +285,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(receivedWhereNowMessage, "where_now message not received");
+                            TestComplete();
                         });
                 });
         }
@@ -325,17 +333,9 @@ namespace PubnubWindowsPhone.Test.UnitTest
                             if (payload != null)
                             {
                                 var channels = payload.Value<JContainer>("channels");
-                                if (channels != null && channels.Count > 0)
+                                if (channels != null && channels.Count >= 0)
                                 {
-                                    var channelsContainer = channels["hello_my_channel"];
-                                    if (channelsContainer != null)
-                                    {
-                                        var uuids = channelsContainer.Value<JArray>("uuids");
-                                        if (uuids != null && uuids.Count > 0)
-                                        {
-                                            receivedGlobalHereNowMessage = true;
-                                        }
-                                    }
+                                    receivedGlobalHereNowMessage = true;
                                 }
                             }
                         }
@@ -377,7 +377,6 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 whereNowManualEvent.Set();
             }
         }
-
 
         [Asynchronous]
         void DummyMethodForSubscribe(string receivedMessage)

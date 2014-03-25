@@ -10,18 +10,18 @@ namespace PubnubWindowsPhone.Test.UnitTest
         public const bool PAMEnabled = true;
         public const bool EnableStubTest = true;
 
-        public static readonly string PublishKey = "demo";
-        public static readonly string SubscribeKey = "demo";
-        public static readonly string SecretKey = "demo";
+        public static readonly string PublishKey = "demo-36";
+        public static readonly string SubscribeKey = "demo-36";
+        public static readonly string SecretKey = "demo-36";
 
 
         static PubnubCommon()
         {
             if (PAMEnabled && !EnableStubTest)
             {
-                PublishKey = "pub-c-a2650a22-deb1-44f5-aa87-1517049411d5";
-                SubscribeKey = "sub-c-a478dd2a-c33d-11e2-883f-02ee2ddab7fe";
-                SecretKey = "sec-c-YjFmNzYzMGMtYmI3NC00NzJkLTlkYzYtY2MwMzI4YTJhNDVh";
+                PublishKey = "pub-c-38994634-9e05-4967-bc66-2ac2cef65ed9";
+                SubscribeKey = "sub-c-c9710928-1b7a-11e3-a0c8-02ee2ddab7fe";
+                SecretKey = "sec-c-ZDkzZTBkOTEtNTQxZS00MmQ3LTljMWUtMTNiNGZjNWUwMTVk";
             }
         }
     }
