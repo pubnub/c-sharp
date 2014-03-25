@@ -731,20 +731,28 @@ namespace PubnubWindowsPhone.Test.UnitTest
         [TestMethod]
         public void ThenLargeMessageShoudFailWithMessageTooLargeInfo()
         {
-            isLargeMessagePublished = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    isLargeMessagePublished = false;
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenLargeMessageShoudFailWithMessageTooLargeInfo";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenAMessageIsPublished";
+                    unitTest.TestCaseName = "ThenLargeMessageShoudFailWithMessageTooLargeInfo";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "hello_my_channel";
-            string message = messageLarge2K.Substring(0, 1320);
+                    string channel = "hello_my_channel";
+                    string message = messageLarge2K.Substring(0, 1320);
 
-            pubnub.Publish<string>(channel, message, DummyPublishMessageTooLargeInfoCallback, ReturnPublishMessageTooLargeErrorCallback);
-            mreLaregMessagePublish.WaitOne(310 * 1000);
-            Assert.IsTrue(isLargeMessagePublished, "Message Too Large is not failing as expected.");
+                    pubnub.Publish<string>(channel, message, DummyPublishMessageTooLargeInfoCallback, ReturnPublishMessageTooLargeErrorCallback);
+                    mreLaregMessagePublish.WaitOne(310 * 1000);
+
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                        {
+                            Assert.IsTrue(isLargeMessagePublished, "Message Too Large is not failing as expected.");
+                            //TestComplete();
+                        });
+                });
         }
 
         [Asynchronous]

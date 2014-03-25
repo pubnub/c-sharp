@@ -1,9 +1,9 @@
-# PubNub 3.5 Web Data Push Cloud-Hosted API
+# PubNub 3.6 Web Data Push Cloud-Hosted API
 # Windows Phone 8
 
-Open PubnubWindowsPhone.sln and the .xaml files(MainPage.xaml, PubnubOperation.xaml, PubnubDemoStart, PubnubTimeoutSettings, PublishMessageUserControl.xaml) should demonstrate all functionality, asynchronously using callbacks/delegates. You can also view and inspect the tests for additional insight.
+Open PubnubWindowsPhone.sln and the .xaml files(MainPage.xaml, PubnubOperation.xaml, PubnubDemoStart.xaml, PubnubTimeoutSettings.xaml, PublishMessageUserControl.xaml, UserStateUserControl.xaml, WhereNowUserControl.xaml, HereNowOptionsUserControl.xaml, ChangeUUIDUserControl.xaml ) should demonstrate all functionality, asynchronously using callbacks/delegates. You can also view and inspect the tests for additional insight.
 
-## Running the Demo App
+## Running the Demo/Example App
 
 1. Open up the solution file
 2. Right click on PubnubWindowsPhone project, and set as Startup Project

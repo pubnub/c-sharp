@@ -29,34 +29,50 @@ namespace PubnubWindowsPhone.Test.UnitTest
         [Description("Gets the Server Time in Unix time nanosecond format")]
         public void ThenItShouldReturnTimeStamp()
         {
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGetRequestServerTime";
-            unitTest.TestCaseName = "ThenItShouldReturnTimeStamp";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenGetRequestServerTime";
+                    unitTest.TestCaseName = "ThenItShouldReturnTimeStamp";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.Time<string>(ReturnTimeStampCallback, DummyErrorCallback);
-            mreTime.WaitOne(310 * 1000);
-            Assert.IsTrue(timeReceived, "time() Failed");
+                    pubnub.Time<string>(ReturnTimeStampCallback, DummyErrorCallback);
+                    mreTime.WaitOne(310 * 1000);
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                        {
+                            Assert.IsTrue(timeReceived, "time() Failed");
+                        });
+                });
         }
 
         [Asynchronous]
         private void ReturnTimeStampCallback(string result)
         {
-            if (!string.IsNullOrWhiteSpace(result))
+            try
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
-                {
-                    string time = deserializedMessage[0].ToString();
-                    if (time.Length > 0)
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
-                        timeReceived = true;
-                    }
-                }
+                        if (!string.IsNullOrWhiteSpace(result))
+                        {
+                            object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                            if (deserializedMessage is object[])
+                            {
+                                string time = deserializedMessage[0].ToString();
+                                if (time.Length > 0)
+                                {
+                                    timeReceived = true;
+                                }
+                            }
+                        }
+                    });
             }
-            mreTime.Set();
+            catch { }
+            finally
+            {
+                mreTime.Set();
+            }
         }
 
         [Asynchronous]
