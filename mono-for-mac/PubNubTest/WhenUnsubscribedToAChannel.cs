@@ -13,7 +13,9 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenNonExistentChannelShouldReturnNotSubscribed()
         {
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(Common.PublishKey,
+                Common.SubscribeKey,
+                "", "", false);
 
             Common common = new Common();
             common.DeliveryStatus = false;
@@ -39,7 +41,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenShouldReturnUnsubscribedMessage()
         {
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(Common.PublishKey,
+                Common.SubscribeKey, "", "", false);
       
             Common common = new Common();
             common.DeliveryStatus = false;
@@ -71,7 +74,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenShouldReturnUnsubscribedMessageSSL()
         {
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", true);
+            Pubnub pubnub = new Pubnub(Common.PublishKey,
+                Common.SubscribeKey, "", "", true);
 
             Common common = new Common();
             common.DeliveryStatus = false;
@@ -104,8 +108,8 @@ namespace PubNubMessaging.Tests
         public void TestUnsubscribePresence()
         {
             Pubnub pubnub = new Pubnub(
-                                "demo",
-                                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                                 "",
                                 "",
                                 false
@@ -199,8 +203,8 @@ namespace PubNubMessaging.Tests
         public void TestUnsubscribePresenceSSL()
         {
             Pubnub pubnub = new Pubnub(
-                                "demo",
-                                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                                 "",
                                 "",
                                 true

@@ -15,12 +15,17 @@ using Newtonsoft.Json.Converters;
 using System.Text;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Collections;
 
 
 namespace PubNubMessaging.Tests
 {
     public class Common
     {
+        public static string PublishKey = "demo-36";
+        public static string SubscribeKey = "demo-36";
+        public static string SecretKey = "";
+
         public object Response { get; set; }
 
         public bool DeliveryStatus  { get; set; }

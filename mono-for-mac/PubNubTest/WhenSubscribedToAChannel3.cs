@@ -37,8 +37,8 @@ namespace PubNubMessaging.Tests
         public void TestForUnicodeSSL ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "",
                 "",
                 true);
@@ -57,8 +57,8 @@ namespace PubNubMessaging.Tests
         public void TestForUnicode()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "",
                 "",
                 false);
@@ -77,8 +77,8 @@ namespace PubNubMessaging.Tests
         public void TestForForwardSlashSSL ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "",
                 "",
                 true);
@@ -97,8 +97,8 @@ namespace PubNubMessaging.Tests
         public void TestForForwardSlashCipher ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "",
                 "enigma",
                 false);
@@ -117,8 +117,8 @@ namespace PubNubMessaging.Tests
         public void TestForForwardSlash ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "",
                 "",
                 false);
@@ -138,8 +138,8 @@ namespace PubNubMessaging.Tests
         public void TestForForwardSlashCipherSSL ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "",
                 "enigma",
                 true);
@@ -159,8 +159,8 @@ namespace PubNubMessaging.Tests
         public void TestForForwardSlashSecret ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "secret",
                 "",
                 false);
@@ -179,8 +179,8 @@ namespace PubNubMessaging.Tests
         public void TestForForwardSlashCipherSecret ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "secret",
                 "enigma",
                 false);
@@ -200,8 +200,8 @@ namespace PubNubMessaging.Tests
         public void TestForForwardSlashCipherSecretSSL ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "secret",
                 "enigma",
                 true);
@@ -221,8 +221,8 @@ namespace PubNubMessaging.Tests
         public void TestForForwardSlashSecretSSL ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "secret",
                 "",
                 true);
@@ -241,8 +241,8 @@ namespace PubNubMessaging.Tests
         public void TestForSpecialCharSSL ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "",
                 "",
                 true);
@@ -262,8 +262,8 @@ namespace PubNubMessaging.Tests
         public void TestForSpecialCharCipher ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "",
                 "enigma",
                 false);
@@ -283,8 +283,8 @@ namespace PubNubMessaging.Tests
         public void TestForSpecialChar ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "",
                 "",
                 false);
@@ -304,8 +304,8 @@ namespace PubNubMessaging.Tests
         public void TestForSpecialCharCipherSSL ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "",
                 "enigma",
                 true);
@@ -325,8 +325,8 @@ namespace PubNubMessaging.Tests
         public void TestForSpecialCharSecret ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "secret",
                 "",
                 false);
@@ -346,8 +346,8 @@ namespace PubNubMessaging.Tests
         public void TestForSpecialCharCipherSecret ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "secret",
                 "enigma",
                 false);
@@ -367,8 +367,8 @@ namespace PubNubMessaging.Tests
         public void TestForSpecialCharCipherSecretSSL ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "secret",
                 "enigma",
                 true);
@@ -388,8 +388,8 @@ namespace PubNubMessaging.Tests
         public void TestForSpecialCharSecretSSL ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "secret",
                 "",
                 true);

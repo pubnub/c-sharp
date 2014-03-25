@@ -16,8 +16,8 @@ namespace PubNubMessaging.Tests
         public void TestForComplexMessage()
         {
             Pubnub pubnub = new Pubnub(
-                                "demo",
-                                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                                 "",
                                 "",
                                 false);
@@ -36,8 +36,8 @@ namespace PubNubMessaging.Tests
         public void TestForComplexMessageCipher()
         {
             Pubnub pubnub = new Pubnub(
-                                "demo",
-                                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                                 "",
                                 "enigma",
                                 false);
@@ -56,8 +56,8 @@ namespace PubNubMessaging.Tests
         public void TestForComplexMessageCipherSecret()
         {
             Pubnub pubnub = new Pubnub(
-                                "demo",
-                                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                                 "secret",
                                 "enigma",
                                 false);
@@ -76,8 +76,8 @@ namespace PubNubMessaging.Tests
         public void TestForComplexMessageCipherSecretSSL()
         {
             Pubnub pubnub = new Pubnub(
-                                "demo",
-                                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                                 "secret",
                                 "enigma",
                                 true);
@@ -96,8 +96,8 @@ namespace PubNubMessaging.Tests
         public void TestForComplexMessageCipherSSL()
         {
             Pubnub pubnub = new Pubnub(
-                                "demo",
-                                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                                 "",
                                 "enigma",
                                 true);
@@ -116,8 +116,8 @@ namespace PubNubMessaging.Tests
         public void TestForComplexMessageSecret()
         {
             Pubnub pubnub = new Pubnub(
-                                "demo",
-                                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                                 "secret",
                                 "",
                                 false);
@@ -136,8 +136,8 @@ namespace PubNubMessaging.Tests
         public void TestForComplexMessageSecretSSL()
         {
             Pubnub pubnub = new Pubnub(
-                                "demo",
-                                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                                 "secret",
                                 "",
                                 false);
@@ -156,8 +156,8 @@ namespace PubNubMessaging.Tests
         public void TestForComplexMessageSSL()
         {
             Pubnub pubnub = new Pubnub(
-                                "demo",
-                                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                                 "",
                                 "",
                                 true);
@@ -229,7 +229,9 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSubscribeShouldReturnConnectStatus()
         {
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(Common.PublishKey,
+                Common.SubscribeKey,
+               "", "", false);
           
             Common common = new Common();
             common.DeliveryStatus = false;
@@ -280,7 +282,9 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenMultiSubscribeShouldReturnConnectStatus()
         {
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(Common.PublishKey,
+                Common.SubscribeKey,
+               "", "", false);
           
             Common common = new Common();
             common.DeliveryStatus = false;
@@ -315,7 +319,9 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenMultiSubscribeShouldReturnConnectStatusSSL()
         {
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", true);
+            Pubnub pubnub = new Pubnub(Common.PublishKey,
+                Common.SubscribeKey,
+               "", "", true);
 
             Common common = new Common();
             common.DeliveryStatus = false;
@@ -350,7 +356,9 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenDuplicateChannelShouldReturnAlreadySubscribed()
         {
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(Common.PublishKey,
+                Common.SubscribeKey,
+                 "", "", false);
           
             Common common = new Common();
             common.DeliveryStatus = false;
@@ -379,7 +387,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSubscriberShouldBeAbleToReceiveManyMessages()
         {
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            Pubnub pubnub = new Pubnub(Common.PublishKey,
+                Common.SubscribeKey, "", "", false);
           
             Common common = new Common();
             common.DeliveryStatus = false;

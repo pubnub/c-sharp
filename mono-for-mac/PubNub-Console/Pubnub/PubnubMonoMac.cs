@@ -12,6 +12,7 @@ using Microsoft.Win32;
 using System.Threading;
 using System.Security.Cryptography;
 using System.Configuration;
+using System.Linq;
 
 namespace PubNubMessaging.Core
 {
@@ -312,6 +313,23 @@ namespace PubNubMessaging.Core
 				IAsyncResult asyncResult = request.BeginGetResponse (new AsyncCallback (UrlProcessResponseCallback<T>), pubnubRequestState);
 				if (!asyncResult.AsyncWaitHandle.WaitOne (GetTimeoutInSecondsForResponseType (pubnubRequestState.Type) * 1000)) {
 					OnPubnubWebRequestTimeout<T> (pubnubRequestState, true);
+				}
+			}
+			if (pubnubRequestState.Type == ResponseType.Presence || pubnubRequestState.Type == ResponseType.Subscribe)
+			{
+				if (presenceHeartbeatTimer != null)
+				{
+					presenceHeartbeatTimer.Dispose();
+					presenceHeartbeatTimer = null;
+				}
+				if (pubnubRequestState.Channels != null && pubnubRequestState.Channels.Length > 0 && pubnubRequestState.Channels.Where(s => s.Contains("-pnpres") == false).ToArray().Length > 0)
+				{
+					RequestState<T> presenceHeartbeatState = new RequestState<T>();
+					presenceHeartbeatState.Channels = pubnubRequestState.Channels;
+					presenceHeartbeatState.Type = ResponseType.PresenceHeartbeat;
+					presenceHeartbeatState.ErrorCallback = pubnubRequestState.ErrorCallback;
+
+					presenceHeartbeatTimer = new Timer(OnPresenceHeartbeatIntervalTimeout<T>, presenceHeartbeatState, base.PresenceHeartbeatInterval * 1000, base.PresenceHeartbeatInterval * 1000);
 				}
 			}
 			#elif (SILVERLIGHT || WINDOWS_PHONE)

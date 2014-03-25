@@ -88,8 +88,9 @@ namespace PubNubMessaging.Tests
 
                                 }
                         }
-                } catch
+            } catch (Exception ex)
                 {
+                    Console.WriteLine("UserCallbackForCleanUpAccessAtChannelLevel" + ex.ToString());
                 } finally
                 {
                     auditManualEvent.Set();
@@ -224,8 +225,9 @@ namespace PubNubMessaging.Tests
 
                                 }
                         }
-                } catch
+            } catch (Exception ex)
                 {
+                    Console.WriteLine("UserCallbackForCleanUpAccessAtUserLevel" + ex.ToString());
                 } finally
                 {
                     auditManualEvent.Set();

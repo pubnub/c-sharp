@@ -39,8 +39,8 @@ namespace PubNubMessaging.Tests
         {
 
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "",
                 "",
                 false);
@@ -62,8 +62,8 @@ namespace PubNubMessaging.Tests
         {
 
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "",
                 "",
                 true);
@@ -83,8 +83,8 @@ namespace PubNubMessaging.Tests
         {
 
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "",
                 "enigma",
                 true);
@@ -103,8 +103,8 @@ namespace PubNubMessaging.Tests
         {
 
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "secret",
                 "",
                 false);
@@ -123,8 +123,8 @@ namespace PubNubMessaging.Tests
         {
 
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "secret",
                 "",
                 true);
@@ -143,8 +143,8 @@ namespace PubNubMessaging.Tests
         {
 
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "secret",
                 "engima",
                 false);
@@ -164,8 +164,8 @@ namespace PubNubMessaging.Tests
         {
 
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "secret",
                 "enigma",
                 true);
@@ -185,8 +185,8 @@ namespace PubNubMessaging.Tests
         {
 
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "",
                 "enigma",
                 false);
@@ -206,8 +206,8 @@ namespace PubNubMessaging.Tests
         public void TestForEmojiSSL ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "",
                 "",
                 true);
@@ -226,8 +226,8 @@ namespace PubNubMessaging.Tests
         public void TestForEmojiCipher ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "",
                 "enigma",
                 false);
@@ -247,8 +247,8 @@ namespace PubNubMessaging.Tests
         public void TestForEmoji ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "",
                 "",
                 false);
@@ -267,8 +267,8 @@ namespace PubNubMessaging.Tests
         public void TestForEmojiCipherSSL ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "",
                 "enigma",
                 true);
@@ -287,8 +287,8 @@ namespace PubNubMessaging.Tests
         public void TestForEmojiSecret ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "secret",
                 "",
                 false);
@@ -308,8 +308,8 @@ namespace PubNubMessaging.Tests
         public void TestForEmojiCipherSecret ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "secret",
                 "enigma",
                 false);
@@ -328,8 +328,8 @@ namespace PubNubMessaging.Tests
         public void TestForEmojiCipherSecretSSL ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "secret",
                 "enigma",
                 true);
@@ -348,8 +348,8 @@ namespace PubNubMessaging.Tests
         public void TestForEmojiSecretSSL ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "secret",
                 "",
                 true);
