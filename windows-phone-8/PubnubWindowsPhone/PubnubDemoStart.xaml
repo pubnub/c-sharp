@@ -36,11 +36,11 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="20,70,19,0" Name="spnlInput2" HorizontalAlignment="Stretch" VerticalAlignment="Top">
                 <TextBlock Name="lblPubKey" VerticalAlignment="Center" Text="Publish Key"></TextBlock>
-                <TextBox x:Name="txtPubKey" Text="pub-c-38994634-9e05-4967-bc66-2ac2cef65ed9" Width="270"/>
+                <TextBox x:Name="txtPubKey" Text="demo-36" Width="270"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="20,130,19,0" Name="spnlInput3" HorizontalAlignment="Stretch" VerticalAlignment="Top">
                 <TextBlock Name="lblSubKey" VerticalAlignment="Center" Text="Subscribe Key"></TextBlock>
-                <TextBox x:Name="txtSubKey" Text="sub-c-c9710928-1b7a-11e3-a0c8-02ee2ddab7fe" Width="250"/>
+                <TextBox x:Name="txtSubKey" Text="demo-36" Width="250"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="20,190,19,0" Name="spnlInput4" HorizontalAlignment="Stretch" VerticalAlignment="Top">
                 <TextBlock Name="lblCipher" VerticalAlignment="Center" Text="Cipher Key"></TextBlock>
@@ -48,7 +48,7 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="20,250,19,0" Name="spnlInput5" HorizontalAlignment="Stretch" VerticalAlignment="Top">
                 <TextBlock Name="lblSecret" VerticalAlignment="Center" Text="Secret Key"></TextBlock>
-                <TextBox Name="txtSecret" Text="sec-c-ZDkzZTBkOTEtNTQxZS00MmQ3LTljMWUtMTNiNGZjNWUwMTVk" Width="236"></TextBox>
+                <TextBox Name="txtSecret" Text="demo-36" Width="236"></TextBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="20,310,19,0" Name="spnlInput6" HorizontalAlignment="Stretch" VerticalAlignment="Top">
                 <TextBlock Name="lblUUID" VerticalAlignment="Center" Text="Session UUID"></TextBlock>
