@@ -35,9 +35,16 @@ namespace PubnubWindowsPhone
         int operationTimeoutInSeconds;
         int networkMaxRetries;
         int networkRetryIntervalInSeconds;
-        int heartbeatIntervalInSeconds;
+        int localClientHeartbeatIntervalInSeconds;
+        int presenceHeartbeat;
+        int presenceHeartbeatInterval;
 
         Popup publishPopup = null;
+        Popup hereNowPopup = null;
+        Popup whereNowPopup = null;
+        Popup globalHereNowPopup = null;
+        Popup userStatePopup = null;
+        Popup changeUUIDPopup = null;
 
         public PubnubOperation()
         {
@@ -53,9 +60,11 @@ namespace PubnubWindowsPhone
             pubnub.NonSubscribeTimeout = operationTimeoutInSeconds;
             pubnub.NetworkCheckMaxRetries = networkMaxRetries;
             pubnub.NetworkCheckRetryInterval = networkRetryIntervalInSeconds;
-            pubnub.HeartbeatInterval = heartbeatIntervalInSeconds;
+            pubnub.LocalClientHeartbeatInterval = localClientHeartbeatIntervalInSeconds;
             pubnub.EnableResumeOnReconnect = resumeOnReconnect;
             pubnub.AuthenticationKey = authKey;
+            pubnub.PresenceHeartbeat = presenceHeartbeat;
+            pubnub.PresenceHeartbeatInterval = presenceHeartbeatInterval;
         }
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
@@ -74,9 +83,11 @@ namespace PubnubWindowsPhone
             operationTimeoutInSeconds = Convert.ToInt32(NavigationContext.QueryString["optimeout"]);
             networkMaxRetries = Convert.ToInt32(NavigationContext.QueryString["retries"]);
             networkRetryIntervalInSeconds = Convert.ToInt32(NavigationContext.QueryString["retryinterval"]);
-            heartbeatIntervalInSeconds = Convert.ToInt32(NavigationContext.QueryString["beatinterval"]);
+            localClientHeartbeatIntervalInSeconds = Convert.ToInt32(NavigationContext.QueryString["localbeatinterval"]);
             resumeOnReconnect = Boolean.Parse(NavigationContext.QueryString["resumeOnReconnect"].ToString());
             hideErrorCallbackMsg = Boolean.Parse(NavigationContext.QueryString["hideErrCallbackMsg"].ToString());
+            presenceHeartbeat = Convert.ToInt32(NavigationContext.QueryString["prebeat"]);
+            presenceHeartbeatInterval = Convert.ToInt32(NavigationContext.QueryString["prebeatinterval"]);
         }
 
         protected override void OnBackKeyPress(System.ComponentModel.CancelEventArgs e)
@@ -104,6 +115,10 @@ namespace PubnubWindowsPhone
                     {
                         TextBlock textBlock = new TextBlock();
                         textBlock.TextWrapping = TextWrapping.Wrap;
+                        if (result.Length > 3000)
+                        {
+                            result = string.Format("{0}..LONG TEXT DATA TRUNCATED",result.Substring(0, 3000));
+                        }
                         textBlock.Text = string.Format("REGULAR CALLBACK: {0}", result);
                         messageStackPanel.Children.Add(textBlock);
                         scrollViewerResult.UpdateLayout();
@@ -151,9 +166,12 @@ namespace PubnubWindowsPhone
                     {
                         TextBlock textBlock = new TextBlock();
                         textBlock.TextWrapping = TextWrapping.Wrap;
-                        //textBlock.Text = string.Format("ERROR CALLBACK: {0}", result.Description);
-                        textBlock.Text = string.Format("ERROR CALLBACK: {0}; {1}; {2}", result.Description, result.DetailedDotNetException, result.Message);
-                        LoggingMethod.WriteToLog(result.PubnubWebRequest.RequestUri.ToString(), true);
+                        textBlock.Text = string.Format("ERROR CALLBACK: {0}", result.Description);
+                        //textBlock.Text = string.Format("ERROR CALLBACK: {0}; {1}; {2}", result.Description, result.DetailedDotNetException, result.Message);
+                        if (result.PubnubWebRequest != null)
+                        {
+                            LoggingMethod.WriteToLog(result.PubnubWebRequest.RequestUri.ToString(), true);
+                        }
                         messageStackPanel.Children.Add(textBlock);
                         scrollViewerResult.UpdateLayout();
                         scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
@@ -212,7 +230,263 @@ namespace PubnubWindowsPhone
         private void btnHereNow_Click(object sender, RoutedEventArgs e)
         {
             channel = txtChannel.Text;
-            pubnub.HereNow<string>(channel, PubnubCallbackResult, PubnubDisplayErrorMessage);
+            this.IsEnabled = false;
+            Border border = new Border();
+            border.BorderBrush = new SolidColorBrush(Colors.Black);
+            border.BorderThickness = new Thickness(5.0);
+
+            StackPanel herenowStackPanel = new StackPanel();
+            herenowStackPanel.Background = new SolidColorBrush(Colors.Blue);
+            herenowStackPanel.Width = 300;
+            herenowStackPanel.Height = 300;
+
+            hereNowPopup = new Popup();
+            hereNowPopup.Height = 300;
+            hereNowPopup.Width = 300;
+            hereNowPopup.VerticalOffset = 100;
+            hereNowPopup.HorizontalOffset = 100;
+            HereNowOptionsUserControl control = new HereNowOptionsUserControl();
+            herenowStackPanel.Children.Add(control);
+            border.Child = herenowStackPanel;
+
+            hereNowPopup.Child = border;
+            hereNowPopup.IsOpen = true;
+            control.btnOK.Click += (s, args) =>
+            {
+                hereNowPopup.IsOpen = false;
+                bool showUUID = control.chkHereNowShowUUID.IsChecked.Value;
+                bool includeState = control.chkHereIncludeUserState.IsChecked.Value;
+
+                pubnub.HereNow<string>(channel, showUUID, includeState, PubnubCallbackResult, PubnubDisplayErrorMessage);
+
+                TextBlock textBlock = new TextBlock();
+                textBlock.Text = string.Format("Running HereNow\n");
+                messageStackPanel.Children.Add(textBlock);
+                scrollViewerResult.UpdateLayout();
+                scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
+                hereNowPopup = null;
+                this.IsEnabled = true;
+            };
+            control.btnCancel.Click += (s, args) =>
+            {
+                hereNowPopup.IsOpen = false;
+                hereNowPopup = null;
+                this.IsEnabled = true;
+            };
+
+        }
+
+        private void btnWhereNow_Click(object sender, RoutedEventArgs e)
+        {
+            this.IsEnabled = false;
+            Border border = new Border();
+            border.BorderBrush = new SolidColorBrush(Colors.Black);
+            border.BorderThickness = new Thickness(5.0);
+
+            StackPanel whereNowStackPanel = new StackPanel();
+            whereNowStackPanel.Background = new SolidColorBrush(Colors.Blue);
+            whereNowStackPanel.Width = 300;
+            whereNowStackPanel.Height = 300;
+
+            whereNowPopup = new Popup();
+            whereNowPopup.Height = 300;
+            whereNowPopup.Width = 300;
+            whereNowPopup.VerticalOffset = 100;
+            whereNowPopup.HorizontalOffset = 100;
+            WhereNowUserControl control = new WhereNowUserControl();
+            control.txtWhereNowUUID.Text = uuid;
+            whereNowStackPanel.Children.Add(control);
+            border.Child = whereNowStackPanel;
+
+            whereNowPopup.Child = border;
+            whereNowPopup.IsOpen = true;
+            control.btnOK.Click += (s, args) =>
+            {
+                whereNowPopup.IsOpen = false;
+                string whereNowUUID = control.txtWhereNowUUID.Text;
+                pubnub.WhereNow<string>(whereNowUUID, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                TextBlock textBlock = new TextBlock();
+                textBlock.Text = string.Format("Running WhereNow \n");
+                messageStackPanel.Children.Add(textBlock);
+                scrollViewerResult.UpdateLayout();
+                scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
+                whereNowPopup = null;
+                this.IsEnabled = true;
+            };
+            control.btnCancel.Click += (s, args) =>
+            {
+                whereNowPopup.IsOpen = false;
+                whereNowPopup = null;
+                this.IsEnabled = true;
+            };
+        }
+
+        private void btnChangeUUID_Click(object sender, RoutedEventArgs e)
+        {
+            this.IsEnabled = false;
+            Border border = new Border();
+            border.BorderBrush = new SolidColorBrush(Colors.Black);
+            border.BorderThickness = new Thickness(5.0);
+
+            StackPanel changeUUIDStackPanel = new StackPanel();
+            changeUUIDStackPanel.Background = new SolidColorBrush(Colors.Blue);
+            changeUUIDStackPanel.Width = 400;
+            changeUUIDStackPanel.Height = 300;
+
+            changeUUIDPopup = new Popup();
+            changeUUIDPopup.Height = 300;
+            changeUUIDPopup.Width = 300;
+            changeUUIDPopup.VerticalOffset = 10;
+            changeUUIDPopup.HorizontalOffset = 10;
+            ChangeUUIDUserControl control = new ChangeUUIDUserControl();
+            control.lblCurrentUUID.Text = uuid;
+            changeUUIDStackPanel.Children.Add(control);
+            border.Child = changeUUIDStackPanel;
+
+            changeUUIDPopup.Child = border;
+            changeUUIDPopup.IsOpen = true;
+            control.btnOK.Click += (s, args) =>
+            {
+                changeUUIDPopup.IsOpen = false;
+                string newUUID = control.txtNewUUID.Text;
+                if (!string.IsNullOrEmpty(newUUID) && newUUID.Trim().Length > 0)
+                {
+                    uuid = newUUID;
+                    pubnub.ChangeUUID(uuid);
+
+                    TextBlock textBlock = new TextBlock();
+                    textBlock.Text = string.Format("Change UUID done.\n");
+                    messageStackPanel.Children.Add(textBlock);
+                    scrollViewerResult.UpdateLayout();
+                    scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
+                }
+                changeUUIDPopup = null;
+                this.IsEnabled = true;
+            };
+            control.btnCancel.Click += (s, args) =>
+            {
+                changeUUIDPopup.IsOpen = false;
+                changeUUIDPopup = null;
+                this.IsEnabled = true;
+            };
+        }
+
+        private void btnGlobalHereNow_Click(object sender, RoutedEventArgs e)
+        {
+            channel = txtChannel.Text;
+            this.IsEnabled = false;
+            Border border = new Border();
+            border.BorderBrush = new SolidColorBrush(Colors.Black);
+            border.BorderThickness = new Thickness(5.0);
+
+            StackPanel globalHerenowStackPanel = new StackPanel();
+            globalHerenowStackPanel.Background = new SolidColorBrush(Colors.Blue);
+            globalHerenowStackPanel.Width = 300;
+            globalHerenowStackPanel.Height = 300;
+
+            globalHereNowPopup = new Popup();
+            globalHereNowPopup.Height = 300;
+            globalHereNowPopup.Width = 300;
+            globalHereNowPopup.VerticalOffset = 100;
+            globalHereNowPopup.HorizontalOffset = 100;
+            HereNowOptionsUserControl control = new HereNowOptionsUserControl();
+            globalHerenowStackPanel.Children.Add(control);
+            border.Child = globalHerenowStackPanel;
+
+            globalHereNowPopup.Child = border;
+            globalHereNowPopup.IsOpen = true;
+            control.btnOK.Click += (s, args) =>
+            {
+                globalHereNowPopup.IsOpen = false;
+                bool showUUID = control.chkHereNowShowUUID.IsChecked.Value;
+                bool includeState = control.chkHereIncludeUserState.IsChecked.Value;
+
+                pubnub.GlobalHereNow<string>(showUUID, includeState, PubnubCallbackResult, PubnubDisplayErrorMessage);
+
+                TextBlock textBlock = new TextBlock();
+                textBlock.Text = string.Format("Running Global HereNow\n");
+                messageStackPanel.Children.Add(textBlock);
+                scrollViewerResult.UpdateLayout();
+                scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
+                globalHereNowPopup = null;
+                this.IsEnabled = true;
+            };
+            control.btnCancel.Click += (s, args) =>
+            {
+                globalHereNowPopup.IsOpen = false;
+                globalHereNowPopup = null;
+                this.IsEnabled = true;
+            };
+        }
+
+        private void btnUserState_Click(object sender, RoutedEventArgs e)
+        {
+            channel = txtChannel.Text;
+            this.IsEnabled = false;
+            Border border = new Border();
+            border.BorderBrush = new SolidColorBrush(Colors.Black);
+            border.BorderThickness = new Thickness(5.0);
+
+            StackPanel userStateStackPanel = new StackPanel();
+            userStateStackPanel.Background = new SolidColorBrush(Colors.Blue);
+            userStateStackPanel.Width = 600;
+            userStateStackPanel.Height = 600;
+
+            userStatePopup = new Popup();
+            userStatePopup.Height = 300;
+            userStatePopup.Width = 300;
+            userStatePopup.VerticalOffset = 20;
+            userStatePopup.HorizontalOffset = 20;
+            UserStateUserControl control = new UserStateUserControl();
+            userStateStackPanel.Children.Add(control);
+            border.Child = userStateStackPanel;
+
+            userStatePopup.Child = border;
+            userStatePopup.IsOpen = true;
+            control.btnOK.Click += (s, args) =>
+            {
+                string msg = "";
+                userStatePopup.IsOpen = false;
+                if (control.radSetUserState.IsChecked.Value)
+                {
+                    string key1 = control.txtKey1.Text;
+                    string value1 = control.txtValue1.Text;
+                    string key2 = control.txtKey2.Text;
+                    string value2 = control.txtValue2.Text;
+                    pubnub.SetLocalUserState(channel, key1, value1);
+                    pubnub.SetLocalUserState(channel, key2, value2);
+
+                    string jsonUserState = pubnub.GetLocalUserState(channel);
+                    if (!string.IsNullOrEmpty(jsonUserState) && jsonUserState.Trim().Length > 0)
+                    {
+                        pubnub.SetUserState<string>(channel, uuid, jsonUserState, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        msg = "Running Set User State";
+                    }
+                    else
+                    {
+                        msg = "Oops. Required Data Missing. Verify user state";
+                    }
+                }
+                else
+                {
+                    pubnub.GetUserState<string>(channel, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                    msg = "Running Get User State";
+                }
+
+                TextBlock textBlock = new TextBlock();
+                textBlock.Text = msg;
+                messageStackPanel.Children.Add(textBlock);
+                scrollViewerResult.UpdateLayout();
+                scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
+                userStatePopup = null;
+                this.IsEnabled = true;
+            };
+            control.btnCancel.Click += (s, args) =>
+            {
+                userStatePopup.IsOpen = false;
+                userStatePopup = null;
+                this.IsEnabled = true;
+            };
         }
 
         private void btnPresence_Click(object sender, RoutedEventArgs e)
