@@ -655,7 +655,7 @@ namespace PubNubMessaging.Core
                         string grantPresenceTimeLimit = Console.ReadLine();
                         int grantPresenceTimeLimitInSeconds;
                         Int32.TryParse(grantPresenceTimeLimit, out grantPresenceTimeLimitInSeconds);
-                        if (grantPresenceTimeLimitInSeconds == 0) grantTimeLimitInSeconds = 1440;
+                        if (grantPresenceTimeLimitInSeconds == 0) grantPresenceTimeLimitInSeconds = 1440;
 
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", channel));
