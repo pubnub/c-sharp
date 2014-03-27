@@ -95,7 +95,7 @@
         .PopupControls
         {
             padding:5px;
-            float:right;
+            text-align:right;
         }
     </style>
     <script type="text/javascript">
@@ -130,143 +130,164 @@
                             <fieldset>
                                 <table border="0" cellpadding="0" cellspacing="0">
                                     <tr>
-                                        <td valign="top">
-                                            <table width="100%" border="0" cellpadding="0" cellspacing="0">
-                                                <tr>
-                                                    <td align="right">
-                                                        <asp:Button ID="btnReset" runat="server" Text="Reset Pubnub Instance" Enabled="false"
-                                                            CssClass="SmallButton" OnClick="btnReset_Click" />
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <asp:CheckBox ID="chkSSL" runat="server" Text="Enable SSL" />
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <asp:CheckBox ID="chkResumeOnReconnect" runat="server" Text="Resume On Reconnect"
-                                                            Checked="true" />
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td valign="top">
+                                        <td>
                                             <table border="0" cellpadding="0" cellspacing="0">
                                                 <tr>
-                                                    <td>
-                                                        Origin
+                                                    <td valign="top">
+                                                        <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                                                            <tr>
+                                                                <td align="right">
+                                                                    <asp:Button ID="btnReset" runat="server" Text="Reset Pubnub Instance" Enabled="false"
+                                                                        CssClass="SmallButton" OnClick="btnReset_Click" />
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    <asp:CheckBox ID="chkSSL" runat="server" Text="Enable SSL" />
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    <asp:CheckBox ID="chkResumeOnReconnect" runat="server" Text="Resume On Reconnect"
+                                                                        Checked="true" />
+                                                                </td>
+                                                            </tr>
+                                                        </table>
                                                     </td>
-                                                    <td>
-                                                        <asp:TextBox ID="txtOrigin" runat="server" Text="pubsub.pubnub.com" Width="150" AutoPostBack="false" />
+                                                </tr>
+                                                <tr>
+                                                    <td valign="top">
+                                                        <table border="0" cellpadding="0" cellspacing="0">
+                                                            <tr>
+                                                                <td>
+                                                                    Origin
+                                                                </td>
+                                                                <td>
+                                                                    <asp:TextBox ID="txtOrigin" runat="server" Text="pubsub.pubnub.com" Width="150"
+                                                                        AutoPostBack="false" />
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    Publish Key
+                                                                </td>
+                                                                <td>
+                                                                    <asp:TextBox ID="txtPubKey" runat="server" Text="demo-36" Width="150" AutoPostBack="false" />
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    Subscriber Key
+                                                                </td>
+                                                                <td>
+                                                                    <asp:TextBox ID="txtSubKey" runat="server" Text="demo-36" Width="150" AutoPostBack="false" />
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    Cipher Key
+                                                                </td>
+                                                                <td>
+                                                                    <asp:TextBox ID="txtCipher" runat="server" Text="" Width="150" AutoPostBack="false" />
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    Secret Key
+                                                                </td>
+                                                                <td>
+                                                                    <asp:TextBox ID="txtSecret" runat="server" Text="demo-36" Width="150" AutoPostBack="false" />
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    Auth Key
+                                                                </td>
+                                                                <td>
+                                                                    <asp:TextBox ID="txtAuthKey" runat="server" Text="" Width="150" AutoPostBack="false" />
+                                                                </td>
+                                                            </tr>
+                                                        </table>
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td>
-                                                        Publish Key
-                                                    </td>
-                                                    <td>
-                                                        <asp:TextBox ID="txtPubKey" runat="server" Text="demo" Width="150" AutoPostBack="false" />
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        Subscriber Key
-                                                    </td>
-                                                    <td>
-                                                        <asp:TextBox ID="txtSubKey" runat="server" Text="demo" Width="150" AutoPostBack="false" />
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        Cipher Key
-                                                    </td>
-                                                    <td>
-                                                        <asp:TextBox ID="txtCipher" runat="server" Text="" Width="150" AutoPostBack="false" />
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        Secret Key
-                                                    </td>
-                                                    <td>
-                                                        <asp:TextBox ID="txtSecret" runat="server" Text="" Width="150" AutoPostBack="false" />
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        UUID
-                                                    </td>
-                                                    <td>
-                                                        <asp:TextBox ID="txtUUID" runat="server" Text="" Width="150" AutoPostBack="false" />
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        Auth Key
-                                                    </td>
-                                                    <td>
-                                                        <asp:TextBox ID="txtAuthKey" runat="server" Text="" Width="150" AutoPostBack="false" />
+                                                        <table>
+                                                            <tr>
+                                                                <td>
+                                                                    Subscriber Timeout (in sec)
+                                                                </td>
+                                                                <td>
+                                                                    <asp:TextBox ID="txtSubscribeTimeout" runat="server" Text="310" Width="50" AutoPostBack="false"></asp:TextBox>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    Non Subscribe Timeout (in sec)
+                                                                </td>
+                                                                <td>
+                                                                    <asp:TextBox ID="txtNonSubscribeTimeout" runat="server" Text="15" Width="50" AutoPostBack="false"></asp:TextBox>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    Number of MAX retries
+                                                                </td>
+                                                                <td>
+                                                                    <asp:TextBox ID="txtNetworkMaxRetries" runat="server" Text="50" Width="50" AutoPostBack="false"></asp:TextBox>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    Retry Interval (in sec)
+                                                                </td>
+                                                                <td>
+                                                                    <asp:TextBox ID="txtRetryInterval" runat="server" Text="10" Width="50" AutoPostBack="false"></asp:TextBox>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    Local Client Heartbeat Interval (in sec)
+                                                                </td>
+                                                                <td>
+                                                                    <asp:TextBox ID="txtLocalClientHeartbeatInterval" runat="server" Text="10" Width="50"
+                                                                        AutoPostBack="false"></asp:TextBox>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    Presence Heartbeat(in sec)
+                                                                </td>
+                                                                <td>
+                                                                    <asp:TextBox ID="txtPresenceHeartbeat" runat="server" Text="63" Width="50" AutoPostBack="false"></asp:TextBox>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    Presence Heartbeat Interval(in sec)
+                                                                </td>
+                                                                <td>
+                                                                    <asp:TextBox ID="txtPresenceHeartbeatInterval" runat="server" Text="60" Width="50"
+                                                                        AutoPostBack="false"></asp:TextBox>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
                                                     </td>
                                                 </tr>
                                             </table>
                                         </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <table>
-                                                <tr>
-                                                    <td>
-                                                        Subscriber Timeout (in sec)
-                                                    </td>
-                                                    <td>
-                                                        <asp:TextBox ID="txtSubscribeTimeout" runat="server" Text="310" Width="50" AutoPostBack="false"></asp:TextBox>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        Non Subscribe Timeout (in sec)
-                                                    </td>
-                                                    <td>
-                                                        <asp:TextBox ID="txtNonSubscribeTimeout" runat="server" Text="15" Width="50" AutoPostBack="false"></asp:TextBox>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        Number of MAX retries
-                                                    </td>
-                                                    <td>
-                                                        <asp:TextBox ID="txtNetworkMaxRetries" runat="server" Text="50" Width="50" AutoPostBack="false"></asp:TextBox>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        Retry Interval (in sec)
-                                                    </td>
-                                                    <td>
-                                                        <asp:TextBox ID="txtRetryInterval" runat="server" Text="10" Width="50" AutoPostBack="false"></asp:TextBox>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        Heartbeat Interval (in sec)
-                                                    </td>
-                                                    <td>
-                                                        <asp:TextBox ID="txtHeartbeatInterval" runat="server" Text="10" Width="50" AutoPostBack="false"></asp:TextBox>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
+                                        <td valign="top">
                                             <table>
                                                 <tr>
                                                     <td colspan="2">
+                                                        UUID:
+                                                        <asp:TextBox ID="txtUUID" runat="server" Text="" Width="220" AutoPostBack="false" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2">
                                                         Channel Name :
-                                                        <asp:TextBox ID="txtChannel" runat="server" Text="my/channel" AutoPostBack="false"></asp:TextBox>
+                                                        <asp:TextBox ID="txtChannel" runat="server" Text="my_hello_word" AutoPostBack="false"></asp:TextBox>
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -311,8 +332,8 @@
                                                 </tr>
                                                 <tr>
                                                     <td>
-                                                        <asp:Button ID="btnGrant" runat="server" Text="Grant Access" Width="138px"
-                                                            CommandName="GrantAccess" OnCommand="btnGrant_Command" />
+                                                        <asp:Button ID="btnGrant" runat="server" Text="Grant Access" Width="138px" CommandName="GrantAccess"
+                                                            OnCommand="btnGrant_Command" />
                                                     </td>
                                                     <td>
                                                         <asp:Button ID="btnRevoke" runat="server" Text="RevokeAccess" Width="138px" CommandName="RevokeAccess"
@@ -321,8 +342,8 @@
                                                 </tr>
                                                 <tr>
                                                     <td>
-                                                        <asp:Button ID="btnAudit" runat="server" Text="Audit Access" Width="138px"
-                                                            CommandName="AuditAccess" OnCommand="btnAudit_Command" />
+                                                        <asp:Button ID="btnAudit" runat="server" Text="Audit Access" Width="138px" CommandName="AuditAccess"
+                                                            OnCommand="btnAudit_Command" />
                                                     </td>
                                                     <td>
                                                         <asp:Button ID="btnDisconnectAndRetry" runat="server" Text="Disconnect/Retry" Width="138px"
@@ -340,29 +361,143 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
+                                                    <td>
+                                                        <asp:Button ID="btnWhereNow" runat="server" Text="Where Now" Width="138px" CommandName="WhereNow"
+                                                            OnCommand="btnWhereNow_Command" />
+                                                    </td>
+                                                    <td>
+                                                        <asp:Button ID="btnGlobalHereNow" runat="server" Text="Global Here Now" Width="138px"
+                                                            CommandName="GlobalHereNow" OnCommand="btnGlobalHereNow_Command" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <asp:Button ID="btnSetUserState" runat="server" Text="Set User State" Width="138px" CommandName="SetUserState"
+                                                            OnCommand="btnSetUserState_Command" />
+                                                    </td>
+                                                    <td>
+                                                        <asp:Button ID="btnGetUserState" runat="server" Text="Get User State" Width="138px"
+                                                            CommandName="GetUserState" OnCommand="btnGetUserState_Command" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
                                                     <td colspan="2">
                                                         <asp:ModalPopupExtender ID="publishModalPopupExtender" runat="server" TargetControlID="btnPublish"
-                                                            PopupDragHandleControlID="PopupHeader" Drag="true" 
-                                                            PopupControlID="popUpPanelPublishMessage"  CancelControlID="btnCancel" 
-                                                            BackgroundCssClass="ModalPopupBG" />
+                                                            PopupDragHandleControlID="PopupHeader" Drag="true" PopupControlID="popUpPanelPublishMessage"
+                                                            CancelControlID="btnCancel" BackgroundCssClass="ModalPopupBG" />
                                                         <asp:Panel ID="popUpPanelPublishMessage" runat="server" Style="display: none">
                                                             <div class="publishPopup">
                                                                 <div class="PopupHeader" id="PopupHeader">
                                                                     Enter message to publish:</div>
                                                                 <div class="PopupBody">
                                                                     <p>
-                                                                        <asp:TextBox ID="txtPublishMessage" TextMode="MultiLine" runat="server" Height="180px" Width="98%" Wrap="true"></asp:TextBox>
-                                                                        <asp:Label ID="lblErrorMessage" Text="" runat="server" Font-Names="verdana" ForeColor="Red" Height="15px" Font-Size="X-Small"></asp:Label>
+                                                                        <asp:TextBox ID="txtPublishMessage" TextMode="MultiLine" runat="server" Height="180px"
+                                                                            Width="98%" Wrap="true"></asp:TextBox>
+                                                                        <asp:Label ID="lblErrorMessage" Text="" runat="server" Font-Names="verdana" ForeColor="Red"
+                                                                            Height="15px" Font-Size="X-Small"></asp:Label>
                                                                     </p>
                                                                 </div>
                                                                 <div class="PopupControls">
-                                                                    <asp:Button ID="btnOkay" Text="Publish" runat="server" OnClick="btnOkay_OnClick" OnClientClick="if (!ValidateDataPublish()) { return false };"  />
+                                                                    <asp:Button ID="btnOkay" Text="Publish" runat="server" OnClick="btnOkay_OnClick"
+                                                                        OnClientClick="if (!ValidateDataPublish()) { return false };" />
                                                                     <input id="btnCancel" type="button" value="Cancel" />
                                                                 </div>
                                                             </div>
                                                         </asp:Panel>
                                                     </td>
                                                 </tr>
+                                                <tr>
+                                                    <td colspan="2">
+                                                        <asp:ModalPopupExtender ID="globalHereNowPopupExtender" runat="server" TargetControlID="btnGlobalHereNow"
+                                                            PopupDragHandleControlID="globalHereNowPopup" Drag="true" PopupControlID="popupPanelGlobalHereNow"
+                                                            CancelControlID="btnCancelGlobalHereNow" BackgroundCssClass="ModalPopupBG">
+                                                        </asp:ModalPopupExtender>
+                                                        <asp:Panel ID="popupPanelGlobalHereNow" runat="server" Style="display: none">
+                                                            <div class="publishPopup">
+                                                                <div class="PopupHeader" id="globalHereNowPopup">
+                                                                    Select the options for Global Here Now:</div>
+                                                                <div class="PopupBody">
+                                                                    <p>
+                                                                        <asp:CheckBox ID="chbShowUUIDList" Text="Show UUID List" Checked="true" runat="server" />
+                                                                        <br />
+                                                                        <asp:CheckBox ID="chbShowUserState" Text="Show User State" runat="server" />
+                                                                    </p>
+                                                                </div>
+                                                                <div class="PopupControls">
+                                                                    <asp:Button ID="btnOkayGlobalHereNow" Text="Global Here Now" runat="server" OnClick="btnOkayGlobalHereNow_OnClick" />
+                                                                    <input id="btnCancelGlobalHereNow" type="button" value="Cancel" />
+                                                                </div>
+                                                            </div>
+                                                        </asp:Panel>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2">
+                                                        <asp:ModalPopupExtender ID="hereNowPopupExtender" runat="server" TargetControlID="btnHereNow"
+                                                            PopupDragHandleControlID="hereNowPopup" Drag="true" PopupControlID="popupPanelHereNow"
+                                                            CancelControlID="btnCancelHereNow" BackgroundCssClass="ModalPopupBG">
+                                                        </asp:ModalPopupExtender>
+                                                        <asp:Panel ID="popupPanelHereNow" runat="server" Style="display: none">
+                                                            <div class="publishPopup">
+                                                                <div class="PopupHeader" id="hereNowPopup">
+                                                                    Select the options for Here Now:</div>
+                                                                <div class="PopupBody">
+                                                                    <p>
+                                                                        <asp:CheckBox ID="chbShowUUIDList2" Text="Show UUID List" Checked="true" runat="server" />
+                                                                        <br />
+                                                                        <asp:CheckBox ID="chbShowUserState2" Text="Show User State" runat="server" />
+                                                                    </p>
+                                                                </div>
+                                                                <div class="PopupControls">
+                                                                    <asp:Button ID="btnOkayHereNow" Text="Here Now" runat="server" OnClick="btnOkayHereNow_OnClick" />
+                                                                    <input id="btnCancelHereNow" type="button" value="Cancel" />
+                                                                </div>
+                                                            </div>
+                                                        </asp:Panel>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2">
+                                                        <asp:ModalPopupExtender ID="setUserStatePopupExtender" runat="server" TargetControlID="btnSetUserState"
+                                                            PopupDragHandleControlID="setUserStatePopup" Drag="true" PopupControlID="popupPanelSetUserState"
+                                                            CancelControlID="btnCancelSetUserState" BackgroundCssClass="ModalPopupBG">
+                                                        </asp:ModalPopupExtender>
+                                                        <asp:Panel ID="popupPanelSetUserState" runat="server" Style="display: none">
+                                                            <div class="publishPopup">
+                                                                <div class="PopupHeader" id="setUserStatePopup">
+                                                                    Set User State:</div>
+                                                                <div class="PopupBody">
+                                                                    <p>
+                                                                        Enter user state in json format ( Eg. {"channel":{"key1":"value1","key2":"value2"}}  ):
+                                                                        <br />
+                                                                        <asp:TextBox ID="txtJsonUserState" Text="" Width="300px" runat="server"></asp:TextBox>
+                                                                    </p>
+                                                                </div>
+                                                                <div class="PopupControls">
+                                                                    <asp:Button ID="btnOkayJsonSetUserState" Text="Set User State in Json Format" runat="server" OnClick="btnOkayJsonSetUserState_OnClick" />
+                                                                    <input id="btnCancelJsonSetUserState" type="button" value="Cancel" />
+                                                                </div>
+                                                                <p style="text-align:center; font-weight:bold"> OR </p>                                                                
+                                                                <div class="PopupBody">
+                                                                    <p>
+                                                                        Enter user state in dictionary format (key:value pair):
+                                                                        <br />
+                                                                        <asp:TextBox ID="txtKey1" Text="" Width="100px" runat="server"></asp:TextBox> : <asp:TextBox ID="txtValue1" Text="" Width="100px" runat="server"></asp:TextBox><br />
+                                                                        <asp:TextBox ID="txtKey2" Text="" Width="100px" runat="server"></asp:TextBox> : <asp:TextBox ID="txtValue2" Text="" Width="100px" runat="server"></asp:TextBox><br />
+                                                                        <asp:TextBox ID="txtKey3" Text="" Width="100px" runat="server"></asp:TextBox> : <asp:TextBox ID="txtValue3" Text="" Width="100px" runat="server"></asp:TextBox>
+                                                                    </p>
+                                                                </div>
+                                                                <div class="PopupControls">
+                                                                    <asp:Button ID="btnOkaySetUserState" Text="Set User State" runat="server" OnClick="btnOkaySetUserState_OnClick" />
+                                                                    <input id="btnCancelSetUserState" type="button" value="Cancel" />
+                                                                </div>
+
+                                                                
+                                                            </div>
+                                                        </asp:Panel>
+                                                    </td>
+                                                </tr>
+
                                             </table>
                                         </td>
                                     </tr>
@@ -380,8 +515,8 @@
                         </Triggers>
                         <ContentTemplate>
                             <fieldset>
-                                <asp:TextBox ID="txtMessage" runat="server" ReadOnly="true" BackColor="Black" ForeColor="Aqua" Height="500px"
-                                    TextMode="MultiLine" Wrap="true" AutoPostBack="false" Width="100%"></asp:TextBox>
+                                <asp:TextBox ID="txtMessage" runat="server" ReadOnly="true" BackColor="Black" ForeColor="Aqua"
+                                    Height="500px" TextMode="MultiLine" Wrap="true" AutoPostBack="false" Width="100%"></asp:TextBox>
                                 <asp:Timer runat="server" ID="UpdateTimer" Interval="500" Enabled="true" OnTick="UpdateTimer_Tick" />
                             </fieldset>
                         </ContentTemplate>
@@ -389,7 +524,6 @@
                 </td>
             </tr>
         </table>
-
         <script type="text/javascript" language="javascript">
 
             var xPos, yPos;
