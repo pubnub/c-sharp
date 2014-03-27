@@ -68,7 +68,13 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ChangeUUIDUserControl.xaml.cs">
+      <DependentUpon>ChangeUUIDUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ClientNetworkStatus.cs" />
+    <Compile Include="HereNowOptionsUserControl.xaml.cs">
+      <DependentUpon>HereNowOptionsUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="LoggingMethod.cs" />
     <Compile Include="MainPage.cs" />
     <Compile Include="MD5.cs" />
@@ -92,12 +98,26 @@
     <Compile Include="PubnubTimeoutSettings.xaml.cs">
       <DependentUpon>PubnubTimeoutSettings.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserStateUserControl.xaml.cs">
+      <DependentUpon>UserStateUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WhereNowUserControl.xaml.cs">
+      <DependentUpon>WhereNowUserControl.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
+    <Page Include="ChangeUUIDUserControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="HereNowOptionsUserControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="PubnubDemoStart.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -117,6 +137,14 @@
     <Page Include="PubnubTimeoutSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserStateUserControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="WhereNowUserControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
