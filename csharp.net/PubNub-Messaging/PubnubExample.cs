@@ -96,7 +96,7 @@ namespace PubNubMessaging.Core
             else
             {
                 Console.WriteLine("Default demo subscribe key provided");
-                subscribeKey = "demo";
+                subscribeKey = "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -112,7 +112,7 @@ namespace PubNubMessaging.Core
             else
             {
                 Console.WriteLine("Default demo publish key provided");
-                publishKey = "demo";
+                publishKey = "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -127,14 +127,13 @@ namespace PubNubMessaging.Core
             }
             else
             {
-                Console.WriteLine("No Secret key provided");
-                //secretKey = "sec-c-YjFmNzYzMGMtYmI3NC00NzJkLTlkYzYtY2MwMzI4YTJhNDVh";
+                Console.WriteLine("Default demo Secret key provided");
+                secretKey = "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
 
             pubnub = new Pubnub(publishKey, subscribeKey, secretKey, cipherKey,
-            //pubnub = new Pubnub("pub-c-a2650a22-deb1-44f5-aa87-1517049411d5", "sub-c-a478dd2a-c33d-11e2-883f-02ee2ddab7fe", "sec-c-YjFmNzYzMGMtYmI3NC00NzJkLTlkYzYtY2MwMzI4YTJhNDVh", cipherKey,
                 (enableSSL.Trim().ToLower() == "y") ? true : false);
 
             pubnub.Origin = origin;
