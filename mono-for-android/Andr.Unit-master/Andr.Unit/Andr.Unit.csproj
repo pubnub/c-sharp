@@ -65,6 +65,7 @@
     <Compile Include="GenerateSampleGrant.cs" />
     <Compile Include="PubnubCommon.cs" />
     <Compile Include="WhenSubscribedToAChannel2.cs" />
+    <Compile Include="WhenSubscribedToAChannel3.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

@@ -17,8 +17,8 @@ namespace PubNubMessaging.Tests
         public void NullMessage ()
         {
             Pubnub pubnub = new Pubnub (
-                                "demo",
-                                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                                 "",
                                 "",
                                 false
@@ -48,8 +48,8 @@ namespace PubNubMessaging.Tests
         public void ThenItShouldReturnSuccessCodeAndInfoForEncryptedComplexMessage2 ()
         {
             Pubnub pubnub = new Pubnub (
-                              "demo",
-                              "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                               "",
                               "enigma",
                               false
@@ -82,8 +82,8 @@ namespace PubNubMessaging.Tests
         public void ThenItShouldReturnSuccessCodeAndInfoForComplexMessage2WithSsl ()
         {
             Pubnub pubnub = new Pubnub (
-                              "demo",
-                              "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                               "",
                               "",
                               true
@@ -119,8 +119,8 @@ namespace PubNubMessaging.Tests
         public void ThenItShouldReturnSuccessCodeAndInfoForComplexMessage2 ()
         {
             Pubnub pubnub = new Pubnub (
-                                "demo",
-                                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                                 "",
                                 "",
                                 false
@@ -156,8 +156,8 @@ namespace PubNubMessaging.Tests
         public void ThenItShouldReturnSuccessCodeAndInfoForComplexMessage ()
         {
             Pubnub pubnub = new Pubnub (
-                              "demo",
-                              "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                               "",
                               "",
                               false
@@ -190,8 +190,8 @@ namespace PubNubMessaging.Tests
         public void ThenItShouldReturnSuccessCodeAndInfoWhenEncrypted ()
         {
             Pubnub pubnub = new Pubnub (
-                              "demo",
-                              "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                               "",
                               "enigma",
                               false
@@ -225,8 +225,8 @@ namespace PubNubMessaging.Tests
         public void ThenItShouldReturnSuccessCodeAndInfoWhenEncryptedAndSecretKeyed ()
         {
             Pubnub pubnub = new Pubnub (
-                              "demo",
-                              "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                               "secret",
                               "enigma",
                               false
@@ -260,8 +260,8 @@ namespace PubNubMessaging.Tests
         public void ThenItShouldReturnSuccessCodeAndInfo ()
         {
             Pubnub pubnub = new Pubnub (
-                                "demo",
-                                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                                 "",
                                 "",
                                 false
@@ -399,8 +399,8 @@ namespace PubNubMessaging.Tests
         public void ThenLargeMessageShoudFailWithMessageTooLargeInfo ()
         {
             Pubnub pubnub = new Pubnub (
-                                "demo",
-                                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                                 "",
                                 "",
                                 false
