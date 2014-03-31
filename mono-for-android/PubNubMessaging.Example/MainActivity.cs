@@ -528,12 +528,12 @@ namespace PubNubMessaging.Example
                     Display (string.Format("Current user state: {0}", currentState));
                 } else if (cea.cds == CommonDialogStates.SetUserState){
                     string jsonUserState = "";
-                    if (string.IsNullOrEmpty (cea.valueToSet)) {
+                    if (string.IsNullOrEmpty (cea.valueToSet2)) {
                         jsonUserState = pubnub.GetLocalUserState (cea.channel);
                     } else {
-                        jsonUserState = cea.valueToSet;
+                        jsonUserState = cea.valueToSet2;
                     }
-                    pubnub.SetUserState<string> (cea.channel, cea.valueToSet2, jsonUserState, DisplayReturnMessage, DisplayErrorMessage);
+                    pubnub.SetUserState<string> (cea.channel, cea.valueToSet, jsonUserState, DisplayReturnMessage, DisplayErrorMessage);
                 }
             } catch (Exception ex) {
                 Display (ex.Message);
@@ -598,7 +598,7 @@ namespace PubNubMessaging.Example
         {
             this.RunOnUiThread (() => {
                 TextView txtViewLog = FindViewById<TextView> (Resource.Id.txtViewLog);
-                txtViewLog.Append ("\n");
+                txtViewLog.Append ("\n\n");
                 txtViewLog.Append (strText);
             }
             );

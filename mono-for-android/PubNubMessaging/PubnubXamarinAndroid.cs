@@ -251,6 +251,8 @@ namespace PubNubMessaging.Core
                     presenceHeartbeatState.Channels = pubnubRequestState.Channels;
                     presenceHeartbeatState.Type = ResponseType.PresenceHeartbeat;
                     presenceHeartbeatState.ErrorCallback = pubnubRequestState.ErrorCallback;
+                    presenceHeartbeatState.Request = null;
+                    presenceHeartbeatState.Response = null;
 
                     presenceHeartbeatTimer = new Timer(OnPresenceHeartbeatIntervalTimeout<T>, presenceHeartbeatState, base.PresenceHeartbeatInterval * 1000, base.PresenceHeartbeatInterval * 1000);
                 }
@@ -743,6 +745,16 @@ namespace PubNubMessaging.Core
         {
             req.KeepAlive = keepAliveRequest;
             req.UserAgent = string.Format ("ua_string=({0}) PubNub-csharp/3.5", userOS.VersionString);
+            return req;
+        }
+
+        protected override HttpWebRequest SetNoCache(HttpWebRequest req, bool nocache)
+        {
+            if (nocache)
+            {
+                req.Headers["Cache-Control"] = "no-cache";
+                req.Headers["Pragma"] = "no-cache";
+            }
             return req;
         }
     }

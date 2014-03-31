@@ -179,7 +179,7 @@ namespace PubNubMessaging.Core
 
         public void SetUserState<T>(string channel, string jsonUserState, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
-            pubnub.SetUserState<T>(channel,"", jsonUserState, userCallback, errorCallback);
+            pubnub.SetUserState<T>(channel, "", jsonUserState, userCallback, errorCallback);
         }
 
         public void GetUserState<T>(string channel, string uuid, Action<T> userCallback, Action<PubnubClientError> errorCallback)

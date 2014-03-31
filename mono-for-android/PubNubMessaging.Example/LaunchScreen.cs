@@ -228,7 +228,8 @@ namespace PubNubMessaging.Example
 
                 mainActivity.PutExtra("Cipher", txtCipher.Text.Trim());
 
-                pubnub = new Pubnub ("demo-36", "demo-36", "demo-36", txtCipher.Text.Trim(), tbSsl.Checked);
+                //pubnub = new Pubnub ("demo-36", "demo-36", "demo-36", txtCipher.Text.Trim(), tbSsl.Checked);
+                pubnub = new Pubnub ("pub-c-199e0a5c-8aa6-418b-bbca-3e90c20569a8", "sub-c-a3d5a1c8-ae97-11e3-a952-02ee2ddab7fe", "sec-c-NGVlNmRkYjAtY2Q1OS00OWM2LWE4NzktNzM5YzIxNGQxZjg3", txtCipher.Text.Trim(), tbSsl.Checked);
 
                 if(!String.IsNullOrWhiteSpace (txtCustomUuid.Text.Trim()))
                 {
