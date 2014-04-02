@@ -7,9 +7,14 @@ After checking out the general setup video, [For iOS targets](https://vimeo.com/
 
 ### Important Change from previous version
 Error Callback parameter is being introduced in all operation/non-operation methods of C# Core Pubnub.cs file. 
-If you had been using a previous version, your application might break due to signature difference.
+If you had been using a previous version, your application might break due to signature difference in the method call.
 Removes the dependency of .NET sockets.
 Implements the features of Pubnub 3.5
+
+WE have modified the JsonFX pre processor directives: Now we have 3. 
+1) ```USE_JSONFX_UNITY``` is for UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID 2) ```USE_JSONFX_UNITY_IOS``` is Unity IOS
+
+If you are using the preprocessor directive for JSONFX by using the "#define" keyword, you need to set the pre processor directive in both the PubnubCore.cs and PubnubUnity.cs.
 
 #### Cheatsheet to migrate to the new Error Callback implementation
 
@@ -22,6 +27,10 @@ NOTE: The callback methods DisplayReturnMessage, DisplayConnectStatusMessage and
 
 ```
 
+```
+replace USE_JSONFX with USE_JSONFX_UNITY
+and USE_JSONFX_FOR_UNITY with USE_JSONFX_UNITY_IOS
+```
 #### Prerequisites
 1. Install a free Full version of Unity 4 Pro from http://unity3d.com/unity/download/ (Unity 4 is recommended, but current/later versions should be ok). MonoDevelop IDE tool will be installed as part of Unity to write C# scripts.
 2. For Unity, JSONFX is needed for the serialization library. 
