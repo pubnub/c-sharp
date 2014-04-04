@@ -19,7 +19,9 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Threading;
 using System.Diagnostics;
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE && WP7
+using System.Collections.Concurrent;
+#elif WINDOWS_PHONE
 using TvdP.Collections;
 #else
 using System.Collections.Concurrent;
@@ -376,10 +378,10 @@ namespace PubNubMessaging.Core
 						LoggingMethod.WriteToLog("USE_MiniJSON", LoggingMethod.LevelInfo);
 						this.JsonPluggableLibrary = new MiniJSONObjectSerializer();
 			#elif (USE_JSONFX_UNITY_IOS)
-						LoggingMethod.WriteToLog("USE_JSONFX_FOR_UNITY", LoggingMethod.LevelInfo);
+						LoggingMethod.WriteToLog("USE_JSONFX_UNITY_IOS", LoggingMethod.LevelInfo);
 						this.JsonPluggableLibrary = new JsonFxUnitySerializer();
-			#else
-						LoggingMethod.WriteToLog("NewtonsoftJsonDotNet", LoggingMethod.LevelInfo);
+            #else
+            LoggingMethod.WriteToLog("NewtonsoftJsonDotNet", LoggingMethod.LevelInfo);
 						this.JsonPluggableLibrary = new NewtonsoftJsonDotNet();
 			#endif
 
