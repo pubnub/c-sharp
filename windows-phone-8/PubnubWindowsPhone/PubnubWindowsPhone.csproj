@@ -207,14 +207,15 @@
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>WP8\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="System.Threading.Tasks.WP71, Version=3.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>WP8\System.Threading.Tasks.WP71.dll</HintPath>
-      <Aliases>global</Aliases>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WP8\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ConcurrentHashtable\ConcurrentHashtable.csproj">
+      <Project>{082DCD59-A75E-4942-843B-70D36E8B56E3}</Project>
+      <Name>ConcurrentHashtable</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets" />
