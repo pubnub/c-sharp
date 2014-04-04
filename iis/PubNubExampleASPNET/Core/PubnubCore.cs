@@ -1,4 +1,4 @@
-//Build Date: March 26, 2014
+//Build Date: April 04, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX_UNITY
@@ -19,7 +19,13 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Threading;
 using System.Diagnostics;
+#if WINDOWS_PHONE && WP7
 using System.Collections.Concurrent;
+#elif WINDOWS_PHONE
+using TvdP.Collections;
+#else
+using System.Collections.Concurrent;
+#endif
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -372,10 +378,10 @@ namespace PubNubMessaging.Core
 						LoggingMethod.WriteToLog("USE_MiniJSON", LoggingMethod.LevelInfo);
 						this.JsonPluggableLibrary = new MiniJSONObjectSerializer();
 			#elif (USE_JSONFX_UNITY_IOS)
-						LoggingMethod.WriteToLog("USE_JSONFX_FOR_UNITY", LoggingMethod.LevelInfo);
+						LoggingMethod.WriteToLog("USE_JSONFX_UNITY_IOS", LoggingMethod.LevelInfo);
 						this.JsonPluggableLibrary = new JsonFxUnitySerializer();
-			#else
-						LoggingMethod.WriteToLog("NewtonsoftJsonDotNet", LoggingMethod.LevelInfo);
+            #else
+            LoggingMethod.WriteToLog("NewtonsoftJsonDotNet", LoggingMethod.LevelInfo);
 						this.JsonPluggableLibrary = new NewtonsoftJsonDotNet();
 			#endif
 
@@ -1564,6 +1570,7 @@ namespace PubNubMessaging.Core
 
 		private Uri BuildMultiChannelSubscribeRequest (string[] channels, object timetoken)
 		{
+            subscribeParameters = "";
 			string channelsJsonState = BuildJsonUserState (channels);
 			if (channelsJsonState != "{}" && channelsJsonState != "") {
 				subscribeParameters = string.Format ("&state={0}", EncodeUricomponent (channelsJsonState, ResponseType.Subscribe, false));
@@ -1879,6 +1886,7 @@ namespace PubNubMessaging.Core
 
 		private Uri BuildPresenceHeartbeatRequest (string[] channels)
 		{
+            presenceHeartbeatParameters = "";
 			string channelsJsonState = BuildJsonUserState (channels);
 			if (channelsJsonState != "{}" && channelsJsonState != "") {
 				presenceHeartbeatParameters = string.Format ("&state={0}", EncodeUricomponent (channelsJsonState, ResponseType.PresenceHeartbeat, false));
@@ -2058,6 +2066,8 @@ namespace PubNubMessaging.Core
 
 		private string AddOrUpdateOrDeleteLocalUserState (string channel, string userStateKey, object userStateValue)
 		{
+            string retJsonUserState = "";
+
 			Dictionary<string, object> userStateDictionary = null;
 
 			if (_channelUserState.ContainsKey (channel)) {
@@ -2088,7 +2098,13 @@ namespace PubNubMessaging.Core
 					_channelUserState.AddOrUpdate (channel, userStateDictionary, (oldData, newData) => userStateDictionary);
 				}
 			}
-			return BuildJsonUserState (channel);
+
+            string jsonUserState = BuildJsonUserState(channel);
+            if (jsonUserState != "")
+            {
+                retJsonUserState = string.Format("{{{0}}}", jsonUserState);
+            }
+            return retJsonUserState;
 		}
 
 		private bool DeleteLocalUserState (string channel)
@@ -2128,48 +2144,54 @@ namespace PubNubMessaging.Core
 
 			StringBuilder jsonStateBuilder = new StringBuilder ();
 
-			if (userStateDictionary != null) {
+			if (userStateDictionary != null) 
+            {
 				string[] userStateKeys = userStateDictionary.Keys.ToArray<string> ();
 
-				//jsonStateBuilder.AppendFormat("\"{0}\":", channel);
-				//jsonStateBuilder.Append("{");
-
-
-				for (int keyIndex = 0; keyIndex < userStateKeys.Length; keyIndex++) {
+				for (int keyIndex = 0; keyIndex < userStateKeys.Length; keyIndex++) 
+                {
 					string useStateKey = userStateKeys [keyIndex];
 					object userStateValue = userStateDictionary [useStateKey];
 					jsonStateBuilder.AppendFormat ("\"{0}\":{1}", useStateKey, (userStateValue.GetType ().ToString () == "System.String") ? string.Format ("\"{0}\"", userStateValue) : userStateValue);
-					if (keyIndex < userStateKeys.Length - 1) {
+					if (keyIndex < userStateKeys.Length - 1) 
+                    {
 						jsonStateBuilder.Append (",");
 					}
 				}
-
-				if (userStateKeys.Length > 0) {
-					retJsonUserState = string.Format ("{{\"{0}\":{{{1}}}}}", channel, jsonStateBuilder.ToString ());
-				}
-				//jsonStateBuilder.Append("}");
 			}
 
-			return retJsonUserState;
+            return jsonStateBuilder.ToString();
 		}
 
 		private string BuildJsonUserState (string[] channels)
 		{
+            string retJsonUserState = "";
+
 			StringBuilder jsonStateBuilder = new StringBuilder ();
-			jsonStateBuilder.Append ("{");
 
-			if (channels != null) {
-				for (int index = 0; index < channels.Length; index++) {
-					string currentJsonState = BuildJsonUserState (channels [index].ToString ());
-					jsonStateBuilder.Append (currentJsonState);
-					if (index < channels.Length - 1 && !string.IsNullOrEmpty (currentJsonState)) {
-						jsonStateBuilder.Append (",");
-					}
-				}
-			}
+			if (channels != null) 
+            {
+                for (int index = 0; index < channels.Length; index++)
+                {
+                    string currentJsonState = BuildJsonUserState(channels[index].ToString());
+                    if (!string.IsNullOrEmpty(currentJsonState))
+                    {
+                        currentJsonState = string.Format("\"{0}\":{{{1}}}", channels[index].ToString(), currentJsonState);
+                        if (jsonStateBuilder.Length > 0)
+                        {
+                            jsonStateBuilder.Append(",");
+                        }
+                        jsonStateBuilder.Append(currentJsonState);
+                    }
+                }
 
-			jsonStateBuilder.Append ("}");
-			return jsonStateBuilder.ToString ();
+                if (jsonStateBuilder.Length > 0)
+                {
+                    retJsonUserState = string.Format("{{{0}}}", jsonStateBuilder.ToString());
+                }
+            }
+
+            return retJsonUserState;
 		}
 
 		internal string SetLocalUserState (string channel, string userStateKey, int userStateValue)
@@ -2189,19 +2211,22 @@ namespace PubNubMessaging.Core
 
 		internal string GetLocalUserState (string channel)
 		{
-			StringBuilder builder = new StringBuilder ();
-			//builder.Append("{");
-			builder.Append (BuildJsonUserState (channel));
-			//builder.Append("}");
-			return builder.ToString ();
+            string retJsonUserState = "";
+            StringBuilder jsonStateBuilder = new StringBuilder();
+
+            jsonStateBuilder.Append(BuildJsonUserState(channel));
+            if (jsonStateBuilder.Length > 0)
+            {
+                retJsonUserState = string.Format("{{{0}}}", jsonStateBuilder.ToString());
+            }
+            
+            return retJsonUserState;
 		}
 
 		internal string GetLocalUserState (string[] channels)
 		{
 			StringBuilder builder = new StringBuilder ();
-			builder.Append ("{");
 			builder.Append (BuildJsonUserState (channels));
-			builder.Append ("}");
 			return builder.ToString ();
 		}
 
