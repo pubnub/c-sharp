@@ -847,6 +847,11 @@ namespace PubNubMessaging.Core
                         {
                             jsonUserState = manualJsonUserState;
                         }
+                        if (jsonUserState == "" || jsonUserState == "{}")
+                        {
+                            Console.WriteLine("Invalid User State");
+                            break;
+                        }
                         Console.WriteLine("Enter UUID. (Optional. Press ENTER to skip it)");
                         string uuid = Console.ReadLine();
                         if (string.IsNullOrEmpty(uuid))
