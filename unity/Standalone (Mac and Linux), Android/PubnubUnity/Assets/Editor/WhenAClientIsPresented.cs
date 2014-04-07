@@ -532,7 +532,7 @@ namespace PubNubMessaging.Tests
 						pubnub.SetLocalUserState(channel, "testkey", "testval");
 						pubnub.SetLocalUserState(channel, "testkey2", "testval2");
 						pubnub.SetLocalUserState(channel, "testkey2", null);
-						Assert.True(("{\"testChannel\":{\"testkey\":\"testval\"}}").Equals(pubnub.GetLocalUserState(channel)));
+						Assert.True(("{\"testkey\":\"testval\"}").Equals(pubnub.GetLocalUserState(channel)));
 				}
 
 				[Test]
@@ -546,7 +546,7 @@ namespace PubNubMessaging.Tests
 						);
 						string channel = "testChannel2";
 						pubnub.SetLocalUserState(channel, "testkey", "testval");
-						Assert.True(("{\"testChannel2\":{\"testkey\":\"testval\"}}").Equals(pubnub.GetLocalUserState(channel)));
+						Assert.True(("{\"testkey\":\"testval\"}").Equals(pubnub.GetLocalUserState(channel)));
 				}
 
 				[Test]
@@ -569,7 +569,7 @@ namespace PubNubMessaging.Tests
 						pubnub.GetUserState<string>(channel, common.DisplayReturnMessage, common.DisplayErrorMessage);
 						common.WaitForResponse(30);
 
-						Assert.True(common.Response.ToString().Contains("{\"testChannel3\":{\"testkey\":\"testval\"}}"));
+						Assert.True(common.Response.ToString().Contains("{\"testkey\":\"testval\"}"));
 				}
 
 				[Test]
@@ -609,7 +609,7 @@ namespace PubNubMessaging.Tests
 						pubnub.GetUserState<string>(channel, common.DisplayReturnMessage, common.DisplayErrorMessage);
 						common.WaitForResponse(30);
 						Console.WriteLine("Response GetUserState:" + common.Response.ToString());
-						Assert.True(common.Response.ToString().Contains("{\"testChannel4\":{\"testkey\":\"testval\"}}"));
+						Assert.True(common.Response.ToString().Contains("{\"testkey\":\"testval\"}"));
 				}
 
 				[Test]

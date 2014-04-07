@@ -1,4 +1,4 @@
-#define USE_JSONFX
+#define USE_JSONFX_UNITY
 //#define USE_MiniJSON
 using System;
 using PubNubMessaging.Core;
