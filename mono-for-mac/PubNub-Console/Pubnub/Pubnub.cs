@@ -278,7 +278,7 @@ namespace PubNubMessaging.Core
             set { pubnub.AuthenticationKey = value; }
         }
 
-        public int HeartbeatInterval {
+        public int LocalClientHeartbeatInterval {
 			get { return pubnub.LocalClientHeartbeatInterval; }
 			set { pubnub.LocalClientHeartbeatInterval = value; }
         }

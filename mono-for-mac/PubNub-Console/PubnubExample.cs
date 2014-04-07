@@ -84,7 +84,7 @@ namespace PubNubMessaging.Core
 				Console.WriteLine ("Subscribe key provided.");
 			} else {
 				Console.WriteLine ("Default demo subscribe key provided");
-				subscribeKey = "demo";
+                subscribeKey = "demo-36";
 			}
 			Console.ResetColor ();
 			Console.WriteLine ();
@@ -97,7 +97,7 @@ namespace PubNubMessaging.Core
 				Console.WriteLine ("Publish key provided.");
 			} else {
 				Console.WriteLine ("Default demo publish key provided");
-				publishKey = "demo";
+                publishKey = "demo-36";
 			}
 			Console.ResetColor ();
 			Console.WriteLine ();
@@ -109,12 +109,14 @@ namespace PubNubMessaging.Core
 			if (secretKey.Trim ().Length > 0) {
 				Console.WriteLine ("Secret key provided.");
 			} else {
-				Console.WriteLine ("No Secret key provided");
+				Console.WriteLine ("Default demo secret key provided");
+                secretKey = "demo-36";
 			}
 			Console.ResetColor ();
 			Console.WriteLine ();
 
-			pubnub = new Pubnub (publishKey, subscribeKey, secretKey, cipherKey,
+			pubnub = new Pubnub ("pub-c-199e0a5c-8aa6-418b-bbca-3e90c20569a8", "sub-c-a3d5a1c8-ae97-11e3-a952-02ee2ddab7fe", "sec-c-NGVlNmRkYjAtY2Q1OS00OWM2LWE4NzktNzM5YzIxNGQxZjg3", cipherKey,
+				//pubnub = new Pubnub (publishKey, subscribeKey, secretKey, cipherKey,
 				(enableSSL.Trim ().ToLower () == "y") ? true : false);
 			pubnub.Origin = origin;
 
@@ -203,16 +205,16 @@ namespace PubNubMessaging.Core
 			Console.ResetColor ();
 			Console.WriteLine ();
 
-			Console.WriteLine ("Heartbeat Interval = 15 seconds (default). Enter the value to change, else press ENTER");
+			Console.WriteLine ("Local Client Heartbeat Interval = 15 seconds (default). Enter the value to change, else press ENTER");
 			string heartbeatIntervalEntry = Console.ReadLine ();
-			int heartbeatInterval;
-			Int32.TryParse (heartbeatIntervalEntry, out heartbeatInterval);
+			int localClientHeartbeatInterval;
+			Int32.TryParse (heartbeatIntervalEntry, out localClientHeartbeatInterval);
 			Console.ForegroundColor = ConsoleColor.Blue;
-			if (heartbeatInterval > 0) {
-				Console.WriteLine ("Heartbeat Interval = {0} seconds", heartbeatInterval);
-				pubnub.HeartbeatInterval = heartbeatInterval;
+			if (localClientHeartbeatInterval > 0) {
+				Console.WriteLine ("Heartbeat Interval = {0} seconds", localClientHeartbeatInterval);
+				pubnub.LocalClientHeartbeatInterval = localClientHeartbeatInterval;
 			} else {
-				Console.WriteLine ("Heartbeat Interval = {0} seconds (default)", pubnub.HeartbeatInterval);
+				Console.WriteLine ("Heartbeat Interval = {0} seconds (default)", pubnub.LocalClientHeartbeatInterval);
 			}
 			Console.ResetColor ();
 			Console.WriteLine ();
@@ -586,7 +588,7 @@ namespace PubNubMessaging.Core
 					int grantPresenceTimeLimitInSeconds;
 					Int32.TryParse (grantPresenceTimeLimit, out grantPresenceTimeLimitInSeconds);
 					if (grantPresenceTimeLimitInSeconds == 0)
-						grantTimeLimitInSeconds = 1440;
+						grantPresenceTimeLimitInSeconds = 1440;
 
 					Console.ForegroundColor = ConsoleColor.Blue;
 					Console.WriteLine (string.Format ("Channel = {0}", channel));
@@ -759,6 +761,11 @@ namespace PubNubMessaging.Core
 						jsonUserState = pubnub.GetLocalUserState (setUserStateChannel);
 					} else {
 						jsonUserState = manualJsonUserState;
+					}
+					if (jsonUserState == "" || jsonUserState == "{}")
+					{
+						Console.WriteLine("Invalid User State");
+						break;
 					}
 					Console.WriteLine ("Enter UUID. (Optional. Press ENTER to skip it)");
 					string uuid = Console.ReadLine ();

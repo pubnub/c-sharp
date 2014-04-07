@@ -1,15 +1,13 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="PubNub-Console/Pubnub/PubnubCore.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="PubNubTest/WhenAClientIsPresented.cs">
     <Files>
-      <File FileName="PubNub-Console/PubnubExample.cs" Line="19" Column="43" />
-      <File FileName="PubNub-Console/Pubnub/PubnubCore.cs" Line="3480" Column="37" />
-      <File FileName="PubNub-Console/Pubnub/PubnubMonoMac.cs" Line="3" Column="3" />
-      <File FileName="PubNub-Console/Pubnub/LoggingMethod.cs" Line="239" Column="5" />
-      <File FileName="PubNubTest/WhenSubscribedToAChannel3.cs" Line="51" Column="45" />
-      <File FileName="PubNubTest/EncryptionTests.cs" Line="597" Column="32" />
-      <File FileName="PubNubTest/Common.cs" Line="147" Column="35" />
-      <File FileName="PubNub-Console/Pubnub/Pubnub.cs" Line="261" Column="1" />
+      <File FileName="PubNubTest/WhenAClientIsPresented.cs" Line="611" Column="89" />
+      <File FileName="PubNub-Console/Pubnub/LoggingMethod.cs" Line="1" Column="1" />
+      <File FileName="PubNub-Console/Pubnub/PubnubMonoMac.cs" Line="1" Column="1" />
+      <File FileName="PubNub-Console/PubnubExample.cs" Line="1" Column="1" />
+      <File FileName="PubNub-Console/Pubnub/Pubnub.cs" Line="1" Column="1" />
+      <File FileName="PubNub-Console/Pubnub/PubnubCore.cs" Line="2139" Column="1" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.NUnit.TestPad">
@@ -17,9 +15,10 @@
           <Node name="PubNub-Messaging.Tests" expanded="True">
             <Node name="PubNubMessaging" expanded="True">
               <Node name="Tests" expanded="True">
-                <Node name="WhenSubscribedToAChannel2" expanded="True" />
-                <Node name="WhenSubscribedToAChannel3" expanded="True" />
-                <Node name="WhenUnsubscribedToAChannel" expanded="True" selected="True" />
+                <Node name="WhenAClientIsPresented" expanded="True">
+                  <Node name="SetAndGetLocalState" selected="True" />
+                </Node>
+                <Node name="WhenUnsubscribedToAChannel" expanded="True" />
               </Node>
             </Node>
           </Node>
@@ -29,34 +28,17 @@
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint enabled="false" file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNub-Console/Pubnub/PubnubCore.cs" line="2995" column="13" />
-      <Breakpoint enabled="false" file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNub-Console/Pubnub/PubnubCore.cs" line="3878" column="1" />
-      <Breakpoint enabled="false" file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNub-Console/Pubnub/PubnubMonoMac.cs" line="554" column="17" />
-      <Breakpoint enabled="false" file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNub-Console/Pubnub/PubnubMonoMac.cs" line="616" column="17" />
-      <Breakpoint enabled="false" file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNubTest/Common.cs" line="200" column="17" />
-      <Breakpoint enabled="false" file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNubTest/Common.cs" line="200" column="1" />
-      <Breakpoint enabled="false" file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNubTest/Common.cs" line="156" column="41" />
-      <Breakpoint enabled="false" file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNubTest/WhenAMessageIsPublished.cs" line="151" column="1" />
-      <Breakpoint enabled="false" file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNubTest/Common.cs" line="85" column="1" />
-      <Breakpoint enabled="false" file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNubTest/Common.cs" line="78" column="1" />
-      <Breakpoint enabled="false" file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNubTest/Common.cs" line="65" column="1" />
-      <Breakpoint enabled="false" file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNubTest/WhenSubscribedToAChannel2.cs" line="25" column="1" />
-      <Breakpoint enabled="false" file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNub-Console/Pubnub/PubnubCore.cs" line="3195" column="1" />
-      <Breakpoint enabled="false" file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNub-Console/Pubnub/PubnubCore.cs" line="3266" column="1" />
-      <Breakpoint enabled="false" file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNub-Console/Pubnub/PubnubCore.cs" line="3158" column="25" />
-      <Breakpoint enabled="false" file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNub-Console/Pubnub/PubnubCore.cs" line="3086" column="17" />
-      <Breakpoint enabled="false" file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNub-Console/Pubnub/PubnubCore.cs" line="2992" column="1" />
-      <Breakpoint enabled="false" file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNub-Console/Pubnub/PubnubCore.cs" line="2989" column="1" />
-      <Breakpoint file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNubTest/WhenUnsubscribedToAChannel.cs" line="144" column="1" />
-      <Breakpoint file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNubTest/WhenUnsubscribedToAChannel.cs" line="147" column="47" />
-      <Breakpoint file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNubTest/WhenAClientIsPresented.cs" line="410" column="1" />
-      <Breakpoint file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNub-Console/Pubnub/PubnubCore.cs" line="4282" column="1" />
-      <Breakpoint file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNub-Console/PubnubExample.cs" line="937" column="1" />
+      <Breakpoint file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNubTest/CleanupGrant.cs" line="45" column="1" />
+      <Breakpoint file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNubTest/CleanupGrant.cs" line="93" column="1" />
+      <Breakpoint file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNubTest/CleanupGrant.cs" line="56" column="1" />
+      <Breakpoint file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNubTest/WhenAClientIsPresented.cs" line="445" column="1" />
+      <Breakpoint file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNubTest/WhenAClientIsPresented.cs" line="353" column="1" />
+      <Breakpoint file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNubTest/WhenAClientIsPresented.cs" line="471" column="27" />
+      <Breakpoint file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNubTest/WhenAClientIsPresented.cs" line="434" column="57" />
+      <Breakpoint file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNubTest/WhenAClientIsPresented.cs" line="468" column="22" />
+      <Breakpoint file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNub-Console/Pubnub/PubnubCore.cs" line="2262" column="1" />
+      <Breakpoint file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNubTest/WhenAClientIsPresented.cs" line="651" column="89" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches>
-    <Watch file="../../../../../../../../rajat/Projects/3.4/PubNub-Messaging/PubNub-Console/PubnubExample.cs" line="436" offsetX="693" offsetY="6525" expression="lst" liveUpdate="False" />
-    <Watch file="../../../../../../../../rajat/Projects/pubnub/PubNub-Messaging-baseclass/PubNubTest/WhenDetailedHistoryIsRequested.cs" line="71" offsetX="612" offsetY="1050" expression="commonResponse" liveUpdate="False" />
-    <Watch file="PubNubTest/WhenSubscribedToAChannel.cs" line="57" offsetX="591" offsetY="810" expression="myObjectArray" liveUpdate="False" />
-  </MonoDevelop.Ide.DebuggingService.PinnedWatches>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>
