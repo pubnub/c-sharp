@@ -84,7 +84,7 @@ namespace PubNubMessaging.Core
 				Console.WriteLine ("Subscribe key provided.");
 			} else {
 				Console.WriteLine ("Default demo subscribe key provided");
-                subscribeKey = "demo-36";
+				subscribeKey = "demo-36";
 			}
 			Console.ResetColor ();
 			Console.WriteLine ();
@@ -97,7 +97,7 @@ namespace PubNubMessaging.Core
 				Console.WriteLine ("Publish key provided.");
 			} else {
 				Console.WriteLine ("Default demo publish key provided");
-                publishKey = "demo-36";
+				publishKey = "demo-36";
 			}
 			Console.ResetColor ();
 			Console.WriteLine ();
@@ -110,7 +110,7 @@ namespace PubNubMessaging.Core
 				Console.WriteLine ("Secret key provided.");
 			} else {
 				Console.WriteLine ("Default demo secret key provided");
-                secretKey = "demo-36";
+				secretKey = "demo-36";
 			}
 			Console.ResetColor ();
 			Console.WriteLine ();
@@ -762,9 +762,8 @@ namespace PubNubMessaging.Core
 					} else {
 						jsonUserState = manualJsonUserState;
 					}
-					if (jsonUserState == "" || jsonUserState == "{}")
-					{
-						Console.WriteLine("Invalid User State");
+					if (jsonUserState == "" || jsonUserState == "{}") {
+						Console.WriteLine ("Invalid User State");
 						break;
 					}
 					Console.WriteLine ("Enter UUID. (Optional. Press ENTER to skip it)");

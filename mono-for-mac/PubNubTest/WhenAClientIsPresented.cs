@@ -8,11 +8,9 @@ using System.Threading;
 
 #if (USE_JSONFX)
 using JsonFx.Json;
-
 #elif (USE_DOTNET_SERIALIZATION)
 using System.Runtime.Serialization.Json;
 using System.Web.Script.Serialization;
-
 #else
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -26,8 +24,8 @@ namespace PubNubMessaging.Tests
         public void ThenItShouldReturnReceivedMessage()
         {
             Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
+                                Common.PublishKey,
+                                Common.SubscribeKey,
                                 "",
                                 "",
                                 false
@@ -74,8 +72,8 @@ namespace PubNubMessaging.Tests
         public void ThenItShouldReturnReceivedMessageSSL()
         {
             Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
+                                Common.PublishKey,
+                                Common.SubscribeKey,
                                 "",
                                 "",
                                 true
@@ -166,8 +164,8 @@ namespace PubNubMessaging.Tests
         public void IfHereNowIsCalledThenItShouldReturnInfo()
         {
             Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
+                                Common.PublishKey,
+                                Common.SubscribeKey,
                                 "",
                                 "",
                                 false
@@ -186,8 +184,8 @@ namespace PubNubMessaging.Tests
         public void IfHereNowIsCalledThenItShouldReturnInfoCipher()
         {
             Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
+                                Common.PublishKey,
+                                Common.SubscribeKey,
                                 "",
                                 "enigma",
                                 false
@@ -206,8 +204,8 @@ namespace PubNubMessaging.Tests
         public void IfHereNowIsCalledThenItShouldReturnInfoCipherSecret()
         {
             Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
+                                Common.PublishKey,
+                                Common.SubscribeKey,
                                 "secret",
                                 "enigma",
                                 false
@@ -226,8 +224,8 @@ namespace PubNubMessaging.Tests
         public void IfHereNowIsCalledThenItShouldReturnInfoCipherSecretSSL()
         {
             Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
+                                Common.PublishKey,
+                                Common.SubscribeKey,
                                 "secret",
                                 "enigma",
                                 false
@@ -246,8 +244,8 @@ namespace PubNubMessaging.Tests
         public void IfHereNowIsCalledThenItShouldReturnInfoCipherSSL()
         {
             Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
+                                Common.PublishKey,
+                                Common.SubscribeKey,
                                 "",
                                 "enigma",
                                 true
@@ -266,8 +264,8 @@ namespace PubNubMessaging.Tests
         public void IfHereNowIsCalledThenItShouldReturnInfoSecret()
         {
             Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
+                                Common.PublishKey,
+                                Common.SubscribeKey,
                                 "secret",
                                 "",
                                 false
@@ -286,8 +284,8 @@ namespace PubNubMessaging.Tests
         public void IfHereNowIsCalledThenItShouldReturnInfoSecretSSL()
         {
             Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
+                                Common.PublishKey,
+                                Common.SubscribeKey,
                                 "secret",
                                 "",
                                 true
@@ -306,8 +304,8 @@ namespace PubNubMessaging.Tests
         public void IfHereNowIsCalledThenItShouldReturnInfoSSL()
         {
             Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
+                                Common.PublishKey,
+                                Common.SubscribeKey,
                                 "",
                                 "",
                                 true
@@ -370,7 +368,7 @@ namespace PubNubMessaging.Tests
                                                 } else if (expectedType2.IsAssignableFrom(valueType))
                                                 {
                                                     objUuid = message ["uuids"] as object[];
-                                                }else
+                                                } else
                                                 {
                                                     objUuid = Common.Deserialize<object[]>(message ["uuids"].ToString());
                                                 }
@@ -413,8 +411,8 @@ namespace PubNubMessaging.Tests
         public void IfHereNowIsCalledWithState()
         {
             Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
+                                Common.PublishKey,
+                                Common.SubscribeKey,
                                 "",
                                 "",
                                 false
@@ -476,12 +474,12 @@ namespace PubNubMessaging.Tests
         public void TestGlobalHerewNow()
         {
             Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "",
-                "",
-                false
-            );
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "",
+                                false
+                            );
             Common common = new Common();
             common.DeliveryStatus = false;
             common.Response = null;
@@ -497,20 +495,20 @@ namespace PubNubMessaging.Tests
             common.WaitForResponse();   
 
             if (common.Response.Equals(null))
-            {
-                Assert.Fail("Null response");
-            } else
-            {
-                if (common.Response.ToString().Contains(pubnub.SessionUUID) 
-                    && common.Response.ToString().Contains(channel))
                 {
-                    Assert.True(true, "Test passed:" + testname);
+                    Assert.Fail("Null response");
                 } else
                 {
-                    Console.WriteLine("response:" + common.Response.ToString()); 
-                    Assert.Fail("Test failed:" + testname);
+                    if (common.Response.ToString().Contains(pubnub.SessionUUID)
+                    && common.Response.ToString().Contains(channel))
+                        {
+                            Assert.True(true, "Test passed:" + testname);
+                        } else
+                        {
+                            Console.WriteLine("response:" + common.Response.ToString()); 
+                            Assert.Fail("Test failed:" + testname);
+                        }
                 }
-            }
             pubnub.Unsubscribe<string>(channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy);
         }
 
@@ -518,12 +516,12 @@ namespace PubNubMessaging.Tests
         public void TestWhereNow()
         {
             Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "",
-                "",
-                false
-            );
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "",
+                                false
+                            );
             Common common = new Common();
             common.DeliveryStatus = false;
             common.Response = null;
@@ -541,62 +539,65 @@ namespace PubNubMessaging.Tests
             common.WaitForResponse();   
 
             if (common.Response.Equals(null))
-            {
-                Assert.Fail("Null response");
-            } else
-            {
-                if (common.Response.ToString().Contains(pubnub.SessionUUID) 
-                    && common.Response.ToString().Contains(channel))
                 {
-                    Assert.True(true, "Test passed:" + testname);
+                    Assert.Fail("Null response");
                 } else
                 {
-                    Console.WriteLine("response:" + common.Response.ToString()); 
-                    Assert.Fail("Test failed:" + testname);
+                    if (common.Response.ToString().Contains(pubnub.SessionUUID)
+                    && common.Response.ToString().Contains(channel))
+                        {
+                            Assert.True(true, "Test passed:" + testname);
+                        } else
+                        {
+                            Console.WriteLine("response:" + common.Response.ToString()); 
+                            Assert.Fail("Test failed:" + testname);
+                        }
                 }
-            }
             pubnub.Unsubscribe<string>(channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy);
         }
 
         [Test]
-        public void SetAndDeleteLocalState(){
+        public void SetAndDeleteLocalState()
+        {
             Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "",
-                "",
-                false
-            );
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "",
+                                false
+                            );
             string channel = "testChannel";
             pubnub.SetLocalUserState(channel, "testkey", "testval");
             pubnub.SetLocalUserState(channel, "testkey2", "testval2");
             pubnub.SetLocalUserState(channel, "testkey2", null);
-            Assert.AreEqual("{\"testkey\":\"testval\"}",pubnub.GetLocalUserState(channel));
+            Assert.AreEqual("{\"testkey\":\"testval\"}", pubnub.GetLocalUserState(channel));
         }
 
         [Test]
-        public void SetAndGetLocalState(){
+        public void SetAndGetLocalState()
+        {
             Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "",
-                "",
-                false
-            );
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "",
+                                false
+                            );
             string channel = "testChannel2";
             pubnub.SetLocalUserState(channel, "testkey", "testval");
-            Assert.AreEqual("{\"testkey\":\"testval\"}",pubnub.GetLocalUserState(channel));
+            Assert.AreEqual("{\"testkey\":\"testval\"}", pubnub.GetLocalUserState(channel));
         }
 
         [Test]
-        public void SetAndGetGlobalState(){
+        public void SetAndGetGlobalState()
+        {
             Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "sec-c-NGVlNmRkYjAtY2Q1OS00OWM2LWE4NzktNzM5YzIxNGQxZjg3",
-                "",
-                false
-            );
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "sec-c-NGVlNmRkYjAtY2Q1OS00OWM2LWE4NzktNzM5YzIxNGQxZjg3",
+                                "",
+                                false
+                            );
             string channel = "testChannel3";
             pubnub.SetLocalUserState(channel, "testkey", "testval");
 
@@ -612,14 +613,15 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void SetAndDeleteGlobalState(){
+        public void SetAndDeleteGlobalState()
+        {
             Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "",
-                "",
-                false
-            );
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "",
+                                false
+                            );
             string channel = "testChannel4";
             pubnub.SetLocalUserState(channel, "testkey", "testval");
             pubnub.SetLocalUserState(channel, "testkey2", "testval2");
@@ -652,14 +654,15 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void TestPresenceHeartbeat(){
+        public void TestPresenceHeartbeat()
+        {
             Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "",
-                "",
-                false
-            );     
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "",
+                                false
+                            );     
             string channel = "testChannel6";
 
             Common common = new Common();
@@ -679,20 +682,20 @@ namespace PubNubMessaging.Tests
             common.WaitForResponse(pubnub.PresenceHeartbeat + 3); 
 
             if (common.Response == null)
-            {
-                Assert.True(true, "Test passed");
-            } else
-            {
-                if (common.Response.ToString().Contains("timeout") 
-                    && common.Response.ToString().Contains(channel))
                 {
-                    Assert.Fail("Test failed: timed out");
+                    Assert.True(true, "Test passed");
                 } else
                 {
-                    Console.WriteLine("response:" + common.Response.ToString()); 
-                    Assert.True(true, "Test passed");
+                    if (common.Response.ToString().Contains("timeout")
+                    && common.Response.ToString().Contains(channel))
+                        {
+                            Assert.Fail("Test failed: timed out");
+                        } else
+                        {
+                            Console.WriteLine("response:" + common.Response.ToString()); 
+                            Assert.True(true, "Test passed");
+                        }
                 }
-            }
             pubnub.Unsubscribe<string>(channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy);
 
         }
@@ -701,8 +704,8 @@ namespace PubNubMessaging.Tests
         public void ThenPresenceShouldReturnCustomUUID()
         {
             Pubnub pubnub = new Pubnub(Common.PublishKey,
-                Common.SubscribeKey,
-                 "", "", false);
+                                Common.SubscribeKey,
+                                "", "", false);
         
             Common commonHereNow = new Common();
             commonHereNow.DeliveryStatus = false;

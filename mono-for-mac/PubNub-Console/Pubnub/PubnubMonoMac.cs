@@ -332,23 +332,20 @@ namespace PubNubMessaging.Core
 				base.LocalClientHeartbeatInterval * 1000);
 
 			base.channelLocalClientHeartbeatTimer.AddOrUpdate (requestUri, base.localClientHeartBeatTimer, (key, oldState) => base.localClientHeartBeatTimer);
-			if (pubnubRequestState.Type == ResponseType.Presence || pubnubRequestState.Type == ResponseType.Subscribe)
-			{
-				if (presenceHeartbeatTimer != null)
-				{
-					presenceHeartbeatTimer.Dispose();
+			if (pubnubRequestState.Type == ResponseType.Presence || pubnubRequestState.Type == ResponseType.Subscribe) {
+				if (presenceHeartbeatTimer != null) {
+					presenceHeartbeatTimer.Dispose ();
 					presenceHeartbeatTimer = null;
 				}
-				if (pubnubRequestState.Channels != null && pubnubRequestState.Channels.Length > 0 && pubnubRequestState.Channels.Where(s => s.Contains("-pnpres") == false).ToArray().Length > 0)
-				{
-					RequestState<T> presenceHeartbeatState = new RequestState<T>();
+				if (pubnubRequestState.Channels != null && pubnubRequestState.Channels.Length > 0 && pubnubRequestState.Channels.Where (s => s.Contains ("-pnpres") == false).ToArray ().Length > 0) {
+					RequestState<T> presenceHeartbeatState = new RequestState<T> ();
 					presenceHeartbeatState.Channels = pubnubRequestState.Channels;
 					presenceHeartbeatState.Type = ResponseType.PresenceHeartbeat;
 					presenceHeartbeatState.ErrorCallback = pubnubRequestState.ErrorCallback;
 					presenceHeartbeatState.Request = null;
 					presenceHeartbeatState.Response = null;
 
-					presenceHeartbeatTimer = new Timer(OnPresenceHeartbeatIntervalTimeout<T>, presenceHeartbeatState, base.PresenceHeartbeatInterval * 1000, base.PresenceHeartbeatInterval * 1000);
+					presenceHeartbeatTimer = new Timer (OnPresenceHeartbeatIntervalTimeout<T>, presenceHeartbeatState, base.PresenceHeartbeatInterval * 1000, base.PresenceHeartbeatInterval * 1000);
 
 				}
 			}
@@ -883,6 +880,7 @@ namespace PubNubMessaging.Core
 			req.UserAgent = string.Format ("ua_string=({0}) PubNub-csharp/3.5", userOS.VersionString);
 			return req;
 		}
+
 		protected override HttpWebRequest SetNoCache (HttpWebRequest req, bool nocache)
 		{
 			if (nocache) {
