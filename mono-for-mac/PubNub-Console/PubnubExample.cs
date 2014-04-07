@@ -115,8 +115,7 @@ namespace PubNubMessaging.Core
 			Console.ResetColor ();
 			Console.WriteLine ();
 
-			pubnub = new Pubnub ("pub-c-199e0a5c-8aa6-418b-bbca-3e90c20569a8", "sub-c-a3d5a1c8-ae97-11e3-a952-02ee2ddab7fe", "sec-c-NGVlNmRkYjAtY2Q1OS00OWM2LWE4NzktNzM5YzIxNGQxZjg3", cipherKey,
-				//pubnub = new Pubnub (publishKey, subscribeKey, secretKey, cipherKey,
+			pubnub = new Pubnub (publishKey, subscribeKey, secretKey, cipherKey,
 				(enableSSL.Trim ().ToLower () == "y") ? true : false);
 			pubnub.Origin = origin;
 
