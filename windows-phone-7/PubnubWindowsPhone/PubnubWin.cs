@@ -1,4 +1,4 @@
-//Build Date: March 24, 2014
+//Build Date: April 08, 2014
 using System;
 using System.Text;
 //using System.Net.Security;
@@ -261,8 +261,11 @@ namespace PubNubMessaging.Core
                     presenceHeartbeatState.ErrorCallback = pubnubRequestState.ErrorCallback;
                     presenceHeartbeatState.Request = null;
                     presenceHeartbeatState.Response = null;
-                    
-                    presenceHeartbeatTimer = new Timer(OnPresenceHeartbeatIntervalTimeout<T>, presenceHeartbeatState, base.PresenceHeartbeatInterval * 1000, base.PresenceHeartbeatInterval * 1000);
+
+                    if (base.PresenceHeartbeatInterval > 0)
+                    {
+                        presenceHeartbeatTimer = new Timer(OnPresenceHeartbeatIntervalTimeout<T>, presenceHeartbeatState, base.PresenceHeartbeatInterval * 1000, base.PresenceHeartbeatInterval * 1000);
+                    }
                 }
             }
         }
@@ -280,10 +283,15 @@ namespace PubNubMessaging.Core
         protected override bool HandleWebException<T>(WebException webEx, RequestState<T> asynchRequestState, string channel)
         {
             bool reconnect = false;
+#if SILVERLIGHT
+            if (webEx.Status == WebExceptionStatus.ConnectFailure //Sending Keep-alive packet failed (No network)/Server is down.
+             && !overrideTcpKeepAlive)
+#else
             if ((webEx.Status == WebExceptionStatus.NameResolutionFailure //No network
             || webEx.Status == WebExceptionStatus.ConnectFailure //Sending Keep-alive packet failed (No network)/Server is down.
             || webEx.Status == WebExceptionStatus.ServerProtocolViolation //Problem with proxy or ISP
             || webEx.Status == WebExceptionStatus.ProtocolError) && (!overrideTcpKeepAlive))
+#endif
             {
                 //internet connection problem.
                 LoggingMethod.WriteToLog(string.Format("DateTime {0}, _urlRequest - Internet connection problem", DateTime.Now.ToString()), LoggingMethod.LevelError);
@@ -926,7 +934,7 @@ namespace PubNubMessaging.Core
             {
                 req.Headers["Cache-Control"] = "no-cache";
                 req.Headers["Pragma"] = "no-cache";
-#if (SILVERLIGHT || WINDOWS_PHONE)
+#if (WINDOWS_PHONE)
                 req.Headers[HttpRequestHeader.IfModifiedSince] = DateTime.UtcNow.ToString();
 #endif
             }
