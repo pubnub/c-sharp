@@ -15,7 +15,7 @@ When creating a new project or a new configuration please add a compiler flag by
 
 You can use either Newtonsoft.Json (recommended) or JsonFx as the serialization library. The example project has the references for both Newtonsoft.Json and JsonFx. You can retain either one.
 
-To use JsonFx as the serialization library you need to use the pre processor directive USE_JSONFX in the files PubnubCore.cs and PubnubMonoMac.cs and REMOVE the reference of Newtonsoft.Json from the project
+To use JsonFx as the serialization library you need to use the pre processor directive USE_JSONFX in the files PubnubCore.cs and PubnubXamarinAndroid.cs and REMOVE the reference of Newtonsoft.Json from the project
 Please note that JsonFx doesn't support the serialization for type XmlDocument.
 
 To use Newtonsoft.Json you need not specify any pre processor directive. This is the used as the default serialization library. You need to REMOVE the reference of JsonFx from the project and retain the reference of Newtonsoft.Json
