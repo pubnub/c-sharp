@@ -5,12 +5,13 @@
            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
            mc:Ignorable="d"
            xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation"
-           d:DesignWidth="640" d:DesignHeight="480"
+           d:DesignWidth="820" d:DesignHeight="480"
            Title="CodeExampleView Page" >
 
-    <Grid x:Name="LayoutRoot">
+    <Grid x:Name="LayoutRoot" Margin="5,5,5,15">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="325" />
+            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="300" />
             <ColumnDefinition Width="335*" />
         </Grid.ColumnDefinitions>
 
@@ -47,19 +48,19 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Column="0" Grid.Row="0" Name="lblSubKey" Text="Sub Key" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
-                    <TextBox Grid.Column="1" Grid.Row="0" Name="txtSubKey" Text="demo" Width="150" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" />
+                    <TextBox Grid.Column="1" Grid.Row="0" Name="txtSubKey" Text="demo-36" Width="150" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" />
 
                     <TextBlock Grid.Column="0" Grid.Row="2" Name="lblPubKey" Text="Pub Key" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
-                    <TextBox Grid.Column="1" Grid.Row="2" Name="txtPubKey" Text="demo" Width="150" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" />
+                    <TextBox Grid.Column="1" Grid.Row="2" Name="txtPubKey" Text="demo-36" Width="150" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" />
 
                     <TextBlock Grid.Column="0" Grid.Row="4" Name="lblCipher" Text="Cipher Key" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
                     <TextBox Grid.Column="1" Grid.Row="4" Name="txtCipher" Text="" Width="150" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" />
 
                     <TextBlock Grid.Column="0" Grid.Row="6" Name="lblSecret" Text="Secret Key" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
-                    <TextBox Grid.Column="1" Grid.Row="6" Name="txtSecret" Text="" Width="150" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" />
+                    <TextBox Grid.Column="1" Grid.Row="6" Name="txtSecret" Text="demo-36" Width="150" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" />
 
                     <TextBlock Grid.Column="0" Grid.Row="8" Name="lblUUID" Text="UUID" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
-                    <TextBox Grid.Column="1" Grid.Row="8" Name="txtUUID" Text="" Width="150" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" />
+                    <TextBox Grid.Column="1" Grid.Row="8" Name="txtUUID" Text="demouuid" Width="150" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" />
 
                     <TextBlock Grid.Column="0" Grid.Row="10" Name="lblAuthKey" Text="Auth Key" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
                     <TextBox Grid.Column="1" Grid.Row="10" Name="txtAuthKey" Text="" Width="150" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" />
@@ -74,6 +75,8 @@
                 </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
+                    <RowDefinition /> <RowDefinition Height="3" />
+                    <RowDefinition /> <RowDefinition Height="3" />
                     <RowDefinition /> <RowDefinition Height="3" />
                     <RowDefinition /> <RowDefinition Height="3" />
                     <RowDefinition /> <RowDefinition Height="3" />
@@ -94,60 +97,70 @@
                 <TextBlock Grid.Column="0" Grid.Row="6" Name="lblRetryInterval" Text="Retry Interval (in sec)" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
                 <TextBox Grid.Column="1" Grid.Row="6" Name="txtRetryInterval" Text="10" Width="50" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
 
-                <TextBlock Grid.Column="0" Grid.Row="8" Name="lblHeartbeatInterval" Text="Heartbeat Interval (in sec)" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
-                <TextBox Grid.Column="1" Grid.Row="8" Name="txtHeartbeatInterval" Text="10" Width="50" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
+                <TextBlock Grid.Column="0" Grid.Row="8" Name="lblLocalClientHeartbeatInterval" Text="Local Client Heartbeat Interval(in sec)" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
+                <TextBox Grid.Column="1" Grid.Row="8" Name="txtLocalClientHeartbeatInterval" Text="10" Width="50" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
+
+                <TextBlock Grid.Column="0" Grid.Row="10" Name="lblPresenceHeartbeat" Text="Presence Heartbeat(in sec)" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
+                <TextBox Grid.Column="1" Grid.Row="10" Name="txtPresenceHeartbeat" Text="63" Width="50" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
+
+                <TextBlock Grid.Column="0" Grid.Row="12" Name="lblPresenceHeartbeatInterval" Text="Presence Heartbeat Interval(in sec)" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
+                <TextBox Grid.Column="1" Grid.Row="12" Name="txtPresenceHeartbeatInterval" Text="60" Width="50" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
             </Grid>
 
             <StackPanel Orientation="Horizontal"   Margin="0 10 0 0">
                 <TextBlock Text="Channel Name : " VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
                 <TextBox Name="txtChannel" Text="hello_my_channel" VerticalAlignment="Center" Width="150" FontFamily="Verdana" FontSize="12"/>
             </StackPanel>
-
-            <Grid  Margin="0 10 0 0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="145" />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                
-                <Grid.RowDefinitions>
-                    <RowDefinition /> <RowDefinition Height="4" />
-                    <RowDefinition /> <RowDefinition Height="4" />
-                    <RowDefinition /> <RowDefinition Height="4" />
-                    <RowDefinition /> <RowDefinition Height="4" />
-                    <RowDefinition /> <RowDefinition Height="4" />
-                    <RowDefinition /> <RowDefinition Height="4" />
-                    <RowDefinition /> <RowDefinition Height="4" />
-                </Grid.RowDefinitions>
-
-                <Button  Grid.Column="0" Grid.Row="0" Name="btnSubscribe" Content="Subscribe" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="Subscribe_Click" />
-                <Button Grid.Column="1" Grid.Row="0" Name="btnPresence" Content="Presence" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="Presence_Click" />
-
-                <Button Grid.Column="0" Grid.Row="2" Name="btnDetailedHistory" Content="Detailed History" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="History_Click" />
-                <Button Grid.Column="1" Grid.Row="2" Name="btnPublish" Content="Publish" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="Publish_Click" />
-
-                <Button Grid.Column="0" Grid.Row="4" Name="btnUnsubscribe" Content="Unsubscribe" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="Unsubscribe_Click" />
-                <Button Grid.Column="1" Grid.Row="4" Name="btnHereNow" Content="HereNow" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="HereNow_Click" />
-
-                <Button Grid.Column="0" Grid.Row="6" Name="btnPresenceUnsub" Content="Presence-Unsubscribe" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="PresenceUnsubscrib_Click" />
-                <Button Grid.Column="1" Grid.Row="6" Name="btnTime" Content="Time" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="Time_Click" />
-
-                <Button Grid.Column="0" Grid.Row="8" Name="btnDisableNetwork" Content="Disable Network" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="btnDisableNetwork_Click" />
-                <Button Grid.Column="1" Grid.Row="8" Name="btnEnableNetwork" Content="Enable Network" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="btnEnableNetwork_Click" />
-
-                <Button Grid.Column="0" Grid.Row="10" Name="btnDisconnectRetry" Content="Disconnect/Retry" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="btnDisconnectRetry_Click" />
-                <Button Grid.Column="1" Grid.Row="10" Name="btnGrant" Content="Grant" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="btnGrant_Click" />
-
-                <Button Grid.Column="0" Grid.Row="12" Name="btnRevoke" Content="Revoke" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="btnRevoke_Click" />
-                <Button Grid.Column="1" Grid.Row="12" Name="btnAudit" Content="Audit" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="btnAudit_Click" />
-            </Grid>
         </StackPanel>
 
-        <ScrollViewer Grid.Column="1" Background="Black">
+        <Grid Grid.Column="1" Margin="5,13,2,290">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="145" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="0" />
+                <RowDefinition />
+                <RowDefinition Height="0" />
+                <RowDefinition />
+                <RowDefinition Height="4" />
+                <RowDefinition />
+                <RowDefinition Height="4" />
+                <RowDefinition />
+                <RowDefinition Height="4" />
+                <RowDefinition />
+                <RowDefinition Height="4" />
+                <RowDefinition />
+                <RowDefinition Height="4" />
+                <RowDefinition />
+                <RowDefinition Height="4" />
+                <RowDefinition />
+                <RowDefinition Height="4" />
+            </Grid.RowDefinitions>
+            <Button Grid.Column="0" Grid.Row="0" Name="btnSubscribe" Content="Subscribe" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="Subscribe_Click" />
+            <Button Grid.Column="1" Grid.Row="0" Name="btnPresence" Content="Presence" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="Presence_Click" />
+            <Button Grid.Column="0" Grid.Row="2" Name="btnDetailedHistory" Content="Detailed History" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="History_Click" />
+            <Button Grid.Column="1" Grid.Row="2" Name="btnPublish" Content="Publish" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="Publish_Click" />
+            <Button Grid.Column="0" Grid.Row="4" Name="btnUnsubscribe" Content="Unsubscribe" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="Unsubscribe_Click" />
+            <Button Grid.Column="1" Grid.Row="4" Name="btnHereNow" Content="HereNow" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="HereNow_Click" />
+            <Button Grid.Column="0" Grid.Row="6" Name="btnPresenceUnsub" Content="Presence-Unsubscribe" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="PresenceUnsubscrib_Click" />
+            <Button Grid.Column="1" Grid.Row="6" Name="btnTime" Content="Time" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="Time_Click" />
+            <Button Grid.Column="0" Grid.Row="8" Name="btnDisableNetwork" Content="Disable Network" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="btnDisableNetwork_Click" />
+            <Button Grid.Column="1" Grid.Row="8" Name="btnEnableNetwork" Content="Enable Network" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="btnEnableNetwork_Click" />
+            <Button Grid.Column="0" Grid.Row="10" Name="btnDisconnectRetry" Content="Disconnect/Retry" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="btnDisconnectRetry_Click" />
+            <Button Grid.Column="1" Grid.Row="10" Name="btnGrant" Content="Grant" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="btnGrant_Click" />
+            <Button Grid.Column="0" Grid.Row="12" Name="btnRevoke" Content="Revoke" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="btnRevoke_Click" />
+            <Button Grid.Column="1" Grid.Row="12" Name="btnAudit" Content="Audit" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="btnAudit_Click" />
+            <Button Grid.Column="0" Grid.Row="14" Name="btnWhereNow" Content="WhereNow" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="btnWhereNow_Click" />
+            <Button Grid.Column="1" Grid.Row="14" Name="btnGlobalHereNow" Content="Global HereNow" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="btnGlobalHereNow_Click" />
+            <Button Grid.Column="0" Grid.Row="16" Name="btnUserState" Content="User State" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="btnUserState_Click" />
+            <Button Grid.Column="1" Grid.Row="16" Name="btnChangeUUID" Content="Change UUID" Width="140" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" Click="btnChangeUUID_Click" />
+        </Grid>
 
+        <ScrollViewer Grid.Column="2" Background="Black" Margin="5,5,15,5">
             <TextBlock x:Name="ConsoleContainer" Foreground="Aqua" TextWrapping="Wrap" />
-
         </ScrollViewer>
-
     </Grid>
 
 </navigation:Page>

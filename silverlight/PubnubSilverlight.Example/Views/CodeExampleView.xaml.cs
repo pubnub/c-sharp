@@ -40,7 +40,9 @@ namespace PubnubSilverlight
         static int operationTimeoutInSeconds = 0;
         static int networkMaxRetries = 0;
         static int networkRetryIntervalInSeconds = 0;
-        static int heartbeatIntervalInSeconds = 0;
+        static int localClientHeartbeatIntervalInSeconds = 0;
+        static int presenceHeartbeat = 0;
+        static int presenceHeartbeatInterval = 0;
 
         static bool showErrorMessageSegments = true;
        
@@ -77,8 +79,14 @@ namespace PubnubSilverlight
             Int32.TryParse(txtRetryInterval.Text, out networkRetryIntervalInSeconds);
             networkRetryIntervalInSeconds = (networkRetryIntervalInSeconds <= 0) ? 10 : networkRetryIntervalInSeconds;
 
-            Int32.TryParse(txtHeartbeatInterval.Text, out heartbeatIntervalInSeconds);
-            heartbeatIntervalInSeconds = (heartbeatIntervalInSeconds <= 0) ? 10 : heartbeatIntervalInSeconds;
+            Int32.TryParse(txtLocalClientHeartbeatInterval.Text, out localClientHeartbeatIntervalInSeconds);
+            localClientHeartbeatIntervalInSeconds = (localClientHeartbeatIntervalInSeconds <= 0) ? 10 : localClientHeartbeatIntervalInSeconds;
+
+            Int32.TryParse(txtPresenceHeartbeat.Text, out presenceHeartbeat);
+            presenceHeartbeat = (presenceHeartbeat <= 0) ? 63 : presenceHeartbeat;
+            
+            Int32.TryParse(txtPresenceHeartbeatInterval.Text, out presenceHeartbeatInterval);
+            presenceHeartbeatInterval = (presenceHeartbeatInterval <= 0) ? 60 : presenceHeartbeatInterval;
 
             if (pubnub == null)
             {
@@ -96,7 +104,9 @@ namespace PubnubSilverlight
                 txtNonSubscribeTimeout.IsEnabled = false;
                 txtNetworkMaxRetries.IsEnabled = false;
                 txtRetryInterval.IsEnabled = false;
-                txtHeartbeatInterval.IsEnabled = false;
+                txtLocalClientHeartbeatInterval.IsEnabled = false;
+                txtPresenceHeartbeat.IsEnabled = false;
+                txtPresenceHeartbeatInterval.IsEnabled = false;
 
                 btnReset.IsEnabled = true;
             }
@@ -105,7 +115,9 @@ namespace PubnubSilverlight
             pubnub.NonSubscribeTimeout = operationTimeoutInSeconds;
             pubnub.NetworkCheckMaxRetries = networkMaxRetries;
             pubnub.NetworkCheckRetryInterval = networkRetryIntervalInSeconds;
-            pubnub.HeartbeatInterval = heartbeatIntervalInSeconds;
+            pubnub.LocalClientHeartbeatInterval = localClientHeartbeatIntervalInSeconds;
+            pubnub.PresenceHeartbeat = presenceHeartbeat;
+            pubnub.PresenceHeartbeatInterval = presenceHeartbeatInterval;
             pubnub.EnableResumeOnReconnect = resumeOnReconnect;
         }
 
@@ -125,7 +137,6 @@ namespace PubnubSilverlight
         {
             CheckUserInputs();
             channel = txtChannel.Text;
-            Console.WriteLine("Running publish()");
 
             PublishMessageDialog publishView = new PublishMessageDialog();
 
@@ -135,6 +146,8 @@ namespace PubnubSilverlight
             {
                 if (publishView.DialogResult == true && publishView.Message.Text.Length > 0)
                 {
+                    Console.WriteLine("Running publish()");
+
                     string publishedMessage = publishView.Message.Text;
                     if (authKey.Trim() != "")
                     {
@@ -173,12 +186,36 @@ namespace PubnubSilverlight
         {
             CheckUserInputs();
             channel = txtChannel.Text;
+            uuid = txtUUID.Text;
+            
+            if (uuid.Trim() == "")
+            {
+                MessageBox.Show("UUID is required");
+                return;
+            }
+
             if (authKey.Trim() != "")
             {
                 pubnub.AuthenticationKey = authKey;
             }
-            Console.WriteLine("Running Here_Now()");
-            pubnub.HereNow<string>(channel, DisplayUserCallbackMessage, DisplayErrorMessage);
+
+            HereNowOptionsDialog hereNowPopup = new HereNowOptionsDialog();
+
+            hereNowPopup.Show();
+
+            hereNowPopup.Closed += (obj, args) =>
+            {
+                if (hereNowPopup.DialogResult == true)
+                {
+                    Console.WriteLine("Running Here_Now()");
+
+                    bool hereNowShowUUIDList = hereNowPopup.chkHereNowShowUUIDList.IsChecked.Value;
+                    bool hereNowIncludeState = hereNowPopup.chkHereNowIncludeState.IsChecked.Value;
+
+                    pubnub.HereNow<string>(channel, hereNowShowUUIDList, hereNowIncludeState, DisplayUserCallbackMessage, DisplayErrorMessage);
+                }
+            };
+
         }
 
         private void Unsubscribe_Click(object sender, RoutedEventArgs e)
@@ -270,6 +307,173 @@ namespace PubnubSilverlight
             }
             Console.WriteLine("Running Audit()");
             pubnub.AuditAccess<string>(channel, DisplayAuditCallbackMessage, DisplayErrorMessage);
+        }
+
+        private void btnWhereNow_Click(object sender, RoutedEventArgs e)
+        {
+            CheckUserInputs();
+            uuid = txtUUID.Text;
+            if (uuid.Trim() == "")
+            {
+                MessageBox.Show("UUID is required");
+                return;
+            }
+
+            if (authKey.Trim() != "")
+            {
+                pubnub.AuthenticationKey = authKey;
+            }
+            
+            WhereNowDialog whereNowPopup = new WhereNowDialog();
+            whereNowPopup.txtWhereNowUUID.Text = uuid;
+
+            whereNowPopup.Show();
+
+            whereNowPopup.Closed += (obj, args) =>
+            {
+                if (whereNowPopup.DialogResult == true && whereNowPopup.txtWhereNowUUID.Text.Length > 0)
+                {
+                    Console.WriteLine("Running WhereNow()");
+
+                    string whereNowUUID = whereNowPopup.txtWhereNowUUID.Text;
+                    pubnub.WhereNow<string>(whereNowUUID, DisplayUserCallbackMessage, DisplayErrorMessage);
+                }
+            };
+        }
+
+        private void btnGlobalHereNow_Click(object sender, RoutedEventArgs e)
+        {
+            CheckUserInputs();
+
+            if (authKey.Trim() != "")
+            {
+                pubnub.AuthenticationKey = authKey;
+            }
+
+            GlobalHereNowDialog globalHereNowPopup = new GlobalHereNowDialog();
+
+            globalHereNowPopup.Show();
+
+            globalHereNowPopup.Closed += (obj, args) =>
+            {
+                if (globalHereNowPopup.DialogResult == true)
+                {
+                    Console.WriteLine("Running Global_Here_Now()");
+
+                    bool globalHereNowShowUUIDList = globalHereNowPopup.chkHereNowShowUUIDList.IsChecked.Value;
+                    bool globalHereNowIncludeState = globalHereNowPopup.chkHereNowIncludeState.IsChecked.Value;
+
+                    pubnub.GlobalHereNow<string>(globalHereNowShowUUIDList, globalHereNowIncludeState, DisplayUserCallbackMessage, DisplayErrorMessage);
+                }
+            };
+        }
+
+        private void btnUserState_Click(object sender, RoutedEventArgs e)
+        {
+            CheckUserInputs();
+            channel = txtChannel.Text;
+
+            if (authKey.Trim() != "")
+            {
+                pubnub.AuthenticationKey = authKey;
+            }
+
+            UserStateDialog userStatePopup = new UserStateDialog();
+            userStatePopup.Show();
+
+            userStatePopup.Closed += (obj, args) =>
+            {
+                if (userStatePopup.DialogResult == true)
+                {
+                    if (userStatePopup.radGetUserState.IsChecked.Value)
+                    {
+                        Console.WriteLine("Running GetUserState()");
+                        pubnub.GetUserState<string>(channel, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    }
+                    else if (userStatePopup.radSetUserState.IsChecked.Value)
+                    {
+                        string userStateKey1 = userStatePopup.txtKey1.Text;
+                        string userStateKey2 = userStatePopup.txtKey2.Text;
+
+                        string userStateValue1 = userStatePopup.txtValue1.Text;
+                        string userStateValue2 = userStatePopup.txtValue2.Text;
+
+                        int valueInt;
+                        double valueDouble;
+                        if (Int32.TryParse(userStateValue1, out valueInt))
+                        {
+                            pubnub.SetLocalUserState(channel, userStateKey1, valueInt);
+                        }
+                        else if (Double.TryParse(userStateValue1, out valueDouble))
+                        {
+                            pubnub.SetLocalUserState(channel, userStateKey1, valueDouble);
+                        }
+                        else
+                        {
+                            pubnub.SetLocalUserState(channel, userStateKey1, userStateValue1);
+                        }
+
+                        if (Int32.TryParse(userStateValue2, out valueInt))
+                        {
+                            pubnub.SetLocalUserState(channel, userStateKey2, valueInt);
+                        }
+                        else if (Double.TryParse(userStateValue2, out valueDouble))
+                        {
+                            pubnub.SetLocalUserState(channel, userStateKey2, valueDouble);
+                        }
+                        else
+                        {
+                            pubnub.SetLocalUserState(channel, userStateKey2, userStateValue2);
+                        }
+                        
+                        string jsonUserState = pubnub.GetLocalUserState(channel);
+
+                        if (!string.IsNullOrEmpty(jsonUserState) && jsonUserState.Trim().Length > 0)
+                        {
+                            Console.WriteLine("Running SetUserState()");
+
+                            pubnub.SetUserState<string>(channel, uuid, jsonUserState, DisplayUserCallbackMessage, DisplayErrorMessage);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Oops. Required Data Missing. Verify user state");
+                        }
+                    }
+                }
+            };
+        }
+
+        private void btnChangeUUID_Click(object sender, RoutedEventArgs e)
+        {
+            CheckUserInputs();
+            uuid = txtUUID.Text;
+            if (uuid.Trim() == "")
+            {
+                MessageBox.Show("UUID is required");
+                return;
+            }
+
+            if (authKey.Trim() != "")
+            {
+                pubnub.AuthenticationKey = authKey;
+            }
+
+            ChangeUUIDDialog changeUUIDPopup = new ChangeUUIDDialog();
+            changeUUIDPopup.txtChangeUUID.Text = uuid;
+
+            changeUUIDPopup.Show();
+
+            changeUUIDPopup.Closed += (obj, args) =>
+            {
+                if (changeUUIDPopup.DialogResult == true && changeUUIDPopup.txtChangeUUID.Text.Trim().Length > 0)
+                {
+                    Console.WriteLine("Running ChangeUUID()");
+
+                    string newUUID = changeUUIDPopup.txtChangeUUID.Text;
+                    pubnub.ChangeUUID(newUUID);
+                    txtUUID.Text = uuid = newUUID;
+                }
+            };
         }
 
         static void DisplayUserCallbackMessage(string result)
@@ -517,7 +721,9 @@ namespace PubnubSilverlight
             txtNonSubscribeTimeout.IsEnabled = true;
             txtNetworkMaxRetries.IsEnabled = true;
             txtRetryInterval.IsEnabled = true;
-            txtHeartbeatInterval.IsEnabled = true;
+            txtLocalClientHeartbeatInterval.IsEnabled = true;
+            txtPresenceHeartbeat.IsEnabled = true;
+            txtPresenceHeartbeatInterval.IsEnabled = true;
 
             btnReset.IsEnabled = false;
         }
