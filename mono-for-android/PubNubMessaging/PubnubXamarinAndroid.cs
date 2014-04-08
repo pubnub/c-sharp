@@ -1,5 +1,5 @@
 //ver3.6
-//Build Date: March 26, 2014
+//Build Date: Apr 7, 2014
 //#define USE_JSONFX
 using System;
 using System.Text;
@@ -194,9 +194,9 @@ namespace PubNubMessaging.Core
             base.PubnubErrorLevel = errorLevel;
 
             base.publishKey = publishKey;
-            base.subscribeKey = subscribeKey;
             base.secretKey = secretKey;
             base.cipherKey = cipherKey;
+            base.subscribeKey = subscribeKey;
             base.ssl = sslOn;
 
             base.VerifyOrSetSessionUUID ();
@@ -238,6 +238,14 @@ namespace PubNubMessaging.Core
                     OnPubnubWebRequestTimeout<T> (pubnubRequestState, true);
                 }
             }
+        }
+
+        protected override void TimerWhenOverrideTcpKeepAlive<T> (Uri requestUri, RequestState<T> pubnubRequestState)
+        {
+            base.localClientHeartBeatTimer = new Timer (new TimerCallback (OnPubnubLocalClientHeartBeatTimeoutCallback<T>), pubnubRequestState, 0,
+                base.LocalClientHeartbeatInterval * 1000);
+
+            base.channelLocalClientHeartbeatTimer.AddOrUpdate (requestUri, base.localClientHeartBeatTimer, (key, oldState) => base.localClientHeartBeatTimer);
             if (pubnubRequestState.Type == ResponseType.Presence || pubnubRequestState.Type == ResponseType.Subscribe)
             {
                 if (presenceHeartbeatTimer != null)
@@ -257,13 +265,6 @@ namespace PubNubMessaging.Core
                     presenceHeartbeatTimer = new Timer(OnPresenceHeartbeatIntervalTimeout<T>, presenceHeartbeatState, base.PresenceHeartbeatInterval * 1000, base.PresenceHeartbeatInterval * 1000);
                 }
             }
-        }
-
-        protected override void TimerWhenOverrideTcpKeepAlive<T> (Uri requestUri, RequestState<T> pubnubRequestState)
-        {
-            base.localClientHeartBeatTimer = new Timer (new TimerCallback (OnPubnubLocalClientHeartBeatTimeoutCallback<T>), pubnubRequestState, 0,
-                base.LocalClientHeartbeatInterval * 1000);
-            base.channelLocalClientHeartbeatTimer.AddOrUpdate (requestUri, base.localClientHeartBeatTimer, (key, oldState) => base.localClientHeartBeatTimer);
         }
 
         #endregion
