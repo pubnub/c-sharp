@@ -1,4 +1,4 @@
-## PubNub 3.5 Web Data Push Cloud-Hosted API for Unity 4
+## PubNub 3.6 Web Data Push Cloud-Hosted API for Unity 4
 ### This read me is for Unity-iOS client. To run on windows standalone please refer to folder named Standalone (Windows) and for Android/Standalone (Mac and Linux) please refer to the folder Standalone (Mac and Linux), Android
 
 ### View this First!
@@ -8,6 +8,14 @@ After checking out the general setup video, [For iOS targets](https://vimeo.com/
 ### Important Change from previous version
 Error Callback parameter is being introduced in all operation/non-operation methods of C# Core Pubnub.cs file. 
 If you had been using a previous version, your application might break due to signature difference.
+Removes the dependency of .NET sockets.
+Implements the features of Pubnub 3.6
+
+WE have modified the JsonFX pre processor directives: Now we have 3. 
+1) ```USE_JSONFX_UNITY``` is for UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID 2) ```USE_JSONFX_UNITY_IOS``` is Unity IOS
+3) ```USE_JSONFX``` for non-unity clients.
+
+If you are using the preprocessor directive for JSONFX by using the "#define" keyword, you need to set the pre processor directive in both the PubnubCore.cs and PubnubUnity.cs.
 
 #### Cheatsheet to migrate to the new Error Callback implementation
 
@@ -20,6 +28,11 @@ NOTE: The callback methods DisplayReturnMessage, DisplayConnectStatusMessage and
 
 ```
 
+```
+replace USE_JSONFX with USE_JSONFX_UNITY
+and USE_JSONFX_FOR_UNITY with USE_JSONFX_UNITY_IOS
+```
+
 #### Prerequisites
 1. Install a free Full version of Unity 4 Pro from http://unity3d.com/unity/download/ (Unity 4 is recommended, but current/later versions should be ok). MonoDevelop IDE tool will be installed as part of Unity to write C# scripts.
 2. For Unity on iOS, we have tested 2 JSON serializers
@@ -27,16 +40,16 @@ NOTE: The callback methods DisplayReturnMessage, DisplayConnectStatusMessage and
 2.2 MiniJson: A small class, with no additional dependencies. But this class can only serialize arrays, strings, Chars, hashtables, Dictionary, arraylist and some more but not custom classes and objects. If you want to use this you need to 
 - open the project in MonoDevelop and remove the reference of JsonFx.Json.dll from the references. Delete the JsonFx.Json.dll from the assets folder.
 - add MiniJson to the project. This can be done by going to the Solution Explorer, ctrl-clicking Assets -> Add -> Add Files and select the file MiniJson.cs from the Assets folder.
-- In the PubnubCore.cs file uncomment the line which says #define USE_MiniJSON and comment the line #define USE_JSONFX_FOR_UNITY
+- In the PubnubCore.cs and PubnubUnity.cs filea uncomment the line which says #define USE_MiniJSON and comment the line #define USE_JSONFX_UNITY_IOS
 ```
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX
 #elif (UNITY_IOS)
 #define USE_MiniJSON 
-//#define USE_JSONFX_FOR_UNITY
+//#define USE_JSONFX_UNITY_IOS
 #endif
 ```
-- Similarly you need to uncomment the line which says #define USE_MiniJSON and comment the line #define USE_JSONFX_FOR_UNITY in the file PubnubUnityiOS.cs
+- Similarly you need to uncomment the line which says #define USE_MiniJSON and comment the line #define USE_JSONFX_UNITY_IOS in the file PubnubUnity.cs
 
 #### To run the unit tests, in addition to the above, you need to 
 1. Import UnityTestTools package (this is already present in the Pubnub client code under the path PubnubUnity/Assets/UnityTestTools) into your Assets. (https://www.assetstore.unity3d.com/#/content/13802)

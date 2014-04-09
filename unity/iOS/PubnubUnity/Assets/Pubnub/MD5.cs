@@ -664,7 +664,7 @@ namespace PubNubMessaging.Core
         /// </param>
         protected string EncodeNonAsciiCharacters (string value)
         {
-            #if (USE_JSONFX || USE_JSONFX_FOR_UNITY)
+			#if (USE_JSONFX_UNITY || USE_JSONFX_UNITY_IOS)
             value = ConvertHexToUnicodeChars(value);
             #endif
 
