@@ -12,8 +12,10 @@ Removes the dependency of .NET sockets.
 Implements the features of Pubnub 3.6
 
 WE have modified the JsonFX pre processor directives: Now we have 3. 
-1. ```USE_JSONFX_UNITY``` is for UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID 2. ```USE_JSONFX_UNITY_IOS``` is Unity IOS
-3. ```USE_JSONFX``` for non-unity clients.
+- ```USE_JSONFX_UNITY``` is for UNITY_STANDALONE or UNITY_WEBPLAYER or UNITY_ANDROID
+ - ```USE_JSONFX_UNITY_IOS``` is Unity IOS
+
+- ```USE_JSONFX``` for non-unity clients.
 
 If you are using the preprocessor directive for JSONFX by using the "#define" keyword, you need to set the pre processor directive in both the PubnubCore.cs and PubnubUnity.cs.
 
@@ -29,8 +31,9 @@ NOTE: The callback methods DisplayReturnMessage, DisplayConnectStatusMessage and
 ```
 
 ```
-replace USE_JSONFX with USE_JSONFX_UNITY
-and USE_JSONFX_FOR_UNITY with USE_JSONFX_UNITY_IOS
+REPLACE
+USE_JSONFX with USE_JSONFX_UNITY and 
+USE_JSONFX_FOR_UNITY with USE_JSONFX_UNITY_IOS
 ```
 
 #### Prerequisites

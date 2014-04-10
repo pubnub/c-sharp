@@ -25,8 +25,11 @@ NOTE: The callback methods DisplayReturnMessage, DisplayConnectStatusMessage and
 #### Prerequisites
 1. Install a free Full version of Unity 4 Pro from http://unity3d.com/unity/download/ (Unity 4 is recommended, but current/later versions should be ok). MonoDevelop IDE tool will be installed as part of Unity to write C# scripts.
 2. For Unity, JSONFX is needed for the serialization library. To use JSONFX we have defined 3 pre processor directives: 
-* ```USE_JSONFX_UNITY``` is for UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID * ```USE_JSONFX_UNITY_IOS``` is Unity IOS
-* ```USE_JSONFX``` for non-unity clients.
+- ```USE_JSONFX_UNITY``` is for UNITY_STANDALONE or UNITY_WEBPLAYER or UNITY_ANDROID
+ - ```USE_JSONFX_UNITY_IOS``` is Unity IOS
+
+- ```USE_JSONFX``` for non-unity clients.
+
 Please note the other serialization libraries used in the pubnub.cs class are the default from the builtin .NET class (activated when the pre-compiler directive USE_DOTNET_SERIALIZATION is used) and Newtonsoft.Json (activated when neither USE_JSONFX nor USE_DOTNET_SERIALIZATION is defined). Both of these libraries won't work with UNITY. So you need to be sure the pre-compiler variable USE_JSONFX is "defined" at the top of the pubnub.cs class (default behavior).
 
 #### To run the unit tests, in addition to the above, you need to 
