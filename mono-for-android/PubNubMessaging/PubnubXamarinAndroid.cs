@@ -1,5 +1,6 @@
-//ver3.5.1
-//Build Date: February 25, 2014
+//ver3.6
+//Build Date: Apr 7, 2014
+//#define USE_JSONFX
 using System;
 using System.Text;
 using System.Net.Security;
@@ -12,6 +13,7 @@ using System.Threading;
 using System.Security.Cryptography;
 using Javax.Net.Ssl;
 using Android.Runtime;
+using System.Linq;
 
 namespace PubNubMessaging.Core
 {
@@ -20,7 +22,7 @@ namespace PubNubMessaging.Core
 
         #region "Constants and Globals"
 
-        const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Error;
+        const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Info;
         const PubnubErrorFilter.Level errorLevel = PubnubErrorFilter.Level.Info;
         protected bool pubnubEnableProxyConfig = true;
         protected string _domainName = "pubsub.pubnub.com";
@@ -142,6 +144,7 @@ namespace PubNubMessaging.Core
         {
             string encodedUri = "";
             StringBuilder o = new StringBuilder ();
+
             foreach (char ch in s) {
                 if (IsUnsafe (ch, ignoreComma)) {
                     o.Append ('%');
@@ -169,7 +172,7 @@ namespace PubNubMessaging.Core
 
         protected override sealed void Init (string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
         {
-            #if (USE_JSONFX)
+            #if (USE_JSONFX) || (USE_JSONFX_UNITY)
 						LoggingMethod.WriteToLog ("Using USE_JSONFX", LoggingMethod.LevelInfo);
 						this.JsonPluggableLibrary = new JsonFXDotNet ();
             #elif (USE_DOTNET_SERIALIZATION)
@@ -178,7 +181,7 @@ namespace PubNubMessaging.Core
             #elif (USE_MiniJSON)
 						LoggingMethod.WriteToLog("USE_MiniJSON", LoggingMethod.LevelInfo);
 						this.JsonPluggableLibrary = new MiniJSONObjectSerializer();
-            #elif (USE_JSONFX_FOR_UNITY)
+            #elif (USE_JSONFX_UNITY_IOS)
 						LoggingMethod.WriteToLog("USE_JSONFX_FOR_UNITY", LoggingMethod.LevelInfo);
 						this.JsonPluggableLibrary = new JsonFxUnitySerializer();
             #else
@@ -191,9 +194,9 @@ namespace PubNubMessaging.Core
             base.PubnubErrorLevel = errorLevel;
 
             base.publishKey = publishKey;
-            base.subscribeKey = subscribeKey;
             base.secretKey = secretKey;
             base.cipherKey = cipherKey;
+            base.subscribeKey = subscribeKey;
             base.ssl = sslOn;
 
             base.VerifyOrSetSessionUUID ();
@@ -210,7 +213,7 @@ namespace PubNubMessaging.Core
 
         protected override bool CheckInternetConnectionStatus<T> (bool systemActive, Action<PubnubClientError> errorCallback, string[] channels)
         {
-            return ClientNetworkStatus.CheckInternetStatusUnity<T> (PubnubCore.pubnetSystemActive, errorCallback, channels, HeartbeatInterval);
+            return ClientNetworkStatus.CheckInternetStatusUnity<T> (PubnubCore.pubnetSystemActive, errorCallback, channels, base.LocalClientHeartbeatInterval);
         }
 
         public override Guid GenerateGuid ()
@@ -239,9 +242,29 @@ namespace PubNubMessaging.Core
 
         protected override void TimerWhenOverrideTcpKeepAlive<T> (Uri requestUri, RequestState<T> pubnubRequestState)
         {
-            heartBeatTimer = new Timer (new TimerCallback (OnPubnubHeartBeatTimeoutCallback<T>), pubnubRequestState, 0,
-                base.HeartbeatInterval * 1000);
-            base.channelHeartbeatTimer.AddOrUpdate (requestUri, heartBeatTimer, (key, oldState) => heartBeatTimer);
+            base.localClientHeartBeatTimer = new Timer (new TimerCallback (OnPubnubLocalClientHeartBeatTimeoutCallback<T>), pubnubRequestState, 0,
+                base.LocalClientHeartbeatInterval * 1000);
+
+            base.channelLocalClientHeartbeatTimer.AddOrUpdate (requestUri, base.localClientHeartBeatTimer, (key, oldState) => base.localClientHeartBeatTimer);
+            if (pubnubRequestState.Type == ResponseType.Presence || pubnubRequestState.Type == ResponseType.Subscribe)
+            {
+                if (presenceHeartbeatTimer != null)
+                {
+                    presenceHeartbeatTimer.Dispose();
+                    presenceHeartbeatTimer = null;
+                }
+                if (pubnubRequestState.Channels != null && pubnubRequestState.Channels.Length > 0 && pubnubRequestState.Channels.Where(s => s.Contains("-pnpres") == false).ToArray().Length > 0)
+                {
+                    RequestState<T> presenceHeartbeatState = new RequestState<T>();
+                    presenceHeartbeatState.Channels = pubnubRequestState.Channels;
+                    presenceHeartbeatState.Type = ResponseType.PresenceHeartbeat;
+                    presenceHeartbeatState.ErrorCallback = pubnubRequestState.ErrorCallback;
+                    presenceHeartbeatState.Request = null;
+                    presenceHeartbeatState.Response = null;
+
+                    presenceHeartbeatTimer = new Timer(OnPresenceHeartbeatIntervalTimeout<T>, presenceHeartbeatState, base.PresenceHeartbeatInterval * 1000, base.PresenceHeartbeatInterval * 1000);
+                }
+            }
         }
 
         #endregion
@@ -297,10 +320,25 @@ namespace PubNubMessaging.Core
                     break;
                 }
             }
+
+            //emoji fix
+            requestMessage = new StringBuilder ();
+            string[] requestUriSegments = requestUri.OriginalString.Split ('/');
+            if (requestUriSegments.Length > 9) {
+                for (int i = 9; i < requestUriSegments.Length; i++) {
+                    requestMessage.Append (requestUriSegments [i]);
+                }
+            }
+            foreach (char ch in requestMessage.ToString().ToCharArray()) {
+                if (Char.IsSurrogate (ch)) {
+                    isUnsafe = true;
+                    break;
+                } 
+            }
+
             return isUnsafe;
         }
         #endif
-
         #if (__MonoCS__ && !UNITY_ANDROID && !UNITY_IOS)
         string CreateRequest (Uri requestUri)
         {
@@ -398,8 +436,8 @@ namespace PubNubMessaging.Core
                 int bytesRead = netStream.EndRead (asynchronousResult);
 
                 if (bytesRead > 0) {
-                    asynchStateObject.sb.Append (Encoding.ASCII.GetString (asynchStateObject.buffer, 0, bytesRead));
-
+                    //asynchStateObject.sb.Append (Encoding.ASCII.GetString (asynchStateObject.buffer, 0, bytesRead));
+                    asynchStateObject.sb.Append (Encoding.UTF8.GetString (asynchStateObject.buffer, 0, bytesRead));
                     netStream.BeginRead (asynchStateObject.buffer, 0, StateObject<T>.BufferSize,
                         new AsyncCallback (ConnectToHostAndSendRequestCallback<T>), asynchStateObject);
                 } else {
@@ -430,14 +468,11 @@ namespace PubNubMessaging.Core
 
         void SendSslRequest<T> (NetworkStream netStream, TcpClient tcpClient, RequestState<T> pubnubRequestState, string requestString)
         {
-						
 #if(MONODROID || __ANDROID__)
             SslStream sslStream = new SslStream (netStream, true, Validator, null);
-						
 #elif(UNITY_ANDROID|| MONOTOUCH || __IOS__)
 						ServicePointManager.ServerCertificateValidationCallback = ValidatorUnity;
 						SslStream sslStream = new SslStream(netStream, true, ValidatorUnity, null);
-						
 #else
 						SslStream sslStream = new SslStream (netStream);
             #endif
@@ -457,9 +492,8 @@ namespace PubNubMessaging.Core
 
             sslStream.Write (sendBuffer);
             sslStream.Flush ();
-						
-#if(!MONODROID && !__ANDROID__ && !UNITY_ANDROID)
-						sslStream.ReadTimeout = state.RequestState.Request.Timeout;
+            #if(!MONODROID && !__ANDROID__ && !UNITY_ANDROID)
+			sslStream.ReadTimeout = state.RequestState.Request.Timeout;
             #endif
             sslStream.BeginRead (state.buffer, 0, state.buffer.Length, new AsyncCallback (SendRequestUsingTcpClientCallback<T>), state);
         }
@@ -577,8 +611,8 @@ namespace PubNubMessaging.Core
                     int bytesRead = netStream.EndRead (asynchronousResult);
 
                     if (bytesRead > 0) {
-                        state.sb.Append (Encoding.ASCII.GetString (state.buffer, 0, bytesRead));
-
+                        //state.sb.Append (Encoding.ASCII.GetString (state.buffer, 0, bytesRead));
+                        state.sb.Append (Encoding.UTF8.GetString (state.buffer, 0, bytesRead));
                         netStream.BeginRead (state.buffer, 0, StateObject<T>.BufferSize,
                             new AsyncCallback (SendRequestUsingTcpClientCallback<T>), state);
                     } else {
@@ -600,7 +634,7 @@ namespace PubNubMessaging.Core
                 LoggingMethod.WriteToLog (string.Format ("DateTime {0}, JSON for channel={1} ({2}) ={3}", DateTime.Now.ToString (), channel, asynchRequestState.Type.ToString (), jsonString), LoggingMethod.LevelInfo);
 
                 if (overrideTcpKeepAlive) {
-                    TerminateHeartbeatTimer (state.RequestState.Request.RequestUri);
+                    TerminateLocalClientHeartbeatTimer (state.RequestState.Request.RequestUri);
                 }
 
                 if (jsonString != null && !string.IsNullOrEmpty (jsonString) && !string.IsNullOrEmpty (channel.Trim ())) {
@@ -712,6 +746,16 @@ namespace PubNubMessaging.Core
         {
             req.KeepAlive = keepAliveRequest;
             req.UserAgent = string.Format ("ua_string=({0}) PubNub-csharp/3.5", userOS.VersionString);
+            return req;
+        }
+
+        protected override HttpWebRequest SetNoCache(HttpWebRequest req, bool nocache)
+        {
+            if (nocache)
+            {
+                req.Headers["Cache-Control"] = "no-cache";
+                req.Headers["Pragma"] = "no-cache";
+            }
             return req;
         }
     }

@@ -1,22 +1,15 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Pubnub/PubnubCore.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/PubnubExample.cs">
     <Files>
-      <File FileName="Assets/Pubnub/PubnubCore.cs" Line="2932" Column="5" />
-      <File FileName="Assets/Pubnub/PubnubUnity.cs" Line="1" Column="1" />
-      <File FileName="Assets/PubnubExample.cs" Line="1" Column="1" />
+      <File FileName="Assets/Pubnub/PubnubUnity.cs" Line="94" Column="68" />
+      <File FileName="Assets/PubnubExample.cs" Line="939" Column="1" />
+      <File FileName="Assets/Pubnub/Pubnub.cs" Line="1" Column="1" />
+      <File FileName="Assets/Editor/WhenAClientIsPresented.cs" Line="612" Column="80" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/Unity/3.5/Unity with www/PubnubUnity/Assets/Pubnub/PubnubCore.cs" line="3530" column="1" />
-      <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/Unity/3.5/Unity-IOS-refactored/PubnubUnity/Assets/Pubnub/PubnubUnityiOS.cs" line="139" column="1" />
-      <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/Unity/3.5/Unity with www/PubnubUnity/Assets/Pubnub/PubnubUnity.cs" line="138" column="1" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches>
-    <Watch file="../../../../../../../../../../../../Users/rajat/Projects/3.4/PubNub-Messaging/PubNub-Console/PubnubExample.cs" line="436" offsetX="693" offsetY="6525" expression="lst" liveUpdate="False" />
-    <Watch file="../../../../../../../../../../../../Users/rajat/Projects/pubnub/PubNub-Messaging-baseclass/PubNubTest/WhenDetailedHistoryIsRequested.cs" line="71" offsetX="612" offsetY="1050" expression="commonResponse" liveUpdate="False" />
-    <Watch file="../../../../../../../../../../../../Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNubTest/WhenSubscribedToAChannel.cs" line="57" offsetX="591" offsetY="810" expression="myObjectArray" liveUpdate="False" />
-  </MonoDevelop.Ide.DebuggingService.PinnedWatches>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

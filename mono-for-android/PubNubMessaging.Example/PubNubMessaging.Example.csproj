@@ -54,7 +54,7 @@
     <Compile Include="MainActivity.cs" />
     <Compile Include="LaunchScreen.cs" />
     <Compile Include="GrantDialogFragment.cs" />
-    <Compile Include="AuthDialogFragment.cs" />
+    <Compile Include="CommonDialogFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
