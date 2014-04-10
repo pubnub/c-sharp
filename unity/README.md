@@ -24,7 +24,8 @@ NOTE: The callback methods DisplayReturnMessage, DisplayConnectStatusMessage and
 
 #### Prerequisites
 1. Install a free Full version of Unity 4 Pro from http://unity3d.com/unity/download/ (Unity 4 is recommended, but current/later versions should be ok). MonoDevelop IDE tool will be installed as part of Unity to write C# scripts.
-2. For Unity, JSONFX is needed for the serialization library. To use JSONFX we have defined 3 pre processor directives: 
+2. For Unity, JSONFX is needed for the serialization library. To use JSONFX we have defined 3 pre processor directives
+
 - `USE_JSONFX_UNITY` is for UNITY_STANDALONE or UNITY_WEBPLAYER or UNITY_ANDROID
 
 - `USE_JSONFX` for non-unity clients.
