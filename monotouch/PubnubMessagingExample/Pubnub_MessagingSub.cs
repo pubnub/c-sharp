@@ -424,10 +424,17 @@ namespace PubnubMessagingExample
 
             if (showEntryText3) {
                 entryText3 = new EntryElement (elementText3, elementSubText3, "");
+                entryText3.AutocapitalizationType = UITextAutocapitalizationType.None;
+                entryText3.AutocorrectionType = UITextAutocorrectionType.No;
             }
 
             EntryElement entryText1 = new EntryElement (elementText1, elementSubText1, "");
+            entryText1.AutocapitalizationType = UITextAutocapitalizationType.None;
+            entryText1.AutocorrectionType = UITextAutocorrectionType.No;
+
             EntryElement entryText2 = new EntryElement (elementText2, elementSubText2, "");
+            entryText2.AutocapitalizationType = UITextAutocapitalizationType.None;
+            entryText2.AutocorrectionType = UITextAutocorrectionType.No;
 
             var newroot = new RootElement (strHead, 0, 0){
                 new Section (){
@@ -583,6 +590,8 @@ namespace PubnubMessagingExample
             if (showEntryText) {
                 entryText = new EntryElement (elementText3, elementSubText, "");
                 entryText.KeyboardType = keyboardType;
+                entryText.AutocapitalizationType = UITextAutocapitalizationType.None;
+                entryText.AutocorrectionType = UITextAutocorrectionType.No;
             }
 
             var newroot = new RootElement (strHead, 0, 0){

@@ -1,9 +1,14 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhone" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneDeviceTarget" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="PubnubMessagingExample/Pubnub_MessagingSub.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="PubnubMessagingExample/Pubnub_MessagingMain.cs">
     <Files>
-      <File FileName="PubnubMessagingExample/Pubnub_MessagingSub.cs" Line="613" Column="73" />
-      <File FileName="../../../Xamarin.Android/3.5/Pubnub-Messaging/PubNubMessaging.Example/MainActivity.cs" Line="537" Column="1" />
+      <File FileName="../../../Xamarin.Android/3.5/Pubnub-Messaging/PubNubMessaging.Example/MainActivity.cs" Line="1" Column="1" />
+      <File FileName="PubnubMessaging.Tests/WhenAClientIsPresented.cs" Line="634" Column="66" />
+      <File FileName="PubnubMessaging.Tests/WhenSubscribedToAChannel3.cs" Line="32" Column="42" />
+      <File FileName="PubnubMessaging.Tests/WhenDetailedHistoryIsRequested.cs" Line="498" Column="44" />
+      <File FileName="PubnubMessaging.Tests/Common.cs" Line="122" Column="4" />
+      <File FileName="PubnubMessaging.Tests/WhenSubscribedToAChannel.cs" Line="187" Column="94" />
+      <File FileName="PubnubMessagingExample/Pubnub_MessagingMain.cs" Line="182" Column="53" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
@@ -12,10 +17,10 @@
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <MonoDevelop.Ide.ItemProperties.PubnubMessagingExample>
-    <MonoDevelop.MacDev.AppleDevelopmentTeam DeveloperId="NK6E38LY64" TeamId="Y9X42V6EK7" />
-  </MonoDevelop.Ide.ItemProperties.PubnubMessagingExample>
   <MonoDevelop.Ide.ItemProperties.Touch.Unit>
     <MonoDevelop.MacDev.AppleDevelopmentTeam DeveloperId="NK6E38LY64" TeamId="Y9X42V6EK7" />
   </MonoDevelop.Ide.ItemProperties.Touch.Unit>
+  <MonoDevelop.Ide.ItemProperties.PubnubMessagingExample>
+    <MonoDevelop.MacDev.AppleDevelopmentTeam DeveloperId="NK6E38LY64" TeamId="Y9X42V6EK7" />
+  </MonoDevelop.Ide.ItemProperties.PubnubMessagingExample>
 </Properties>
