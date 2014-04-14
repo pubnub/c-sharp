@@ -1,9 +1,10 @@
-//Build Date: April 04, 2014
+//Build Date: April 08, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX_UNITY
 #elif (UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
+//#define USE_MiniJSON
 #endif
 #if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
 #define TRACE
@@ -74,7 +75,7 @@ namespace PubNubMessaging.Core
 		int _pubnubNetworkCheckRetries = 50;
 		int _pubnubWebRequestRetryIntervalInSeconds = 10;
 		int _pubnubPresenceHeartbeatInSeconds = 63;
-		int _presenceHeartbeatIntervalInSeconds = 60;
+		int _presenceHeartbeatIntervalInSeconds = 30;
 		bool _enableResumeOnReconnect = true;
 		bool _uuidChanged = false;
 		protected bool overrideTcpKeepAlive = true;
@@ -268,7 +269,10 @@ namespace PubNubMessaging.Core
 				} else {
 					_pubnubPresenceHeartbeatInSeconds = value;
 				}
-				_presenceHeartbeatIntervalInSeconds = _pubnubPresenceHeartbeatInSeconds - 3;
+				if (_pubnubPresenceHeartbeatInSeconds != 0)
+				{
+					_presenceHeartbeatIntervalInSeconds = (_pubnubPresenceHeartbeatInSeconds / 2) - 1;
+				}
 			}
 		}
 
@@ -279,8 +283,9 @@ namespace PubNubMessaging.Core
 			
 			set {
 				_presenceHeartbeatIntervalInSeconds = value;
-				if (_presenceHeartbeatIntervalInSeconds > _pubnubPresenceHeartbeatInSeconds - 3) {
-					_presenceHeartbeatIntervalInSeconds = _pubnubPresenceHeartbeatInSeconds - 3;
+				if (_presenceHeartbeatIntervalInSeconds > _pubnubPresenceHeartbeatInSeconds - 3 && _pubnubPresenceHeartbeatInSeconds > 0) 
+				{
+						_presenceHeartbeatIntervalInSeconds = (_pubnubPresenceHeartbeatInSeconds / 2) - 1;
 				}
 			}
 		}

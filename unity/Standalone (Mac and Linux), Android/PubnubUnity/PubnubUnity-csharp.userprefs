@@ -1,15 +1,18 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/PubnubExample.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Pubnub/PubnubCore.cs">
     <Files>
-      <File FileName="Assets/Pubnub/PubnubUnity.cs" Line="94" Column="68" />
-      <File FileName="Assets/PubnubExample.cs" Line="939" Column="1" />
-      <File FileName="Assets/Pubnub/Pubnub.cs" Line="1" Column="1" />
-      <File FileName="Assets/Editor/WhenAClientIsPresented.cs" Line="612" Column="80" />
+      <File FileName="Assets/Pubnub/PubnubUnity.cs" Line="355" Column="115" />
+      <File FileName="Assets/PubnubExample.cs" Line="677" Column="25" />
+      <File FileName="Assets/Pubnub/Pubnub.cs" Line="333" Column="37" />
+      <File FileName="Assets/Editor/WhenAClientIsPresented.cs" Line="1" Column="1" />
+      <File FileName="Assets/Pubnub/PubnubCore.cs" Line="109" Column="48" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/Unity/3.5/Unity-jsonfx-fix/PubnubUnity/Assets/Pubnub/PubnubCore.cs" line="288" column="1" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>
