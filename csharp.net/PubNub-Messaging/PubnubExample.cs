@@ -835,7 +835,7 @@ namespace PubNubMessaging.Core
 
                         Console.WriteLine("NOTE: Hopefully you added local user state.");
                         Console.WriteLine("If you want to consider already created local user state, press ENTER");
-                        Console.WriteLine("Else enter user state in json format (Eg. {\"channel\":{\"key1\":\"value1\",\"key2\":\"value2\"}}");
+                        Console.WriteLine("Else enter user state in json format (Eg. {\"key1\":\"value1\",\"key2\":\"value2\"}");
                         string manualJsonUserState = Console.ReadLine();
 
                         string jsonUserState = "";
