@@ -16,20 +16,14 @@ namespace PubnubSilverlight.UnitTest
     [TestClass]
     public class WhenUnsubscribedToAChannel : SilverlightTest
     {
-        ManualResetEvent meNotSubscribed = new ManualResetEvent(false);
-        ManualResetEvent meChannelSubscribed = new ManualResetEvent(false);
-        ManualResetEvent meChannelUnsubscribed = new ManualResetEvent(false);
-        ManualResetEvent grantManualEvent = new ManualResetEvent(false);
+        ManualResetEvent mreSubscribe = new ManualResetEvent(false);
+        ManualResetEvent mreUnsubscribe = new ManualResetEvent(false);
+        ManualResetEvent mreGrant = new ManualResetEvent(false);
 
         bool receivedNotSubscribedMessage = false;
         bool receivedUnsubscribedMessage = false;
         bool receivedChannelConnectedMessage = false;
         bool receivedGrantMessage = false;
-
-        bool grantInitInvoked = false;
-        bool nochannelUnsubscribeInvoked = false;
-        bool unsubscribeDisconnectInvoked = false;
-        bool subscribeConnectInvoked = false;
 
         [ClassInitialize, Asynchronous]
         public void Init()
@@ -42,40 +36,50 @@ namespace PubnubSilverlight.UnitTest
 
             receivedGrantMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "GrantRequestUnitTest";
-            unitTest.TestCaseName = "Init";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "GrantRequestUnitTest";
+                    unitTest.TestCaseName = "Init";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "hello_my_channel";
+                    string channel = "hello_my_channel";
 
-            EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, true, 20, ThenUnsubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback));
-            EnqueueConditional(() => grantInitInvoked);
-            EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenUnsubscribedToAChannel Grant access failed."));
-            EnqueueTestComplete();
+                    EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, true, 20, ThenUnsubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback));
+                    mreGrant.WaitOne(310 * 1000);
+                    //EnqueueConditional(() => grantInitInvoked);
+                    EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenUnsubscribedToAChannel Grant access failed."));
+                    EnqueueTestComplete();
+                });
         }
 
         [TestMethod, Asynchronous]
         public void ThenNoExistChannelShouldReturnNotSubscribed()
         {
             receivedNotSubscribedMessage = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            mreUnsubscribe = new ManualResetEvent(false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenUnsubscribedToAChannel";
-            unitTest.TestCaseName = "ThenNoExistChannelShouldReturnNotSubscribed";
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenUnsubscribedToAChannel";
+                    unitTest.TestCaseName = "ThenNoExistChannelShouldReturnNotSubscribed";
 
-            string channel = "hello_my_channel";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            EnqueueCallback(() => pubnub.Unsubscribe<string>(channel, DummyMethodNoExistChannelUnsubscribeChannelUserCallback, DummyMethodNoExistChannelUnsubscribeChannelConnectCallback, DummyMethodNoExistChannelUnsubscribeChannelDisconnectCallback1, NoExistChannelErrorCallback));
-            EnqueueConditional(() => nochannelUnsubscribeInvoked);
-            EnqueueCallback(() => pubnub.EndPendingRequests());
-            EnqueueCallback(() => Assert.IsTrue(receivedNotSubscribedMessage, "WhenUnsubscribedToAChannel --> ThenNoExistChannelShouldReturnNotSubscribed Failed"));
-            EnqueueTestComplete();
+                    string channel = "hello_my_channel";
+
+                    EnqueueCallback(() => pubnub.Unsubscribe<string>(channel, DummyMethodNoExistChannelUnsubscribeChannelUserCallback, DummyMethodNoExistChannelUnsubscribeChannelConnectCallback, DummyMethodNoExistChannelUnsubscribeChannelDisconnectCallback1, NoExistChannelErrorCallback));
+                    mreUnsubscribe.WaitOne(310 * 1000);
+                    //EnqueueConditional(() => nochannelUnsubscribeInvoked);
+                    EnqueueCallback(() => pubnub.EndPendingRequests());
+                    EnqueueCallback(() => Assert.IsTrue(receivedNotSubscribedMessage, "WhenUnsubscribedToAChannel --> ThenNoExistChannelShouldReturnNotSubscribed Failed"));
+                    EnqueueTestComplete();
+                });
         }
 
         [TestMethod, Asynchronous]
@@ -84,26 +88,34 @@ namespace PubnubSilverlight.UnitTest
             receivedChannelConnectedMessage = false;
             receivedUnsubscribedMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            mreSubscribe = new ManualResetEvent(false);
+            mreUnsubscribe = new ManualResetEvent(false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenUnsubscribedToAChannel";
-            unitTest.TestCaseName = "ThenShouldReturnUnsubscribedMessage";
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenUnsubscribedToAChannel";
+                    unitTest.TestCaseName = "ThenShouldReturnUnsubscribedMessage";
 
-            string channel = "hello_my_channel";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            EnqueueCallback(() => pubnub.Subscribe<string>(channel, DummyMethodChannelSubscribeUserCallback, DummyMethodChannelSubscribeConnectCallback, DummyErrorCallback));
-            EnqueueConditional(() => subscribeConnectInvoked);
+                    string channel = "hello_my_channel";
 
-            EnqueueConditional(() => receivedChannelConnectedMessage);
-            EnqueueCallback(() => pubnub.Unsubscribe<string>(channel, DummyMethodUnsubscribeChannelUserCallback, DummyMethodUnsubscribeChannelConnectCallback, DummyMethodUnsubscribeChannelDisconnectCallback, DummyErrorCallback));
-            EnqueueConditional(() => unsubscribeDisconnectInvoked);
+                    EnqueueCallback(() => pubnub.Subscribe<string>(channel, DummyMethodChannelSubscribeUserCallback, DummyMethodChannelSubscribeConnectCallback, DummyErrorCallback));
+                    mreSubscribe.WaitOne(310 * 1000);
+                    //EnqueueConditional(() => subscribeConnectInvoked);
 
-            EnqueueCallback(() => pubnub.EndPendingRequests());
-            EnqueueCallback(() => Assert.IsTrue(receivedUnsubscribedMessage, "WhenUnsubscribedToAChannel --> ThenShouldReturnUnsubscribedMessage Failed"));
-            EnqueueTestComplete();
+                    //EnqueueConditional(() => receivedChannelConnectedMessage);
+                    EnqueueCallback(() => pubnub.Unsubscribe<string>(channel, DummyMethodUnsubscribeChannelUserCallback, DummyMethodUnsubscribeChannelConnectCallback, DummyMethodUnsubscribeChannelDisconnectCallback, DummyErrorCallback));
+                    mreUnsubscribe.WaitOne(310 * 1000);
+                    //EnqueueConditional(() => unsubscribeDisconnectInvoked);
+
+                    EnqueueCallback(() => pubnub.EndPendingRequests());
+                    EnqueueCallback(() => Assert.IsTrue(receivedChannelConnectedMessage && receivedUnsubscribedMessage, "WhenUnsubscribedToAChannel --> ThenShouldReturnUnsubscribedMessage Failed"));
+                    EnqueueTestComplete();
+                });
         }
 
         [Asynchronous]
@@ -124,7 +136,8 @@ namespace PubnubSilverlight.UnitTest
             }
             catch { }
 
-            grantInitInvoked = true;
+            //grantInitInvoked = true;
+            mreGrant.Set();
         }
 
         [Asynchronous]
@@ -139,7 +152,8 @@ namespace PubnubSilverlight.UnitTest
             {
                 receivedChannelConnectedMessage = true;
             }
-            subscribeConnectInvoked = true;
+            //subscribeConnectInvoked = true;
+            mreSubscribe.Set();
         }
 
 
@@ -160,7 +174,8 @@ namespace PubnubSilverlight.UnitTest
             {
                 receivedUnsubscribedMessage = true;
             }
-            unsubscribeDisconnectInvoked = true;
+            //unsubscribeDisconnectInvoked = true;
+            mreUnsubscribe.Set();
         }
 
         [Asynchronous]
@@ -190,7 +205,8 @@ namespace PubnubSilverlight.UnitTest
             {
                 receivedNotSubscribedMessage = true;
             }
-            nochannelUnsubscribeInvoked = true;
+            //nochannelUnsubscribeInvoked = true;
+            mreUnsubscribe.Set();
         }
     }
 }

@@ -17,23 +17,30 @@ namespace PubnubSilverlight.UnitTest
     [TestClass]
     public class WhenGetRequestServerTime : SilverlightTest
     {
-        bool isTimeStamp = false;
+        //bool isTimeStamp = false;
         bool timeReceived = false;
+        ManualResetEvent mreTime = new ManualResetEvent(false);
 
         [TestMethod]
         [Asynchronous]
         public void ThenItShouldReturnTimeStamp()
         {
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGetRequestServerTime";
-            unitTest.TestCaseName = "ThenItShouldReturnTimeStamp";
-            pubnub.PubnubUnitTest = unitTest;
+            mreTime = new ManualResetEvent(false);
 
-            EnqueueCallback(() => pubnub.Time<string>(ReturnTimeStampCallback, DummyErrorCallback));
-            EnqueueConditional(() => isTimeStamp);
-            EnqueueCallback(() => Assert.IsTrue(timeReceived, "time() Failed"));
-            EnqueueTestComplete();
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenGetRequestServerTime";
+                    unitTest.TestCaseName = "ThenItShouldReturnTimeStamp";
+                    pubnub.PubnubUnitTest = unitTest;
+
+                    EnqueueCallback(() => pubnub.Time<string>(ReturnTimeStampCallback, DummyErrorCallback));
+                    //EnqueueConditional(() => isTimeStamp);
+                    mreTime.WaitOne(310 * 1000);
+                    EnqueueCallback(() => Assert.IsTrue(timeReceived, "time() Failed"));
+                    EnqueueTestComplete();
+                });
         }
 
         [Asynchronous]
@@ -51,7 +58,8 @@ namespace PubnubSilverlight.UnitTest
                     }
                 }
             }
-            isTimeStamp = true;
+            //isTimeStamp = true;
+            mreTime.Set();
         }
 
         [Asynchronous]
