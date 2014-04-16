@@ -2233,60 +2233,63 @@ namespace PubNubMessaging.Core
 			return builder.ToString ();
 		}
 
-		internal void SetUserState<T> (string channel, string uuid, string jsonUserState, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			if (string.IsNullOrEmpty (channel) || string.IsNullOrEmpty (channel.Trim ())) {
-				throw new ArgumentException ("Missing Channel");
-			}
-			if (string.IsNullOrEmpty (jsonUserState) || string.IsNullOrEmpty (jsonUserState.Trim ())) {
-				throw new ArgumentException ("Missing User State");
-			}
-			if (userCallback == null) {
-				throw new ArgumentException ("Missing userCallback");
-			}
-			if (errorCallback == null) {
-				throw new ArgumentException ("Missing errorCallback");
-			}
-			if (_jsonPluggableLibrary == null) {
-				throw new NullReferenceException ("Missing Json Pluggable Library for Pubnub Instance");
-			}
+        internal void SetUserState<T>(string channel, string uuid, string jsonUserState, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()))
+            {
+                throw new ArgumentException("Missing Channel");
+            }
+            if (string.IsNullOrEmpty(jsonUserState) || string.IsNullOrEmpty(jsonUserState.Trim()))
+            {
+                throw new ArgumentException("Missing User State");
+            }
+            if (userCallback == null)
+            {
+                throw new ArgumentException("Missing userCallback");
+            }
+            if (errorCallback == null)
+            {
+                throw new ArgumentException("Missing errorCallback");
+            }
+            if (_jsonPluggableLibrary == null)
+            {
+                throw new NullReferenceException("Missing Json Pluggable Library for Pubnub Instance");
+            }
 
-			if (!_jsonPluggableLibrary.IsDictionaryCompatible (jsonUserState)) {
-				throw new MissingFieldException ("Missing json format for user state");
-			} else {
-				Dictionary<string, object> deserializeUserState = _jsonPluggableLibrary.DeserializeToDictionaryOfObject (jsonUserState);
-				if (deserializeUserState == null) {
-					throw new MissingFieldException ("Missing json format user state");
-				} else {
-					string channelInState = deserializeUserState.Keys.First<string> ();
+            if (!_jsonPluggableLibrary.IsDictionaryCompatible(jsonUserState))
+            {
+                throw new MissingFieldException("Missing json format for user state");
+            }
+            else
+            {
+                Dictionary<string, object> deserializeUserState = _jsonPluggableLibrary.DeserializeToDictionaryOfObject(jsonUserState);
+                if (deserializeUserState == null)
+                {
+                    throw new MissingFieldException("Missing json format user state");
+                }
+                else
+                {
+                    _channelUserState.AddOrUpdate(channel.Trim(), deserializeUserState, (oldState, newState) => deserializeUserState);
+                }
+            }
 
-					if (deserializeUserState [channelInState] != null) {
-						//string jsonState = (deserializeUserState [channelInState] != null) ? deserializeUserState [channelInState].ToString () : "";
-						Dictionary<string, object> stateDictionary = deserializeUserState [channelInState] as Dictionary<string, object>;//_jsonPluggableLibrary.DeserializeToDictionaryOfObject (jsonState);
-						if (stateDictionary != null) {
-							_channelUserState.AddOrUpdate (channelInState, stateDictionary, (oldState, newState) => stateDictionary);
-						}
-					}
-				}
-			}
+            if (string.IsNullOrEmpty(uuid))
+            {
+                VerifyOrSetSessionUUID();
+                uuid = this.sessionUUID;
+            }
 
-			if (string.IsNullOrEmpty (uuid)) {
-				VerifyOrSetSessionUUID ();
-				uuid = this.sessionUUID;
-			}
+            Uri request = BuildSetUserStateRequest(channel, uuid, jsonUserState);
 
-			Uri request = BuildSetUserStateRequest (channel, uuid, jsonUserState);
+            RequestState<T> requestState = new RequestState<T>();
+            requestState.Channels = new string[] { channel };
+            requestState.Type = ResponseType.SetUserState;
+            requestState.UserCallback = userCallback;
+            requestState.ErrorCallback = errorCallback;
+            requestState.Reconnect = false;
 
-			RequestState<T> requestState = new RequestState<T> ();
-			requestState.Channels = new string[] { channel };
-			;
-			requestState.Type = ResponseType.SetUserState;
-			requestState.UserCallback = userCallback;
-			requestState.ErrorCallback = errorCallback;
-			requestState.Reconnect = false;
-
-			UrlProcessRequest<T> (request, requestState);
-		}
+            UrlProcessRequest<T>(request, requestState);
+        }
 
 		internal void GetUserState<T> (string channel, string uuid, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
