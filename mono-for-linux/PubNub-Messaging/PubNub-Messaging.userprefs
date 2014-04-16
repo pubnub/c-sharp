@@ -1,21 +1,21 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="PubNub-Console/Pubnub/PubnubMonoMac.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="PubNub-Console/Pubnub/PubnubCore.cs">
     <Files>
-      <File FileName="PubNubTest/CleanupGrant.cs" Line="7" Column="24" />
-      <File FileName="PubNubTest/WhenAClientIsPresented.cs" Line="237" Column="66" />
-      <File FileName="PubNub-Console/Pubnub/PubnubCore.cs" Line="1" Column="1" />
-      <File FileName="PubNub-Console/Pubnub/PubnubMonoMac.cs" Line="329" Column="10" />
+      <File FileName="PubNub-Console/Pubnub/PubnubCore.cs" Line="221" Column="11" />
+      <File FileName="PubNub-Console/PubnubExample.cs" Line="665" Column="1" />
+      <File FileName="PubNubTest/Common.cs" Line="1" Column="21" />
+      <File FileName="PubNub-Console/Pubnub/Pubnub.cs" Line="332" Column="30" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="PubNub-Messaging" expanded="True">
-            <Node name="Pubnub" expanded="True">
-              <Node name="PubnubMonoMac.cs" selected="True" />
-            </Node>
+            <Node name="Pubnub" expanded="True" />
           </Node>
-          <Node name="PubNub-Messaging.Tests" expanded="True" />
+          <Node name="PubNub-Messaging.Tests" expanded="True" selected="True">
+            <Node name="References" expanded="True" />
+          </Node>
         </State>
       </Pad>
       <Pad Id="ClassPad">
@@ -27,8 +27,9 @@
       <Pad Id="MonoDevelop.NUnit.TestPad">
         <State expanded="True">
           <Node name="PubNub-Messaging.Tests" expanded="True">
-            <Node name="PubNubMessaging" expanded="True">
+            <Node name="PubNubMessaging" expanded="True" selected="True">
               <Node name="Tests" expanded="True">
+                <Node name="CleanupGrantAtChannelLevel" expanded="True" />
                 <Node name="WhenUnsubscribedToAChannel" expanded="True" />
               </Node>
             </Node>
@@ -38,7 +39,9 @@
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/home/rajat/Projects/pubnub/36/mono-for-linux/PubNub-Messaging/PubNub-Console/Pubnub/PubnubCore.cs" line="284" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches>
     <Watch file="../../3.4/PubNub-Messaging/PubNub-Console/PubnubExample.cs" line="436" offsetX="693" offsetY="6525" expression="lst" liveUpdate="False" />
