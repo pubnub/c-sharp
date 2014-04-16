@@ -23,6 +23,7 @@ namespace PubnubSilverlight.UnitTest
 
         ManualResetEvent mreDetailedHistory = new ManualResetEvent(false);
         ManualResetEvent mrePublish = new ManualResetEvent(false);
+        ManualResetEvent mreGrant = new ManualResetEvent(false);
 
         int expectedCountAtStartTimeWithReverseTrue=0;
         long startTimeWithReverseTrue = 0;
@@ -43,20 +44,23 @@ namespace PubnubSilverlight.UnitTest
 
             receivedGrantMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "GrantRequestUnitTest";
-            unitTest.TestCaseName = "Init";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "GrantRequestUnitTest";
+                    unitTest.TestCaseName = "Init";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "hello_my_channel";
+                    string channel = "hello_my_channel";
 
-            EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, true, 20, ThenDetailedHistoryInitializeShouldReturnGrantMessage, DummyErrorCallback));
-            //Thread.Sleep(1000);
-            EnqueueConditional(() => grantInitCallbackInvoked);
-            EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenDetailedHistoryIsRequested Grant access failed."));
-            EnqueueTestComplete();
+                    EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, true, 20, ThenDetailedHistoryInitializeShouldReturnGrantMessage, DummyErrorCallback));
+                    mreGrant.WaitOne(310 * 1000);
+
+                    EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenDetailedHistoryIsRequested Grant access failed."));
+                    EnqueueTestComplete();
+                });
         }
 
         [Asynchronous]
@@ -78,7 +82,7 @@ namespace PubnubSilverlight.UnitTest
             catch { }
             finally
             {
-                grantInitCallbackInvoked = true;
+                mreGrant.Set();
             }
         }
 
@@ -100,7 +104,7 @@ namespace PubnubSilverlight.UnitTest
 
                     EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, 10, DetailedHistoryCount10Callback, DummyErrorCallback));
                     mreDetailedHistory.WaitOne(310 * 1000);
-                    //EnqueueConditional(() => detailedHistoryCount10CallbackInvoked);
+                    
                     EnqueueCallback(() => Assert.IsTrue(message10Received, "Detailed History Failed"));
                     EnqueueTestComplete();
                 });
@@ -126,7 +130,6 @@ namespace PubnubSilverlight.UnitTest
                 }
             }
 
-            //detailedHistoryCount10CallbackInvoked = true;
             mreDetailedHistory.Set();
         }
 
@@ -147,7 +150,6 @@ namespace PubnubSilverlight.UnitTest
                     pubnub.PubnubUnitTest = unitTest;
 
                     EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, -1, 10, true, DetailedHistoryCount10ReverseTrueCallback, DummyErrorCallback));
-                    //EnqueueConditional(() => detailedHistoryCount10ReverseCallbackInvoked);
                     mreDetailedHistory.WaitOne(310 * 1000);
                     EnqueueCallback(() => Assert.IsTrue(message10ReverseTrueReceived, "Detailed History Failed"));
                     EnqueueTestComplete();
@@ -173,15 +175,12 @@ namespace PubnubSilverlight.UnitTest
                 }
             }
 
-            //detailedHistoryCount10ReverseCallbackInvoked = true;
             mreDetailedHistory.Set();
         }
 
         [TestMethod, Asynchronous]
         public void DetailedHistoryStartWithReverseTrue()
         {
-            //detailedHistoryPublishCallbackInvoked = false;
-            //isDetailedHistoryStartReverseTrue = false;
             mreDetailedHistory = new ManualResetEvent(false);
 
             expectedCountAtStartTimeWithReverseTrue = 0;
@@ -205,17 +204,13 @@ namespace PubnubSilverlight.UnitTest
                         EnqueueCallback(() => pubnub.Publish<string>(channel,
                                             string.Format("DetailedHistoryStartTimeWithReverseTrue {0}", index),
                                             DetailedHistorySamplePublishCallback, DummyErrorCallback));
-                        //EnqueueCallback(() => Thread.Sleep(100));
                         mrePublish.WaitOne(310 * 1000);
-                        //EnqueueConditional(() => detailedHistoryPublishCallbackInvoked);
                     }
 
 
                     EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, startTimeWithReverseTrue, DetailedHistoryStartWithReverseTrueCallback, DummyErrorCallback, true));
-                    //EnqueueConditional(() => isDetailedHistoryStartReverseTrue);
                     mreDetailedHistory.WaitOne(310 * 1000);
                     EnqueueCallback(() => Assert.IsTrue(messageStartReverseTrue, "Detailed History with Start and Reverse True Failed"));
-                    //  });
                     EnqueueTestComplete();
                 });
         }
@@ -249,7 +244,6 @@ namespace PubnubSilverlight.UnitTest
                     }
                 }
             }
-            //isDetailedHistoryStartReverseTrue = true;
             mreDetailedHistory.Set();
         }
 
@@ -269,15 +263,12 @@ namespace PubnubSilverlight.UnitTest
                     }
                 }
             }
-            //detailedHistoryPublishCallbackInvoked = true;
             mrePublish.Set();
         }
 
         [Asynchronous]
         private void DummyErrorCallback(PubnubClientError result)
         {
-            //detailedHistoryPublishCallbackInvoked = true;
-            //isDetailedHistoryStartReverseTrue = true;
             if (result != null)
             {
                 Console.WriteLine(result.Description);

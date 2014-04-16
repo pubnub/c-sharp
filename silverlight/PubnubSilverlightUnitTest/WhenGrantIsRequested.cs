@@ -16,8 +16,8 @@ namespace PubnubSilverlight.UnitTest
     [TestClass]
     public class WhenGrantIsRequested : SilverlightTest
     {
-
         ManualResetEvent mreGrant = new ManualResetEvent(false);
+
         bool receivedGrantMessage = false;
         bool receivedRevokeMessage = false;
         int multipleChannelGrantCount = 5;
@@ -27,7 +27,6 @@ namespace PubnubSilverlight.UnitTest
         [TestMethod, Asynchronous]
         public void ThenSubKeyLevelWithReadWriteShouldReturnSuccess()
         {
-            //grantAccessCallbackInvoked = false;
             currentUnitTestCase = "ThenSubKeyLevelWithReadWriteShouldReturnSuccess";
             mreGrant = new ManualResetEvent(false);
 
@@ -58,8 +57,6 @@ namespace PubnubSilverlight.UnitTest
         [TestMethod, Asynchronous]
         public void ThenSubKeyLevelWithReadShouldReturnSuccess()
         {
-            //grantAccessCallbackInvoked = false;
-
             currentUnitTestCase = "ThenSubKeyLevelWithReadShouldReturnSuccess";
             mreGrant = new ManualResetEvent(false);
 
@@ -90,8 +87,6 @@ namespace PubnubSilverlight.UnitTest
         [TestMethod, Asynchronous]
         public void ThenSubKeyLevelWithWriteShouldReturnSuccess()
         {
-            //grantAccessCallbackInvoked = false;
-
             currentUnitTestCase = "ThenSubKeyLevelWithWriteShouldReturnSuccess";
             mreGrant = new ManualResetEvent(false);
 
@@ -122,8 +117,6 @@ namespace PubnubSilverlight.UnitTest
         [TestMethod, Asynchronous]
         public void ThenChannelLevelWithReadWriteShouldReturnSuccess()
         {
-            //grantAccessCallbackInvoked = false;
-
             currentUnitTestCase = "ThenChannelLevelWithReadWriteShouldReturnSuccess";
 
             receivedGrantMessage = false;
@@ -144,8 +137,6 @@ namespace PubnubSilverlight.UnitTest
                         EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback));
                         mreGrant.WaitOne(310 * 1000);
 
-                        //EnqueueConditional(() => grantAccessCallbackInvoked);
-
                         EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithReadWriteShouldReturnSuccess failed."));
                     }
                     else
@@ -159,8 +150,6 @@ namespace PubnubSilverlight.UnitTest
         [TestMethod, Asynchronous]
         public void ThenChannelLevelWithReadShouldReturnSuccess()
         {
-            //grantAccessCallbackInvoked = false;
-
             currentUnitTestCase = "ThenChannelLevelWithReadShouldReturnSuccess";
 
             receivedGrantMessage = false;
@@ -181,8 +170,6 @@ namespace PubnubSilverlight.UnitTest
                         EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, false, 5, AccessToChannelLevelCallback, DummyErrorCallback));
                         mreGrant.WaitOne(310 * 1000);
 
-                        //EnqueueConditional(() => grantAccessCallbackInvoked);
-
                         EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithReadShouldReturnSuccess failed."));
                     }
                     else
@@ -196,8 +183,6 @@ namespace PubnubSilverlight.UnitTest
         [TestMethod, Asynchronous]
         public void ThenChannelLevelWithWriteShouldReturnSuccess()
         {
-            //grantAccessCallbackInvoked = false;
-
             currentUnitTestCase = "ThenChannelLevelWithWriteShouldReturnSuccess";
 
             receivedGrantMessage = false;
@@ -218,8 +203,6 @@ namespace PubnubSilverlight.UnitTest
                         EnqueueCallback(() => pubnub.GrantAccess<string>(channel, false, true, 5, AccessToChannelLevelCallback, DummyErrorCallback));
                         mreGrant.WaitOne(310 * 1000);
 
-                        //EnqueueConditional(() => grantAccessCallbackInvoked);
-
                         EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithWriteShouldReturnSuccess failed."));
                     }
                     else
@@ -233,8 +216,6 @@ namespace PubnubSilverlight.UnitTest
         [TestMethod, Asynchronous]
         public void ThenUserLevelWithReadWriteShouldReturnSuccess()
         {
-            //grantAccessCallbackInvoked = false;
-
             currentUnitTestCase = "ThenUserLevelWithReadWriteShouldReturnSuccess";
 
             receivedGrantMessage = false;
@@ -257,8 +238,6 @@ namespace PubnubSilverlight.UnitTest
                         EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback));
                         mreGrant.WaitOne(310 * 1000);
 
-                        //EnqueueConditional(() => grantAccessCallbackInvoked);
-
                         EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadWriteShouldReturnSuccess failed."));
                     }
                     else
@@ -272,8 +251,6 @@ namespace PubnubSilverlight.UnitTest
         [TestMethod, Asynchronous]
         public void ThenUserLevelWithReadShouldReturnSuccess()
         {
-            //grantAccessCallbackInvoked = false;
-
             currentUnitTestCase = "ThenUserLevelWithReadShouldReturnSuccess";
 
             receivedGrantMessage = false;
@@ -296,8 +273,6 @@ namespace PubnubSilverlight.UnitTest
                         EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, false, 5, AccessToUserLevelCallback, DummyErrorCallback));
                         mreGrant.WaitOne(310 * 1000);
 
-                        //EnqueueConditional(() => grantAccessCallbackInvoked);
-
                         EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadShouldReturnSuccess failed."));
                     }
                     else
@@ -311,8 +286,6 @@ namespace PubnubSilverlight.UnitTest
         [TestMethod, Asynchronous]
         public void ThenUserLevelWithWriteShouldReturnSuccess()
         {
-            //grantAccessCallbackInvoked = false;
-
             currentUnitTestCase = "ThenUserLevelWithWriteShouldReturnSuccess";
 
             receivedGrantMessage = false;
@@ -335,8 +308,6 @@ namespace PubnubSilverlight.UnitTest
                         EnqueueCallback(() => pubnub.GrantAccess<string>(channel, false, true, 5, AccessToUserLevelCallback, DummyErrorCallback));
                         mreGrant.WaitOne(310 * 1000);
 
-                        //EnqueueConditional(() => grantAccessCallbackInvoked);
-
                         EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithWriteShouldReturnSuccess failed."));
                     }
                     else
@@ -350,8 +321,6 @@ namespace PubnubSilverlight.UnitTest
         [TestMethod, Asynchronous]
         public void ThenMultipleChannelGrantShouldReturnSuccess()
         {
-            //grantAccessCallbackInvoked = false;
-
             currentUnitTestCase = "ThenMultipleChannelGrantShouldReturnSuccess";
 
             receivedGrantMessage = false;
@@ -393,8 +362,6 @@ namespace PubnubSilverlight.UnitTest
                         EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, true, 5, AccessToMultiChannelGrantCallback, DummyErrorCallback));
                         mreGrant.WaitOne(310 * 1000);
 
-                        //EnqueueConditional(() => grantAccessCallbackInvoked);
-
                         EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenMultipleChannelGrantShouldReturnSuccess failed."));
                     }
                     else
@@ -408,8 +375,6 @@ namespace PubnubSilverlight.UnitTest
         [TestMethod, Asynchronous]
         public void ThenMultipleAuthGrantShouldReturnSuccess()
         {
-            //grantAccessCallbackInvoked = false;
-
             currentUnitTestCase = "ThenMultipleAuthGrantShouldReturnSuccess";
 
             receivedGrantMessage = false;
@@ -453,8 +418,6 @@ namespace PubnubSilverlight.UnitTest
                         EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, true, 5, AccessToMultiAuthGrantCallback, DummyErrorCallback));
                         mreGrant.WaitOne(310 * 1000);
 
-                        //EnqueueConditional(() => grantAccessCallbackInvoked);
-
                         EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenMultipleAuthGrantShouldReturnSuccess failed."));
                     }
                     else
@@ -468,8 +431,6 @@ namespace PubnubSilverlight.UnitTest
         [TestMethod, Asynchronous]
         public void ThenRevokeAtSubKeyLevelReturnSuccess()
         {
-            //grantAccessCallbackInvoked = false;
-
             currentUnitTestCase = "ThenRevokeAtSubKeyLevelReturnSuccess";
             mreGrant = new ManualResetEvent(false);
 
@@ -501,7 +462,7 @@ namespace PubnubSilverlight.UnitTest
                             Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess -> Grant ok..Now trying Revoke");
                             EnqueueCallback(() => pubnub.GrantAccess<string>("", false, false, 5, RevokeToSubKeyLevelCallback, DummyErrorCallback));
                             mreGrant.WaitOne(310 * 1000);
-                            //EnqueueConditional(() => grantAccessCallbackInvoked);
+                            
                             EnqueueCallback(() => Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess -> Grant success but revoke failed."));
                         }
                         else
@@ -520,8 +481,6 @@ namespace PubnubSilverlight.UnitTest
         [TestMethod, Asynchronous]
         public void ThenRevokeAtChannelLevelReturnSuccess()
         {
-            //grantAccessCallbackInvoked = false;
-            
             currentUnitTestCase = "ThenRevokeAtChannelLevelReturnSuccess";
 
             receivedGrantMessage = false;
@@ -545,7 +504,6 @@ namespace PubnubSilverlight.UnitTest
                         {
                             EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback));
                             mreGrant.WaitOne(310 * 1000);
-                            //EnqueueConditional(() => grantAccessCallbackInvoked);
                         }
                         else
                         {
@@ -553,12 +511,10 @@ namespace PubnubSilverlight.UnitTest
                         }
                         if (receivedGrantMessage)
                         {
-                            //grantAccessCallbackInvoked = false;
-                            //Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess -> Grant ok..Now trying Revoke");
                             mreGrant = new ManualResetEvent(false);
                             EnqueueCallback(() => pubnub.GrantAccess<string>("", false, false, 5, RevokeToChannelLevelCallback, DummyErrorCallback));
                             mreGrant.WaitOne(310 * 1000);
-                            //EnqueueConditional(() => grantAccessCallbackInvoked);
+                            
                             EnqueueCallback(() => Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess -> Grant success but revoke failed."));
                         }
                         else
@@ -577,8 +533,6 @@ namespace PubnubSilverlight.UnitTest
         [TestMethod, Asynchronous]
         public void ThenRevokeAtUserLevelReturnSuccess()
         {
-            //grantAccessCallbackInvoked = false;
-
             currentUnitTestCase = "ThenRevokeAtUserLevelReturnSuccess";
 
             receivedGrantMessage = false;
@@ -604,7 +558,6 @@ namespace PubnubSilverlight.UnitTest
                             pubnub.AuthenticationKey = authKey;
                             EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback));
                             mreGrant.WaitOne(310 * 1000);
-                            //EnqueueConditional(() => grantAccessCallbackInvoked);
                         }
                         else
                         {
@@ -613,11 +566,9 @@ namespace PubnubSilverlight.UnitTest
                         if (receivedGrantMessage)
                         {
                             mreGrant = new ManualResetEvent(false);
-                            //grantAccessCallbackInvoked = false;
-                            //Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant ok..Now trying Revoke");
                             EnqueueCallback(() => pubnub.GrantAccess<string>("", false, false, 5, RevokeToUserLevelCallback, DummyErrorCallback));
                             mreGrant.WaitOne(310 * 1000);
-                            //EnqueueConditional(() => grantAccessCallbackInvoked);
+                            
                             EnqueueCallback(() => Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant success but revoke failed."));
                         }
                         else
@@ -680,7 +631,6 @@ namespace PubnubSilverlight.UnitTest
             catch { }
             finally
             {
-                //grantAccessCallbackInvoked = true;
                 mreGrant.Set();
             }
         }
@@ -741,7 +691,6 @@ namespace PubnubSilverlight.UnitTest
             catch { }
             finally
             {
-                //grantAccessCallbackInvoked = true;
                 mreGrant.Set();
             }
         }
@@ -815,7 +764,6 @@ namespace PubnubSilverlight.UnitTest
             catch { }
             finally
             {
-                //grantAccessCallbackInvoked = true;
                 mreGrant.Set();
             }
         }
@@ -857,7 +805,6 @@ namespace PubnubSilverlight.UnitTest
             catch { }
             finally
             {
-                //grantAccessCallbackInvoked = true;
                 mreGrant.Set();
             }
         }
@@ -900,7 +847,6 @@ namespace PubnubSilverlight.UnitTest
             catch { }
             finally
             {
-                //grantAccessCallbackInvoked = true;
                 mreGrant.Set();
             }
         }
@@ -945,20 +891,12 @@ namespace PubnubSilverlight.UnitTest
                                 }
                             }
                         }
-
-                        //if (dictionary.
-                        //if (status == "200")
-                        //{
-                        //    receivedGrantMessage = true;
-                        //}
                     }
-                    //var level = dictionary["level"].ToString();
                 }
             }
             catch { }
             finally
             {
-                //grantAccessCallbackInvoked = true;
                 mreGrant.Set();
             }
         }
@@ -1004,7 +942,6 @@ namespace PubnubSilverlight.UnitTest
             catch { }
             finally
             {
-                //grantAccessCallbackInvoked = true;
                 mreGrant.Set();
             }
         }
@@ -1065,7 +1002,6 @@ namespace PubnubSilverlight.UnitTest
             catch { }
             finally
             {
-                //grantAccessCallbackInvoked = true;
                 mreGrant.Set();
             }
         }

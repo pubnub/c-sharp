@@ -26,7 +26,6 @@ namespace PubnubSilverlight.UnitTest
         int numberOfReceivedMessages = 0;
 
         bool receivedGrantMessage = false;
-        //bool grantInitCallbackInvoked = false;
 
         ManualResetEvent mreSubscribe = new ManualResetEvent(false);
         ManualResetEvent mreConnect = new ManualResetEvent(false);
@@ -57,8 +56,6 @@ namespace PubnubSilverlight.UnitTest
 
                     EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, true, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback));
                     mreGrant.WaitOne(310 * 1000);
-
-                    //EnqueueConditional(() => grantInitCallbackInvoked);
 
                     EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenSubscribedToAChannel Grant access failed."));
                     EnqueueTestComplete();
@@ -144,10 +141,8 @@ namespace PubnubSilverlight.UnitTest
 
                     EnqueueCallback(() => pubnub.Subscribe<string>(channel, ReceivedMessageCallbackYesConnect, ConnectStatusCallback, DummyErrorCallback));
                     mreConnect.WaitOne(310 * 1000);
-                    //EnqueueConditional(() => receivedConnectMessage);
 
                     EnqueueCallback(() => pubnub.EndPendingRequests());
-                    //EnqueueCallback(() => Thread.Sleep(200));
 
                     EnqueueCallback(() => Assert.IsTrue(receivedConnectMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnConnectStatus Failed"));
                     EnqueueTestComplete();
@@ -175,17 +170,13 @@ namespace PubnubSilverlight.UnitTest
                 string channel1 = "hello_my_channel1";
                 EnqueueCallback(() => pubnub.Subscribe<string>(channel1, ReceivedChannelUserCallback, ReceivedChannel1ConnectCallback, DummyErrorCallback));
                 mreConnect.WaitOne(310 * 1000);
-                //EnqueueConditional(() => receivedChannel1ConnectMessage);
 
                 mreConnect = new ManualResetEvent(false);
                 string channel2 = "hello_my_channel2";
                 EnqueueCallback(() => pubnub.Subscribe<string>(channel2, ReceivedChannelUserCallback, ReceivedChannel2ConnectCallback, DummyErrorCallback));
                 mreConnect.WaitOne(310 * 1000);
-                //EnqueueConditional(() => receivedChannel2ConnectMessage);
 
                 EnqueueCallback(() => pubnub.EndPendingRequests());
-                //EnqueueCallback(() => Thread.Sleep(100));
-
 
                 EnqueueCallback(() => Assert.IsTrue(receivedChannel1ConnectMessage && receivedChannel2ConnectMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnConnectStatus Failed"));
                 EnqueueTestComplete();
@@ -196,7 +187,6 @@ namespace PubnubSilverlight.UnitTest
         [TestMethod, Asynchronous]
         public void ThenDuplicateChannelShouldReturnAlreadySubscribed()
         {
-            //subscribeConnectedBeforeDuplicate = false;
             receivedAlreadySubscribedMessage = false;
 
             mreConnect = new ManualResetEvent(false);
@@ -213,15 +203,10 @@ namespace PubnubSilverlight.UnitTest
 
                     EnqueueCallback(() => pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback1, DummyMethodDuplicateChannelConnectCallback, DummyErrorCallback));
                     mreConnect.WaitOne(310 * 1000);
-                    //EnqueueConditional(() => subscribeConnectedBeforeDuplicate);
-                    //EnqueueCallback(() => Thread.Sleep(100));
 
                     mreConnect = new ManualResetEvent(false);
                     EnqueueCallback(() => pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback2, DummyMethodDuplicateChannelConnectCallback, DuplicateChannelErrorCallback2));
                     mreConnect.WaitOne(310 * 1000);
-                    //receivedAlreadySubscribedMessage = true;
-                    //EnqueueConditional(() => receivedAlreadySubscribedMessage);
-                    //EnqueueCallback(() => Thread.Sleep(100));
 
                     EnqueueCallback(() => pubnub.EndPendingRequests());
 
@@ -254,17 +239,11 @@ namespace PubnubSilverlight.UnitTest
                         {
                             mrePublish = new ManualResetEvent(false);
                             EnqueueCallback(() => pubnub.Publish<string>(channel, index, SubscribeManyMessagesPublishCallback, DummyErrorCallback));
-                            //EnqueueCallback(() => Thread.Sleep(100));
                             mrePublish.WaitOne(310 * 1000);
-                            //EnqueueConditional(() => detailedHistoryPublishCallbackInvoked);
                         }
                     }
 
                     mreSubscribe.WaitOne(310 * 1000);
-                    //EnqueueCallback(() => Thread.Sleep(1000));
-
-                    //meSubscriberManyMessages.WaitOne();
-                    //EnqueueConditional(() => receivedManyMessages);
 
                     EnqueueCallback(() => pubnub.EndPendingRequests());
 
@@ -305,7 +284,6 @@ namespace PubnubSilverlight.UnitTest
                     }
                 }
             }
-            //detailedHistoryPublishCallbackInvoked = true;
             mrePublish.Set();
         }
 
@@ -382,7 +360,6 @@ namespace PubnubSilverlight.UnitTest
         [Asynchronous]
         private void DummyMethodDuplicateChannelConnectCallback(string result)
         {
-            //subscribeConnectedBeforeDuplicate = true;
             mreConnect.Set();
         }
 
@@ -447,30 +424,9 @@ namespace PubnubSilverlight.UnitTest
 
         }
 
-        // LAST
-        
-        //[Asynchronous]
-        //private void ReceivedMessageCallback(string result)
-        //{
-        //    if (!string.IsNullOrWhiteSpace(result))
-        //    {
-        //        object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-        //        if (deserializedMessage is object[])
-        //        {
-        //            object subscribedObj = (object)deserializedMessage[0];
-        //            if (subscribedObj != null)
-        //            {
-        //                receivedMessage = true;
-        //            }
-        //        }
-        //    }
-        //    receivedMessageInCallback = true;
-        //}
-
         [Asynchronous]
         private void dummyPublishCallback(string result)
         {
-            //publishInCallback = true;
             mrePublish.Set();
         }
 

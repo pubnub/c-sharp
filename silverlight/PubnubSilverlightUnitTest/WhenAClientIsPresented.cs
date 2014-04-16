@@ -24,6 +24,7 @@ namespace PubnubSilverlight.UnitTest
         static bool receivedCustomUUID = false;
 
         ManualResetEvent mrePresence = new ManualResetEvent(false);
+        ManualResetEvent mreGrant = new ManualResetEvent(false);
 
         string customUUID = "mylocalmachine.mydomain.com";
         bool receivedGrantMessage = false;
@@ -39,21 +40,23 @@ namespace PubnubSilverlight.UnitTest
             }
 
             receivedGrantMessage = false;
-            //receivedGrantMessage2 = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "GrantRequestUnitTest";
-            unitTest.TestCaseName = "Init2";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "GrantRequestUnitTest";
+                    unitTest.TestCaseName = "Init2";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "hello_my_channel,hello_my_channel-pnpres";
-            EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, true, 20, ThenPresenceInitializeShouldReturnGrantMessage, DummyErrorCallback));
-            Thread.Sleep(1000);
-            EnqueueConditional(() => grantInitCallbackInvoked);
-            EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed."));
-            EnqueueTestComplete();
+                    string channel = "hello_my_channel,hello_my_channel-pnpres";
+                    EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, true, 20, ThenPresenceInitializeShouldReturnGrantMessage, DummyErrorCallback));
+                    mreGrant.WaitOne(310 * 1000);
+
+                    EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed."));
+                    EnqueueTestComplete();
+                });
         }
 
         [Asynchronous]
@@ -103,7 +106,7 @@ namespace PubnubSilverlight.UnitTest
             catch { }
             finally
             {
-                grantInitCallbackInvoked = true;
+                mreGrant.Set();
             }
         }
         
@@ -112,7 +115,7 @@ namespace PubnubSilverlight.UnitTest
         {
             receivedPresenceMessage = false;
             mrePresence = new ManualResetEvent(false);
-            //currentUnitTestCase = "ThenPresenceShouldReturnReceivedMessage";
+            
             ThreadPool.QueueUserWorkItem((s) =>
                 {
                     Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
@@ -163,8 +166,6 @@ namespace PubnubSilverlight.UnitTest
         [Asynchronous]
         public void DummyMethodForSubscribe(string receivedMessage)
         {
-            //subscribeCallbackInvoked = true;
-
             try
             {
                 if (!string.IsNullOrWhiteSpace(receivedMessage))
@@ -192,7 +193,6 @@ namespace PubnubSilverlight.UnitTest
         [Asynchronous]
         public void DummyMethodForUnSubscribe(string receivedMessage)
         {
-            //unSubscribeCallbackInvoked = true;
             //Dummary callback method for unsubscribe to test presence
         }
 
@@ -257,7 +257,6 @@ namespace PubnubSilverlight.UnitTest
             }
             catch { }
 
-            //presenceUUIDCallbackInvoked = true;
             mrePresence.Set();
         }
 
@@ -269,8 +268,6 @@ namespace PubnubSilverlight.UnitTest
         [Asynchronous]
         void DummyMethodForSubscribeUUID(string receivedMessage)
         {
-            //subscribeUUIDCallbackInvoked = true;
-
             try
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
@@ -286,7 +283,6 @@ namespace PubnubSilverlight.UnitTest
             }
             catch { }
 
-            //presenceUUIDCallbackInvoked = true;
             mrePresence.Set();
             //Dummary callback method for subscribe and unsubscribe to test presence
         }
@@ -294,13 +290,12 @@ namespace PubnubSilverlight.UnitTest
         [Asynchronous]
         void SubscribeUUIDDummyMethodForConnectCallback(string receivedMessage)
         {
-            //subscribeUUIDConnectStatusCallbackInvoked = true;
+
         }
 
         [Asynchronous]
         void DummyMethodForUnSubscribeUUID(string receivedMessage)
         {
-            //unSubscribeUUIDCallbackInvoked = true;
             //Dummary callback method for unsubscribe to test presence
         }
 
@@ -312,7 +307,7 @@ namespace PubnubSilverlight.UnitTest
         [Asynchronous]
         void UnsubscribeUUIDDummyMethodForDisconnectCallback(string receivedMessage)
         {
-            //unsubscribeUUIDManualEvent.Set();
+
         }
 
         [TestMethod, Asynchronous]
@@ -330,7 +325,6 @@ namespace PubnubSilverlight.UnitTest
                     pubnub.PubnubUnitTest = unitTest;
 
                     EnqueueCallback(() => pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback));
-                    //EnqueueConditional(() => hereNowReturnMessageCallbackInvoked);
                     mrePresence.WaitOne(310 * 1000);
                     EnqueueCallback(() => Assert.IsTrue(receivedHereNowMessage, "here_now message not received"));
                     EnqueueTestComplete();
@@ -373,7 +367,6 @@ namespace PubnubSilverlight.UnitTest
 
                     EnqueueCallback(() => pubnub.WhereNow<string>(uuid, ThenWhereNowShouldReturnMessage, DummyErrorCallback));
                     mrePresence.WaitOne(310 * 1000);
-                    //EnqueueConditional(() => hereNowReturnMessageCallbackInvoked);
                     EnqueueCallback(() => Assert.IsTrue(receivedWhereNowMessage, "where_now message not received"));
                     EnqueueTestComplete();
                 });
@@ -396,7 +389,6 @@ namespace PubnubSilverlight.UnitTest
             }
             catch { }
 
-            //hereNowReturnMessageCallbackInvoked = true;
             mrePresence.Set();
         }
 
@@ -449,7 +441,6 @@ namespace PubnubSilverlight.UnitTest
             }
             catch { }
 
-            //whereNowReturnMessageCallbackInvoked = true;
             mrePresence.Set();
         }
 

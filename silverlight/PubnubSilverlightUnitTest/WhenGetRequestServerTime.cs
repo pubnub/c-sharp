@@ -17,7 +17,6 @@ namespace PubnubSilverlight.UnitTest
     [TestClass]
     public class WhenGetRequestServerTime : SilverlightTest
     {
-        //bool isTimeStamp = false;
         bool timeReceived = false;
         ManualResetEvent mreTime = new ManualResetEvent(false);
 
@@ -36,7 +35,6 @@ namespace PubnubSilverlight.UnitTest
                     pubnub.PubnubUnitTest = unitTest;
 
                     EnqueueCallback(() => pubnub.Time<string>(ReturnTimeStampCallback, DummyErrorCallback));
-                    //EnqueueConditional(() => isTimeStamp);
                     mreTime.WaitOne(310 * 1000);
                     EnqueueCallback(() => Assert.IsTrue(timeReceived, "time() Failed"));
                     EnqueueTestComplete();
@@ -58,7 +56,6 @@ namespace PubnubSilverlight.UnitTest
                     }
                 }
             }
-            //isTimeStamp = true;
             mreTime.Set();
         }
 

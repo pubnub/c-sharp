@@ -49,7 +49,7 @@ namespace PubnubSilverlight.UnitTest
 
                     EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, true, 20, ThenUnsubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback));
                     mreGrant.WaitOne(310 * 1000);
-                    //EnqueueConditional(() => grantInitInvoked);
+
                     EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenUnsubscribedToAChannel Grant access failed."));
                     EnqueueTestComplete();
                 });
@@ -75,7 +75,7 @@ namespace PubnubSilverlight.UnitTest
 
                     EnqueueCallback(() => pubnub.Unsubscribe<string>(channel, DummyMethodNoExistChannelUnsubscribeChannelUserCallback, DummyMethodNoExistChannelUnsubscribeChannelConnectCallback, DummyMethodNoExistChannelUnsubscribeChannelDisconnectCallback1, NoExistChannelErrorCallback));
                     mreUnsubscribe.WaitOne(310 * 1000);
-                    //EnqueueConditional(() => nochannelUnsubscribeInvoked);
+
                     EnqueueCallback(() => pubnub.EndPendingRequests());
                     EnqueueCallback(() => Assert.IsTrue(receivedNotSubscribedMessage, "WhenUnsubscribedToAChannel --> ThenNoExistChannelShouldReturnNotSubscribed Failed"));
                     EnqueueTestComplete();
@@ -105,12 +105,9 @@ namespace PubnubSilverlight.UnitTest
 
                     EnqueueCallback(() => pubnub.Subscribe<string>(channel, DummyMethodChannelSubscribeUserCallback, DummyMethodChannelSubscribeConnectCallback, DummyErrorCallback));
                     mreSubscribe.WaitOne(310 * 1000);
-                    //EnqueueConditional(() => subscribeConnectInvoked);
 
-                    //EnqueueConditional(() => receivedChannelConnectedMessage);
                     EnqueueCallback(() => pubnub.Unsubscribe<string>(channel, DummyMethodUnsubscribeChannelUserCallback, DummyMethodUnsubscribeChannelConnectCallback, DummyMethodUnsubscribeChannelDisconnectCallback, DummyErrorCallback));
                     mreUnsubscribe.WaitOne(310 * 1000);
-                    //EnqueueConditional(() => unsubscribeDisconnectInvoked);
 
                     EnqueueCallback(() => pubnub.EndPendingRequests());
                     EnqueueCallback(() => Assert.IsTrue(receivedChannelConnectedMessage && receivedUnsubscribedMessage, "WhenUnsubscribedToAChannel --> ThenShouldReturnUnsubscribedMessage Failed"));
@@ -136,7 +133,6 @@ namespace PubnubSilverlight.UnitTest
             }
             catch { }
 
-            //grantInitInvoked = true;
             mreGrant.Set();
         }
 
@@ -152,7 +148,6 @@ namespace PubnubSilverlight.UnitTest
             {
                 receivedChannelConnectedMessage = true;
             }
-            //subscribeConnectInvoked = true;
             mreSubscribe.Set();
         }
 
@@ -174,7 +169,6 @@ namespace PubnubSilverlight.UnitTest
             {
                 receivedUnsubscribedMessage = true;
             }
-            //unsubscribeDisconnectInvoked = true;
             mreUnsubscribe.Set();
         }
 
@@ -205,7 +199,6 @@ namespace PubnubSilverlight.UnitTest
             {
                 receivedNotSubscribedMessage = true;
             }
-            //nochannelUnsubscribeInvoked = true;
             mreUnsubscribe.Set();
         }
     }
