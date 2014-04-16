@@ -467,7 +467,7 @@
                                                                     Set User State:</div>
                                                                 <div class="PopupBody">
                                                                     <p>
-                                                                        Enter user state in json format ( Eg. {"channel":{"key1":"value1","key2":"value2"}}  ):
+                                                                        Enter user state in json format ( Eg. {"key1":"value1","key2":"value2"}  ):
                                                                         <br />
                                                                         <asp:TextBox ID="txtJsonUserState" Text="" Width="300px" runat="server"></asp:TextBox>
                                                                     </p>
