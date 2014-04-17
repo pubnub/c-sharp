@@ -31,7 +31,7 @@ namespace PubNubMessaging.Core
 			AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionTrapper;
 
 			PubnubProxy proxy = null;
-            
+
 			Console.WriteLine ("HINT: TO TEST RE-CONNECT AND CATCH-UP,");
 			Console.WriteLine ("      DISCONNECT YOUR MACHINE FROM NETWORK/INTERNET AND ");
 			Console.WriteLine ("      RE-CONNECT YOUR MACHINE AFTER SOMETIME.");
@@ -235,7 +235,7 @@ namespace PubNubMessaging.Core
 					string proxyUsername = Console.ReadLine ();
 					Console.WriteLine ("ENTER password for proxy server authentication.");
 					string proxyPassword = Console.ReadLine ();
-                    
+
 					proxy = new PubnubProxy ();
 					proxy.ProxyServer = proxyServer;
 					proxy.ProxyPort = port;
@@ -355,8 +355,8 @@ namespace PubNubMessaging.Core
 
 					Console.WriteLine ("Running subscribe()");
 					pubnub.Subscribe<string> (channel, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
-                    //pubnub2.Subscribe<string>(channel, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
-                    //pubnub.Subscribe<object>(channel, (object o)=> {DisplayReturnMessage(o);}, (object o)=> {DisplayReturnMessage(o);}, DisplayErrorMessage);
+					//pubnub2.Subscribe<string>(channel, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
+					//pubnub.Subscribe<object>(channel, (object o)=> {DisplayReturnMessage(o);}, (object o)=> {DisplayReturnMessage(o);}, DisplayErrorMessage);
 
 					break;
 				case "2":
@@ -367,13 +367,13 @@ namespace PubNubMessaging.Core
 					Console.WriteLine (string.Format ("Channel = {0}", channel));
 					Console.ResetColor ();
 
-                        /* TO TEST SMALL TEXT PUBLISH ONLY */
+					/*					 TO TEST SMALL TEXT PUBLISH ONLY */
 					Console.WriteLine ("Enter the message for publish and press ENTER key to submit");
 					string publishMsg = Console.ReadLine ();
 
-                            /* UNCOMMENT THE FOLLOWING CODE BLOCK TO TEST LARGE TEXT PUBLISH ONLY */
-                            #region Code To Test Large Text Publish
-                        /*ConsoleKeyInfo enteredKey;
+					/*					 UNCOMMENT THE FOLLOWING CODE BLOCK TO TEST LARGE TEXT PUBLISH ONLY */
+					#region Code To Test Large Text Publish
+					/*					ConsoleKeyInfo enteredKey;
                         StringBuilder publishBuilder = new StringBuilder ();
                         do {
                             enteredKey = Console.ReadKey (); //This logic is being used to capture > 2K input in console window
@@ -382,7 +382,7 @@ namespace PubNubMessaging.Core
                             }
                         } while (enteredKey.Key != ConsoleKey.Enter);
                         string publishMsg = publishBuilder.ToString ();*/
-                            #endregion
+					#endregion
 
 					Console.WriteLine ("Running publish()");
 					Console.WriteLine ("Sending message " + publishMsg);
@@ -480,7 +480,7 @@ namespace PubNubMessaging.Core
 
 					Console.WriteLine ("Running unsubscribe()");
 					pubnub.Unsubscribe<string> (channel, DisplayReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeDisconnectStatusMessage, DisplayErrorMessage);
-                    /*pubnub.Unsubscribe<object>(channel, (object o) => {}
+					/*					pubnub.Unsubscribe<object>(channel, (object o) => {}
                     , (object o) => {}, (object o) => {}, (PubnubClientError e) => {});*/
 					break;
 				case "7":
@@ -661,12 +661,13 @@ namespace PubNubMessaging.Core
 					break;
 				case "22":
 					Console.WriteLine ("Enter Presence Heartbeat Interval in seconds");
-					Console.WriteLine ("NOTE: Ensure that it is less than Presence Heartbeat-3 seconds");
+					Console.WriteLine ("NOTE: We apply the logic Presence Heartbeat/2-1 seconds to calculate it." +
+						"\nIf you enter a value greater than the Presence Heartbeat value, \nwe will reset it to this calculated value.");
 					string pnHeartbeatIntervalInput = Console.ReadLine ();
 					Int32.TryParse (pnHeartbeatIntervalInput, out presenceHeartbeatInterval);
 					pubnub.PresenceHeartbeatInterval = presenceHeartbeatInterval;
 					Console.ForegroundColor = ConsoleColor.Blue;
-					Console.WriteLine (string.Format ("Presence Heartbeat Interval = {0}", presenceHeartbeatInterval));
+					Console.WriteLine (string.Format ("Presence Heartbeat Interval = {0}", pubnub.PresenceHeartbeatInterval));
 					Console.ResetColor ();
 					break;
 				case "23":
@@ -752,7 +753,7 @@ namespace PubNubMessaging.Core
 
 					//Console.WriteLine ("NOTE: Hopefully you added local user state.");
 					Console.WriteLine ("If you want to consider already created local user state, press ENTER");
-					Console.WriteLine ("Else enter user state in json format (Eg. {\"channel\":{\"key1\":\"value1\",\"key2\":\"value2\"}}");
+					Console.WriteLine ("Else enter user state in json format (Eg. {\"key1\":\"value1\",\"key2\":\"value2\"}");
 					string manualJsonUserState = Console.ReadLine ();
 
 					string jsonUserState = "";
@@ -842,8 +843,8 @@ namespace PubNubMessaging.Core
 					break;
 				}
 				if (!exitFlag) {
-					userinput = Console.ReadLine ();
-					Int32.TryParse (userinput, out currentUserChoice);
+				userinput = Console.ReadLine ();
+				Int32.TryParse (userinput, out currentUserChoice);
 				}
 			}
 
@@ -945,119 +946,119 @@ namespace PubNubMessaging.Core
 
 			switch (result.StatusCode) {
 			case 103:
-                    //Warning: Verify origin host name and internet connectivity
+				//Warning: Verify origin host name and internet connectivity
 				break;
 			case 104:
-                    //Critical: Verify your cipher key
+				//Critical: Verify your cipher key
 				break;
 			case 106:
-                    //Warning: Check network/internet connection
+				//Warning: Check network/internet connection
 				break;
 			case 108:
-                    //Warning: Check network/internet connection
+				//Warning: Check network/internet connection
 				break;
 			case 109:
-                    //Warning: No network/internet connection. Please check network/internet connection
+				//Warning: No network/internet connection. Please check network/internet connection
 				break;
 			case 110:
-                    //Informational: Network/internet connection is back. Active subscriber/presence channels will be restored.
+				//Informational: Network/internet connection is back. Active subscriber/presence channels will be restored.
 				break;
 			case 111:
-                    //Informational: Duplicate channel subscription is not allowed. Internally Pubnub API removes the duplicates before processing.
+				//Informational: Duplicate channel subscription is not allowed. Internally Pubnub API removes the duplicates before processing.
 				break;
 			case 112:
-                    //Informational: Channel Already Subscribed/Presence Subscribed. Duplicate channel subscription not allowed
+				//Informational: Channel Already Subscribed/Presence Subscribed. Duplicate channel subscription not allowed
 				break;
 			case 113:
-                    //Informational: Channel Already Presence-Subscribed. Duplicate channel presence-subscription not allowed
+				//Informational: Channel Already Presence-Subscribed. Duplicate channel presence-subscription not allowed
 				break;
 			case 114:
-                    //Warning: Please verify your cipher key
+				//Warning: Please verify your cipher key
 				break;
 			case 115:
-                    //Warning: Protocol Error. Please contact PubNub with error details.
+				//Warning: Protocol Error. Please contact PubNub with error details.
 				break;
 			case 116:
-                    //Warning: ServerProtocolViolation. Please contact PubNub with error details.
+				//Warning: ServerProtocolViolation. Please contact PubNub with error details.
 				break;
 			case 117:
-                    //Informational: Input contains invalid channel name
+				//Informational: Input contains invalid channel name
 				break;
 			case 118:
-                    //Informational: Channel not subscribed yet
+				//Informational: Channel not subscribed yet
 				break;
 			case 119:
-                    //Informational: Channel not subscribed for presence yet
+				//Informational: Channel not subscribed for presence yet
 				break;
 			case 120:
-                    //Informational: Incomplete unsubscribe. Try again for unsubscribe.
+				//Informational: Incomplete unsubscribe. Try again for unsubscribe.
 				break;
 			case 121:
-                    //Informational: Incomplete presence-unsubscribe. Try again for presence-unsubscribe.
+				//Informational: Incomplete presence-unsubscribe. Try again for presence-unsubscribe.
 				break;
 			case 122:
-                    //Informational: Network/Internet connection not available. C# client retrying again to verify connection. No action is needed from your side.
+				//Informational: Network/Internet connection not available. C# client retrying again to verify connection. No action is needed from your side.
 				break;
 			case 123:
-                    //Informational: During non-availability of network/internet, max retries for connection were attempted. So unsubscribed the channel.
+				//Informational: During non-availability of network/internet, max retries for connection were attempted. So unsubscribed the channel.
 				break;
 			case 124:
-                    //Informational: During non-availability of network/internet, max retries for connection were attempted. So presence-unsubscribed the channel.
+				//Informational: During non-availability of network/internet, max retries for connection were attempted. So presence-unsubscribed the channel.
 				break;
 			case 125:
-                    //Informational: Publish operation timeout occured.
+				//Informational: Publish operation timeout occured.
 				break;
 			case 126:
-                    //Informational: HereNow operation timeout occured
+				//Informational: HereNow operation timeout occured
 				break;
 			case 127:
-                    //Informational: Detailed History operation timeout occured
+				//Informational: Detailed History operation timeout occured
 				break;
 			case 128:
-                    //Informational: Time operation timeout occured
+				//Informational: Time operation timeout occured
 				break;
 			case 4000:
-                    //Warning: Message too large. Your message was not sent. Try to send this again smaller sized
+				//Warning: Message too large. Your message was not sent. Try to send this again smaller sized
 				break;
 			case 4001:
-                    //Warning: Bad Request. Please check the entered inputs or web request URL
+				//Warning: Bad Request. Please check the entered inputs or web request URL
 				break;
 			case 4002:
-                    //Warning: Invalid Key. Please verify the publish key
+				//Warning: Invalid Key. Please verify the publish key
 				break;
 			case 4010:
-                    //Critical: Please provide correct subscribe key. This corresponds to a 401 on the server due to a bad sub key
+				//Critical: Please provide correct subscribe key. This corresponds to a 401 on the server due to a bad sub key
 				break;
 			case 4020:
-                    // PAM is not enabled. Please contact PubNub support
+				// PAM is not enabled. Please contact PubNub support
 				break;
 			case 4030:
-                    //Warning: Not authorized. Check the permimissions on the channel. Also verify authentication key, to check access.
+				//Warning: Not authorized. Check the permimissions on the channel. Also verify authentication key, to check access.
 				break;
 			case 4031:
-                    //Warning: Incorrect public key or secret key.
+				//Warning: Incorrect public key or secret key.
 				break;
 			case 4140:
-                    //Warning: Length of the URL is too long. Reduce the length by reducing subscription/presence channels or grant/revoke/audit channels/auth key list
+				//Warning: Length of the URL is too long. Reduce the length by reducing subscription/presence channels or grant/revoke/audit channels/auth key list
 				break;
 			case 5000:
-                    //Critical: Internal Server Error. Unexpected error occured at PubNub Server. Please try again. If same problem persists, please contact PubNub support
+				//Critical: Internal Server Error. Unexpected error occured at PubNub Server. Please try again. If same problem persists, please contact PubNub support
 				break;
 			case 5020:
-                    //Critical: Bad Gateway. Unexpected error occured at PubNub Server. Please try again. If same problem persists, please contact PubNub support
+				//Critical: Bad Gateway. Unexpected error occured at PubNub Server. Please try again. If same problem persists, please contact PubNub support
 				break;
 			case 5040:
-                    //Critical: Gateway Timeout. No response from server due to PubNub server timeout. Please try again. If same problem persists, please contact PubNub support
+				//Critical: Gateway Timeout. No response from server due to PubNub server timeout. Please try again. If same problem persists, please contact PubNub support
 				break;
 			case 0:
-                    //Undocumented error. Please contact PubNub support with full error object details for further investigation
+				//Undocumented error. Please contact PubNub support with full error object details for further investigation
 				break;
 			default:
 				break;
 			}
 			if (showErrorMessageSegments) {
-				DisplayErrorMessageSegments (result);
-				Console.WriteLine ();
+			DisplayErrorMessageSegments (result);
+			Console.WriteLine ();
 			}
 		}
 
