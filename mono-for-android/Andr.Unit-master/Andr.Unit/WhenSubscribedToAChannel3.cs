@@ -88,7 +88,7 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
 
-            string message = "";
+            string message = "Text with /";
 
             SubscribePublishAndParse (message, pubnub, common, channel);
         }
