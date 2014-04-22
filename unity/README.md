@@ -11,6 +11,14 @@ If you had been using a previous version, your application might break due to si
 Removes the dependency of .NET sockets.
 Implements the features of Pubnub 3.6
 
+WE have modified the JsonFX pre processor directives: Now we have 3: 
+
+- `USE_JSONFX_UNITY` is for UNITY_STANDALONE or UNITY_WEBPLAYER or UNITY_ANDROID
+
+- `USE_JSONFX` for non-unity clients.
+
+- `USE_JSONFX_UNITY_IOS` is Unity IOS
+
 #### Cheatsheet to migrate to the new Error Callback implementation
 
 ```
@@ -19,7 +27,13 @@ Old => pubnub.Subscribe<string> (channel, DisplayReturnMessage, DisplayConnectSt
 New (current) => pubnub.Subscribe<string> (channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
 
 NOTE: The callback methods DisplayReturnMessage, DisplayConnectStatusMessage and DisplayErrorMessage (new callback parameter) are used in the example code for your review.
+```
 
+#####REPLACE
+```
+USE_JSONFX with USE_JSONFX_UNITY and 
+
+USE_JSONFX_FOR_UNITY with USE_JSONFX_UNITY_IOS
 ```
 
 #### Prerequisites

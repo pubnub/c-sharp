@@ -38,22 +38,21 @@ USE_JSONFX_FOR_UNITY with USE_JSONFX_UNITY_IOS
 ```
 
 #### Prerequisites
-1. Install a free Full version of Unity 4 Pro from http://unity3d.com/unity/download/ (Unity 4 is recommended, but current/later versions should be ok). MonoDevelop IDE tool will be installed as part of Unity to write C# scripts.
-2. For Unity, JSONFX is needed for the serialization library. To use JSONFX we have defined 3 pre processor directives: 
+1) Install a free Full version of Unity 4 Pro from http://unity3d.com/unity/download/ (Unity 4 is recommended, but current/later versions should be ok). MonoDevelop IDE tool will be installed as part of Unity to write C# scripts.
+2) For Unity, JSONFX is needed for the serialization library. To use JSONFX we have defined 3 pre processor directives:
+
 - `USE_JSONFX_UNITY` is for UNITY_STANDALONE or UNITY_WEBPLAYER or UNITY_ANDROID
-
 - `USE_JSONFX` for non-unity clients.
-
 - `USE_JSONFX_UNITY_IOS` is Unity IOS
 
-Please note the other serialization libraries used in the pubnub.cs class are the default from the builtin .NET class (activated when the pre-compiler directive USE_DOTNET_SERIALIZATION is used) and Newtonsoft.Json (activated when neither USE_JSONFX nor USE_DOTNET_SERIALIZATION is defined). Both of these libraries won't work with UNITY. So you need to be sure the pre-compiler variable USE_JSONFX is "defined" at the top of the pubnub.cs class (default behavior).
-3. The unit tests for unity also require JSONFX library for serialization.
+3) Please note the other serialization libraries used in the pubnub.cs class are the default from the builtin .NET class (activated when the pre-compiler directive USE_DOTNET_SERIALIZATION is used) and Newtonsoft.Json (activated when neither USE_JSONFX nor USE_DOTNET_SERIALIZATION is defined). Both of these libraries won't work with UNITY. So you need to be sure the pre-compiler variable USE_JSONFX is "defined" at the top of the pubnub.cs class (default behavior).
 
-4. For unity windows project we have added a scripting define symbols ```__MonoCS__``` under player settings -> configuration. This is useful if we build the project under VS.
+4) The unit tests for unity also require JSONFX library for serialization.
 
-#### To run the unit test code (under UnityUnitTest folder of Standalone), in addition to the above step, you need to 
-1. Import UnityTestTools package (this is already present in the Pubnub client code under the path PubnubUnity/Assets/UnityTestTools) into your Assets. (https://www.assetstore.unity3d.com/#/content/13802)  
-   
+5) For unity windows project we have added a scripting define symbols ```__MonoCS__``` under player settings -> configuration. This is useful if we build the project under VS.
+
+#### To run the unit tests, in addition to the above, you need to 
+1. Import UnityTestTools package (this is already present in the Pubnub client code under the path PubnubUnity/Assets/UnityTestTools) into your Assets. (https://www.assetstore.unity3d.com/#/content/13802) 
 
 #### Running the Demo App on PC
 
