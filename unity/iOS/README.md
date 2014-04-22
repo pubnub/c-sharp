@@ -43,9 +43,9 @@ USE_JSONFX_FOR_UNITY with USE_JSONFX_UNITY_IOS
 2. For Unity on iOS, we have tested 2 JSON serializers
 2.1 JsonFx 1.4 mod by TowerOBricks (https://bitbucket.org/TowerOfBricks/jsonfx-for-unity3d/overview). This is recommended and is added by default. If you are finalizing  this library you can delete the class "MiniJson.cs" from the "Assets" directory, and open the project in Unity IDE. Unity IDE will do the rest.
 2.2 MiniJson: A small class, with no additional dependencies. But this class can only serialize arrays, strings, Chars, hashtables, Dictionary, arraylist and some more but not custom classes and objects. If you want to use this you need to 
-- open the project in MonoDevelop and remove the reference of JsonFx.Json.dll from the references. Delete the JsonFx.Json.dll from the assets folder.
-- add MiniJson to the project. This can be done by going to the Solution Explorer, ctrl-clicking Assets -> Add -> Add Files and select the file MiniJson.cs from the Assets folder.
-- In the PubnubCore.cs and PubnubUnity.cs filea uncomment the line which says #define USE_MiniJSON and comment the line #define USE_JSONFX_UNITY_IOS
+..* open the project in MonoDevelop and remove the reference of JsonFx.Json.dll from the references. Delete the JsonFx.Json.dll from the assets folder.
+..* add MiniJson to the project. This can be done by going to the Solution Explorer, ctrl-clicking Assets -> Add -> Add Files and select the file MiniJson.cs from the Assets folder.
+..* In the PubnubCore.cs and PubnubUnity.cs filea uncomment the line which says #define USE_MiniJSON and comment the line #define USE_JSONFX_UNITY_IOS
 ```
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX
