@@ -20,72 +20,85 @@ using System.Collections.Generic;
 namespace PubnubWindowsPhone.Test.UnitTest
 {
     [TestClass]
-    public class WhenAuditIsRequested
+    public class WhenAuditIsRequested: WorkItemTest
     {
-        ManualResetEvent auditManualEvent = new ManualResetEvent(false);
+        ManualResetEvent mreAudit = new ManualResetEvent(false);
         bool receivedAuditMessage = false;
         string currentUnitTestCase = "";
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenSubKeyLevelShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenSubKeyLevelShouldReturnSuccess";
 
             receivedAuditMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAuditIsRequested";
-            unitTest.TestCaseName = "ThenSubKeyLevelShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-            if (PubnubCommon.PAMEnabled)
-            {
-                pubnub.AuditAccess<string>(AccessToSubKeyLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenAuditIsRequested";
+                    unitTest.TestCaseName = "ThenSubKeyLevelShouldReturnSuccess";
+                    pubnub.PubnubUnitTest = unitTest;
+                    if (PubnubCommon.PAMEnabled)
+                    {
+                        mreAudit = new ManualResetEvent(false);
+                        pubnub.AuditAccess<string>(AccessToSubKeyLevelCallback, DummyErrorCallback);
+                        mreAudit.WaitOne(60 * 1000);
 
-                auditManualEvent.WaitOne();
-
-                Assert.IsTrue(receivedAuditMessage, "WhenAuditIsRequested -> ThenSubKeyLevelShouldReturnSuccess failed.");
-            }
-            else
-            {
-                Assert.Inconclusive("PAM Not Enabled for WhenAuditIsRequested -> ThenSubKeyLevelShouldReturnSuccess");
-            }
+                        Assert.IsTrue(receivedAuditMessage, "WhenAuditIsRequested -> ThenSubKeyLevelShouldReturnSuccess failed.");
+                    }
+                    else
+                    {
+                        Assert.Inconclusive("PAM Not Enabled for WhenAuditIsRequested -> ThenSubKeyLevelShouldReturnSuccess");
+                    }
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        TestComplete();
+                    });
+                });
 
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenChannelLevelShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenChannelLevelShouldReturnSuccess";
 
             receivedAuditMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAuditIsRequested";
-            unitTest.TestCaseName = "ThenChannelLevelShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenAuditIsRequested";
+                    unitTest.TestCaseName = "ThenChannelLevelShouldReturnSuccess";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "hello_my_channel";
+                    string channel = "hello_my_channel";
 
-            if (PubnubCommon.PAMEnabled)
-            {
-                pubnub.AuditAccess<string>(channel, AccessToChannelLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
+                    if (PubnubCommon.PAMEnabled)
+                    {
+                        mreAudit = new ManualResetEvent(false);
+                        pubnub.AuditAccess<string>(channel, AccessToChannelLevelCallback, DummyErrorCallback);
+                        mreAudit.WaitOne(60 * 1000);
 
-                auditManualEvent.WaitOne();
-
-                Assert.IsTrue(receivedAuditMessage, "WhenAuditIsRequested -> ThenChannelLevelShouldReturnSuccess failed.");
-            }
-            else
-            {
-                Assert.Inconclusive("PAM Not Enabled for WhenAuditIsRequested -> ThenChannelLevelShouldReturnSuccess");
-            }
+                        Assert.IsTrue(receivedAuditMessage, "WhenAuditIsRequested -> ThenChannelLevelShouldReturnSuccess failed.");
+                    }
+                    else
+                    {
+                        Assert.Inconclusive("PAM Not Enabled for WhenAuditIsRequested -> ThenChannelLevelShouldReturnSuccess");
+                    }
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        TestComplete();
+                    });
+                });
         }
 
+        [Asynchronous]
         void AccessToSubKeyLevelCallback(string receivedMessage)
         {
             try
@@ -124,10 +137,11 @@ namespace PubnubWindowsPhone.Test.UnitTest
             catch { }
             finally
             {
-                auditManualEvent.Set();
+                mreAudit.Set();
             }
         }
 
+        [Asynchronous]
         void AccessToChannelLevelCallback(string receivedMessage)
         {
             try
@@ -164,10 +178,11 @@ namespace PubnubWindowsPhone.Test.UnitTest
             catch { }
             finally
             {
-                auditManualEvent.Set();
+                mreAudit.Set();
             }
         }
 
+        [Asynchronous]
         private void DummyErrorCallback(PubnubClientError result)
         {
 

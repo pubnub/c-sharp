@@ -5,7 +5,7 @@ using System.Text;
 using PubNubMessaging.Core;
 using System.IO;
 using System.Net;
-#if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
+#if (UNITY_STANDALONE || UNITY_WEBPLAYER)
 using UnityEngine;
 #endif
 
@@ -122,6 +122,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
             Dictionary<string, string> data = new Dictionary<string, string>();
 #if (SILVERLIGHT || WINDOWS_PHONE)
             data.Add("/publish/demo-36/demo-36/f377f886fada25afdf617739af129c2b/hello_my_channel/0/%22f42pIQcWZ9zbTbH8cyLwB/tdvRxjFLOYcBNMVKeHS54%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/e462eda69685ce9ddfd5be20c7e13cab/hello_my_channel/0/%22f42pIQcWZ9zbTbH8cyLwB/tdvRxjFLOYcBNMVKeHS54%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/91db22a2ce85d4d4b2d6c96be732b411/hello_my_channel/0/%22f42pIQcWZ9zbTbH8cyLwB/tdvRxjFLOYcBNMVKeHS54%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
 #else
             data.Add("/publish/demo-36/demo-36/f2df042fa9883d95d1f0ce5c42b69b27/hello_my_channel/0/%22f42pIQcWZ9zbTbH8cyLwB%2FtdvRxjFLOYcBNMVKeHS54%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
 #endif
@@ -137,13 +139,13 @@ namespace PubnubWindowsPhone.Test.UnitTest
             data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%7B%22VersionID%22%3A3.4%2C%22Timetoken%22%3A%2213601488652764619%22%2C%22OperationName%22%3A%22Publish%22%2C%22Channels%22%3A%5B%22ch1%22%5D%2C%22DemoMessage%22%3A%7B%22DefaultMessage%22%3A%22%7E%21%40%23%24%25%5E%26%2A%28%29_%2B%20%601234567890-%3D%20qwertyuiop%5B%5D//%20%7B%7D%7C%20asdfghjkl%3B%27%20%3A/%22%20zxcvbnm%2C/%20%3C%3E%3F%20%22%7D%2C%22CustomMessage%22%3A%7B%22DefaultMessage%22%3A%22Welcome%20to%20the%20world%20of%20Pubnub%20for%20Publish%20and%20Subscribe.%20Hah%21%22%7D%2C%22SampleXml%22%3A%5B%7B%22Name%22%3A%7B%22First%22%3A%22John%22%2C%22Middle%22%3A%22P.%22%2C%22Last%22%3A%22Doe%22%7D%2C%22Address%22%3A%7B%22Street%22%3A%22123%20Duck%20Street%22%2C%22City%22%3A%22New%20City%22%2C%22State%22%3A%22New%20York%22%2C%22Country%22%3A%22United%20States%22%7D%2C%22ID%22%3A%22ABCD123%22%7D%2C%7B%22Name%22%3A%7B%22First%22%3A%22Peter%22%2C%22Middle%22%3A%22Z.%22%2C%22Last%22%3A%22Smith%22%7D%2C%22Address%22%3A%7B%22Street%22%3A%2212%20Hollow%20Street%22%2C%22City%22%3A%22Philadelphia%22%2C%22State%22%3A%22Pennsylvania%22%2C%22Country%22%3A%22United%20States%22%7D%2C%22ID%22%3A%22ABCD456%22%7D%5D%7D", "[1,\"Sent\",\"13602210467298480\"]"); //FOR WP7. Difference where there is ./
             data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel", "[[{\"VersionID\":3.4,\"Timetoken\":\"13601488652764619\",\"OperationName\":\"Publish\",\"Channels\":[\"ch1\"],\"DemoMessage\":{\"DefaultMessage\":\"~!@#$%^&*()_+ `1234567890-= qwertyuiop[]\\\\ {}| asdfghjkl;' :\\\" zxcvbnm,./ <>? \"},\"CustomMessage\":{\"DefaultMessage\":\"Welcome to the world of Pubnub for Publish and Subscribe. Hah!\"},\"SampleXml\":[{\"Name\":{\"First\":\"John\",\"Middle\":\"P.\",\"Last\":\"Doe\"},\"Address\":{\"Street\":\"123 Duck Street\",\"City\":\"New City\",\"State\":\"New York\",\"Country\":\"United States\"},\"ID\":\"ABCD123\"},{\"Name\":{\"First\":\"Peter\",\"Middle\":\"Z.\",\"Last\":\"Smith\"},\"Address\":{\"Street\":\"12 Hollow Street\",\"City\":\"Philadelphia\",\"State\":\"Pennsylvania\",\"Country\":\"United States\"},\"ID\":\"ABCD456\"}]}],13735400879163600,13735400879163600]");
 #else
-            #if USE_JSONFX
+#if USE_JSONFX
             data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel", "[[{\"VersionID\":3.4,\"Timetoken\":\"13601488652764619\",\"OperationName\":\"Publish\",\"Channels\":[\"ch1\"],\"DemoMessage\":{\"DefaultMessage\":\"~!@#$%^&*()_+ `1234567890-= qwertyuiop[]\\\\ {}| asdfghjkl;' :\\\" zxcvbnm,./ <>? \"},\"CustomMessage\":{\"DefaultMessage\":\"Welcome to the world of Pubnub for Publish and Subscribe. Hah!\"},\"SampleXml\":[{\"ID\":\"ABCD123\",\"Name\":{\"First\":\"John\",\"Middle\":\"P.\",\"Last\":\"Doe\"},\"Address\":{\"Street\":\"123 Duck Street\",\"City\":\"New City\",\"State\":\"New York\",\"Country\":\"United States\"}},{\"ID\":\"ABCD456\",\"Name\":{\"First\":\"Peter\",\"Middle\":\"Z.\",\"Last\":\"Smith\"},\"Address\":{\"Street\":\"12 Hollow Street\",\"City\":\"Philadelphia\",\"State\":\"Pennsylvania\",\"Country\":\"United States\"}}]}],13735400879163600,13735400879163600]"); //JsonFX
             data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%7B%22VersionID%22%3A3.4%2C%22Timetoken%22%3A%2213601488652764619%22%2C%22OperationName%22%3A%22Publish%22%2C%22Channels%22%3A%5B%22ch1%22%5D%2C%22DemoMessage%22%3A%7B%22DefaultMessage%22%3A%22%7E%21%40%23%24%25%5E%26%2A%28%29_%2B%20%601234567890-%3D%20qwertyuiop%5B%5D%5C%5C%20%7B%7D%7C%20asdfghjkl%3B%27%20%3A%5C%22%20zxcvbnm%2C.%2F%20%3C%3E%3F%20%22%7D%2C%22CustomMessage%22%3A%7B%22DefaultMessage%22%3A%22Welcome%20to%20the%20world%20of%20Pubnub%20for%20Publish%20and%20Subscribe.%20Hah%21%22%7D%2C%22SampleXml%22%3A%5B%7B%22ID%22%3A%22ABCD123%22%2C%22Name%22%3A%7B%22First%22%3A%22John%22%2C%22Middle%22%3A%22P.%22%2C%22Last%22%3A%22Doe%22%7D%2C%22Address%22%3A%7B%22Street%22%3A%22123%20Duck%20Street%22%2C%22City%22%3A%22New%20City%22%2C%22State%22%3A%22New%20York%22%2C%22Country%22%3A%22United%20States%22%7D%7D%2C%7B%22ID%22%3A%22ABCD456%22%2C%22Name%22%3A%7B%22First%22%3A%22Peter%22%2C%22Middle%22%3A%22Z.%22%2C%22Last%22%3A%22Smith%22%7D%2C%22Address%22%3A%7B%22Street%22%3A%2212%20Hollow%20Street%22%2C%22City%22%3A%22Philadelphia%22%2C%22State%22%3A%22Pennsylvania%22%2C%22Country%22%3A%22United%20States%22%7D%7D%5D%7D", "[1,\"Sent\",\"13602210467298480\"]"); //JsonFx
-            #else
+#else
             data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel", "[[{\"VersionID\":3.4,\"Timetoken\":\"13601488652764619\",\"OperationName\":\"Publish\",\"Channels\":[\"ch1\"],\"DemoMessage\":{\"DefaultMessage\":\"~!@#$%^&*()_+ `1234567890-= qwertyuiop[]\\\\ {}| asdfghjkl;' :\\\" zxcvbnm,./ <>? \"},\"CustomMessage\":{\"DefaultMessage\":\"Welcome to the world of Pubnub for Publish and Subscribe. Hah!\"},\"SampleXml\":[{\"Name\":{\"First\":\"John\",\"Middle\":\"P.\",\"Last\":\"Doe\"},\"Address\":{\"Street\":\"123 Duck Street\",\"City\":\"New City\",\"State\":\"New York\",\"Country\":\"United States\"},\"ID\":\"ABCD123\"},{\"Name\":{\"First\":\"Peter\",\"Middle\":\"Z.\",\"Last\":\"Smith\"},\"Address\":{\"Street\":\"12 Hollow Street\",\"City\":\"Philadelphia\",\"State\":\"Pennsylvania\",\"Country\":\"United States\"},\"ID\":\"ABCD456\"}]}],13735400879163600,13735400879163600]"); //Newton Json.NET
             data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%7B%22VersionID%22%3A3.4%2C%22Timetoken%22%3A%2213601488652764619%22%2C%22OperationName%22%3A%22Publish%22%2C%22Channels%22%3A%5B%22ch1%22%5D%2C%22DemoMessage%22%3A%7B%22DefaultMessage%22%3A%22%7E%21%40%23%24%25%5E%26%2A%28%29_%2B%20%601234567890-%3D%20qwertyuiop%5B%5D%5C%5C%20%7B%7D%7C%20asdfghjkl%3B%27%20%3A%5C%22%20zxcvbnm%2C.%2F%20%3C%3E%3F%20%22%7D%2C%22CustomMessage%22%3A%7B%22DefaultMessage%22%3A%22Welcome%20to%20the%20world%20of%20Pubnub%20for%20Publish%20and%20Subscribe.%20Hah%21%22%7D%2C%22SampleXml%22%3A%5B%7B%22Name%22%3A%7B%22First%22%3A%22John%22%2C%22Middle%22%3A%22P.%22%2C%22Last%22%3A%22Doe%22%7D%2C%22Address%22%3A%7B%22Street%22%3A%22123%20Duck%20Street%22%2C%22City%22%3A%22New%20City%22%2C%22State%22%3A%22New%20York%22%2C%22Country%22%3A%22United%20States%22%7D%2C%22ID%22%3A%22ABCD123%22%7D%2C%7B%22Name%22%3A%7B%22First%22%3A%22Peter%22%2C%22Middle%22%3A%22Z.%22%2C%22Last%22%3A%22Smith%22%7D%2C%22Address%22%3A%7B%22Street%22%3A%2212%20Hollow%20Street%22%2C%22City%22%3A%22Philadelphia%22%2C%22State%22%3A%22Pennsylvania%22%2C%22Country%22%3A%22United%20States%22%7D%2C%22ID%22%3A%22ABCD456%22%7D%5D%7D", "[1,\"Sent\",\"13602210467298480\"]"); //Newton Json.NET
-            #endif
+#endif
 #endif
             return data;
         }
@@ -152,6 +154,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add("/publish/demo-36/demo-36/20881fd95e10c440b24f79baf0e4cdb7/hello_my_channel/0/%22Pubnub%20API%20Usage%20Example%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/154de00ed4a7a76b4dc4a83906d05bab/hello_my_channel/0/%22Pubnub%20API%20Usage%20Example%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/cd8eab92c8b4ec5ef50c30d89687fe72/hello_my_channel/0/%22Pubnub%20API%20Usage%20Example%22", "[1,\"Sent\",\"13559014566792817\"]");
             return data;
         }
 
