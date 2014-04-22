@@ -184,6 +184,7 @@ namespace PubNubMessaging.Tests
             common.WaitForResponse ();
 
             if (common.Response != null) {
+                Console.WriteLine ("response:" + common.Response.ToString ());
                 object[] fields = Common.Deserialize<object[]> (common.Response.ToString ());
 
                 if (fields [0] != null) {
@@ -201,7 +202,15 @@ namespace PubNubMessaging.Tests
                         cc.foo = (string)dict ["foo"];
                         cc.bar = (int[])dict ["bar"];
                     } else {
-                        cc = Common.Deserialize<CustomClass> (myObjectArray [0].ToString ());
+                        Type valueType = myObjectArray [0].GetType();
+                        var expectedType = typeof(System.Dynamic.ExpandoObject);
+                        if (expectedType.IsAssignableFrom (valueType)) {
+                            dynamic x = myObjectArray [0];
+                            cc.foo = x.foo;
+                            cc.bar = x.bar;
+                        } else {
+                            cc = Common.Deserialize<CustomClass> (myObjectArray [0].ToString ());
+                        }
                     }  
                     if (cc.bar.SequenceEqual (message.bar) && cc.foo.Equals (message.foo)) {
                         Assert.True (true, "Complex message test successful");

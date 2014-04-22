@@ -1,3 +1,4 @@
+//#define USE_JSONFX
 using System;
 using PubNubMessaging.Core;
 using System.Collections.Generic;
@@ -9,19 +10,29 @@ using System.Globalization;
 
 #if (USE_JSONFX)
 using JsonFx.Json;
+
 #elif (USE_DOTNET_SERIALIZATION)
 using System.Runtime.Serialization.Json;
 using System.Web.Script.Serialization;
+
 #else
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Converters;
 #endif
+using System.Text;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Collections;
 
 namespace PubNubMessaging.Tests
 {
     public class Common
     {
+        public static string PublishKey = "demo-36";
+        public static string SubscribeKey = "demo-36";
+        public static string SecretKey = "demo-36";
+
         public object Response { get; set; }
 
         public bool DeliveryStatus  { get; set; }
@@ -31,7 +42,7 @@ namespace PubNubMessaging.Tests
         /// or timeout occurs
         /// </summary>
         /// <param name="countdownSeconds">seconds to timeout</param>
-        public void WaitForResponse (int countdownSeconds = 30)
+        public void WaitForResponse (int countdownSeconds = 45)
         {
             Timer timer = new Timer ();
             DateTime start = DateTime.UtcNow; 
@@ -45,7 +56,6 @@ namespace PubNubMessaging.Tests
                     DeliveryStatus = true;
                 }
             };
-
             while (!DeliveryStatus)
                 ;
             timer.Stop ();
@@ -62,41 +72,37 @@ namespace PubNubMessaging.Tests
         public void DisplayErrorMessage (PubnubClientError result)
         {
             //Response = result;
-            Console.WriteLine (result.ToString ());
         }
 
         public void DisplayReturnMessageDummy (object result)
         {
             //deliveryStatus = true;
             //Response = result;
-            Console.WriteLine (result.ToString ());
         }
 
         public void DisplayReturnMessage (object result)
         {
-            Response = result;
             DeliveryStatus = true;
-            Console.WriteLine (result.ToString ());
+            Response = result;
         }
 
         public void DisplayReturnMessage (string result)
         {
-            Response = (object)result;
             DeliveryStatus = true;
-            Console.WriteLine ("result:" + result.ToString ());
+            Response = (object)result;
         }
 
         public long Timestamp (Pubnub pubnub)
         {
             DeliveryStatus = false;
-            Response = null;
-            pubnub.Time<string> (DisplayReturnMessage, DisplayErrorMessage);
+
+            pubnub.Time<string> (DisplayReturnMessage, DisplayReturnMessage);
             while (!DeliveryStatus)
                 ;
 
-            //IList<object> fields = Response as IList<object>;
-            Console.WriteLine ("Response:" + Response.ToString ());
             object[] fields = Common.Deserialize<object[]> (Response.ToString ());
+
+            //IList<object> fields = Response as IList<object>;
             return Convert.ToInt64 (fields [0].ToString ());
         }
 
@@ -109,12 +115,23 @@ namespace PubNubMessaging.Tests
         {
             object retMessage;
             #if (USE_JSONFX)
-            var reader = new JsonFx.Json.JsonReader();
-            retMessage= reader.Read<T>(message);
+        var reader = new JsonFx.Json.JsonReader();
+        retMessage= reader.Read<T>(message);
             #else
             retMessage = JsonConvert.DeserializeObject<T> (message);
             #endif
             return (T)retMessage;
+        }
+
+        private static byte[] ObjectToByteArray (Object obj)
+        {
+            if (obj == null)
+                return null;
+            BinaryFormatter bf = new BinaryFormatter ();
+            using (MemoryStream ms = new MemoryStream ()) {
+                bf.Serialize (ms, obj);
+                return ms.ToArray ();
+            }
         }
 
         /// <summary>
@@ -126,9 +143,9 @@ namespace PubNubMessaging.Tests
         {
             string retMessage;
             #if (USE_JSONFX)
-            var writer = new JsonFx.Json.JsonWriter();
-            retMessage= writer.Write(message);
-            retMessage = ConvertHexToUnicodeChars(retMessage);
+        var writer = new JsonFx.Json.JsonWriter();
+        retMessage= writer.Write(message);
+        retMessage = ConvertHexToUnicodeChars(retMessage);
             #else
             retMessage = JsonConvert.SerializeObject (message);
             #endif
@@ -145,7 +162,7 @@ namespace PubNubMessaging.Tests
             //if(;
             return Regex.Replace (
                 value,
-                @"                \\u(?<Value>[a-zA-Z0-9]{4})",
+                @"\\u(?<Value>[a-zA-Z0-9]{4})",
                 m => {
                     return ((char)int.Parse (m.Groups ["Value"].Value, NumberStyles.HexNumber)).ToString ();
                 }     
@@ -162,6 +179,7 @@ namespace PubNubMessaging.Tests
         public int[] bar = { 1, 2, 3, 4, 5 };
     }
 
+    [Serializable]
     class PubnubDemoObject
     {
         public double VersionID = 3.4;
@@ -173,6 +191,7 @@ namespace PubNubMessaging.Tests
         public XmlDocument SampleXml = new PubnubDemoMessage ().TryXmlDemo ();
     }
 
+    [Serializable]
     class PubnubDemoMessage
     {
         public string DefaultMessage = "~!@#$%^&*()_+ `1234567890-= qwertyuiop[]\\ {}| asdfghjkl;' :\" zxcvbnm,./ <>? ";

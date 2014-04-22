@@ -136,10 +136,18 @@ namespace PubNubMessaging.Core
                     socket.Close();
                 }
                 #elif (UNITY_IOS || UNITY_ANDROID)
+                if(request!=null){
+                    request.Abort();
+                    request = null;
+                }
                 request = (HttpWebRequest)WebRequest.Create("http://pubsub.pubnub.com");
                 if(request!= null){
                     request.Timeout = HeartbeatInterval * 1000;
                     request.ContentType = "application/json";
+                    if(response!=null){
+                            response.Close();
+                            response = null;
+                    }
                     response = request.GetResponse ();
                     if(response != null){
                         if(((HttpWebResponse)response).ContentLength <= 0){
@@ -162,7 +170,7 @@ namespace PubNubMessaging.Core
                 #elif(__MonoCS__)
                 udp = new UdpClient ("pubsub.pubnub.com", 80);
                 IPAddress localAddress = ((IPEndPoint)udp.Client.LocalEndPoint).Address;
-                if (udp != null && udp.Client != null) {
+                if (udp != null && udp.Client != null  && udp.Client.RemoteEndPoint != null) {
                     EndPoint remotepoint = udp.Client.RemoteEndPoint;
                     string remoteAddress = (remotepoint != null) ? remotepoint.ToString () : "";
                     LoggingMethod.WriteToLog (string.Format ("DateTime {0} checkInternetStatus LocalIP: {1}, RemoteEndPoint:{2}", DateTime.Now.ToString (), localAddress.ToString (), remoteAddress), LoggingMethod.LevelVerbose);

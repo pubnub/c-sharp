@@ -637,11 +637,11 @@ namespace PubNubMessaging.Core
             return obj.ComputeHash(data);
         }*/
         /// <summary>
-        /// Converts the upper case hex to lower case hex.  
-        /// </summary>  
+        /// Converts the upper case hex to lower case hex.
+        /// </summary>
         /// <returns>The lower case hex.</returns>
         /// <param name="value">Hex Value.</param>
-        public static string ConvertHexToUnicodeChars (string value)
+		public static string ConvertHexToUnicodeChars (string value)
         {
             //if(;
             return Regex.Replace (
@@ -664,7 +664,7 @@ namespace PubNubMessaging.Core
         /// </param>
         protected string EncodeNonAsciiCharacters (string value)
         {
-            #if (USE_JSONFX || USE_JSONFX_FOR_UNITY)
+			#if (USE_JSONFX_UNITY || USE_JSONFX_UNITY_IOS)
             value = ConvertHexToUnicodeChars(value);
             #endif
 

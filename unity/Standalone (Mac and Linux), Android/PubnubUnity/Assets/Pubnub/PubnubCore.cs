@@ -1,4 +1,4 @@
-//Build Date: April 04, 2014
+//Build Date: April 08, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX_UNITY
@@ -74,7 +74,7 @@ namespace PubNubMessaging.Core
 		int _pubnubNetworkCheckRetries = 50;
 		int _pubnubWebRequestRetryIntervalInSeconds = 10;
 		int _pubnubPresenceHeartbeatInSeconds = 63;
-		int _presenceHeartbeatIntervalInSeconds = 60;
+		int _presenceHeartbeatIntervalInSeconds = 30;
 		bool _enableResumeOnReconnect = true;
 		bool _uuidChanged = false;
 		protected bool overrideTcpKeepAlive = true;
@@ -268,7 +268,9 @@ namespace PubNubMessaging.Core
 				} else {
 					_pubnubPresenceHeartbeatInSeconds = value;
 				}
-				_presenceHeartbeatIntervalInSeconds = _pubnubPresenceHeartbeatInSeconds - 3;
+				if (_pubnubPresenceHeartbeatInSeconds != 0) {
+					_presenceHeartbeatIntervalInSeconds = (_pubnubPresenceHeartbeatInSeconds / 2) - 1;
+				}
 			}
 		}
 
@@ -279,8 +281,8 @@ namespace PubNubMessaging.Core
 			
 			set {
 				_presenceHeartbeatIntervalInSeconds = value;
-				if (_presenceHeartbeatIntervalInSeconds > _pubnubPresenceHeartbeatInSeconds - 3) {
-					_presenceHeartbeatIntervalInSeconds = _pubnubPresenceHeartbeatInSeconds - 3;
+				if (_presenceHeartbeatIntervalInSeconds > _pubnubPresenceHeartbeatInSeconds - 3 && _pubnubPresenceHeartbeatInSeconds > 0) {
+					_presenceHeartbeatIntervalInSeconds = (_pubnubPresenceHeartbeatInSeconds / 2) - 1;
 				}
 			}
 		}
@@ -2159,15 +2161,7 @@ namespace PubNubMessaging.Core
 				if (deserializeUserState == null) {
 					throw new MissingFieldException ("Missing json format user state");
 				} else {
-					string channelInState = deserializeUserState.Keys.First<string> ();
-
-					if (deserializeUserState [channelInState] != null) {
-						//string jsonState = (deserializeUserState [channelInState] != null) ? deserializeUserState [channelInState].ToString () : "";
-						Dictionary<string, object> stateDictionary = deserializeUserState [channelInState] as Dictionary<string, object>;//_jsonPluggableLibrary.DeserializeToDictionaryOfObject (jsonState);
-						if (stateDictionary != null) {
-							_channelUserState.AddOrUpdate (channelInState, stateDictionary, (oldState, newState) => stateDictionary);
-						}
-					}
+					_channelUserState.AddOrUpdate (channel.Trim (), deserializeUserState, (oldState, newState) => deserializeUserState);
 				}
 			}
 
@@ -2180,7 +2174,6 @@ namespace PubNubMessaging.Core
 
 			RequestState<T> requestState = new RequestState<T> ();
 			requestState.Channels = new string[] { channel };
-			;
 			requestState.Type = ResponseType.SetUserState;
 			requestState.UserCallback = userCallback;
 			requestState.ErrorCallback = errorCallback;
@@ -2841,8 +2834,8 @@ namespace PubNubMessaging.Core
 					}
 
 					if (result == null && currentHttpStatusCode == HttpStatusCode.NotFound
-					    && (asynchRequestState.Type == ResponseType.Presence || asynchRequestState.Type == ResponseType.Subscribe)
-					    && webEx.Response.GetType ().ToString () == "System.Net.Browser.ClientHttpWebResponse") {
+					                   && (asynchRequestState.Type == ResponseType.Presence || asynchRequestState.Type == ResponseType.Subscribe)
+					                   && webEx.Response.GetType ().ToString () == "System.Net.Browser.ClientHttpWebResponse") {
 						ProcessResponseCallbackExceptionHandler (webEx, asynchRequestState);
 					}
 				} else {
@@ -2850,8 +2843,8 @@ namespace PubNubMessaging.Core
 						if (asynchRequestState.Type == ResponseType.Subscribe
 						    || asynchRequestState.Type == ResponseType.Presence) {
 							if ((webEx.Message.IndexOf ("The request was aborted: The request was canceled") == -1
-							    || webEx.Message.IndexOf ("Machine suspend mode enabled. No request will be processed.") == -1)
-							    && (webEx.Status != WebExceptionStatus.RequestCanceled)) {
+							                         || webEx.Message.IndexOf ("Machine suspend mode enabled. No request will be processed.") == -1)
+							                         && (webEx.Status != WebExceptionStatus.RequestCanceled)) {
 								for (int index = 0; index < asynchRequestState.Channels.Length; index++) {
 									string activeChannel = asynchRequestState.Channels [index].ToString ();
 									PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey ();
@@ -3097,9 +3090,9 @@ namespace PubNubMessaging.Core
 					//Do not send 105 = WebRequestCancelled
 					//Do not send 130 = PubnubClientMachineSleep
 					if (error.StatusCode != 107
-					    && error.StatusCode != 105
-					    && error.StatusCode != 130
-					    && error.StatusCode != 4040) { //Error Code that should not go out
+					                   && error.StatusCode != 105
+					                   && error.StatusCode != 130
+					                   && error.StatusCode != 4040) { //Error Code that should not go out
 						Callback (error);
 					}
 				}
@@ -4298,13 +4291,11 @@ namespace PubNubMessaging.Core
 		public string SerializeToJsonString (object objectToSerialize)
 		{
 			
-
 #if(__MonoCS__)
 			var writer = new JsonFx.Json.JsonWriter ();
 			string json = writer.Write (objectToSerialize);
 			return PubnubCryptoBase.ConvertHexToUnicodeChars (json);
 			
-
 #else
 			string json = "";
 			var resolver = new JsonFx.Serialization.Resolvers.CombinedResolverStrategy(new JsonFx.Serialization.Resolvers.DataContractResolverStrategy());
@@ -4335,7 +4326,6 @@ namespace PubNubMessaging.Core
 		public Dictionary<string, object> DeserializeToDictionaryOfObject (string jsonString)
 		{
 			
-
 #if USE_JSONFX_UNITY
 			LoggingMethod.WriteToLog ("jsonstring:"+jsonString, LoggingMethod.LevelInfo);
 			object obj = DeserializeToObject(jsonString);
@@ -4348,7 +4338,6 @@ namespace PubNubMessaging.Core
 			}
 			return stateDictionary;
 			
-
 #else
 			jsonString = PubnubCryptoBase.ConvertHexToUnicodeChars (jsonString);
 			var reader = new JsonFx.Json.JsonReader ();
@@ -4379,7 +4368,6 @@ namespace PubNubMessaging.Core
 		}
 	}
 	
-
 #elif (USE_DOTNET_SERIALIZATION)
 	public class JscriptSerializer : IJsonPluggableLibrary
 	{
@@ -4415,7 +4403,6 @@ namespace PubNubMessaging.Core
 		}
 	}
 	
-
 #elif (USE_MiniJSON)
 	public class MiniJSONObjectSerializer : IJsonPluggableLibrary
 	{
@@ -4448,7 +4435,6 @@ namespace PubNubMessaging.Core
 		}
 	}
 	
-
 #elif (USE_JSONFX_UNITY_IOS)
 	public class JsonFxUnitySerializer : IJsonPluggableLibrary
 	{
@@ -4496,7 +4482,6 @@ namespace PubNubMessaging.Core
 		}
 	}
 	
-
 #else
 	public class NewtonsoftJsonDotNet : IJsonPluggableLibrary
 	{

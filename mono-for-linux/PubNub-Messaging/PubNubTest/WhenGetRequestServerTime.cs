@@ -14,8 +14,8 @@ namespace PubNubMessaging.Tests
         public void ThenItShouldReturnTimeStamp()
         {
             Pubnub pubnub = new Pubnub(
-                                "demo",
-                                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                                 "",
                                 "",
                                 false
@@ -44,8 +44,8 @@ namespace PubNubMessaging.Tests
         public void ThenItShouldReturnTimeStampSSL()
         {
             Pubnub pubnub = new Pubnub(
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "",
                 "",
                 true

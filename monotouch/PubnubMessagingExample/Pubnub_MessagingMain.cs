@@ -164,7 +164,7 @@ namespace PubnubMessagingExample
             
             if(errorFree)
             {
-                pubnub = new Pubnub ("demo", "demo", "", cipher, ssl);
+                pubnub = new Pubnub ("demo-36", "demo-36", "demo-36", cipher, ssl);
                 if(!String.IsNullOrWhiteSpace (customUuid.Trim()))
                 {
                     pubnub.SessionUUID = customUuid.Trim();

@@ -22,7 +22,7 @@ namespace PubNubMessaging.Core
 
         #region "Constants and Globals"
 
-        const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Info;
+        const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Error;
         const PubnubErrorFilter.Level errorLevel = PubnubErrorFilter.Level.Info;
         protected bool pubnubEnableProxyConfig = true;
         protected string _domainName = "pubsub.pubnub.com";

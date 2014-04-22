@@ -134,7 +134,11 @@ namespace PubNubMessaging.Tests
 				{
 						UnityEngine.Debug.Log ("DisplayErrorMessage1:" + result.ToString ());
 				}
+				#if(UNITY_ANDROID)
+				[Ignore]
+				#else
 				[Test]
+				#endif
 				public void ThenItShouldReturnSuccessCodeAndInfoForEncryptedComplexMessage2 ()
 				{
 						Pubnub pubnub = new Pubnub (
@@ -182,7 +186,11 @@ namespace PubNubMessaging.Tests
 						}*/
 
 				}
+				#if(UNITY_ANDROID)
+				[Ignore]
+				#else
 				[Test]
+				#endif
 				public void ThenItShouldReturnSuccessCodeAndInfoForComplexMessage2WithSsl ()
 				{
 						Pubnub pubnub = new Pubnub (

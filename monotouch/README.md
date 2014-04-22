@@ -1,4 +1,4 @@
-# PubNub 3.5 Web Data Push Cloud-Hosted API - C# Mono 3.2.5
+# PubNub 3.6 Web Data Push Cloud-Hosted API - C# Mono 3.2.5
 ##PubNub C Sharp (MonoTouch Usage)
 
 For a quick video walkthrough, checkout https://vimeo.com/55630516 !

@@ -48,6 +48,7 @@
     <Reference Include="JsonFx">
       <HintPath>..\..\PubNubMessaging\Library\JsonFx.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Resources\Resource.designer.cs" />
