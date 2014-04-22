@@ -12,7 +12,7 @@ Removes the dependency of .NET sockets.
 Implements the features of Pubnub 3.6
 
 WE have modified the JsonFX pre processor directives: Now we have 3. 
-- `USE_JSONFX_UNITY` is for UNITY_STANDALONE or UNITY_WEBPLAYER or UNITY_ANDROID
+- `USE_JSONFX_UNITY` is for `UNITY_STANDALONE` or `UNITY_WEBPLAYER` or `UNITY_ANDROID`
 
 - `USE_JSONFX` for non-unity clients.
 
@@ -41,11 +41,11 @@ USE_JSONFX_FOR_UNITY with USE_JSONFX_UNITY_IOS
 #### Prerequisites
 1. Install a free Full version of Unity 4 Pro from http://unity3d.com/unity/download/ (Unity 4 is recommended, but current/later versions should be ok). MonoDevelop IDE tool will be installed as part of Unity to write C# scripts.
 2. For Unity on iOS, we have tested 2 JSON serializers
-2.1 JsonFx 1.4 mod by TowerOBricks (https://bitbucket.org/TowerOfBricks/jsonfx-for-unity3d/overview). This is recommended and is added by default. If you are finalizing  this library you can delete the class "MiniJson.cs" from the "Assets" directory, and open the project in Unity IDE. Unity IDE will do the rest.
-2.2 MiniJson: A small class, with no additional dependencies. But this class can only serialize arrays, strings, Chars, hashtables, Dictionary, arraylist and some more but not custom classes and objects. If you want to use this you need to 
-..* open the project in MonoDevelop and remove the reference of JsonFx.Json.dll from the references. Delete the JsonFx.Json.dll from the assets folder.
-..* add MiniJson to the project. This can be done by going to the Solution Explorer, ctrl-clicking Assets -> Add -> Add Files and select the file MiniJson.cs from the Assets folder.
-..* In the PubnubCore.cs and PubnubUnity.cs filea uncomment the line which says #define USE_MiniJSON and comment the line #define USE_JSONFX_UNITY_IOS
+    2.1 JsonFx 1.4 mod by TowerOBricks (https://bitbucket.org/TowerOfBricks/jsonfx-for-unity3d/overview). This is recommended and is added by default. If you are finalizing  this library you can delete the class "MiniJson.cs" from the "Assets" directory, and open the project in Unity IDE. Unity IDE will do the rest.
+    2.2 MiniJson: A small class, with no additional dependencies. But this class can only serialize arrays, strings, Chars, hashtables, Dictionary, arraylist and some more but not custom classes and objects. If you want to use this you need to 
+        * open the project in MonoDevelop and remove the reference of JsonFx.Json.dll from the references. Delete the JsonFx.Json.dll from the assets folder.
+        * add MiniJson to the project. This can be done by going to the Solution Explorer, ctrl-clicking Assets -> Add -> Add Files and select the file MiniJson.cs from the Assets folder.
+        * In the PubnubCore.cs and PubnubUnity.cs filea uncomment the line which says #define USE_MiniJSON and comment the line #define USE_JSONFX_UNITY_IOS
 ```
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX
@@ -54,7 +54,7 @@ USE_JSONFX_FOR_UNITY with USE_JSONFX_UNITY_IOS
 //#define USE_JSONFX_UNITY_IOS
 #endif
 ```
-- Similarly you need to uncomment the line which says #define USE_MiniJSON and comment the line #define USE_JSONFX_UNITY_IOS in the file PubnubUnity.cs
+    2.3 Similarly you need to uncomment the line which says #define USE_MiniJSON and comment the line #define USE_JSONFX_UNITY_IOS in the file PubnubUnity.cs
 
 #### To run the unit tests, in addition to the above, you need to 
 1. Import UnityTestTools package (this is already present in the Pubnub client code under the path PubnubUnity/Assets/UnityTestTools) into your Assets. (https://www.assetstore.unity3d.com/#/content/13802)
