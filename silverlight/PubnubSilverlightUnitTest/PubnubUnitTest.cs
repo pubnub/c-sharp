@@ -123,8 +123,10 @@ namespace PubnubSilverlight.UnitTest
 #if (SILVERLIGHT || WINDOWS_PHONE)
             data.Add("/publish/demo-36/demo-36/f377f886fada25afdf617739af129c2b/hello_my_channel/0/%22f42pIQcWZ9zbTbH8cyLwB/tdvRxjFLOYcBNMVKeHS54%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
             data.Add("/publish/demo-36/demo-36/e462eda69685ce9ddfd5be20c7e13cab/hello_my_channel/0/%22f42pIQcWZ9zbTbH8cyLwB/tdvRxjFLOYcBNMVKeHS54%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/91db22a2ce85d4d4b2d6c96be732b411/hello_my_channel/0/%22f42pIQcWZ9zbTbH8cyLwB/tdvRxjFLOYcBNMVKeHS54%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
 #else
             data.Add("/publish/demo-36/demo-36/f2df042fa9883d95d1f0ce5c42b69b27/hello_my_channel/0/%22f42pIQcWZ9zbTbH8cyLwB%2FtdvRxjFLOYcBNMVKeHS54%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/e462eda69685ce9ddfd5be20c7e13cab/hello_my_channel/0/%22f42pIQcWZ9zbTbH8cyLwB%2FtdvRxjFLOYcBNMVKeHS54%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
 #endif
             data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel", "[[\"f42pIQcWZ9zbTbH8cyLwB/tdvRxjFLOYcBNMVKeHS54=\"],13559191494674157,13559191494674157]");
             return data;
@@ -154,6 +156,7 @@ namespace PubnubSilverlight.UnitTest
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add("/publish/demo-36/demo-36/20881fd95e10c440b24f79baf0e4cdb7/hello_my_channel/0/%22Pubnub%20API%20Usage%20Example%22", "[1,\"Sent\",\"13559014566792817\"]");
             data.Add("/publish/demo-36/demo-36/154de00ed4a7a76b4dc4a83906d05bab/hello_my_channel/0/%22Pubnub%20API%20Usage%20Example%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/cd8eab92c8b4ec5ef50c30d89687fe72/hello_my_channel/0/%22Pubnub%20API%20Usage%20Example%22", "[1,\"Sent\",\"13559014566792817\"]");
             return data;
         }
 

@@ -28,26 +28,9 @@ namespace PubnubWindowsPhone.Test.UnitTest
     {
         JsonSerializer serializer = new JsonSerializer();
 
-        ManualResetEvent mreUnencryptedPublish = new ManualResetEvent(false);
-        ManualResetEvent mreOptionalSecretKeyPublish = new ManualResetEvent(false);
-        ManualResetEvent mreNoSslPublish = new ManualResetEvent(false);
-
-        ManualResetEvent mreUnencryptObjectPublish = new ManualResetEvent(false);
-        ManualResetEvent mreEncryptObjectPublish = new ManualResetEvent(false);
-        ManualResetEvent mreEncryptPublish = new ManualResetEvent(false);
-        ManualResetEvent mreSecretEncryptPublish = new ManualResetEvent(false);
-        ManualResetEvent mreComplexObjectPublish = new ManualResetEvent(false);
-        ManualResetEvent mreLaregMessagePublish = new ManualResetEvent(false);
-
-        ManualResetEvent mreEncryptDetailedHistory = new ManualResetEvent(false);
-        ManualResetEvent mreSecretEncryptDetailedHistory = new ManualResetEvent(false);
-        ManualResetEvent mreUnencryptDetailedHistory = new ManualResetEvent(false);
-        ManualResetEvent mreUnencryptObjectDetailedHistory = new ManualResetEvent(false);
-        ManualResetEvent mreEncryptObjectDetailedHistory = new ManualResetEvent(false);
-        ManualResetEvent mreComplexObjectDetailedHistory = new ManualResetEvent(false);
-        ManualResetEvent mreSerializedObjectMessageForPublish = new ManualResetEvent(false);
-        ManualResetEvent mreSerializedMessagePublishDetailedHistory = new ManualResetEvent(false);
-        ManualResetEvent grantManualEvent = new ManualResetEvent(false);
+        ManualResetEvent mrePublish = new ManualResetEvent(false);
+        ManualResetEvent mreDetailedHistory = new ManualResetEvent(false);
+        ManualResetEvent mreGrant = new ManualResetEvent(false);
 
         bool isPublished2 = false;
         bool isPublished3 = false;
@@ -88,31 +71,37 @@ namespace PubnubWindowsPhone.Test.UnitTest
 
         System.Collections.Generic.List<string> errors = new System.Collections.Generic.List<string>();
 
-        [ClassInitialize]
+        [ClassInitialize, Asynchronous]
         public void Init()
         {
             if (!PubnubCommon.PAMEnabled)
             {
-                Assert.Inconclusive("WhenAClientIsPresent Grant access failed.");
+                TestComplete();
                 return;
             }
 
             receivedGrantMessage = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "GrantRequestUnitTest";
-            unitTest.TestCaseName = "Init";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "GrantRequestUnitTest";
+                    unitTest.TestCaseName = "Init";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "hello_my_channel";
+                    string channel = "hello_my_channel";
 
-            pubnub.GrantAccess<string>(channel, true, true, 20, ThenPublishInitializeShouldReturnGrantMessage, DummyErrorCallback);
-            //Thread.Sleep(1000);
+                    mreGrant = new ManualResetEvent(false);
+                    pubnub.GrantAccess<string>(channel, true, true, 20, ThenPublishInitializeShouldReturnGrantMessage, DummyErrorCallback);
+                    mreGrant.WaitOne(60 * 1000);
 
-            grantManualEvent.WaitOne();
-
-            Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed.");
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                        {
+                            Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed.");
+                            TestComplete();
+                        });
+                });
         }
 
         [Asynchronous]
@@ -134,154 +123,217 @@ namespace PubnubWindowsPhone.Test.UnitTest
             catch { }
             finally
             {
-                grantManualEvent.Set();
+                mreGrant.Set();
             }
         }
 
-
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenUnencryptPublishShouldReturnSuccessCodeAndInfo()
         {
-            isUnencryptPublished = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
-            string channel = "hello_my_channel";
-            string message = messageForUnencryptPublish;
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    isUnencryptPublished = false;
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+                    string channel = "hello_my_channel";
+                    string message = messageForUnencryptPublish;
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenUnencryptPublishShouldReturnSuccessCodeAndInfo";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenAMessageIsPublished";
+                    unitTest.TestCaseName = "ThenUnencryptPublishShouldReturnSuccessCodeAndInfo";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.Publish<string>(channel, message, ReturnSuccessUnencryptPublishCodeCallback, DummyErrorCallback);
-            mreUnencryptedPublish.WaitOne(310 * 1000);
+                    mrePublish = new ManualResetEvent(false);
+                    pubnub.Publish<string>(channel, message, ReturnSuccessUnencryptPublishCodeCallback, DummyErrorCallback);
+                    mrePublish.WaitOne(60 * 1000);
 
-            if (!isUnencryptPublished)
-            {
-                Assert.IsTrue(isUnencryptPublished, "Unencrypt Publish Failed");
-            }
-            else
-            {
-                pubnub.DetailedHistory<string>(channel, -1, unEncryptPublishTimetoken, -1, false, CaptureUnencryptDetailedHistoryCallback, DummyErrorCallback);
-                mreUnencryptDetailedHistory.WaitOne(310 * 1000);
-                Assert.IsTrue(isUnencryptDetailedHistory, "Unable to match the successful unencrypt Publish");
-            }
+                    if (!isUnencryptPublished)
+                    {
+                        Deployment.Current.Dispatcher.BeginInvoke(() =>
+                       {
+                           Assert.IsTrue(isUnencryptPublished, "Unencrypt Publish Failed");
+                           TestComplete();
+                       });
+                    }
+                    else
+                    {
+                        mreDetailedHistory = new ManualResetEvent(false);
+                        pubnub.DetailedHistory<string>(channel, -1, unEncryptPublishTimetoken, -1, false, CaptureUnencryptDetailedHistoryCallback, DummyErrorCallback);
+                        mreDetailedHistory.WaitOne(60 * 1000);
+                        Deployment.Current.Dispatcher.BeginInvoke(() =>
+                       {
+                           Assert.IsTrue(isUnencryptDetailedHistory, "Unable to match the successful unencrypt Publish");
+                           TestComplete();
+                       });
+                    }
+                });
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo()
         {
-            isUnencryptObjectPublished = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
-            string channel = "hello_my_channel";
-            object message = new CustomClass();
-            messageObjectForUnencryptPublish = JsonConvert.SerializeObject(message);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    isUnencryptObjectPublished = false;
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+                    string channel = "hello_my_channel";
+                    object message = new CustomClass();
+                    messageObjectForUnencryptPublish = JsonConvert.SerializeObject(message);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenAMessageIsPublished";
+                    unitTest.TestCaseName = "ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.Publish<string>(channel, message, ReturnSuccessUnencryptObjectPublishCodeCallback, DummyErrorCallback);
-            mreUnencryptObjectPublish.WaitOne(310 * 1000);
-            Thread.Sleep(1000);
-            if (!isUnencryptObjectPublished)
-            {
-                Assert.IsTrue(isUnencryptObjectPublished, "Unencrypt Publish Failed");
-            }
-            else
-            {
-                pubnub.DetailedHistory<string>(channel, -1, unEncryptObjectPublishTimetoken, -1, false, CaptureUnencryptObjectDetailedHistoryCallback, DummyErrorCallback);
-                mreUnencryptObjectDetailedHistory.WaitOne(310 * 1000);
-                Assert.IsTrue(isUnencryptObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
-            }
+                    mrePublish = new ManualResetEvent(false);
+                    pubnub.Publish<string>(channel, message, ReturnSuccessUnencryptObjectPublishCodeCallback, DummyErrorCallback);
+                    mrePublish.WaitOne(60 * 1000);
+
+                    if (!isUnencryptObjectPublished)
+                    {
+                        Deployment.Current.Dispatcher.BeginInvoke(() =>
+                       {
+                           Assert.IsTrue(isUnencryptObjectPublished, "Unencrypt Publish Failed");
+                           TestComplete();
+                       });
+                    }
+                    else
+                    {
+                        mreDetailedHistory = new ManualResetEvent(false);
+                        pubnub.DetailedHistory<string>(channel, -1, unEncryptObjectPublishTimetoken, -1, false, CaptureUnencryptObjectDetailedHistoryCallback, DummyErrorCallback);
+                        mreDetailedHistory.WaitOne(60 * 1000);
+                        Deployment.Current.Dispatcher.BeginInvoke(() =>
+                       {
+                           Assert.IsTrue(isUnencryptObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
+                           TestComplete();
+                       });
+                    }
+                });
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo()
         {
-            isEncryptObjectPublished = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "enigma", false);
-            string channel = "hello_my_channel";
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    isEncryptObjectPublished = false;
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "enigma", false);
+                    string channel = "hello_my_channel";
+                    
+                    object message = new SecretCustomClass();
 
-            object message = new SecretCustomClass();
+                    messageObjectForEncryptPublish = JsonConvert.SerializeObject(message);
 
-            messageObjectForEncryptPublish = JsonConvert.SerializeObject(message);
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenAMessageIsPublished";
+                    unitTest.TestCaseName = "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo";
-            pubnub.PubnubUnitTest = unitTest;
+                    mrePublish = new ManualResetEvent(false);
+                    pubnub.Publish<string>(channel, message, ReturnSuccessEncryptObjectPublishCodeCallback, DummyErrorCallback);
+                    mrePublish.WaitOne(60 * 1000);
 
-            pubnub.Publish<string>(channel, message, ReturnSuccessEncryptObjectPublishCodeCallback, DummyErrorCallback);
-            mreEncryptObjectPublish.WaitOne(310 * 1000);
-
-            if (!isEncryptObjectPublished)
-            {
-                Assert.IsTrue(isEncryptObjectPublished, "Encrypt Object Publish Failed");
-            }
-            else
-            {
-                pubnub.DetailedHistory<string>(channel, -1, encryptObjectPublishTimetoken, -1, false, CaptureEncryptObjectDetailedHistoryCallback, DummyErrorCallback);
-                mreEncryptObjectDetailedHistory.WaitOne(310 * 1000);
-                Assert.IsTrue(isEncryptObjectDetailedHistory, "Unable to match the successful encrypt object Publish");
-            }
+                    if (!isEncryptObjectPublished)
+                    {
+                        Deployment.Current.Dispatcher.BeginInvoke(() =>
+                       {
+                           Assert.IsTrue(isEncryptObjectPublished, "Encrypt Object Publish Failed");
+                           TestComplete();
+                       });
+                    }
+                    else
+                    {
+                        mreDetailedHistory = new ManualResetEvent(false);
+                        pubnub.DetailedHistory<string>(channel, -1, encryptObjectPublishTimetoken, -1, false, CaptureEncryptObjectDetailedHistoryCallback, DummyErrorCallback);
+                        mreDetailedHistory.WaitOne(60 * 1000);
+                        Deployment.Current.Dispatcher.BeginInvoke(() =>
+                       {
+                           Assert.IsTrue(isEncryptObjectDetailedHistory, "Unable to match the successful encrypt object Publish");
+                           TestComplete();
+                       });
+                    }
+                });
         }
 
-
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenEncryptPublishShouldReturnSuccessCodeAndInfo()
         {
-            isEncryptPublished = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "enigma", false);
-            string channel = "hello_my_channel";
-            string message = messageForEncryptPublish;
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    isEncryptPublished = false;
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "enigma", false);
+                    string channel = "hello_my_channel";
+                    string message = messageForEncryptPublish;
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenEncryptPublishShouldReturnSuccessCodeAndInfo";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenAMessageIsPublished";
+                    unitTest.TestCaseName = "ThenEncryptPublishShouldReturnSuccessCodeAndInfo";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.Publish<string>(channel, message, ReturnSuccessEncryptPublishCodeCallback, DummyErrorCallback);
-            mreEncryptPublish.WaitOne(310 * 1000);
+                    mrePublish = new ManualResetEvent(false);
+                    pubnub.Publish<string>(channel, message, ReturnSuccessEncryptPublishCodeCallback, DummyErrorCallback);
+                    mrePublish.WaitOne(60 * 1000);
 
-            if (!isEncryptPublished)
-            {
-                Assert.IsTrue(isEncryptPublished, "Encrypt Publish Failed");
-            }
-            else
-            {
-                pubnub.DetailedHistory<string>(channel, -1, encryptPublishTimetoken, -1, false, CaptureEncryptDetailedHistoryCallback, DummyErrorCallback);
-                mreEncryptDetailedHistory.WaitOne(310 * 1000);
-                Assert.IsTrue(isEncryptDetailedHistory, "Unable to decrypt the successful Publish");
-            }
+                    if (!isEncryptPublished)
+                    {
+                        Deployment.Current.Dispatcher.BeginInvoke(() =>
+                       {
+                           Assert.IsTrue(isEncryptPublished, "Encrypt Publish Failed");
+                           TestComplete();
+                       });
+                    }
+                    else
+                    {
+                        mreDetailedHistory = new ManualResetEvent(false);
+                        pubnub.DetailedHistory<string>(channel, -1, encryptPublishTimetoken, -1, false, CaptureEncryptDetailedHistoryCallback, DummyErrorCallback);
+                        mreDetailedHistory.WaitOne(60 * 1000);
+                        Deployment.Current.Dispatcher.BeginInvoke(() =>
+                       {
+                           Assert.IsTrue(isEncryptDetailedHistory, "Unable to decrypt the successful Publish");
+                           TestComplete();
+                       });
+                    }
+                });
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo()
         {
-            isSecretEncryptPublished = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "enigma", false);
-            string channel = "hello_my_channel";
-            string message = messageForSecretEncryptPublish;
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    isSecretEncryptPublished = false;
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "enigma", false);
+                    string channel = "hello_my_channel";
+                    string message = messageForSecretEncryptPublish;
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenAMessageIsPublished";
+                    unitTest.TestCaseName = "ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.Publish<string>(channel, message, ReturnSuccessSecretEncryptPublishCodeCallback, DummyErrorCallback);
-            mreSecretEncryptPublish.WaitOne(310 * 1000);
+                    mrePublish = new ManualResetEvent(false);
+                    pubnub.Publish<string>(channel, message, ReturnSuccessSecretEncryptPublishCodeCallback, DummyErrorCallback);
+                    mrePublish.WaitOne(60 * 1000);
 
-            if (!isSecretEncryptPublished)
-            {
-                Assert.IsTrue(isSecretEncryptPublished, "Secret Encrypt Publish Failed");
-            }
-            else
-            {
-                pubnub.DetailedHistory<string>(channel, -1, secretEncryptPublishTimetoken, -1, false, CaptureSecretEncryptDetailedHistoryCallback, DummyErrorCallback);
-                mreSecretEncryptDetailedHistory.WaitOne(310 * 1000);
-                Assert.IsTrue(isSecretEncryptDetailedHistory, "Unable to decrypt the successful Secret key Publish");
-            }
+                    if (!isSecretEncryptPublished)
+                    {
+                        Deployment.Current.Dispatcher.BeginInvoke(() =>
+                       {
+                           Assert.IsTrue(isSecretEncryptPublished, "Secret Encrypt Publish Failed");
+                           TestComplete();
+                       });
+                    }
+                    else
+                    {
+                        mreDetailedHistory = new ManualResetEvent(false);
+                        pubnub.DetailedHistory<string>(channel, -1, secretEncryptPublishTimetoken, -1, false, CaptureSecretEncryptDetailedHistoryCallback, DummyErrorCallback);
+                        mreDetailedHistory.WaitOne(60 * 1000);
+                        Deployment.Current.Dispatcher.BeginInvoke(() =>
+                       {
+                           Assert.IsTrue(isSecretEncryptDetailedHistory, "Unable to decrypt the successful Secret key Publish");
+                           TestComplete();
+                       });
+                    }
+                });
         }
 
         [Asynchronous]
@@ -301,7 +353,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                 }
             }
-            mreUnencryptedPublish.Set();
+            mrePublish.Set();
         }
 
         [Asynchronous]
@@ -321,7 +373,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                 }
             }
-            mreUnencryptObjectPublish.Set();
+            mrePublish.Set();
         }
 
         [Asynchronous]
@@ -341,7 +393,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                 }
             }
-            mreEncryptObjectPublish.Set();
+            mrePublish.Set();
         }
 
         [Asynchronous]
@@ -361,7 +413,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                 }
             }
-            mreEncryptPublish.Set();
+            mrePublish.Set();
         }
 
         [Asynchronous]
@@ -381,7 +433,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                 }
             }
-            mreSecretEncryptPublish.Set();
+            mrePublish.Set();
         }
 
         [Asynchronous]
@@ -400,7 +452,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 }
             }
 
-            mreUnencryptDetailedHistory.Set();
+            mreDetailedHistory.Set();
         }
 
         [Asynchronous]
@@ -409,17 +461,17 @@ namespace PubnubWindowsPhone.Test.UnitTest
             if (!string.IsNullOrWhiteSpace(result))
             {
                 object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[] && deserializedMessage.Length > 0)
+                if (deserializedMessage is object[])
                 {
                     JArray message = deserializedMessage[0] as JArray;
-                    if (message != null && message.Count > 0 && message[0].ToString(Formatting.None) == messageObjectForUnencryptPublish)
+                    if (message != null && message[0].ToString(Formatting.None) == messageObjectForUnencryptPublish)
                     {
                         isUnencryptObjectDetailedHistory = true;
                     }
                 }
             }
 
-            mreUnencryptObjectDetailedHistory.Set();
+            mreDetailedHistory.Set();
         }
 
         [Asynchronous]
@@ -428,17 +480,17 @@ namespace PubnubWindowsPhone.Test.UnitTest
             if (!string.IsNullOrWhiteSpace(result))
             {
                 object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[] && deserializedMessage.Length > 0)
+                if (deserializedMessage is object[])
                 {
                     JArray message = deserializedMessage[0] as JArray;
-                    if (message != null && message.Count > 0 && message[0].ToString(Formatting.None) == messageObjectForEncryptPublish)
+                    if (message != null && message[0].ToString(Formatting.None) == messageObjectForEncryptPublish)
                     {
                         isEncryptObjectDetailedHistory = true;
                     }
                 }
             }
 
-            mreEncryptObjectDetailedHistory.Set();
+            mreDetailedHistory.Set();
         }
 
         [Asynchronous]
@@ -457,7 +509,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 }
             }
 
-            mreEncryptDetailedHistory.Set();
+            mreDetailedHistory.Set();
         }
 
         [Asynchronous]
@@ -476,58 +528,81 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 }
             }
 
-            mreSecretEncryptDetailedHistory.Set();
+            mreDetailedHistory.Set();
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenPubnubShouldGenerateUniqueIdentifier()
         {
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-            Assert.IsNotNull(pubnub.GenerateGuid());
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                               {
+                                   Assert.IsNotNull(pubnub.GenerateGuid());
+                                   TestComplete();
+                               });
+                });
+
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenPublishKeyShouldNotBeEmpty()
         {
             bool isExpectedException = false;
-            Pubnub pubnub = new Pubnub("", PubnubCommon.SubscribeKey, "", "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub("", PubnubCommon.SubscribeKey, "", "", false);
 
-            string channel = "hello_my_channel";
-            string message = "Pubnub API Usage Example";
+                    string channel = "hello_my_channel";
+                    string message = "Pubnub API Usage Example";
 
-            try
-            {
-                pubnub.Publish<string>(channel, message, null, DummyErrorCallback);
-            }
-            catch (MissingFieldException)
-            {
-                isExpectedException = true;
-            }
-            catch (Exception)
-            {
-                isExpectedException = false;
-            }
-            Assert.IsTrue(isExpectedException);
+                    try
+                    {
+                        pubnub.Publish<string>(channel, message, null, DummyErrorCallback);
+                    }
+                    catch (MissingFieldException)
+                    {
+                        isExpectedException = true;
+                    }
+                    catch (Exception)
+                    {
+                        isExpectedException = false;
+                    }
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                        {
+                            Assert.IsTrue(isExpectedException);
+                            TestComplete();
+                        });
+                });
         }
 
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenOptionalSecretKeyShouldBeProvidedInConstructor()
         {
-            isPublished2 = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey);
-            string channel = "hello_my_channel";
-            string message = "Pubnub API Usage Example";
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    isPublished2 = false;
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey);
+                    string channel = "hello_my_channel";
+                    string message = "Pubnub API Usage Example";
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenOptionalSecretKeyShouldBeProvidedInConstructor";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenAMessageIsPublished";
+                    unitTest.TestCaseName = "ThenOptionalSecretKeyShouldBeProvidedInConstructor";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.Publish<string>(channel, message, ReturnSecretKeyPublishCallback, DummyErrorCallback);
-            mreOptionalSecretKeyPublish.WaitOne(310 * 1000);
-            Assert.IsTrue(isPublished2, "Publish Failed with secret key");
+                    mrePublish = new ManualResetEvent(false);
+                    pubnub.Publish<string>(channel, message, ReturnSecretKeyPublishCallback, DummyErrorCallback);
+                    mrePublish.WaitOne(60 * 1000);
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                               {
+                                   Assert.IsTrue(isPublished2, "Publish Failed with secret key");
+                                   TestComplete();
+                               });
+                });
         }
 
         [Asynchronous]
@@ -546,25 +621,33 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                 }
             }
-            mreOptionalSecretKeyPublish.Set();
+            mrePublish.Set();
         }
 
-        [TestMethod]
+        [TestMethod,Asynchronous]
         public void IfSSLNotProvidedThenDefaultShouldBeFalse()
         {
-            isPublished3 = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "");
-            string channel = "hello_my_channel";
-            string message = "Pubnub API Usage Example";
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    isPublished3 = false;
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "");
+                    string channel = "hello_my_channel";
+                    string message = "Pubnub API Usage Example";
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "IfSSLNotProvidedThenDefaultShouldBeFalse";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenAMessageIsPublished";
+                    unitTest.TestCaseName = "IfSSLNotProvidedThenDefaultShouldBeFalse";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.Publish<string>(channel, message, ReturnNoSSLDefaultFalseCallback, DummyErrorCallback);
-            mreNoSslPublish.WaitOne(310 * 1000);
-            Assert.IsTrue(isPublished3, "Publish Failed with no SSL");
+                    mrePublish = new ManualResetEvent(false);
+                    pubnub.Publish<string>(channel, message, ReturnNoSSLDefaultFalseCallback, DummyErrorCallback);
+                    mrePublish.WaitOne(60 * 1000);
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                               {
+                                   Assert.IsTrue(isPublished3, "Publish Failed with no SSL");
+                                   TestComplete();
+                               });
+                });
         }
 
         [Asynchronous]
@@ -572,48 +655,64 @@ namespace PubnubWindowsPhone.Test.UnitTest
         {
             if (!string.IsNullOrWhiteSpace(result))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
-                {
-                    long statusCode = Int64.Parse(deserializedMessage[0].ToString());
-                    string statusMessage = (string)deserializedMessage[1];
-                    if (statusCode == 1 && statusMessage.ToLower() == "sent")
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
-                        isPublished3 = true;
-                    }
-                }
+                        object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                        if (deserializedMessage is object[])
+                        {
+                            long statusCode = Int64.Parse(deserializedMessage[0].ToString());
+                            string statusMessage = (string)deserializedMessage[1];
+                            if (statusCode == 1 && statusMessage.ToLower() == "sent")
+                            {
+                                isPublished3 = true;
+                            }
+                        }
+                    });
             }
-            mreNoSslPublish.Set();
+            mrePublish.Set();
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo()
         {
-            isComplexObjectPublished = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    isComplexObjectPublished = false;
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenAMessageIsPublished";
+                    unitTest.TestCaseName = "ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "hello_my_channel";
-            object message = new PubnubDemoObject();
-            messageComplexObjectForPublish = JsonConvert.SerializeObject(message);
+                    string channel = "hello_my_channel";
+                    object message = new PubnubDemoObject();
+                    messageComplexObjectForPublish = JsonConvert.SerializeObject(message);
 
-            pubnub.Publish<string>(channel, message, ReturnSuccessComplexObjectPublishCodeCallback, DummyErrorCallback);
-            mreComplexObjectPublish.WaitOne(310 * 1000);
+                    mrePublish = new ManualResetEvent(false);
+                    pubnub.Publish<string>(channel, message, ReturnSuccessComplexObjectPublishCodeCallback, DummyErrorCallback);
+                    mrePublish.WaitOne(60 * 1000);
 
-            if (!isComplexObjectPublished)
-            {
-                Assert.IsTrue(isComplexObjectPublished, "Complex Object Publish Failed");
-            }
-            else
-            {
-                pubnub.DetailedHistory<string>(channel, -1, complexObjectPublishTimetoken, -1, false, CaptureComplexObjectDetailedHistoryCallback, DummyErrorCallback);
-                mreComplexObjectDetailedHistory.WaitOne(310 * 1000);
-                Assert.IsTrue(isComplexObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
-            }
+                    if (!isComplexObjectPublished)
+                    {
+                        Deployment.Current.Dispatcher.BeginInvoke(() =>
+                            {
+                                Assert.IsTrue(isComplexObjectPublished, "Complex Object Publish Failed");
+                                TestComplete();
+                            });
+                    }
+                    else
+                    {
+                        mreDetailedHistory = new ManualResetEvent(false);
+                        pubnub.DetailedHistory<string>(channel, -1, complexObjectPublishTimetoken, -1, false, CaptureComplexObjectDetailedHistoryCallback, DummyErrorCallback);
+                        mreDetailedHistory.WaitOne(60 * 1000);
+                        Deployment.Current.Dispatcher.BeginInvoke(() =>
+                            {
+                                Assert.IsTrue(isComplexObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
+                                TestComplete();
+                            });
+                    }
+                });
         }
 
         [Asynchronous]
@@ -621,21 +720,24 @@ namespace PubnubWindowsPhone.Test.UnitTest
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
-                {
-                    long statusCode = Int64.Parse(deserializedMessage[0].ToString());
-                    string statusMessage = (string)deserializedMessage[1];
-                    if (statusCode == 1 && statusMessage.ToLower() == "sent")
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
-                        isComplexObjectPublished = true;
-                        complexObjectPublishTimetoken = Convert.ToInt64(deserializedMessage[2].ToString());
-                    }
-                }
+                        object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                        if (deserializedMessage is object[])
+                        {
+                            long statusCode = Int64.Parse(deserializedMessage[0].ToString());
+                            string statusMessage = (string)deserializedMessage[1];
+                            if (statusCode == 1 && statusMessage.ToLower() == "sent")
+                            {
+                                isComplexObjectPublished = true;
+                                complexObjectPublishTimetoken = Convert.ToInt64(deserializedMessage[2].ToString());
+                            }
+                        }
+                    });
             }
 
 
-            mreComplexObjectPublish.Set();
+            mrePublish.Set();
 
         }
 
@@ -644,49 +746,65 @@ namespace PubnubWindowsPhone.Test.UnitTest
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
-                {
-                    JArray message = deserializedMessage[0] as JArray;
-                    if (message != null && message[0].ToString(Formatting.None) == messageComplexObjectForPublish)
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
-                        isComplexObjectDetailedHistory = true;
-                    }
-                }
+                        object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                        if (deserializedMessage is object[])
+                        {
+                            JArray message = deserializedMessage[0] as JArray;
+                            if (message != null && message[0].ToString(Formatting.None) == messageComplexObjectForPublish)
+                            {
+                                isComplexObjectDetailedHistory = true;
+                            }
+                        }
+                    });
             }
 
-            mreComplexObjectDetailedHistory.Set();
+            mreDetailedHistory.Set();
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenDisableJsonEncodeShouldSendSerializedObjectMessage()
         {
-            isSerializedObjectMessagePublished = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
-            pubnub.EnableJsonEncodingForPublish = false;
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    isSerializedObjectMessagePublished = false;
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+                    pubnub.EnableJsonEncodingForPublish = false;
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenDisableJsonEncodeShouldSendSerializedObjectMessage";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenAMessageIsPublished";
+                    unitTest.TestCaseName = "ThenDisableJsonEncodeShouldSendSerializedObjectMessage";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "hello_my_channel";
-            object message = "{\"operation\":\"ReturnData\",\"channel\":\"Mobile1\",\"sequenceNumber\":0,\"data\":[\"ping 1.0.0.1\"]}";
-            serializedObjectMessageForPublish = message.ToString();
+                    string channel = "hello_my_channel";
+                    object message = "{\"operation\":\"ReturnData\",\"channel\":\"Mobile1\",\"sequenceNumber\":0,\"data\":[\"ping 1.0.0.1\"]}";
+                    serializedObjectMessageForPublish = message.ToString();
 
-            pubnub.Publish<string>(channel, message, ReturnSuccessSerializedObjectMessageForPublishCallback, DummyErrorCallback);
-            mreSerializedObjectMessageForPublish.WaitOne(310 * 1000);
+                    mrePublish = new ManualResetEvent(false);
+                    pubnub.Publish<string>(channel, message, ReturnSuccessSerializedObjectMessageForPublishCallback, DummyErrorCallback);
+                    mrePublish.WaitOne(60 * 1000);
 
-            if (!isSerializedObjectMessagePublished)
-            {
-                Assert.IsTrue(isSerializedObjectMessagePublished, "Serialized Object Message Publish Failed");
-            }
-            else
-            {
-                pubnub.DetailedHistory<string>(channel, -1, serializedMessagePublishTimetoken, -1, false, CaptureSerializedMessagePublishDetailedHistoryCallback, DummyErrorCallback);
-                mreSerializedMessagePublishDetailedHistory.WaitOne(310 * 1000);
-                Assert.IsTrue(isSerializedObjectMessageDetailedHistory, "Unable to match the successful serialized object message Publish");
-            }
+                    if (!isSerializedObjectMessagePublished)
+                    {
+                        Deployment.Current.Dispatcher.BeginInvoke(() =>
+                            {
+                                Assert.IsTrue(isSerializedObjectMessagePublished, "Serialized Object Message Publish Failed");
+                                TestComplete();
+                            });
+                    }
+                    else
+                    {
+                        mreDetailedHistory = new ManualResetEvent(false);
+                        pubnub.DetailedHistory<string>(channel, -1, serializedMessagePublishTimetoken, -1, false, CaptureSerializedMessagePublishDetailedHistoryCallback, DummyErrorCallback);
+                        mreDetailedHistory.WaitOne(60 * 1000);
+                        Deployment.Current.Dispatcher.BeginInvoke(() =>
+                            {
+                                Assert.IsTrue(isSerializedObjectMessageDetailedHistory, "Unable to match the successful serialized object message Publish");
+                                TestComplete();
+                            });
+                    }
+                });
         }
 
         [Asynchronous]
@@ -694,19 +812,22 @@ namespace PubnubWindowsPhone.Test.UnitTest
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedResult = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedResult is object[])
-                {
-                    long statusCode = Int64.Parse(deserializedResult[0].ToString());
-                    string statusMessage = (string)deserializedResult[1];
-                    if (statusCode == 1 && statusMessage.ToLower() == "sent")
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
-                        isSerializedObjectMessagePublished = true;
-                        serializedMessagePublishTimetoken = Convert.ToInt64(deserializedResult[2].ToString());
-                    }
-                }
+                        object[] deserializedResult = JsonConvert.DeserializeObject<object[]>(result);
+                        if (deserializedResult is object[])
+                        {
+                            long statusCode = Int64.Parse(deserializedResult[0].ToString());
+                            string statusMessage = (string)deserializedResult[1];
+                            if (statusCode == 1 && statusMessage.ToLower() == "sent")
+                            {
+                                isSerializedObjectMessagePublished = true;
+                                serializedMessagePublishTimetoken = Convert.ToInt64(deserializedResult[2].ToString());
+                            }
+                        }
+                    });
             }
-            mreSerializedObjectMessageForPublish.Set();
+            mrePublish.Set();
         }
 
         [Asynchronous]
@@ -714,21 +835,24 @@ namespace PubnubWindowsPhone.Test.UnitTest
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
-                {
-                    JArray message = deserializedMessage[0] as JArray;
-                    if (message != null && message[0].ToString(Formatting.None) == serializedObjectMessageForPublish)
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
-                        isSerializedObjectMessageDetailedHistory = true;
-                    }
-                }
+                        object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                        if (deserializedMessage is object[])
+                        {
+                            JArray message = deserializedMessage[0] as JArray;
+                            if (message != null && message[0].ToString(Formatting.None) == serializedObjectMessageForPublish)
+                            {
+                                isSerializedObjectMessageDetailedHistory = true;
+                            }
+                        }
+                    });
             }
 
-            mreSerializedMessagePublishDetailedHistory.Set();
+            mreDetailedHistory.Set();
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenLargeMessageShoudFailWithMessageTooLargeInfo()
         {
             ThreadPool.QueueUserWorkItem((s) =>
@@ -744,19 +868,19 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     string channel = "hello_my_channel";
                     string message = messageLarge2K.Substring(0, 1320);
 
-                    pubnub.Publish<string>(channel, message, DummyPublishMessageTooLargeInfoCallback, ReturnPublishMessageTooLargeErrorCallback);
-                    mreLaregMessagePublish.WaitOne(310 * 1000);
-
+                    mrePublish = new ManualResetEvent(false);
+                    pubnub.Publish<string>(channel, message, ReturnPublishMessageTooLargeInfoCallback, ReturnPublishMessageTooLargeErrorCallback);
+                    mrePublish.WaitOne(60 * 1000);
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(isLargeMessagePublished, "Message Too Large is not failing as expected.");
-                            //TestComplete();
+                            TestComplete();
                         });
                 });
         }
 
         [Asynchronous]
-        private void DummyPublishMessageTooLargeInfoCallback(string result)
+        private void ReturnPublishMessageTooLargeInfoCallback(string result)
         {
         }
 
@@ -770,13 +894,12 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     isLargeMessagePublished = true;
                 }
             }
-            mreLaregMessagePublish.Set();
+            mrePublish.Set();
         }
         
         [Asynchronous]
         private void DummyErrorCallback(PubnubClientError result)
         {
-            System.Diagnostics.Debug.WriteLine(result.Description);
         }
 
     }

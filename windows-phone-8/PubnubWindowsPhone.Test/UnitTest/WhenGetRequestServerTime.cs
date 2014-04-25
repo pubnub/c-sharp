@@ -25,7 +25,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
         ManualResetEvent mreTime = new ManualResetEvent(false);
         bool timeReceived = false;
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         [Description("Gets the Server Time in Unix time nanosecond format")]
         public void ThenItShouldReturnTimeStamp()
         {
@@ -39,10 +39,11 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     pubnub.PubnubUnitTest = unitTest;
 
                     pubnub.Time<string>(ReturnTimeStampCallback, DummyErrorCallback);
-                    mreTime.WaitOne(310 * 1000);
+                    mreTime.WaitOne(60 * 1000);
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(timeReceived, "time() Failed");
+                            TestComplete();
                         });
                 });
         }
@@ -50,29 +51,22 @@ namespace PubnubWindowsPhone.Test.UnitTest
         [Asynchronous]
         private void ReturnTimeStampCallback(string result)
         {
-            try
-            {
-                Deployment.Current.Dispatcher.BeginInvoke(() =>
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    if (!string.IsNullOrWhiteSpace(result))
                     {
-                        if (!string.IsNullOrWhiteSpace(result))
+                        object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                        if (deserializedMessage is object[])
                         {
-                            object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                            if (deserializedMessage is object[])
+                            string time = deserializedMessage[0].ToString();
+                            if (time.Length > 0)
                             {
-                                string time = deserializedMessage[0].ToString();
-                                if (time.Length > 0)
-                                {
-                                    timeReceived = true;
-                                }
+                                timeReceived = true;
                             }
                         }
-                    });
-            }
-            catch { }
-            finally
-            {
-                mreTime.Set();
-            }
+                    }
+                });
+            mreTime.Set();
         }
 
         [Asynchronous]

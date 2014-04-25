@@ -23,46 +23,48 @@ namespace PubnubWindowsPhone.Test.UnitTest
     [TestClass]
     public class WhenDetailedHistoryIsRequested : WorkItemTest
     {
-        ManualResetEvent mreMessageCount10 = new ManualResetEvent(false);
-        ManualResetEvent mreMessageCount10ReverseTrue = new ManualResetEvent(false);
-        ManualResetEvent mreMessageStartReverseTrue = new ManualResetEvent(false);
-        ManualResetEvent mrePublishStartReverseTrue = new ManualResetEvent(false);
-        ManualResetEvent grantManualEvent = new ManualResetEvent(false);
+        ManualResetEvent mreDetailedHistory = new ManualResetEvent(false);
+        ManualResetEvent mrePublish = new ManualResetEvent(false);
+        ManualResetEvent mreGrant = new ManualResetEvent(false);
 
         bool message10Received = false;
         bool message10ReverseTrueReceived = false;
-        bool receivedGrantMessage = false;
-
         bool messageStartReverseTrue = false;
+        bool receivedGrantMessage = false;
 
         int expectedCountAtStartTimeWithReverseTrue=0;
         long startTimeWithReverseTrue = 0;
 
-        [ClassInitialize]
+        [ClassInitialize, Asynchronous]
         public void Init()
         {
             if (!PubnubCommon.PAMEnabled)
             {
-                Assert.Inconclusive("WhenAClientIsPresent Grant access failed.");
+                TestComplete();
                 return;
             }
 
             receivedGrantMessage = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "GrantRequestUnitTest";
-            unitTest.TestCaseName = "Init";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "GrantRequestUnitTest";
+                    unitTest.TestCaseName = "Init";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "hello_my_channel";
+                    string channel = "hello_my_channel";
 
-            pubnub.GrantAccess<string>(channel, true, true, 20, ThenDetailedHistoryInitializeShouldReturnGrantMessage, DummyErrorCallback);
-            //Thread.Sleep(1000);
-
-            grantManualEvent.WaitOne();
-
-            Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed.");
+                    mreGrant = new ManualResetEvent(false);
+                    pubnub.GrantAccess<string>(channel, true, true, 20, ThenDetailedHistoryInitializeShouldReturnGrantMessage, DummyErrorCallback);
+                    mreGrant.WaitOne(60 * 1000);
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                        {
+                            Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed.");
+                            TestComplete();
+                        });
+                });
         }
 
         [Asynchronous]
@@ -84,25 +86,33 @@ namespace PubnubWindowsPhone.Test.UnitTest
             catch { }
             finally
             {
-                grantManualEvent.Set();
+                mreGrant.Set();
             }
         }
-
-        [TestMethod]
+        
+        [TestMethod,Asynchronous]
         public void DetailHistoryCount10ReturnsRecords()
         {
             message10Received = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
-            string channel = "hello_my_channel";
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+                    string channel = "hello_my_channel";
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailHistoryCount10ReturnsRecords";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
+                    unitTest.TestCaseName = "DetailHistoryCount10ReturnsRecords";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.DetailedHistory<string>(channel, 10, DetailedHistoryCount10Callback, DummyErrorCallback);
-            mreMessageCount10.WaitOne(310 * 1000);
-            Assert.IsTrue(message10Received, "Detailed History Failed");
+                    mreDetailedHistory = new ManualResetEvent(false);
+                    pubnub.DetailedHistory<string>(channel, 10, DetailedHistoryCount10Callback, DummyErrorCallback);
+                    mreDetailedHistory.WaitOne(60 * 1000);
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                        {
+                            Assert.IsTrue(message10Received, "Detailed History Failed");
+                            TestComplete();
+                        });
+                });
         }
 
         [Asynchronous]
@@ -124,24 +134,32 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 }
             }
 
-            mreMessageCount10.Set();
+            mreDetailedHistory.Set();
         }
 
-        [TestMethod]
+        [TestMethod,Asynchronous]
         public void DetailHistoryCount10ReverseTrueReturnsRecords()
         {
             message10ReverseTrueReceived = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
-            string channel = "hello_my_channel";
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+                    string channel = "hello_my_channel";
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailHistoryCount10ReverseTrueReturnsRecords";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
+                    unitTest.TestCaseName = "DetailHistoryCount10ReverseTrueReturnsRecords";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.DetailedHistory<string>(channel, -1, -1, 10, true, DetailedHistoryCount10ReverseTrueCallback, DummyErrorCallback);
-            mreMessageCount10ReverseTrue.WaitOne(310 * 1000);
-            Assert.IsTrue(message10ReverseTrueReceived, "Detailed History Failed");
+                    mreDetailedHistory = new ManualResetEvent(false);
+                    pubnub.DetailedHistory<string>(channel, -1, -1, 10, true, DetailedHistoryCount10ReverseTrueCallback, DummyErrorCallback);
+                    mreDetailedHistory.WaitOne(60 * 1000);
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                        {
+                            Assert.IsTrue(message10ReverseTrueReceived, "Detailed History Failed");
+                            TestComplete();
+                        });
+                });
         }
 
         [Asynchronous]
@@ -163,39 +181,50 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 }
             }
 
-            mreMessageCount10ReverseTrue.Set();
+            mreDetailedHistory.Set();
         }
 
-        [TestMethod]
+        [TestMethod,Asynchronous]
         public void DetailedHistoryStartWithReverseTrue()
         {
             expectedCountAtStartTimeWithReverseTrue = 0;
             messageStartReverseTrue = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailedHistoryStartWithReverseTrue";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
+                    unitTest.TestCaseName = "DetailedHistoryStartWithReverseTrue";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "hello_my_channel";
-            startTimeWithReverseTrue = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(new DateTime(2012, 12, 1));
-            for (int index = 0; index < 10; index++)
-            {
-                pubnub.Publish<string>(channel,
-                    string.Format("DetailedHistoryStartTimeWithReverseTrue {0}", index),
-                    DetailedHistorySamplePublishCallback, DummyErrorCallback);
-                mrePublishStartReverseTrue.WaitOne(310 * 1000);
-                Thread.Sleep(200);
-            }
-            if (!unitTest.EnableStubTest)
-            {
-                Thread.Sleep(1000);
-            }
+                    string channel = "hello_my_channel";
+                    if (PubnubCommon.EnableStubTest)
+                    {
+                        startTimeWithReverseTrue = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(new DateTime(2012, 12, 1));
+                    }
+                    else
+                    {
+                        startTimeWithReverseTrue = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(DateTime.UtcNow);
+                    }
+                    for (int index = 0; index < 10; index++)
+                    {
+                        mrePublish = new ManualResetEvent(false);
+                        pubnub.Publish<string>(channel,
+                            string.Format("DetailedHistoryStartTimeWithReverseTrue {0}", index),
+                            DetailedHistorySamplePublishCallback, DummyErrorCallback);
+                        mrePublish.WaitOne(60 * 1000);
+                    }
 
-            pubnub.DetailedHistory<string>(channel, startTimeWithReverseTrue, DetailedHistoryStartWithReverseTrueCallback, DummyErrorCallback, true);
-            mreMessageStartReverseTrue.WaitOne(310 * 1000);
-            Assert.IsTrue(messageStartReverseTrue, "Detailed History with Start and Reverse True Failed");
+                    mreDetailedHistory = new ManualResetEvent(false);
+                    pubnub.DetailedHistory<string>(channel, startTimeWithReverseTrue, DetailedHistoryStartWithReverseTrueCallback, DummyErrorCallback, true);
+                    mreDetailedHistory.WaitOne(60 * 1000);
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                        {
+                            Assert.IsTrue(messageStartReverseTrue, "Detailed History with Start and Reverse True Failed");
+                            TestComplete();
+                        });
+                });
         }
 
         [Asynchronous]
@@ -218,10 +247,6 @@ namespace PubnubWindowsPhone.Test.UnitTest
                                 {
                                     actualCountAtStartTimeWithReverseFalse++;
                                 }
-                                if (actualCountAtStartTimeWithReverseFalse >= expectedCountAtStartTimeWithReverseTrue)
-                                {
-                                    break;
-                                }
                             }
                             if (actualCountAtStartTimeWithReverseFalse == expectedCountAtStartTimeWithReverseTrue)
                             {
@@ -231,7 +256,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                 }
             }
-            mreMessageStartReverseTrue.Set();
+            mreDetailedHistory.Set();
         }
 
         [Asynchronous]
@@ -250,7 +275,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                 }
             }
-            mrePublishStartReverseTrue.Set();
+            mrePublish.Set();
         }
 
         [Asynchronous]
