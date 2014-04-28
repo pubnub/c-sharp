@@ -39,8 +39,8 @@ namespace PubNubMessaging.Tests
         {
 
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+				Common.PublishKey,
+				Common.SubscribeKey,
                 "",
                 "",
                 false);
@@ -62,8 +62,8 @@ namespace PubNubMessaging.Tests
         {
 
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+				Common.PublishKey,
+				Common.SubscribeKey,
                 "",
                 "",
                 true);
@@ -83,8 +83,8 @@ namespace PubNubMessaging.Tests
         {
 
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+				Common.PublishKey,
+				Common.SubscribeKey,
                 "",
                 "enigma",
                 true);
@@ -103,9 +103,9 @@ namespace PubNubMessaging.Tests
         {
 
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
-                "secret",
+				Common.PublishKey,
+				Common.SubscribeKey,
+				Common.SecretKey,
                 "",
                 false);
             string channel = "hello_world";
@@ -123,9 +123,9 @@ namespace PubNubMessaging.Tests
         {
 
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
-                "secret",
+				Common.PublishKey,
+				Common.SubscribeKey,
+				Common.SecretKey,
                 "",
                 true);
             string channel = "hello_world";
@@ -143,9 +143,9 @@ namespace PubNubMessaging.Tests
         {
 
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
-                "secret",
+				Common.PublishKey,
+				Common.SubscribeKey,
+				Common.SecretKey,
                 "engima",
                 false);
             string channel = "hello_world";
@@ -164,9 +164,9 @@ namespace PubNubMessaging.Tests
         {
 
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
-                "secret",
+				Common.PublishKey,
+				Common.SubscribeKey,
+				Common.SecretKey,
                 "enigma",
                 true);
             string channel = "hello_world";
@@ -185,8 +185,8 @@ namespace PubNubMessaging.Tests
         {
 
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+				Common.PublishKey,
+				Common.SubscribeKey,
                 "",
                 "enigma",
                 false);
@@ -202,12 +202,16 @@ namespace PubNubMessaging.Tests
             SubscribePublishAndParse (message, pubnub, common, channel);
         }
 
-        [Test]
-        public void TestForEmojiSSL ()
+        #if(UNITY_STANDALONE_WIN)
+		[Ignore]
+		#else
+		[Test]
+		#endif
+		public void TestForEmojiSSL ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+				Common.PublishKey,
+				Common.SubscribeKey,
                 "",
                 "",
                 true);
@@ -222,12 +226,16 @@ namespace PubNubMessaging.Tests
             SubscribePublishAndParse (message, pubnub, common, channel);
         }
 
-        [Test]
+        #if(UNITY_STANDALONE_WIN)
+		[Ignore]
+		#else
+		[Test]
+		#endif
         public void TestForEmojiCipher ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+				Common.PublishKey,
+				Common.SubscribeKey,
                 "",
                 "enigma",
                 false);
@@ -243,12 +251,16 @@ namespace PubNubMessaging.Tests
 
         }
 
-        [Test]
+        #if(UNITY_STANDALONE_WIN)
+		[Ignore]
+		#else
+		[Test]
+		#endif
         public void TestForEmoji ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+				Common.PublishKey,
+				Common.SubscribeKey,
                 "",
                 "",
                 false);
@@ -263,12 +275,16 @@ namespace PubNubMessaging.Tests
             SubscribePublishAndParse (message, pubnub, common, channel);
         }
 
-        [Test]
+        #if(UNITY_STANDALONE_WIN)
+		[Ignore]
+		#else
+		[Test]
+		#endif
         public void TestForEmojiCipherSSL ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+				Common.PublishKey,
+				Common.SubscribeKey,
                 "",
                 "enigma",
                 true);
@@ -283,12 +299,16 @@ namespace PubNubMessaging.Tests
             SubscribePublishAndParse (message, pubnub, common, channel);
         }
 
-        [Test]
+        #if(UNITY_STANDALONE_WIN)
+		[Ignore]
+		#else
+		[Test]
+		#endif
         public void TestForEmojiSecret ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
+				Common.PublishKey,
+				Common.SubscribeKey,
                 "",
                 "secret",
                 false);
@@ -304,13 +324,17 @@ namespace PubNubMessaging.Tests
 
         }
 
-        [Test]
+        #if(UNITY_STANDALONE_WIN)
+		[Ignore]
+		#else
+		[Test]
+		#endif
         public void TestForEmojiCipherSecret ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
-                "secret",
+				Common.PublishKey,
+				Common.SubscribeKey,
+				Common.SecretKey,
                 "enigma",
                 false);
             string channel = "hello_world";
@@ -324,13 +348,17 @@ namespace PubNubMessaging.Tests
             SubscribePublishAndParse (message, pubnub, common, channel);
         }
 
-        [Test]
+        #if(UNITY_STANDALONE_WIN)
+		[Ignore]
+		#else
+		[Test]
+		#endif
         public void TestForEmojiCipherSecretSSL ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
-                "secret",
+				Common.PublishKey,
+				Common.SubscribeKey,
+				Common.SecretKey,
                 "enigma",
                 true);
             string channel = "hello_world";
@@ -344,13 +372,17 @@ namespace PubNubMessaging.Tests
             SubscribePublishAndParse (message, pubnub, common, channel);
         }
 
-        [Test]
+        #if(UNITY_STANDALONE_WIN)
+		[Ignore]
+		#else
+		[Test]
+		#endif
         public void TestForEmojiSecretSSL ()
         {
             Pubnub pubnub = new Pubnub (
-                "demo",
-                "demo",
-                "secret",
+				Common.PublishKey,
+				Common.SubscribeKey,
+				Common.SecretKey,
                 "",
                 true);
             string channel = "hello_world";

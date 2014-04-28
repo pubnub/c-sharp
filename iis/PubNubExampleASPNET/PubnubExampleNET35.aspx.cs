@@ -30,7 +30,9 @@ namespace PubNubMessaging
         static int operationTimeoutInSeconds = 0;
         static int networkMaxRetries = 0;
         static int networkRetryIntervalInSeconds = 0;
-        static int heartbeatIntervalInSeconds = 0;
+        static int localClientheartbeatIntervalInSeconds = 0;
+        static int presenceHeartbeat = 0;
+        static int presenceHeartbeatInterval = 0;
 
 
         ManualResetEvent mre = new ManualResetEvent(false);
@@ -58,6 +60,10 @@ namespace PubNubMessaging
         {
             txtMessage.Attributes.Add("onmouseover", "javascript:MessageDisplayHolderMouseOver();");
             txtMessage.Attributes.Add("onmouseout", "javascript:MessageDisplayHolderMouseOut();");
+            if (!Page.IsPostBack)
+            {
+                txtUUID.Text = "myuuid";
+            }
         }
 
         private void CheckUserInputs()
@@ -84,8 +90,12 @@ namespace PubNubMessaging
             Int32.TryParse(txtRetryInterval.Text, out networkRetryIntervalInSeconds);
             networkRetryIntervalInSeconds = (networkRetryIntervalInSeconds <= 0) ? 10 : networkRetryIntervalInSeconds;
 
-            Int32.TryParse(txtHeartbeatInterval.Text, out heartbeatIntervalInSeconds);
-            heartbeatIntervalInSeconds = (heartbeatIntervalInSeconds <= 0) ? 10 : heartbeatIntervalInSeconds;
+            Int32.TryParse(txtLocalClientHeartbeatInterval.Text, out localClientheartbeatIntervalInSeconds);
+            localClientheartbeatIntervalInSeconds = (localClientheartbeatIntervalInSeconds <= 0) ? 10 : localClientheartbeatIntervalInSeconds;
+
+            Int32.TryParse(txtPresenceHeartbeat.Text, out presenceHeartbeat);
+
+            Int32.TryParse(txtPresenceHeartbeatInterval.Text, out presenceHeartbeatInterval);
 
             if (pubnub == null)
             {
@@ -96,7 +106,7 @@ namespace PubNubMessaging
                 txtSubKey.Enabled = false;
                 txtSecret.Enabled = false;
                 txtCipher.Enabled = false;
-                txtUUID.Enabled = false;
+                //txtUUID.Enabled = false;
                 chkSSL.Enabled = false;
                 chkResumeOnReconnect.Enabled = false;
 
@@ -104,7 +114,9 @@ namespace PubNubMessaging
                 txtNonSubscribeTimeout.Enabled = false;
                 txtNetworkMaxRetries.Enabled = false;
                 txtRetryInterval.Enabled = false;
-                txtHeartbeatInterval.Enabled = false;
+                txtLocalClientHeartbeatInterval.Enabled = false;
+                txtPresenceHeartbeat.Enabled = false;
+                txtPresenceHeartbeatInterval.Enabled = false;
 
                 btnReset.Enabled = true;
             }
@@ -114,8 +126,10 @@ namespace PubNubMessaging
             pubnub.NonSubscribeTimeout = operationTimeoutInSeconds;
             pubnub.NetworkCheckMaxRetries = networkMaxRetries;
             pubnub.NetworkCheckRetryInterval = networkRetryIntervalInSeconds;
-            pubnub.HeartbeatInterval = heartbeatIntervalInSeconds;
+            pubnub.LocalClientHeartbeatInterval = localClientheartbeatIntervalInSeconds;
             pubnub.EnableResumeOnReconnect = resumeOnReconnect;
+            pubnub.PresenceHeartbeat = presenceHeartbeat;
+            pubnub.PresenceHeartbeatInterval = presenceHeartbeatInterval;
         }
 
         private void AddToPubnubResultContainer(string result)
@@ -156,6 +170,13 @@ namespace PubNubMessaging
             AddToPubnubResultContainer("");
         }
 
+        /// <summary>
+        /// Callback method for error messages
+        /// </summary>
+        /// <param name="result"></param>
+        protected void DisplayErrorMessage(string result)
+        {
+        }
         /// <summary>
         /// Callback method for error messages
         /// </summary>
@@ -346,6 +367,26 @@ namespace PubNubMessaging
             ProcessPubnubRequest(e.CommandName);
         }
 
+        protected void btnWhereNow_Command(object sender, CommandEventArgs e)
+        {
+            ProcessPubnubRequest(e.CommandName);
+        }
+
+        protected void btnGlobalHereNow_Command(object sender, CommandEventArgs e)
+        {
+            ProcessPubnubRequest(e.CommandName);
+        }
+
+        protected void btnSetUserState_Command(object sender, CommandEventArgs e)
+        {
+            ProcessPubnubRequest(e.CommandName);
+        }
+
+        protected void btnGetUserState_Command(object sender, CommandEventArgs e)
+        {
+            ProcessPubnubRequest(e.CommandName);
+        }
+
         void ProcessPubnubRequest(string requestType)
         {
             CheckUserInputs();
@@ -376,7 +417,17 @@ namespace PubNubMessaging
                     pubnub.PresenceUnsubscribe<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayDisconnectCallbackMessage, DisplayErrorMessage);
                     break;
                 case "herenow":
-                    pubnub.HereNow<string>(channel, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    bool showUUID2 = chbShowUUIDList2.Checked;
+                    bool includeUserState2 = chbShowUserState2.Checked;
+                    pubnub.HereNow<string>(channel, showUUID2, includeUserState2, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    break;
+                case "globalherenow":
+                    bool showUUID = chbShowUUIDList.Checked;
+                    bool includeUserState = chbShowUserState.Checked;
+                    pubnub.GlobalHereNow<string>(showUUID, includeUserState, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    break;
+                case "wherenow":
+                    pubnub.WhereNow<string>(uuid, DisplayUserCallbackMessage, DisplayErrorMessage);
                     break;
                 case "time":
                     pubnub.Time<string>(DisplayUserCallbackMessage, DisplayErrorMessage);
@@ -399,6 +450,66 @@ namespace PubNubMessaging
                 case "disconnectandretry":
                     pubnub.TerminateCurrentSubscriberRequest();
                     break;
+                case "getuserstate":
+                    pubnub.GetUserState<string>(channel, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    break;
+                case "jsonsetuserstate":
+                    string jsonUserState = txtJsonUserState.Text;
+                    pubnub.SetUserState<string>(channel, jsonUserState, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    break;
+                case "setuserstate":
+                    string key1 = txtKey1.Text;
+                    string key2 = txtKey2.Text;
+                    string key3 = txtKey3.Text;
+                    string value1 = txtValue1.Text;
+                    string value2 = txtValue2.Text;
+                    string value3 = txtValue3.Text;
+
+                    int valueInt;
+                    double valueDouble;
+                    string currentUserState = "";
+
+                    if (Int32.TryParse(value1, out valueInt))
+                    {
+                        currentUserState = pubnub.SetLocalUserState(channel, key1, valueInt);
+                    }
+                    else if (Double.TryParse(value1, out valueDouble))
+                    {
+                        currentUserState = pubnub.SetLocalUserState(channel, key1, valueDouble);
+                    }
+                    else
+                    {
+                        currentUserState = pubnub.SetLocalUserState(channel, key1, value1);
+                    }
+
+                    if (Int32.TryParse(value2, out valueInt))
+                    {
+                        currentUserState = pubnub.SetLocalUserState(channel, key2, valueInt);
+                    }
+                    else if (Double.TryParse(value1, out valueDouble))
+                    {
+                        currentUserState = pubnub.SetLocalUserState(channel, key2, valueDouble);
+                    }
+                    else
+                    {
+                        currentUserState = pubnub.SetLocalUserState(channel, key2, value2);
+                    }
+
+                    if (Int32.TryParse(value3, out valueInt))
+                    {
+                        currentUserState = pubnub.SetLocalUserState(channel, key3, valueInt);
+                    }
+                    else if (Double.TryParse(value1, out valueDouble))
+                    {
+                        currentUserState = pubnub.SetLocalUserState(channel, key3, valueDouble);
+                    }
+                    else
+                    {
+                        currentUserState = pubnub.SetLocalUserState(channel, key3, value3);
+                    }
+
+                    pubnub.SetUserState<string>(channel, currentUserState, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    break;
                 default:
                     break;
             }
@@ -414,6 +525,11 @@ namespace PubNubMessaging
             string recordTest;
             if (_recordQueue.TryPeek(out recordTest))
             {
+                if (txtUUID.Text.Trim() == "")
+                {
+                    txtUUID.Text = pubnub.SessionUUID;
+                }
+
                 if (txtMessage.Text.Length > 1000)
                 {
                     string trucatedMessage = "..(truncated)..." + txtMessage.Text.Substring(txtMessage.Text.Length - 300);
@@ -443,7 +559,7 @@ namespace PubNubMessaging
             txtSubKey.Enabled = true;
             txtSecret.Enabled = true;
             txtCipher.Enabled = true;
-            txtUUID.Enabled = true;
+            //txtUUID.Enabled = true;
             chkSSL.Enabled = true;
             chkResumeOnReconnect.Enabled = true;
 
@@ -451,7 +567,9 @@ namespace PubNubMessaging
             txtNonSubscribeTimeout.Enabled = true;
             txtNetworkMaxRetries.Enabled = true;
             txtRetryInterval.Enabled = true;
-            txtHeartbeatInterval.Enabled = true;
+            txtLocalClientHeartbeatInterval.Enabled = true;
+            txtPresenceHeartbeat.Enabled = true;
+            txtPresenceHeartbeatInterval.Enabled = true;
 
             btnReset.Enabled = false;
 
@@ -476,8 +594,53 @@ namespace PubNubMessaging
             UpdatePanelLeft.Update();
         }
 
+        protected void btnOkayGlobalHereNow_OnClick(object sender, EventArgs e)
+        {
+            btnReset.Enabled = true;
 
+            lblErrorMessage.Text = "";
 
+            globalHereNowPopupExtender.Hide();
+
+            ProcessPubnubRequest("globalherenow");
+            UpdatePanelLeft.Update();
+        }
+
+        protected void btnOkayHereNow_OnClick(object sender, EventArgs e)
+        {
+            btnReset.Enabled = true;
+
+            lblErrorMessage.Text = "";
+
+            hereNowPopupExtender.Hide();
+
+            ProcessPubnubRequest("herenow");
+            UpdatePanelLeft.Update();
+        }
+
+        protected void btnOkayJsonSetUserState_OnClick(object sender, EventArgs e)
+        {
+            btnReset.Enabled = true;
+            lblErrorMessage.Text = "";
+
+            setUserStatePopupExtender.Hide();
+
+            ProcessPubnubRequest("jsonsetuserstate");
+
+            UpdatePanelLeft.Update();
+        }
+
+        protected void btnOkaySetUserState_OnClick(object sender, EventArgs e)
+        {
+            btnReset.Enabled = true;
+            lblErrorMessage.Text = "";
+
+            setUserStatePopupExtender.Hide();
+
+            ProcessPubnubRequest("setuserstate");
+
+            UpdatePanelLeft.Update();
+        }
     }
 }
 

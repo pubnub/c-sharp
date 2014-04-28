@@ -17,9 +17,11 @@ namespace PubNubMessaging.Example
     internal class GrantEventArgs : EventArgs
     {
         internal int ttl;
-        internal bool canWrite;
-        internal bool canRead;
+        internal string channel;
+        internal bool valToSet1;
+        internal bool valToSet2;
         internal bool isPresence;
+        internal CommonDialogStates cds;
     }
 
     public class GrantDialogFragment : Android.Support.V4.App.DialogFragment
@@ -28,6 +30,9 @@ namespace PubNubMessaging.Example
 
         Button btnDismiss;
         Button btnGrant;
+        TextView lblInput1, lblInput2, lblInput3;
+        ToggleButton tbRead;
+        EditText txtVal;
         View view;
 
         public bool IsPresenceGrant {
@@ -35,33 +40,53 @@ namespace PubNubMessaging.Example
             set;
         }
 
-        void ButtonGrantClick (object sender, EventArgs e)
-        {
-            ToggleButton tbCanWrite = view.FindViewById<ToggleButton> (Resource.Id.tbWrite);
-            ToggleButton tbCanRead = view.FindViewById<ToggleButton> (Resource.Id.tbRead);
-            EditText txtttl = view.FindViewById<EditText> (Resource.Id.txtttl);
-            int iTtl;
+        CommonDialogStates cds;
 
-            Int32.TryParse(txtttl.Text, out iTtl);
-            if (iTtl == 0) 
-            {
-                iTtl = 1440;
-                txtttl.Text = "1440";
-            }
-
-            FireEvent (iTtl, tbCanRead.Checked, tbCanWrite.Checked, IsPresenceGrant);
-
-            Dismiss();
+        public GrantDialogFragment(CommonDialogStates cds){
+            this.cds = cds;
         }
 
-        public void FireEvent(int iTtl, bool canRead, bool canWrite, bool isPresence){
+        void ButtonGrantClick (object sender, EventArgs e)
+        {
+            if (cds == CommonDialogStates.Grant) {
+
+                ToggleButton tbCanWrite = view.FindViewById<ToggleButton> (Resource.Id.tbWrite);
+                ToggleButton tbCanRead = view.FindViewById<ToggleButton> (Resource.Id.tbRead);
+                EditText txtttl = view.FindViewById<EditText> (Resource.Id.txtttl);
+                int iTtl;
+
+                Int32.TryParse (txtttl.Text, out iTtl);
+                if (iTtl == 0) {
+                    iTtl = 1440;
+                    txtttl.Text = "1440";
+                }
+
+                FireEvent (iTtl, tbCanRead.Checked, tbCanWrite.Checked, IsPresenceGrant, "");
+
+                Dismiss ();
+            } else if ((cds == CommonDialogStates.HereNow) 
+                ||  (cds == CommonDialogStates.GlobalHereNow)) {
+                ToggleButton tbCanWrite = view.FindViewById<ToggleButton> (Resource.Id.tbWrite);
+                ToggleButton tbCanRead = view.FindViewById<ToggleButton> (Resource.Id.tbRead);
+                EditText txtval = view.FindViewById<EditText> (Resource.Id.txtttl);
+
+                FireEvent (0, tbCanRead.Checked, tbCanWrite.Checked, IsPresenceGrant, txtval.Text);
+
+                Dismiss ();
+
+            }
+        }
+
+        public void FireEvent(int iTtl, bool canRead, bool canWrite, bool isPresence, string channel){
             if(GrantPerms != null)
             {
                 GrantEventArgs cea = new GrantEventArgs ();
-                cea.canRead = canRead;
-                cea.canWrite = canWrite;
+                cea.valToSet2 = canRead;
+                cea.valToSet1 = canWrite;
                 cea.ttl = iTtl;
                 cea.isPresence = isPresence;
+                cea.cds = cds;
+                cea.channel = channel;
                 GrantPerms(this, cea);
             }
         }
@@ -74,19 +99,73 @@ namespace PubNubMessaging.Example
             // Create our view
             view = inflater.Inflate(Resource.Layout.GrantDialog, container, true);
 
-            var tvGrantLabel = view.FindViewById<TextView>(Resource.Id.tvGrantLabel);
-            tvGrantLabel.Text = "Subscribe Grant";
-            if (IsPresenceGrant) 
-            {
-                tvGrantLabel.Text = "Presence Grant";
+            if (cds == CommonDialogStates.Grant) {
+
+                var tvGrantLabel = view.FindViewById<TextView> (Resource.Id.tvGrantLabel);
+                tvGrantLabel.Text = "Subscribe Grant";
+                if (IsPresenceGrant) {
+                    tvGrantLabel.Text = "Presence Grant";
+                }
+
+                // Handle dismiss button click
+                btnGrant = view.FindViewById<Button> (Resource.Id.btnGrant);
+                btnGrant.Click += ButtonGrantClick;
+
+                btnDismiss = view.FindViewById<Button> (Resource.Id.btnCancel);
+                btnDismiss.Click += ButtonDismissClick;
+            } else if (cds == CommonDialogStates.HereNow) {
+                var tvGrantLabel = view.FindViewById<TextView> (Resource.Id.tvGrantLabel);
+                tvGrantLabel.SetText(Resource.String.hereNow);
+
+                lblInput1 = view.FindViewById<TextView> (Resource.Id.lblGrant1);
+                lblInput1.SetText (Resource.String.showUuid);
+
+                lblInput2 = view.FindViewById<TextView> (Resource.Id.lblGrant2);
+                lblInput2.SetText (Resource.String.showUserState);
+
+                lblInput3 = view.FindViewById<TextView> (Resource.Id.lblGrant3);
+                lblInput3.SetText (Resource.String.channel);
+
+                txtVal = view.FindViewById<EditText> (Resource.Id.txtttl);
+                txtVal.InputType = Android.Text.InputTypes.TextFlagAutoComplete;
+
+                tbRead = view.FindViewById<ToggleButton> (Resource.Id.tbRead);
+                tbRead.Checked = true;
+
+                // Handle dismiss button click
+                btnGrant = view.FindViewById<Button> (Resource.Id.btnGrant);
+                btnGrant.SetText (Resource.String.hereNow);
+                btnGrant.Click += ButtonGrantClick;
+
+                btnDismiss = view.FindViewById<Button> (Resource.Id.btnCancel);
+                btnDismiss.Click += ButtonDismissClick;
+            } else if (cds == CommonDialogStates.GlobalHereNow) {
+                var tvGrantLabel = view.FindViewById<TextView> (Resource.Id.tvGrantLabel);
+                tvGrantLabel.SetText(Resource.String.globalHereNow);
+
+                lblInput1 = view.FindViewById<TextView> (Resource.Id.lblGrant1);
+                lblInput1.SetText (Resource.String.showUuid);
+
+                lblInput2 = view.FindViewById<TextView> (Resource.Id.lblGrant2);
+                lblInput2.SetText (Resource.String.showUserState);
+
+                lblInput3 = view.FindViewById<TextView> (Resource.Id.lblGrant3);
+                lblInput3.Visibility = ViewStates.Invisible;
+
+                txtVal = view.FindViewById<EditText> (Resource.Id.txtttl);
+                txtVal.Visibility = ViewStates.Invisible;
+
+                tbRead = view.FindViewById<ToggleButton> (Resource.Id.tbRead);
+                tbRead.Checked = true;
+
+                // Handle dismiss button click
+                btnGrant = view.FindViewById<Button> (Resource.Id.btnGrant);
+                btnGrant.SetText (Resource.String.globalHereNow);
+                btnGrant.Click += ButtonGrantClick;
+
+                btnDismiss = view.FindViewById<Button> (Resource.Id.btnCancel);
+                btnDismiss.Click += ButtonDismissClick;
             }
-
-            // Handle dismiss button click
-            btnGrant = view.FindViewById<Button>(Resource.Id.btnGrant);
-            btnGrant.Click += ButtonGrantClick;
-
-            btnDismiss = view.FindViewById<Button>(Resource.Id.btnCancel);
-            btnDismiss.Click += ButtonDismissClick;
 
             return view;
         }

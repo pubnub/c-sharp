@@ -170,7 +170,7 @@ namespace PubNubMessaging.Core
                 #elif(__MonoCS__)
                 udp = new UdpClient ("pubsub.pubnub.com", 80);
                 IPAddress localAddress = ((IPEndPoint)udp.Client.LocalEndPoint).Address;
-                if (udp != null && udp.Client != null) {
+                if (udp != null && udp.Client != null  && udp.Client.RemoteEndPoint != null) {
                     EndPoint remotepoint = udp.Client.RemoteEndPoint;
                     string remoteAddress = (remotepoint != null) ? remotepoint.ToString () : "";
                     LoggingMethod.WriteToLog (string.Format ("DateTime {0} checkInternetStatus LocalIP: {1}, RemoteEndPoint:{2}", DateTime.Now.ToString (), localAddress.ToString (), remoteAddress), LoggingMethod.LevelVerbose);

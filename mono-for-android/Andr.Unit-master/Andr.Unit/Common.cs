@@ -1,3 +1,4 @@
+//#define USE_JSONFX
 using System;
 using PubNubMessaging.Core;
 using System.Collections.Generic;
@@ -18,10 +19,18 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Converters;
 #endif
 
+using System.Text;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Collections;
+
 namespace PubNubMessaging.Tests
 {
   public class Common
   {
+        public static string PublishKey = "demo-36";
+        public static string SubscribeKey = "demo-36";
+        public static string SecretKey = "demo-36";
         public object Response { get; set; }
         public bool DeliveryStatus  { get; set; }
 
@@ -106,6 +115,26 @@ namespace PubNubMessaging.Tests
         return (T)retMessage;
         }
 
+        public static T DeserializeUsingJSONFx<T>(string message)
+        {
+            object retMessage;
+            var reader = new JsonFx.Json.JsonReader();
+            retMessage = reader.Read<T>(message);
+            return (T)retMessage;
+        }
+
+        private static byte[] ObjectToByteArray(Object obj)
+        {
+            if(obj == null)
+                return null;
+            BinaryFormatter bf = new BinaryFormatter();
+            using (MemoryStream ms = new MemoryStream())
+            {
+                bf.Serialize(ms, obj);
+                return ms.ToArray();
+            }
+        }
+
         /// <summary>
         /// Serialize the specified message using either JSONFX or NEWTONSOFT.JSON.
         /// The functionality is based on the pre-compiler flag
@@ -123,6 +152,26 @@ namespace PubNubMessaging.Tests
         #endif
         return retMessage;
         }
+
+        public static string SerializeUsingJSONFx(object message)
+        {
+            string retMessage;
+            var writer = new JsonFx.Json.JsonWriter();
+
+            retMessage = writer.Write(message);
+            retMessage = ConvertHexToUnicodeChars(retMessage);
+            /*            StringBuilder builder = new StringBuilder();
+            using (TextWriter textWriter = new EncodingStringWriter(builder, Encoding.UTF8))
+            {
+                var writer = new JsonFx.Json.JsonWriter ();
+
+                writer.Write (message, textWriter);
+
+                return PubnubCryptoBase.ConvertHexToUnicodeChars("");
+            }*/
+            return retMessage;
+        }
+
 
         /// <summary>
         /// Converts the upper case hex to lower case hex.
@@ -150,6 +199,7 @@ namespace PubNubMessaging.Tests
     public int [] bar = {1, 2, 3, 4, 5};
   }
 
+  [Serializable]
   class PubnubDemoObject
   {
     public double VersionID = 3.4;
@@ -161,7 +211,8 @@ namespace PubNubMessaging.Tests
 
     public XmlDocument SampleXml = new PubnubDemoMessage().TryXmlDemo();
   }
-
+  
+  [Serializable]
   class PubnubDemoMessage
   {
     public string DefaultMessage = "~!@#$%^&*()_+ `1234567890-= qwertyuiop[]\\ {}| asdfghjkl;' :\" zxcvbnm,./ <>? ";

@@ -8,15 +8,15 @@ using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
 {
-    //[TestFixture]
+    [TestFixture]
     public class WhenDetailedHistoryIsRequested
     {
         [Test]
         public void ItShouldReturnDetailedHistory ()
         {
             Pubnub pubnub = new Pubnub (
-                                "demo",
-                                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,                                
                                 "",
                                 "",
                                 false
@@ -106,9 +106,8 @@ namespace PubNubMessaging.Tests
         public void DetailedHistoryExample ()
         {
             Pubnub pubnub = new Pubnub (
-                                "demo",
-                                "demo",
-                                "",
+                Common.PublishKey,
+                Common.SubscribeKey,                                "",
                                 "",
                                 false);
             string channel = "hello_world";
@@ -139,8 +138,8 @@ namespace PubNubMessaging.Tests
         public void DetailedHistoryDecryptedExample ()
         {
             Pubnub pubnub = new Pubnub (
-                                "demo",
-                                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,                                
                                 "",
                                 "enigma",
                                 false);
@@ -172,9 +171,9 @@ namespace PubNubMessaging.Tests
         public void TestEncryptedSecretDetailedHistoryParams ()
         {
             Pubnub pubnub = new Pubnub (
-                                "demo",
-                                "demo",
-                                "secretkey",
+                Common.PublishKey,
+                Common.SubscribeKey,
+                Common.SecretKey,
                                 "enigma",
                                 false);
 
@@ -240,9 +239,9 @@ namespace PubNubMessaging.Tests
         public void TestUnencryptedSecretDetailedHistoryParams ()
         {
             Pubnub pubnub = new Pubnub (
-                                "demo",
-                                "demo",
-                                "secretkey",
+                Common.PublishKey,
+                Common.SubscribeKey,
+                Common.SecretKey,
                                 "",
                                 false);
 
@@ -307,8 +306,8 @@ namespace PubNubMessaging.Tests
         public void TestUnencryptedDetailedHistoryParams ()
         {
             Pubnub pubnub = new Pubnub (
-                                "demo",
-                                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                                 "",
                                 "",
                                 false);
@@ -374,8 +373,8 @@ namespace PubNubMessaging.Tests
         public void TestEncryptedDetailedHistoryParams ()
         {
             Pubnub pubnub = new Pubnub (
-                                "demo",
-                                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                                 "",
                                 "enigma",
                                 false);
@@ -442,8 +441,8 @@ namespace PubNubMessaging.Tests
         public void TestUnencryptedDetailedHistory ()
         {
             Pubnub pubnub = new Pubnub (
-                                "demo",
-                                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                                 "",
                                 "",
                                 false);
@@ -483,8 +482,8 @@ namespace PubNubMessaging.Tests
         public void TestEncryptedDetailedHistory ()
         {
             Pubnub pubnub = new Pubnub (
-                                "demo",
-                                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                                 "",
                                 "enigma",
                                 false);
@@ -524,9 +523,9 @@ namespace PubNubMessaging.Tests
         public void TestEncryptedSecretDetailedHistoryParamsSSL()
         {
             Pubnub pubnub = new Pubnub(
-                "demo",
-                "demo",
-                "secretkey",
+                Common.PublishKey,
+                Common.SubscribeKey,
+                Common.SecretKey,
                 "enigma",
                 true);
 
@@ -592,9 +591,9 @@ namespace PubNubMessaging.Tests
         public void TestUnencryptedSecretDetailedHistoryParamsSSL()
         {
             Pubnub pubnub = new Pubnub(
-                "demo",
-                "demo",
-                "secretkey",
+                Common.PublishKey,
+                Common.SubscribeKey,
+                Common.SecretKey,
                 "",
                 true);
 
@@ -659,8 +658,8 @@ namespace PubNubMessaging.Tests
         public void TestUnencryptedDetailedHistoryParamsSSL()
         {
             Pubnub pubnub = new Pubnub(
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "",
                 "",
                 true);
@@ -726,8 +725,8 @@ namespace PubNubMessaging.Tests
         public void TestEncryptedDetailedHistoryParamsSSL()
         {
             Pubnub pubnub = new Pubnub(
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "",
                 "enigma",
                 true);
@@ -794,8 +793,8 @@ namespace PubNubMessaging.Tests
         public void TestUnencryptedDetailedHistorySSL()
         {
             Pubnub pubnub = new Pubnub(
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "",
                 "",
                 true);
@@ -835,8 +834,8 @@ namespace PubNubMessaging.Tests
         public void TestEncryptedDetailedHistorySSL()
         {
             Pubnub pubnub = new Pubnub(
-                "demo",
-                "demo",
+                Common.PublishKey,
+                Common.SubscribeKey,
                 "",
                 "enigma",
                 true);

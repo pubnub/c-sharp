@@ -87,6 +87,15 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\ChangeUUIDDialog.xaml.cs">
+      <DependentUpon>ChangeUUIDDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\HereNowOptionsDialog.xaml.cs">
+      <DependentUpon>HereNowOptionsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\GlobalHereNowDialog.xaml.cs">
+      <DependentUpon>GlobalHereNowDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
     </Compile>
@@ -94,11 +103,17 @@
     <Compile Include="Dialogs\PublishMessageDialog.xaml.cs">
       <DependentUpon>PublishMessageDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\UserStateDialog.xaml.cs">
+      <DependentUpon>UserStateDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\CodeExampleView.xaml.cs">
       <DependentUpon>CodeExampleView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ErrorWindow.xaml.cs">
       <DependentUpon>ErrorWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\WhereNowDialog.xaml.cs">
+      <DependentUpon>WhereNowDialog.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -111,6 +126,18 @@
     <None Include="Properties\AppManifest.xml" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Dialogs\ChangeUUIDDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\HereNowOptionsDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\GlobalHereNowDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -127,6 +154,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Dialogs\UserStateDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\CodeExampleView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -134,6 +165,10 @@
     <Page Include="Views\ErrorWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\WhereNowDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>

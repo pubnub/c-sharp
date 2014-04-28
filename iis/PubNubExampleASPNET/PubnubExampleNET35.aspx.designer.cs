@@ -112,15 +112,6 @@ namespace PubNubMessaging {
         protected global::System.Web.UI.WebControls.TextBox txtSecret;
         
         /// <summary>
-        /// txtUUID control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtUUID;
-        
-        /// <summary>
         /// txtAuthKey control.
         /// </summary>
         /// <remarks>
@@ -166,13 +157,40 @@ namespace PubNubMessaging {
         protected global::System.Web.UI.WebControls.TextBox txtRetryInterval;
         
         /// <summary>
-        /// txtHeartbeatInterval control.
+        /// txtLocalClientHeartbeatInterval control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtHeartbeatInterval;
+        protected global::System.Web.UI.WebControls.TextBox txtLocalClientHeartbeatInterval;
+        
+        /// <summary>
+        /// txtPresenceHeartbeat control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtPresenceHeartbeat;
+        
+        /// <summary>
+        /// txtPresenceHeartbeatInterval control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtPresenceHeartbeatInterval;
+        
+        /// <summary>
+        /// txtUUID control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtUUID;
         
         /// <summary>
         /// txtChannel control.
@@ -310,6 +328,42 @@ namespace PubNubMessaging {
         protected global::System.Web.UI.WebControls.Button btnEnableNetwork;
         
         /// <summary>
+        /// btnWhereNow control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnWhereNow;
+        
+        /// <summary>
+        /// btnGlobalHereNow control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnGlobalHereNow;
+        
+        /// <summary>
+        /// btnSetUserState control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnSetUserState;
+        
+        /// <summary>
+        /// btnGetUserState control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnGetUserState;
+        
+        /// <summary>
         /// publishModalPopupExtender control.
         /// </summary>
         /// <remarks>
@@ -353,6 +407,195 @@ namespace PubNubMessaging {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnOkay;
+        
+        /// <summary>
+        /// globalHereNowPopupExtender control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::AjaxControlToolkit.ModalPopupExtender globalHereNowPopupExtender;
+        
+        /// <summary>
+        /// popupPanelGlobalHereNow control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel popupPanelGlobalHereNow;
+        
+        /// <summary>
+        /// chbShowUUIDList control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chbShowUUIDList;
+        
+        /// <summary>
+        /// chbShowUserState control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chbShowUserState;
+        
+        /// <summary>
+        /// btnOkayGlobalHereNow control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnOkayGlobalHereNow;
+        
+        /// <summary>
+        /// hereNowPopupExtender control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::AjaxControlToolkit.ModalPopupExtender hereNowPopupExtender;
+        
+        /// <summary>
+        /// popupPanelHereNow control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel popupPanelHereNow;
+        
+        /// <summary>
+        /// chbShowUUIDList2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chbShowUUIDList2;
+        
+        /// <summary>
+        /// chbShowUserState2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chbShowUserState2;
+        
+        /// <summary>
+        /// btnOkayHereNow control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnOkayHereNow;
+        
+        /// <summary>
+        /// setUserStatePopupExtender control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::AjaxControlToolkit.ModalPopupExtender setUserStatePopupExtender;
+        
+        /// <summary>
+        /// popupPanelSetUserState control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel popupPanelSetUserState;
+        
+        /// <summary>
+        /// txtJsonUserState control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtJsonUserState;
+        
+        /// <summary>
+        /// btnOkayJsonSetUserState control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnOkayJsonSetUserState;
+        
+        /// <summary>
+        /// txtKey1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtKey1;
+        
+        /// <summary>
+        /// txtValue1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtValue1;
+        
+        /// <summary>
+        /// txtKey2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtKey2;
+        
+        /// <summary>
+        /// txtValue2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtValue2;
+        
+        /// <summary>
+        /// txtKey3 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtKey3;
+        
+        /// <summary>
+        /// txtValue3 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtValue3;
+        
+        /// <summary>
+        /// btnOkaySetUserState control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnOkaySetUserState;
         
         /// <summary>
         /// UpdatePanelRight control.

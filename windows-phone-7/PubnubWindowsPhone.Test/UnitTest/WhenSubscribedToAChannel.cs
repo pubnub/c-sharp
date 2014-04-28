@@ -23,15 +23,12 @@ namespace PubnubWindowsPhone.Test.UnitTest
     [TestClass]
     public class WhenSubscribedToAChannel : WorkItemTest
     {
-        ManualResetEvent meSubscribeNoConnect = new ManualResetEvent(false);
-        ManualResetEvent meSubscribeYesConnect = new ManualResetEvent(false);
-        ManualResetEvent mePublish = new ManualResetEvent(false);
+        ManualResetEvent mreSubscribe = new ManualResetEvent(false);
+        ManualResetEvent mrePublish = new ManualResetEvent(false);
         ManualResetEvent meUnsubscribe = new ManualResetEvent(false);
         ManualResetEvent meAlreadySubscribed = new ManualResetEvent(false);
-        ManualResetEvent meChannel1SubscribeConnect = new ManualResetEvent(false);
-        ManualResetEvent meChannel2SubscribeConnect = new ManualResetEvent(false);
-        ManualResetEvent meSubscriberManyMessages = new ManualResetEvent(false);
-        ManualResetEvent grantManualEvent = new ManualResetEvent(false);
+        ManualResetEvent mreConnect = new ManualResetEvent(false);
+        ManualResetEvent mreGrant = new ManualResetEvent(false);
 
         bool receivedMessage = false;
         bool receivedConnectMessage = false;
@@ -43,12 +40,12 @@ namespace PubnubWindowsPhone.Test.UnitTest
 
         int numberOfReceivedMessages = 0;
 
-        [ClassInitialize]
+        [ClassInitialize, Asynchronous]
         public void Init()
         {
             if (!PubnubCommon.PAMEnabled)
             {
-                Assert.Inconclusive("WhenAClientIsPresent Grant access failed.");
+                TestComplete();
                 return;
             }
 
@@ -62,15 +59,16 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     unitTest.TestCaseName = "Init";
                     pubnub.PubnubUnitTest = unitTest;
 
-                    string channel = "hello_my_channel";
+                    string channel = "hello_my_channel,hello_my_channel1,hello_my_channel2";
 
+                    mreGrant = new ManualResetEvent(false);
                     pubnub.GrantAccess<string>(channel, true, true, 20, ThenSubscriberInitializeShouldReturnGrantMessage, DummyErrorCallback);
-                    //Thread.Sleep(1000);
+                    mreGrant.WaitOne(60 * 1000); //1 minute
 
-                    grantManualEvent.WaitOne();
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed.");
+                            TestComplete();
                         });
                 });
         }
@@ -94,7 +92,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             catch { }
             finally
             {
-                grantManualEvent.Set();
+                mreGrant.Set();
             }
         }
         
@@ -102,6 +100,10 @@ namespace PubnubWindowsPhone.Test.UnitTest
         public void ThenSubscribeShouldReturnReceivedMessage()
         {
             receivedMessage = false;
+            mreConnect = new ManualResetEvent(false);
+            mrePublish = new ManualResetEvent(false);
+            mreSubscribe = new ManualResetEvent(false);
+
             ThreadPool.QueueUserWorkItem((s) =>
                 {
                     Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
@@ -114,16 +116,17 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     pubnub.PubnubUnitTest = unitTest;
 
                     pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
-                    //Thread.Sleep(500);
+                    mreConnect.WaitOne(310 * 1000);
+                    
                     pubnub.Publish<string>(channel, "Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage", dummyPublishCallback, DummyErrorCallback);
-                    mePublish.WaitOne(310 * 1000);
+                    mrePublish.WaitOne(310 * 1000);
+                    
+                    mreSubscribe.WaitOne(310 * 1000);
+                    //pubnub.Unsubscribe<string>(channel, dummyUnsubscribeCallback, SubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
                     //Thread.Sleep(500);
-                    meSubscribeNoConnect.WaitOne(310 * 1000);
-                    pubnub.Unsubscribe<string>(channel, dummyUnsubscribeCallback, SubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
-                    Thread.Sleep(500);
-                    meUnsubscribe.WaitOne(310 * 1000);
+                    //meUnsubscribe.WaitOne(60 * 1000);
 
-                    Thread.Sleep(1000);
+                    //Thread.Sleep(1000);
                     pubnub.EndPendingRequests();
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
@@ -137,6 +140,9 @@ namespace PubnubWindowsPhone.Test.UnitTest
         public void ThenSubscribeShouldReturnConnectStatus()
         {
             receivedConnectMessage = false;
+            mreConnect = new ManualResetEvent(false);
+            mreSubscribe = new ManualResetEvent(false);
+
             ThreadPool.QueueUserWorkItem((s) =>
                 {
                     Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
@@ -150,10 +156,10 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     string channel = "hello_my_channel";
 
                     pubnub.Subscribe<string>(channel, ReceivedMessageCallbackYesConnect, ConnectStatusCallback, DummyErrorCallback);
-                    meSubscribeYesConnect.WaitOne(310 * 1000);
+                    mreConnect.WaitOne(310 * 1000);
 
                     pubnub.EndPendingRequests();
-                    Thread.Sleep(200);
+                    
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(receivedConnectMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnConnectStatus Failed");
@@ -167,6 +173,9 @@ namespace PubnubWindowsPhone.Test.UnitTest
         {
             receivedChannel1ConnectMessage = false;
             receivedChannel2ConnectMessage = false;
+            
+            mreConnect = new ManualResetEvent(false);
+
             ThreadPool.QueueUserWorkItem((s) =>
                 {
                     Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
@@ -180,13 +189,12 @@ namespace PubnubWindowsPhone.Test.UnitTest
 
                     string channel1 = "hello_my_channel1";
                     pubnub.Subscribe<string>(channel1, ReceivedChannelUserCallback, ReceivedChannel1ConnectCallback, DummyErrorCallback);
-                    meChannel1SubscribeConnect.WaitOne(310 * 1000);
+                    mreConnect.WaitOne(310 * 1000);
 
+                    mreConnect = new ManualResetEvent(false);
                     string channel2 = "hello_my_channel2";
                     pubnub.Subscribe<string>(channel2, ReceivedChannelUserCallback, ReceivedChannel2ConnectCallback, DummyErrorCallback);
-                    meChannel2SubscribeConnect.WaitOne(310 * 1000);
-
-                    Thread.Sleep(500);
+                    mreConnect.WaitOne(310 * 1000);
 
                     pubnub.EndPendingRequests();
 
@@ -202,6 +210,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
         public void ThenDuplicateChannelShouldReturnAlreadySubscribed()
         {
             receivedAlreadySubscribedMessage = false;
+            mreConnect = new ManualResetEvent(false);
+
             ThreadPool.QueueUserWorkItem((s) =>
                 {
                     Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
@@ -215,10 +225,11 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     string channel = "hello_my_channel";
 
                     pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback1, DummyMethodDuplicateChannelConnectCallback, DummyErrorCallback);
-                    Thread.Sleep(100);
+                    mreConnect.WaitOne(310 * 1000);
 
+                    mreConnect = new ManualResetEvent(false);
                     pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback2, DummyMethodDuplicateChannelConnectCallback, DuplicateChannelErrorCallback);
-                    meAlreadySubscribed.WaitOne();
+                    mreConnect.WaitOne(310 * 1000);
 
                     pubnub.EndPendingRequests();
 
@@ -234,6 +245,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
         public void ThenSubscriberShouldBeAbleToReceiveManyMessages()
         {
             receivedManyMessages = false;
+            mreSubscribe = new ManualResetEvent(false);
+            mrePublish = new ManualResetEvent(false);
 
             ThreadPool.QueueUserWorkItem((s) =>
                 {
@@ -247,8 +260,17 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     string channel = "hello_my_channel";
 
                     pubnub.Subscribe<string>(channel, SubscriberDummyMethodForManyMessagesUserCallback, SubscribeDummyMethodForManyMessagesConnectCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
-                    meSubscriberManyMessages.WaitOne();
+                    if (!PubnubCommon.EnableStubTest)
+                    {
+                        for (int index = 0; index < 10; index++)
+                        {
+                            mrePublish = new ManualResetEvent(false);
+                            pubnub.Publish<string>(channel, index, SubscribeManyMessagesPublishCallback, DummyErrorCallback);
+                            mrePublish.WaitOne(310 * 1000);
+                        }
+                    }
+
+                    mreSubscribe.WaitOne(310 * 1000);
 
                     pubnub.EndPendingRequests();
 
@@ -267,13 +289,32 @@ namespace PubnubWindowsPhone.Test.UnitTest
             if (numberOfReceivedMessages >= 10)
             {
                 receivedManyMessages = true;
-                meSubscriberManyMessages.Set();
+                mreSubscribe.Set();
             }
         }
 
         [Asynchronous]
         private void SubscribeDummyMethodForManyMessagesConnectCallback(string result)
         {
+        }
+
+        [Asynchronous]
+        public void SubscribeManyMessagesPublishCallback(string result)
+        {
+            if (!string.IsNullOrWhiteSpace(result))
+            {
+                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
+                if (deserializedMessage is object[])
+                {
+                    int statusCode = Int32.Parse(deserializedMessage[0].ToString());
+                    string statusMessage = (string)deserializedMessage[1];
+                    if (statusCode == 1 && statusMessage.ToLower() == "sent")
+                    {
+                        //good
+                    }
+                }
+            }
+            mrePublish.Set();
         }
 
         [Asynchronous]
@@ -297,7 +338,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                 }
             }
-            meChannel1SubscribeConnect.Set();
+            mreConnect.Set();
         }
 
         [Asynchronous]
@@ -316,7 +357,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                 }
             }
-            meChannel2SubscribeConnect.Set();
+            mreConnect.Set();
         }
 
         [Asynchronous]
@@ -336,12 +377,13 @@ namespace PubnubWindowsPhone.Test.UnitTest
             {
                 receivedAlreadySubscribedMessage = true;
             }
-            meAlreadySubscribed.Set();
+            mreConnect.Set();
         }
 
         [Asynchronous]
         private void DummyMethodDuplicateChannelConnectCallback(string result)
         {
+            mreConnect.Set();
         }
 
         [Asynchronous]
@@ -359,7 +401,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                 }
             }
-            meSubscribeNoConnect.Set();
+            mreSubscribe.Set();
         }
 
 
@@ -385,13 +427,13 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                 }
             }
-            meSubscribeYesConnect.Set();
+            mreConnect.Set();
         }
 
         [Asynchronous]
         private void dummyPublishCallback(string result)
         {
-            mePublish.Set();
+            mrePublish.Set();
         }
 
         [Asynchronous]
@@ -403,6 +445,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
         [Asynchronous]
         void SubscribeDummyMethodForConnectCallback(string receivedMessage)
         {
+            mreConnect.Set();
         }
 
         [Asynchronous]

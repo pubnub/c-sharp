@@ -30,7 +30,9 @@ namespace PubnubWindowsPhone
         int operationTimeoutInSeconds = 0;
         int networkMaxRetries = 0;
         int networkRetryIntervalInSeconds = 0;
-        int heartbeatIntervalInSeconds = 0;
+        int localClientHeartbeatIntervalInSeconds = 0;
+        int presenceHeartbeat = 0;
+        int presenceHeartbeatInterval = 0;
         
         public PubnubTimeoutSettings()
         {
@@ -67,10 +69,16 @@ namespace PubnubWindowsPhone
             Int32.TryParse(txtRetryInterval.Text, out networkRetryIntervalInSeconds);
             networkRetryIntervalInSeconds = (networkRetryIntervalInSeconds <= 0) ? 10 : networkRetryIntervalInSeconds;
 
-            Int32.TryParse(txtHeartbeatInterval.Text, out heartbeatIntervalInSeconds);
-            heartbeatIntervalInSeconds = (heartbeatIntervalInSeconds <= 0) ? 10 : heartbeatIntervalInSeconds;
+            Int32.TryParse(txtLocalClientHeartbeatInterval.Text, out localClientHeartbeatIntervalInSeconds);
+            localClientHeartbeatIntervalInSeconds = (localClientHeartbeatIntervalInSeconds <= 0) ? 10 : localClientHeartbeatIntervalInSeconds;
 
-            Uri nextPage = new Uri(string.Format("/PubnubOperation.xaml?ssl={0}&origin={1}&publishKey={2}&subscribeKey={3}&cipherkey={4}&secretkey={5}&uuid={6}&subtimeout={7}&optimeout={8}&retries={9}&retryinterval={10}&beatinterval={11}&resumeOnReconnect={12}&hideErrCallbackMsg={13}&authKey={14}", ssl, origin, publishKey, subscribeKey, cipherKey, secretKey, sessionUUID, subscribeTimeoutInSeconds, operationTimeoutInSeconds, networkMaxRetries, networkRetryIntervalInSeconds, heartbeatIntervalInSeconds, resumeOnReconnect, hideErrCallbackMsg, authKey), UriKind.Relative);
+            Int32.TryParse(txtPresenceHeartbeat.Text, out presenceHeartbeat);
+            presenceHeartbeat = (presenceHeartbeat <= 0 || presenceHeartbeat > 300) ? 60 : presenceHeartbeat;
+
+            Int32.TryParse(txtPresenceHeartbeatInterval.Text, out presenceHeartbeatInterval);
+            presenceHeartbeatInterval = (presenceHeartbeatInterval <= 0) ? 10 : localClientHeartbeatIntervalInSeconds;
+
+            Uri nextPage = new Uri(string.Format("/PubnubOperation.xaml?ssl={0}&origin={1}&publishKey={2}&subscribeKey={3}&cipherkey={4}&secretkey={5}&uuid={6}&subtimeout={7}&optimeout={8}&retries={9}&retryinterval={10}&localbeatinterval={11}&resumeOnReconnect={12}&hideErrCallbackMsg={13}&authKey={14}&prebeat={15}&prebeatinterval={16}", ssl, origin, publishKey, subscribeKey, cipherKey, secretKey, sessionUUID, subscribeTimeoutInSeconds, operationTimeoutInSeconds, networkMaxRetries, networkRetryIntervalInSeconds, localClientHeartbeatIntervalInSeconds, resumeOnReconnect, hideErrCallbackMsg, authKey, presenceHeartbeat, presenceHeartbeatInterval), UriKind.Relative);
             NavigationService.Navigate(nextPage);
         }
 

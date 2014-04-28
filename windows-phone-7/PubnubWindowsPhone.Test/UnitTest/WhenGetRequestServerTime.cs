@@ -25,8 +25,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
         ManualResetEvent mreTime = new ManualResetEvent(false);
         bool timeReceived = false;
 
-        [TestMethod]
-        [Asynchronous]
+        [TestMethod, Asynchronous]
         [Description("Gets the Server Time in Unix time nanosecond format")]
         public void ThenItShouldReturnTimeStamp()
         {
@@ -40,7 +39,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     pubnub.PubnubUnitTest = unitTest;
 
                     pubnub.Time<string>(ReturnTimeStampCallback, DummyErrorCallback);
-                    mreTime.WaitOne(310 * 1000);
+                    mreTime.WaitOne(60 * 1000);
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(timeReceived, "time() Failed");

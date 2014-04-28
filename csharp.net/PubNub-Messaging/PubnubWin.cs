@@ -1,4 +1,4 @@
-//Build Date: March 4, 2014
+//Build Date: April 08, 2014
 using System;
 using System.Text;
 //using System.Net.Security;
@@ -39,18 +39,22 @@ namespace PubNubMessaging.Core
 		#endregion
 
 		#region "Properties"
-		#if (!SILVERLIGHT && !WINDOWS_PHONE)
 		//Proxy
 		private PubnubProxy _pubnubProxy = null;
 		public PubnubProxy Proxy
 		{
 			get
 			{
-				return _pubnubProxy;
-			}
+		        #if (!SILVERLIGHT && !WINDOWS_PHONE)
+                return _pubnubProxy;
+                #else
+                throw new NotSupportedException("Proxy is not supported");
+                #endif
+            }
 			set
 			{
-				_pubnubProxy = value;
+                #if (!SILVERLIGHT && !WINDOWS_PHONE)
+                _pubnubProxy = value;
 				if (_pubnubProxy == null)
 				{
 					throw new ArgumentException("Missing Proxy Details");
@@ -60,9 +64,11 @@ namespace PubNubMessaging.Core
 					_pubnubProxy = null;
 					throw new MissingFieldException("Insufficient Proxy Details");
 				}
+                #else
+                throw new NotSupportedException("Proxy is not supported");
+                #endif
 			}
 		}
-		#endif
 		#endregion
 
 		#region "Constructors and destructors"
@@ -253,8 +259,13 @@ namespace PubNubMessaging.Core
                     presenceHeartbeatState.Channels = pubnubRequestState.Channels;
                     presenceHeartbeatState.Type = ResponseType.PresenceHeartbeat;
                     presenceHeartbeatState.ErrorCallback = pubnubRequestState.ErrorCallback;
-                    
-                    presenceHeartbeatTimer = new Timer(OnPresenceHeartbeatIntervalTimeout<T>, presenceHeartbeatState, base.PresenceHeartbeatInterval * 1000, base.PresenceHeartbeatInterval * 1000);
+                    presenceHeartbeatState.Request = null;
+                    presenceHeartbeatState.Response = null;
+
+                    if (base.PresenceHeartbeatInterval > 0)
+                    {
+                        presenceHeartbeatTimer = new Timer(OnPresenceHeartbeatIntervalTimeout<T>, presenceHeartbeatState, base.PresenceHeartbeatInterval * 1000, base.PresenceHeartbeatInterval * 1000);
+                    }
                 }
             }
         }
@@ -272,10 +283,15 @@ namespace PubNubMessaging.Core
         protected override bool HandleWebException<T>(WebException webEx, RequestState<T> asynchRequestState, string channel)
         {
             bool reconnect = false;
+#if SILVERLIGHT
+            if (webEx.Status == WebExceptionStatus.ConnectFailure //Sending Keep-alive packet failed (No network)/Server is down.
+             && !overrideTcpKeepAlive)
+#else
             if ((webEx.Status == WebExceptionStatus.NameResolutionFailure //No network
             || webEx.Status == WebExceptionStatus.ConnectFailure //Sending Keep-alive packet failed (No network)/Server is down.
             || webEx.Status == WebExceptionStatus.ServerProtocolViolation //Problem with proxy or ISP
             || webEx.Status == WebExceptionStatus.ProtocolError) && (!overrideTcpKeepAlive))
+#endif
             {
                 //internet connection problem.
                 LoggingMethod.WriteToLog(string.Format("DateTime {0}, _urlRequest - Internet connection problem", DateTime.Now.ToString()), LoggingMethod.LevelError);
@@ -912,6 +928,18 @@ namespace PubNubMessaging.Core
             return req;
         }
 
+        protected override HttpWebRequest SetNoCache(HttpWebRequest req, bool nocache)
+        {
+            if (nocache)
+            {
+                req.Headers["Cache-Control"] = "no-cache";
+                req.Headers["Pragma"] = "no-cache";
+#if (WINDOWS_PHONE)
+                req.Headers[HttpRequestHeader.IfModifiedSince] = DateTime.UtcNow.ToString();
+#endif
+            }
+            return req;
+        }
     }
     #endregion
 

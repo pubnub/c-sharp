@@ -142,7 +142,6 @@ namespace PubNubMessaging.Core
 					SocketAsyncEventArgs sae = new SocketAsyncEventArgs();
 					sae.UserToken = state;
 					sae.RemoteEndPoint = new DnsEndPoint("pubsub.pubnub.com", 80);
-                    sae.SocketClientAccessPolicyProtocol = SocketClientAccessPolicyProtocol.Tcp;
 					sae.Completed += new EventHandler<SocketAsyncEventArgs>(socketAsync_Completed<T>);
 					bool test = socket.ConnectAsync(sae);
 

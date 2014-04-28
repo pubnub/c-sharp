@@ -1,4 +1,4 @@
-# PubNub 3.5 Web Data Push Cloud-Hosted API - C# Mono 2.10.9 
+# PubNub 3.6 Web Data Push Cloud-Hosted API - C# Mono 2.10.9 
 ##PubNub C Sharp (Mono for Linux) Usage
 
 For a video walkthrough, check out https://vimeo.com/54805917 !

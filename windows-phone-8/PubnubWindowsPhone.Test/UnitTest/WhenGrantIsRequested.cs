@@ -23,389 +23,454 @@ namespace PubnubWindowsPhone.Test.UnitTest
     public class WhenGrantIsRequested : WorkItemTest
     {
 
-        ManualResetEvent grantManualEvent = new ManualResetEvent(false);
-        ManualResetEvent revokeManualEvent = new ManualResetEvent(false);
+        ManualResetEvent mreGrant = new ManualResetEvent(false);
+
         bool receivedGrantMessage = false;
         bool receivedRevokeMessage = false;
         int multipleChannelGrantCount = 5;
         int multipleAuthGrantCount = 5;
         string currentUnitTestCase = "";
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenSubKeyLevelWithReadWriteShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenSubKeyLevelWithReadWriteShouldReturnSuccess";
 
             receivedGrantMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenSubKeyLevelWithReadWriteShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-            if (PubnubCommon.PAMEnabled)
-            {
-                pubnub.GrantAccess<string>("", true, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenGrantIsRequested";
+                    unitTest.TestCaseName = "ThenSubKeyLevelWithReadWriteShouldReturnSuccess";
+                    pubnub.PubnubUnitTest = unitTest;
+                    if (PubnubCommon.PAMEnabled)
+                    {
+                        mreGrant = new ManualResetEvent(false);
+                        pubnub.GrantAccess<string>("", true, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
+                        mreGrant.WaitOne(60 * 1000);
 
-                grantManualEvent.WaitOne();
-
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithReadWriteShouldReturnSuccess failed.");
-            }
-            else
-            {
-                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithReadWriteShouldReturnSuccess.");
-            }
+                        Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithReadWriteShouldReturnSuccess failed.");
+                    }
+                    else
+                    {
+                        Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithReadWriteShouldReturnSuccess.");
+                    }
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                        {
+                            TestComplete();
+                        });
+                });
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenSubKeyLevelWithReadShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenSubKeyLevelWithReadShouldReturnSuccess";
 
             receivedGrantMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenSubKeyLevelWithReadShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-            if (PubnubCommon.PAMEnabled)
-            {
-                pubnub.GrantAccess<string>("", true, false, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenGrantIsRequested";
+                    unitTest.TestCaseName = "ThenSubKeyLevelWithReadShouldReturnSuccess";
+                    pubnub.PubnubUnitTest = unitTest;
+                    if (PubnubCommon.PAMEnabled)
+                    {
+                        mreGrant = new ManualResetEvent(false);
+                        pubnub.GrantAccess<string>("", true, false, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
+                        mreGrant.WaitOne(60 * 1000);
 
-                grantManualEvent.WaitOne();
-
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithReadShouldReturnSuccess failed.");
-            }
-            else
-            {
-                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithReadShouldReturnSuccess.");
-            }
+                        Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithReadShouldReturnSuccess failed.");
+                    }
+                    else
+                    {
+                        Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithReadShouldReturnSuccess.");
+                    }
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        TestComplete();
+                    });
+                });
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenSubKeyLevelWithWriteShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenSubKeyLevelWithWriteShouldReturnSuccess";
 
             receivedGrantMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenSubKeyLevelWithWriteShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-            if (PubnubCommon.PAMEnabled)
-            {
-                pubnub.GrantAccess<string>("", false, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenGrantIsRequested";
+                    unitTest.TestCaseName = "ThenSubKeyLevelWithWriteShouldReturnSuccess";
+                    pubnub.PubnubUnitTest = unitTest;
+                    if (PubnubCommon.PAMEnabled)
+                    {
+                        mreGrant = new ManualResetEvent(false);
+                        pubnub.GrantAccess<string>("", false, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
+                        mreGrant.WaitOne(60 * 1000);
 
-                grantManualEvent.WaitOne();
-
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithWriteShouldReturnSuccess failed.");
-            }
-            else
-            {
-                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithWriteShouldReturnSuccess.");
-            }
+                        Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithWriteShouldReturnSuccess failed.");
+                    }
+                    else
+                    {
+                        Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithWriteShouldReturnSuccess.");
+                    }
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        TestComplete();
+                    });
+                });
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenChannelLevelWithReadWriteShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenChannelLevelWithReadWriteShouldReturnSuccess";
 
             receivedGrantMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenChannelLevelWithReadWriteShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenGrantIsRequested";
+                    unitTest.TestCaseName = "ThenChannelLevelWithReadWriteShouldReturnSuccess";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "hello_my_channel";
-            if (PubnubCommon.PAMEnabled)
-            {
-                pubnub.GrantAccess<string>(channel, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
+                    string channel = "hello_my_channel";
+                    if (PubnubCommon.PAMEnabled)
+                    {
+                        mreGrant = new ManualResetEvent(false);
+                        pubnub.GrantAccess<string>(channel, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                        mreGrant.WaitOne(60 * 1000);
 
-                grantManualEvent.WaitOne();
-
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithReadWriteShouldReturnSuccess failed.");
-            }
-            else
-            {
-                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithReadWriteShouldReturnSuccess.");
-            }
+                        Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithReadWriteShouldReturnSuccess failed.");
+                    }
+                    else
+                    {
+                        Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithReadWriteShouldReturnSuccess.");
+                    }
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        TestComplete();
+                    });
+                });
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenChannelLevelWithReadShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenChannelLevelWithReadShouldReturnSuccess";
 
             receivedGrantMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenChannelLevelWithReadShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenGrantIsRequested";
+                    unitTest.TestCaseName = "ThenChannelLevelWithReadShouldReturnSuccess";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "hello_my_channel";
-            if (PubnubCommon.PAMEnabled)
-            {
-                pubnub.GrantAccess<string>(channel, true, false, 5, AccessToChannelLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
+                    string channel = "hello_my_channel";
+                    if (PubnubCommon.PAMEnabled)
+                    {
+                        mreGrant = new ManualResetEvent(false);
+                        pubnub.GrantAccess<string>(channel, true, false, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                        mreGrant.WaitOne(60 * 1000);
 
-                grantManualEvent.WaitOne();
-
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithReadShouldReturnSuccess failed.");
-            }
-            else
-            {
-                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithReadShouldReturnSuccess.");
-            }
+                        Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithReadShouldReturnSuccess failed.");
+                    }
+                    else
+                    {
+                        Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithReadShouldReturnSuccess.");
+                    }
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        TestComplete();
+                    });
+                });
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenChannelLevelWithWriteShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenChannelLevelWithWriteShouldReturnSuccess";
 
             receivedGrantMessage = false;
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenGrantIsRequested";
+                    unitTest.TestCaseName = "ThenChannelLevelWithWriteShouldReturnSuccess";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenChannelLevelWithWriteShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+                    string channel = "hello_my_channel";
+                    if (PubnubCommon.PAMEnabled)
+                    {
+                        mreGrant = new ManualResetEvent(false);
+                        pubnub.GrantAccess<string>(channel, false, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                        mreGrant.WaitOne(60 * 1000);
 
-            string channel = "hello_my_channel";
-            if (PubnubCommon.PAMEnabled)
-            {
-                pubnub.GrantAccess<string>(channel, false, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
-
-                grantManualEvent.WaitOne();
-
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithWriteShouldReturnSuccess failed.");
-            }
-            else
-            {
-                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithWriteShouldReturnSuccess.");
-            }
+                        Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithWriteShouldReturnSuccess failed.");
+                    }
+                    else
+                    {
+                        Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithWriteShouldReturnSuccess.");
+                    }
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        TestComplete();
+                    });
+                });
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenUserLevelWithReadWriteShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenUserLevelWithReadWriteShouldReturnSuccess";
 
             receivedGrantMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenUserLevelWithReadWriteShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenGrantIsRequested";
+                    unitTest.TestCaseName = "ThenUserLevelWithReadWriteShouldReturnSuccess";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "hello_my_authchannel";
-            string authKey = "hello_my_authkey";
-            if (PubnubCommon.PAMEnabled)
-            {
-                pubnub.AuthenticationKey = authKey;
-                pubnub.GrantAccess<string>(channel, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
+                    string channel = "hello_my_authchannel";
+                    string authKey = "hello_my_authkey";
+                    if (PubnubCommon.PAMEnabled)
+                    {
+                        mreGrant = new ManualResetEvent(false);
+                        pubnub.AuthenticationKey = authKey;
+                        pubnub.GrantAccess<string>(channel, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                        mreGrant.WaitOne(60 * 1000);
 
-                grantManualEvent.WaitOne();
-
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadWriteShouldReturnSuccess failed.");
-            }
-            else
-            {
-                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenUserLevelWithReadWriteShouldReturnSuccess.");
-            }
+                        Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadWriteShouldReturnSuccess failed.");
+                    }
+                    else
+                    {
+                        Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenUserLevelWithReadWriteShouldReturnSuccess.");
+                    }
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        TestComplete();
+                    });
+                });
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenUserLevelWithReadShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenUserLevelWithReadShouldReturnSuccess";
 
             receivedGrantMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenUserLevelWithReadShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenGrantIsRequested";
+                    unitTest.TestCaseName = "ThenUserLevelWithReadShouldReturnSuccess";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "hello_my_authchannel";
-            string authKey = "hello_my_authkey";
-            if (PubnubCommon.PAMEnabled)
-            {
-                pubnub.AuthenticationKey = authKey;
-                pubnub.GrantAccess<string>(channel, true, false, 5, AccessToUserLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
+                    string channel = "hello_my_authchannel";
+                    string authKey = "hello_my_authkey";
+                    if (PubnubCommon.PAMEnabled)
+                    {
+                        mreGrant = new ManualResetEvent(false);
+                        pubnub.AuthenticationKey = authKey;
+                        pubnub.GrantAccess<string>(channel, true, false, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                        mreGrant.WaitOne(60 * 1000);
 
-                grantManualEvent.WaitOne();
-
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadShouldReturnSuccess failed.");
-            }
-            else
-            {
-                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenUserLevelWithReadShouldReturnSuccess.");
-            }
+                        Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadShouldReturnSuccess failed.");
+                    }
+                    else
+                    {
+                        Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenUserLevelWithReadShouldReturnSuccess.");
+                    }
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        TestComplete();
+                    });
+                });
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenUserLevelWithWriteShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenUserLevelWithWriteShouldReturnSuccess";
 
             receivedGrantMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenUserLevelWithWriteShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenGrantIsRequested";
+                    unitTest.TestCaseName = "ThenUserLevelWithWriteShouldReturnSuccess";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "hello_my_authchannel";
-            string authKey = "hello_my_authkey";
-            if (PubnubCommon.PAMEnabled)
-            {
-                pubnub.AuthenticationKey = authKey;
-                pubnub.GrantAccess<string>(channel, false, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
+                    string channel = "hello_my_authchannel";
+                    string authKey = "hello_my_authkey";
+                    if (PubnubCommon.PAMEnabled)
+                    {
+                        mreGrant = new ManualResetEvent(false);
+                        pubnub.AuthenticationKey = authKey;
+                        pubnub.GrantAccess<string>(channel, false, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                        mreGrant.WaitOne(60 * 1000);
 
-                grantManualEvent.WaitOne();
-
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithWriteShouldReturnSuccess failed.");
-            }
-            else
-            {
-                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenUserLevelWithWriteShouldReturnSuccess.");
-            }
+                        Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithWriteShouldReturnSuccess failed.");
+                    }
+                    else
+                    {
+                        Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenUserLevelWithWriteShouldReturnSuccess.");
+                    }
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        TestComplete();
+                    });
+                });
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenMultipleChannelGrantShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenMultipleChannelGrantShouldReturnSuccess";
 
             receivedGrantMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenMultipleChannelGrantShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-
-            System.Text.StringBuilder channelBuilder = new System.Text.StringBuilder();
-            for (int index = 0; index < multipleChannelGrantCount; index++)
-            {
-                if (index == multipleChannelGrantCount - 1)
+            ThreadPool.QueueUserWorkItem((s) =>
                 {
-                    channelBuilder.AppendFormat("csharp-hello_my_channel-{0}", index);
-                }
-                else
-                {
-                    channelBuilder.AppendFormat("csharp-hello_my_channel-{0},", index);
-                }
-            }
-            string channel = "";
-            if (!unitTest.EnableStubTest)
-            {
-                channel = channelBuilder.ToString();
-            }
-            else
-            {
-                multipleChannelGrantCount = 5;
-                channel = "csharp-hello_my_channel-0,csharp-hello_my_channel-1,csharp-hello_my_channel-2,csharp-hello_my_channel-3,csharp-hello_my_channel-4";
-            }
-            if (PubnubCommon.PAMEnabled)
-            {
-                pubnub.GrantAccess<string>(channel, true, true, 5, AccessToMultiChannelGrantCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-                grantManualEvent.WaitOne();
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenGrantIsRequested";
+                    unitTest.TestCaseName = "ThenMultipleChannelGrantShouldReturnSuccess";
+                    pubnub.PubnubUnitTest = unitTest;
 
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenMultipleChannelGrantShouldReturnSuccess failed.");
-            }
-            else
-            {
-                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenMultipleChannelGrantShouldReturnSuccess.");
-            }
+                    System.Text.StringBuilder channelBuilder = new System.Text.StringBuilder();
+                    for (int index = 0; index < multipleChannelGrantCount; index++)
+                    {
+                        if (index == multipleChannelGrantCount - 1)
+                        {
+                            channelBuilder.AppendFormat("csharp-hello_my_channel-{0}", index);
+                        }
+                        else
+                        {
+                            channelBuilder.AppendFormat("csharp-hello_my_channel-{0},", index);
+                        }
+                    }
+                    string channel = "";
+                    if (!unitTest.EnableStubTest)
+                    {
+                        channel = channelBuilder.ToString();
+                    }
+                    else
+                    {
+                        multipleChannelGrantCount = 5;
+                        channel = "csharp-hello_my_channel-0,csharp-hello_my_channel-1,csharp-hello_my_channel-2,csharp-hello_my_channel-3,csharp-hello_my_channel-4";
+                    }
+                    if (PubnubCommon.PAMEnabled)
+                    {
+                        mreGrant = new ManualResetEvent(false);
+                        pubnub.GrantAccess<string>(channel, true, true, 5, AccessToMultiChannelGrantCallback, DummyErrorCallback);
+                        mreGrant.WaitOne(60 * 1000);
+
+                        Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenMultipleChannelGrantShouldReturnSuccess failed.");
+                    }
+                    else
+                    {
+                        Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenMultipleChannelGrantShouldReturnSuccess.");
+                    }
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        TestComplete();
+                    });
+                });
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenMultipleAuthGrantShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenMultipleAuthGrantShouldReturnSuccess";
 
             receivedGrantMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenMultipleAuthGrantShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-
-            System.Text.StringBuilder authKeyBuilder = new System.Text.StringBuilder();
-            for (int index = 0; index < multipleAuthGrantCount; index++)
-            {
-                if (index == multipleAuthGrantCount - 1)
+            ThreadPool.QueueUserWorkItem((s) =>
                 {
-                    authKeyBuilder.AppendFormat("csharp-auth_key-{0}", index);
-                }
-                else
-                {
-                    authKeyBuilder.AppendFormat("csharp-auth_key-{0},", index);
-                }
-            }
-            string channel = "hello_my_channel";
-            string auth = "";
-            if (!unitTest.EnableStubTest)
-            {
-                auth = authKeyBuilder.ToString();
-            }
-            else
-            {
-                multipleAuthGrantCount = 5;
-                auth = "csharp-auth_key-0,csharp-auth_key-1,csharp-auth_key-2,csharp-auth_key-3,csharp-auth_key-4";
-            }
-            if (PubnubCommon.PAMEnabled)
-            {
-                pubnub.AuthenticationKey = auth;
-                pubnub.GrantAccess<string>(channel, true, true, 5, AccessToMultiAuthGrantCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-                grantManualEvent.WaitOne();
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenGrantIsRequested";
+                    unitTest.TestCaseName = "ThenMultipleAuthGrantShouldReturnSuccess";
+                    pubnub.PubnubUnitTest = unitTest;
 
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenMultipleAuthGrantShouldReturnSuccess failed.");
-            }
-            else
-            {
-                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenMultipleAuthGrantShouldReturnSuccess.");
-            }
+                    System.Text.StringBuilder authKeyBuilder = new System.Text.StringBuilder();
+                    for (int index = 0; index < multipleAuthGrantCount; index++)
+                    {
+                        if (index == multipleAuthGrantCount - 1)
+                        {
+                            authKeyBuilder.AppendFormat("csharp-auth_key-{0}", index);
+                        }
+                        else
+                        {
+                            authKeyBuilder.AppendFormat("csharp-auth_key-{0},", index);
+                        }
+                    }
+                    string channel = "hello_my_channel";
+                    string auth = "";
+                    if (!unitTest.EnableStubTest)
+                    {
+                        auth = authKeyBuilder.ToString();
+                    }
+                    else
+                    {
+                        multipleAuthGrantCount = 5;
+                        auth = "csharp-auth_key-0,csharp-auth_key-1,csharp-auth_key-2,csharp-auth_key-3,csharp-auth_key-4";
+                    }
+                    if (PubnubCommon.PAMEnabled)
+                    {
+                        mreGrant = new ManualResetEvent(false);
+                        pubnub.AuthenticationKey = auth;
+                        pubnub.GrantAccess<string>(channel, true, true, 5, AccessToMultiAuthGrantCallback, DummyErrorCallback);
+                        mreGrant.WaitOne(60 * 1000);
+
+                        Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenMultipleAuthGrantShouldReturnSuccess failed.");
+                    }
+                    else
+                    {
+                        Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenMultipleAuthGrantShouldReturnSuccess.");
+                    }
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        TestComplete();
+                    });
+                });
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenRevokeAtSubKeyLevelReturnSuccess()
         {
             currentUnitTestCase = "ThenRevokeAtSubKeyLevelReturnSuccess";
@@ -413,44 +478,50 @@ namespace PubnubWindowsPhone.Test.UnitTest
             receivedGrantMessage = false;
             receivedRevokeMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenRevokeAtSubKeyLevelReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-            if (PubnubCommon.PAMEnabled)
-            {
-                if (!unitTest.EnableStubTest)
-                {
-                    pubnub.GrantAccess<string>("", true, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
-                    grantManualEvent.WaitOne();
-                }
-                else
-                {
-                    receivedGrantMessage = true;
-                }
-                if (receivedGrantMessage)
-                {
-                    Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess -> Grant ok..Now trying Revoke");
-                    pubnub.GrantAccess<string>("", false, false, 5, RevokeToSubKeyLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
-                    revokeManualEvent.WaitOne();
-                    Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess -> Grant success but revoke failed.");
-                }
-                else
-                {
-                    Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess failed. -> Grant not occured, so is revoke");
-                }
-            }
-            else
-            {
-                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess.");
-            }
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenGrantIsRequested";
+                    unitTest.TestCaseName = "ThenRevokeAtSubKeyLevelReturnSuccess";
+                    pubnub.PubnubUnitTest = unitTest;
+                    if (PubnubCommon.PAMEnabled)
+                    {
+                        if (!unitTest.EnableStubTest)
+                        {
+                            mreGrant = new ManualResetEvent(false);
+                            pubnub.GrantAccess<string>("", true, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
+                            mreGrant.WaitOne(60 * 1000);
+                        }
+                        else
+                        {
+                            receivedGrantMessage = true;
+                        }
+                        if (receivedGrantMessage)
+                        {
+                            mreGrant = new ManualResetEvent(false);
+                            pubnub.GrantAccess<string>("", false, false, 5, RevokeToSubKeyLevelCallback, DummyErrorCallback);
+                            mreGrant.WaitOne(60 * 1000);
+                            Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess -> Grant success but revoke failed.");
+                        }
+                        else
+                        {
+                            Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess failed. -> Grant not occured, so is revoke");
+                        }
+                    }
+                    else
+                    {
+                        Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess.");
+                    }
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        TestComplete();
+                    });
+                });
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenRevokeAtChannelLevelReturnSuccess()
         {
             currentUnitTestCase = "ThenRevokeAtChannelLevelReturnSuccess";
@@ -458,46 +529,52 @@ namespace PubnubWindowsPhone.Test.UnitTest
             receivedGrantMessage = false;
             receivedRevokeMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenRevokeAtChannelLevelReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenGrantIsRequested";
+                    unitTest.TestCaseName = "ThenRevokeAtChannelLevelReturnSuccess";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "hello_my_channel";
-            if (PubnubCommon.PAMEnabled)
-            {
-                if (!unitTest.EnableStubTest)
-                {
-                    pubnub.GrantAccess<string>(channel, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
-                    grantManualEvent.WaitOne();
-                }
-                else
-                {
-                    receivedGrantMessage = true;
-                }
-                if (receivedGrantMessage)
-                {
-                    Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess -> Grant ok..Now trying Revoke");
-                    pubnub.GrantAccess<string>("", false, false, 5, RevokeToChannelLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
-                    revokeManualEvent.WaitOne();
-                    Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess -> Grant success but revoke failed.");
-                }
-                else
-                {
-                    Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess failed. -> Grant not occured, so is revoke");
-                }
-            }
-            else
-            {
-                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess.");
-            }
+                    string channel = "hello_my_channel";
+                    if (PubnubCommon.PAMEnabled)
+                    {
+                        if (!unitTest.EnableStubTest)
+                        {
+                            mreGrant = new ManualResetEvent(false);
+                            pubnub.GrantAccess<string>(channel, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                            mreGrant.WaitOne(60 * 1000);
+                        }
+                        else
+                        {
+                            receivedGrantMessage = true;
+                        }
+                        if (receivedGrantMessage)
+                        {
+                            mreGrant = new ManualResetEvent(false);
+                            pubnub.GrantAccess<string>("", false, false, 5, RevokeToChannelLevelCallback, DummyErrorCallback);
+                            mreGrant.WaitOne(60 * 1000);
+                            Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess -> Grant success but revoke failed.");
+                        }
+                        else
+                        {
+                            Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess failed. -> Grant not occured, so is revoke");
+                        }
+                    }
+                    else
+                    {
+                        Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess.");
+                    }
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        TestComplete();
+                    });
+                });
         }
 
-        [TestMethod]
+        [TestMethod, Asynchronous]
         public void ThenRevokeAtUserLevelReturnSuccess()
         {
             currentUnitTestCase = "ThenRevokeAtUserLevelReturnSuccess";
@@ -505,45 +582,51 @@ namespace PubnubWindowsPhone.Test.UnitTest
             receivedGrantMessage = false;
             receivedRevokeMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenRevokeAtUserLevelReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenGrantIsRequested";
+                    unitTest.TestCaseName = "ThenRevokeAtUserLevelReturnSuccess";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "hello_my_authchannel";
-            string authKey = "hello_my_authkey";
-            if (PubnubCommon.PAMEnabled)
-            {
-                if (!unitTest.EnableStubTest)
-                {
-                    pubnub.AuthenticationKey = authKey;
-                    pubnub.GrantAccess<string>(channel, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
-                    grantManualEvent.WaitOne();
-                }
-                else
-                {
-                    receivedGrantMessage = true;
-                }
-                if (receivedGrantMessage)
-                {
-                    Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant ok..Now trying Revoke");
-                    pubnub.GrantAccess<string>("", false, false, 5, RevokeToUserLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
-                    revokeManualEvent.WaitOne();
-                    Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant success but revoke failed.");
-                }
-                else
-                {
-                    Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess failed. -> Grant not occured, so is revoke");
-                }
-            }
-            else
-            {
-                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess.");
-            }
+                    string channel = "hello_my_authchannel";
+                    string authKey = "hello_my_authkey";
+                    if (PubnubCommon.PAMEnabled)
+                    {
+                        if (!unitTest.EnableStubTest)
+                        {
+                            mreGrant = new ManualResetEvent(false);
+                            pubnub.AuthenticationKey = authKey;
+                            pubnub.GrantAccess<string>(channel, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                            mreGrant.WaitOne(60 * 1000);
+                        }
+                        else
+                        {
+                            receivedGrantMessage = true;
+                        }
+                        if (receivedGrantMessage)
+                        {
+                            mreGrant = new ManualResetEvent(false);
+                            pubnub.GrantAccess<string>("", false, false, 5, RevokeToUserLevelCallback, DummyErrorCallback);
+                            mreGrant.WaitOne(60 * 1000);
+                            Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant success but revoke failed.");
+                        }
+                        else
+                        {
+                            Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess failed. -> Grant not occured, so is revoke");
+                        }
+                    }
+                    else
+                    {
+                        Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess.");
+                    }
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        TestComplete();
+                    });
+                });
         }
 
         [Asynchronous]
@@ -593,7 +676,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             catch { }
             finally
             {
-                grantManualEvent.Set();
+                mreGrant.Set();
             }
         }
 
@@ -653,7 +736,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             catch { }
             finally
             {
-                grantManualEvent.Set();
+                mreGrant.Set();
             }
         }
 
@@ -726,7 +809,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             catch { }
             finally
             {
-                grantManualEvent.Set();
+                mreGrant.Set();
             }
         }
 
@@ -767,7 +850,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             catch { }
             finally
             {
-                grantManualEvent.Set();
+                mreGrant.Set();
             }
         }
 
@@ -809,7 +892,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             catch { }
             finally
             {
-                grantManualEvent.Set();
+                mreGrant.Set();
             }
         }
 
@@ -866,7 +949,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             catch { }
             finally
             {
-                revokeManualEvent.Set();
+                mreGrant.Set();
             }
         }
 
@@ -911,7 +994,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             catch { }
             finally
             {
-                revokeManualEvent.Set();
+                mreGrant.Set();
             }
         }
 
@@ -971,7 +1054,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             catch { }
             finally
             {
-                revokeManualEvent.Set();
+                mreGrant.Set();
             }
         }
 

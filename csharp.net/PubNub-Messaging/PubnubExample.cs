@@ -96,7 +96,7 @@ namespace PubNubMessaging.Core
             else
             {
                 Console.WriteLine("Default demo subscribe key provided");
-                subscribeKey = "demo";
+                subscribeKey = "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -112,7 +112,7 @@ namespace PubNubMessaging.Core
             else
             {
                 Console.WriteLine("Default demo publish key provided");
-                publishKey = "demo";
+                publishKey = "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -127,14 +127,13 @@ namespace PubNubMessaging.Core
             }
             else
             {
-                Console.WriteLine("No Secret key provided");
-                //secretKey = "sec-c-YjFmNzYzMGMtYmI3NC00NzJkLTlkYzYtY2MwMzI4YTJhNDVh";
+                Console.WriteLine("Default demo Secret key provided");
+                secretKey = "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
 
             pubnub = new Pubnub(publishKey, subscribeKey, secretKey, cipherKey,
-            //pubnub = new Pubnub("pub-c-a2650a22-deb1-44f5-aa87-1517049411d5", "sub-c-a478dd2a-c33d-11e2-883f-02ee2ddab7fe", "sec-c-YjFmNzYzMGMtYmI3NC00NzJkLTlkYzYtY2MwMzI4YTJhNDVh", cipherKey,
                 (enableSSL.Trim().ToLower() == "y") ? true : false);
 
             pubnub.Origin = origin;
@@ -655,7 +654,7 @@ namespace PubNubMessaging.Core
                         string grantPresenceTimeLimit = Console.ReadLine();
                         int grantPresenceTimeLimitInSeconds;
                         Int32.TryParse(grantPresenceTimeLimit, out grantPresenceTimeLimitInSeconds);
-                        if (grantPresenceTimeLimitInSeconds == 0) grantTimeLimitInSeconds = 1440;
+                        if (grantPresenceTimeLimitInSeconds == 0) grantPresenceTimeLimitInSeconds = 1440;
 
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", channel));
@@ -836,7 +835,7 @@ namespace PubNubMessaging.Core
 
                         Console.WriteLine("NOTE: Hopefully you added local user state.");
                         Console.WriteLine("If you want to consider already created local user state, press ENTER");
-                        Console.WriteLine("Else enter user state in json format (Eg. {\"channel\":{\"key1\":\"value1\",\"key2\":\"value2\"}}");
+                        Console.WriteLine("Else enter user state in json format (Eg. {\"key1\":\"value1\",\"key2\":\"value2\"}");
                         string manualJsonUserState = Console.ReadLine();
 
                         string jsonUserState = "";
@@ -847,6 +846,11 @@ namespace PubNubMessaging.Core
                         else
                         {
                             jsonUserState = manualJsonUserState;
+                        }
+                        if (jsonUserState == "" || jsonUserState == "{}")
+                        {
+                            Console.WriteLine("Invalid User State");
+                            break;
                         }
                         Console.WriteLine("Enter UUID. (Optional. Press ENTER to skip it)");
                         string uuid = Console.ReadLine();

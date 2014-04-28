@@ -304,7 +304,7 @@ namespace PubNubMessaging.Core
                 }
                 break;
             default:
-                Console.WriteLine ("ATTENTION: webExceptionStatus = " + webExceptionStatus.ToString ());
+                Debug.WriteLine ("ATTENTION: webExceptionStatus = " + webExceptionStatus.ToString ());
                 break;
             }
             return ret;
@@ -332,8 +332,8 @@ namespace PubNubMessaging.Core
             } else if (errorType == "System.Runtime.InteropServices.SEHException" && errorMessage == "External component has thrown an exception.") {
                 ret = PubnubErrorCode.PubnubInterOpSEHException;
             } else {
-                Console.WriteLine ("ATTENTION: Error Type = " + errorType);
-                Console.WriteLine ("ATTENTION: Error Message = " + errorMessage);
+                Debug.WriteLine ("ATTENTION: Error Type = " + errorType);
+                Debug.WriteLine ("ATTENTION: Error Message = " + errorMessage);
                 ret = PubnubErrorCode.None;
             }
             return ret;
@@ -352,6 +352,10 @@ namespace PubNubMessaging.Core
                 } else if (httpErrorCodeMessage.ToUpper () == "BADREQUEST") {
                     ret = PubnubErrorCode.BadRequest;
                 }
+				else if (httpErrorCodeMessage.ToUpper() == "NO UUID SPECIFIED")
+				{
+					ret = PubnubErrorCode.NoUuidSpecified;
+				}
                 break;
             case 401:
                 ret = PubnubErrorCode.InvalidSubscribeKey;
@@ -367,6 +371,9 @@ namespace PubNubMessaging.Core
                 } else if (httpErrorCodeMessage.ToUpper () == "SIGNATURE DOES NOT MATCH") {
                     ret = PubnubErrorCode.SignatureDoesNotMatch;
                 }
+                break;
+            case 404:
+                ret = PubnubErrorCode.NotFound;
                 break;
             case 414:
                 ret = PubnubErrorCode.RequestUriTooLong;
@@ -420,13 +427,21 @@ namespace PubNubMessaging.Core
         TimeOperationTimeout = 128,
         PubnubInterOpSEHException = 129,
         PubnubClientMachineSleep = 130,
+		SetUserStateTimeout = 131,
+		GetUserStateTimeout = 132,
+		WhereNowOperationTimeout = 133,
+		GlobalHereNowOperationTimeout = 134,
+		PAMAccessOperationTimeout = 135,
+
         MessageTooLarge = 4000,
         BadRequest = 4001,
         InvalidKey = 4002,
+		NoUuidSpecified = 4003,
         InvalidSubscribeKey = 4010,
         PamNotEnabled = 4020,
         Forbidden = 4030,
         SignatureDoesNotMatch = 4031,
+        NotFound = 4040,
         RequestUriTooLong = 4140,
         InternalServerError = 5000,
         BadGateway = 5020,
@@ -443,10 +458,12 @@ namespace PubNubMessaging.Core
             dictionaryCodes.Add (4000, "If you must publish a message greater than the default of max message size of 1.8K (post-URLEncoded) please enable the elastic message size feature from your admin portal at admin.pubnub.com.");
             dictionaryCodes.Add (4001, "Bad Request. Please check the entered inputs or web request URL");
             dictionaryCodes.Add (4002, "Invalid Key. Please verify your pub and sub keys");
+			dictionaryCodes.Add (4003, "No UUID specified. Please ensure that UUID is being passed to server for heartbeat");
             dictionaryCodes.Add (4010, "Please provide a valid subscribe key");
             dictionaryCodes.Add (4020, "PAM is not enabled for this keyset. Please contact PubNub support for instructions on enabling PAM.");
             dictionaryCodes.Add (4030, "Not authorized. Please ensure that the channel has the correct PAM permission, your authentication key is set correctly, then try again via unsub and re-sub. For further assistance, contact PubNub support.");
             dictionaryCodes.Add (4031, "Please verify pub, sub, and secret keys. For assistance, contact PubNub support");
+            dictionaryCodes.Add (4040, "HTTP 404 - Not Found Occured. Please try again. If the issue continues, please contact PubNub support");
             dictionaryCodes.Add (4140, "The URL request too long. Reduce the length by reducing subscription/presence channels or grant/revoke/audit channels/auth key list. Hint: You may spread the load across multiple PubNub instances to prevent this message.");
             dictionaryCodes.Add (5000, "Internal Server Error. Please try again. If the issue continues, please contact PubNub support");
             dictionaryCodes.Add (5020, "Bad Gateway. Please try again. If the issue continues, please contact PubNub support");
@@ -480,6 +497,12 @@ namespace PubNubMessaging.Core
             dictionaryCodes.Add (127, "Detailed History operation timeout occured.");
             dictionaryCodes.Add (128, "Time operation timeout occured.");
             dictionaryCodes.Add (129, "Error occured in external component. Please contact PubNub support with full error object details for further investigation");
+            dictionaryCodes.Add (130, "Client machine is sleeping. Please check your machine.");
+            dictionaryCodes.Add (131, "Timeout occured while setting user state. Please try again. If it continues, please contact PubNub support");
+            dictionaryCodes.Add (132, "Timeout occured while getting user state. Please try again. If it continues, please contact PubNub support");
+            dictionaryCodes.Add (133, "Timeout occured while running WhereNow. Please try again. If it continues, please contact PubNub support");
+            dictionaryCodes.Add (134, "Timeout occured while running GlobalHereNow. Please try again. If it continues, please contact PubNub support");
+            dictionaryCodes.Add (135, "Timeout occured while running PAM operations. Please try again. If it continues, please contact PubNub support");
             dictionaryCodes.Add (0, "Undocumented error. Please contact PubNub support with full error object details for further investigation");
         }
 

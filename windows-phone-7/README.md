@@ -1,7 +1,9 @@
-# PubNub 3.5 Web Data Push Cloud-Hosted API
+# PubNub 3.6 Web Data Push Cloud-Hosted API
 # Windows Phone 7.1
 
-Open PubnubWindowsPhone.sln and the .xaml files(MainPage.xaml, PubnubOperation.xaml, PubnubDemoStart, PubnubTimeoutSettings, PublishMessageUserControl.xaml) should demonstrate all functionality, asynchronously using callbacks/delegates. You can also view and inspect the tests for additional insight.
+Open PubnubWindowsPhone.sln and the .xaml files(MainPage.xaml, PubnubOperation.xaml, PubnubDemoStart.xaml, PubnubTimeoutSettings.xaml, PublishMessageUserControl.xaml, UserStateUserControl.xaml, WhereNowUserControl.xaml, HereNowOptionsUserControl.xaml, ChangeUUIDUserControl.xaml ) should demonstrate all functionality, asynchronously using callbacks/delegates. You can also view and inspect the tests for additional insight.
+
+### To compile windows phone 7.1 project, ensure that "WP7" is added as conditional compilation symbol in addition to WINDOWS_PHONE under project properties -> Build -> General
 
 ## Running the Demo App
 

@@ -1,3 +1,4 @@
+//#define USE_MiniJSON
 using System;
 using PubNubMessaging.Core;
 using NUnit.Framework;
@@ -18,9 +19,9 @@ namespace PubNubMessaging.Tests
 				public void NullMessage ()
 				{
 						Pubnub pubnub = new Pubnub (
-								                "demo",
-								                "demo",
-								                "",
+								Common.PublishKey,
+								Common.SubscribeKey,
+												"",
 								                "",
 								                false
 						                );
@@ -134,12 +135,13 @@ namespace PubNubMessaging.Tests
 				{
 						UnityEngine.Debug.Log ("DisplayErrorMessage1:" + result.ToString ());
 				}
-				[Test]
+
+				//[Test]
 				public void ThenItShouldReturnSuccessCodeAndInfoForEncryptedComplexMessage2 ()
 				{
 						Pubnub pubnub = new Pubnub (
-								                "demo",
-								                "demo",
+								Common.PublishKey,
+								Common.SubscribeKey,
 								                "",
 								                "enigma",
 								                false
@@ -182,12 +184,12 @@ namespace PubNubMessaging.Tests
 						}*/
 
 				}
-				[Test]
+				//[Test]
 				public void ThenItShouldReturnSuccessCodeAndInfoForComplexMessage2WithSsl ()
 				{
 						Pubnub pubnub = new Pubnub (
-								                "demo",
-								                "demo",
+								Common.PublishKey,
+								Common.SubscribeKey,
 								                "",
 								                "",
 								                true
@@ -206,9 +208,8 @@ namespace PubNubMessaging.Tests
           
 						pubnub.Publish (channel, message, common.DisplayReturnMessage, common.DisplayReturnMessage);
 						//wait till the response is received from the server
-						common.WaitForResponse (45);
+						common.WaitForResponse ();
 						if (common.Response != null) {
-								UnityEngine.Debug.Log ("common.Response" +common.Response);
 								IList<object> fields = common.Response as IList<object>;
 								string sent = fields [1].ToString ();
 								string one = fields [0].ToString ();
@@ -249,8 +250,8 @@ namespace PubNubMessaging.Tests
 				public void ThenItShouldReturnSuccessCodeAndInfoForComplexMessage2 ()
 				{
 						Pubnub pubnub = new Pubnub (
-								                "demo",
-								                "demo",
+								Common.PublishKey,
+								Common.SubscribeKey,
 								                "",
 								                "",
 								                false
@@ -294,12 +295,16 @@ namespace PubNubMessaging.Tests
 						}*/
 
 				}
+				#if USE_MiniJSON
+				[Ignore]
+				#else
 				[Test]
+				#endif
 				public void ThenItShouldReturnSuccessCodeAndInfoForComplexMessage ()
 				{
 						Pubnub pubnub = new Pubnub (
-								                "demo",
-								                "demo",
+								Common.PublishKey,
+								Common.SubscribeKey,
 								                "",
 								                "",
 								                false
@@ -331,8 +336,8 @@ namespace PubNubMessaging.Tests
 				public void ThenItShouldReturnSuccessCodeAndInfoWhenEncrypted ()
 				{
 						Pubnub pubnub = new Pubnub (
-								                "demo",
-								                "demo",
+								Common.PublishKey,
+								Common.SubscribeKey,
 								                "",
 								                "enigma",
 								                false
@@ -365,8 +370,8 @@ namespace PubNubMessaging.Tests
 				public void ThenItShouldReturnSuccessCodeAndInfoWhenEncryptedAndSecretKeyed ()
 				{
 						Pubnub pubnub = new Pubnub (
-								                "demo",
-								                "demo",
+								Common.PublishKey,
+								Common.SubscribeKey,
 								                "secret",
 								                "enigma",
 								                false
@@ -399,8 +404,8 @@ namespace PubNubMessaging.Tests
 				public void ThenItShouldReturnSuccessCodeAndInfo ()
 				{
 						Pubnub pubnub = new Pubnub (
-								                "demo",
-								                "demo",
+								Common.PublishKey,
+								Common.SubscribeKey,
 								                "",
 								                "",
 								                false
@@ -531,8 +536,8 @@ namespace PubNubMessaging.Tests
 				public void ThenLargeMessageShoudFailWithMessageTooLargeInfo ()
 				{
 						Pubnub pubnub = new Pubnub (
-								                "demo",
-								                "demo",
+								Common.PublishKey,
+								Common.SubscribeKey,
 								                "",
 								                "",
 								                false

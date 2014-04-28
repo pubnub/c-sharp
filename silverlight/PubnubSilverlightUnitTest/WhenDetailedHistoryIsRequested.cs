@@ -21,13 +21,13 @@ namespace PubnubSilverlight.UnitTest
         bool message10ReverseTrueReceived = false;
         bool messageStartReverseTrue = false;
 
+        ManualResetEvent mreDetailedHistory = new ManualResetEvent(false);
+        ManualResetEvent mrePublish = new ManualResetEvent(false);
+        ManualResetEvent mreGrant = new ManualResetEvent(false);
+
         int expectedCountAtStartTimeWithReverseTrue=0;
         long startTimeWithReverseTrue = 0;
 
-        bool detailedHistoryCount10CallbackInvoked = false;
-        bool detailedHistoryCount10ReverseCallbackInvoked = false;
-        bool isDetailedHistoryStartReverseTrue = false;
-        bool detailedHistoryPublishCallbackInvoked = false;
         bool receivedGrantMessage = false;
         bool grantInitCallbackInvoked = false;
 
@@ -44,20 +44,23 @@ namespace PubnubSilverlight.UnitTest
 
             receivedGrantMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "GrantRequestUnitTest";
-            unitTest.TestCaseName = "Init";
-            pubnub.PubnubUnitTest = unitTest;
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "GrantRequestUnitTest";
+                    unitTest.TestCaseName = "Init";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "hello_my_channel";
+                    string channel = "hello_my_channel";
 
-            EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, true, 20, ThenDetailedHistoryInitializeShouldReturnGrantMessage, DummyErrorCallback));
-            //Thread.Sleep(1000);
-            EnqueueConditional(() => grantInitCallbackInvoked);
-            EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenDetailedHistoryIsRequested Grant access failed."));
-            EnqueueTestComplete();
+                    EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, true, 20, ThenDetailedHistoryInitializeShouldReturnGrantMessage, DummyErrorCallback));
+                    mreGrant.WaitOne(310 * 1000);
+
+                    EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenDetailedHistoryIsRequested Grant access failed."));
+                    EnqueueTestComplete();
+                });
         }
 
         [Asynchronous]
@@ -79,17 +82,18 @@ namespace PubnubSilverlight.UnitTest
             catch { }
             finally
             {
-                grantInitCallbackInvoked = true;
+                mreGrant.Set();
             }
         }
 
-        [TestMethod]
-        [Asynchronous]
+        [TestMethod, Asynchronous]
         public void DetailHistoryCount10ReturnsRecords()
         {
             message10Received = false;
-            //ThreadPool.QueueUserWorkItem((s) =>
-            //    {
+            mreDetailedHistory = new ManualResetEvent(false);
+
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
                     Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
                     string channel = "hello_my_channel";
 
@@ -99,10 +103,12 @@ namespace PubnubSilverlight.UnitTest
                     pubnub.PubnubUnitTest = unitTest;
 
                     EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, 10, DetailedHistoryCount10Callback, DummyErrorCallback));
-                    EnqueueConditional(() => detailedHistoryCount10CallbackInvoked);
+                    mreDetailedHistory.WaitOne(310 * 1000);
+                    
                     EnqueueCallback(() => Assert.IsTrue(message10Received, "Detailed History Failed"));
-            //    });
-            EnqueueTestComplete();
+                    EnqueueTestComplete();
+                });
+            
         }
 
         [Asynchronous]
@@ -124,14 +130,15 @@ namespace PubnubSilverlight.UnitTest
                 }
             }
 
-            detailedHistoryCount10CallbackInvoked = true;
+            mreDetailedHistory.Set();
         }
 
-        [TestMethod]
-        [Asynchronous]
+        [TestMethod, Asynchronous]
         public void DetailHistoryCount10ReverseTrueReturnsRecords()
         {
             message10ReverseTrueReceived = false;
+            mreDetailedHistory = new ManualResetEvent(false);
+
             ThreadPool.QueueUserWorkItem((s) =>
                 {
                     Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
@@ -143,10 +150,10 @@ namespace PubnubSilverlight.UnitTest
                     pubnub.PubnubUnitTest = unitTest;
 
                     EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, -1, 10, true, DetailedHistoryCount10ReverseTrueCallback, DummyErrorCallback));
-                    EnqueueConditional(() => detailedHistoryCount10ReverseCallbackInvoked);
+                    mreDetailedHistory.WaitOne(310 * 1000);
                     EnqueueCallback(() => Assert.IsTrue(message10ReverseTrueReceived, "Detailed History Failed"));
+                    EnqueueTestComplete();
                 });
-            EnqueueTestComplete();
         }
 
         [Asynchronous]
@@ -168,55 +175,44 @@ namespace PubnubSilverlight.UnitTest
                 }
             }
 
-            detailedHistoryCount10ReverseCallbackInvoked = true;
+            mreDetailedHistory.Set();
         }
 
-        //[TestMethod, Asynchronous]
+        [TestMethod, Asynchronous]
         public void DetailedHistoryStartWithReverseTrue()
         {
-            detailedHistoryPublishCallbackInvoked = false;
-            isDetailedHistoryStartReverseTrue = false;
+            mreDetailedHistory = new ManualResetEvent(false);
 
             expectedCountAtStartTimeWithReverseTrue = 0;
             messageStartReverseTrue = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailedHistoryStartWithReverseTrue";
-            pubnub.PubnubUnitTest = unitTest;
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-            string channel = "hello_my_channel";
-            startTimeWithReverseTrue = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(DateTime.UtcNow);
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
+                    unitTest.TestCaseName = "DetailedHistoryStartWithReverseTrue";
+                    pubnub.PubnubUnitTest = unitTest;
 
-            //ThreadPool.QueueUserWorkItem((s) =>
-            //    {
-                    //EnqueueCallback(() =>
-                    //{
-                    //    for (int index = 0; index < 10; index++)
-                    //    {
-                    //        pubnub.Publish<string>(channel,
-                    //                            string.Format("DetailedHistoryStartTimeWithReverseTrue {0}", index),
-                    //                            DetailedHistorySamplePublishCallback, DummyErrorCallback);
-                    //        Thread.Sleep(100);
-                    //        EnqueueConditional(() => detailedHistoryPublishCallbackInvoked);
-                    //    }
-                    //});
+                    string channel = "hello_my_channel";
+                    startTimeWithReverseTrue = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(DateTime.UtcNow);
+
                     for (int index = 0; index < 10; index++)
                     {
+                        mrePublish = new ManualResetEvent(false);
                         EnqueueCallback(() => pubnub.Publish<string>(channel,
                                             string.Format("DetailedHistoryStartTimeWithReverseTrue {0}", index),
                                             DetailedHistorySamplePublishCallback, DummyErrorCallback));
-                        EnqueueCallback(() => Thread.Sleep(100));
-                        EnqueueConditional(() => detailedHistoryPublishCallbackInvoked);
+                        mrePublish.WaitOne(310 * 1000);
                     }
 
 
                     EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, startTimeWithReverseTrue, DetailedHistoryStartWithReverseTrueCallback, DummyErrorCallback, true));
-                    EnqueueConditional(() => isDetailedHistoryStartReverseTrue);
+                    mreDetailedHistory.WaitOne(310 * 1000);
                     EnqueueCallback(() => Assert.IsTrue(messageStartReverseTrue, "Detailed History with Start and Reverse True Failed"));
-              //  });
-            EnqueueTestComplete();
+                    EnqueueTestComplete();
+                });
         }
 
         [Asynchronous]
@@ -248,7 +244,7 @@ namespace PubnubSilverlight.UnitTest
                     }
                 }
             }
-            isDetailedHistoryStartReverseTrue = true;
+            mreDetailedHistory.Set();
         }
 
         [Asynchronous]
@@ -267,14 +263,12 @@ namespace PubnubSilverlight.UnitTest
                     }
                 }
             }
-            detailedHistoryPublishCallbackInvoked = true;
+            mrePublish.Set();
         }
 
         [Asynchronous]
         private void DummyErrorCallback(PubnubClientError result)
         {
-            detailedHistoryPublishCallbackInvoked = true;
-            isDetailedHistoryStartReverseTrue = true;
             if (result != null)
             {
                 Console.WriteLine(result.Description);
