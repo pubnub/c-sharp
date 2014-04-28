@@ -592,6 +592,11 @@ namespace PubNubMessaging.Core
                     case "12":
                         Console.WriteLine("Enter CHANNEL name for PAM Grant. For Presence, Select Option 15.");
                         channel = Console.ReadLine();
+
+                        Console.WriteLine("Enter the auth_key for PAM Grant (optional)");
+                        Console.WriteLine("Press Enter Key if there is no auth_key at this time.");
+                        string authGrant = Console.ReadLine();
+                        
                         Console.WriteLine("Read Access? Enter Y for Yes (default), N for No.");
                         string readAccess = Console.ReadLine();
                         bool read = (readAccess.ToLower() == "n") ? false : true;
@@ -607,6 +612,7 @@ namespace PubNubMessaging.Core
 
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}",channel));
+                        Console.WriteLine(string.Format("auth_key = {0}", authGrant));
                         Console.WriteLine(string.Format("Read Access = {0}", read.ToString()));
                         Console.WriteLine(string.Format("Write Access = {0}", write.ToString()));
                         Console.WriteLine(string.Format("Grant Access Time Limit = {0}", grantTimeLimitInSeconds.ToString()));
@@ -614,7 +620,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine();
 
                         Console.WriteLine("Running PamGrant()");
-                        pubnub.GrantAccess<string>(channel, read, write, grantTimeLimitInSeconds, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.GrantAccess<string>(channel, authGrant, read, write, grantTimeLimitInSeconds, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "13":
                         Console.WriteLine("Enter CHANNEL name for PAM Audit");
@@ -625,24 +631,47 @@ namespace PubNubMessaging.Core
                         Console.ResetColor();
                         Console.WriteLine();
 
+                        Console.WriteLine("Enter the auth_key for PAM Audit (optional)");
+                        Console.WriteLine("Press Enter Key if there is no auth_key at this time.");
+                        string authAudit = Console.ReadLine();
+                        
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("auth_key = {0}", authAudit));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
                         Console.WriteLine("Running PamAudit()");
-                        pubnub.AuditAccess<string>(channel,DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.AuditAccess<string>(channel, authAudit, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "14":
                         Console.WriteLine("Enter CHANNEL name for PAM Revoke");
                         channel = Console.ReadLine();
-
+                        
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", channel));
                         Console.ResetColor();
                         Console.WriteLine();
 
+                        Console.WriteLine("Enter the auth_key for PAM Revoke (optional)");
+                        Console.WriteLine("Press Enter Key if there is no auth_key at this time.");
+                        string authRevoke = Console.ReadLine();
+                        
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("auth_key = {0}", authRevoke));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
                         Console.WriteLine("Running PamRevoke()");
-                        pubnub.GrantAccess<string>(channel, false,false, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.GrantAccess<string>(channel, authRevoke, false,false, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "15":
                         Console.WriteLine("Enter CHANNEL name for PAM Grant Presence.");
                         channel = Console.ReadLine();
+                        
+                        Console.WriteLine("Enter the auth_key for PAM Grant Presence (optional)");
+                        Console.WriteLine("Press Enter Key if there is no auth_key at this time.");
+                        string authGrantPresence = Console.ReadLine();
+                        
                         Console.WriteLine("Read Access? Enter Y for Yes (default), N for No.");
                         string readPresenceAccess = Console.ReadLine();
                         bool readPresence = (readPresenceAccess.ToLower() == "n") ? false : true;
@@ -658,6 +687,7 @@ namespace PubNubMessaging.Core
 
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", channel));
+                        Console.WriteLine(string.Format("auth_key = {0}", authGrantPresence));
                         Console.WriteLine(string.Format("Read Access = {0}", readPresence.ToString()));
                         Console.WriteLine(string.Format("Write Access = {0}", writePresence.ToString()));
                         Console.WriteLine(string.Format("Grant Access Time Limit = {0}", grantPresenceTimeLimitInSeconds.ToString()));
@@ -665,19 +695,27 @@ namespace PubNubMessaging.Core
                         Console.WriteLine();
 
                         Console.WriteLine("Running PAM GrantPresenceAccess()");
-                        pubnub.GrantPresenceAccess<string>(channel, readPresence, writePresence, grantPresenceTimeLimitInSeconds, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.GrantPresenceAccess<string>(channel, authGrantPresence, readPresence, writePresence, grantPresenceTimeLimitInSeconds, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "16":
                         Console.WriteLine("Enter CHANNEL name for PAM Presence Audit");
                         channel = Console.ReadLine();
-
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", channel));
                         Console.ResetColor();
                         Console.WriteLine();
 
+                        Console.WriteLine("Enter the auth_key for PAM Presence Audit (optional)");
+                        Console.WriteLine("Press Enter Key if there is no auth_key at this time.");
+                        string authPresenceAudit = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("auth_key = {0}", authPresenceAudit));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
+
                         Console.WriteLine("Running PAM Presence Audit()");
-                        pubnub.AuditPresenceAccess<string>(channel, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.AuditPresenceAccess<string>(channel, authPresenceAudit, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "17":
                         Console.WriteLine("Enter CHANNEL name for PAM Presence Revoke");
@@ -688,8 +726,16 @@ namespace PubNubMessaging.Core
                         Console.ResetColor();
                         Console.WriteLine();
 
+                        Console.WriteLine("Enter the auth_key for PAM Presence Revoke (optional)");
+                        Console.WriteLine("Press Enter Key if there is no auth_key at this time.");
+                        string authPresenceRevoke = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("auth_key = {0}", authPresenceRevoke));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
                         Console.WriteLine("Running PAM Presence Revoke()");
-                        pubnub.GrantPresenceAccess<string>(channel, false, false, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.GrantPresenceAccess<string>(channel, authPresenceRevoke, false, false, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "18":
                         Console.WriteLine("Enter Auth Key. Use comma to enter multiple Auth Keys.");

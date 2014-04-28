@@ -1,4 +1,4 @@
-//Build Date: April 08, 2014
+//Build Date: April 28, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX_UNITY
@@ -3393,52 +3393,55 @@ namespace PubNubMessaging.Core
 
 		#region "PAM"
 
-		private Uri BuildGrantAccessRequest (string channel, bool read, bool write, int ttl)
+		private Uri BuildGrantAccessRequest(string channel, string authenticationKey, bool read, bool write, int ttl)
 		{
 			string signature = "0";
 			long timeStamp = TranslateDateTimeToSeconds (DateTime.UtcNow);
 			string queryString = "";
 			StringBuilder queryStringBuilder = new StringBuilder ();
-			if (!string.IsNullOrEmpty (_authenticationKey)) {
-				queryStringBuilder.AppendFormat ("auth={0}", EncodeUricomponent (_authenticationKey, ResponseType.GrantAccess, false));
+            if (!string.IsNullOrEmpty(authenticationKey))
+            {
+                queryStringBuilder.AppendFormat("auth={0}", EncodeUricomponent(authenticationKey, ResponseType.GrantAccess, false));
 			}
 
-			if (!string.IsNullOrEmpty (channel)) {
-				queryStringBuilder.AppendFormat ("{0}channel={1}", (queryStringBuilder.Length > 0) ? "&" : "", EncodeUricomponent (channel, ResponseType.GrantAccess, false));
+			if (!string.IsNullOrEmpty(channel)) 
+            {
+				queryStringBuilder.AppendFormat ("{0}channel={1}", (queryStringBuilder.Length > 0) ? "&" : "", EncodeUricomponent(channel, ResponseType.GrantAccess, false));
 			}
 
 			queryStringBuilder.AppendFormat ("{0}", (queryStringBuilder.Length > 0) ? "&" : "");
 			queryStringBuilder.AppendFormat ("r={0}&timestamp={1}{2}&w={3}", Convert.ToInt32 (read), timeStamp.ToString (), (ttl > -1) ? "&ttl=" + ttl.ToString () : "", Convert.ToInt32 (write));
 
-			if (this.secretKey.Length > 0) {
-				StringBuilder string_to_sign = new StringBuilder ();
+			if (this.secretKey.Length > 0) 
+            {
+				StringBuilder string_to_sign = new StringBuilder();
 				string_to_sign.Append (this.subscribeKey)
-					.Append ("\n")
-						.Append (this.publishKey)
-						.Append ("\n")
-						.Append ("grant")
-						.Append ("\n")
-						.Append (queryStringBuilder.ToString ());
+					.Append("\n")
+						.Append(this.publishKey)
+						.Append("\n")
+						.Append("grant")
+						.Append("\n")
+						.Append(queryStringBuilder.ToString());
 
 				PubnubCrypto pubnubCrypto = new PubnubCrypto (this.cipherKey);
-				signature = pubnubCrypto.PubnubAccessManagerSign (this.secretKey, string_to_sign.ToString ());
-				queryString = string.Format ("signature={0}&{1}", signature, queryStringBuilder.ToString ());
+				signature = pubnubCrypto.PubnubAccessManagerSign (this.secretKey, string_to_sign.ToString());
+				queryString = string.Format("signature={0}&{1}", signature, queryStringBuilder.ToString());
 			}
 
 			parameters = "";
 			parameters += "?" + queryString;
 
-			List<string> url = new List<string> ();
-			url.Add ("v1");
-			url.Add ("auth");
-			url.Add ("grant");
-			url.Add ("sub-key");
-			url.Add (this.subscribeKey);
+			List<string> url = new List<string>();
+			url.Add("v1");
+			url.Add("auth");
+			url.Add("grant");
+			url.Add("sub-key");
+			url.Add(this.subscribeKey);
 
-			return BuildRestApiRequest<Uri> (url, ResponseType.GrantAccess);
+			return BuildRestApiRequest<Uri>(url, ResponseType.GrantAccess);
 		}
 
-		private Uri BuildAuditAccessRequest (string channel)
+        private Uri BuildAuditAccessRequest(string channel, string authenticationKey)
 		{
 			string signature = "0";
 			long timeStamp = ((_pubnubUnitTest == null) || (_pubnubUnitTest is IPubnubUnitTest && !_pubnubUnitTest.EnableStubTest))
@@ -3446,8 +3449,9 @@ namespace PubNubMessaging.Core
 					: TranslateDateTimeToSeconds (new DateTime (2013, 01, 01));
 			string queryString = "";
 			StringBuilder queryStringBuilder = new StringBuilder ();
-			if (!string.IsNullOrEmpty (_authenticationKey)) {
-				queryStringBuilder.AppendFormat ("auth={0}", EncodeUricomponent (_authenticationKey, ResponseType.AuditAccess, false));
+            if (!string.IsNullOrEmpty(authenticationKey))
+            {
+                queryStringBuilder.AppendFormat("auth={0}", EncodeUricomponent(authenticationKey, ResponseType.AuditAccess, false));
 			}
 			if (!string.IsNullOrEmpty (channel)) {
 				queryStringBuilder.AppendFormat ("{0}channel={1}", (queryStringBuilder.Length > 0) ? "&" : "", EncodeUricomponent (channel, ResponseType.AuditAccess, false));
@@ -3484,16 +3488,26 @@ namespace PubNubMessaging.Core
 
 		public bool GrantAccess<T> (string channel, bool read, bool write, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			return GrantAccess (channel, read, write, -1, userCallback, errorCallback);
+			return GrantAccess (channel, "", read, write, -1, userCallback, errorCallback);
 		}
 
-		public bool GrantAccess<T> (string channel, bool read, bool write, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        public bool GrantAccess<T>(string channel, bool read, bool write, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return GrantAccess<T>(channel, "", read, write, ttl, userCallback, errorCallback);
+        }
+
+        public bool GrantAccess<T>(string channel, string authenticationKey, bool read, bool write, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return GrantAccess(channel, authenticationKey, read, write, -1, userCallback, errorCallback);
+        }
+        
+        public bool GrantAccess<T> (string channel, string authenticationKey, bool read, bool write, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
 			if (string.IsNullOrEmpty (this.secretKey) || string.IsNullOrEmpty (this.secretKey.Trim ()) || this.secretKey.Length <= 0) {
 				throw new MissingFieldException ("Invalid secret key");
 			}
 
-			Uri request = BuildGrantAccessRequest (channel, read, write, ttl);
+			Uri request = BuildGrantAccessRequest(channel, authenticationKey, read, write, ttl);
 
 			RequestState<T> requestState = new RequestState<T> ();
 			requestState.Channels = new string[] { channel };
@@ -3507,10 +3521,20 @@ namespace PubNubMessaging.Core
 
 		public bool GrantPresenceAccess<T> (string channel, bool read, bool write, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			return GrantPresenceAccess (channel, read, write, -1, userCallback, errorCallback);
+			return GrantPresenceAccess (channel, "", read, write, -1, userCallback, errorCallback);
 		}
 
-		public bool GrantPresenceAccess<T> (string channel, bool read, bool write, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        public bool GrantPresenceAccess<T>(string channel, bool read, bool write, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return GrantPresenceAccess(channel, "", read, write, ttl, userCallback, errorCallback);
+        }
+
+        public bool GrantPresenceAccess<T>(string channel, string authenticationKey, bool read, bool write, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return GrantPresenceAccess<T>(channel, authenticationKey, read, write, -1, userCallback, errorCallback);
+        }
+
+		public bool GrantPresenceAccess<T>(string channel, string authenticationKey, bool read, bool write, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
 			string[] multiChannels = channel.Split (',');
 			if (multiChannels.Length > 0) {
@@ -3523,45 +3547,59 @@ namespace PubNubMessaging.Core
 				}
 			}
 			string presenceChannel = string.Join (",", multiChannels);
-			return GrantAccess (presenceChannel, read, write, ttl, userCallback, errorCallback);
+			return GrantAccess(presenceChannel, authenticationKey, read, write, ttl, userCallback, errorCallback);
 		}
 
 		public void AuditAccess<T> (Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			AuditAccess ("", userCallback, errorCallback);
+			AuditAccess("", "", userCallback, errorCallback);
 		}
 
 		public void AuditAccess<T> (string channel, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			if (string.IsNullOrEmpty (this.secretKey) || string.IsNullOrEmpty (this.secretKey.Trim ()) || this.secretKey.Length <= 0) {
-				throw new MissingFieldException ("Invalid secret key");
-			}
-
-			Uri request = BuildAuditAccessRequest (channel);
-
-			RequestState<T> requestState = new RequestState<T> ();
-			if (!string.IsNullOrEmpty (channel)) {
-				requestState.Channels = new string[] { channel };
-			}
-			requestState.Type = ResponseType.AuditAccess;
-			requestState.UserCallback = userCallback;
-			requestState.ErrorCallback = errorCallback;
-			requestState.Reconnect = false;
-
-			UrlProcessRequest<T> (request, requestState);
+            AuditAccess(channel, "", userCallback, errorCallback);
 		}
+
+        public void AuditAccess<T>(string channel, string authenticationKey, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            if (string.IsNullOrEmpty(this.secretKey) || string.IsNullOrEmpty(this.secretKey.Trim()) || this.secretKey.Length <= 0)
+            {
+                throw new MissingFieldException("Invalid secret key");
+            }
+
+            Uri request = BuildAuditAccessRequest(channel, authenticationKey);
+
+            RequestState<T> requestState = new RequestState<T>();
+            if (!string.IsNullOrEmpty(channel))
+            {
+                requestState.Channels = new string[] { channel };
+            }
+            requestState.Type = ResponseType.AuditAccess;
+            requestState.UserCallback = userCallback;
+            requestState.ErrorCallback = errorCallback;
+            requestState.Reconnect = false;
+
+            UrlProcessRequest<T>(request, requestState);
+        }
 
 		public void AuditPresenceAccess<T> (string channel, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			string[] multiChannels = channel.Split (',');
-			if (multiChannels.Length > 0) {
-				for (int index = 0; index < multiChannels.Length; index++) {
-					multiChannels [index] = string.Format ("{0}-pnpres", multiChannels [index]);
-				}
-			}
-			string presenceChannel = string.Join (",", multiChannels);
-			AuditAccess (presenceChannel, userCallback, errorCallback);
+            AuditPresenceAccess(channel, "", userCallback, errorCallback);
 		}
+
+        public void AuditPresenceAccess<T>(string channel, string authenticationKey, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            string[] multiChannels = channel.Split(',');
+            if (multiChannels.Length > 0)
+            {
+                for (int index = 0; index < multiChannels.Length; index++)
+                {
+                    multiChannels[index] = string.Format("{0}-pnpres", multiChannels[index]);
+                }
+            }
+            string presenceChannel = string.Join(",", multiChannels);
+            AuditAccess(presenceChannel, authenticationKey, userCallback, errorCallback);
+        }
 
 		#endregion
 
