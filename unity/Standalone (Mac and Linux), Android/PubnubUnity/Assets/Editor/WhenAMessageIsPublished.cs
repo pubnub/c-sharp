@@ -134,7 +134,7 @@ namespace PubNubMessaging.Tests
 				{
 						UnityEngine.Debug.Log ("DisplayErrorMessage1:" + result.ToString ());
 				}
-				#if(UNITY_ANDROID)
+				#if(UNITY_ANDROID || UNITY_STANDALONE)
 				[Ignore]
 				#else
 				[Test]
@@ -186,7 +186,7 @@ namespace PubNubMessaging.Tests
 						}*/
 
 				}
-				#if(UNITY_ANDROID)
+				#if(UNITY_ANDROID || UNITY_STANDALONE)
 				[Ignore]
 				#else
 				[Test]
