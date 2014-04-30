@@ -1,5 +1,7 @@
-# PubNub 3.6 for C Sharp (C#)
-## Supporting .net 3.5, 4.0, and 4.5
+# Please direct all Support Questions and Concerns to Support@PubNub.com
+
+## PubNub 3.6 for C Sharp (C#)
+### Supporting .net 3.5, 4.0, and 4.5
 
 Open PubNub-Messaging/PubNub-Messaging.csproj, and the example file PubnubExample.cs should demonstrate all functionality, asyncronously using delegates.
 You can also view and inspect the tests for additional insight. 
@@ -478,4 +480,4 @@ This variable default value is set to "pubsub.pubnub.com". This variable is used
 
 ** NOTE: ** Some variable values needs to be passed to Pubnub constructor for setup and configuration of PubNub C# API. The variables that needs to be setup are publishKey, subscribeKey, secretKey, cipherKey.
 
-Report an issue, or email us at support if there are any additional questions or comments.
+# Please direct all Support Questions and Concerns to Support@PubNub.com
