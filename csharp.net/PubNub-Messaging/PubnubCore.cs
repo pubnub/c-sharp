@@ -904,6 +904,7 @@ namespace PubNubMessaging.Core
 			TerminateLocalClientHeartbeatTimer();
 			TerminateReconnectTimer();
 			RemoveChannelCallback();
+            RemoveUserState();
             TerminatePresenceHeartbeatTimer();
 		}
 
