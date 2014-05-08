@@ -702,7 +702,7 @@ namespace PubNubMessaging.Core
 			using (var hmacsha256 = new HMACSHA256(keyByte))
 			{
 				byte[] hashmessage = hmacsha256.ComputeHash(messageBytes);
-				return Convert.ToBase64String(hashmessage).Replace('+', '-').Replace('/', '_'); ;
+				return Convert.ToBase64String(hashmessage).Replace('+', '-').Replace('/', '_');
 			}
 		}
 
