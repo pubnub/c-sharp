@@ -285,17 +285,9 @@ namespace PubNubMessaging.Tests
                     if (payload != null)
                     {
                         var channels = payload.Value<JContainer>("channels");
-                        if (channels != null && channels.Count > 0)
+                        if (channels != null && channels.Count >= 0)
                         {
-                            var channelsContainer = channels["hello_my_channel"];
-                            if (channelsContainer != null)
-                            {
-                                var uuids = channelsContainer.Value<JArray>("uuids");
-                                if (uuids != null && uuids.Count > 0)
-                                {
-                                    receivedGlobalHereNowMessage = true;
-                                }
-                            }
+                            receivedGlobalHereNowMessage = true;
                         }
                     }
                 }
@@ -319,12 +311,9 @@ namespace PubNubMessaging.Tests
                     if (payload != null)
                     {
                         var channels = payload.Value<JContainer>("channels");
-                        if (channels != null && channels.Count > 0)
+                        if (channels != null && channels.Count >= 0)
                         {
-                            if (channels[0].ToString() == "hello_my_channel")
-                            {
-                                receivedWhereNowMessage = true;
-                            }
+                            receivedWhereNowMessage = true;
                         }
                     }
                 }

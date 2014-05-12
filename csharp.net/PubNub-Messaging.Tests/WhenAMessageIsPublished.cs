@@ -615,6 +615,7 @@ namespace PubNubMessaging.Tests
 
         private void DummyPublishMessageTooLargeInfoCallback(string result)
         {
+            mreLaregMessagePublish.Set();
         }
 
         [Test]
