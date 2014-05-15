@@ -112,15 +112,6 @@ namespace PubNubMessaging {
         protected global::System.Web.UI.WebControls.TextBox txtSecret;
         
         /// <summary>
-        /// txtAuthKey control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtAuthKey;
-        
-        /// <summary>
         /// txtSubscribeTimeout control.
         /// </summary>
         /// <remarks>
@@ -200,6 +191,24 @@ namespace PubNubMessaging {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox txtChannel;
+        
+        /// <summary>
+        /// txtAuthKey control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtAuthKey;
+        
+        /// <summary>
+        /// txtPAMAuthKey control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtPAMAuthKey;
         
         /// <summary>
         /// btnPresence control.
@@ -553,42 +562,6 @@ namespace PubNubMessaging {
         protected global::System.Web.UI.WebControls.TextBox txtValue1;
         
         /// <summary>
-        /// txtKey2 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtKey2;
-        
-        /// <summary>
-        /// txtValue2 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtValue2;
-        
-        /// <summary>
-        /// txtKey3 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtKey3;
-        
-        /// <summary>
-        /// txtValue3 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtValue3;
-        
-        /// <summary>
         /// btnOkaySetUserState control.
         /// </summary>
         /// <remarks>
@@ -596,6 +569,42 @@ namespace PubNubMessaging {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnOkaySetUserState;
+        
+        /// <summary>
+        /// getUserStatePopupExtender control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::AjaxControlToolkit.ModalPopupExtender getUserStatePopupExtender;
+        
+        /// <summary>
+        /// popupPanelGetUserState control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel popupPanelGetUserState;
+        
+        /// <summary>
+        /// txtGetUserStateUUID control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtGetUserStateUUID;
+        
+        /// <summary>
+        /// btnOkayGetUserState control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnOkayGetUserState;
         
         /// <summary>
         /// UpdatePanelRight control.

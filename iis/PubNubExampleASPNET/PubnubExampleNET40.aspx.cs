@@ -392,6 +392,7 @@ namespace PubNubMessaging
             CheckUserInputs();
             channel = txtChannel.Text;
             string messageToBePublished = txtPublishMessage.Text;
+            string pamAuthKey = txtPAMAuthKey.Text.Trim();
             UpdateTimer.Enabled = true;
 
             switch (requestType.ToLower())
@@ -433,13 +434,13 @@ namespace PubNubMessaging
                     pubnub.Time<string>(DisplayUserCallbackMessage, DisplayErrorMessage);
                     break;
                 case "grantaccess":
-                    pubnub.GrantAccess<string>(channel, true, true,60, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    pubnub.GrantAccess<string>(channel, pamAuthKey, true, true, 60, DisplayUserCallbackMessage, DisplayErrorMessage);
                     break;
                 case "revokeaccess":
-                    pubnub.GrantAccess<string>(channel, false, false, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    pubnub.GrantAccess<string>(channel, pamAuthKey, false, false, DisplayUserCallbackMessage, DisplayErrorMessage);
                     break;
                 case "auditaccess":
-                    pubnub.AuditAccess<string>(channel, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    pubnub.AuditAccess<string>(channel, pamAuthKey, DisplayUserCallbackMessage, DisplayErrorMessage);
                     break;
                 case "disablenetwork":
                     pubnub.EnableSimulateNetworkFailForTestingOnly();
@@ -451,7 +452,8 @@ namespace PubNubMessaging
                     pubnub.TerminateCurrentSubscriberRequest();
                     break;
                 case "getuserstate":
-                    pubnub.GetUserState<string>(channel, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    string getUserStateUUID = txtGetUserStateUUID.Text;
+                    pubnub.GetUserState<string>(channel, getUserStateUUID,  DisplayUserCallbackMessage, DisplayErrorMessage);
                     break;
                 case "jsonsetuserstate":
                     string jsonUserState = txtJsonUserState.Text;
@@ -459,56 +461,24 @@ namespace PubNubMessaging
                     break;
                 case "setuserstate":
                     string key1 = txtKey1.Text;
-                    string key2 = txtKey2.Text;
-                    string key3 = txtKey3.Text;
                     string value1 = txtValue1.Text;
-                    string value2 = txtValue2.Text;
-                    string value3 = txtValue3.Text;
                     
                     int valueInt;
                     double valueDouble;
-                    string currentUserState = "";
 
                     if (Int32.TryParse(value1, out valueInt))
                     {
-                        currentUserState = pubnub.SetLocalUserState(channel, key1, valueInt);
+                        pubnub.SetUserState<string>(channel, new KeyValuePair<string, object>(key1, valueInt), DisplayUserCallbackMessage, DisplayErrorMessage);
                     }
                     else if (Double.TryParse(value1, out valueDouble))
                     {
-                        currentUserState = pubnub.SetLocalUserState(channel, key1, valueDouble);
+                        pubnub.SetUserState<string>(channel, new KeyValuePair<string, object>(key1, valueDouble), DisplayUserCallbackMessage, DisplayErrorMessage);
                     }
                     else
                     {
-                        currentUserState = pubnub.SetLocalUserState(channel, key1, value1);
+                        pubnub.SetUserState<string>(channel, new KeyValuePair<string, object>(key1, value1), DisplayUserCallbackMessage, DisplayErrorMessage);
                     }
 
-                    if (Int32.TryParse(value2, out valueInt))
-                    {
-                        currentUserState = pubnub.SetLocalUserState(channel, key2, valueInt);
-                    }
-                    else if (Double.TryParse(value1, out valueDouble))
-                    {
-                        currentUserState = pubnub.SetLocalUserState(channel, key2, valueDouble);
-                    }
-                    else
-                    {
-                        currentUserState = pubnub.SetLocalUserState(channel, key2, value2);
-                    }
-
-                    if (Int32.TryParse(value3, out valueInt))
-                    {
-                        currentUserState = pubnub.SetLocalUserState(channel, key3, valueInt);
-                    }
-                    else if (Double.TryParse(value1, out valueDouble))
-                    {
-                        currentUserState = pubnub.SetLocalUserState(channel, key3, valueDouble);
-                    }
-                    else
-                    {
-                        currentUserState = pubnub.SetLocalUserState(channel, key3, value3);
-                    }
-
-                    pubnub.SetUserState<string>(channel, currentUserState, DisplayUserCallbackMessage, DisplayErrorMessage);
                     break;
                 default:
                     break;
@@ -639,6 +609,18 @@ namespace PubNubMessaging
 
             ProcessPubnubRequest("setuserstate");
             
+            UpdatePanelLeft.Update();
+        }
+
+        protected void btnOkayGetUserState_OnClick(object sender, EventArgs e)
+        {
+            btnReset.Enabled = true;
+            lblErrorMessage.Text = "";
+
+            getUserStatePopupExtender.Hide();
+
+            ProcessPubnubRequest("getuserstate");
+
             UpdatePanelLeft.Update();
         }
     }

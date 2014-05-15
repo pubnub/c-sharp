@@ -199,14 +199,6 @@
                                                                     <asp:TextBox ID="txtSecret" runat="server" Text="demo-36" Width="150" AutoPostBack="false" />
                                                                 </td>
                                                             </tr>
-                                                            <tr>
-                                                                <td>
-                                                                    Auth Key
-                                                                </td>
-                                                                <td>
-                                                                    <asp:TextBox ID="txtAuthKey" runat="server" Text="" Width="150" AutoPostBack="false" />
-                                                                </td>
-                                                            </tr>
                                                         </table>
                                                     </td>
                                                 </tr>
@@ -288,6 +280,22 @@
                                                     <td colspan="2">
                                                         Channel Name :
                                                         <asp:TextBox ID="txtChannel" runat="server" Text="my_hello_word" AutoPostBack="false"></asp:TextBox>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        Auth Key (for non-PAM methods)
+                                                    </td>
+                                                    <td>
+                                                        <asp:TextBox ID="txtAuthKey" runat="server" Text="" Width="150" AutoPostBack="false" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        Auth Key (for PAM methods)
+                                                    </td>
+                                                    <td>
+                                                        <asp:TextBox ID="txtPAMAuthKey" runat="server" Text="" Width="150" AutoPostBack="false" />
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -483,8 +491,6 @@
                                                                         Enter user state in dictionary format (key:value pair):
                                                                         <br />
                                                                         <asp:TextBox ID="txtKey1" Text="" Width="100px" runat="server"></asp:TextBox> : <asp:TextBox ID="txtValue1" Text="" Width="100px" runat="server"></asp:TextBox><br />
-                                                                        <asp:TextBox ID="txtKey2" Text="" Width="100px" runat="server"></asp:TextBox> : <asp:TextBox ID="txtValue2" Text="" Width="100px" runat="server"></asp:TextBox><br />
-                                                                        <asp:TextBox ID="txtKey3" Text="" Width="100px" runat="server"></asp:TextBox> : <asp:TextBox ID="txtValue3" Text="" Width="100px" runat="server"></asp:TextBox>
                                                                     </p>
                                                                 </div>
                                                                 <div class="PopupControls">
@@ -493,6 +499,32 @@
                                                                 </div>
 
                                                                 
+                                                            </div>
+                                                        </asp:Panel>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2">
+                                                        <asp:ModalPopupExtender ID="getUserStatePopupExtender" runat="server" TargetControlID="btnGetUserState"
+                                                            PopupDragHandleControlID="getUserStatePopup" Drag="true" PopupControlID="popupPanelGetUserState"
+                                                            CancelControlID="btnCancelGetUserState" BackgroundCssClass="ModalPopupBG">
+                                                        </asp:ModalPopupExtender>
+                                                        <asp:Panel ID="popupPanelGetUserState" runat="server" Style="display: none">
+                                                            <div class="publishPopup">
+                                                                <div class="PopupHeader" id="getUserStatePopup">
+                                                                    Get User State:</div>
+                                                                <div class="PopupBody">
+                                                                    <p>
+                                                                        Enter UUID (optional):
+                                                                        <br />
+                                                                        <asp:TextBox ID="txtGetUserStateUUID" Text="" Width="300px" runat="server"></asp:TextBox>
+                                                                    </p>
+                                                                </div>
+                                                                <div class="PopupControls">
+                                                                    <asp:Button ID="btnOkayGetUserState" Text="Get User State" runat="server" OnClick="btnOkayGetUserState_OnClick" />
+                                                                    <input id="btnCancelGetUserState" type="button" value="Cancel" />
+                                                                </div>
+
                                                             </div>
                                                         </asp:Panel>
                                                     </td>
