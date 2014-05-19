@@ -199,7 +199,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     pubnub.PubnubUnitTest = unitTest;
 
                     string channel = "hello_my_channel";
-                    if (PubnubCommon.EnableStubTest)
+                     if (PubnubCommon.EnableStubTest)
                     {
                         startTimeWithReverseTrue = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(new DateTime(2012, 12, 1));
                     }

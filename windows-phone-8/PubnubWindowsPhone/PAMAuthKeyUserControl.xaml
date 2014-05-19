@@ -1,0 +1,29 @@
+﻿<UserControl x:Class="PubnubWindowsPhone.PAMAuthKeyUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    d:DesignHeight="480" d:DesignWidth="480">
+
+    <Grid x:Name="LayoutRoot" Height="470" Width="451" Margin="0,20,20,0">
+        <StackPanel HorizontalAlignment="Stretch" Margin="1,1,1,1" Name="stackPanel1" VerticalAlignment="Stretch">
+            <StackPanel Orientation="Vertical" Margin="5,5,10,5" Name="spnlCurrent" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <TextBlock Height="30" Name="lblPAMAuthKeyTitle" Text="Enter Auth Key (optional)" Foreground="Black" HorizontalAlignment="Left"></TextBlock>
+            </StackPanel>
+            <TextBlock Height="10"></TextBlock>
+            <StackPanel Orientation="Vertical" Margin="5,5,10,5" Name="spnlNew" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <TextBlock Height="30" Name="lblPAMAuthKey" Text="Auth Key" Foreground="Black" HorizontalAlignment="Left"></TextBlock>
+                <TextBox Height="75" Name="txtPAMAuthKey" Text="" Foreground="Black" HorizontalContentAlignment="Left" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="5,5,10,5" Name="spnlCommands" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <Button Content="Go" Height="71" Name="btnOK" Width="150" HorizontalContentAlignment="Center" />
+                <Button Content="Cancel" Height="70" Name="btnCancel" Width="150" HorizontalContentAlignment="Center" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>
