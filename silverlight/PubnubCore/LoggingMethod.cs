@@ -14,7 +14,7 @@ namespace PubNubMessaging.Core
 	internal class LoggingMethod
 	#endif
 	{
-		private static int logLevel = 0;
+		private static int logLevel = 3;
 		public static Level LogLevel
 		{
 			get
@@ -502,6 +502,7 @@ namespace PubNubMessaging.Core
         WhereNowOperationTimeout = 133,
         GlobalHereNowOperationTimeout = 134,
         PAMAccessOperationTimeout = 135,
+        UserStateUnchanged = 136,
 
 		MessageTooLarge = 4000,
 		BadRequest = 4001,
@@ -573,6 +574,7 @@ namespace PubNubMessaging.Core
             dictionaryCodes.Add(133, "Timeout occured while running WhereNow. Please try again. If it continues, please contact PubNub support");
             dictionaryCodes.Add(134, "Timeout occured while running GlobalHereNow. Please try again. If it continues, please contact PubNub support");
             dictionaryCodes.Add(135, "Timeout occured while running PAM operations. Please try again. If it continues, please contact PubNub support");
+            dictionaryCodes.Add(136, "User State Unchanged");
 			dictionaryCodes.Add(0, "Undocumented error. Please contact PubNub support with full error object details for further investigation");
 		}
 

@@ -265,12 +265,10 @@ namespace PubnubSilverlight
             bool read = true;
             bool write = true;
             int grantTimeLimitMinutes = 60;
-            if (authKey.Trim() != "")
-            {
-                pubnub.AuthenticationKey = authKey;
-            }
+            string authKeyPAM = txtAuthKeyPAM.Text.Trim();
+
             Console.WriteLine("Running Grant()");
-            pubnub.GrantAccess<string>(channel, read, write, grantTimeLimitMinutes, DisplayGrantCallbackMessage, DisplayErrorMessage);
+            pubnub.GrantAccess<string>(channel, authKeyPAM, read, write, grantTimeLimitMinutes, DisplayGrantCallbackMessage, DisplayErrorMessage);
         }
 
         private void btnRevoke_Click(object sender, RoutedEventArgs e)
@@ -284,12 +282,10 @@ namespace PubnubSilverlight
             channel = txtChannel.Text;
             bool read = false;
             bool write = false;
-            if (authKey.Trim() != "")
-            {
-                pubnub.AuthenticationKey = authKey;
-            }
+            string authKeyPAM = txtAuthKeyPAM.Text.Trim();
+            
             Console.WriteLine("Running Revoke()");
-            pubnub.GrantAccess<string>(channel, read, write, DisplayRevokeCallbackMessage, DisplayErrorMessage);
+            pubnub.GrantAccess<string>(channel, authKeyPAM, read, write, DisplayRevokeCallbackMessage, DisplayErrorMessage);
         }
 
         private void btnAudit_Click(object sender, RoutedEventArgs e)
@@ -301,12 +297,10 @@ namespace PubnubSilverlight
                 return;
             }
             channel = txtChannel.Text;
-            if (authKey.Trim() != "")
-            {
-                pubnub.AuthenticationKey = authKey;
-            }
+            string authKeyPAM = txtAuthKeyPAM.Text.Trim();
+            
             Console.WriteLine("Running Audit()");
-            pubnub.AuditAccess<string>(channel, DisplayAuditCallbackMessage, DisplayErrorMessage);
+            pubnub.AuditAccess<string>(channel, authKeyPAM, DisplayAuditCallbackMessage, DisplayErrorMessage);
         }
 
         private void btnWhereNow_Click(object sender, RoutedEventArgs e)
@@ -379,6 +373,7 @@ namespace PubnubSilverlight
             }
 
             UserStateDialog userStatePopup = new UserStateDialog();
+            userStatePopup.txtGetUserStateUUID.Text = uuid;
             userStatePopup.Show();
 
             userStatePopup.Closed += (obj, args) =>
@@ -387,56 +382,29 @@ namespace PubnubSilverlight
                 {
                     if (userStatePopup.radGetUserState.IsChecked.Value)
                     {
+                        string getUserStateUUID = userStatePopup.txtGetUserStateUUID.Text.Trim();
                         Console.WriteLine("Running GetUserState()");
-                        pubnub.GetUserState<string>(channel, DisplayUserCallbackMessage, DisplayErrorMessage);
+                        pubnub.GetUserState<string>(channel, getUserStateUUID, DisplayUserCallbackMessage, DisplayErrorMessage);
                     }
                     else if (userStatePopup.radSetUserState.IsChecked.Value)
                     {
+                        Console.WriteLine("Running SetUserState()");
                         string userStateKey1 = userStatePopup.txtKey1.Text;
-                        string userStateKey2 = userStatePopup.txtKey2.Text;
-
                         string userStateValue1 = userStatePopup.txtValue1.Text;
-                        string userStateValue2 = userStatePopup.txtValue2.Text;
 
                         int valueInt;
                         double valueDouble;
                         if (Int32.TryParse(userStateValue1, out valueInt))
                         {
-                            pubnub.SetLocalUserState(channel, userStateKey1, valueInt);
+                            pubnub.SetUserState<string>(channel, new KeyValuePair<string, object>(userStateKey1, valueInt), DisplayUserCallbackMessage, DisplayErrorMessage);
                         }
                         else if (Double.TryParse(userStateValue1, out valueDouble))
                         {
-                            pubnub.SetLocalUserState(channel, userStateKey1, valueDouble);
+                            pubnub.SetUserState<string>(channel, new KeyValuePair<string, object>(userStateKey1, valueDouble), DisplayUserCallbackMessage, DisplayErrorMessage);
                         }
                         else
                         {
-                            pubnub.SetLocalUserState(channel, userStateKey1, userStateValue1);
-                        }
-
-                        if (Int32.TryParse(userStateValue2, out valueInt))
-                        {
-                            pubnub.SetLocalUserState(channel, userStateKey2, valueInt);
-                        }
-                        else if (Double.TryParse(userStateValue2, out valueDouble))
-                        {
-                            pubnub.SetLocalUserState(channel, userStateKey2, valueDouble);
-                        }
-                        else
-                        {
-                            pubnub.SetLocalUserState(channel, userStateKey2, userStateValue2);
-                        }
-                        
-                        string jsonUserState = pubnub.GetLocalUserState(channel);
-
-                        if (!string.IsNullOrEmpty(jsonUserState) && jsonUserState.Trim().Length > 0)
-                        {
-                            Console.WriteLine("Running SetUserState()");
-
-                            pubnub.SetUserState<string>(channel, uuid, jsonUserState, DisplayUserCallbackMessage, DisplayErrorMessage);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Oops. Required Data Missing. Verify user state");
+                            pubnub.SetUserState<string>(channel, new KeyValuePair<string, object>(userStateKey1, userStateValue1), DisplayUserCallbackMessage, DisplayErrorMessage);
                         }
                     }
                 }

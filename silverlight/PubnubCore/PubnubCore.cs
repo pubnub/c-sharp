@@ -1,4 +1,4 @@
-//Build Date: April 08, 2014
+//Build Date: May 08, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX_UNITY
@@ -88,7 +88,9 @@ namespace PubNubMessaging.Core
 		ConcurrentDictionary<string, Timer> _channelReconnectTimer = new ConcurrentDictionary<string, Timer>();
 		protected ConcurrentDictionary<Uri, Timer> channelLocalClientHeartbeatTimer = new ConcurrentDictionary<Uri, Timer>();
 		protected ConcurrentDictionary<PubnubChannelCallbackKey, object> channelCallbacks = new ConcurrentDictionary<PubnubChannelCallbackKey, object>();
-		ConcurrentDictionary<string, Dictionary<string, object>> _channelUserState = new ConcurrentDictionary<string, Dictionary<string, object>>();
+		ConcurrentDictionary<string, Dictionary<string, object>> _channelLocalUserState = new ConcurrentDictionary<string, Dictionary<string, object>>();
+        ConcurrentDictionary<string, Dictionary<string, object>> _channelUserState = new ConcurrentDictionary<string, Dictionary<string, object>>();
+        ConcurrentDictionary<string, List<string>> _channelSubscribedAuthKeys = new ConcurrentDictionary<string, List<string>>();
 		protected System.Threading.Timer localClientHeartBeatTimer;
 		protected System.Threading.Timer presenceHeartbeatTimer = null;
 		protected static bool pubnetSystemActive = true;
@@ -100,8 +102,7 @@ namespace PubNubMessaging.Core
 		private static long lastSubscribeTimetoken = 0;
 		// Pubnub Core API implementation
 		private string _origin = "pubsub.pubnub.com";
-		//private string _origin = "presence-beta.pubnub.com"; //"pres-beta.pubnub.com";//"50.112.215.116";//"pam-beta.pubnub.com"; //;"uls-test.pubnub.co"; //"pam-beta.pubnub.com";
-		protected string publishKey = "";
+        protected string publishKey = "";
 		protected string subscribeKey = "";
 		protected string secretKey = "";
 		protected string cipherKey = "";
@@ -324,7 +325,7 @@ namespace PubNubMessaging.Core
             set 
             {
 				_presenceHeartbeatIntervalInSeconds = value;
-                if (_presenceHeartbeatIntervalInSeconds > _pubnubPresenceHeartbeatInSeconds - 3 && _pubnubPresenceHeartbeatInSeconds > 0) 
+                if (_presenceHeartbeatIntervalInSeconds >= _pubnubPresenceHeartbeatInSeconds) 
                 {
 					_presenceHeartbeatIntervalInSeconds = (_pubnubPresenceHeartbeatInSeconds / 2) - 1;
 				}
@@ -764,6 +765,46 @@ namespace PubNubMessaging.Core
 			}
 		}
 
+        private void RemoveUserState()
+        {
+            ICollection<string> channelLocalUserStateCollection = _channelLocalUserState.Keys;
+            ICollection<string> channelUserStateCollection = _channelUserState.Keys;
+
+            foreach (string key in channelLocalUserStateCollection)
+            {
+                if (_channelLocalUserState.ContainsKey(key))
+                {
+                    Dictionary<string, object> tempUserState;
+                    bool removeKey = _channelLocalUserState.TryRemove(key, out tempUserState);
+                    if (removeKey)
+                    {
+                        LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveUserState from local user state dictionary for channel= {1}", DateTime.Now.ToString(), removeKey), LoggingMethod.LevelInfo);
+                    }
+                    else
+                    {
+                        LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveUserState from local user state dictionary for channel= {1}", DateTime.Now.ToString(), removeKey), LoggingMethod.LevelError);
+                    }
+                }
+            }
+
+            foreach (string key in channelUserStateCollection)
+            {
+                if (_channelUserState.ContainsKey(key))
+                {
+                    Dictionary<string, object> tempUserState;
+                    bool removeKey = _channelUserState.TryRemove(key, out tempUserState);
+                    if (removeKey)
+                    {
+                        LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveUserState from user state dictionary for channel= {1}", DateTime.Now.ToString(), removeKey), LoggingMethod.LevelInfo);
+                    }
+                    else
+                    {
+                        LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveUserState from user state dictionary for channel= {1}", DateTime.Now.ToString(), removeKey), LoggingMethod.LevelError);
+                    }
+                }
+            }
+        }
+
         protected virtual void TerminatePresenceHeartbeatTimer()
         {
             if (presenceHeartbeatTimer != null)
@@ -863,6 +904,7 @@ namespace PubNubMessaging.Core
 			TerminateLocalClientHeartbeatTimer();
 			TerminateReconnectTimer();
 			RemoveChannelCallback();
+            RemoveUserState();
             TerminatePresenceHeartbeatTimer();
 		}
 
@@ -1574,7 +1616,7 @@ namespace PubNubMessaging.Core
 		private Uri BuildMultiChannelSubscribeRequest (string[] channels, object timetoken)
 		{
             subscribeParameters = "";
-			string channelsJsonState = BuildJsonUserState (channels);
+			string channelsJsonState = BuildJsonUserState (channels, false);
 			if (channelsJsonState != "{}" && channelsJsonState != "") {
 				subscribeParameters = string.Format ("&state={0}", EncodeUricomponent (channelsJsonState, ResponseType.Subscribe, false));
 			}
@@ -1890,7 +1932,7 @@ namespace PubNubMessaging.Core
 		private Uri BuildPresenceHeartbeatRequest (string[] channels)
 		{
             presenceHeartbeatParameters = "";
-			string channelsJsonState = BuildJsonUserState (channels);
+			string channelsJsonState = BuildJsonUserState (channels, false);
 			if (channelsJsonState != "{}" && channelsJsonState != "") {
 				presenceHeartbeatParameters = string.Format ("&state={0}", EncodeUricomponent (channelsJsonState, ResponseType.PresenceHeartbeat, false));
 			}
@@ -2073,36 +2115,50 @@ namespace PubNubMessaging.Core
 
 			Dictionary<string, object> userStateDictionary = null;
 
-			if (_channelUserState.ContainsKey (channel)) {
-				userStateDictionary = _channelUserState [channel];
-				if (userStateDictionary != null) {
-					if (userStateDictionary.ContainsKey (userStateKey)) {
-						if (userStateValue != null) {
-							userStateDictionary [userStateKey] = userStateValue;
-						} else {
-							userStateDictionary.Remove (userStateKey);
-						}
-					} else {
-						if (!string.IsNullOrEmpty (userStateKey) && userStateKey.Trim ().Length > 0 && userStateValue != null) {
+			if (_channelLocalUserState.ContainsKey (channel)) 
+            {
+				userStateDictionary = _channelLocalUserState[channel];
+				if (userStateDictionary != null) 
+                {
+					if (userStateDictionary.ContainsKey (userStateKey)) 
+                    {
+                        if (userStateValue != null)
+                        {
+                            userStateDictionary[userStateKey] = userStateValue;
+                        }
+                        else
+                        {
+                            userStateDictionary.Remove(userStateKey);
+                        }
+					} 
+                    else 
+                    {
+						if (!string.IsNullOrEmpty (userStateKey) && userStateKey.Trim ().Length > 0 && userStateValue != null) 
+                        {
 							userStateDictionary.Add (userStateKey, userStateValue);
 						}
 					}
-				} else {
+				} 
+                else 
+                {
 					userStateDictionary = new Dictionary<string, object> ();
 					userStateDictionary.Add (userStateKey, userStateValue);
 				}
 
-				_channelUserState.AddOrUpdate (channel, userStateDictionary, (oldData, newData) => userStateDictionary);
-			} else {
-				if (!string.IsNullOrEmpty (userStateKey) && userStateKey.Trim ().Length > 0 && userStateValue != null) {
+				_channelLocalUserState.AddOrUpdate(channel, userStateDictionary, (oldData, newData) => userStateDictionary);
+			} 
+            else 
+            {
+				if (!string.IsNullOrEmpty (userStateKey) && userStateKey.Trim ().Length > 0 && userStateValue != null) 
+                {
 					userStateDictionary = new Dictionary<string, object> ();
 					userStateDictionary.Add (userStateKey, userStateValue);
 
-					_channelUserState.AddOrUpdate (channel, userStateDictionary, (oldData, newData) => userStateDictionary);
+					_channelLocalUserState.AddOrUpdate (channel, userStateDictionary, (oldData, newData) => userStateDictionary);
 				}
 			}
 
-            string jsonUserState = BuildJsonUserState(channel);
+            string jsonUserState = BuildJsonUserState(channel, true);
             if (jsonUserState != "")
             {
                 retJsonUserState = string.Format("{{{0}}}", jsonUserState);
@@ -2114,36 +2170,32 @@ namespace PubNubMessaging.Core
 		{
 			bool userStateDeleted = false;
 
-			if (_channelUserState.ContainsKey (channel)) {
+			if (_channelLocalUserState.ContainsKey (channel)) {
 				Dictionary<string, object> returnedUserState = null;
-				userStateDeleted = _channelUserState.TryRemove (channel, out returnedUserState);
+				userStateDeleted = _channelLocalUserState.TryRemove (channel, out returnedUserState);
 			}
 
 			return userStateDeleted;
 		}
-		//private bool DeleteLocalMetadata(string[] channels)
-		//{
-		//    bool metadataDeleted = false;
-		//    foreach (string channel in channels)
-		//    {
-		//        if (_channelMetadata.ContainsKey(channel))
-		//        {
-		//            Dictionary<string, object> returnedMetadata = null;
-		//            metadataDeleted = _channelMetadata.TryRemove(channel, out returnedMetadata);
-		//            if (!metadataDeleted) break;
-		//        }
-		//    }
-		//    return metadataDeleted;
-		//}
-		private string BuildJsonUserState (string channel)
-		{
-			string retJsonUserState = "";
 
+        private string BuildJsonUserState (string channel, bool local)
+		{
 			Dictionary<string, object> userStateDictionary = null;
 
-			if (_channelUserState.ContainsKey (channel)) {
-				userStateDictionary = _channelUserState [channel];
-			}
+            if (local)
+            {
+                if (_channelLocalUserState.ContainsKey(channel))
+                {
+                    userStateDictionary = _channelLocalUserState[channel];
+                }
+            }
+            else
+            {
+                if (_channelUserState.ContainsKey(channel))
+                {
+                    userStateDictionary = _channelUserState[channel];
+                }
+            }
 
 			StringBuilder jsonStateBuilder = new StringBuilder ();
 
@@ -2154,8 +2206,15 @@ namespace PubNubMessaging.Core
 				for (int keyIndex = 0; keyIndex < userStateKeys.Length; keyIndex++) 
                 {
 					string useStateKey = userStateKeys [keyIndex];
-					object userStateValue = userStateDictionary [useStateKey];
-					jsonStateBuilder.AppendFormat ("\"{0}\":{1}", useStateKey, (userStateValue.GetType ().ToString () == "System.String") ? string.Format ("\"{0}\"", userStateValue) : userStateValue);
+					object userStateValue = userStateDictionary[useStateKey];
+                    if (userStateValue == null)
+                    {
+                        jsonStateBuilder.AppendFormat("\"{0}\":{1}", useStateKey, string.Format("\"{0}\"", "null"));
+                    }
+                    else
+                    {
+                        jsonStateBuilder.AppendFormat("\"{0}\":{1}", useStateKey, (userStateValue.GetType().ToString() == "System.String") ? string.Format("\"{0}\"", userStateValue) : userStateValue);
+                    }
 					if (keyIndex < userStateKeys.Length - 1) 
                     {
 						jsonStateBuilder.Append (",");
@@ -2166,7 +2225,7 @@ namespace PubNubMessaging.Core
             return jsonStateBuilder.ToString();
 		}
 
-		private string BuildJsonUserState (string[] channels)
+		private string BuildJsonUserState (string[] channels, bool local)
 		{
             string retJsonUserState = "";
 
@@ -2176,7 +2235,7 @@ namespace PubNubMessaging.Core
             {
                 for (int index = 0; index < channels.Length; index++)
                 {
-                    string currentJsonState = BuildJsonUserState(channels[index].ToString());
+                    string currentJsonState = BuildJsonUserState(channels[index].ToString(), local);
                     if (!string.IsNullOrEmpty(currentJsonState))
                     {
                         currentJsonState = string.Format("\"{0}\":{{{1}}}", channels[index].ToString(), currentJsonState);
@@ -2197,41 +2256,34 @@ namespace PubNubMessaging.Core
             return retJsonUserState;
 		}
 
-		internal string SetLocalUserState (string channel, string userStateKey, int userStateValue)
+		private string SetLocalUserState (string channel, string userStateKey, int userStateValue)
 		{
 			return AddOrUpdateOrDeleteLocalUserState (channel, userStateKey, userStateValue);
 		}
 
-		internal string SetLocalUserState (string channel, string userStateKey, double userStateValue)
+        private string SetLocalUserState(string channel, string userStateKey, double userStateValue)
 		{
 			return AddOrUpdateOrDeleteLocalUserState (channel, userStateKey, userStateValue);
 		}
 
-		internal string SetLocalUserState (string channel, string userStateKey, string userStateValue)
+        private string SetLocalUserState(string channel, string userStateKey, string userStateValue)
 		{
 			return AddOrUpdateOrDeleteLocalUserState (channel, userStateKey, userStateValue);
 		}
 
-		internal string GetLocalUserState (string channel)
-		{
+        internal string GetLocalUserState(string channel)
+        {
             string retJsonUserState = "";
             StringBuilder jsonStateBuilder = new StringBuilder();
 
-            jsonStateBuilder.Append(BuildJsonUserState(channel));
+            jsonStateBuilder.Append(BuildJsonUserState(channel, false));
             if (jsonStateBuilder.Length > 0)
             {
                 retJsonUserState = string.Format("{{{0}}}", jsonStateBuilder.ToString());
             }
-            
-            return retJsonUserState;
-		}
 
-		internal string GetLocalUserState (string[] channels)
-		{
-			StringBuilder builder = new StringBuilder ();
-			builder.Append (BuildJsonUserState (channels));
-			return builder.ToString ();
-		}
+            return retJsonUserState;
+        }
 
         internal void SetUserState<T>(string channel, string uuid, string jsonUserState, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
@@ -2269,14 +2321,94 @@ namespace PubNubMessaging.Core
                 }
                 else
                 {
-                    _channelUserState.AddOrUpdate(channel.Trim(), deserializeUserState, (oldState, newState) => deserializeUserState);
+                    string oldJsonState = GetLocalUserState(channel);
+                    if (oldJsonState == jsonUserState)
+                    {
+                        string message = "No change in User State";
+
+                        CallErrorCallback(PubnubErrorSeverity.Info, PubnubMessageSource.Client,
+                            channel, errorCallback, message, PubnubErrorCode.UserStateUnchanged, null, null);
+                        return;
+                    }
+
                 }
             }
 
+            SharedSetUserState(channel, uuid, jsonUserState, userCallback, errorCallback);
+        }
+
+        internal void SetUserState<T>(string channel, string uuid, KeyValuePair<string, object> keyValuePair, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()))
+            {
+                throw new ArgumentException("Missing Channel");
+            }
+            if (userCallback == null)
+            {
+                throw new ArgumentException("Missing userCallback");
+            }
+            if (errorCallback == null)
+            {
+                throw new ArgumentException("Missing errorCallback");
+            }
+            
+            string key = keyValuePair.Key;
+
+            int valueInt;
+            double valueDouble;
+            string currentUserState = "";
+
+            string oldJsonState = GetLocalUserState(channel);
+            if (keyValuePair.Value == null)
+            {
+                currentUserState = SetLocalUserState(channel, key, null);
+            }
+            else if (Int32.TryParse(keyValuePair.Value.ToString(), out valueInt))
+            {
+                currentUserState = SetLocalUserState(channel, key, valueInt);
+            }
+            else if (Double.TryParse(keyValuePair.Value.ToString(), out valueDouble))
+            {
+                currentUserState = SetLocalUserState(channel, key, valueDouble);
+            }
+            else
+            {
+                currentUserState = SetLocalUserState(channel, key, keyValuePair.Value.ToString());
+            }
+
+            if (oldJsonState == currentUserState)
+            {
+                string message = "No change in User State";
+
+                CallErrorCallback(PubnubErrorSeverity.Info, PubnubMessageSource.Client,
+                    channel, errorCallback, message, PubnubErrorCode.UserStateUnchanged, null, null);
+                return;
+            }
+            
+            if (currentUserState.Trim() == "")
+            {
+                currentUserState = "{}";
+            }
+
+            SharedSetUserState<T>(channel, uuid, currentUserState, userCallback, errorCallback);
+        }
+
+        private void SharedSetUserState<T>(string channel, string uuid, string jsonUserState, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
             if (string.IsNullOrEmpty(uuid))
             {
                 VerifyOrSetSessionUUID();
                 uuid = this.sessionUUID;
+            }
+
+            Dictionary<string, object> deserializeUserState = _jsonPluggableLibrary.DeserializeToDictionaryOfObject(jsonUserState);
+            if (_channelUserState != null)
+            {
+                _channelUserState.AddOrUpdate(channel.Trim(), deserializeUserState, (oldState, newState) => deserializeUserState);
+            }
+            if (_channelLocalUserState != null)
+            {
+                _channelLocalUserState.AddOrUpdate(channel.Trim(), deserializeUserState, (oldState, newState) => deserializeUserState);
             }
 
             Uri request = BuildSetUserStateRequest(channel, uuid, jsonUserState);
@@ -2289,6 +2421,9 @@ namespace PubNubMessaging.Core
             requestState.Reconnect = false;
 
             UrlProcessRequest<T>(request, requestState);
+
+            //bounce the long-polling subscribe requests to update user state
+            TerminateCurrentSubscriberRequest();
         }
 
 		internal void GetUserState<T> (string channel, string uuid, Action<T> userCallback, Action<PubnubClientError> errorCallback)
@@ -2315,7 +2450,6 @@ namespace PubNubMessaging.Core
 
 			RequestState<T> requestState = new RequestState<T> ();
 			requestState.Channels = new string[] { channel };
-			;
 			requestState.Type = ResponseType.GetUserState;
 			requestState.UserCallback = userCallback;
 			requestState.ErrorCallback = errorCallback;
@@ -3093,9 +3227,6 @@ namespace PubNubMessaging.Core
 							callbackKey.Channel = currentChannel;
 							callbackKey.Type = (currentChannel.LastIndexOf ("-pnpres") == -1) ? ResponseType.Subscribe : ResponseType.Presence;
 
-							//callbackKey.Channel = (type == ResponseType.Subscribe) ? currentChannel.Replace("-pnpres", "") : currentChannel;
-							//callbackKey.Type = (type == ResponseType.Presence && currentChannel.LastIndexOf("-pnpres") == -1) ? ResponseType.Subscribe : type;
-
 							if (channelCallbacks.Count > 0 && channelCallbacks.ContainsKey (callbackKey)) {
 								if ((typeof(T) == typeof(string) && channelCallbacks [callbackKey].GetType ().Name.Contains ("[System.String]")) ||
 								            (typeof(T) == typeof(object) && channelCallbacks [callbackKey].GetType ().Name.Contains ("[System.Object]"))) {
@@ -3393,52 +3524,55 @@ namespace PubNubMessaging.Core
 
 		#region "PAM"
 
-		private Uri BuildGrantAccessRequest (string channel, bool read, bool write, int ttl)
+		private Uri BuildGrantAccessRequest(string channel, string authenticationKey, bool read, bool write, int ttl)
 		{
 			string signature = "0";
 			long timeStamp = TranslateDateTimeToSeconds (DateTime.UtcNow);
 			string queryString = "";
 			StringBuilder queryStringBuilder = new StringBuilder ();
-			if (!string.IsNullOrEmpty (_authenticationKey)) {
-				queryStringBuilder.AppendFormat ("auth={0}", EncodeUricomponent (_authenticationKey, ResponseType.GrantAccess, false));
+            if (!string.IsNullOrEmpty(authenticationKey))
+            {
+                queryStringBuilder.AppendFormat("auth={0}", EncodeUricomponent(authenticationKey, ResponseType.GrantAccess, false));
 			}
 
-			if (!string.IsNullOrEmpty (channel)) {
-				queryStringBuilder.AppendFormat ("{0}channel={1}", (queryStringBuilder.Length > 0) ? "&" : "", EncodeUricomponent (channel, ResponseType.GrantAccess, false));
+			if (!string.IsNullOrEmpty(channel)) 
+            {
+				queryStringBuilder.AppendFormat ("{0}channel={1}", (queryStringBuilder.Length > 0) ? "&" : "", EncodeUricomponent(channel, ResponseType.GrantAccess, false));
 			}
 
 			queryStringBuilder.AppendFormat ("{0}", (queryStringBuilder.Length > 0) ? "&" : "");
 			queryStringBuilder.AppendFormat ("r={0}&timestamp={1}{2}&w={3}", Convert.ToInt32 (read), timeStamp.ToString (), (ttl > -1) ? "&ttl=" + ttl.ToString () : "", Convert.ToInt32 (write));
 
-			if (this.secretKey.Length > 0) {
-				StringBuilder string_to_sign = new StringBuilder ();
+			if (this.secretKey.Length > 0) 
+            {
+				StringBuilder string_to_sign = new StringBuilder();
 				string_to_sign.Append (this.subscribeKey)
-					.Append ("\n")
-						.Append (this.publishKey)
-						.Append ("\n")
-						.Append ("grant")
-						.Append ("\n")
-						.Append (queryStringBuilder.ToString ());
+					.Append("\n")
+						.Append(this.publishKey)
+						.Append("\n")
+						.Append("grant")
+						.Append("\n")
+						.Append(queryStringBuilder.ToString());
 
 				PubnubCrypto pubnubCrypto = new PubnubCrypto (this.cipherKey);
-				signature = pubnubCrypto.PubnubAccessManagerSign (this.secretKey, string_to_sign.ToString ());
-				queryString = string.Format ("signature={0}&{1}", signature, queryStringBuilder.ToString ());
+				signature = pubnubCrypto.PubnubAccessManagerSign (this.secretKey, string_to_sign.ToString());
+				queryString = string.Format("signature={0}&{1}", signature, queryStringBuilder.ToString());
 			}
 
 			parameters = "";
 			parameters += "?" + queryString;
 
-			List<string> url = new List<string> ();
-			url.Add ("v1");
-			url.Add ("auth");
-			url.Add ("grant");
-			url.Add ("sub-key");
-			url.Add (this.subscribeKey);
+			List<string> url = new List<string>();
+			url.Add("v1");
+			url.Add("auth");
+			url.Add("grant");
+			url.Add("sub-key");
+			url.Add(this.subscribeKey);
 
-			return BuildRestApiRequest<Uri> (url, ResponseType.GrantAccess);
+			return BuildRestApiRequest<Uri>(url, ResponseType.GrantAccess);
 		}
 
-		private Uri BuildAuditAccessRequest (string channel)
+        private Uri BuildAuditAccessRequest(string channel, string authenticationKey)
 		{
 			string signature = "0";
 			long timeStamp = ((_pubnubUnitTest == null) || (_pubnubUnitTest is IPubnubUnitTest && !_pubnubUnitTest.EnableStubTest))
@@ -3446,8 +3580,9 @@ namespace PubNubMessaging.Core
 					: TranslateDateTimeToSeconds (new DateTime (2013, 01, 01));
 			string queryString = "";
 			StringBuilder queryStringBuilder = new StringBuilder ();
-			if (!string.IsNullOrEmpty (_authenticationKey)) {
-				queryStringBuilder.AppendFormat ("auth={0}", EncodeUricomponent (_authenticationKey, ResponseType.AuditAccess, false));
+            if (!string.IsNullOrEmpty(authenticationKey))
+            {
+                queryStringBuilder.AppendFormat("auth={0}", EncodeUricomponent(authenticationKey, ResponseType.AuditAccess, false));
 			}
 			if (!string.IsNullOrEmpty (channel)) {
 				queryStringBuilder.AppendFormat ("{0}channel={1}", (queryStringBuilder.Length > 0) ? "&" : "", EncodeUricomponent (channel, ResponseType.AuditAccess, false));
@@ -3484,16 +3619,26 @@ namespace PubNubMessaging.Core
 
 		public bool GrantAccess<T> (string channel, bool read, bool write, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			return GrantAccess (channel, read, write, -1, userCallback, errorCallback);
+			return GrantAccess (channel, "", read, write, -1, userCallback, errorCallback);
 		}
 
-		public bool GrantAccess<T> (string channel, bool read, bool write, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        public bool GrantAccess<T>(string channel, bool read, bool write, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return GrantAccess<T>(channel, "", read, write, ttl, userCallback, errorCallback);
+        }
+
+        public bool GrantAccess<T>(string channel, string authenticationKey, bool read, bool write, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return GrantAccess(channel, authenticationKey, read, write, -1, userCallback, errorCallback);
+        }
+        
+        public bool GrantAccess<T> (string channel, string authenticationKey, bool read, bool write, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
 			if (string.IsNullOrEmpty (this.secretKey) || string.IsNullOrEmpty (this.secretKey.Trim ()) || this.secretKey.Length <= 0) {
 				throw new MissingFieldException ("Invalid secret key");
 			}
 
-			Uri request = BuildGrantAccessRequest (channel, read, write, ttl);
+			Uri request = BuildGrantAccessRequest(channel, authenticationKey, read, write, ttl);
 
 			RequestState<T> requestState = new RequestState<T> ();
 			requestState.Channels = new string[] { channel };
@@ -3507,10 +3652,20 @@ namespace PubNubMessaging.Core
 
 		public bool GrantPresenceAccess<T> (string channel, bool read, bool write, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			return GrantPresenceAccess (channel, read, write, -1, userCallback, errorCallback);
+			return GrantPresenceAccess (channel, "", read, write, -1, userCallback, errorCallback);
 		}
 
-		public bool GrantPresenceAccess<T> (string channel, bool read, bool write, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        public bool GrantPresenceAccess<T>(string channel, bool read, bool write, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return GrantPresenceAccess(channel, "", read, write, ttl, userCallback, errorCallback);
+        }
+
+        public bool GrantPresenceAccess<T>(string channel, string authenticationKey, bool read, bool write, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return GrantPresenceAccess<T>(channel, authenticationKey, read, write, -1, userCallback, errorCallback);
+        }
+
+		public bool GrantPresenceAccess<T>(string channel, string authenticationKey, bool read, bool write, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
 			string[] multiChannels = channel.Split (',');
 			if (multiChannels.Length > 0) {
@@ -3523,45 +3678,59 @@ namespace PubNubMessaging.Core
 				}
 			}
 			string presenceChannel = string.Join (",", multiChannels);
-			return GrantAccess (presenceChannel, read, write, ttl, userCallback, errorCallback);
+			return GrantAccess(presenceChannel, authenticationKey, read, write, ttl, userCallback, errorCallback);
 		}
 
 		public void AuditAccess<T> (Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			AuditAccess ("", userCallback, errorCallback);
+			AuditAccess("", "", userCallback, errorCallback);
 		}
 
 		public void AuditAccess<T> (string channel, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			if (string.IsNullOrEmpty (this.secretKey) || string.IsNullOrEmpty (this.secretKey.Trim ()) || this.secretKey.Length <= 0) {
-				throw new MissingFieldException ("Invalid secret key");
-			}
-
-			Uri request = BuildAuditAccessRequest (channel);
-
-			RequestState<T> requestState = new RequestState<T> ();
-			if (!string.IsNullOrEmpty (channel)) {
-				requestState.Channels = new string[] { channel };
-			}
-			requestState.Type = ResponseType.AuditAccess;
-			requestState.UserCallback = userCallback;
-			requestState.ErrorCallback = errorCallback;
-			requestState.Reconnect = false;
-
-			UrlProcessRequest<T> (request, requestState);
+            AuditAccess(channel, "", userCallback, errorCallback);
 		}
+
+        public void AuditAccess<T>(string channel, string authenticationKey, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            if (string.IsNullOrEmpty(this.secretKey) || string.IsNullOrEmpty(this.secretKey.Trim()) || this.secretKey.Length <= 0)
+            {
+                throw new MissingFieldException("Invalid secret key");
+            }
+
+            Uri request = BuildAuditAccessRequest(channel, authenticationKey);
+
+            RequestState<T> requestState = new RequestState<T>();
+            if (!string.IsNullOrEmpty(channel))
+            {
+                requestState.Channels = new string[] { channel };
+            }
+            requestState.Type = ResponseType.AuditAccess;
+            requestState.UserCallback = userCallback;
+            requestState.ErrorCallback = errorCallback;
+            requestState.Reconnect = false;
+
+            UrlProcessRequest<T>(request, requestState);
+        }
 
 		public void AuditPresenceAccess<T> (string channel, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			string[] multiChannels = channel.Split (',');
-			if (multiChannels.Length > 0) {
-				for (int index = 0; index < multiChannels.Length; index++) {
-					multiChannels [index] = string.Format ("{0}-pnpres", multiChannels [index]);
-				}
-			}
-			string presenceChannel = string.Join (",", multiChannels);
-			AuditAccess (presenceChannel, userCallback, errorCallback);
+            AuditPresenceAccess(channel, "", userCallback, errorCallback);
 		}
+
+        public void AuditPresenceAccess<T>(string channel, string authenticationKey, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            string[] multiChannels = channel.Split(',');
+            if (multiChannels.Length > 0)
+            {
+                for (int index = 0; index < multiChannels.Length; index++)
+                {
+                    multiChannels[index] = string.Format("{0}-pnpres", multiChannels[index]);
+                }
+            }
+            string presenceChannel = string.Join(",", multiChannels);
+            AuditAccess(presenceChannel, authenticationKey, userCallback, errorCallback);
+        }
 
 		#endregion
 
@@ -3773,11 +3942,7 @@ namespace PubNubMessaging.Core
 		}
 
 		protected abstract PubnubWebRequest SetServicePointSetTcpKeepAlive (PubnubWebRequest request);
-		/*{
-					#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE)
-					request.ServicePoint.SetTcpKeepAlive(true, _pubnubNetworkTcpCheckIntervalInSeconds * 1000, 1000);
-					#endif
-				}*/
+
 		protected virtual void SendRequestAndGetResult<T> (Uri requestUri, RequestState<T> pubnubRequestState, PubnubWebRequest request)
 		{
 			IAsyncResult asyncResult = request.BeginGetResponse (new AsyncCallback (UrlProcessResponseCallback<T>), pubnubRequestState);
