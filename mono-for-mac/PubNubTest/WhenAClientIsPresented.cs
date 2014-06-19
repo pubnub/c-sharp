@@ -646,7 +646,6 @@ namespace PubNubMessaging.Tests
             common.WaitForResponse(30);
 
             Assert.IsTrue(common.Response.ToString().Contains("{\"testkey\":\"testval\"}"));
-            pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -695,7 +694,6 @@ namespace PubNubMessaging.Tests
             common.WaitForResponse(30);
             Console.WriteLine("Response GetUserStateAfterDelete:" + common.Response.ToString());
             Assert.IsTrue(common.Response.ToString().Contains("{\"k\":\"v\"}"));
-            pubnub.EndPendingRequests();
         }
 
         [Test]
