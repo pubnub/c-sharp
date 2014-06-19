@@ -176,8 +176,11 @@ namespace PubNubMessaging.Tests
         {
             CustomClass message = new CustomClass ();
 
+            Random r = new Random();
+            channel = "hello_world_sub" + r.Next(1000);
+
             pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
-            Thread.Sleep (1500);
+            Thread.Sleep (5000);
 
             pubnub.Publish (channel, (object)message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
 
@@ -219,11 +222,19 @@ namespace PubNubMessaging.Tests
                         Assert.Fail ("Complex message test not successful");
                     }
                 } else {
-                    Assert.Fail ("No response");
+                    Assert.Fail ("No response1");
                 }
             } else {
                 Assert.Fail ("No response");
             }
+            common.DeliveryStatus = false;
+            common.Response = null;
+
+            pubnub.Unsubscribe<string>(channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+
+            common.WaitForResponse(20);
+
+            pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -252,6 +263,7 @@ namespace PubNubMessaging.Tests
                 {
                     Assert.Fail("Test failed");
                 }
+            pubnub.EndPendingRequests();
         }
 
         bool ParseResponse(object response)
@@ -314,6 +326,7 @@ namespace PubNubMessaging.Tests
                 {
                     Assert.Fail("Test failed");
                 }
+            pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -351,6 +364,7 @@ namespace PubNubMessaging.Tests
                 {
                     Assert.Fail("Test failed");
                 }
+            pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -382,6 +396,7 @@ namespace PubNubMessaging.Tests
                 {
                     Assert.Fail("Test failed");
                 }
+            pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -436,6 +451,7 @@ namespace PubNubMessaging.Tests
                 {
                     Assert.Fail("Test failed");
                 }
+            pubnub.EndPendingRequests();
         }
     }
 }
