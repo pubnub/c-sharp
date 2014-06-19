@@ -882,6 +882,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
         [Asynchronous]
         private void ReturnPublishMessageTooLargeInfoCallback(string result)
         {
+            mrePublish.Set();
         }
 
         [Asynchronous]

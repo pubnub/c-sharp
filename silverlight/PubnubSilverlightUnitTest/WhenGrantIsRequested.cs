@@ -234,8 +234,7 @@ namespace PubnubSilverlight.UnitTest
                     string authKey = "hello_my_authkey";
                     if (PubnubCommon.PAMEnabled)
                     {
-                        pubnub.AuthenticationKey = authKey;
-                        EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback));
+                        EnqueueCallback(() => pubnub.GrantAccess<string>(channel, authKey, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback));
                         mreGrant.WaitOne(310 * 1000);
 
                         EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadWriteShouldReturnSuccess failed."));
@@ -269,8 +268,7 @@ namespace PubnubSilverlight.UnitTest
                     string authKey = "hello_my_authkey";
                     if (PubnubCommon.PAMEnabled)
                     {
-                        pubnub.AuthenticationKey = authKey;
-                        EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, false, 5, AccessToUserLevelCallback, DummyErrorCallback));
+                        EnqueueCallback(() => pubnub.GrantAccess<string>(channel, authKey, true, false, 5, AccessToUserLevelCallback, DummyErrorCallback));
                         mreGrant.WaitOne(310 * 1000);
 
                         EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadShouldReturnSuccess failed."));
@@ -304,8 +302,7 @@ namespace PubnubSilverlight.UnitTest
                     string authKey = "hello_my_authkey";
                     if (PubnubCommon.PAMEnabled)
                     {
-                        pubnub.AuthenticationKey = authKey;
-                        EnqueueCallback(() => pubnub.GrantAccess<string>(channel, false, true, 5, AccessToUserLevelCallback, DummyErrorCallback));
+                        EnqueueCallback(() => pubnub.GrantAccess<string>(channel, authKey, false, true, 5, AccessToUserLevelCallback, DummyErrorCallback));
                         mreGrant.WaitOne(310 * 1000);
 
                         EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithWriteShouldReturnSuccess failed."));
@@ -414,8 +411,7 @@ namespace PubnubSilverlight.UnitTest
                     }
                     if (PubnubCommon.PAMEnabled)
                     {
-                        pubnub.AuthenticationKey = auth;
-                        EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, true, 5, AccessToMultiAuthGrantCallback, DummyErrorCallback));
+                        EnqueueCallback(() => pubnub.GrantAccess<string>(channel, auth, true, true, 5, AccessToMultiAuthGrantCallback, DummyErrorCallback));
                         mreGrant.WaitOne(310 * 1000);
 
                         EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenMultipleAuthGrantShouldReturnSuccess failed."));
@@ -555,8 +551,7 @@ namespace PubnubSilverlight.UnitTest
                     {
                         if (!unitTest.EnableStubTest)
                         {
-                            pubnub.AuthenticationKey = authKey;
-                            EnqueueCallback(() => pubnub.GrantAccess<string>(channel, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback));
+                            EnqueueCallback(() => pubnub.GrantAccess<string>(channel, authKey, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback));
                             mreGrant.WaitOne(310 * 1000);
                         }
                         else

@@ -78,6 +78,9 @@
     <Compile Include="LoggingMethod.cs" />
     <Compile Include="MainPage.cs" />
     <Compile Include="MD5.cs" />
+    <Compile Include="PAMAuthKeyUserControl.xaml.cs">
+      <DependentUpon>PAMAuthKeyUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pubnub.cs" />
     <Compile Include="PubnubCore.cs" />
     <Compile Include="PubnubDemoStart.xaml.cs">
@@ -115,6 +118,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="HereNowOptionsUserControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PAMAuthKeyUserControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

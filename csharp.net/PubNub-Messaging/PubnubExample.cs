@@ -383,14 +383,13 @@ namespace PubNubMessaging.Core
                     Console.WriteLine("ENTER 20 TO Simulate Machine Awake Mode");
                     Console.WriteLine("ENTER 21 TO Set Presence Heartbeat (Current value = {0} sec)", pubnub.PresenceHeartbeat);
                     Console.WriteLine("ENTER 22 TO Set Presence Heartbeat Interval (Current value = {0} sec)", pubnub.PresenceHeartbeatInterval);
-                    Console.WriteLine("Enter 23 TO Add/Modify Local User State");
-                    Console.WriteLine("Enter 24 TO Delete Local User State");
-                    Console.WriteLine("Enter 25 TO View/Get Local User State");
-                    Console.WriteLine("Enter 26 TO Set User State");
-                    Console.WriteLine("Enter 27 TO Get User State");
-                    Console.WriteLine("Enter 28 FOR WhereNow");
-                    Console.WriteLine("Enter 29 FOR GlobalHere_Now");
-                    Console.WriteLine("Enter 30 TO change UUID. (Current value = {0})", pubnub.SessionUUID);
+                    Console.WriteLine("Enter 23 TO Set User State by Add/Modify Key-Pair");
+                    Console.WriteLine("Enter 24 TO Set User State by Deleting existing Key-Pair");
+                    Console.WriteLine("Enter 25 TO Set User State with direct json string");
+                    Console.WriteLine("Enter 26 TO Get User State");
+                    Console.WriteLine("Enter 27 FOR WhereNow");
+                    Console.WriteLine("Enter 28 FOR GlobalHere_Now");
+                    Console.WriteLine("Enter 29 TO change UUID. (Current value = {0})", pubnub.SessionUUID);
                     Console.WriteLine("ENTER 99 FOR EXIT OR QUIT");
 
                     userinput = Console.ReadLine();
@@ -592,6 +591,11 @@ namespace PubNubMessaging.Core
                     case "12":
                         Console.WriteLine("Enter CHANNEL name for PAM Grant. For Presence, Select Option 15.");
                         channel = Console.ReadLine();
+
+                        Console.WriteLine("Enter the auth_key for PAM Grant (optional)");
+                        Console.WriteLine("Press Enter Key if there is no auth_key at this time.");
+                        string authGrant = Console.ReadLine();
+                        
                         Console.WriteLine("Read Access? Enter Y for Yes (default), N for No.");
                         string readAccess = Console.ReadLine();
                         bool read = (readAccess.ToLower() == "n") ? false : true;
@@ -607,6 +611,7 @@ namespace PubNubMessaging.Core
 
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}",channel));
+                        Console.WriteLine(string.Format("auth_key = {0}", authGrant));
                         Console.WriteLine(string.Format("Read Access = {0}", read.ToString()));
                         Console.WriteLine(string.Format("Write Access = {0}", write.ToString()));
                         Console.WriteLine(string.Format("Grant Access Time Limit = {0}", grantTimeLimitInSeconds.ToString()));
@@ -614,7 +619,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine();
 
                         Console.WriteLine("Running PamGrant()");
-                        pubnub.GrantAccess<string>(channel, read, write, grantTimeLimitInSeconds, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.GrantAccess<string>(channel, authGrant, read, write, grantTimeLimitInSeconds, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "13":
                         Console.WriteLine("Enter CHANNEL name for PAM Audit");
@@ -625,24 +630,47 @@ namespace PubNubMessaging.Core
                         Console.ResetColor();
                         Console.WriteLine();
 
+                        Console.WriteLine("Enter the auth_key for PAM Audit (optional)");
+                        Console.WriteLine("Press Enter Key if there is no auth_key at this time.");
+                        string authAudit = Console.ReadLine();
+                        
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("auth_key = {0}", authAudit));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
                         Console.WriteLine("Running PamAudit()");
-                        pubnub.AuditAccess<string>(channel,DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.AuditAccess<string>(channel, authAudit, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "14":
                         Console.WriteLine("Enter CHANNEL name for PAM Revoke");
                         channel = Console.ReadLine();
-
+                        
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", channel));
                         Console.ResetColor();
                         Console.WriteLine();
 
+                        Console.WriteLine("Enter the auth_key for PAM Revoke (optional)");
+                        Console.WriteLine("Press Enter Key if there is no auth_key at this time.");
+                        string authRevoke = Console.ReadLine();
+                        
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("auth_key = {0}", authRevoke));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
                         Console.WriteLine("Running PamRevoke()");
-                        pubnub.GrantAccess<string>(channel, false,false, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.GrantAccess<string>(channel, authRevoke, false,false, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "15":
                         Console.WriteLine("Enter CHANNEL name for PAM Grant Presence.");
                         channel = Console.ReadLine();
+                        
+                        Console.WriteLine("Enter the auth_key for PAM Grant Presence (optional)");
+                        Console.WriteLine("Press Enter Key if there is no auth_key at this time.");
+                        string authGrantPresence = Console.ReadLine();
+                        
                         Console.WriteLine("Read Access? Enter Y for Yes (default), N for No.");
                         string readPresenceAccess = Console.ReadLine();
                         bool readPresence = (readPresenceAccess.ToLower() == "n") ? false : true;
@@ -658,6 +686,7 @@ namespace PubNubMessaging.Core
 
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", channel));
+                        Console.WriteLine(string.Format("auth_key = {0}", authGrantPresence));
                         Console.WriteLine(string.Format("Read Access = {0}", readPresence.ToString()));
                         Console.WriteLine(string.Format("Write Access = {0}", writePresence.ToString()));
                         Console.WriteLine(string.Format("Grant Access Time Limit = {0}", grantPresenceTimeLimitInSeconds.ToString()));
@@ -665,19 +694,27 @@ namespace PubNubMessaging.Core
                         Console.WriteLine();
 
                         Console.WriteLine("Running PAM GrantPresenceAccess()");
-                        pubnub.GrantPresenceAccess<string>(channel, readPresence, writePresence, grantPresenceTimeLimitInSeconds, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.GrantPresenceAccess<string>(channel, authGrantPresence, readPresence, writePresence, grantPresenceTimeLimitInSeconds, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "16":
                         Console.WriteLine("Enter CHANNEL name for PAM Presence Audit");
                         channel = Console.ReadLine();
-
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", channel));
                         Console.ResetColor();
                         Console.WriteLine();
 
+                        Console.WriteLine("Enter the auth_key for PAM Presence Audit (optional)");
+                        Console.WriteLine("Press Enter Key if there is no auth_key at this time.");
+                        string authPresenceAudit = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("auth_key = {0}", authPresenceAudit));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
+
                         Console.WriteLine("Running PAM Presence Audit()");
-                        pubnub.AuditPresenceAccess<string>(channel, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.AuditPresenceAccess<string>(channel, authPresenceAudit, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "17":
                         Console.WriteLine("Enter CHANNEL name for PAM Presence Revoke");
@@ -688,17 +725,25 @@ namespace PubNubMessaging.Core
                         Console.ResetColor();
                         Console.WriteLine();
 
+                        Console.WriteLine("Enter the auth_key for PAM Presence Revoke (optional)");
+                        Console.WriteLine("Press Enter Key if there is no auth_key at this time.");
+                        string authPresenceRevoke = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("auth_key = {0}", authPresenceRevoke));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
                         Console.WriteLine("Running PAM Presence Revoke()");
-                        pubnub.GrantPresenceAccess<string>(channel, false, false, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.GrantPresenceAccess<string>(channel, authPresenceRevoke, false, false, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "18":
-                        Console.WriteLine("Enter Auth Key. Use comma to enter multiple Auth Keys.");
+                        Console.WriteLine("Enter Auth Key (applies to all subscribed channels).");
                         Console.WriteLine("If you don't want to use Auth Key, Press ENTER Key");
                         authKey = Console.ReadLine();
                         pubnub.AuthenticationKey = authKey;
 
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Auth Key(s) = {0}", authKey));
+                        Console.WriteLine(string.Format("Auth Key = {0}", authKey));
                         Console.ResetColor();
                         Console.WriteLine();
 
@@ -744,46 +789,34 @@ namespace PubNubMessaging.Core
                         Console.ResetColor();
 
                         Console.WriteLine("User State will be accepted as dictionary key:value pair");
-                        while (true)
+
+                        Console.WriteLine("Enter key. ");
+                        string keyUserState = Console.ReadLine();
+                        if (string.IsNullOrEmpty(keyUserState.Trim()))
                         {
-                            Console.WriteLine("Enter key. ");
-                            string keyUserState = Console.ReadLine();
-                            if (string.IsNullOrEmpty(keyUserState.Trim()))
-                            {
-                                Console.WriteLine("dictionary key:value pair entry completed.");
-                                break;
-                            }
-                            Console.WriteLine("Enter value");
-                            string valueUserState = Console.ReadLine();
-                            int valueInt;
-                            double valueDouble;
-                            string currentUserState = "";
-                            if (Int32.TryParse(valueUserState, out valueInt))
-                            {
-                                currentUserState = pubnub.SetLocalUserState(userStateChannel, keyUserState, valueInt);
-                            }
-                            else if (Double.TryParse(valueUserState, out valueDouble))
-                            {
-                                currentUserState = pubnub.SetLocalUserState(userStateChannel, keyUserState, valueDouble);
-                            }
-                            else
-                            {
-                                currentUserState = pubnub.SetLocalUserState(userStateChannel, keyUserState, valueUserState);
-                            }
-
-                            Console.ForegroundColor = ConsoleColor.Blue;
-                            if (!string.IsNullOrEmpty(currentUserState))
-                            {
-                                Console.WriteLine("Current User State = {0}", currentUserState);
-                            }
-                            else
-                            {
-                                Console.Write("No User State Exists");
-                            }
-                            Console.ResetColor();
+                            Console.WriteLine("dictionary key:value pair entry completed.");
+                            break;
                         }
-                        break;
+                        Console.WriteLine("Enter value");
+                        string valueUserState = Console.ReadLine();
 
+                        int valueInt;
+                        double valueDouble;
+                        //string currentUserState = "";
+                        if (Int32.TryParse(valueUserState, out valueInt))
+                        {
+                            pubnub.SetUserState<string>(userStateChannel, new KeyValuePair<string, object>(keyUserState, valueInt), DisplayReturnMessage, DisplayErrorMessage);
+                        }
+                        else if (Double.TryParse(valueUserState, out valueDouble))
+                        {
+                            pubnub.SetUserState<string>(userStateChannel, new KeyValuePair<string, object>(keyUserState, valueDouble), DisplayReturnMessage, DisplayErrorMessage);
+                        }
+                        else
+                        {
+                            pubnub.SetUserState<string>(userStateChannel, new KeyValuePair<string, object>(keyUserState, valueUserState), DisplayReturnMessage, DisplayErrorMessage);
+                        }
+
+                        break;
                     case "24":
                         Console.WriteLine("Enter channel name");
                         string deleteUserStateChannel = Console.ReadLine();
@@ -791,63 +824,22 @@ namespace PubNubMessaging.Core
                         Console.WriteLine(string.Format("Channel = {0}", deleteUserStateChannel));
                         Console.ResetColor();
 
-                        Console.WriteLine("Enter key of the local user state to be deleted");
+                        Console.WriteLine("Enter key of the User State Key-Value pair to be deleted");
                         string deleteKeyUserState = Console.ReadLine();
-                        string currentUserStateAfterDelete = pubnub.SetLocalUserState(deleteUserStateChannel, deleteKeyUserState, null);
+                        pubnub.SetUserState<string>(deleteUserStateChannel, new KeyValuePair<string, object>(deleteKeyUserState, null), DisplayReturnMessage, DisplayErrorMessage);
 
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        if (!string.IsNullOrEmpty(currentUserStateAfterDelete))
-                        {
-                            Console.WriteLine("Current User State = {0}", currentUserStateAfterDelete);
-                        }
-                        else
-                        {
-                            Console.Write("No User State Exists");
-                        }
-                        Console.ResetColor();
                         break;
                     case "25":
-                        Console.WriteLine("Enter channel name");
-                        string getUserStateChannel = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", getUserStateChannel));
-                        Console.ResetColor();
-
-                        string currentUserStateView = pubnub.GetLocalUserState(getUserStateChannel);
-
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        if (!string.IsNullOrEmpty(currentUserStateView))
-                        {
-                            Console.WriteLine("Current User State = {0}", currentUserStateView);
-                        }
-                        else
-                        {
-                            Console.Write("No User State Exists");
-                        }
-                        Console.ResetColor();
-                        break;
-                    case "26":
                         Console.WriteLine("Enter channel name");
                         string setUserStateChannel = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", setUserStateChannel));
                         Console.ResetColor();
 
-                        Console.WriteLine("NOTE: Hopefully you added local user state.");
-                        Console.WriteLine("If you want to consider already created local user state, press ENTER");
-                        Console.WriteLine("Else enter user state in json format (Eg. {\"key1\":\"value1\",\"key2\":\"value2\"}");
-                        string manualJsonUserState = Console.ReadLine();
+                        Console.WriteLine("Enter user state in json format (Eg. {\"key1\":\"value1\",\"key2\":\"value2\"}");
+                        string jsonUserState = Console.ReadLine();
 
-                        string jsonUserState = "";
-                        if (string.IsNullOrEmpty(manualJsonUserState))
-                        {
-                            jsonUserState = pubnub.GetLocalUserState(setUserStateChannel);
-                        }
-                        else
-                        {
-                            jsonUserState = manualJsonUserState;
-                        }
-                        if (jsonUserState == "" || jsonUserState == "{}")
+                        if (jsonUserState.Trim() == "")
                         {
                             Console.WriteLine("Invalid User State");
                             break;
@@ -863,7 +855,7 @@ namespace PubNubMessaging.Core
                             pubnub.SetUserState<string>(setUserStateChannel, uuid, jsonUserState, DisplayReturnMessage, DisplayErrorMessage);
                         }
                         break;
-                    case "27":
+                    case "26":
                         Console.WriteLine("Enter channel name");
                         string getUserStateChannel2 = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
@@ -881,7 +873,7 @@ namespace PubNubMessaging.Core
                             pubnub.GetUserState<string>(getUserStateChannel2, uuid2, DisplayReturnMessage, DisplayErrorMessage);
                         }
                         break;
-                    case "28":
+                    case "27":
                         Console.WriteLine("Enter uuid for WhereNow. To consider SessionUUID, just press ENTER");
                         string whereNowUuid = Console.ReadLine();
 
@@ -893,7 +885,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine("Running Where_Now()");
                         pubnub.WhereNow<string>(whereNowUuid, DisplayReturnMessage, DisplayErrorMessage);
                         break;
-                    case "29":
+                    case "28":
                         bool globalHereNowShowUUID = true;
                         bool globalHereNowIncludeUserState = false;
 
@@ -922,7 +914,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine("Running Global HereNow()");
                         pubnub.GlobalHereNow<string>(globalHereNowShowUUID, globalHereNowIncludeUserState,DisplayReturnMessage, DisplayErrorMessage);
                         break;
-                    case "30":
+                    case "29":
                         Console.WriteLine("ENTER UUID.");
                         string sessionUUID = Console.ReadLine();
                         pubnub.ChangeUUID(sessionUUID);

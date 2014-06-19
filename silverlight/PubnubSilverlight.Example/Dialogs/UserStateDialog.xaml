@@ -23,16 +23,12 @@
                 <TextBlock Name="lblValue1" VerticalAlignment="Center" Text="Value 1" Width="70"></TextBlock>
                 <TextBox x:Name="txtValue1" Text="" Width="270"/>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="5,5,10,5" Name="spnlKey2" HorizontalAlignment="Stretch" VerticalAlignment="Top">
-                <TextBlock Name="lblKey2" VerticalAlignment="Center" Text="Key 2" Width="70"></TextBlock>
-                <TextBox x:Name="txtKey2" Text="" Width="270"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="5,5,10,5" Name="spnlValue2" HorizontalAlignment="Stretch" VerticalAlignment="Top">
-                <TextBlock Name="lblValue2" VerticalAlignment="Center" Text="Value 2" Width="70"></TextBlock>
-                <TextBox x:Name="txtValue2" Text="" Width="270"/>
-            </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5,5,10,5" Name="spnlChoice2">
                 <RadioButton x:Name="radGetUserState" FontSize="14" GroupName="UserState" Grid.Row="1">Get User State</RadioButton>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="5,5,10,5" Name="spnlKey2" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <TextBlock Name="lblGetUserStateUUID" VerticalAlignment="Center" Text="UUID" Width="70"></TextBlock>
+                <TextBox x:Name="txtGetUserStateUUID" Text="" Width="270"/>
             </StackPanel>
         </StackPanel>
         <Button x:Name="CancelButton" Content="Cancel" Click="CancelButton_Click" Width="75" Height="23" HorizontalAlignment="Right" Margin="0,12,0,0" Grid.Row="2" />

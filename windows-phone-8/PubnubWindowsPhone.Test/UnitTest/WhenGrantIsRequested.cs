@@ -261,8 +261,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     if (PubnubCommon.PAMEnabled)
                     {
                         mreGrant = new ManualResetEvent(false);
-                        pubnub.AuthenticationKey = authKey;
-                        pubnub.GrantAccess<string>(channel, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                        pubnub.GrantAccess<string>(channel, authKey, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
                         mreGrant.WaitOne(60 * 1000);
 
                         Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadWriteShouldReturnSuccess failed.");
@@ -299,8 +298,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     if (PubnubCommon.PAMEnabled)
                     {
                         mreGrant = new ManualResetEvent(false);
-                        pubnub.AuthenticationKey = authKey;
-                        pubnub.GrantAccess<string>(channel, true, false, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                        pubnub.GrantAccess<string>(channel, authKey, true, false, 5, AccessToUserLevelCallback, DummyErrorCallback);
                         mreGrant.WaitOne(60 * 1000);
 
                         Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadShouldReturnSuccess failed.");
@@ -337,8 +335,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     if (PubnubCommon.PAMEnabled)
                     {
                         mreGrant = new ManualResetEvent(false);
-                        pubnub.AuthenticationKey = authKey;
-                        pubnub.GrantAccess<string>(channel, false, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                        pubnub.GrantAccess<string>(channel, authKey, false, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
                         mreGrant.WaitOne(60 * 1000);
 
                         Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithWriteShouldReturnSuccess failed.");
@@ -453,8 +450,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     if (PubnubCommon.PAMEnabled)
                     {
                         mreGrant = new ManualResetEvent(false);
-                        pubnub.AuthenticationKey = auth;
-                        pubnub.GrantAccess<string>(channel, true, true, 5, AccessToMultiAuthGrantCallback, DummyErrorCallback);
+                        pubnub.GrantAccess<string>(channel, auth, true, true, 5, AccessToMultiAuthGrantCallback, DummyErrorCallback);
                         mreGrant.WaitOne(60 * 1000);
 
                         Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenMultipleAuthGrantShouldReturnSuccess failed.");
@@ -598,8 +594,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         if (!unitTest.EnableStubTest)
                         {
                             mreGrant = new ManualResetEvent(false);
-                            pubnub.AuthenticationKey = authKey;
-                            pubnub.GrantAccess<string>(channel, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                            pubnub.GrantAccess<string>(channel, authKey, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
                             mreGrant.WaitOne(60 * 1000);
                         }
                         else
@@ -609,7 +604,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         if (receivedGrantMessage)
                         {
                             mreGrant = new ManualResetEvent(false);
-                            pubnub.GrantAccess<string>("", false, false, 5, RevokeToUserLevelCallback, DummyErrorCallback);
+                            pubnub.GrantAccess<string>(channel, authKey, false, false, 5, RevokeToUserLevelCallback, DummyErrorCallback);
                             mreGrant.WaitOne(60 * 1000);
                             Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant success but revoke failed.");
                         }
