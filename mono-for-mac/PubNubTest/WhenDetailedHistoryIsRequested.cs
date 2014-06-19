@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
 using PubNubMessaging.Core;
+using System.Threading;
 
 namespace PubNubMessaging.Tests
 {
@@ -21,7 +22,7 @@ namespace PubNubMessaging.Tests
                           "",
                           false
                       );
-            string channel = "hello_world";
+            string channel = "hello_world_de1";
             string message = "Test Message";
       
             Common common = new Common();
@@ -37,10 +38,12 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, 1, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
             common.WaitForResponse();
 
             ParseResponse(common.Response, 0, 0, message);
+            pubnub.EndPendingRequests();
         }
 
         public void SendMultipleIntMessages(int messageStart, int messageEnd, string channel, Pubnub pubnub)
@@ -51,12 +54,13 @@ namespace PubNubMessaging.Tests
 
             for (int i = messageStart; i < messageEnd; i++)
                 {
+                    Thread.Sleep(2000);
                     common.DeliveryStatus = false;
                     string msg = i.ToString();
                     pubnub.Publish(channel, msg, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
                     common.WaitForResponse();
-
+                    
                     Console.WriteLine("Message # " + i.ToString() + " published");
                 }
         }
@@ -121,7 +125,7 @@ namespace PubNubMessaging.Tests
                           "",
                           "",
                           false);
-            string channel = "hello_world";
+            string channel = "hello_world_de2";
 
             string message = "Test Message";
 
@@ -136,13 +140,14 @@ namespace PubNubMessaging.Tests
       
             common.DeliveryStatus = false;
             common.Response = null;
-      
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, 10, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse();
             Console.WriteLine("\n*********** DetailedHistory Messages Received*********** ");
 
             ParseResponse(common.Response, 0, 0, "");
+            pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -154,7 +159,7 @@ namespace PubNubMessaging.Tests
                           "",
                           "enigma",
                           false);
-            string channel = "hello_world";
+            string channel = "hello_world_de3";
 
             string message = "Test Message";
 
@@ -169,13 +174,14 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
-
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, 1, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse();
             Console.WriteLine("\n*********** DetailedHistory Messages Received*********** ");
 
             ParseResponse(common.Response, 0, 0, message);
+            pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -188,7 +194,7 @@ namespace PubNubMessaging.Tests
                           "enigma",
                           false);
       
-            string channel = "hello_world";
+            string channel = "hello_world_de4";
       
             int totalMessages = 10;
       
@@ -211,7 +217,7 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
             Console.WriteLine("DetailedHistory with start & end");
-      
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
             common.WaitForResponse();
@@ -224,6 +230,7 @@ namespace PubNubMessaging.Tests
       
             common.DeliveryStatus = false;
             common.Response = null;
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
             common.WaitForResponse();
@@ -236,6 +243,7 @@ namespace PubNubMessaging.Tests
       
             common.DeliveryStatus = false;
             common.Response = null;
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
             common.WaitForResponse();
@@ -243,7 +251,7 @@ namespace PubNubMessaging.Tests
             Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
       
             ParseResponse(common.Response, 0, totalMessages / 2, "");
-
+            pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -256,7 +264,7 @@ namespace PubNubMessaging.Tests
                           "",
                           false);
       
-            string channel = "hello_world";
+            string channel = "hello_world_de5";
       
             int totalMessages = 10;
       
@@ -279,7 +287,7 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
             Console.WriteLine("DetailedHistory with start & end");
-      
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
             common.WaitForResponse();
@@ -292,6 +300,7 @@ namespace PubNubMessaging.Tests
       
             common.DeliveryStatus = false;
             common.Response = null;
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
             common.WaitForResponse();
@@ -304,6 +313,7 @@ namespace PubNubMessaging.Tests
       
             common.DeliveryStatus = false;
             common.Response = null;
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
             common.WaitForResponse();
@@ -311,6 +321,7 @@ namespace PubNubMessaging.Tests
             Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
       
             ParseResponse(common.Response, 0, totalMessages / 2, "");
+            pubnub.EndPendingRequests();
         }
     
         [Test]
@@ -323,7 +334,7 @@ namespace PubNubMessaging.Tests
                 "",
                 false);
 
-            string channel = "hello_world";
+            string channel = "hello_world_de6";
 
             int totalMessages = 10;
 
@@ -346,7 +357,7 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
             Console.WriteLine("DetailedHistory with start & end");
-
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse();
@@ -359,6 +370,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse();
@@ -371,6 +383,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse();
@@ -378,6 +391,7 @@ namespace PubNubMessaging.Tests
             Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
 
             ParseResponse(common.Response, 0, totalMessages / 2, "");
+            pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -390,7 +404,7 @@ namespace PubNubMessaging.Tests
                 "enigma",
                 false);
 
-            string channel = "hello_world";
+            string channel = "hello_world_de7";
 
             int totalMessages = 10;
 
@@ -412,6 +426,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
+            Thread.Sleep(2000);
             Console.WriteLine("DetailedHistory with start & end");
 
             pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
@@ -426,6 +441,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse();
@@ -438,6 +454,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse();
@@ -445,7 +462,7 @@ namespace PubNubMessaging.Tests
             Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
 
             ParseResponse(common.Response, 0, totalMessages / 2, "");
-
+            pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -458,7 +475,7 @@ namespace PubNubMessaging.Tests
                 "",
                 false);
 
-            string channel = "hello_world";
+            string channel = "hello_world_de8";
             int totalMessages = 10;
 
             Common common = new Common();
@@ -480,13 +497,14 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
-
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, totalMessages, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
             common.WaitForResponse();
 
             Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
 
             ParseResponse(common.Response, 0, totalMessages, "");
+            pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -498,7 +516,7 @@ namespace PubNubMessaging.Tests
                 "",
                 "enigma",
                 false);
-            string channel = "hello_world";
+            string channel = "hello_world_de9";
 
             int totalMessages = 10;
 
@@ -521,13 +539,14 @@ namespace PubNubMessaging.Tests
 
             common.Response = null;
             common.DeliveryStatus = false;
-
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, totalMessages, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse();
             Console.WriteLine("\n*********** DetailedHistory Messages Received*********** ");
 
             ParseResponse(common.Response, 0, totalMessages, "");
+            pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -540,7 +559,7 @@ namespace PubNubMessaging.Tests
                 "enigma",
                 true);
 
-            string channel = "hello_world2";
+            string channel = "hello_world_de10";
 
             int totalMessages = 10;
 
@@ -563,7 +582,7 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
             Console.WriteLine("DetailedHistory with start & end");
-
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse();
@@ -576,6 +595,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse();
@@ -588,6 +608,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse();
@@ -595,7 +616,7 @@ namespace PubNubMessaging.Tests
             Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
 
             ParseResponse(common.Response, 0, totalMessages / 2, "");
-
+            pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -608,7 +629,7 @@ namespace PubNubMessaging.Tests
                 "",
                 true);
 
-            string channel = "hello_world";
+            string channel = "hello_world_de11";
 
             int totalMessages = 10;
 
@@ -631,7 +652,7 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
             Console.WriteLine("DetailedHistory with start & end");
-
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse();
@@ -644,6 +665,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse();
@@ -656,6 +678,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse();
@@ -663,6 +686,7 @@ namespace PubNubMessaging.Tests
             Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
 
             ParseResponse(common.Response, 0, totalMessages / 2, "");
+            pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -675,7 +699,7 @@ namespace PubNubMessaging.Tests
                 "",
                 true);
 
-            string channel = "hello_world";
+            string channel = "hello_world_de12";
 
             int totalMessages = 10;
 
@@ -698,7 +722,7 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
             Console.WriteLine("DetailedHistory with start & end");
-
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse();
@@ -711,6 +735,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse();
@@ -723,6 +748,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse();
@@ -730,6 +756,7 @@ namespace PubNubMessaging.Tests
             Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
 
             ParseResponse(common.Response, 0, totalMessages / 2, "");
+            pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -742,7 +769,7 @@ namespace PubNubMessaging.Tests
                 "enigma",
 				true);
 
-            string channel = "hello_world2";
+            string channel = "hello_world2_de13";
 
             int totalMessages = 10;
 
@@ -765,7 +792,7 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
             Console.WriteLine("DetailedHistory with start & end");
-
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse();
@@ -778,6 +805,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse();
@@ -790,6 +818,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse();
@@ -797,7 +826,7 @@ namespace PubNubMessaging.Tests
             Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
 
             ParseResponse(common.Response, 0, totalMessages / 2, "");
-
+            pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -810,7 +839,7 @@ namespace PubNubMessaging.Tests
                 "",
                 true);
 
-            string channel = "hello_world";
+            string channel = "hello_world_de14";
             int totalMessages = 10;
 
             Common common = new Common();
@@ -833,12 +862,15 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
 
+            Thread.Sleep(2000);
+
             pubnub.DetailedHistory(channel, totalMessages, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
             common.WaitForResponse();
 
             Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
 
             ParseResponse(common.Response, 0, totalMessages, "");
+            pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -850,7 +882,7 @@ namespace PubNubMessaging.Tests
                 "",
                 "enigma",
 				true);
-            string channel = "hello_world2";
+            string channel = "hello_world_de15";
 
             int totalMessages = 10;
 
@@ -873,13 +905,14 @@ namespace PubNubMessaging.Tests
 
             common.Response = null;
             common.DeliveryStatus = false;
-
+            Thread.Sleep(2000);
             pubnub.DetailedHistory(channel, totalMessages, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse();
             Console.WriteLine("\n*********** DetailedHistory Messages Received*********** ");
 
             ParseResponse(common.Response, 0, totalMessages, "");
+            pubnub.EndPendingRequests();
         }
 
     }

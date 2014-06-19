@@ -115,6 +115,19 @@ namespace PubNubMessaging.Core
             #endif
         }
 
+        static void CleanupUdp ()
+        {
+            if (udp != null && udp.Client != null) {
+                udp.Client.Close ();
+                udp.Client = null;
+            } 
+
+            if (udp != null) {
+                udp.Close ();
+                udp = null;
+            }
+        }
+
         private static void CheckSocketConnect<T> (object internetState)
         {
             InternetState<T> state = internetState as InternetState<T>;
@@ -136,10 +149,18 @@ namespace PubNubMessaging.Core
                     socket.Close();
                 }
                 #elif (UNITY_IOS || UNITY_ANDROID)
+                if(request!=null){
+                    request.Abort();
+                    request = null;
+                }
                 request = (HttpWebRequest)WebRequest.Create("http://pubsub.pubnub.com");
                 if(request!= null){
                     request.Timeout = HeartbeatInterval * 1000;
                     request.ContentType = "application/json";
+                    if(response!=null){
+                            response.Close();
+                            response = null;
+                    }
                     response = request.GetResponse ();
                     if(response != null){
                         if(((HttpWebResponse)response).ContentLength <= 0){
@@ -160,14 +181,18 @@ namespace PubNubMessaging.Core
                     } 
                 }
                 #elif(__MonoCS__)
-                udp = new UdpClient ("pubsub.pubnub.com", 80);
-                IPAddress localAddress = ((IPEndPoint)udp.Client.LocalEndPoint).Address;
-				if (udp != null && udp.Client != null && udp.Client.RemoteEndPoint != null) {
-                    EndPoint remotepoint = udp.Client.RemoteEndPoint;
-                    string remoteAddress = (remotepoint != null) ? remotepoint.ToString () : "";
-                    LoggingMethod.WriteToLog (string.Format ("DateTime {0} checkInternetStatus LocalIP: {1}, RemoteEndPoint:{2}", DateTime.Now.ToString (), localAddress.ToString (), remoteAddress), LoggingMethod.LevelVerbose);
-                    _status = true;
-                    callback (true);
+                //CleanupUdp();
+                using(udp = new UdpClient ("pubsub.pubnub.com", 80)){
+                    IPAddress localAddress = ((IPEndPoint)udp.Client.LocalEndPoint).Address;
+                    if (udp != null && udp.Client != null  && udp.Client.RemoteEndPoint != null) {
+                        udp.Client.SendTimeout = HeartbeatInterval * 1000;
+
+                        EndPoint remotepoint = udp.Client.RemoteEndPoint;
+                        string remoteAddress = (remotepoint != null) ? remotepoint.ToString () : "";
+                        LoggingMethod.WriteToLog (string.Format ("DateTime {0} checkInternetStatus LocalIP: {1}, RemoteEndPoint:{2}", DateTime.Now.ToString (), localAddress.ToString (), remoteAddress), LoggingMethod.LevelVerbose);
+                        _status = true;
+                        callback (true);
+                    }
                 }
                 #else
                 using (UdpClient udp = new UdpClient("pubsub.pubnub.com", 80))
@@ -211,9 +236,8 @@ namespace PubNubMessaging.Core
                     request = null;
                 }
                 #elif(__MonoCS__)
-                if (udp != null) {
-                    udp.Close ();
-                }
+                //CleanupUdp();
+
                 #endif
                 #if(UNITY_IOS)
                 GC.Collect();
@@ -229,7 +253,7 @@ namespace PubNubMessaging.Core
             PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType (ex);
             int statusCode = (int)errorType;
             string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription (errorType);
-            PubnubClientError error = new PubnubClientError (statusCode, PubnubErrorSeverity.Warn, true, ex.Message, ex, PubnubMessageSource.Client, null, null, errorDescription, string.Join (",", channels));
+            PubnubClientError error = new PubnubClientError (statusCode, PubnubErrorSeverity.Warn, true, ex.ToString(), ex, PubnubMessageSource.Client, null, null, errorDescription, string.Join (",", channels));
             GoToCallback (error, errorCallback);
 
             LoggingMethod.WriteToLog (string.Format ("DateTime {0} checkInternetStatus Error. {1}", DateTime.Now.ToString (), ex.ToString ()), LoggingMethod.LevelError);
