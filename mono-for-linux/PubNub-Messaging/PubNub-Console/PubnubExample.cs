@@ -84,7 +84,7 @@ namespace PubNubMessaging.Core
 				Console.WriteLine ("Subscribe key provided.");
 			} else {
 				Console.WriteLine ("Default demo subscribe key provided");
-				subscribeKey = "pam";
+				subscribeKey = "demo-36";
 			}
 			Console.ResetColor ();
 			Console.WriteLine ();
@@ -97,7 +97,7 @@ namespace PubNubMessaging.Core
 				Console.WriteLine ("Publish key provided.");
 			} else {
 				Console.WriteLine ("Default demo publish key provided");
-				publishKey = "pam";
+				publishKey = "demo-36";
 			}
 			Console.ResetColor ();
 			Console.WriteLine ();
@@ -110,7 +110,7 @@ namespace PubNubMessaging.Core
 				Console.WriteLine ("Secret key provided.");
 			} else {
 				Console.WriteLine ("Default demo secret key provided");
-				secretKey = "pam";
+				secretKey = "demo-36";
 			}
 			Console.ResetColor ();
 			Console.WriteLine ();

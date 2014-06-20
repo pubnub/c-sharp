@@ -50,7 +50,15 @@ Please note the other serialization libraries used in the pubnub.cs class are th
 
 #### To run the unit tests, in addition to the above, you need to 
 1. Import UnityTestTools package (this is already present in the Pubnub client code under the path PubnubUnity/Assets/UnityTestTools) into your Assets. (https://www.assetstore.unity3d.com/#/content/13802)
-   
+
+#### Why do we have 4 versions of Unity code
+The PubNub classes which reside under the Assets → Pubnub are the same for all. The code under this folder (along with a ref to a JSON serialization library) is all you need to implement PubNub in your project.
+
+For Unity-iOS and Unity-Standalone/Unity-Android the difference lies in the JSONFX serialization libraries (for iOS and Android/Standalone) making the .csproj files different for these 2 client. The normal version of JsonFx has trouble running under Unity-iOS so we had to use a different library.
+
+Similarly for windows the code is the same but the same project file (.csproj) ( if we used the Android/Standalone’s project file ) was giving issues when opened under windows environment. In order to not run into issues in this case we had to provide a different project. The serialization library used in Windows is the same as the one used in Android/Standalone.   
+
+There are 2 versions of Unity-iOS code (iOS and iOS-MiniJson). The code under the folder iOS uses the JsonFx 1.4 library (mod by TowerOBricks) and the code under iOS-MiniJson used MiniJson as the serialization library.
 
 #### Running the Demo App on PC
 

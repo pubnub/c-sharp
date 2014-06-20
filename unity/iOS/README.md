@@ -40,6 +40,7 @@ USE_JSONFX_FOR_UNITY with USE_JSONFX_UNITY_IOS
 
 #### Prerequisites
 + Install a free Full version of Unity 4 Pro from http://unity3d.com/unity/download/ (Unity 4 is recommended, but current/later versions should be ok). MonoDevelop IDE tool will be installed as part of Unity to write C# scripts.
++ This version is pre-compiled with JsonFx 1.4 mod by TowerOfBricks
 + For Unity on iOS, we have tested 2 JSON serializers
     * JsonFx 1.4 mod by TowerOBricks (https://bitbucket.org/TowerOfBricks/jsonfx-for-unity3d/overview). This is recommended and is added by default. If you are finalizing  this library you can delete the class "MiniJson.cs" from the "Assets" directory, and open the project in Unity IDE. Unity IDE will do the rest.
     * MiniJson: A small class, with no additional dependencies. But this class can only serialize arrays, strings, Chars, hashtables, Dictionary, arraylist and some more but not custom classes and objects. If you want to use this you need to 
