@@ -115,19 +115,6 @@ namespace PubNubMessaging.Core
             #endif
         }
 
-        static void CleanupUdp ()
-        {
-            if (udp != null && udp.Client != null) {
-                udp.Client.Close ();
-                udp.Client = null;
-            } 
-
-            if (udp != null) {
-                udp.Close ();
-                udp = null;
-            }
-        }
-
         private static void CheckSocketConnect<T> (object internetState)
         {
             InternetState<T> state = internetState as InternetState<T>;
@@ -181,7 +168,6 @@ namespace PubNubMessaging.Core
                     } 
                 }
                 #elif(__MonoCS__)
-                //CleanupUdp();
                 using(udp = new UdpClient ("pubsub.pubnub.com", 80)){
                     IPAddress localAddress = ((IPEndPoint)udp.Client.LocalEndPoint).Address;
                     if (udp != null && udp.Client != null  && udp.Client.RemoteEndPoint != null) {
@@ -236,8 +222,6 @@ namespace PubNubMessaging.Core
                     request = null;
                 }
                 #elif(__MonoCS__)
-                //CleanupUdp();
-
                 #endif
                 #if(UNITY_IOS)
                 GC.Collect();
