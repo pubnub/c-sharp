@@ -43,6 +43,7 @@ namespace PubNubMessaging.Tests
 						} else {
 								Assert.Fail ("Null response");
 						}
+						pubnub.EndPendingRequests();
 				}
 				//[Test]
 				public void Test0ForComplexMessage2 ()
@@ -134,7 +135,7 @@ namespace PubNubMessaging.Tests
 				{
 						UnityEngine.Debug.Log ("DisplayErrorMessage1:" + result.ToString ());
 				}
-				#if(UNITY_ANDROID)
+				#if(UNITY_ANDROID || UNITY_STANDALONE)
 				[Ignore]
 				#else
 				[Test]
@@ -184,9 +185,9 @@ namespace PubNubMessaging.Tests
 						} else {
 								Assert.Fail ("Null response");
 						}*/
-
+						pubnub.EndPendingRequests();
 				}
-				#if((UNITY_ANDROID) || (UNITY_STANDALONE_WIN))
+				#if(UNITY_ANDROID || UNITY_STANDALONE)
 				[Ignore]
 				#else
 				[Test]
@@ -233,6 +234,7 @@ namespace PubNubMessaging.Tests
 						} else {
 								Assert.Fail ("Null response");
 						}*/
+						pubnub.EndPendingRequests();
 				}
 
 				object Response;
@@ -299,7 +301,7 @@ namespace PubNubMessaging.Tests
 						} else {
 								Assert.Fail ("Null response");
 						}*/
-
+						pubnub.EndPendingRequests();
 				}
 				[Test]
 				public void ThenItShouldReturnSuccessCodeAndInfoForComplexMessage ()
@@ -333,6 +335,7 @@ namespace PubNubMessaging.Tests
 						} else {
 								Assert.Fail ("Null response");
 						}
+						pubnub.EndPendingRequests();
 				}
 				[Test]
 				public void ThenItShouldReturnSuccessCodeAndInfoWhenEncrypted ()
@@ -367,6 +370,7 @@ namespace PubNubMessaging.Tests
 						} else {
 								Assert.Fail ("Null response");
 						}
+						pubnub.EndPendingRequests();
 				}
 				[Test]
 				public void ThenItShouldReturnSuccessCodeAndInfoWhenEncryptedAndSecretKeyed ()
@@ -401,6 +405,7 @@ namespace PubNubMessaging.Tests
 						} else {
 								Assert.Fail ("Null response");
 						}
+						pubnub.EndPendingRequests();
 				}
 				[Test]
 				public void ThenItShouldReturnSuccessCodeAndInfo ()
@@ -434,6 +439,7 @@ namespace PubNubMessaging.Tests
 						} else {
 								Assert.Fail ("Null response");
 						}
+						pubnub.EndPendingRequests();
 				}
 				[Test]
 				public void ThenItShouldGenerateUniqueIdentifier ()

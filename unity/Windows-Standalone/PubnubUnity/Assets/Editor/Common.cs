@@ -8,21 +8,17 @@ using System.Timers;
 using System.Xml;
 using System.Text.RegularExpressions;
 using System.Globalization;
+using System.Linq;
 
 #if (USE_JSONFX) || (USE_JSONFX_UNITY)
 using JsonFx.Json;
-
 #elif (USE_JSONFX_UNITY_IOS)
 using Pathfinding.Serialization.JsonFx;
-
-
 #elif (USE_DOTNET_SERIALIZATION)
 using System.Runtime.Serialization.Json;
 using System.Web.Script.Serialization;
-
 #elif (USE_MiniJSON)
 using MiniJSON;
-
 #else
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -131,16 +127,38 @@ namespace PubNubMessaging.Tests
 						var reader = new JsonFx.Json.JsonReader ();
 						retMessage = reader.Read<T> (message);
 						#elif (USE_JSONFX_UNITY_IOS)
-                                    UnityEngine.Debug.Log("message: " + message);
-                                    retMessage = JsonReader.Deserialize<T>(message);
+						UnityEngine.Debug.Log("message: " + message);
+						retMessage = JsonReader.Deserialize<T>(message);
 						#elif (USE_MiniJSON)
-                                    UnityEngine.Debug.Log("message: " + message);
-						            retMessage = Json.Deserialize(message) as object;
+						UnityEngine.Debug.Log("message: " + message);
+						object retMessage1 = Json.Deserialize(message) as object;
+						Type type = typeof(T);
+						var expectedType2 = typeof(object[]);
+						if(expectedType2.IsAssignableFrom(type)){
+							retMessage = ((System.Collections.IEnumerable)retMessage1).Cast<object> ().ToArray ();
+						} else {
+							retMessage	= retMessage1;
+						}
 						#else
-                                    retMessage = JsonConvert.DeserializeObject<T> (message);
+						retMessage = JsonConvert.DeserializeObject<T> (message);
 						#endif
 						return (T)retMessage;
 				}
+
+				#if (USE_MiniJSON)
+				/// <summary>
+				/// Deserialize the specified message using either JSONFX or NEWTONSOFT.JSON.
+				/// The functionality is based on the pre-compiler flag
+				/// </summary>
+				/// <param name="message">Message.</param>
+				public static T DeserializeMiniJson<T> (string message)
+				{
+						object retMessage;
+						UnityEngine.Debug.Log("message: " + message);
+						retMessage = MiniJSON.Json.Deserialize(message) as object;
+						return (T)retMessage;
+				}
+				#endif 
 
 				/// <summary>
 				/// Serialize the specified message using either JSONFX or NEWTONSOFT.JSON.
@@ -154,17 +172,32 @@ namespace PubNubMessaging.Tests
 						var writer = new JsonFx.Json.JsonWriter ();
 						retMessage = writer.Write (message);
 						retMessage = ConvertHexToUnicodeChars (retMessage);
-						#elif (USE_JSON_UNITY_IOS)
-                                    retMessage = JsonWriter.Serialize(message);
-									retMessage = ConvertHexToUnicodeChars (retMessage);
+						#elif (USE_JSONFX_UNITY_IOS)
+						retMessage = JsonWriter.Serialize(message);
+						retMessage = ConvertHexToUnicodeChars (retMessage);
 						#elif (USE_MiniJSON)
-                                    retMessage = Json.Serialize(message);
-						            UnityEngine.Debug.Log("retMessage: " + retMessage);
+						retMessage = Json.Serialize(message);
+						UnityEngine.Debug.Log("retMessage: " + retMessage);
 						#else
-                                    retMessage = JsonConvert.SerializeObject (message);
+						retMessage = JsonConvert.SerializeObject (message);
 						#endif
 						return retMessage;
 				}
+
+				#if (USE_MiniJSON)
+				/// <summary>
+				/// Serialize the specified message using either JSONFX or NEWTONSOFT.JSON.
+				/// The functionality is based on the pre-compiler flag
+				/// </summary>
+				/// <param name="message">Message.</param>
+				public static string SerializeMiniJson (object message)
+				{
+						string retMessage;
+						retMessage = MiniJSON.Json.Serialize(message);
+						UnityEngine.Debug.Log("retMessage: " + retMessage);
+						return retMessage;
+				}
+				#endif
 
 				/// <summary>
 				/// Converts the upper case hex to lower case hex.

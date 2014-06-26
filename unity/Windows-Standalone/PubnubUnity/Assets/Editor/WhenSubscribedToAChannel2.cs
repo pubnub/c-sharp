@@ -15,23 +15,34 @@ namespace PubNubMessaging.Tests
     {
         void SubscribePublishAndParse (string message, Pubnub pubnub, Common common, string channel)
         {
-            pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
-            Thread.Sleep (1500);
+			Random r = new Random();
+			channel = "hello_world_sub" + r.Next(1000);
 
-            pubnub.Publish (channel, message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
+			pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
+			Thread.Sleep (5000);
+			pubnub.NonSubscribeTimeout = 30;
+			pubnub.Publish (channel, message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
+			pubnub.NonSubscribeTimeout = 15;
+			common.WaitForResponse ();
 
-            common.WaitForResponse ();
+			if (common.Response != null) {
+				object[] deserializedMessage = Common.Deserialize<object[]> (common.Response.ToString ());
+				if (deserializedMessage != null) {
+					Assert.True (message.Equals(deserializedMessage [0].ToString ()));
+				} else {
+					Assert.Fail ("Test not successful");
+				}
+			} else {
+				Assert.Fail ("No response");
+			}
+			common.DeliveryStatus = false;
+			common.Response = null;
 
-            if (common.Response != null) {
-                object[] deserializedMessage = Common.Deserialize<object[]> (common.Response.ToString ());
-                if (deserializedMessage != null) {
-                    Assert.True (message.Equals(deserializedMessage [0].ToString ()));
-                } else {
-                    Assert.Fail ("Test not successful");
-                }
-            } else {
-                Assert.Fail ("No response");
-            }
+			pubnub.Unsubscribe<string>(channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+
+			common.WaitForResponse(20);
+
+			pubnub.EndPendingRequests();
         }
 
         [Test]

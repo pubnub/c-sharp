@@ -14,10 +14,15 @@ namespace PubNubMessaging.Tests
     {
         void SubscribePublishAndParse (string message, Pubnub pubnub, Common common, string channel)
         {
+			Random r = new Random();
+			channel = "hello_world_sub" + r.Next(1000);
+
             pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
-            Thread.Sleep (1500);
+			Thread.Sleep (5000);
+			pubnub.NonSubscribeTimeout = 30;
 
             pubnub.Publish (channel, message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
+			pubnub.NonSubscribeTimeout = 15;
 
             common.WaitForResponse ();
 
@@ -26,14 +31,22 @@ namespace PubNubMessaging.Tests
                 if (deserializedMessage != null) {
                     Assert.True (message.Equals(deserializedMessage [0].ToString ()));
                 } else {
-                    Assert.Fail ("Test not successful");
+					Assert.Fail (string.Format("Test not successful {0}, {1}", message, common.Response.ToString ()));
                 }
             } else {
-                Assert.Fail ("No response");
+				Assert.Fail ("No response " + common.Response);
             }
+			common.DeliveryStatus = false;
+			common.Response = null;
+
+			pubnub.Unsubscribe<string>(channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+
+			common.WaitForResponse(20);
+
+			pubnub.EndPendingRequests();
         }
 
-		[Test]
+				[Test]
 		public void TestForUnicodeSSL ()
 		{
 				Pubnub pubnub = new Pubnub (
@@ -237,7 +250,7 @@ namespace PubNubMessaging.Tests
             SubscribePublishAndParse (message, pubnub, common, channel);
         }
 
-        [Test]
+				[Test]
         public void TestForSpecialCharSSL ()
         {
             Pubnub pubnub = new Pubnub (
@@ -300,7 +313,7 @@ namespace PubNubMessaging.Tests
 
         }
 
-        [Test]
+				[Test]
         public void TestForSpecialCharCipherSSL ()
         {
             Pubnub pubnub = new Pubnub (
@@ -384,7 +397,7 @@ namespace PubNubMessaging.Tests
 
         }
 
-        [Test]
+				[Test]
         public void TestForSpecialCharSecretSSL ()
         {
             Pubnub pubnub = new Pubnub (
