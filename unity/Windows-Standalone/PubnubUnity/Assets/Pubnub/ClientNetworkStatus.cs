@@ -49,9 +49,9 @@ namespace PubNubMessaging.Core
                 _machineSuspendMode = value;
             }
         }
-        #if(__MonoCS__ && !UNITY_IOS && !UNITY_ANDROID)
+				/*#if(__MonoCS__ && !UNITY_IOS && !UNITY_ANDROID)
         static UdpClient udp;
-        #endif
+        #endif*/
         #if(UNITY_IOS || UNITY_ANDROID || __MonoCS__)
         static HttpWebRequest request;
         static WebResponse response;
@@ -135,7 +135,7 @@ namespace PubNubMessaging.Core
                     sae.Completed -= new EventHandler<SocketAsyncEventArgs>(socketAsync_Completed<T>);
                     socket.Close();
                 }
-                #elif (UNITY_IOS || UNITY_ANDROID)
+				#elif (UNITY_IOS || UNITY_ANDROID)
                 if(request!=null){
                     request.Abort();
                     request = null;
@@ -168,7 +168,7 @@ namespace PubNubMessaging.Core
                     } 
                 }
                 #elif(__MonoCS__)
-                using(udp = new UdpClient ("pubsub.pubnub.com", 80)){
+				using(UdpClient udp = new UdpClient ("pubsub.pubnub.com", 80)){
                     IPAddress localAddress = ((IPEndPoint)udp.Client.LocalEndPoint).Address;
                     if (udp != null && udp.Client != null  && udp.Client.RemoteEndPoint != null) {
                         udp.Client.SendTimeout = HeartbeatInterval * 1000;

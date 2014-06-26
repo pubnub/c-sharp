@@ -1,5 +1,5 @@
-//#define USE_JSONFX_UNITY_IOS
-#define USE_MiniJSON
+#define USE_JSONFX_UNITY_IOS
+//#define USE_MiniJSON
 
 using System;
 using PubNubMessaging.Core;
@@ -28,6 +28,16 @@ namespace PubNubMessaging.Tests
 		[TestFixture]
 		public class WhenAClientIsPresented
 		{
+				#if (UNITY_ANDROID)
+				[Test]
+				#else
+				[Ignore]
+				#endif
+				public void TestsForUNITYANDROID ()
+				{
+					Assert.True (true);
+				}
+
 				#if (UNITY_IOS)
 				[Test]
 				#else
@@ -343,11 +353,10 @@ namespace PubNubMessaging.Tests
 						unitTest.TestClassName = "WhenAClientIsPresented";
 						unitTest.TestCaseName = unitTestCaseName;
 						pubnub.PubnubUnitTest = unitTest;
-						Thread.Sleep (4000);
+						Thread.Sleep (3000);
 						pubnub.HereNow (channel, userCallback, errorCallback);
 
 						//pubnub.Unsubscribe<string> (channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy);
-
 				}
 
 				public void ParseResponse (object commonResponse, Pubnub pubnub)
@@ -422,7 +431,7 @@ namespace PubNubMessaging.Tests
 						HereNowWithState<string> (pubnub, channel, testname, common.DisplayReturnMessage, common.DisplayErrorMessage);
 						common.WaitForResponse ();
 
-						ParseResponseWithState (common.Response, pubnub.GetLocalUserState (channel), testname);
+						ParseResponseWithState (common.Response, "{\"testkey\":\"testval\"}", testname);
 						pubnub.Unsubscribe<string> (channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
 						pubnub.EndPendingRequests ();
 				}
@@ -477,8 +486,8 @@ namespace PubNubMessaging.Tests
 						commonSubscribe.DeliveryStatus = false;
 						commonSubscribe.Response = null;
 
-						pubnub.SetLocalUserState (channel, "testkey", "testval");
-						pubnub.SetUserState<string> (channel, pubnub.GetLocalUserState (channel), commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayErrorMessage);
+			//pubnub.SetLocalUserState (channel, "testkey", "testval");
+						pubnub.SetUserState<string> (channel, "{\"testkey\":\"testval\"}", commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayErrorMessage);
 						commonSubscribe.WaitForResponse (30);
 						Thread.Sleep (3000);
 						pubnub.HereNow<T> (channel, true, true, userCallback, errorCallback);
@@ -566,7 +575,7 @@ namespace PubNubMessaging.Tests
 						pubnub.EndPendingRequests ();
 				}
 
-				[Test]
+		/*[Test]
 				public void SetAndDeleteLocalState ()
 				{
 						Pubnub pubnub = new Pubnub (
@@ -598,7 +607,7 @@ namespace PubNubMessaging.Tests
 						pubnub.SetLocalUserState (channel, "testkey", "testval");
 						Assert.True (("{\"testkey\":\"testval\"}").Equals (pubnub.GetLocalUserState (channel)));
 						pubnub.EndPendingRequests ();
-				}
+				}*/
 
 				[Test]
 				public void SetAndGetGlobalState ()
@@ -611,11 +620,11 @@ namespace PubNubMessaging.Tests
 								                false
 						                );
 						string channel = "testChannel3";
-						pubnub.SetLocalUserState (channel, "testkey", "testval");
+			//pubnub.SetLocalUserState (channel, "testkey", "testval");
 
 						Common common = new Common ();
 
-						pubnub.SetUserState<string> (channel, pubnub.GetLocalUserState (channel), common.DisplayReturnMessage, common.DisplayErrorMessage);
+						pubnub.SetUserState<string> (channel, "{\"testkey\": \"testval\"}", common.DisplayReturnMessage, common.DisplayErrorMessage);
 						common.WaitForResponse (30);
 
 						pubnub.GetUserState<string> (channel, common.DisplayReturnMessage, common.DisplayErrorMessage);
@@ -636,35 +645,41 @@ namespace PubNubMessaging.Tests
 								                false
 						                );
 						string channel = "testChannel4";
-						pubnub.SetLocalUserState (channel, "testkey", "testval");
-						pubnub.SetLocalUserState (channel, "testkey2", "testval2");
 						Common common = new Common ();
+						KeyValuePair<string, object> kvp = new KeyValuePair<string, object>("k", "v");
+						pubnub.SetUserState<string>(channel, kvp, common.DisplayReturnMessage, common.DisplayErrorMessage);
+						common.WaitForResponse(30);
+						Console.WriteLine("Response UserStateAfterKvp:" + common.Response.ToString());
+						common.DeliveryStatus = false;
+						common.Response = null;
 
-						pubnub.SetUserState<string> (channel, pubnub.GetLocalUserState (channel), common.DisplayReturnMessage, common.DisplayErrorMessage);
-						common.WaitForResponse (30);
+						KeyValuePair<string, object> kvp2 = new KeyValuePair<string, object>("k2", "v2");
+						pubnub.SetUserState<string>(channel, kvp2, common.DisplayReturnMessage, common.DisplayErrorMessage);
+						common.WaitForResponse(30);
+						Console.WriteLine("Response UserStateAfterKvp2:" + common.Response.ToString());
 						common.DeliveryStatus = false;
 						common.Response = null;
 
 						pubnub.GetUserState<string> (channel, common.DisplayReturnMessage, common.DisplayErrorMessage);
 						common.WaitForResponse (30);
 
-						pubnub.SetLocalUserState (channel, "testkey2", null);
+						Console.WriteLine("Response GetUserStateBeforeDelete:" + common.Response.ToString());
+						Thread.Sleep(5000);
 						common.DeliveryStatus = false;
 						common.Response = null;
 
-						pubnub.SetUserState<string> (channel, pubnub.GetLocalUserState (channel), common.DisplayReturnMessage, common.DisplayErrorMessage);
-						Console.WriteLine ("pubnub.GetLocalUserState:" + pubnub.GetLocalUserState (channel));
+						pubnub.SetUserState<string>(channel, new KeyValuePair<string, object>("k2", null), common.DisplayReturnMessage, common.DisplayErrorMessage);
+						common.WaitForResponse(30);
 
-						common.WaitForResponse (30);
-						Console.WriteLine ("Response SetUserState:" + common.Response.ToString ());
+						Console.WriteLine("Response SetUserState:" + common.Response.ToString());
 						common.DeliveryStatus = false;
 						common.Response = null;
-						Thread.Sleep (5000);
-						pubnub.GetUserState<string> (channel, common.DisplayReturnMessage, common.DisplayErrorMessage);
-						common.WaitForResponse (30);
-						Console.WriteLine ("Response GetUserState:" + common.Response.ToString ());
-						Assert.True (common.Response.ToString ().Contains ("{\"testkey\":\"testval\"}"));
-						pubnub.EndPendingRequests ();
+
+						Thread.Sleep(5000);
+						pubnub.GetUserState<string>(channel, common.DisplayReturnMessage, common.DisplayErrorMessage);
+						common.WaitForResponse(30);
+						Console.WriteLine("Response GetUserStateAfterDelete:" + common.Response.ToString());
+						Assert.True (common.Response.ToString ().Contains ("{\"k\":\"v\"}"));
 				}
 
 				[Test]
@@ -741,7 +756,7 @@ namespace PubNubMessaging.Tests
 						pubnub.HereNow<string> (channel, commonHereNow.DisplayReturnMessage, commonHereNow.DisplayReturnMessage);
 
 						commonHereNow.WaitForResponse (30);
-						//pubnub.Unsubscribe<string> (channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessage);
+						pubnub.Unsubscribe<string> (channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessage);
 
 						if (commonHereNow.Response != null) {
 								#if (USE_JSONFX || USE_JSONFX_UNITY || USE_JSONFX_UNITY_IOS|| USE_MiniJSON)
@@ -756,17 +771,11 @@ namespace PubNubMessaging.Tests
 								#endif
 								if (fields [0] != null) {
 										bool result = false;
-										#if (USE_MiniJSON)
-										if(commonHereNow.Response.ToString ().Contains (pubnub.SessionUUID)){
-												result = true;
-										}
-										#else
 										Dictionary<string, object> message = (Dictionary<string, object>)fields [0];
 										foreach (KeyValuePair<String, object> entry in message) {
-												UnityEngine.Debug.Log ("value:" + entry.Value + "  " + "key:" + entry.Key);
+												Console.WriteLine ("value:" + entry.Value + "  " + "key:" + entry.Key);
 												Type valueType = entry.Value.GetType ();
 												var expectedType = typeof(string[]);
-
 												if (valueType.IsArray && expectedType.IsAssignableFrom (valueType)) {
 														List<string> uuids = new List<string> (entry.Value as string[]);
 														if (uuids.Contains (pubnub.SessionUUID)) {
@@ -775,7 +784,6 @@ namespace PubNubMessaging.Tests
 														}
 												}
 										}
-										#endif
 										Assert.True (result);
 								} else {
 										Assert.Fail ("Null response");
