@@ -1,5 +1,5 @@
 //ver3.6
-//Build Date: April 8, 2014
+//Build Date: Jun 27, 2014
 using System;
 using System.Text;
 using System.Net.Security;
@@ -21,7 +21,7 @@ namespace PubNubMessaging.Core
 
         #region "Constants and Globals"
 
-        const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Error;
+		const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Info;
         const PubnubErrorFilter.Level errorLevel = PubnubErrorFilter.Level.Info;
         protected bool pubnubEnableProxyConfig = true;
         protected string _domainName = "pubsub.pubnub.com";
@@ -741,7 +741,7 @@ namespace PubNubMessaging.Core
         protected override HttpWebRequest SetUserAgent (HttpWebRequest req, bool keepAliveRequest, OperatingSystem userOS)
         {
             req.KeepAlive = keepAliveRequest;
-            req.UserAgent = string.Format ("ua_string=({0}) PubNub-csharp/3.5", userOS.VersionString);
+            req.UserAgent = string.Format ("ua_string=({0}) PubNub-csharp/3.6", userOS.VersionString);
             return req;
         }
 

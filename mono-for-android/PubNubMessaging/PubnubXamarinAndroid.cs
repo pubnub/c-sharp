@@ -1,5 +1,5 @@
 //ver3.6
-//Build Date: Apr 7, 2014
+//Build Date: Jun 27, 2014
 //#define USE_JSONFX
 using System;
 using System.Text;
@@ -746,7 +746,7 @@ namespace PubNubMessaging.Core
         protected override HttpWebRequest SetUserAgent (HttpWebRequest req, bool keepAliveRequest, OperatingSystem userOS)
         {
             req.KeepAlive = keepAliveRequest;
-            req.UserAgent = string.Format ("ua_string=({0}) PubNub-csharp/3.5", userOS.VersionString);
+			req.UserAgent = string.Format ("ua_string=({0}) PubNub-csharp/3.6", userOS.VersionString);
             return req;
         }
 
