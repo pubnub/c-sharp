@@ -19,9 +19,31 @@ using Newtonsoft.Json.Linq;
 #endif
 namespace PubNubMessaging.Tests
 {
-    [TestFixture]
+	[TestFixture]
     public class WhenAClientIsPresented
     {
+        #if (USE_JSONFX)
+        [Test]
+        #else
+        [Ignore]
+        #endif
+        public void UsingJsonFx ()
+        {
+			Console.Write("UsingJsonFx");
+            Assert.True (true);
+        }
+
+        #if (USE_JSONFX)
+        [Ignore]
+        #else
+        [Test]
+        #endif
+        public void UsingNewtonSoft ()
+        {
+			Console.Write("UsingNewtonSoft");
+            Assert.True (true);
+        }
+
         [Test]
         public void ThenItShouldReturnReceivedMessage ()
         {
@@ -40,7 +62,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenAClientIsPresented", "ThenPresenceShouldReturnReceivedMessage");
 
             pubnub.Presence<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessage, common.DisplayErrorMessage);
-            Thread.Sleep (1000);
+			Thread.Sleep (3000);
             Common commonSubscribe = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;
@@ -66,9 +88,10 @@ namespace PubNubMessaging.Tests
                 Assert.True (("hello_world").Equals (responseFields [2]));*/
                 Assert.True (("hello_world2").Equals (serializedMessage [2]));
             }
+			pubnub.EndPendingRequests();
         }
 
-        [Test]
+        //[Test]
         public void ThenItShouldReturnReceivedMessageSSL ()
         {
             Pubnub pubnub = new Pubnub (
@@ -78,7 +101,7 @@ namespace PubNubMessaging.Tests
                                 "",
                                 true
                             );
-            string channel = "hello_world2";
+			string channel = "hello_world3";
             Common common = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;
@@ -86,7 +109,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenAClientIsPresented", "ThenPresenceShouldReturnReceivedMessage");
 
             pubnub.Presence<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessage, common.DisplayErrorMessage);
-            Thread.Sleep (1000);
+			Thread.Sleep (3000);
             Common commonSubscribe = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;
@@ -105,6 +128,7 @@ namespace PubNubMessaging.Tests
                 object[] serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject (common.Response.ToString ()).ToArray ();
                 Assert.True (("hello_world2").Equals (serializedMessage [2]));
             }
+			pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -125,6 +149,7 @@ namespace PubNubMessaging.Tests
             common.WaitForResponse ();
 
             ParseResponse (common.Response, pubnub);
+			pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -145,6 +170,7 @@ namespace PubNubMessaging.Tests
             common.WaitForResponse ();
 
             ParseResponse (common.Response, pubnub);
+			pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -165,6 +191,7 @@ namespace PubNubMessaging.Tests
             common.WaitForResponse ();
 
             ParseResponse (common.Response, pubnub);
+			pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -185,6 +212,7 @@ namespace PubNubMessaging.Tests
             common.WaitForResponse ();
 
             ParseResponse (common.Response, pubnub);
+			pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -205,6 +233,7 @@ namespace PubNubMessaging.Tests
             common.WaitForResponse ();
 
             ParseResponse (common.Response, pubnub);
+			pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -225,6 +254,7 @@ namespace PubNubMessaging.Tests
             common.WaitForResponse ();
 
             ParseResponse (common.Response, pubnub);
+			pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -245,6 +275,7 @@ namespace PubNubMessaging.Tests
             common.WaitForResponse ();
 
             ParseResponse (common.Response, pubnub);
+			pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -265,13 +296,14 @@ namespace PubNubMessaging.Tests
             common.WaitForResponse ();
 
             ParseResponse (common.Response, pubnub);
+			pubnub.EndPendingRequests();
         }
 
         void HereNow (Pubnub pubnub, string unitTestCaseName, 
                       Action<PubnubClientError> errorCallback, Action<object> userCallback)
         {
             Random r = new Random();
-            string channel = "hello_world" + r.Next(100);
+			string channel = "hello_world_hn" + r.Next(100);
 
             Common commonSubscribe = new Common();
             pubnub.Subscribe<string>(channel, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayErrorMessage);
@@ -286,10 +318,10 @@ namespace PubNubMessaging.Tests
             unitTest.TestClassName = "WhenAClientIsPresented";
             unitTest.TestCaseName = unitTestCaseName;
             pubnub.PubnubUnitTest = unitTest;
-
+			Thread.Sleep(3000);
             pubnub.HereNow (channel, userCallback, errorCallback);
 
-            pubnub.Unsubscribe<string>(channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy);
+			//pubnub.Unsubscribe<string>(channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy);
         }
 
         public void ParseResponse (object commonResponse, Pubnub pubnub)
@@ -374,13 +406,15 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
 
-            string channel = "testChannel";
+			string channel = "testChannelhn1";
             string testname = "IfHereNowIsCalledWithState";
 
             HereNowWithState<string>(pubnub, channel, testname, common.DisplayReturnMessage, common.DisplayErrorMessage);
             common.WaitForResponse();
 
-            ParseResponseWithState(common.Response, pubnub.GetLocalUserState(channel), testname);
+			ParseResponseWithState(common.Response, "{\"testkey\":\"testval\"}", testname);
+			pubnub.Unsubscribe<string>(channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
+			pubnub.EndPendingRequests();
         }
 
         public void ParseResponseWithState(object commonResponse, string userState, string testname)
@@ -411,13 +445,13 @@ namespace PubNubMessaging.Tests
             commonSubscribe.DeliveryStatus = false;
             commonSubscribe.Response = null;
 
-            pubnub.SetLocalUserState(channel, "testkey", "testval");
-            pubnub.SetUserState<string>(channel, pubnub.GetLocalUserState(channel), commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayErrorMessage);
+			//pubnub.SetLocalUserState(channel, "testkey", "testval");
+			pubnub.SetUserState<string>(channel, "{\"testkey\":\"testval\"}", commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayErrorMessage);
             commonSubscribe.WaitForResponse(30);
-
+			Thread.Sleep(3000);
             pubnub.HereNow<T>(channel, true, true, userCallback, errorCallback);
 
-            pubnub.Unsubscribe<string>(channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy);
+			//pubnub.Unsubscribe<string>(channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy);
         }
 
         [Test]
@@ -460,6 +494,7 @@ namespace PubNubMessaging.Tests
                 }
             }
             pubnub.Unsubscribe<string>(channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy);
+			pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -504,9 +539,10 @@ namespace PubNubMessaging.Tests
                 }
             }
             pubnub.Unsubscribe<string>(channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy);
+			pubnub.EndPendingRequests();
         }
 
-        [Test]
+		/*[Test]
         public void SetAndDeleteLocalState(){
             Pubnub pubnub = new Pubnub(
                 Common.PublishKey,
@@ -534,7 +570,7 @@ namespace PubNubMessaging.Tests
             string channel = "testChannel2";
             pubnub.SetLocalUserState(channel, "testkey", "testval");
             Assert.True(("{\"testkey\":\"testval\"}").Equals(pubnub.GetLocalUserState(channel)));
-        }
+        }*/
 
         [Test]
         public void SetAndGetGlobalState(){
@@ -546,11 +582,11 @@ namespace PubNubMessaging.Tests
                 false
             );
             string channel = "testChannel3";
-            pubnub.SetLocalUserState(channel, "testkey", "testval");
+			//pubnub.SetLocalUserState(channel, "testkey", "testval");
 
             Common common = new Common();
 
-            pubnub.SetUserState<string>(channel, pubnub.GetLocalUserState(channel), common.DisplayReturnMessage, common.DisplayErrorMessage);
+			pubnub.SetUserState<string>(channel, "{\"testkey\":\"testval\"}", common.DisplayReturnMessage, common.DisplayErrorMessage);
             common.WaitForResponse(30);
 
             pubnub.GetUserState<string>(channel, common.DisplayReturnMessage, common.DisplayErrorMessage);
@@ -569,34 +605,42 @@ namespace PubNubMessaging.Tests
                 false
             );
             string channel = "testChannel4";
-            pubnub.SetLocalUserState(channel, "testkey", "testval");
-            pubnub.SetLocalUserState(channel, "testkey2", "testval2");
             Common common = new Common();
 
-            pubnub.SetUserState<string>(channel, pubnub.GetLocalUserState(channel), common.DisplayReturnMessage, common.DisplayErrorMessage);
-            common.WaitForResponse(30);
-            common.DeliveryStatus = false;
-            common.Response = null;
+			KeyValuePair<string, object> kvp = new KeyValuePair<string, object>("k", "v");
+			pubnub.SetUserState<string>(channel, kvp, common.DisplayReturnMessage, common.DisplayErrorMessage);
+			common.WaitForResponse(30);
+			Console.WriteLine("Response UserStateAfterKvp:" + common.Response.ToString());
+			common.DeliveryStatus = false;
+			common.Response = null;
 
-            pubnub.GetUserState<string>(channel, common.DisplayReturnMessage, common.DisplayErrorMessage);
-            common.WaitForResponse(30);
 
-            pubnub.SetLocalUserState(channel, "testkey2", null);
-            common.DeliveryStatus = false;
-            common.Response = null;
+			KeyValuePair<string, object> kvp2 = new KeyValuePair<string, object>("k2", "v2");
+			pubnub.SetUserState<string>(channel, kvp2, common.DisplayReturnMessage, common.DisplayErrorMessage);
+			common.WaitForResponse(30);
+			Console.WriteLine("Response UserStateAfterKvp2:" + common.Response.ToString());
+			common.DeliveryStatus = false;
+			common.Response = null;
 
-            pubnub.SetUserState<string>(channel, pubnub.GetLocalUserState(channel), common.DisplayReturnMessage, common.DisplayErrorMessage);
-            Console.WriteLine("pubnub.GetLocalUserState:" + pubnub.GetLocalUserState(channel));
+			pubnub.GetUserState<string>(channel, common.DisplayReturnMessage, common.DisplayErrorMessage);
+			common.WaitForResponse(30);
+			Console.WriteLine("Response GetUserStateBeforeDelete:" + common.Response.ToString());
+			Thread.Sleep(5000);
+			common.DeliveryStatus = false;
+			common.Response = null;
 
-            common.WaitForResponse(30);
-            Console.WriteLine("Response SetUserState:" + common.Response.ToString());
-            common.DeliveryStatus = false;
-            common.Response = null;
-            Thread.Sleep(5000);
-            pubnub.GetUserState<string>(channel, common.DisplayReturnMessage, common.DisplayErrorMessage);
-            common.WaitForResponse(30);
-            Console.WriteLine("Response GetUserState:" + common.Response.ToString());
-            Assert.True(common.Response.ToString().Contains("{\"testkey\":\"testval\"}"));
+			pubnub.SetUserState<string>(channel, new KeyValuePair<string, object>("k2", null), common.DisplayReturnMessage, common.DisplayErrorMessage);
+			common.WaitForResponse(30);
+
+			Console.WriteLine("Response SetUserState:" + common.Response.ToString());
+			common.DeliveryStatus = false;
+			common.Response = null;
+
+			Thread.Sleep(5000);
+			pubnub.GetUserState<string>(channel, common.DisplayReturnMessage, common.DisplayErrorMessage);
+			common.WaitForResponse(30);
+			Console.WriteLine("Response GetUserStateAfterDelete:" + common.Response.ToString());
+			Assert.True(common.Response.ToString().Contains("{\"k\":\"v\"}"));
         }
 
         [Test]
@@ -642,10 +686,14 @@ namespace PubNubMessaging.Tests
                 }
             }
             pubnub.Unsubscribe<string>(channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy);
-
+			pubnub.EndPendingRequests();
         }
 
-        [Test]
+		#if (USE_JSONFX)
+		[Ignore]
+		#else
+		[Test]
+		#endif
         public void ThenPresenceShouldReturnCustomUUID ()
         {
             Pubnub pubnub = new Pubnub (Common.PublishKey,
@@ -720,7 +768,7 @@ namespace PubNubMessaging.Tests
             } else {
                 Assert.Fail ("Null response");
             }
-
+			pubnub.EndPendingRequests();
         }
     }
 }

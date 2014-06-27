@@ -39,7 +39,7 @@ namespace PubNubMessaging.Tests
 
                 auditManualEvent.WaitOne();
 
-                Assert.IsTrue(receivedAuditMessage, "WhenAuditIsRequested -> ThenSubKeyLevelShouldReturnSuccess failed.");
+                Assert.True(receivedAuditMessage, "WhenAuditIsRequested -> ThenSubKeyLevelShouldReturnSuccess failed.");
             }
             else
             {
@@ -71,7 +71,7 @@ namespace PubNubMessaging.Tests
 
                 auditManualEvent.WaitOne();
 
-                Assert.IsTrue(receivedAuditMessage, "WhenAuditIsRequested -> ThenChannelLevelShouldReturnSuccess failed.");
+                Assert.True(receivedAuditMessage, "WhenAuditIsRequested -> ThenChannelLevelShouldReturnSuccess failed.");
             }
             else
             {

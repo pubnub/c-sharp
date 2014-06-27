@@ -52,10 +52,9 @@ namespace PubNubMessaging.Example
             "Auth Key",
             "Presence Heartbeat",
             "Presence Interval",
-            "Add/Mod Local User State",
-            "Del Local User State",
-            "View Local User State",
             "Set User State",
+            "Del User State",
+            "Set User State Json",
             "Get User State",
             "Where Now",
             "Global Here Now",
@@ -172,33 +171,33 @@ namespace PubNubMessaging.Example
                 break;
             case 17:
                 //"Add/Mod Local User State",
-                AddLocalUserState ();
+                AddUserStateKeyPair ();
                 break;
             case 18:
                 //"Del Local User State",
-                DeleteLocalUserState ();
+                DeleteUserState ();
                 break;
-            case 19:
+                /*case 19:
                 //"View Local User State",
                 ViewLocalUserState ();
+                break;*/
+            case 19:
+                //"Set User State",
+                SetUserStateJson ();
                 break;
             case 20:
-                //"Set User State",
-                SetUserState ();
-                break;
-            case 21:
                 //"Get User State",
                 GetUsetState ();
                 break;
-            case 22:
+            case 21:
                 //"Where Now",
                 WhereNow ();
                 break;
-            case 23:
+            case 22:
                 //"Global Here Now",
                 GlobalHereNow ();
                 break;
-            case 24:
+            case 23:
                 //"Change UUID"
                 ChangeUuid ();
                 break;
@@ -321,14 +320,14 @@ namespace PubNubMessaging.Example
             dialog.Show (SupportFragmentManager, "dialog");
         }
 
-        void SetUserState ()
+        void SetUserStateJson ()
         {
-            var dialog = new CommonDialogFragment (CommonDialogStates.SetUserState, this);
+            var dialog = new CommonDialogFragment (CommonDialogStates.SetUserStateJson, this);
             dialog.SetValues += HandleSetValues;
             dialog.Show (SupportFragmentManager, "dialog");
         }
 
-        void ViewLocalUserState ()
+        /*void ViewLocalUserState ()
         {
             string[] channels = channel.Split (',');
             foreach (string channelToCall in channels) {
@@ -339,18 +338,18 @@ namespace PubNubMessaging.Example
                     Display (string.Format("No User State Exists for channel {0}", channelToCall));
                 }
             }
-        }
+        }*/
 
-        void DeleteLocalUserState ()
+        void DeleteUserState ()
         {
-            var dialog = new CommonDialogFragment (CommonDialogStates.DeleteLocalUserState, this);
+            var dialog = new CommonDialogFragment (CommonDialogStates.DeleteUserState, this);
             dialog.SetValues += HandleSetValues;
             dialog.Show (SupportFragmentManager, "dialog");
         }
 
-        void AddLocalUserState ()
+        void AddUserStateKeyPair ()
         {
-            var dialog = new CommonDialogFragment (CommonDialogStates.AddLocalUserState, this);
+            var dialog = new CommonDialogFragment (CommonDialogStates.AddUserStateKeyValue, this);
             dialog.SetValues += HandleSetValues;
             dialog.Show (SupportFragmentManager, "dialog");
         }
@@ -457,14 +456,16 @@ namespace PubNubMessaging.Example
 
         public void SubscribeAudit ()
         {
-            Display ("Running Subscribe Audit");
-            pubnub.AuditAccess<string> (channel, DisplayReturnMessage, DisplayErrorMessage);
+            var dialog = new CommonDialogFragment (CommonDialogStates.AuditSubscribe, this);
+            dialog.SetValues += HandleSetValues;
+            dialog.Show (SupportFragmentManager, "dialog");
         }
 
         public void SubscribeRevoke ()
         {
-            Display ("Running Subscribe Revoke");
-            pubnub.GrantAccess<string> (channel, false, false, DisplayReturnMessage, DisplayErrorMessage);
+            var dialog = new CommonDialogFragment (CommonDialogStates.RevokeSubscribe, this);
+            dialog.SetValues += HandleSetValues;
+            dialog.Show (SupportFragmentManager, "dialog");
         }
 
         public void PresenceGrant ()
@@ -474,14 +475,16 @@ namespace PubNubMessaging.Example
 
         public void PresenceAudit ()
         {
-            Display ("Running Presence Audit");
-            pubnub.AuditPresenceAccess<string> (channel, DisplayReturnMessage, DisplayErrorMessage);
+            var dialog = new CommonDialogFragment (CommonDialogStates.AuditPresence, this);
+            dialog.SetValues += HandleSetValues;
+            dialog.Show (SupportFragmentManager, "dialog");
         }
 
         public void PresenceRevoke ()
         {
-            Display ("Running Presence Revoke");
-            pubnub.GrantPresenceAccess<string> (channel, false, false, DisplayReturnMessage, DisplayErrorMessage);
+            var dialog = new CommonDialogFragment (CommonDialogStates.RevokePresence, this);
+            dialog.SetValues += HandleSetValues;
+            dialog.Show (SupportFragmentManager, "dialog");
         }
 
         public void AuthKey ()
@@ -499,6 +502,25 @@ namespace PubNubMessaging.Example
                     Display ("Setting Auth Key");
                     pubnub.AuthenticationKey = cea.valueToSet;
                     Display ("Auth Key set");
+                } else if (cea.cds == CommonDialogStates.AuditSubscribe) {
+
+                    Display ("Running Subscribe Audit");
+                    pubnub.AuditAccess<string> (channel, cea.valueToSet, DisplayReturnMessage, DisplayErrorMessage);
+
+                } else if (cea.cds == CommonDialogStates.AuditPresence) {
+
+                    Display ("Running Presence Audit");
+                    pubnub.AuditPresenceAccess<string> (channel, cea.valueToSet, DisplayReturnMessage, DisplayErrorMessage);
+
+                } else if (cea.cds == CommonDialogStates.RevokePresence) {
+                    Display ("Running Presence Revoke");
+                    pubnub.GrantPresenceAccess<string> (channel, cea.valueToSet, false, false, DisplayReturnMessage, DisplayErrorMessage);
+
+                } else if (cea.cds == CommonDialogStates.RevokeSubscribe) {
+
+                    Display ("Running Subscribe Revoke");
+                    pubnub.GrantAccess<string> (channel, cea.valueToSet, false, false, DisplayReturnMessage, DisplayErrorMessage);
+
                 }else if (cea.cds == CommonDialogStates.ChangeUuid){
                     Display ("Setting UUID");
                     pubnub.ChangeUUID(cea.valueToSet);
@@ -509,10 +531,9 @@ namespace PubNubMessaging.Example
                 }else if (cea.cds == CommonDialogStates.GetUserState){
                     Display ("Running get user state");
                     pubnub.GetUserState<string> (cea.channel, cea.valueToSet, DisplayReturnMessage, DisplayErrorMessage);
-                }else if (cea.cds == CommonDialogStates.DeleteLocalUserState){
-                    Display ("Running delete local user state");
-                    string currentUserStateAfterDelete = pubnub.SetLocalUserState (cea.channel, cea.valueToSet, null);
-                    Display (string.Format("Current user state: {0}", currentUserStateAfterDelete));
+                }else if (cea.cds == CommonDialogStates.DeleteUserState){
+                    Display ("Running delete user state");
+                    pubnub.SetUserState<string>(cea.channel, new KeyValuePair<string, object>(cea.valueToSet, null), DisplayReturnMessage, DisplayErrorMessage);
                 }else if (cea.cds == CommonDialogStates.PresenceHeartbeat){
                     Display ("Setting presence heartbeat");
                     //int check done in CommonDialogFragment
@@ -523,13 +544,26 @@ namespace PubNubMessaging.Example
                     //int check done in CommonDialogFragment
                     pubnub.PresenceHeartbeatInterval = int.Parse(cea.valueToSet);
                     Display (string.Format("PresenceHeartbeatInterval set to {0}", pubnub.PresenceHeartbeatInterval));
-                } else if (cea.cds == CommonDialogStates.AddLocalUserState){
-                    string currentState = pubnub.SetLocalUserState (cea.channel, cea.valueToSet, cea.valueToSet2);
-                    Display (string.Format("Current user state: {0}", currentState));
-                } else if (cea.cds == CommonDialogStates.SetUserState){
+                } else if (cea.cds == CommonDialogStates.AddUserStateKeyValue){
+                    int valueInt;
+                    double valueDouble;
+
+                    if (Int32.TryParse(cea.valueToSet2, out valueInt))
+                    {
+                        pubnub.SetUserState<string>(cea.channel, new KeyValuePair<string, object>(cea.valueToSet, valueInt), DisplayReturnMessage, DisplayErrorMessage);
+                    }
+                    else if (Double.TryParse(cea.valueToSet2, out valueDouble))
+                    {
+                        pubnub.SetUserState<string>(cea.channel, new KeyValuePair<string, object>(cea.valueToSet, valueDouble), DisplayReturnMessage, DisplayErrorMessage);
+                    }
+                    else
+                    {
+                        pubnub.SetUserState<string>(cea.channel, new KeyValuePair<string, object>(cea.valueToSet, cea.valueToSet2), DisplayReturnMessage, DisplayErrorMessage);
+                    }
+                } else if (cea.cds == CommonDialogStates.SetUserStateJson){
                     string jsonUserState = "";
                     if (string.IsNullOrEmpty (cea.valueToSet2)) {
-                        jsonUserState = pubnub.GetLocalUserState (cea.channel);
+                        //jsonUserState = ;
                     } else {
                         jsonUserState = cea.valueToSet2;
                     }
@@ -558,10 +592,10 @@ namespace PubNubMessaging.Example
                 if (cea.cds == CommonDialogStates.Grant) {
                     if (cea.isPresence) {
                         Display ("Running Presence Grant");
-                        pubnub.GrantPresenceAccess<string> (channel, cea.valToSet2, cea.valToSet1, cea.ttl, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.GrantPresenceAccess<string> (channel, cea.channel, cea.valToSet2, cea.valToSet1, cea.ttl, DisplayReturnMessage, DisplayErrorMessage);
                     } else {
                         Display ("Running Subscribe Grant");
-                        pubnub.GrantAccess<string> (channel, cea.valToSet2, cea.valToSet1, cea.ttl, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.GrantAccess<string> (channel, cea.channel, cea.valToSet2, cea.valToSet1, cea.ttl, DisplayReturnMessage, DisplayErrorMessage);
                     }
                 } else if (cea.cds == CommonDialogStates.HereNow) {
                     pubnub.HereNow<string> (cea.channel, cea.valToSet2, cea.valToSet1, DisplayReturnMessage, DisplayErrorMessage);

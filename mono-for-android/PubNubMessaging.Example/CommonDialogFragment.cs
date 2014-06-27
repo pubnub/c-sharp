@@ -28,14 +28,18 @@ namespace PubNubMessaging.Example
         Auth,
         PresenceHeartbeat,
         PresenceHeartbeatInterval,
-        AddLocalUserState,
-        DeleteLocalUserState,
-        SetUserState,
+        AddUserStateKeyValue,
+        DeleteUserState,
+        SetUserStateJson,
         GetUserState,
         WhereNow,
         GlobalHereNow,
         ChangeUuid,
-        Grant
+        Grant,
+        AuditSubscribe,
+        AuditPresence,
+        RevokeSubscribe,
+        RevokePresence
     }
 
     public class CommonDialogFragment : Android.Support.V4.App.DialogFragment
@@ -76,7 +80,12 @@ namespace PubNubMessaging.Example
         {
             if ((cds == CommonDialogStates.Auth)
                 || (cds == CommonDialogStates.ChangeUuid)
-                || (cds == CommonDialogStates.WhereNow)) {
+                || (cds == CommonDialogStates.WhereNow)
+                || (cds == CommonDialogStates.AuditPresence)
+                || (cds == CommonDialogStates.AuditSubscribe)
+                || (cds == CommonDialogStates.RevokePresence) 
+                || (cds == CommonDialogStates.RevokeSubscribe)
+            ) {
                 EditText txtauth = view.FindViewById<EditText> (Resource.Id.txtauth);
 
                 FireEvent (txtauth.Text, "", "");
@@ -89,7 +98,7 @@ namespace PubNubMessaging.Example
                 FireEvent (txtuuid.Text, txtChannel.Text, "");
 
                 Dismiss ();
-            } else if (cds == CommonDialogStates.DeleteLocalUserState) {
+            } else if (cds == CommonDialogStates.DeleteUserState) {
                 EditText txtkey = view.FindViewById<EditText> (Resource.Id.txtauth);
                 EditText txtChannel = view.FindViewById<EditText> (Resource.Id.txtChannel);
 
@@ -117,7 +126,7 @@ namespace PubNubMessaging.Example
                     FireEvent (txtkey.Text, "", "");
                     Dismiss ();
                 }
-            } else if (cds == CommonDialogStates.AddLocalUserState){
+            } else if (cds == CommonDialogStates.AddUserStateKeyValue){
                 EditText txtkey = view.FindViewById<EditText> (Resource.Id.txtauth);
                 EditText txtChannel = view.FindViewById<EditText> (Resource.Id.txtChannel);
                 EditText txtInput2 = view.FindViewById<EditText> (Resource.Id.txtinput2);
@@ -126,7 +135,7 @@ namespace PubNubMessaging.Example
 
                 Dismiss ();
 
-            } else if (cds == CommonDialogStates.SetUserState){
+            } else if (cds == CommonDialogStates.SetUserStateJson){
                 EditText txtkey = view.FindViewById<EditText> (Resource.Id.txtauth);
                 EditText txtChannel = view.FindViewById<EditText> (Resource.Id.txtChannel);
                 EditText txtInput2 = view.FindViewById<EditText> (Resource.Id.txtinput2);
@@ -185,6 +194,38 @@ namespace PubNubMessaging.Example
 
                 tvinput1 = view.FindViewById<TextView> (Resource.Id.lblinput1);
                 tvinput1.SetText(Resource.String.authkey);
+
+                // Handle dismiss button click
+                btnSet = view.FindViewById<Button> (Resource.Id.btnSet);
+                btnSet.Click += ButtonSetClick;
+
+                btnSet2 = view.FindViewById<Button> (Resource.Id.btnSet2);
+                btnSet2.Visibility = ViewStates.Invisible;
+
+                btnDismiss = view.FindViewById<Button> (Resource.Id.btnCancel);
+                btnDismiss.Click += ButtonDismissClick;
+                //end auth
+            } else if ((cds == CommonDialogStates.AuditPresence) ||
+                (cds == CommonDialogStates.AuditSubscribe) ||
+                (cds == CommonDialogStates.RevokePresence) ||
+                (cds == CommonDialogStates.RevokeSubscribe))
+            {
+                //auth
+                lblInput0 = view.FindViewById<TextView> (Resource.Id.lblinput0);
+                lblInput0.Visibility = ViewStates.Invisible;
+                lblInput2 = view.FindViewById<TextView> (Resource.Id.lblinput2);
+                lblInput2.Visibility = ViewStates.Invisible;
+                tvinput2 = view.FindViewById<TextView> (Resource.Id.txtinput2);
+                tvinput2.Visibility = ViewStates.Invisible;
+
+                txtChannel = view.FindViewById<TextView> (Resource.Id.txtChannel);
+                txtChannel.Visibility = ViewStates.Invisible;
+
+                tvAuthLabel = view.FindViewById<TextView> (Resource.Id.tvAuthLabel);
+                tvAuthLabel.SetText(Resource.String.auth);
+
+                tvinput1 = view.FindViewById<TextView> (Resource.Id.lblinput1);
+                tvinput1.SetText(Resource.String.authopt);
 
                 // Handle dismiss button click
                 btnSet = view.FindViewById<Button> (Resource.Id.btnSet);
@@ -277,7 +318,7 @@ namespace PubNubMessaging.Example
 
                 btnDismiss = view.FindViewById<Button> (Resource.Id.btnCancel);
                 btnDismiss.Click += ButtonDismissClick;
-            } else if (cds == CommonDialogStates.DeleteLocalUserState){
+            } else if (cds == CommonDialogStates.DeleteUserState){
                 tvAuthLabel = view.FindViewById<TextView> (Resource.Id.tvAuthLabel);
                 tvAuthLabel.SetText(Resource.String.deleteUserState);
                 lblInput2 = view.FindViewById<TextView> (Resource.Id.lblinput2);
@@ -350,7 +391,7 @@ namespace PubNubMessaging.Example
 
                 btnDismiss = view.FindViewById<Button> (Resource.Id.btnCancel);
                 btnDismiss.Click += ButtonDismissClick;
-            } else if (cds == CommonDialogStates.AddLocalUserState){
+            } else if (cds == CommonDialogStates.AddUserStateKeyValue){
                 tvAuthLabel = view.FindViewById<TextView> (Resource.Id.tvAuthLabel);
                 tvAuthLabel.SetText(Resource.String.addUserState);
 
@@ -371,7 +412,7 @@ namespace PubNubMessaging.Example
 
                 btnDismiss = view.FindViewById<Button> (Resource.Id.btnCancel);
                 btnDismiss.Click += ButtonDismissClick;
-            } else if (cds == CommonDialogStates.SetUserState){
+            } else if (cds == CommonDialogStates.SetUserStateJson){
                 tvAuthLabel = view.FindViewById<TextView> (Resource.Id.tvAuthLabel);
                 tvAuthLabel.SetText(Resource.String.btnSetUserState);
 
