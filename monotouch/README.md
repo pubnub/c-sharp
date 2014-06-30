@@ -3,7 +3,7 @@
 
 For a quick video walkthrough, checkout https://vimeo.com/55630516 !
 
-### Important Change from previous version
+### Important change from previous version
 - UserState method parameters have been modified.
 - PAM auth method parameters have been modified.
 - Implements the features of Pubnub 3.6
