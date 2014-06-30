@@ -1,15 +1,17 @@
 ## PubNub 3.6 Web Data Push Cloud-Hosted API for Unity 4
-### This read me is for Unity-iOS client. To run on windows standalone please refer to folder named Standalone (Windows) and for Android/Standalone (Mac and Linux) please refer to the folder Standalone (Mac and Linux), Android
+#### This read me is for Unity-iOS client. To run on windows standalone please refer to folder named Standalone (Windows) and for Android/Standalone (Mac and Linux) please refer to the folder Standalone (Mac and Linux), Android
 
 ### View this First!
 We've made a [screencast](https://vimeo.com/69591819) that will walk you through the general setup. 
 After checking out the general setup video, [For iOS targets](https://vimeo.com/71549964) be sure to view this walkthrough next. Check it out!
 
-### Important Change from previous version
-Error Callback parameter is being introduced in all operation/non-operation methods of C# Core Pubnub.cs file. 
-If you had been using a previous version, your application might break due to signature difference.
-Removes the dependency of .NET sockets.
-Implements the features of Pubnub 3.6
+### Important change from previous version
+- UserState method parameters have been modified.
+- PAM auth method parameters have been modified.
+- Implements the features of Pubnub 3.6
+- Error Callback parameter is being introduced in all operation/non-operation methods of C# Core Pubnub.cs file. 
+- If you had been using a previous version, your application might break due to signature difference.
+- Removes the dependency of .NET sockets.
 
 WE have modified the JsonFX pre processor directives: Now we have 3. 
 - `USE_JSONFX_UNITY` is for `UNITY_STANDALONE` or `UNITY_WEBPLAYER` or `UNITY_ANDROID`
@@ -40,6 +42,7 @@ USE_JSONFX_FOR_UNITY with USE_JSONFX_UNITY_IOS
 
 #### Prerequisites
 + Install a free Full version of Unity 4 Pro from http://unity3d.com/unity/download/ (Unity 4 is recommended, but current/later versions should be ok). MonoDevelop IDE tool will be installed as part of Unity to write C# scripts.
++ This version is pre-compiled with JsonFx 1.4 mod by TowerOfBricks
 + For Unity on iOS, we have tested 2 JSON serializers
     * JsonFx 1.4 mod by TowerOBricks (https://bitbucket.org/TowerOfBricks/jsonfx-for-unity3d/overview). This is recommended and is added by default. If you are finalizing  this library you can delete the class "MiniJson.cs" from the "Assets" directory, and open the project in Unity IDE. Unity IDE will do the rest.
     * MiniJson: A small class, with no additional dependencies. But this class can only serialize arrays, strings, Chars, hashtables, Dictionary, arraylist and some more but not custom classes and objects. If you want to use this you need to 

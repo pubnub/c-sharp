@@ -31,7 +31,7 @@ namespace PubNubMessaging.Tests
                 pubnub.AuditAccess<string>(UserCallbackForCleanUpAccessAtUserLevel, ErrorCallbackForCleanUpAccessAtUserLevel);
                 auditManualEvent.WaitOne();
 
-                Assert.IsTrue(receivedAuditMessage, "CleanupGrant -> AtUserLevel failed.");
+                Assert.True(receivedAuditMessage, "CleanupGrant -> AtUserLevel failed.");
             }
             else
             {
@@ -50,7 +50,7 @@ namespace PubNubMessaging.Tests
                 pubnub.AuditAccess<string>(UserCallbackForCleanUpAccessAtChannelLevel, ErrorCallbackForCleanUpAccessAtChannelLevel);
                 auditManualEvent.WaitOne();
 
-                Assert.IsTrue(receivedAuditMessage, "CleanupGrant -> AtChannelLevel failed.");
+                Assert.True(receivedAuditMessage, "CleanupGrant -> AtChannelLevel failed.");
             }
             else
             {

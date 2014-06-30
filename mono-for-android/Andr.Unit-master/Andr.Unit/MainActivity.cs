@@ -38,14 +38,14 @@ namespace Andr.Unit {
             //Add (typeof (PubNubMessaging.Core.EncryptionTests).Assembly);
             // or in any assembly that you load (since JIT is available)
             
-#if false
+			//#if false
             // you can use the default or set your own custom writer (e.g. save to web site and tweet it ;-)
-            Runner.Writer = new TcpTextWriter ("10.0.1.2", 16384);
+			Runner.Writer = new TcpTextWriter ("10.96.67.0", 16384);
             // start running the test suites as soon as the application is loaded
             Runner.AutoStart = true;
             // crash the application (to ensure it's ended) and return to springboard
             Runner.TerminateAfterExecution = true;
-#endif
+			//#endif
             // you cannot add more assemblies once calling base
             base.OnCreate (bundle);
         }

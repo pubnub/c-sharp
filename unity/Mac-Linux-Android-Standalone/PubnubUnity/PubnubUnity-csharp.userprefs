@@ -1,0 +1,22 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Editor/WhenAClientIsPresented.cs">
+    <Files>
+      <File FileName="Assets/Editor/WhenDetailedHistoryIsRequested.cs" Line="1" Column="1" />
+      <File FileName="Assets/Pubnub/PubnubCore.cs" Line="1" Column="1" />
+      <File FileName="Assets/Pubnub/PubnubUnity.cs" Line="1" Column="1" />
+      <File FileName="Assets/Editor/WhenSubscribedToAChannel3.cs" Line="1" Column="1" />
+      <File FileName="Assets/Pubnub/Pubnub.cs" Line="1" Column="1" />
+      <File FileName="Assets/Editor/WhenSubscribedToAChannel2.cs" Line="1" Column="1" />
+      <File FileName="Assets/Editor/WhenSubscribedToAChannel.cs" Line="1" Column="1" />
+      <File FileName="Assets/Editor/WhenAClientIsPresented.cs" Line="448" Column="5" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/Unity/3.5/Unity-jsonfx-fix/PubnubUnity/Assets/Pubnub/PubnubCore.cs" line="268" column="1" />
+      <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/backups/git-develop-23May14/unity/Mac-Linux-Android-Standalone/PubnubUnity/Assets/Editor/WhenDetailedHistoryIsRequested.cs" line="120" column="1" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

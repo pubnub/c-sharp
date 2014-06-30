@@ -24,7 +24,7 @@ namespace PubNubMessaging.Tests
     {
         public static string PublishKey = "demo-36";
         public static string SubscribeKey = "demo-36";
-        public static string SecretKey = "";
+        public static string SecretKey = "demo-36";
 
         public object Response { get; set; }
 
@@ -35,7 +35,7 @@ namespace PubNubMessaging.Tests
         /// or timeout occurs
         /// </summary>
         /// <param name="countdownSeconds">seconds to timeout</param>
-        public void WaitForResponse(int countdownSeconds = 30)
+        public void WaitForResponse(int countdownSeconds = 20)
         {
             Timer timer = new Timer();
             DateTime start = DateTime.UtcNow; 

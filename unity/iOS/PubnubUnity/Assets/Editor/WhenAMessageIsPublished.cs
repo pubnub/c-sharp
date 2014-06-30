@@ -44,6 +44,7 @@ namespace PubNubMessaging.Tests
 						} else {
 								Assert.Fail ("Null response");
 						}
+						pubnub.EndPendingRequests();
 				}
 				//[Test]
 				public void Test0ForComplexMessage2 ()
@@ -331,6 +332,7 @@ namespace PubNubMessaging.Tests
 						} else {
 								Assert.Fail ("Null response");
 						}
+						pubnub.EndPendingRequests();
 				}
 				[Test]
 				public void ThenItShouldReturnSuccessCodeAndInfoWhenEncrypted ()
@@ -365,6 +367,7 @@ namespace PubNubMessaging.Tests
 						} else {
 								Assert.Fail ("Null response");
 						}
+						pubnub.EndPendingRequests();
 				}
 				[Test]
 				public void ThenItShouldReturnSuccessCodeAndInfoWhenEncryptedAndSecretKeyed ()
@@ -399,6 +402,7 @@ namespace PubNubMessaging.Tests
 						} else {
 								Assert.Fail ("Null response");
 						}
+						pubnub.EndPendingRequests();
 				}
 				[Test]
 				public void ThenItShouldReturnSuccessCodeAndInfo ()
@@ -432,6 +436,7 @@ namespace PubNubMessaging.Tests
 						} else {
 								Assert.Fail ("Null response");
 						}
+						pubnub.EndPendingRequests();
 				}
 				[Test]
 				public void ThenItShouldGenerateUniqueIdentifier ()

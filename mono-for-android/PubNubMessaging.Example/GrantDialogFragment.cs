@@ -30,9 +30,9 @@ namespace PubNubMessaging.Example
 
         Button btnDismiss;
         Button btnGrant;
-        TextView lblInput1, lblInput2, lblInput3;
+        TextView lblInput1, lblInput2, lblInput3, lblAuth;
         ToggleButton tbRead;
-        EditText txtVal;
+        EditText txtVal, txtauth;
         View view;
 
         public bool IsPresenceGrant {
@@ -53,6 +53,7 @@ namespace PubNubMessaging.Example
                 ToggleButton tbCanWrite = view.FindViewById<ToggleButton> (Resource.Id.tbWrite);
                 ToggleButton tbCanRead = view.FindViewById<ToggleButton> (Resource.Id.tbRead);
                 EditText txtttl = view.FindViewById<EditText> (Resource.Id.txtttl);
+                EditText txtauth = view.FindViewById<EditText> (Resource.Id.txtauth);
                 int iTtl;
 
                 Int32.TryParse (txtttl.Text, out iTtl);
@@ -61,7 +62,7 @@ namespace PubNubMessaging.Example
                     txtttl.Text = "1440";
                 }
 
-                FireEvent (iTtl, tbCanRead.Checked, tbCanWrite.Checked, IsPresenceGrant, "");
+                FireEvent (iTtl, tbCanRead.Checked, tbCanWrite.Checked, IsPresenceGrant, txtauth.Text);
 
                 Dismiss ();
             } else if ((cds == CommonDialogStates.HereNow) 
@@ -129,6 +130,12 @@ namespace PubNubMessaging.Example
                 txtVal = view.FindViewById<EditText> (Resource.Id.txtttl);
                 txtVal.InputType = Android.Text.InputTypes.TextFlagAutoComplete;
 
+                txtauth = view.FindViewById<EditText> (Resource.Id.txtauth);
+                txtauth.Visibility = ViewStates.Invisible;
+
+                lblAuth = view.FindViewById<TextView> (Resource.Id.lblinput1);
+                lblAuth.Visibility = ViewStates.Invisible;
+
                 tbRead = view.FindViewById<ToggleButton> (Resource.Id.tbRead);
                 tbRead.Checked = true;
 
@@ -154,6 +161,12 @@ namespace PubNubMessaging.Example
 
                 txtVal = view.FindViewById<EditText> (Resource.Id.txtttl);
                 txtVal.Visibility = ViewStates.Invisible;
+
+                txtauth = view.FindViewById<EditText> (Resource.Id.txtauth);
+                txtauth.Visibility = ViewStates.Invisible;
+
+                lblAuth = view.FindViewById<TextView> (Resource.Id.lblinput1);
+                lblAuth.Visibility = ViewStates.Invisible;
 
                 tbRead = view.FindViewById<ToggleButton> (Resource.Id.tbRead);
                 tbRead.Checked = true;

@@ -137,88 +137,105 @@ namespace PubNubMessaging.Core
             return pubnub.Time<T> (userCallback, errorCallback);
         }
 
-        public void AuditAccess<T> (string channel, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.AuditAccess (channel, userCallback, errorCallback);
-        }
+		public void AuditAccess<T>(string channel, string authenticationKey, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			pubnub.AuditAccess(channel, authenticationKey, userCallback, errorCallback);
+		}
 
-        public void AuditAccess<T> (Action<T> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.AuditAccess<T> (userCallback, errorCallback);
-        }
+		public void AuditAccess<T> (string channel, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			pubnub.AuditAccess (channel, userCallback, errorCallback);
+		}
 
-        public bool GrantAccess<T> (string channel, bool read, bool write, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            return pubnub.GrantAccess<T> (channel, read, write, ttl, userCallback, errorCallback);
-        }
+		public void AuditAccess<T> (Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			pubnub.AuditAccess<T> (userCallback, errorCallback);
+		}
 
-        public bool GrantAccess<T> (string channel, bool read, bool write, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            return pubnub.GrantAccess<T> (channel, read, write, userCallback, errorCallback);
-        }
+		public void AuditPresenceAccess<T>(string channel, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			pubnub.AuditPresenceAccess<T>(channel, userCallback, errorCallback);
+		}
 
-        public void AuditPresenceAccess<T> (string channel, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.AuditPresenceAccess<T> (channel, userCallback, errorCallback);
-        }
+		public void AuditPresenceAccess<T>(string channel, string authenticationKey, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			pubnub.AuditPresenceAccess<T>(channel, authenticationKey, userCallback, errorCallback);
+		}
 
-        public bool GrantPresenceAccess<T> (string channel, bool read, bool write, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            return pubnub.GrantPresenceAccess<T> (channel, read, write, userCallback, errorCallback);
-        }
+		public bool GrantAccess<T> (string channel, bool read, bool write, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			return pubnub.GrantAccess<T> (channel, read, write, ttl, userCallback, errorCallback);
+		}
 
-        public bool GrantPresenceAccess<T> (string channel, bool read, bool write, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            return pubnub.GrantPresenceAccess (channel, read, write, ttl, userCallback, errorCallback);
-        }
+		public bool GrantAccess<T> (string channel, bool read, bool write, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			return pubnub.GrantAccess<T> (channel, read, write, userCallback, errorCallback);
+		}
 
-        public void SetUserState<T>(string channel, string uuid, string jsonUserState, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.SetUserState<T>(channel, uuid, jsonUserState, userCallback, errorCallback);
-        }
+		public bool GrantAccess<T>(string channel, string authenticationKey, bool read, bool write, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			return pubnub.GrantAccess<T>(channel, authenticationKey, read, write, ttl, userCallback, errorCallback);
+		}
 
-        public void SetUserState<T>(string channel, string jsonUserState, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.SetUserState<T>(channel, "", jsonUserState, userCallback, errorCallback);
-        }
+		public bool GrantAccess<T>(string channel, string authenticationKey, bool read, bool write, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			return pubnub.GrantAccess<T>(channel, authenticationKey, read, write, userCallback, errorCallback);
+		}
 
-        public void GetUserState<T>(string channel, string uuid, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.GetUserState<T>(channel, uuid, userCallback, errorCallback);
-        }
+		public bool GrantPresenceAccess<T> (string channel, bool read, bool write, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			return pubnub.GrantPresenceAccess<T> (channel, read, write, userCallback, errorCallback);
+		}
 
-        public void GetUserState<T>(string channel, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.GetUserState<T>(channel, "", userCallback, errorCallback);
-        }
+		public bool GrantPresenceAccess<T>(string channel, bool read, bool write, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			return pubnub.GrantPresenceAccess(channel, read, write, ttl, userCallback, errorCallback);
+		}
 
-        public string SetLocalUserState(string channel, string userStateKey, int userStateValue)
-        {
-            return pubnub.SetLocalUserState(channel, userStateKey, userStateValue);
-        }
+		public bool GrantPresenceAccess<T>(string channel, string authenticationKey, bool read, bool write, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			return pubnub.GrantPresenceAccess<T>(channel, authenticationKey, read, write, userCallback, errorCallback);
+		}
 
-        public string SetLocalUserState(string channel, string userStateKey, double userStateValue)
-        {
-            return pubnub.SetLocalUserState(channel, userStateKey, userStateValue);
-        }
+		public bool GrantPresenceAccess<T>(string channel, string authenticationKey, bool read, bool write, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			return pubnub.GrantPresenceAccess(channel, authenticationKey, read, write, ttl, userCallback, errorCallback);
+		}
 
-        public string SetLocalUserState(string channel, string userStateKey, string userStateValue)
-        {
-            return pubnub.SetLocalUserState(channel, userStateKey, userStateValue);
-        }
+		public void SetUserState<T>(string channel, string uuid, string jsonUserState, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			pubnub.SetUserState<T>(channel, uuid, jsonUserState, userCallback, errorCallback);
+		}
 
-        public string GetLocalUserState(string channel)
-        {
-            return pubnub.GetLocalUserState(channel);
-        }
+		public void SetUserState<T>(string channel, string jsonUserState, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			pubnub.SetUserState<T>(channel,"", jsonUserState, userCallback, errorCallback);
+		}
 
-        public string GetLocalUserState(string[] channels)
-        {
-            return pubnub.GetLocalUserState(channels);
-        }
+		public void SetUserState<T>(string channel, string uuid, System.Collections.Generic.KeyValuePair<string, object> keyValuePair, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			pubnub.SetUserState<T>(channel, uuid, keyValuePair, userCallback, errorCallback);
+		}
+
+		public void SetUserState<T>(string channel, System.Collections.Generic.KeyValuePair<string, object> keyValuePair, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			pubnub.SetUserState<T>(channel, "", keyValuePair, userCallback, errorCallback);
+		}
+
+		public void GetUserState<T>(string channel, string uuid, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			pubnub.GetUserState<T>(channel, uuid, userCallback, errorCallback);
+		}
+
+		public void GetUserState<T>(string channel, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			pubnub.GetUserState<T>(channel, "", userCallback, errorCallback);
+		}
+
         #endregion
 
         #region "PubNub API Other Methods"
+
         public void TerminateCurrentSubscriberRequest ()
         {
             pubnub.TerminateCurrentSubscriberRequest ();

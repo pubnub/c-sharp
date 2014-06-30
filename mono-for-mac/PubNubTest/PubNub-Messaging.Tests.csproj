@@ -47,22 +47,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="EncryptionTests.cs" />
-    <Compile Include="WhenAMessageIsPublished.cs" />
     <Compile Include="Common.cs" />
     <Compile Include="PubnubUnitTest.cs" />
-    <Compile Include="WhenSubscribedToAChannel.cs" />
+    <Compile Include="PubnubCommon.cs" />
     <Compile Include="WhenAClientIsPresented.cs" />
-    <Compile Include="WhenDetailedHistoryIsRequested.cs" />
-    <Compile Include="WhenGetRequestServerTime.cs" />
     <Compile Include="WhenUnsubscribedToAChannel.cs" />
+    <Compile Include="WhenGetRequestServerTime.cs" />
+    <Compile Include="WhenAMessageIsPublished.cs" />
     <Compile Include="CleanupGrant.cs" />
-    <Compile Include="GenerateSampleGrant.cs" />
+    <Compile Include="EncryptionTests.cs" />
     <Compile Include="WhenAuditIsRequested.cs" />
     <Compile Include="WhenGrantIsRequested.cs" />
-    <Compile Include="PubnubCommon.cs" />
-    <Compile Include="WhenSubscribedToAChannel2.cs" />
+    <Compile Include="GenerateSampleGrant.cs" />
     <Compile Include="WhenSubscribedToAChannel3.cs" />
+    <Compile Include="WhenSubscribedToAChannel2.cs" />
+    <Compile Include="WhenSubscribedToAChannel.cs" />
+    <Compile Include="WhenDetailedHistoryIsRequested.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

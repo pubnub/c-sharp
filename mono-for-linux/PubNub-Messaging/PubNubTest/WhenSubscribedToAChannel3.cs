@@ -14,8 +14,11 @@ namespace PubNubMessaging.Tests
     {
         void SubscribePublishAndParse (string message, Pubnub pubnub, Common common, string channel)
         {
+            Random r = new Random();
+            channel = "hello_world_sub" + r.Next(1000);
+
             pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
-            Thread.Sleep (1500);
+            Thread.Sleep (5000);
 
             pubnub.Publish (channel, message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
 
@@ -31,6 +34,14 @@ namespace PubNubMessaging.Tests
             } else {
                 Assert.Fail ("No response");
             }
+            common.DeliveryStatus = false;
+            common.Response = null;
+
+            pubnub.Unsubscribe<string>(channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+
+            common.WaitForResponse(20);
+
+            pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -88,7 +99,7 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
 
-            string message = "";
+			string message = "Text with /";
 
             SubscribePublishAndParse (message, pubnub, common, channel);
         }
