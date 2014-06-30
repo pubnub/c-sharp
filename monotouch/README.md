@@ -4,9 +4,9 @@
 For a quick video walkthrough, checkout https://vimeo.com/55630516 !
 
 ### Important Change from previous version
-UserState method parameters have been modified.
-PAM auth method parameters have been modified.
-Implements the features of Pubnub 3.6
+- UserState method parameters have been modified.
+- PAM auth method parameters have been modified.
+- Implements the features of Pubnub 3.6
 
 ### Instructions
 Open Pubnub-Messaging/PubNub-Messaging.csproj. Run the project in the simulator to see a working example. The main functionality lies in the pubnub.cs file.
