@@ -6,10 +6,13 @@ We've made a [screencast](https://vimeo.com/69591819) that will walk you through
 After checking out the general setup video, [For iOS targets](https://vimeo.com/71549964) be sure to view this walkthrough next. Check it out!
 
 ### Important Change from previous version
+UserState method parameters have been modified.
+PAM auth method parameters have been modified.
+Implements the features of Pubnub 3.6
 Error Callback parameter is being introduced in all operation/non-operation methods of C# Core Pubnub.cs file. 
 If you had been using a previous version, your application might break due to signature difference.
 Removes the dependency of .NET sockets.
-Implements the features of Pubnub 3.6
+
 
 WE have modified the JsonFX pre processor directives: Now we have 3: 
 
@@ -62,15 +65,15 @@ There are 2 versions of Unity-iOS code (iOS and iOS-MiniJson). The code under th
 
 #### Running the Demo App on PC
 
-Please use the folder Standalone (Windows) and refer to the ReadMe in it.
+Please use the folder [Windows-Standalone](Windows-Standalone) and refer to the ReadMe in it.
 
 #### Running the Demo App on Mac, Linux and Android
 
-Please use the folder Standalone (Mac and Linux), Android and refer to the ReadMe in it.
+Please use the folder [Mac-Linux-Android-Standalone](Mac-Linux-Android-Standalone) and refer to the ReadMe in it.
 
 #### Running the Demo App on iOS
 
-Please use the folder iOS and refer to the ReadMe in it.
+Please use the folder [iOS](iOS) or [iOS-MiniJson](iOS-MiniJson) and refer to the ReadMe in it.
 
 #### Potential Errors and their resolutions:
 

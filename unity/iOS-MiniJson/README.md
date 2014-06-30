@@ -6,10 +6,12 @@ We've made a [screencast](https://vimeo.com/69591819) that will walk you through
 After checking out the general setup video, [For iOS targets](https://vimeo.com/71549964) be sure to view this walkthrough next. Check it out!
 
 ### Important Change from previous version
+UserState method parameters have been modified.
+PAM auth method parameters have been modified.
+Implements the features of Pubnub 3.6
 Error Callback parameter is being introduced in all operation/non-operation methods of C# Core Pubnub.cs file. 
 If you had been using a previous version, your application might break due to signature difference.
 Removes the dependency of .NET sockets.
-Implements the features of Pubnub 3.6
 
 WE have modified the JsonFX pre processor directives: Now we have 3. 
 - `USE_JSONFX_UNITY` is for `UNITY_STANDALONE` or `UNITY_WEBPLAYER` or `UNITY_ANDROID`
@@ -62,7 +64,7 @@ USE_JSONFX_FOR_UNITY with USE_JSONFX_UNITY_IOS
    
 #### iOS (requires Xcode to be installed)
 
-1. Open up the Unity Project from iOS\PubnubUnity folder present in the PubNub github repo.
+1. Open up the Unity Project from iOS-MiniJson\PubnubUnity folder present in the PubNub github repo.
 2. Ensure "Pubnub Example" is added as component to Main Camera.
 3. Goto File menu -> Build Settings.
 4. In the dialog the opens select iOS under the platform and click "Switch Platform".
@@ -73,7 +75,7 @@ USE_JSONFX_FOR_UNITY with USE_JSONFX_UNITY_IOS
 
 #### Running the Tests
 
-1. Open up the Unity Project from iOS folder.
+1. Open up the Unity Project from iOS-MiniJson folder.
 2. From the "Unity test tools" menu select the "Unit test runner" option.
 3. Run the tests by clicking the "play" button or by selecting the individual tests.
 

@@ -6,10 +6,12 @@ We've made a [screencast](https://vimeo.com/69591819) that will walk you through
 After checking out the general setup video, [For iOS targets](https://vimeo.com/71549964) be sure to view this walkthrough next. Check it out!
 
 ### Important Change from previous version
+UserState method parameters have been modified.
+PAM auth method parameters have been modified.
+Implements the features of Pubnub 3.6
 Error Callback parameter is being introduced in all operation/non-operation methods of C# Core Pubnub.cs file. 
 If you had been using a previous version, your application might break due to signature difference.
 Removes the dependency of .NET sockets.
-Implements the features of Pubnub 3.6
 
 WE have modified the JsonFX pre processor directives: Now we have 3. 
 - `USE_JSONFX_UNITY` is for `UNITY_STANDALONE` or `UNITY_WEBPLAYER` or `UNITY_ANDROID`
