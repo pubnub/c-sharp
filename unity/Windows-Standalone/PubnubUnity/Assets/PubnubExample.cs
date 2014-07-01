@@ -264,10 +264,10 @@ public class PubnubExample : MonoBehaviour
 								title = "Delete User Statue";
 								textWindowRect2 = GUI.ModalWindow (0, textWindowRect2, DoTextWindow, title);
 						} else if (state == PubnubState.SetUserStateJson){
-								title = "Set User State using Key-Value pair";
+								title = "Set User State using Json";
 								textWindowRect = GUI.ModalWindow (0, textWindowRect, DoTextWindow, title);
 						} else if (state == PubnubState.SetUserStateKeyValue){
-								title = "Set User State using Json";
+								title = "Set User State using Key-Value pair";
 								textWindowRect = GUI.ModalWindow (0, textWindowRect, DoTextWindow, title);
 						}
 
