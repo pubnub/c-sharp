@@ -255,56 +255,62 @@ namespace PubNubMessaging.Example
 		public partial class String
 		{
 			
-			// aapt resource value: 0x7f040034
-			public const int addUserState = 2130968628;
+			// aapt resource value: 0x7f040036
+			public const int addUserState = 2130968630;
 			
 			// aapt resource value: 0x7f04001d
 			public const int app_name = 2130968605;
 			
-			// aapt resource value: 0x7f04002d
-			public const int auth = 2130968621;
+			// aapt resource value: 0x7f04002e
+			public const int auth = 2130968622;
 			
 			// aapt resource value: 0x7f04002a
 			public const int authkey = 2130968618;
 			
-			// aapt resource value: 0x7f040046
-			public const int btnChangeUuid = 2130968646;
-			
-			// aapt resource value: 0x7f040038
-			public const int btnDelUserStateAndExit = 2130968632;
-			
-			// aapt resource value: 0x7f040039
-			public const int btnDelUserStateAndMore = 2130968633;
-			
-			// aapt resource value: 0x7f04003a
-			public const int btnGetUserState = 2130968634;
-			
-			// aapt resource value: 0x7f04003f
-			public const int btnGlobalHereNow = 2130968639;
-			
-			// aapt resource value: 0x7f040036
-			public const int btnSaveUserStateAndAddMore = 2130968630;
-			
-			// aapt resource value: 0x7f040035
-			public const int btnSaveUserStateAndExit = 2130968629;
-			
-			// aapt resource value: 0x7f04003c
-			public const int btnSetUserState = 2130968636;
-			
-			// aapt resource value: 0x7f04003b
-			public const int btnUserStateInst = 2130968635;
+			// aapt resource value: 0x7f04002b
+			public const int authkeyopt = 2130968619;
 			
 			// aapt resource value: 0x7f04002f
-			public const int btnWhereNow = 2130968623;
+			public const int authopt = 2130968623;
+			
+			// aapt resource value: 0x7f040048
+			public const int btnChangeUuid = 2130968648;
+			
+			// aapt resource value: 0x7f04003a
+			public const int btnDelUserStateAndExit = 2130968634;
+			
+			// aapt resource value: 0x7f04003b
+			public const int btnDelUserStateAndMore = 2130968635;
+			
+			// aapt resource value: 0x7f04003c
+			public const int btnGetUserState = 2130968636;
+			
+			// aapt resource value: 0x7f040041
+			public const int btnGlobalHereNow = 2130968641;
+			
+			// aapt resource value: 0x7f040038
+			public const int btnSaveUserStateAndAddMore = 2130968632;
+			
+			// aapt resource value: 0x7f040037
+			public const int btnSaveUserStateAndExit = 2130968631;
+			
+			// aapt resource value: 0x7f04003e
+			public const int btnSetUserState = 2130968638;
+			
+			// aapt resource value: 0x7f04003d
+			public const int btnUserStateInst = 2130968637;
+			
+			// aapt resource value: 0x7f040031
+			public const int btnWhereNow = 2130968625;
+			
+			// aapt resource value: 0x7f04002d
+			public const int btncancel = 2130968621;
 			
 			// aapt resource value: 0x7f04002c
-			public const int btncancel = 2130968620;
+			public const int btngrant = 2130968620;
 			
-			// aapt resource value: 0x7f04002b
-			public const int btngrant = 2130968619;
-			
-			// aapt resource value: 0x7f04002e
-			public const int btnset = 2130968622;
+			// aapt resource value: 0x7f040030
+			public const int btnset = 2130968624;
 			
 			// aapt resource value: 0x7f04000d
 			public const int cancel = 2130968589;
@@ -321,8 +327,8 @@ namespace PubNubMessaging.Example
 			// aapt resource value: 0x7f040001
 			public const int customUuid = 2130968577;
 			
-			// aapt resource value: 0x7f040037
-			public const int deleteUserState = 2130968631;
+			// aapt resource value: 0x7f040039
+			public const int deleteUserState = 2130968633;
 			
 			// aapt resource value: 0x7f040013
 			public const int detailedHistory = 2130968595;
@@ -339,23 +345,23 @@ namespace PubNubMessaging.Example
 			// aapt resource value: 0x7f040018
 			public const int enablessl = 2130968600;
 			
-			// aapt resource value: 0x7f040031
-			public const int enterHeartbeatInterval = 2130968625;
-			
-			// aapt resource value: 0x7f040030
-			public const int enterHeartbeatTime = 2130968624;
+			// aapt resource value: 0x7f040033
+			public const int enterHeartbeatInterval = 2130968627;
 			
 			// aapt resource value: 0x7f040032
-			public const int enterUserStateKey = 2130968626;
+			public const int enterHeartbeatTime = 2130968626;
 			
-			// aapt resource value: 0x7f040033
-			public const int enterUserStateValue = 2130968627;
+			// aapt resource value: 0x7f040034
+			public const int enterUserStateKey = 2130968628;
 			
-			// aapt resource value: 0x7f040045
-			public const int enterUuid = 2130968645;
+			// aapt resource value: 0x7f040035
+			public const int enterUserStateValue = 2130968629;
 			
-			// aapt resource value: 0x7f040041
-			public const int globalHereNow = 2130968641;
+			// aapt resource value: 0x7f040047
+			public const int enterUuid = 2130968647;
+			
+			// aapt resource value: 0x7f040043
+			public const int globalHereNow = 2130968643;
 			
 			// aapt resource value: 0x7f040024
 			public const int grant = 2130968612;
@@ -366,8 +372,8 @@ namespace PubNubMessaging.Example
 			// aapt resource value: 0x7f040026
 			public const int grantwrite = 2130968614;
 			
-			// aapt resource value: 0x7f040040
-			public const int hereNow = 2130968640;
+			// aapt resource value: 0x7f040042
+			public const int hereNow = 2130968642;
 			
 			// aapt resource value: 0x7f040012
 			public const int herenow = 2130968594;
@@ -390,8 +396,8 @@ namespace PubNubMessaging.Example
 			// aapt resource value: 0x7f040027
 			public const int on = 2130968615;
 			
-			// aapt resource value: 0x7f04003d
-			public const int optional = 2130968637;
+			// aapt resource value: 0x7f04003f
+			public const int optional = 2130968639;
 			
 			// aapt resource value: 0x7f040011
 			public const int presence = 2130968593;
@@ -429,11 +435,11 @@ namespace PubNubMessaging.Example
 			// aapt resource value: 0x7f040004
 			public const int setProxy = 2130968580;
 			
-			// aapt resource value: 0x7f040043
-			public const int showUserState = 2130968643;
+			// aapt resource value: 0x7f040045
+			public const int showUserState = 2130968645;
 			
-			// aapt resource value: 0x7f040042
-			public const int showUuid = 2130968642;
+			// aapt resource value: 0x7f040044
+			public const int showUuid = 2130968644;
 			
 			// aapt resource value: 0x7f04001a
 			public const int sslOff = 2130968602;
@@ -462,11 +468,11 @@ namespace PubNubMessaging.Example
 			// aapt resource value: 0x7f040016
 			public const int unsubscribePres = 2130968598;
 			
-			// aapt resource value: 0x7f040044
-			public const int uuid = 2130968644;
+			// aapt resource value: 0x7f040046
+			public const int uuid = 2130968646;
 			
-			// aapt resource value: 0x7f04003e
-			public const int whereNow = 2130968638;
+			// aapt resource value: 0x7f040040
+			public const int whereNow = 2130968640;
 			
 			static String()
 			{

@@ -1,5 +1,5 @@
 //ver3.6
-//Build Date: Apr 7, 2014
+//Build Date: Jun 27, 2014
 //#define USE_JSONFX
 using System;
 using System.Text;
@@ -22,7 +22,7 @@ namespace PubNubMessaging.Core
 
         #region "Constants and Globals"
 
-        const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Error;
+		const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Info;
         const PubnubErrorFilter.Level errorLevel = PubnubErrorFilter.Level.Info;
         protected bool pubnubEnableProxyConfig = true;
         protected string _domainName = "pubsub.pubnub.com";
@@ -673,7 +673,7 @@ namespace PubNubMessaging.Core
                            System.Security.Cryptography.X509Certificates.X509Chain chain,
                            System.Net.Security.SslPolicyErrors sslPolicyErrors)
         {
-            var sslTrustManager = (IX509TrustManager)typeof(AndroidEnvironment)
+			/*var sslTrustManager = (IX509TrustManager)typeof(AndroidEnvironment)
 					.GetField ("sslTrustManager",
                                System.Reflection.BindingFlags.NonPublic |
                                System.Reflection.BindingFlags.Static)
@@ -704,7 +704,8 @@ namespace PubNubMessaging.Core
                 return true;
             } catch (Exception e) {
                 throw new Exception ("SSL error");
-            }
+            }*/
+			return true;
         }
         #endif
         #endregion
@@ -745,7 +746,7 @@ namespace PubNubMessaging.Core
         protected override HttpWebRequest SetUserAgent (HttpWebRequest req, bool keepAliveRequest, OperatingSystem userOS)
         {
             req.KeepAlive = keepAliveRequest;
-            req.UserAgent = string.Format ("ua_string=({0}) PubNub-csharp/3.5", userOS.VersionString);
+			req.UserAgent = string.Format ("ua_string=({0}) PubNub-csharp/3.6", userOS.VersionString);
             return req;
         }
 

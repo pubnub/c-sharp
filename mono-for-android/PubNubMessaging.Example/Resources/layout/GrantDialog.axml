@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="200dp"
-    android:layout_height="170dp"
+    android:layout_height="200dp"
     android:padding="2dip"
     android:background="#FFF"
     android:stretchColumns="*">
@@ -57,6 +57,24 @@
         android:background="#000">
         <TextView
             android:layout_column="0"
+            android:text="@string/authkeyopt"
+            android:id="@+id/lblinput1"
+            android:gravity="center_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+        <EditText
+            android:padding="2dp"
+            android:layout_column="1"
+            android:id="@+id/txtauth"
+            android:background="#FFF"
+            android:layout_width="75dp"
+            android:layout_height="wrap_content" />
+    </TableRow>
+    <TableRow
+        android:background="#000">
+        <TextView
+            android:layout_column="0"
             android:text="@string/ttl"
             android:id="@+id/lblGrant3"
             android:gravity="center_horizontal"
@@ -64,11 +82,12 @@
             android:layout_height="wrap_content"
             android:layout_weight="1" />
         <EditText
+            android:padding="2dp"
             android:layout_column="1"
             android:id="@+id/txtttl"
             android:inputType="number"
             android:background="#FFF"
-            android:layout_width="wrap_content"
+            android:layout_width="75dp"
             android:layout_height="wrap_content" />
     </TableRow>
     <TableRow

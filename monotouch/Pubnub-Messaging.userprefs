@@ -1,15 +1,10 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhone" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneDeviceTarget.Iph" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="PubnubMessagingExample/Pubnub_MessagingMain.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhoneRetina.7.1" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="PubnubMessagingExample/Pubnub_MessagingSub.cs">
     <Files>
-      <File FileName="../../../Xamarin.Android/3.5/Pubnub-Messaging/PubNubMessaging.Example/MainActivity.cs" Line="589" Column="33" />
-      <File FileName="PubnubMessaging.Tests/WhenAClientIsPresented.cs" Line="1" Column="1" />
-      <File FileName="PubnubMessaging.Tests/WhenSubscribedToAChannel3.cs" Line="1" Column="1" />
-      <File FileName="PubnubMessaging.Tests/WhenDetailedHistoryIsRequested.cs" Line="1" Column="1" />
-      <File FileName="PubnubMessaging.Tests/Common.cs" Line="1" Column="1" />
-      <File FileName="PubnubMessaging.Tests/WhenSubscribedToAChannel.cs" Line="1" Column="1" />
-      <File FileName="PubnubMessagingExample/Pubnub_MessagingMain.cs" Line="168" Column="46" />
-      <File FileName="PubnubMessaging/PubnubCore.cs" Line="1763" Column="1" />
+      <File FileName="PubnubMessagingExample/Pubnub_MessagingSub.cs" Line="348" Column="10" />
+      <File FileName="PubnubMessaging/ClientNetworkStatus.cs" Line="1" Column="1" />
+      <File FileName="../../Xamarin.Android/latest/PubNubMessaging.Example/MainActivity.cs" Line="633" Column="40" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
@@ -18,10 +13,10 @@
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <MonoDevelop.Ide.ItemProperties.PubnubMessagingExample>
-    <MonoDevelop.MacDev.AppleDevelopmentTeam DeveloperId="NK6E38LY64" TeamId="Y9X42V6EK7" />
-  </MonoDevelop.Ide.ItemProperties.PubnubMessagingExample>
   <MonoDevelop.Ide.ItemProperties.Touch.Unit>
     <MonoDevelop.MacDev.AppleDevelopmentTeam DeveloperId="NK6E38LY64" TeamId="Y9X42V6EK7" />
   </MonoDevelop.Ide.ItemProperties.Touch.Unit>
+  <MonoDevelop.Ide.ItemProperties.PubnubMessagingExample>
+    <MonoDevelop.MacDev.AppleDevelopmentTeam DeveloperId="NK6E38LY64" TeamId="Y9X42V6EK7" />
+  </MonoDevelop.Ide.ItemProperties.PubnubMessagingExample>
 </Properties>

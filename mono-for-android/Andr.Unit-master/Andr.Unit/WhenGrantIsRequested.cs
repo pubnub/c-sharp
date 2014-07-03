@@ -44,7 +44,7 @@ namespace PubNubMessaging.Tests
 
                 grantManualEvent.WaitOne();
 
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithReadWriteShouldReturnSuccess failed.");
+                Assert.True(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithReadWriteShouldReturnSuccess failed.");
             }
             else
             {
@@ -72,7 +72,7 @@ namespace PubNubMessaging.Tests
 
                 grantManualEvent.WaitOne();
 
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithReadShouldReturnSuccess failed.");
+                Assert.True(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithReadShouldReturnSuccess failed.");
             }
             else
             {
@@ -100,7 +100,7 @@ namespace PubNubMessaging.Tests
 
                 grantManualEvent.WaitOne();
 
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithWriteShouldReturnSuccess failed.");
+                Assert.True(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithWriteShouldReturnSuccess failed.");
             }
             else
             {
@@ -130,7 +130,7 @@ namespace PubNubMessaging.Tests
 
                 grantManualEvent.WaitOne();
 
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithReadWriteShouldReturnSuccess failed.");
+                Assert.True(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithReadWriteShouldReturnSuccess failed.");
             }
             else
             {
@@ -160,7 +160,7 @@ namespace PubNubMessaging.Tests
 
                 grantManualEvent.WaitOne();
 
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithReadShouldReturnSuccess failed.");
+                Assert.True(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithReadShouldReturnSuccess failed.");
             }
             else
             {
@@ -190,7 +190,7 @@ namespace PubNubMessaging.Tests
 
                 grantManualEvent.WaitOne();
 
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithWriteShouldReturnSuccess failed.");
+                Assert.True(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithWriteShouldReturnSuccess failed.");
             }
             else
             {
@@ -216,13 +216,12 @@ namespace PubNubMessaging.Tests
             string authKey = "hello_my_authkey";
             if (PubnubCommon.PAMEnabled)
             {
-                pubnub.AuthenticationKey = authKey;
-                pubnub.GrantAccess<string>(channel, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                pubnub.GrantAccess<string>(channel, authKey, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
 
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadWriteShouldReturnSuccess failed.");
+                Assert.True(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadWriteShouldReturnSuccess failed.");
             }
             else
             {
@@ -248,13 +247,12 @@ namespace PubNubMessaging.Tests
             string authKey = "hello_my_authkey";
             if (PubnubCommon.PAMEnabled)
             {
-                pubnub.AuthenticationKey = authKey;
-                pubnub.GrantAccess<string>(channel, true, false, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                pubnub.GrantAccess<string>(channel, authKey, true, false, 5, AccessToUserLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
 
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadShouldReturnSuccess failed.");
+                Assert.True(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadShouldReturnSuccess failed.");
             }
             else
             {
@@ -280,13 +278,12 @@ namespace PubNubMessaging.Tests
             string authKey = "hello_my_authkey";
             if (PubnubCommon.PAMEnabled)
             {
-                pubnub.AuthenticationKey = authKey;
-                pubnub.GrantAccess<string>(channel, false, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                pubnub.GrantAccess<string>(channel, authKey, false, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
 
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithWriteShouldReturnSuccess failed.");
+                Assert.True(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithWriteShouldReturnSuccess failed.");
             }
             else
             {
@@ -337,7 +334,7 @@ namespace PubNubMessaging.Tests
 
                 grantManualEvent.WaitOne();
 
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenMultipleChannelGrantShouldReturnSuccess failed.");
+                Assert.True(receivedGrantMessage, "WhenGrantIsRequested -> ThenMultipleChannelGrantShouldReturnSuccess failed.");
             }
             else
             {
@@ -384,13 +381,12 @@ namespace PubNubMessaging.Tests
             }
             if (PubnubCommon.PAMEnabled)
             {
-                pubnub.AuthenticationKey = auth;
-                pubnub.GrantAccess<string>(channel, true, true, 5, AccessToMultiAuthGrantCallback, DummyErrorCallback);
+                pubnub.GrantAccess<string>(channel, auth, true, true, 5, AccessToMultiAuthGrantCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
 
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenMultipleAuthGrantShouldReturnSuccess failed.");
+                Assert.True(receivedGrantMessage, "WhenGrantIsRequested -> ThenMultipleAuthGrantShouldReturnSuccess failed.");
             }
             else
             {
@@ -430,11 +426,11 @@ namespace PubNubMessaging.Tests
                     pubnub.GrantAccess<string>("", false, false, 5, RevokeToSubKeyLevelCallback, DummyErrorCallback);
                     Thread.Sleep(1000);
                     revokeManualEvent.WaitOne();
-                    Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess -> Grant success but revoke failed.");
+                    Assert.True(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess -> Grant success but revoke failed.");
                 }
                 else
                 {
-                    Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess failed. -> Grant not occured, so is revoke");
+                    Assert.True(receivedGrantMessage, "WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess failed. -> Grant not occured, so is revoke");
                 }
             }
             else
@@ -477,11 +473,11 @@ namespace PubNubMessaging.Tests
                     pubnub.GrantAccess<string>("", false, false, 5, RevokeToChannelLevelCallback, DummyErrorCallback);
                     Thread.Sleep(1000);
                     revokeManualEvent.WaitOne();
-                    Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess -> Grant success but revoke failed.");
+                    Assert.True(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess -> Grant success but revoke failed.");
                 }
                 else
                 {
-                    Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess failed. -> Grant not occured, so is revoke");
+                    Assert.True(receivedGrantMessage, "WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess failed. -> Grant not occured, so is revoke");
                 }
             }
             else
@@ -511,8 +507,7 @@ namespace PubNubMessaging.Tests
             {
                 if (!unitTest.EnableStubTest)
                 {
-                    pubnub.AuthenticationKey = authKey;
-                    pubnub.GrantAccess<string>(channel, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                    pubnub.GrantAccess<string>(channel, authKey, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
                     Thread.Sleep(1000);
                     grantManualEvent.WaitOne();
                 }
@@ -523,14 +518,14 @@ namespace PubNubMessaging.Tests
                 if (receivedGrantMessage)
                 {
                     Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant ok..Now trying Revoke");
-                    pubnub.GrantAccess<string>("", false, false, 5, RevokeToUserLevelCallback, DummyErrorCallback);
+                    pubnub.GrantAccess<string>("", authKey, false, false, 5, RevokeToUserLevelCallback, DummyErrorCallback);
                     Thread.Sleep(1000);
                     revokeManualEvent.WaitOne();
-                    Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant success but revoke failed.");
+                    Assert.True(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant success but revoke failed.");
                 }
                 else
                 {
-                    Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess failed. -> Grant not occured, so is revoke");
+                    Assert.True(receivedGrantMessage, "WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess failed. -> Grant not occured, so is revoke");
                 }
             }
             else
@@ -641,7 +636,7 @@ namespace PubNubMessaging.Tests
                     }
                 }
             }
-            catch { }
+            catch (Exception ex) { Console.WriteLine ("AccessToChannelLevelCallback:" + ex.ToString()); }
             finally
             {
                 grantManualEvent.Set();
@@ -713,7 +708,7 @@ namespace PubNubMessaging.Tests
                     }
                 }
             }
-            catch { }
+            catch (Exception ex) { Console.WriteLine ("AccessToUserLevelCallback:" + ex.ToString()); }
             finally
             {
                 grantManualEvent.Set();
@@ -962,7 +957,9 @@ namespace PubNubMessaging.Tests
 
         private void DummyErrorCallback(PubnubClientError result)
         {
-
+            System.Diagnostics.Debug.WriteLine (result.Description);
+            if(result.IsDotNetException)
+                System.Diagnostics.Debug.WriteLine (result.DetailedDotNetException);
         }
 
     }

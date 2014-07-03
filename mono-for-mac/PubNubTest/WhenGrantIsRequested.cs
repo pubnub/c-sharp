@@ -15,6 +15,7 @@ namespace PubNubMessaging.Tests
     [TestFixture]
     public class WhenGrantIsRequested
     {
+
         ManualResetEvent grantManualEvent = new ManualResetEvent(false);
         ManualResetEvent revokeManualEvent = new ManualResetEvent(false);
         bool receivedGrantMessage = false;
@@ -37,17 +38,18 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "ThenSubKeyLevelWithReadWriteShouldReturnSuccess";
             pubnub.PubnubUnitTest = unitTest;
             if (PubnubCommon.PAMEnabled)
-                {
-                    pubnub.GrantAccess<string>("", true, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
+            {
+                pubnub.GrantAccess<string>("", true, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
+                Thread.Sleep(1000);
 
-                    grantManualEvent.WaitOne();
+                grantManualEvent.WaitOne();
 
-                    Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithReadWriteShouldReturnSuccess failed.");
-                } else
-                {
-                    Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithReadWriteShouldReturnSuccess.");
-                }
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithReadWriteShouldReturnSuccess failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithReadWriteShouldReturnSuccess.");
+            }
         }
 
         [Test]
@@ -64,17 +66,18 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "ThenSubKeyLevelWithReadShouldReturnSuccess";
             pubnub.PubnubUnitTest = unitTest;
             if (PubnubCommon.PAMEnabled)
-                {
-                    pubnub.GrantAccess<string>("", true, false, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
+            {
+                pubnub.GrantAccess<string>("", true, false, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
+                Thread.Sleep(1000);
 
-                    grantManualEvent.WaitOne();
+                grantManualEvent.WaitOne();
 
-                    Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithReadShouldReturnSuccess failed.");
-                } else
-                {
-                    Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithReadShouldReturnSuccess.");
-                }
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithReadShouldReturnSuccess failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithReadShouldReturnSuccess.");
+            }
         }
 
         [Test]
@@ -91,17 +94,18 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "ThenSubKeyLevelWithWriteShouldReturnSuccess";
             pubnub.PubnubUnitTest = unitTest;
             if (PubnubCommon.PAMEnabled)
-                {
-                    pubnub.GrantAccess<string>("", false, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
+            {
+                pubnub.GrantAccess<string>("", false, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
+                Thread.Sleep(1000);
 
-                    grantManualEvent.WaitOne();
+                grantManualEvent.WaitOne();
 
-                    Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithWriteShouldReturnSuccess failed.");
-                } else
-                {
-                    Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithWriteShouldReturnSuccess.");
-                }
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithWriteShouldReturnSuccess failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithWriteShouldReturnSuccess.");
+            }
         }
 
         [Test]
@@ -120,17 +124,18 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
             if (PubnubCommon.PAMEnabled)
-                {
-                    pubnub.GrantAccess<string>(channel, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
+            {
+                pubnub.GrantAccess<string>(channel, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                Thread.Sleep(1000);
 
-                    grantManualEvent.WaitOne();
+                grantManualEvent.WaitOne();
 
-                    Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithReadWriteShouldReturnSuccess failed.");
-                } else
-                {
-                    Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithReadWriteShouldReturnSuccess.");
-                }
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithReadWriteShouldReturnSuccess failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithReadWriteShouldReturnSuccess.");
+            }
         }
 
         [Test]
@@ -149,17 +154,18 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
             if (PubnubCommon.PAMEnabled)
-                {
-                    pubnub.GrantAccess<string>(channel, true, false, 5, AccessToChannelLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
+            {
+                pubnub.GrantAccess<string>(channel, true, false, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                Thread.Sleep(1000);
 
-                    grantManualEvent.WaitOne();
+                grantManualEvent.WaitOne();
 
-                    Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithReadShouldReturnSuccess failed.");
-                } else
-                {
-                    Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithReadShouldReturnSuccess.");
-                }
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithReadShouldReturnSuccess failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithReadShouldReturnSuccess.");
+            }
         }
 
         [Test]
@@ -178,17 +184,18 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
             if (PubnubCommon.PAMEnabled)
-                {
-                    pubnub.GrantAccess<string>(channel, false, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
+            {
+                pubnub.GrantAccess<string>(channel, false, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                Thread.Sleep(1000);
 
-                    grantManualEvent.WaitOne();
+                grantManualEvent.WaitOne();
 
-                    Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithWriteShouldReturnSuccess failed.");
-                } else
-                {
-                    Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithWriteShouldReturnSuccess.");
-                }
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithWriteShouldReturnSuccess failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithWriteShouldReturnSuccess.");
+            }
         }
 
         [Test]
@@ -208,18 +215,18 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_authchannel";
             string authKey = "hello_my_authkey";
             if (PubnubCommon.PAMEnabled)
-                {
-                    pubnub.AuthenticationKey = authKey;
-                    pubnub.GrantAccess<string>(channel, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
+            {
+                pubnub.GrantAccess<string>(channel, authKey, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                Thread.Sleep(1000);
 
-                    grantManualEvent.WaitOne();
+                grantManualEvent.WaitOne();
 
-                    Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadWriteShouldReturnSuccess failed.");
-                } else
-                {
-                    Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenUserLevelWithReadWriteShouldReturnSuccess.");
-                }
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadWriteShouldReturnSuccess failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenUserLevelWithReadWriteShouldReturnSuccess.");
+            }
         }
 
         [Test]
@@ -239,18 +246,18 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_authchannel";
             string authKey = "hello_my_authkey";
             if (PubnubCommon.PAMEnabled)
-                {
-                    pubnub.AuthenticationKey = authKey;
-                    pubnub.GrantAccess<string>(channel, true, false, 5, AccessToUserLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
+            {
+                pubnub.GrantAccess<string>(channel, authKey, true, false, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                Thread.Sleep(1000);
 
-                    grantManualEvent.WaitOne();
+                grantManualEvent.WaitOne();
 
-                    Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadShouldReturnSuccess failed.");
-                } else
-                {
-                    Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenUserLevelWithReadShouldReturnSuccess.");
-                }
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadShouldReturnSuccess failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenUserLevelWithReadShouldReturnSuccess.");
+            }
         }
 
         [Test]
@@ -270,18 +277,18 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_authchannel";
             string authKey = "hello_my_authkey";
             if (PubnubCommon.PAMEnabled)
-                {
-                    pubnub.AuthenticationKey = authKey;
-                    pubnub.GrantAccess<string>(channel, false, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
+            {
+                pubnub.GrantAccess<string>(channel, authKey, false, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                Thread.Sleep(1000);
 
-                    grantManualEvent.WaitOne();
+                grantManualEvent.WaitOne();
 
-                    Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithWriteShouldReturnSuccess failed.");
-                } else
-                {
-                    Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenUserLevelWithWriteShouldReturnSuccess.");
-                }
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithWriteShouldReturnSuccess failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenUserLevelWithWriteShouldReturnSuccess.");
+            }
         }
 
         [Test]
@@ -300,36 +307,39 @@ namespace PubNubMessaging.Tests
 
             StringBuilder channelBuilder = new StringBuilder();
             for (int index = 0; index < multipleChannelGrantCount; index++)
+            {
+                if (index == multipleChannelGrantCount - 1)
                 {
-                    if (index == multipleChannelGrantCount - 1)
-                        {
-                            channelBuilder.AppendFormat("csharp-hello_my_channel-{0}", index);
-                        } else
-                        {
-                            channelBuilder.AppendFormat("csharp-hello_my_channel-{0},", index);
-                        }
+                    channelBuilder.AppendFormat("csharp-hello_my_channel-{0}", index);
                 }
+                else
+                {
+                    channelBuilder.AppendFormat("csharp-hello_my_channel-{0},", index);
+                }
+            }
             string channel = "";
             if (!unitTest.EnableStubTest)
-                {
-                    channel = channelBuilder.ToString();
-                } else
-                {
-                    multipleChannelGrantCount = 5;
-                    channel = "csharp-hello_my_channel-0,csharp-hello_my_channel-1,csharp-hello_my_channel-2,csharp-hello_my_channel-3,csharp-hello_my_channel-4";
-                }
+            {
+                channel = channelBuilder.ToString();
+            }
+            else
+            {
+                multipleChannelGrantCount = 5;
+                channel = "csharp-hello_my_channel-0,csharp-hello_my_channel-1,csharp-hello_my_channel-2,csharp-hello_my_channel-3,csharp-hello_my_channel-4";
+            }
             if (PubnubCommon.PAMEnabled)
-                {
-                    pubnub.GrantAccess<string>(channel, true, true, 5, AccessToMultiChannelGrantCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
+            {
+                pubnub.GrantAccess<string>(channel, true, true, 5, AccessToMultiChannelGrantCallback, DummyErrorCallback);
+                Thread.Sleep(1000);
 
-                    grantManualEvent.WaitOne();
+                grantManualEvent.WaitOne();
 
-                    Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenMultipleChannelGrantShouldReturnSuccess failed.");
-                } else
-                {
-                    Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenMultipleChannelGrantShouldReturnSuccess.");
-                }
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenMultipleChannelGrantShouldReturnSuccess failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenMultipleChannelGrantShouldReturnSuccess.");
+            }
         }
 
         [Test]
@@ -348,38 +358,40 @@ namespace PubNubMessaging.Tests
 
             StringBuilder authKeyBuilder = new StringBuilder();
             for (int index = 0; index < multipleAuthGrantCount; index++)
+            {
+                if (index == multipleAuthGrantCount - 1)
                 {
-                    if (index == multipleAuthGrantCount - 1)
-                        {
-                            authKeyBuilder.AppendFormat("csharp-auth_key-{0}", index);
-                        } else
-                        {
-                            authKeyBuilder.AppendFormat("csharp-auth_key-{0},", index);
-                        }
+                    authKeyBuilder.AppendFormat("csharp-auth_key-{0}", index);
                 }
+                else
+                {
+                    authKeyBuilder.AppendFormat("csharp-auth_key-{0},", index);
+                }
+            }
             string channel = "hello_my_channel";
             string auth = "";
             if (!unitTest.EnableStubTest)
-                {
-                    auth = authKeyBuilder.ToString();
-                } else
-                {
-                    multipleAuthGrantCount = 5;
-                    auth = "csharp-auth_key-0,csharp-auth_key-1,csharp-auth_key-2,csharp-auth_key-3,csharp-auth_key-4";
-                }
+            {
+                auth = authKeyBuilder.ToString();
+            }
+            else
+            {
+                multipleAuthGrantCount = 5;
+                auth = "csharp-auth_key-0,csharp-auth_key-1,csharp-auth_key-2,csharp-auth_key-3,csharp-auth_key-4";
+            }
             if (PubnubCommon.PAMEnabled)
-                {
-                    pubnub.AuthenticationKey = auth;
-                    pubnub.GrantAccess<string>(channel, true, true, 5, AccessToMultiAuthGrantCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
+            {
+                pubnub.GrantAccess<string>(channel, auth, true, true, 5, AccessToMultiAuthGrantCallback, DummyErrorCallback);
+                Thread.Sleep(1000);
 
-                    grantManualEvent.WaitOne();
+                grantManualEvent.WaitOne();
 
-                    Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenMultipleAuthGrantShouldReturnSuccess failed.");
-                } else
-                {
-                    Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenMultipleAuthGrantShouldReturnSuccess.");
-                }
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenMultipleAuthGrantShouldReturnSuccess failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenMultipleAuthGrantShouldReturnSuccess.");
+            }
         }
 
         [Test]
@@ -397,31 +409,34 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "ThenRevokeAtSubKeyLevelReturnSuccess";
             pubnub.PubnubUnitTest = unitTest;
             if (PubnubCommon.PAMEnabled)
+            {
+                if (!unitTest.EnableStubTest)
                 {
-                    if (!unitTest.EnableStubTest)
-                        {
-                            pubnub.GrantAccess<string>("", true, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
-                            Thread.Sleep(1000);
-                            grantManualEvent.WaitOne();
-                        } else
-                        {
-                            receivedGrantMessage = true;
-                        }
-                    if (receivedGrantMessage)
-                        {
-                            Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess -> Grant ok..Now trying Revoke");
-                            pubnub.GrantAccess<string>("", false, false, 5, RevokeToSubKeyLevelCallback, DummyErrorCallback);
-                            Thread.Sleep(1000);
-                            revokeManualEvent.WaitOne();
-                            Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess -> Grant success but revoke failed.");
-                        } else
-                        {
-                            Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess failed. -> Grant not occured, so is revoke");
-                        }
-                } else
-                {
-                    Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess.");
+                    pubnub.GrantAccess<string>("", true, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
+                    Thread.Sleep(1000);
+                    grantManualEvent.WaitOne();
                 }
+                else
+                {
+                    receivedGrantMessage = true;
+                }
+                if (receivedGrantMessage)
+                {
+                    Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess -> Grant ok..Now trying Revoke");
+                    pubnub.GrantAccess<string>("", false, false, 5, RevokeToSubKeyLevelCallback, DummyErrorCallback);
+                    Thread.Sleep(1000);
+                    revokeManualEvent.WaitOne();
+                    Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess -> Grant success but revoke failed.");
+                }
+                else
+                {
+                    Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess failed. -> Grant not occured, so is revoke");
+                }
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess.");
+            }
         }
 
         [Test]
@@ -441,31 +456,34 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
             if (PubnubCommon.PAMEnabled)
+            {
+                if (!unitTest.EnableStubTest)
                 {
-                    if (!unitTest.EnableStubTest)
-                        {
-                            pubnub.GrantAccess<string>(channel, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
-                            Thread.Sleep(1000);
-                            grantManualEvent.WaitOne();
-                        } else
-                        {
-                            receivedGrantMessage = true;
-                        }
-                    if (receivedGrantMessage)
-                        {
-                            Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess -> Grant ok..Now trying Revoke");
-                            pubnub.GrantAccess<string>("", false, false, 5, RevokeToChannelLevelCallback, DummyErrorCallback);
-                            Thread.Sleep(1000);
-                            revokeManualEvent.WaitOne();
-                            Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess -> Grant success but revoke failed.");
-                        } else
-                        {
-                            Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess failed. -> Grant not occured, so is revoke");
-                        }
-                } else
-                {
-                    Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess.");
+                    pubnub.GrantAccess<string>(channel, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                    Thread.Sleep(1000);
+                    grantManualEvent.WaitOne();
                 }
+                else
+                {
+                    receivedGrantMessage = true;
+                }
+                if (receivedGrantMessage)
+                {
+                    Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess -> Grant ok..Now trying Revoke");
+                    pubnub.GrantAccess<string>("", false, false, 5, RevokeToChannelLevelCallback, DummyErrorCallback);
+                    Thread.Sleep(1000);
+                    revokeManualEvent.WaitOne();
+                    Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess -> Grant success but revoke failed.");
+                }
+                else
+                {
+                    Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess failed. -> Grant not occured, so is revoke");
+                }
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess.");
+            }
         }
 
         [Test]
@@ -486,455 +504,461 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_authchannel";
             string authKey = "hello_my_authkey";
             if (PubnubCommon.PAMEnabled)
+            {
+                if (!unitTest.EnableStubTest)
                 {
-                    if (!unitTest.EnableStubTest)
-                        {
-                            pubnub.AuthenticationKey = authKey;
-                            pubnub.GrantAccess<string>(channel, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
-                            Thread.Sleep(1000);
-                            grantManualEvent.WaitOne();
-                        } else
-                        {
-                            receivedGrantMessage = true;
-                        }
-                    if (receivedGrantMessage)
-                        {
-                            Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant ok..Now trying Revoke");
-                            pubnub.GrantAccess<string>("", false, false, 5, RevokeToUserLevelCallback, DummyErrorCallback);
-                            Thread.Sleep(1000);
-                            revokeManualEvent.WaitOne();
-                            Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant success but revoke failed.");
-                        } else
-                        {
-                            Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess failed. -> Grant not occured, so is revoke");
-                        }
-                } else
-                {
-                    Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess.");
+                    pubnub.GrantAccess<string>(channel, authKey, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                    Thread.Sleep(1000);
+                    grantManualEvent.WaitOne();
                 }
+                else
+                {
+                    receivedGrantMessage = true;
+                }
+                if (receivedGrantMessage)
+                {
+                    Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant ok..Now trying Revoke");
+                    pubnub.GrantAccess<string>("", authKey, false, false, 5, RevokeToUserLevelCallback, DummyErrorCallback);
+                    Thread.Sleep(1000);
+                    revokeManualEvent.WaitOne();
+                    Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant success but revoke failed.");
+                }
+                else
+                {
+                    Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess failed. -> Grant not occured, so is revoke");
+                }
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess.");
+            }
         }
 
         void AccessToSubKeyLevelCallback(string receivedMessage)
         {
             try
+            {
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
+                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    if (dictionary != null)
+                    {
+                        int statusCode = dictionary.Value<int>("status");
+                        string statusMessage = dictionary.Value<string>("message");
+                        if (statusCode == 200 && statusMessage.ToLower() == "success")
                         {
-                            object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                            JContainer dictionary = serializedMessage [0] as JContainer;
-                            if (dictionary != null)
+                            var payload = dictionary.Value<JContainer>("payload");
+                            if (payload != null)
+                            {
+                                bool read = payload.Value<bool>("r");
+                                bool write = payload.Value<bool>("w");
+                                string level = payload.Value<string>("level");
+                                if (level == "subkey")
                                 {
-                                    int statusCode = dictionary.Value<int>("status");
-                                    string statusMessage = dictionary.Value<string>("message");
-                                    if (statusCode == 200 && statusMessage.ToLower() == "success")
-                                        {
-                                            var payload = dictionary.Value<JContainer>("payload");
-                                            if (payload != null)
-                                                {
-                                                    bool read = payload.Value<bool>("r");
-                                                    bool write = payload.Value<bool>("w");
-                                                    string level = payload.Value<string>("level");
-                                                    if (level == "subkey")
-                                                        {
-                                                            switch (currentUnitTestCase)
-                                                                {
-                                                                case "ThenSubKeyLevelWithReadWriteShouldReturnSuccess":
-                                                                case "ThenRevokeAtSubKeyLevelReturnSuccess":
-                                                                    if (read && write)
-                                                                        receivedGrantMessage = true;
-                                                                    break;
-                                                                case "ThenSubKeyLevelWithReadShouldReturnSuccess":
-                                                                    if (read && !write)
-                                                                        receivedGrantMessage = true;
-                                                                    break;
-                                                                case "ThenSubKeyLevelWithWriteShouldReturnSuccess":
-                                                                    if (!read && write)
-                                                                        receivedGrantMessage = true;
-                                                                    break;
-                                                                default:
-                                                                    break;
-                                                                }
-                                                        }
-                                                }
-                                        }
+                                    switch (currentUnitTestCase)
+                                    {
+                                        case "ThenSubKeyLevelWithReadWriteShouldReturnSuccess":
+                                        case "ThenRevokeAtSubKeyLevelReturnSuccess":
+                                            if (read && write) receivedGrantMessage = true;
+                                            break;
+                                        case "ThenSubKeyLevelWithReadShouldReturnSuccess":
+                                            if (read && !write) receivedGrantMessage = true;
+                                            break;
+                                        case "ThenSubKeyLevelWithWriteShouldReturnSuccess":
+                                            if (!read && write) receivedGrantMessage = true;
+                                            break;
+                                        default:
+                                            break;
+                                    }
                                 }
+                            }
                         }
-                } catch
-                {
-                } finally
-                {
-                    grantManualEvent.Set();
+                    }
                 }
+            }
+            catch { }
+            finally
+            {
+                grantManualEvent.Set();
+            }
         }
 
         void AccessToChannelLevelCallback(string receivedMessage)
         {
             try
+            {
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
+                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    string currentChannel = serializedMessage[1].ToString();
+                    if (dictionary != null)
+                    {
+                        int statusCode = dictionary.Value<int>("status");
+                        string statusMessage = dictionary.Value<string>("message");
+                        if (statusCode == 200 && statusMessage.ToLower() == "success")
                         {
-                            object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                            JContainer dictionary = serializedMessage [0] as JContainer;
-                            string currentChannel = serializedMessage [1].ToString();
-                            if (dictionary != null)
+                            var payload = dictionary.Value<JContainer>("payload");
+                            if (payload != null)
+                            {
+                                string level = payload.Value<string>("level");
+                                var channels = payload.Value<JContainer>("channels");
+                                if (channels != null)
                                 {
-                                    int statusCode = dictionary.Value<int>("status");
-                                    string statusMessage = dictionary.Value<string>("message");
-                                    if (statusCode == 200 && statusMessage.ToLower() == "success")
+                                    var channelContainer = channels.Value<JContainer>(currentChannel);
+                                    if (channelContainer != null)
+                                    {
+                                        bool read = channelContainer.Value<bool>("r");
+                                        bool write = channelContainer.Value<bool>("w");
+                                        if (level == "channel")
                                         {
-                                            var payload = dictionary.Value<JContainer>("payload");
-                                            if (payload != null)
-                                                {
-                                                    string level = payload.Value<string>("level");
-                                                    var channels = payload.Value<JContainer>("channels");
-                                                    if (channels != null)
-                                                        {
-                                                            var channelContainer = channels.Value<JContainer>(currentChannel);
-                                                            if (channelContainer != null)
-                                                                {
-                                                                    bool read = channelContainer.Value<bool>("r");
-                                                                    bool write = channelContainer.Value<bool>("w");
-                                                                    if (level == "channel")
-                                                                        {
-                                                                            switch (currentUnitTestCase)
-                                                                                {
-                                                                                case "ThenChannelLevelWithReadWriteShouldReturnSuccess":
-                                                                                case "ThenRevokeAtChannelLevelReturnSuccess":
-                                                                                    if (read && write)
-                                                                                        receivedGrantMessage = true;
-                                                                                    break;
-                                                                                case "ThenChannelLevelWithReadShouldReturnSuccess":
-                                                                                    if (read && !write)
-                                                                                        receivedGrantMessage = true;
-                                                                                    break;
-                                                                                case "ThenChannelLevelWithWriteShouldReturnSuccess":
-                                                                                    if (!read && write)
-                                                                                        receivedGrantMessage = true;
-                                                                                    break;
-                                                                                default:
-                                                                                    break;
-                                                                                }
-                                                                        }
-                                                                }
-                                                        }
-                                                }
+                                            switch (currentUnitTestCase)
+                                            {
+                                                case "ThenChannelLevelWithReadWriteShouldReturnSuccess":
+                                                case "ThenRevokeAtChannelLevelReturnSuccess":
+                                                    if (read && write) receivedGrantMessage = true;
+                                                    break;
+                                                case "ThenChannelLevelWithReadShouldReturnSuccess":
+                                                    if (read && !write) receivedGrantMessage = true;
+                                                    break;
+                                                case "ThenChannelLevelWithWriteShouldReturnSuccess":
+                                                    if (!read && write) receivedGrantMessage = true;
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
                                         }
+                                    }
                                 }
+                            }
                         }
-                } catch
-                {
-                } finally
-                {
-                    grantManualEvent.Set();
+                    }
                 }
+            }
+            catch { }
+            finally
+            {
+                grantManualEvent.Set();
+            }
         }
 
         void AccessToUserLevelCallback(string receivedMessage)
         {
             try
+            {
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
+                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    string currentChannel = serializedMessage[1].ToString();
+                    if (dictionary != null)
+                    {
+                        int statusCode = dictionary.Value<int>("status");
+                        string statusMessage = dictionary.Value<string>("message");
+                        if (statusCode == 200 && statusMessage.ToLower() == "success")
                         {
-                            object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                            JContainer dictionary = serializedMessage [0] as JContainer;
-                            if (dictionary != null)
+                            var payload = dictionary.Value<JContainer>("payload");
+                            if (payload != null)
+                            {
+                                string level = payload.Value<string>("level");
+                                string channel = payload.Value<string>("channel");
+                                var auths = payload.Value<JContainer>("auths");
+                                if (auths != null && auths.Count > 0)
                                 {
-                                    int statusCode = dictionary.Value<int>("status");
-                                    string statusMessage = dictionary.Value<string>("message");
-                                    if (statusCode == 200 && statusMessage.ToLower() == "success")
+                                    foreach(JToken auth in auths.Children())
+                                    {
+                                        if (auth is JProperty)
                                         {
-                                            var payload = dictionary.Value<JContainer>("payload");
-                                            if (payload != null)
+                                            var authProperty = auth as JProperty;
+                                            if (authProperty != null)
+                                            {
+                                                string authKey = authProperty.Name;
+                                                var authKeyContainer = auths.Value<JContainer>(authKey);
+                                                if (authKeyContainer != null && authKeyContainer.Count > 0)
                                                 {
-                                                    string level = payload.Value<string>("level");
-                                                    var auths = payload.Value<JContainer>("auths");
-                                                    if (auths != null && auths.Count > 0)
+                                                    bool read = authKeyContainer.Value<bool>("r");
+                                                    bool write = authKeyContainer.Value<bool>("w");
+                                                    if (level == "user")
+                                                    {
+                                                        switch (currentUnitTestCase)
                                                         {
-                                                            foreach (JToken auth in auths.Children())
-                                                                {
-                                                                    if (auth is JProperty)
-                                                                        {
-                                                                            var authProperty = auth as JProperty;
-                                                                            if (authProperty != null)
-                                                                                {
-                                                                                    string authKey = authProperty.Name;
-                                                                                    var authKeyContainer = auths.Value<JContainer>(authKey);
-                                                                                    if (authKeyContainer != null && authKeyContainer.Count > 0)
-                                                                                        {
-                                                                                            bool read = authKeyContainer.Value<bool>("r");
-                                                                                            bool write = authKeyContainer.Value<bool>("w");
-                                                                                            if (level == "user")
-                                                                                                {
-                                                                                                    switch (currentUnitTestCase)
-                                                                                                        {
-                                                                                                        case "ThenUserLevelWithReadWriteShouldReturnSuccess":
-                                                                                                        case "ThenRevokeAtUserLevelReturnSuccess":
-                                                                                                            if (read && write)
-                                                                                                                receivedGrantMessage = true;
-                                                                                                            break;
-                                                                                                        case "ThenUserLevelWithReadShouldReturnSuccess":
-                                                                                                            if (read && !write)
-                                                                                                                receivedGrantMessage = true;
-                                                                                                            break;
-                                                                                                        case "ThenUserLevelWithWriteShouldReturnSuccess":
-                                                                                                            if (!read && write)
-                                                                                                                receivedGrantMessage = true;
-                                                                                                            break;
-                                                                                                        default:
-                                                                                                            break;
-                                                                                                        }
-                                                                                                }
-                                                                                        }
-
-                                                                                }
-                                                                        }
-                                                                }
+                                                            case "ThenUserLevelWithReadWriteShouldReturnSuccess":
+                                                            case "ThenRevokeAtUserLevelReturnSuccess":
+                                                                if (read && write) receivedGrantMessage = true;
+                                                                break;
+                                                            case "ThenUserLevelWithReadShouldReturnSuccess":
+                                                                if (read && !write) receivedGrantMessage = true;
+                                                                break;
+                                                            case "ThenUserLevelWithWriteShouldReturnSuccess":
+                                                                if (!read && write) receivedGrantMessage = true;
+                                                                break;
+                                                            default:
+                                                                break;
                                                         }
+                                                    }
                                                 }
+
+                                            }
                                         }
+                                    }
                                 }
+                            }
                         }
-                } catch
-                {
-                } finally
-                {
-                    grantManualEvent.Set();
+                    }
                 }
+            }
+            catch { }
+            finally
+            {
+                grantManualEvent.Set();
+            }
         }
 
         void AccessToMultiChannelGrantCallback(string receivedMessage)
         {
             try
+            {
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
+                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    string currentChannel = serializedMessage[1].ToString();
+                    if (dictionary != null)
+                    {
+                        int statusCode = dictionary.Value<int>("status");
+                        string statusMessage = dictionary.Value<string>("message");
+                        if (statusCode == 200 && statusMessage.ToLower() == "success")
                         {
-                            object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                            JContainer dictionary = serializedMessage [0] as JContainer;
-                            if (dictionary != null)
+                            var payload = dictionary.Value<JContainer>("payload");
+                            if (payload != null)
+                            {
+                                string level = payload.Value<string>("level");
+                                var channels = payload.Value<JContainer>("channels");
+                                if (channels != null)
                                 {
-                                    int statusCode = dictionary.Value<int>("status");
-                                    string statusMessage = dictionary.Value<string>("message");
-                                    if (statusCode == 200 && statusMessage.ToLower() == "success")
-                                        {
-                                            var payload = dictionary.Value<JContainer>("payload");
-                                            if (payload != null)
-                                                {
-                                                    var channels = payload.Value<JContainer>("channels");
-                                                    if (channels != null)
-                                                        {
-                                                            Console.WriteLine("{0} - AccessToMultiChannelGrantCallback - Grant MultiChannel Count (Received/Sent) = {1}/{2}", currentUnitTestCase, channels.Count, multipleChannelGrantCount);
-                                                            if (channels.Count == multipleChannelGrantCount)
-                                                                {
-                                                                    receivedGrantMessage = true;
-                                                                }
-                                                        }
-                                                }
-                                        }
+                                    Console.WriteLine("{0} - AccessToMultiChannelGrantCallback - Grant MultiChannel Count (Received/Sent) = {1}/{2}", currentUnitTestCase, channels.Count, multipleChannelGrantCount);
+                                    if (channels.Count == multipleChannelGrantCount)
+                                    {
+                                        receivedGrantMessage = true;
+                                    }
                                 }
+                            }
                         }
-                } catch
-                {
-                } finally
-                {
-                    grantManualEvent.Set();
+                    }
                 }
+            }
+            catch { }
+            finally
+            {
+                grantManualEvent.Set();
+            }
         }
 
         void AccessToMultiAuthGrantCallback(string receivedMessage)
         {
             try
+            {
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
+                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    string currentChannel = serializedMessage[1].ToString();
+                    if (dictionary != null)
+                    {
+                        int statusCode = dictionary.Value<int>("status");
+                        string statusMessage = dictionary.Value<string>("message");
+                        if (statusCode == 200 && statusMessage.ToLower() == "success")
                         {
-                            object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                            JContainer dictionary = serializedMessage [0] as JContainer;
-                            if (dictionary != null)
+                            var payload = dictionary.Value<JContainer>("payload");
+                            if (payload != null)
+                            {
+                                string level = payload.Value<string>("level");
+                                string channel = payload.Value<string>("channel");
+                                var auths = payload.Value<JContainer>("auths");
+                                if (auths != null)
                                 {
-                                    int statusCode = dictionary.Value<int>("status");
-                                    string statusMessage = dictionary.Value<string>("message");
-                                    if (statusCode == 200 && statusMessage.ToLower() == "success")
-                                        {
-                                            var payload = dictionary.Value<JContainer>("payload");
-                                            if (payload != null)
-                                                {
-                                                    var auths = payload.Value<JContainer>("auths");
-                                                    if (auths != null)
-                                                        {
-                                                            Console.WriteLine("{0} - AccessToMultiAuthGrantCallback - Grant Auth Count (Received/Sent) = {1}/{2}", currentUnitTestCase, auths.Count, multipleAuthGrantCount);
-                                                            if (auths.Count == multipleAuthGrantCount)
-                                                                {
-                                                                    receivedGrantMessage = true;
-                                                                }
-                                                        }
-                                                }
-                                        }
+                                    Console.WriteLine("{0} - AccessToMultiAuthGrantCallback - Grant Auth Count (Received/Sent) = {1}/{2}", currentUnitTestCase, auths.Count, multipleAuthGrantCount);
+                                    if (auths.Count == multipleAuthGrantCount)
+                                    {
+                                        receivedGrantMessage = true;
+                                    }
                                 }
+                            }
                         }
-                } catch
-                {
-                } finally
-                {
-                    grantManualEvent.Set();
+                    }
                 }
+            }
+            catch { }
+            finally
+            {
+                grantManualEvent.Set();
+            }
         }
 
         void RevokeToSubKeyLevelCallback(string receivedMessage)
         {
             try
+            {
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
+                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    if (dictionary != null)
+                    {
+                        int statusCode = dictionary.Value<int>("status");
+                        string statusMessage = dictionary.Value<string>("message");
+                        if (statusCode == 200 && statusMessage.ToLower() == "success")
                         {
-                            object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                            JContainer dictionary = serializedMessage [0] as JContainer;
-                            if (dictionary != null)
+                            var payload = dictionary.Value<JContainer>("payload");
+                            if (payload != null)
+                            {
+                                bool read = payload.Value<bool>("r");
+                                bool write = payload.Value<bool>("w");
+                                string level = payload.Value<string>("level");
+                                if (level == "subkey")
                                 {
-                                    int statusCode = dictionary.Value<int>("status");
-                                    string statusMessage = dictionary.Value<string>("message");
-                                    if (statusCode == 200 && statusMessage.ToLower() == "success")
-                                        {
-                                            var payload = dictionary.Value<JContainer>("payload");
-                                            if (payload != null)
-                                                {
-                                                    bool read = payload.Value<bool>("r");
-                                                    bool write = payload.Value<bool>("w");
-                                                    string level = payload.Value<string>("level");
-                                                    if (level == "subkey")
-                                                        {
-                                                            switch (currentUnitTestCase)
-                                                                {
-                                                                case "ThenRevokeAtSubKeyLevelReturnSuccess":
-                                                                    if (!read && !write)
-                                                                        receivedRevokeMessage = true;
-                                                                    break;
-                                                                case "ThenSubKeyLevelWithReadShouldReturnSuccess":
+                                    switch (currentUnitTestCase)
+                                    {
+                                        case "ThenRevokeAtSubKeyLevelReturnSuccess":
+                                            if (!read && !write) receivedRevokeMessage = true;
+                                            break;
+                                        case "ThenSubKeyLevelWithReadShouldReturnSuccess":
                                             //if (read && !write) receivedGrantMessage = true;
-                                                                    break;
-                                                                case "ThenSubKeyLevelWithWriteShouldReturnSuccess":
+                                            break;
+                                        case "ThenSubKeyLevelWithWriteShouldReturnSuccess":
                                             //if (!read && write) receivedGrantMessage = true;
-                                                                    break;
-                                                                default:
-                                                                    break;
-                                                                }
-                                                        }
-                                                }
-                                        }
-
-                                    //if (dictionary.
-                                    //if (status == "200")
-                                    //{
-                                    //    receivedGrantMessage = true;
-                                    //}
+                                            break;
+                                        default:
+                                            break;
+                                    }
                                 }
-                            //var level = dictionary["level"].ToString();
+                            }
                         }
-                } catch
-                {
-                } finally
-                {
-                    revokeManualEvent.Set();
+
+                        //if (dictionary.
+                        //if (status == "200")
+                        //{
+                        //    receivedGrantMessage = true;
+                        //}
+                    }
+                    //var level = dictionary["level"].ToString();
                 }
+            }
+            catch { }
+            finally
+            {
+                revokeManualEvent.Set();
+            }
         }
 
         void RevokeToChannelLevelCallback(string receivedMessage)
         {
             try
+            {
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
+                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    string currentChannel = serializedMessage[1].ToString();
+                    if (dictionary != null)
+                    {
+                        int statusCode = dictionary.Value<int>("status");
+                        string statusMessage = dictionary.Value<string>("message");
+                        if (statusCode == 200 && statusMessage.ToLower() == "success")
                         {
-                            object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                            JContainer dictionary = serializedMessage [0] as JContainer;
-                            string currentChannel = serializedMessage [1].ToString();
-                            if (dictionary != null)
+                            var payload = dictionary.Value<JContainer>("payload");
+                            if (payload != null)
+                            {
+                                string level = payload.Value<string>("level");
+                                var channels = payload.Value<JContainer>("channels");
+                                if (channels != null)
                                 {
-                                    int statusCode = dictionary.Value<int>("status");
-                                    string statusMessage = dictionary.Value<string>("message");
-                                    if (statusCode == 200 && statusMessage.ToLower() == "success")
-                                        {
-                                            var payload = dictionary.Value<JContainer>("payload");
-                                            if (payload != null)
-                                                {
-                                                    var channels = payload.Value<JContainer>("channels");
-                                                    if (channels != null)
-                                                        {
-                                                            var channelContainer = channels.Value<JContainer>(currentChannel);
-                                                            if (channelContainer == null)
-                                                                {
-                                                                    receivedRevokeMessage = true;
-                                                                }
-                                                        } else
-                                                        {
-                                                            receivedRevokeMessage = true;
-                                                        }
-                                                }
-                                        }
+                                    var channelContainer = channels.Value<JContainer>(currentChannel);
+                                    if (channelContainer == null)
+                                    {
+                                        receivedRevokeMessage = true;
+                                    }
                                 }
+                                else
+                                {
+                                    receivedRevokeMessage = true;
+                                }
+                            }
                         }
-                } catch
-                {
-                } finally
-                {
-                    revokeManualEvent.Set();
+                    }
                 }
+            }
+            catch { }
+            finally
+            {
+                revokeManualEvent.Set();
+            }
         }
 
         void RevokeToUserLevelCallback(string receivedMessage)
         {
             try
+            {
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
+                    JContainer dictionary = serializedMessage[0] as JContainer;
+                    string currentChannel = serializedMessage[1].ToString();
+                    if (dictionary != null)
+                    {
+                        int statusCode = dictionary.Value<int>("status");
+                        string statusMessage = dictionary.Value<string>("message");
+                        if (statusCode == 200 && statusMessage.ToLower() == "success")
                         {
-                            object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                            JContainer dictionary = serializedMessage [0] as JContainer;
-                            if (dictionary != null)
+                            var payload = dictionary.Value<JContainer>("payload");
+                            if (payload != null)
+                            {
+                                string level = payload.Value<string>("level");
+                                string channel = payload.Value<string>("channel");
+                                var auths = payload.Value<JContainer>("auths");
+                                if (auths != null && auths.Count > 0)
                                 {
-                                    int statusCode = dictionary.Value<int>("status");
-                                    string statusMessage = dictionary.Value<string>("message");
-                                    if (statusCode == 200 && statusMessage.ToLower() == "success")
+                                    receivedRevokeMessage = true;
+                                    foreach (JToken auth in auths.Children())
+                                    {
+                                        if (auth is JProperty)
                                         {
-                                            var payload = dictionary.Value<JContainer>("payload");
-                                            if (payload != null)
+                                            var authProperty = auth as JProperty;
+                                            if (authProperty != null)
+                                            {
+                                                string authKey = authProperty.Name;
+                                                var authKeyContainer = auths.Value<JContainer>(authKey);
+                                                if (authKeyContainer != null)
                                                 {
-                                                    var auths = payload.Value<JContainer>("auths");
-                                                    if (auths != null && auths.Count > 0)
-                                                        {
-                                                            receivedRevokeMessage = true;
-                                                            foreach (JToken auth in auths.Children())
-                                                                {
-                                                                    if (auth is JProperty)
-                                                                        {
-                                                                            var authProperty = auth as JProperty;
-                                                                            if (authProperty != null)
-                                                                                {
-                                                                                    string authKey = authProperty.Name;
-                                                                                    var authKeyContainer = auths.Value<JContainer>(authKey);
-                                                                                    if (authKeyContainer != null)
-                                                                                        {
-                                                                                            receivedRevokeMessage = false;
-                                                                                            break;
-                                                                                        }
-
-                                                                                }
-                                                                        }
-                                                                }
-                                                        } else
-                                                        {
-                                                            receivedRevokeMessage = true;
-                                                        }
+                                                    receivedRevokeMessage = false;
+                                                    break;
                                                 }
+
+                                            }
                                         }
+                                    }
                                 }
+                                else
+                                {
+                                    receivedRevokeMessage = true;
+                                }
+                            }
                         }
-                } catch
-                {
-                } finally
-                {
-                    revokeManualEvent.Set();
+                    }
                 }
+            }
+            catch { }
+            finally
+            {
+                revokeManualEvent.Set();
+            }
         }
 
         private void DummyErrorCallback(PubnubClientError result)
         {
 
         }
+
     }
 }

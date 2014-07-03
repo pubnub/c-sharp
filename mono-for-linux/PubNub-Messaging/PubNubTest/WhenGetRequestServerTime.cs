@@ -38,6 +38,7 @@ namespace PubNubMessaging.Tests
             response = fields [0].ToString();
             Console.WriteLine("Response:" + response);
             Assert.AreNotEqual("0", response);
+            pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -68,6 +69,7 @@ namespace PubNubMessaging.Tests
             response = fields [0].ToString();
             Console.WriteLine("Response:" + response);
             Assert.AreNotEqual("0", response);
+            pubnub.EndPendingRequests();
         }
     }
 }

@@ -42,9 +42,11 @@
     <string name="off">No</string>
     <string name="ttl">TTL (default 1440)</string>
     <string name="authkey">Enter Auth Key</string>
+    <string name="authkeyopt">Enter Auth Key (Optional)</string>
     <string name="btngrant">Grant</string>
     <string name="btncancel">Cancel</string>
     <string name="auth">Set Auth Key</string>
+    <string name="authopt">Set Auth Key (Optional)</string>
     <string name="btnset">Set</string>
     <string name="channel">Channel</string>
     <string name="btnWhereNow">Run Where Now</string>
@@ -59,7 +61,7 @@
     <string name="btnDelUserStateAndExit">Delete</string>
     <string name="btnDelUserStateAndMore">Delete and delete more</string>
     <string name="btnGetUserState">Get User State</string>
-    <string name="btnUserStateInst">enter json, \nleave blank to use \nlocal user state</string>
+    <string name="btnUserStateInst">enter json</string>
     <string name="btnSetUserState">Set User State</string>
     <string name="optional">optional</string>
     <string name="btnWhereNow">Run Where Now</string>

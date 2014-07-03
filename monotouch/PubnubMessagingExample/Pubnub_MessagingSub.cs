@@ -46,10 +46,9 @@ namespace PubnubMessagingExample
                 new StyledStringElement("Auth Key", () => {menu.Hide(true); pubnub_MessagingSub.AuthKey();}),
                 new StyledStringElement("Presence Heartbeat", () => {menu.Hide(true); pubnub_MessagingSub.SetPresenceHeartbeat();}),
                 new StyledStringElement("Presence Interval", () => {menu.Hide(true); pubnub_MessagingSub.SetPresenceInterval();}),
-                new StyledStringElement("Add/Mod Local User State", () => {menu.Hide(true); pubnub_MessagingSub.SetLocalUserState();}),
-                new StyledStringElement("Del Local User State", () => {menu.Hide(true); pubnub_MessagingSub.DelLocalUserState();}),
-                new StyledStringElement("View Local User State", () => {menu.Hide(true); pubnub_MessagingSub.ViewLocalUserState();}),
-                new StyledStringElement("Set User State", () => {menu.Hide(true); pubnub_MessagingSub.SetUserState();}),
+                new StyledStringElement("Set User State Key-Val", () => {menu.Hide(true); pubnub_MessagingSub.SetUserStateKeyVal();}),
+                new StyledStringElement("Del User State", () => {menu.Hide(true); pubnub_MessagingSub.DelUserState();}),
+                new StyledStringElement("Set User State Json", () => {menu.Hide(true); pubnub_MessagingSub.SetUserStateJson();}),
                 new StyledStringElement("Get User State", () => {menu.Hide(true); pubnub_MessagingSub.GetUserState();}),
                 new StyledStringElement("Where Now", () => {menu.Hide(true); pubnub_MessagingSub.WhereNow();}),
                 new StyledStringElement("Global Here Now", () => {menu.Hide(true); pubnub_MessagingSub.GlobalHereNow();}),
@@ -67,16 +66,20 @@ namespace PubnubMessagingExample
             Auth,
             PresenceHeartbeat,
             PresenceHeartbeatInterval,
-            AddLocalUserState,
+            SetUserStateKeyPair,
             ViewLocalUserState,
-            DeleteLocalUserState,
-            SetUserState,
+            DeleteUserState,
+            SetUserStateJson,
             GetUserState,
             WhereNow,
             GlobalHereNow,
             ChangeUuid,
             SubscribeGrant,
-            PresenceGrant
+            PresenceGrant,
+            AuditSubscribe,
+            AuditPresence,
+            RevokeSubscribe,
+            RevokePresence
         }
 
         public SlideoutNavigationController Menu { get; private set; }
@@ -288,14 +291,16 @@ namespace PubnubMessagingExample
 
         public void SubscribeAudit()
         {
-            Display("Running Subscribe Audit");
-            pubnub.AuditAccess<string>(Channel,DisplayReturnMessage, DisplayErrorMessage);
+            //Display("Running Subscribe Audit");
+            //pubnub.AuditAccess<string>(Channel,DisplayReturnMessage, DisplayErrorMessage);
+            ShowAlertType1 (CommonDialogStates.AuditSubscribe);
         }
 
         public void SubscribeRevoke()
         {
-            Display("Running Subscribe Revoke");
-            pubnub.GrantAccess<string>(Channel, false,false, DisplayReturnMessage, DisplayErrorMessage);
+            //Display("Running Subscribe Revoke");
+            //pubnub.GrantAccess<string>(Channel, false,false, DisplayReturnMessage, DisplayErrorMessage);
+            ShowAlertType1 (CommonDialogStates.RevokeSubscribe);
         }
 
         public void PresenceGrant()
@@ -305,14 +310,16 @@ namespace PubnubMessagingExample
 
         public void PresenceAudit()
         {
-            Display("Running Presence Audit");
-            pubnub.AuditPresenceAccess<string>(Channel, DisplayReturnMessage, DisplayErrorMessage);
+            ShowAlertType1 (CommonDialogStates.AuditPresence);
+            //Display("Running Presence Audit");
+            //pubnub.AuditPresenceAccess<string>(Channel, DisplayReturnMessage, DisplayErrorMessage);
         }
 
         public void PresenceRevoke()
         {
-            Display("Running Presence Revoke");
-            pubnub.GrantPresenceAccess<string>(Channel, false, false, DisplayReturnMessage, DisplayErrorMessage);
+            ShowAlertType1 (CommonDialogStates.RevokePresence);
+            //Display("Running Presence Revoke");
+            //pubnub.GrantPresenceAccess<string>(Channel, false, false, DisplayReturnMessage, DisplayErrorMessage);
         }
 
         public void SetPresenceHeartbeat(){
@@ -344,16 +351,16 @@ namespace PubnubMessagingExample
             ShowAlertType3 (CommonDialogStates.GetUserState);
         }
 
-        public void SetUserState ()
+        public void SetUserStateJson ()
         {
-            ShowAlertType3 (CommonDialogStates.SetUserState);
+            ShowAlertType3 (CommonDialogStates.SetUserStateJson);
         }
 
-        public void ViewLocalUserState ()
+        /*public void ViewUserState ()
         {
             string[] channels = Channel.Split (',');
             foreach (string channelToCall in channels) {
-                string currentUserStateView = pubnub.GetLocalUserState (channelToCall);
+                string currentUserStateView = pubnub.GetUserState (channelToCall);
                 if (!string.IsNullOrEmpty (currentUserStateView)) {
                     Display (string.Format("User state for channel {0}:{1}", channelToCall, currentUserStateView));
                 } else {
@@ -361,16 +368,16 @@ namespace PubnubMessagingExample
                 }
             }
 
+        }*/
+
+        public void DelUserState ()
+        {
+            ShowAlertType3 (CommonDialogStates.DeleteUserState);
         }
 
-        public void DelLocalUserState ()
+        public void SetUserStateKeyVal ()
         {
-            ShowAlertType3 (CommonDialogStates.DeleteLocalUserState);
-        }
-
-        public void SetLocalUserState ()
-        {
-            ShowAlertType3 (CommonDialogStates.AddLocalUserState);
+            ShowAlertType3 (CommonDialogStates.SetUserStateKeyPair);
         }
 
         public void AuthKey()
@@ -384,7 +391,7 @@ namespace PubnubMessagingExample
 
             string strHead = "", elementText1 = "", elementText2 = "", elementText3 = "";
             string elementSubText1 = "", elementSubText2 = "", elementSubText3 = "", buttonTitle = "";
-            if (cds == CommonDialogStates.AddLocalUserState) {
+            if (cds == CommonDialogStates.SetUserStateKeyPair) {
                 strHead = "Add Local User State";
                 elementText1 = "Channel";
                 elementText2 = "Key";
@@ -393,7 +400,7 @@ namespace PubnubMessagingExample
                 elementSubText2 = "Enter Key";
                 elementSubText3 = "Enter Value";
                 buttonTitle = "Add";
-            } else if (cds == CommonDialogStates.DeleteLocalUserState) {
+            } else if (cds == CommonDialogStates.DeleteUserState) {
                 strHead = "Delete Local User State";
                 elementText1 = "Channel";
                 elementText2 = "Key";
@@ -401,13 +408,13 @@ namespace PubnubMessagingExample
                 elementSubText2 = "Key to delete";
                 buttonTitle = "Delete";
                 showEntryText3 = false;
-            } else if (cds == CommonDialogStates.SetUserState){
+            } else if (cds == CommonDialogStates.SetUserStateJson){
                 strHead = "Add User State";
                 elementText1 = "Channel";
                 elementText2 = "State";
                 elementText3 = "UUID";
                 elementSubText1 = "Enter Channel";
-                elementSubText2 = "enter json format or skip to use local";
+                elementSubText2 = "enter json format";
                 elementSubText3 = "Enter UUID";
                 buttonTitle = "Add";
             } else if (cds == CommonDialogStates.GetUserState){
@@ -444,16 +451,29 @@ namespace PubnubMessagingExample
                 },
                 new Section (""){
                     new StyledStringElement (buttonTitle, () => {
-                        if (cds == CommonDialogStates.AddLocalUserState) {
-                            string currentState = pubnub.SetLocalUserState (entryText1.Value, entryText2.Value, entryText3.Value);
-                            Display (string.Format("Current user state: {0}", currentState));
-                        } else if (cds == CommonDialogStates.DeleteLocalUserState) {
-                            string currentUserStateAfterDelete = pubnub.SetLocalUserState (entryText1.Value, entryText2.Value, null);
-                            Display (string.Format("Current user state: {0}", currentUserStateAfterDelete));
-                        } else if (cds == CommonDialogStates.SetUserState){
+                        if (cds == CommonDialogStates.SetUserStateKeyPair) {
+                            Display ("Setting user state");
+                            int valueInt;
+                            double valueDouble;
+                            if (Int32.TryParse(entryText3.Value, out valueInt))
+                            {
+                                pubnub.SetUserState<string>(entryText1.Value, new KeyValuePair<string, object>(entryText2.Value, valueInt), DisplayReturnMessage, DisplayErrorMessage);
+                            }
+                            else if (Double.TryParse(entryText3.Value, out valueDouble))
+                            {
+                                pubnub.SetUserState<string>(entryText1.Value, new KeyValuePair<string, object>(entryText2.Value, valueDouble), DisplayReturnMessage, DisplayErrorMessage);
+                            }
+                            else
+                            {
+                                pubnub.SetUserState<string>(entryText1.Value, new KeyValuePair<string, object>(entryText2.Value, entryText3.Value), DisplayReturnMessage, DisplayErrorMessage);
+                            }
+                        } else if (cds == CommonDialogStates.DeleteUserState) {
+                            pubnub.SetUserState<string>(entryText1.Value, new KeyValuePair<string, object>(entryText2.Value, null), DisplayReturnMessage, DisplayErrorMessage);
+                        } else if (cds == CommonDialogStates.SetUserStateJson){
+                            Display ("Setting user state");
                             string jsonUserState = "";
                             if (string.IsNullOrEmpty (entryText2.Value)) {
-                                jsonUserState = pubnub.GetLocalUserState (entryText1.Value);
+                                //jsonUserState = pubnub.GetUserState (entryText1.Value);
                             } else {
                                 jsonUserState = entryText2.Value;
                             }
@@ -480,10 +500,21 @@ namespace PubnubMessagingExample
             UIAlertView alert = new UIAlertView ();
             alert.AlertViewStyle = UIAlertViewStyle.PlainTextInput;
             bool isHeartbeatInterval = false;
+            string messageBoxTitle = "Set";
 
             if (cds == CommonDialogStates.Auth) {
                 alert.Title = "Auth Key";
                 alert.Message = "Enter Auth Key";
+            } 
+            else if ((cds == CommonDialogStates.AuditSubscribe)
+                || (cds == CommonDialogStates.AuditPresence)
+                || (cds == CommonDialogStates.RevokePresence) 
+                || (cds == CommonDialogStates.RevokeSubscribe)
+            )
+            {
+                alert.Title = "Auth Key";
+                alert.Message = "Enter Auth Key (Optional)";
+                messageBoxTitle = cds.ToString ();
             } else if (cds == CommonDialogStates.PresenceHeartbeat){
                 alert.GetTextField (0).KeyboardType = UIKeyboardType.NumberPad;
                 alert.Title = "Presence Heartbeat";
@@ -499,9 +530,10 @@ namespace PubnubMessagingExample
             } else if (cds == CommonDialogStates.WhereNow){
                 alert.Title = "Where Now";
                 alert.Message = "Enter UUID (optional)";
+                messageBoxTitle = "Where Now";
             }
 
-            alert.AddButton ("Set");
+            alert.AddButton (messageBoxTitle);
             alert.AddButton ("Cancel");
             alert.Clicked += delegate(object sender, UIButtonEventArgs e) {
                 if(e.ButtonIndex == 0)
@@ -511,6 +543,18 @@ namespace PubnubMessagingExample
                         if (cds == CommonDialogStates.Auth) {
                             pubnub.AuthenticationKey = input;
                             Display("Auth Key Set");
+                        } else if (cds == CommonDialogStates.AuditSubscribe) {
+                            Display ("Running Subscribe Audit");
+                            pubnub.AuditAccess<string> (Channel, input, DisplayReturnMessage, DisplayErrorMessage);
+                        } else if (cds == CommonDialogStates.AuditPresence) {
+                            Display ("Running Presence Audit");
+                            pubnub.AuditPresenceAccess<string> (Channel, input, DisplayReturnMessage, DisplayErrorMessage);
+                        } else if (cds == CommonDialogStates.RevokePresence) {
+                            Display ("Running Presence Revoke");
+                            pubnub.GrantPresenceAccess<string> (Channel, input, false, false, DisplayReturnMessage, DisplayErrorMessage);
+                        } else if (cds == CommonDialogStates.RevokeSubscribe) {
+                            Display ("Running Subscribe Revoke");
+                            pubnub.GrantAccess<string> (Channel, input, false, false, DisplayReturnMessage, DisplayErrorMessage);
                         } else if ((cds == CommonDialogStates.PresenceHeartbeat) || (cds == CommonDialogStates.PresenceHeartbeatInterval)){
                             int iVal;
                             Int32.TryParse(input, out iVal);
@@ -543,28 +587,35 @@ namespace PubnubMessagingExample
         {
             bool isPresenceGrant = false;
             bool showEntryText = true;
+            bool showEntryText2 = false;
             bool boolval1 = false;
             UIKeyboardType keyboardType = UIKeyboardType.Default;
 
             string strHead = "", elementText1 = "", elementText2 = "", 
-                elementText3 = "", elementSubText = "", buttonTitle = "";
+            elementText3 = "", elementSubText = "", buttonTitle = "", elementText4 = "", elementSubText2 = "";
             if (cds == CommonDialogStates.PresenceGrant) {
                 strHead = "Presence Grant";
                 elementText1 = "Read";
                 elementText2 = "Write";
                 elementText3 = "TTL";
                 elementSubText = "Enter TTL (default 1440)";
+                elementText4 = "Auth key";
+                elementSubText2 = "optional";
                 buttonTitle = "Grant";
                 keyboardType = UIKeyboardType.NumberPad;
                 isPresenceGrant = true;
+                showEntryText2 = true;
             } else if (cds == CommonDialogStates.SubscribeGrant) {
                 elementText1 = "Read";
                 elementText2 = "Write";
                 elementText3 = "TTL";
                 elementSubText = "Enter TTL (default 1440)";
+                elementText4 = "Auth key";
+                elementSubText2 = "optional";
                 strHead = "Subscribe Grant";
                 buttonTitle = "Grant";
                 keyboardType = UIKeyboardType.NumberPad;
+                showEntryText2 = true;
             } else if (cds == CommonDialogStates.HereNow) {
                 elementText1 = "Show UUID";
                 elementText2 = "Include User State";
@@ -586,6 +637,7 @@ namespace PubnubMessagingExample
             BooleanElement be2 = new BooleanElement (elementText2, false);
 
             EntryElement entryText = null;
+            EntryElement entryText2 = null;
 
             if (showEntryText) {
                 entryText = new EntryElement (elementText3, elementSubText, "");
@@ -593,11 +645,17 @@ namespace PubnubMessagingExample
                 entryText.AutocapitalizationType = UITextAutocapitalizationType.None;
                 entryText.AutocorrectionType = UITextAutocorrectionType.No;
             }
+            if (showEntryText2) {
+                entryText2 = new EntryElement (elementText4, elementSubText2, "");
+                entryText2.AutocapitalizationType = UITextAutocapitalizationType.None;
+                entryText2.AutocorrectionType = UITextAutocorrectionType.No;
+            }
 
             var newroot = new RootElement (strHead, 0, 0){
                 new Section (){
                     be1,
                     be2,
+                    entryText2,
                     entryText
                 },
                 new Section (""){
@@ -612,10 +670,10 @@ namespace PubnubMessagingExample
                             }
                             if (isPresenceGrant) {
                                 Display("Running Presence Grant");
-                                pubnub.GrantPresenceAccess<string>(Channel, be1.Value, be2.Value, iTtl, DisplayReturnMessage, DisplayErrorMessage);
+                                pubnub.GrantPresenceAccess<string>(Channel, entryText2.Value,  be1.Value, be2.Value, iTtl, DisplayReturnMessage, DisplayErrorMessage);
                             }else{
                                 Display("Running Subscribe Grant");
-                                pubnub.GrantAccess<string>(Channel, be1.Value, be2.Value, iTtl, DisplayReturnMessage, DisplayErrorMessage);
+                                pubnub.GrantAccess<string>(Channel, entryText2.Value, be1.Value, be2.Value, iTtl, DisplayReturnMessage, DisplayErrorMessage);
                             }
                         } else if (cds == CommonDialogStates.HereNow) {
                             Display ("Running Here Now");

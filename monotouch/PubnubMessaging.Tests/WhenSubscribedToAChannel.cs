@@ -174,10 +174,13 @@ namespace PubNubMessaging.Tests
 
         void SubscribePublishAndParseComplex (Pubnub pubnub, Common common, string channel)
         {
+            Random r = new Random();
+            channel = "hello_world_sub" + r.Next(1000);
+
             CustomClass message = new CustomClass ();
 
             pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
-            Thread.Sleep (1500);
+            Thread.Sleep (5000);
 
             pubnub.Publish (channel, (object)message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
 
@@ -214,6 +217,14 @@ namespace PubNubMessaging.Tests
             } else {
                 Assert.Fail ("No response");
             }
+            common.DeliveryStatus = false;
+            common.Response = null;
+
+            pubnub.Unsubscribe<string>(channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+
+            common.WaitForResponse(20);
+
+            pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -240,6 +251,7 @@ namespace PubNubMessaging.Tests
             } else {
                 Assert.Fail ("Test failed");
             }
+            pubnub.EndPendingRequests();
         }
 
         bool ParseResponse (object response)
@@ -289,10 +301,10 @@ namespace PubNubMessaging.Tests
             bool receivedChannel2ConnectMessage = ParseResponse (common.Response);
 
             Assert.True (receivedChannel1ConnectMessage && receivedChannel2ConnectMessage);
-
+            pubnub.EndPendingRequests();
         }
 
-        [Test]
+        //[Test]
         public void ThenDuplicateChannelShouldReturnAlreadySubscribed ()
         {
             Pubnub pubnub = new Pubnub (Common.PublishKey,
@@ -354,6 +366,7 @@ namespace PubNubMessaging.Tests
             }
             Console.WriteLine (string.Format ("passcount {0}", iPassCount)); 
             Assert.True (iPassCount >= 10);
+            pubnub.EndPendingRequests();
         }
     }
 }

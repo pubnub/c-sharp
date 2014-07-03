@@ -63,6 +63,8 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="Library\Newtonsoft.Json.dll" />
+    <None Include="Library\nunit.framework.dll" />
+    <None Include="Library\JsonFx.dll" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Library\" />

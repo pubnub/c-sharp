@@ -49,7 +49,7 @@ namespace MonoTouch.NUnit {
 			// you can use the default or set your own custom writer (e.g. save to web site and tweet it ;-)
 
             //TODO:change before going live
-            runner.Writer = new TcpTextWriter ("172.16.192.139", 16384);
+            runner.Writer = new TcpTextWriter ("10.96.67.0", 16384);
 
 			// start running the test suites as soon as the application is loaded
             runner.AutoStart = true;

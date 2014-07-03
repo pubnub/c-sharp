@@ -23,7 +23,7 @@ namespace PubNubMessaging.Tests
       
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenUnsubscribedToAChannel", "ThenNonExistentChannelShouldReturnNotSubscribed");
       
-            string channel = "hello_world";
+            string channel = "hello_world_unsub";
       
             pubnub.Unsubscribe<string>(channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessage);
             common.WaitForResponse();
@@ -36,6 +36,7 @@ namespace PubNubMessaging.Tests
                 {
                     Assert.Fail();
                 }
+            pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -50,7 +51,7 @@ namespace PubNubMessaging.Tests
       
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenUnsubscribedToAChannel", "ThenShouldReturnUnsubscribedMessage");
       
-            string channel = "hello_world";
+            string channel = "hello_world_unsub1";
 
             pubnub.Subscribe<string>(channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
@@ -69,6 +70,8 @@ namespace PubNubMessaging.Tests
                 {
                     Assert.Fail();
                 }    
+            pubnub.EndPendingRequests();
+
         }
 
         [Test]
@@ -83,7 +86,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenUnsubscribedToAChannel", "ThenShouldReturnUnsubscribedMessage");
 
-            string channel = "hello_world2";
+            string channel = "hello_world_unsub12";
 
             pubnub.Subscribe<string>(channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
@@ -101,7 +104,9 @@ namespace PubNubMessaging.Tests
                 } else
                 {
                     Assert.Fail();
-                }    
+                }  
+            pubnub.EndPendingRequests();
+
         }
 
         [Test]
@@ -114,7 +119,7 @@ namespace PubNubMessaging.Tests
                                 "",
                                 false
                             );
-            string channel = "hello_world2";
+            string channel = "hello_world_unsub2";
             Common common = new Common();
             common.DeliveryStatus = false;
             common.Response = null;
@@ -133,7 +138,6 @@ namespace PubNubMessaging.Tests
             commonSubscribe.Response = null;
 
             common.WaitForResponse(30);
-
             string response = "";
             if (common.Response == null)
                 {
@@ -172,7 +176,7 @@ namespace PubNubMessaging.Tests
             common.Response = null;
             pubnub.Unsubscribe<string>(channel, commonUnsubscribe.DisplayReturnMessageDummy, commonUnsubscribe.DisplayReturnMessageDummy, commonUnsubscribe.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse(30);
+            common.WaitForResponse(20);
             string response = "";
             if (common.Response == null)
                 {
@@ -197,6 +201,7 @@ namespace PubNubMessaging.Tests
                             Assert.True(channel.Equals(responseFields2 [2]) && responseFields2 [0].ToString().Contains("leave"));
                         }
                 }
+            pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -209,7 +214,7 @@ namespace PubNubMessaging.Tests
                                 "",
                                 true
                             );
-            string channel = "hello_world3";
+            string channel = "hello_world_unsub3";
             Common common = new Common();
             common.DeliveryStatus = false;
             common.Response = null;
@@ -217,7 +222,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenAClientIsPresented", "ThenPresenceShouldReturnReceivedMessage");
 
             pubnub.Presence<string>(channel, common.DisplayReturnMessage, common.DisplayReturnMessage, common.DisplayErrorMessage);
-            Thread.Sleep(3000);
+            Thread.Sleep(5000);
             Common commonSubscribe = new Common();
             common.DeliveryStatus = false;
             common.Response = null;

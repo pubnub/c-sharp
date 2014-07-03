@@ -43,6 +43,7 @@ namespace PubNubMessaging.Tests
             response = fields [0].ToString ();
             Console.WriteLine ("Response:" + response);
             Assert.False (("0").Equals (response));
+			pubnub.EndPendingRequests();
         }
 
         [Test]
@@ -53,7 +54,7 @@ namespace PubNubMessaging.Tests
                 Common.SubscribeKey,
                                 "",
                                 "",
-                                false
+				true
                             );
 
             Common common = new Common ();
@@ -73,6 +74,7 @@ namespace PubNubMessaging.Tests
             response = fields [0].ToString ();
             Console.WriteLine ("Response:" + response);
             Assert.False (("0").Equals (response));
+			pubnub.EndPendingRequests();
         }
 
         private void ReturnTimeStampCallback (string result)

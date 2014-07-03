@@ -145,6 +145,7 @@ namespace PubNubMessaging.Tests
 						return (T)retMessage;
 				}
 
+				#if (USE_MiniJSON)
 				/// <summary>
 				/// Deserialize the specified message using either JSONFX or NEWTONSOFT.JSON.
 				/// The functionality is based on the pre-compiler flag
@@ -157,6 +158,7 @@ namespace PubNubMessaging.Tests
 						retMessage = MiniJSON.Json.Deserialize(message) as object;
 						return (T)retMessage;
 				}
+				#endif
 
 				/// <summary>
 				/// Serialize the specified message using either JSONFX or NEWTONSOFT.JSON.
@@ -181,7 +183,8 @@ namespace PubNubMessaging.Tests
 						#endif
 						return retMessage;
 				}
-
+				
+				#if (USE_MiniJSON)
 				/// <summary>
 				/// Serialize the specified message using either JSONFX or NEWTONSOFT.JSON.
 				/// The functionality is based on the pre-compiler flag
@@ -194,6 +197,7 @@ namespace PubNubMessaging.Tests
 						UnityEngine.Debug.Log("retMessage: " + retMessage);
 						return retMessage;
 				}
+				#endif
 
 				/// <summary>
 				/// Converts the upper case hex to lower case hex.
