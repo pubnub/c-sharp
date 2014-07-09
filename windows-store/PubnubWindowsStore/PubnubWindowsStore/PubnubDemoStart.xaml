@@ -1,0 +1,68 @@
+﻿<Page
+    x:Name="pageRoot"
+    x:Class="PubnubWindowsStore.PubnubDemoStart"
+    DataContext="{Binding DefaultViewModel, RelativeSource={RelativeSource Self}}"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PubnubWindowsStore"
+    xmlns:common="using:PubnubWindowsStore.Common"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <!-- TODO: Delete this line if the key AppName is declared in App.xaml -->
+        <x:String x:Key="AppName">Pubnub C# Demo</x:String>
+    </Page.Resources>
+
+    <!--
+        This grid acts as a root panel for the page that defines two rows:
+        * Row 0 contains the back button and page title
+        * Row 1 contains the rest of the page layout
+    -->
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.ChildrenTransitions>
+            <TransitionCollection>
+                <EntranceThemeTransition/>
+            </TransitionCollection>
+        </Grid.ChildrenTransitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="140"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Back button and page title -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="backButton" Margin="39,59,39,0" Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
+                        Style="{StaticResource NavigationBackButtonNormalStyle}"
+                        VerticalAlignment="Top"
+                        AutomationProperties.Name="Back"
+                        AutomationProperties.AutomationId="BackButton"
+                        AutomationProperties.ItemType="Navigation Button"/>
+            <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
+                        IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="0,0,30,40"/>
+        </Grid>
+        <CheckBox x:Name="chkSSL" Content="Use SSL" HorizontalAlignment="Left" Margin="121,2,0,0" Grid.Row="1" VerticalAlignment="Top"/>
+        <CheckBox x:Name="chkReconnect" Content="Resume on Reconnect" HorizontalAlignment="Left" Margin="280,2,0,0" Grid.Row="1" VerticalAlignment="Top" IsChecked="True"/>
+        <TextBlock HorizontalAlignment="Left" Margin="124,53,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Text="Publish Key" FontSize="14"/>
+        <TextBox x:Name="txtPublishKey" HorizontalAlignment="Left" Margin="213,38,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="313" Text="demo"/>
+        <TextBlock HorizontalAlignment="Left" Margin="124,99,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Text="Subscribe Key" FontSize="14"/>
+        <TextBox x:Name="txtSubscribeKey" HorizontalAlignment="Left" Margin="213,88,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="313" Text="demo"/>
+        <TextBlock HorizontalAlignment="Left" Margin="124,153,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Text="Cipher Key" FontSize="14"/>
+        <TextBox x:Name="txtCipherKey" HorizontalAlignment="Left" Margin="213,142,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="313"/>
+        <TextBlock HorizontalAlignment="Left" Margin="124,207,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Text="Secret Key" FontSize="14"/>
+        <TextBox x:Name="txtSecretKey" HorizontalAlignment="Left" Margin="213,196,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="313" Text="demo"/>
+        <TextBlock HorizontalAlignment="Left" Margin="124,257,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Text="Session UUID" FontSize="14"/>
+        <TextBox x:Name="txtSessionUUID" HorizontalAlignment="Left" Margin="213,246,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="313" Text="winstoreuuid"/>
+        <TextBlock HorizontalAlignment="Left" Margin="124,305,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Text="Origin" FontSize="14"/>
+        <TextBox x:Name="txtOrigin" HorizontalAlignment="Left" Margin="213,294,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="313" Text="pubsub.pubnub.com"/>
+        <TextBlock HorizontalAlignment="Left" Margin="124,353,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Text="Auth Key" FontSize="14"/>
+        <TextBox x:Name="txtAuthKey" HorizontalAlignment="Left" Margin="213,342,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="313"/>
+        <CheckBox x:Name="chkHideErrors" Content="Hide Error Callback Messages" HorizontalAlignment="Left" Margin="156,391,0,0" Grid.Row="1" VerticalAlignment="Top" IsChecked="True"/>
+        <Button Content="Continue" HorizontalAlignment="Left" Margin="434,410,0,0" Grid.Row="1" VerticalAlignment="Top" Click="btnContinue_Click"/>
+    </Grid>
+</Page>
