@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Text;
 using System.Net;
@@ -14,7 +14,7 @@ namespace PubNubMessaging.Core
 	internal class LoggingMethod
 	#endif
 	{
-		private static int logLevel = 0;
+		private static int logLevel = 3;
 		public static Level LogLevel
 		{
 			get
@@ -70,9 +70,9 @@ namespace PubNubMessaging.Core
 		public static void WriteToLog(string logText, bool writeToLog)
 		{
 			if (writeToLog)
-			{
-				#if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || __IOS__ || MONODROID || __ANDROID__)
-				System.Diagnostics.Debug.WriteLine(logText);
+            {
+                #if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || __IOS__ || MONODROID || __ANDROID__ || NETFX_CORE)
+                System.Diagnostics.Debug.WriteLine(logText);
 				#elif (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
 				print(logText);
 				UnityEngine.Debug.Log (logText);
@@ -323,8 +323,8 @@ namespace PubNubMessaging.Core
 		{
 			PubnubErrorCode ret = PubnubErrorCode.None;
 			switch (webExceptionStatus)
-			{
-				#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE)
+            {
+                #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !NETFX_CORE)
 				case WebExceptionStatus.NameResolutionFailure:
 				ret = PubnubErrorCode.NameResolutionFailure;
 				break;
@@ -334,8 +334,8 @@ namespace PubNubMessaging.Core
 				case WebExceptionStatus.ServerProtocolViolation:
 				ret = PubnubErrorCode.ServerProtocolViolation;
 				break;
-				#endif
-				case WebExceptionStatus.RequestCanceled:
+                #endif
+                case WebExceptionStatus.RequestCanceled:
 				ret = PubnubErrorCode.WebRequestCanceled;
 				break;
 				case WebExceptionStatus.ConnectFailure:
