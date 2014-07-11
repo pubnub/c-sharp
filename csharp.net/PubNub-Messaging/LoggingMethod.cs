@@ -14,7 +14,7 @@ namespace PubNubMessaging.Core
 	internal class LoggingMethod
 	#endif
 	{
-		private static int logLevel = 3;
+		private static int logLevel = 0;
 		public static Level LogLevel
 		{
 			get
