@@ -627,7 +627,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(MissingFieldException))]
+        [ExpectedException(typeof(MissingMemberException))]
         public void ThenPublishKeyShouldNotBeEmpty()
         {
             Pubnub pubnub = new Pubnub("", PubnubCommon.SubscribeKey, "", "", false);
