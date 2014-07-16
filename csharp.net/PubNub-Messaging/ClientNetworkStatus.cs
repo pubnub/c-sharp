@@ -252,8 +252,12 @@ namespace PubNubMessaging.Core
 #if NETFX_CORE
         private static async void CheckSocketConnectAsync()
         {
-            DatagramSocket socket = new DatagramSocket();
-            await socket.ConnectAsync(new HostName("pubsub.pubnub.com"), "80");
+            try
+            {
+                DatagramSocket socket = new DatagramSocket();
+                await socket.ConnectAsync(new HostName("pubsub.pubnub.com"), "80");
+            }
+            catch { }
         }
 #endif
 

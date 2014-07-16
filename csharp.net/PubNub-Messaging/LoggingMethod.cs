@@ -348,7 +348,20 @@ namespace PubNubMessaging.Core
 				}
 				break;
 				default:
+#if NETFX_CORE
+                if (webExceptionStatus.ToString() == "NameResolutionFailure")
+                {
+                    ret = PubnubErrorCode.NameResolutionFailure;
+                }
+                else
+                {
+                    Debug.WriteLine("ATTENTION: webExceptionStatus = " + webExceptionStatus.ToString());
+                    ret = PubnubErrorCode.None;
+                }
+#else             
 				Debug.WriteLine("ATTENTION: webExceptionStatus = " + webExceptionStatus.ToString());
+                ret = PubnubErrorCode.None;
+#endif
 				break;
 			}
 			return ret;
@@ -457,6 +470,7 @@ namespace PubNubMessaging.Core
 				ret = PubnubErrorCode.GatewayTimeout;
 				break;
 				default:
+                ret = PubnubErrorCode.None;
 				break;
 			}
 
