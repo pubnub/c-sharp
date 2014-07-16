@@ -1,4 +1,4 @@
-//Build Date: July 09, 2014
+﻿//Build Date: July 10, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX_UNITY
@@ -344,6 +344,7 @@ namespace PubNubMessaging.Core
             set 
             {
 				_pubnubLogLevel = value;
+                LoggingMethod.LogLevel = _pubnubLogLevel;
 			}
 		}
 
@@ -357,6 +358,7 @@ namespace PubNubMessaging.Core
             set 
             {
 				_errorLevel = value;
+                PubnubErrorFilter.ErrorLevel = _errorLevel;
 			}
 		}
 
@@ -407,7 +409,13 @@ namespace PubNubMessaging.Core
 
 		#region "Internet connection and Reconnect Network"
 
-		protected virtual void ReconnectNetwork<T>(ReconnectState<T> netState)
+        protected virtual void ReconnectFromSuspendMode(object netState)
+        {
+            if (netState == null) return;
+            ReconnectFromSuspendModeCallback<string>(netState);
+        }
+        
+        protected virtual void ReconnectNetwork<T>(ReconnectState<T> netState)
 		{
 			System.Threading.Timer timer = new Timer(new TimerCallback(ReconnectNetworkCallback<T>), netState, 0,
 				                                  (-1 == _pubnubNetworkTcpCheckIntervalInSeconds) ? Timeout.Infinite : _pubnubNetworkTcpCheckIntervalInSeconds * 1000);
@@ -605,6 +613,52 @@ namespace PubNubMessaging.Core
 			}
 		}
 
+        protected virtual void ReconnectFromSuspendModeCallback<T>(System.Object reconnectState)
+        {
+            string channel = "";
+            if (PubnubWebRequest.MachineSuspendMode && ClientNetworkStatus.MachineSuspendMode)
+            {
+                return;
+            }
+            
+            LoggingMethod.WriteToLog(string.Format("DateTime {0}, Reconnect from Machine Suspend Mode.", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
+
+            ReconnectState<T> netState = reconnectState as ReconnectState<T>;
+            try
+            {
+                if (netState != null && netState.Channels != null)
+                {
+                    channel = string.Join(",", netState.Channels);
+
+                    switch (netState.Type)
+                    {
+                        case ResponseType.Subscribe:
+                        case ResponseType.Presence:
+                            MultiChannelSubscribeRequest<T>(netState.Type, netState.Channels, netState.Timetoken, netState.Callback, netState.ConnectCallback, netState.ErrorCallback, netState.Reconnect);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    LoggingMethod.WriteToLog(string.Format("DateTime {0}, Unknown request state in ReconnectFromSuspendModeCallback", DateTime.Now.ToString()), LoggingMethod.LevelError);
+                }
+            }
+            catch (Exception ex)
+            {
+                if (netState != null)
+                {
+                    string multiChannel = (netState.Channels != null) ? string.Join(",", netState.Channels) : "";
+
+
+                    CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
+                        multiChannel, netState.ErrorCallback, ex, null, null);
+                }
+
+                LoggingMethod.WriteToLog(string.Format("DateTime {0} method:ReconnectFromSuspendModeCallback \n Exception Details={1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelError);
+            }
+        }
 		#endregion
 
 		#region "Error Callbacks"

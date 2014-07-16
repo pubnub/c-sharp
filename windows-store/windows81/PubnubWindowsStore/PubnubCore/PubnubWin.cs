@@ -1,4 +1,4 @@
-//Build Date: July 09, 2014
+﻿//Build Date: July 09, 2014
 using System;
 using System.Text;
 using System.IO;
@@ -44,6 +44,8 @@ namespace PubNubMessaging.Core
 		#if (__MonoCS__)
 		protected string _domainName = "pubsub.pubnub.com";
 		#endif
+
+        private object _reconnectFromSuspendMode = null;
 
 		#endregion
 
@@ -253,8 +255,25 @@ namespace PubNubMessaging.Core
             IAsyncResult asyncResult = request.BeginGetResponse(new AsyncCallback(UrlProcessResponseCallback<T>), pubnubRequestState);
             Timer webRequestTimer = new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.Type) * 1000, Timeout.Infinite);
 #else
-            IAsyncResult asyncResult = request.BeginGetResponse(new AsyncCallback(UrlProcessResponseCallback<T>), pubnubRequestState);
-            ThreadPool.RegisterWaitForSingleObject(asyncResult.AsyncWaitHandle, new WaitOrTimerCallback(OnPubnubWebRequestTimeout<T>), pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.Type) * 1000, true);
+            if (!ClientNetworkStatus.MachineSuspendMode && !PubnubWebRequest.MachineSuspendMode)
+            {
+                IAsyncResult asyncResult = request.BeginGetResponse(new AsyncCallback(UrlProcessResponseCallback<T>), pubnubRequestState);
+                ThreadPool.RegisterWaitForSingleObject(asyncResult.AsyncWaitHandle, new WaitOrTimerCallback(OnPubnubWebRequestTimeout<T>), pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.Type) * 1000, true);
+            }
+            else
+            {
+                ReconnectState<T> netState = new ReconnectState<T>();
+                netState.Channels = pubnubRequestState.Channels;
+                netState.Type = pubnubRequestState.Type;
+                netState.Callback = pubnubRequestState.UserCallback;
+                netState.ErrorCallback = pubnubRequestState.ErrorCallback;
+                netState.ConnectCallback = pubnubRequestState.ConnectCallback;
+                netState.Timetoken = pubnubRequestState.Timetoken;
+                netState.Reconnect = pubnubRequestState.Reconnect;
+
+                _reconnectFromSuspendMode = netState;
+                return;
+            }
 #endif
             if (pubnubRequestState.Type == ResponseType.Presence || pubnubRequestState.Type == ResponseType.Subscribe)
             {
@@ -773,6 +792,10 @@ namespace PubNubMessaging.Core
 				{
 					LoggingMethod.WriteToLog(string.Format("DateTime {0}, Enabled Timer for heartbeat ", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
 				}
+
+                ReconnectFromSuspendMode(_reconnectFromSuspendMode);
+                _reconnectFromSuspendMode = null;
+
 			}
 		}
 #endif
