@@ -29,4 +29,11 @@ public static class AutoBuilder {
 				EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTarget.iPhone);
 				BuildPipeline.BuildPlayer(GetScenePaths(), "Builds/iOS",BuildTarget.iPhone,BuildOptions.None);
 		}
+
+                [MenuItem("File/AutoBuilder/Android")]
+		static void PerformAndroidBuild ()
+		{
+				EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTarget.Android);
+				BuildPipeline.BuildPlayer(GetScenePaths(), "Builds/Android",BuildTarget.Android,BuildOptions.None);
+		}
 }
