@@ -1,4 +1,4 @@
-﻿//Build Date: July 10, 2014
+﻿//Build Date: July 16, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID)
 #define USE_JSONFX_UNITY
@@ -2993,19 +2993,33 @@ namespace PubNubMessaging.Core
 							callbackKey.Channel = currentChannel;
 							callbackKey.Type = (currentChannel.LastIndexOf ("-pnpres") == -1) ? ResponseType.Subscribe : ResponseType.Presence;
 
-							if (channelCallbacks.Count > 0 && channelCallbacks.ContainsKey (callbackKey)) {
-								if ((typeof(T) == typeof(string) && channelCallbacks [callbackKey].GetType ().Name.Contains ("[System.String]")) ||
-								            (typeof(T) == typeof(object) && channelCallbacks [callbackKey].GetType ().Name.Contains ("[System.Object]"))) {
+							if (channelCallbacks.Count > 0 && channelCallbacks.ContainsKey (callbackKey)) 
+                            {
+								if ((typeof(T) == typeof(string) && channelCallbacks [callbackKey].GetType().Name.Contains ("[System.String]")) ||
+								            (typeof(T) == typeof(object) && channelCallbacks [callbackKey].GetType().Name.Contains ("[System.Object]"))) 
+                                {
 									PubnubChannelCallback<T> currentPubnubCallback = channelCallbacks [callbackKey] as PubnubChannelCallback<T>;
-									if (currentPubnubCallback != null && currentPubnubCallback.Callback != null) {
-										GoToCallback<T> (itemMessage, currentPubnubCallback.Callback);
+									if (currentPubnubCallback != null && currentPubnubCallback.Callback != null) 
+                                    {
+										GoToCallback<T>(itemMessage, currentPubnubCallback.Callback);
 									}
-								} else if (channelCallbacks [callbackKey].GetType ().FullName.Contains ("[System.String")) {
+								} 
+                                else if (channelCallbacks [callbackKey].GetType ().FullName.Contains("[System.String")) 
+                                {
 									PubnubChannelCallback<string> retryPubnubCallback = channelCallbacks [callbackKey] as PubnubChannelCallback<string>;
-									if (retryPubnubCallback != null && retryPubnubCallback.Callback != null) {
-										GoToCallback (itemMessage, retryPubnubCallback.Callback);
+									if (retryPubnubCallback != null && retryPubnubCallback.Callback != null) 
+                                    {
+										GoToCallback(itemMessage, retryPubnubCallback.Callback);
 									}
 								}
+                                else if (channelCallbacks[callbackKey].GetType().FullName.Contains("[System.Object"))
+                                {
+                                    PubnubChannelCallback<object> retryPubnubCallback = channelCallbacks[callbackKey] as PubnubChannelCallback<object>;
+                                    if (retryPubnubCallback != null && retryPubnubCallback.Callback != null)
+                                    {
+                                        GoToCallback(itemMessage, retryPubnubCallback.Callback);
+                                    }
+                                }
 
 							}
 						}
@@ -4348,7 +4362,7 @@ namespace PubNubMessaging.Core
 
 		public List<object> DeserializeToListOfObject (string jsonString)
 		{
-			jsonString = PubnubCryptoBase.ConvertHexToUnicodeChars (jsonString);
+			jsonString = PubnubCryptoBase.ConvertHexToUnicodeChars(jsonString);
 			var reader = new JsonFx.Json.JsonReader ();
 			var output = reader.Read<List<object>> (jsonString);
 			return output;
@@ -4356,7 +4370,7 @@ namespace PubNubMessaging.Core
 
 		public object DeserializeToObject (string jsonString)
 		{
-			jsonString = PubnubCryptoBase.ConvertHexToUnicodeChars (jsonString);
+			jsonString = PubnubCryptoBase.ConvertHexToUnicodeChars(jsonString);
 			var reader = new JsonFx.Json.JsonReader ();
 			var output = reader.Read<object> (jsonString);
 			return output;

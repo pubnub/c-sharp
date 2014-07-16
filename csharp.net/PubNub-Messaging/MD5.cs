@@ -653,7 +653,7 @@ namespace PubNubMessaging.Core
 		/// </summary>
 		/// <returns>The lower case hex.</returns>
 		/// <param name="value">Hex Value.</param>
-		protected string ConvertHexToUnicodeChars( string value ) {
+		public static string ConvertHexToUnicodeChars( string value ) {
 			//if(;
 			return Regex.Replace(
 				value,
