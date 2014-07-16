@@ -38,9 +38,9 @@
 /silverlight/*/obj/Release/*
 /silverlight/PubnubSilverlightUnitTest.Web/bin/*
 /silverlight/*/*.csproj.user
-/windows-store/PubnubWindowsStore/packages/*
-/windows-store/PubnubWindowsStore/*/bin/Debug/*
-/windows-store/PubnubWindowsStore/*/obj/Debug/*
+/windows-store/*/PubnubWindowsStore/packages/*
+/windows-store/*/PubnubWindowsStore/*/bin/Debug/*
+/windows-store/*/PubnubWindowsStore/*/obj/Debug/*
 .DS_Store
 *.cache
 *.suo
