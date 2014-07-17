@@ -282,7 +282,7 @@ namespace PubNubMessaging.Core
         {
             PubnubErrorCode ret = PubnubErrorCode.None;
             switch (webExceptionStatus) {
-                #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE)
+                #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !UNITY_STANDALONE)
                 case WebExceptionStatus.NameResolutionFailure:
                 ret = PubnubErrorCode.NameResolutionFailure;
                 break;

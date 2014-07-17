@@ -27,7 +27,7 @@ namespace PubNubMessaging.Core
         private static ManualResetEvent mreSocketAsync = new ManualResetEvent(false);
         
 
-#elif(!UNITY_IOS && !UNITY_ANDROID)
+#elif(!UNITY_IOS && !UNITY_ANDROID && !UNITY_STANDALONE)
         private static ManualResetEventSlim mres = new ManualResetEventSlim (false);
         #endif
         internal static bool SimulateNetworkFailForTesting {
@@ -52,7 +52,7 @@ namespace PubNubMessaging.Core
 				/*#if(__MonoCS__ && !UNITY_IOS && !UNITY_ANDROID)
         static UdpClient udp;
         #endif*/
-        #if(UNITY_IOS || UNITY_ANDROID || __MonoCS__)
+        #if(UNITY_IOS || UNITY_ANDROID || UNITY_STANDALONE || __MonoCS__)
         static HttpWebRequest request;
         static WebResponse response;
 
@@ -100,7 +100,7 @@ namespace PubNubMessaging.Core
             state.Callback = callback;
             state.ErrorCallback = errorCallback;
             state.Channels = channels;
-            #if (UNITY_ANDROID || UNITY_IOS)
+            #if (UNITY_ANDROID || UNITY_IOS || UNITY_STANDALONE)
             CheckSocketConnect<T>(state);
             #elif(__MonoCS__)
             CheckSocketConnect<T> (state);
@@ -110,7 +110,7 @@ namespace PubNubMessaging.Core
 
             #if (SILVERLIGHT || WINDOWS_PHONE)
             mres.WaitOne();
-            #elif(!UNITY_ANDROID && !UNITY_IOS)
+            #elif(!UNITY_ANDROID && !UNITY_IOS && !UNITY_STANDALONE)
             mres.Wait ();
             #endif
         }
@@ -167,8 +167,8 @@ namespace PubNubMessaging.Core
                         }
                     } 
                 }
-                #elif(__MonoCS__)
-				using(UdpClient udp = new UdpClient ("pubsub.pubnub.com", 80)){
+                #elif(__MonoCS__ || UNITY_STANDALONE)
+                    using (UdpClient udp = new UdpClient ("pubsub.pubnub.com", 80)){
                     IPAddress localAddress = ((IPEndPoint)udp.Client.LocalEndPoint).Address;
                     if (udp != null && udp.Client != null  && udp.Client.RemoteEndPoint != null) {
                         udp.Client.SendTimeout = HeartbeatInterval * 1000;
@@ -206,7 +206,7 @@ namespace PubNubMessaging.Core
             }
             #endif
             catch (Exception ex) {
-                #if(__MonoCS__)
+                #if(__MonoCS__ || UNITY_STANDALONE)
                 _status = false;
                 #endif
                 ParseCheckSocketConnectException<T> (ex, channels, errorCallback, callback);
@@ -221,15 +221,15 @@ namespace PubNubMessaging.Core
                 if(request!=null){
                     request = null;
                 }
-                #elif(__MonoCS__)
+                #elif(__MonoCS__  || UNITY_STANDALONE)
                 #endif
-                #if(UNITY_IOS)
+#if(UNITY_IOS)
                 GC.Collect();
-                #endif
-            }
-            #if (!UNITY_ANDROID && !UNITY_IOS)
+#endif
+                      }
+#if (!UNITY_ANDROID && !UNITY_IOS && !UNITY_STANDALONE)
             mres.Set ();
-            #endif
+#endif
         }
 
         static void ParseCheckSocketConnectException<T> (Exception ex, string[] channels, Action<PubnubClientError> errorCallback, Action<bool> callback)

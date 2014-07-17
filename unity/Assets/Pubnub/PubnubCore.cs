@@ -1,4 +1,4 @@
-//Build Date: May 08, 2014
+//Build Date: Jul 17, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
