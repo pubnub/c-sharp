@@ -5,16 +5,8 @@
 We've made a [screencast](https://vimeo.com/69591819) that will walk you through the general setup. 
 After checking out the general setup video, [For iOS targets](https://vimeo.com/71549964) be sure to view this walkthrough next. Check it out!
 
-#### Why do we have 4 versions of Unity code
-The PubNub classes which reside under the Assets → Pubnub are the same for all. The code under this folder (along with a ref to a JSON serialization library) is all you need to implement PubNub in your project.
-
-For Unity-iOS and Unity-Standalone/Unity-Android the difference lies in the JSONFX serialization libraries (for iOS and Android/Standalone) making the .csproj files different for these 2 client. The normal version of JsonFx has trouble running under Unity-iOS so we had to use a different library.
-
-Similarly for windows the code is the same but the same project file (.csproj) ( if we used the Android/Standalone’s project file ) was giving issues when opened under windows environment. In order to not run into issues in this case we had to provide a different project. The serialization library used in Windows is the same as the one used in Android/Standalone.   
-
-There are 2 versions of Unity-iOS code (iOS and iOS-MiniJson). The code under the folder iOS uses the JsonFx 1.4 library (mod by TowerOBricks) and the code under iOS-MiniJson used MiniJson as the serialization library.
-
 ### Important changes from previous version
+- We have removed the separate versions for Unity, and made this as a common version which  works on all unity distros. The update is an optimized version of the code which was used for Unity iOS. This version uses the JsonFx 1.4 library (mod by TowerOBricks, https://bitbucket.org/TowerOfBricks/jsonfx-for-unity3d/overview).  
 - UserState method parameters have been modified.
 - PAM auth method parameters have been modified.
 - Implements the features of Pubnub 3.6
@@ -60,19 +52,50 @@ USE_JSONFX_FOR_UNITY with USE_JSONFX_UNITY_IOS
 Please note the other serialization libraries used in the pubnub.cs class are the default from the builtin .NET class (activated when the pre-compiler directive USE_DOTNET_SERIALIZATION is used) and Newtonsoft.Json (activated when neither USE_JSONFX nor USE_DOTNET_SERIALIZATION is defined). Both of these libraries won't work with UNITY. So you need to be sure the pre-compiler variable USE_JSONFX is "defined" at the top of the pubnub.cs class (default behavior).
 
 #### To run the unit tests, in addition to the above, you need to 
-1. Import UnityTestTools package (this is already present in the Pubnub client code under the path PubnubUnity/Assets/UnityTestTools) into your Assets. (https://www.assetstore.unity3d.com/#/content/13802)
-
-#### Running the Demo App on PC
-
-Please use the folder [Windows-Standalone](Windows-Standalone) and refer to the ReadMe in it.
+1. Import UnityTestTools package (this is already present in the Pubnub client code under the path Assets/UnityTestTools) into your Assets. (https://www.assetstore.unity3d.com/#/content/13802)
 
 #### Running the Demo App on Mac, Linux and Android
 
-Please use the folder [Mac-Linux-Android-Standalone](Mac-Linux-Android-Standalone) and refer to the ReadMe in it.
+####Common Steps:
 
-#### Running the Demo App on iOS
+1. Open up the Unity Project 
+2. Ensure "PubnubExample" is added as component to Main Camera.
+3. Goto File menu -> Build Settings.
 
-Please use the folder [iOS](iOS) or [iOS-MiniJson](iOS-MiniJson) and refer to the ReadMe in it.
+##### Mac / PC /Linux
+
+1. Follow the 3 steps listed under Common Steps for Running the Demo App on Mac, Linux and Android.
+2. In the dialog that opens select PC, Mac, Linux Standalone under the platform and click "Switch Platform".
+3. On the right side of the same dialog select Mac or Windows or Linux under "Target Platform".
+4. Click "Build and Run"
+5. This will run the PubNub example in the unity standalone player for Mac
+
+##### Android (requires Android development environment to be set)
+
+1. Follow the 3 steps listed under Common Steps for Running the Demo App on Mac.
+2. In the dialog the opens select Android under the platform and click "Switch Platform".
+3. Click "Build and Run". This button may be disabled or you may get an error that no devices are found. To resolve this please ensure that the android emulator is running.
+4. This will run the PubNub example in the Android emulator. 
+5. The code uses the pre-compiler flag UNITY_ANDROID to distinguish between other platforms.
+6. If running on the emulator please enable GPU emulation.
+7. Target Android version 4 (Ice cream sandwich) or above.
+
+#### iOS (requires Xcode to be installed)
+
+1. Open up the Unity Project 
+2. Ensure "PubnubExample" is added as component to Main Camera.
+3. Goto File menu -> Build Settings.
+4. In the dialog the opens select iOS under the platform and click "Switch Platform".
+5. Click "Build and Run"
+6. This will run the PubNub example in the iPad simulator
+7. The code uses the pre-compiler flag UNITY_IOS to distinguish between other platforms.
+8. Target iOS version 4.0 and above. 
+
+#### Running the Tests
+
+1. Open up the Unity Project from iOS folder.
+2. From the "Unity test tools" menu select the "Unit test runner" option.
+3. Run the tests by clicking the "play" button or by selecting the individual tests.
 
 #### Potential Errors and their resolutions:
 
