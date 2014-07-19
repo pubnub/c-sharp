@@ -277,9 +277,11 @@ namespace PubnubWindowsStore
             }
         }
 
-        private void btnClose_Click(object sender, RoutedEventArgs e)
+        private void btnHome_Click(object sender, RoutedEventArgs e)
         {
-            App.Current.Exit();
+            var frame = new Frame();
+            frame.Navigate(typeof(PubnubDemoStart));
+            Window.Current.Content = frame;
         }
 
         private void btnPresence_Click(object sender, RoutedEventArgs e)
@@ -983,6 +985,20 @@ namespace PubnubWindowsStore
             Point point = transform.TransformPoint(new Point(0, 0));
 
             return point;
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            PubnubCleanup();
+        }
+
+        void PubnubCleanup()
+        {
+            if (pubnub != null)
+            {
+                pubnub.EndPendingRequests();
+                pubnub = null;
+            }
         }
 
     }
