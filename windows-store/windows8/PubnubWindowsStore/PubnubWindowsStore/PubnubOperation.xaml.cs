@@ -87,7 +87,7 @@ namespace PubnubWindowsStore
             }
         }
 
-private void btnTime_Click(object sender, RoutedEventArgs e)
+        private void btnTime_Click(object sender, RoutedEventArgs e)
         {
             DisplayMessageInTextBox("Running Time:");
             pubnub.Time<string>(PubnubCallbackResult, PubnubDisplayErrorMessage);
@@ -228,9 +228,12 @@ private void btnTime_Click(object sender, RoutedEventArgs e)
             }
         }
 
-        private void btnClose_Click(object sender, RoutedEventArgs e)
+        private void btnHome_Click(object sender, RoutedEventArgs e)
         {
-            App.Current.Exit();
+            var frame = new Frame();
+            frame.Navigate(typeof(PubnubDemoStart));
+            Window.Current.Content = frame;
+         
         }
 
         private void btnPresence_Click(object sender, RoutedEventArgs e)
@@ -935,6 +938,19 @@ private void btnTime_Click(object sender, RoutedEventArgs e)
 
             return point;
         }
-        
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            PubnubCleanup();
+        }
+
+        void PubnubCleanup()
+        {
+            if (pubnub != null)
+            {
+                pubnub.EndPendingRequests();
+                pubnub = null;
+            }
+        }
     }
 }

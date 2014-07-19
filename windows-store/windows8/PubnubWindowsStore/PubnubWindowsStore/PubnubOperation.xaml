@@ -8,7 +8,7 @@
     xmlns:common="using:PubnubWindowsStore.Common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d" Unloaded="Page_Unloaded">
 
     <Page.Resources>
 
@@ -67,7 +67,7 @@
         <Button Content="Enable Network" HorizontalAlignment="Left" Margin="272,436,0,0" Grid.Row="1" VerticalAlignment="Top" Width="185" Height="40" Click="btnEnableNetwork_Click"/>
 
         <TextBox x:Name="txtResult" HorizontalAlignment="Left" Margin="507,5,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="655" Height="443" IsReadOnly="True" AcceptsReturn="True"/>
-        <!--<Button Content="Close" HorizontalAlignment="Left" Margin="560,464,0,0" Grid.Row="1" VerticalAlignment="Top" Click="btnClose_Click"/>-->
+        <Button Content="Home" HorizontalAlignment="Left" Margin="560,464,0,0" Grid.Row="1" VerticalAlignment="Top" Click="btnHome_Click"/>
         <VisualStateManager.VisualStateGroups>
 
             <!-- Visual states reflect the application's view state -->
