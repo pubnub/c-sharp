@@ -1,4 +1,4 @@
-﻿//Build Date: July 09, 2014
+﻿//Build Date: July 22, 2014
 using System;
 using System.Text;
 using System.IO;
@@ -557,7 +557,7 @@ namespace PubNubMessaging.Core
                                 string errorDescription = "";
                                 int pubnubStatusCode = 0;
 
-                                if ((int)currentHttpStatusCode == 500 || (int)currentHttpStatusCode == 502 || (int)currentHttpStatusCode == 504 || (int)currentHttpStatusCode == 414)
+                                if ((int)currentHttpStatusCode == 500 || (int)currentHttpStatusCode == 502 || (int)currentHttpStatusCode == 503 || (int)currentHttpStatusCode == 504 || (int)currentHttpStatusCode == 414)
                                 {
                                     //This status code is not giving json string.
                                     string statusMessage = currentHttpStatusCode.ToString();
