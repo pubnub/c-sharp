@@ -466,6 +466,9 @@ namespace PubNubMessaging.Core
 				case 502:
 				ret = PubnubErrorCode.BadGateway;
 				break;
+                case 503:
+                ret = PubnubErrorCode.ServiceUnavailable;
+                break;
 				case 504:
 				ret = PubnubErrorCode.GatewayTimeout;
 				break;
@@ -530,6 +533,7 @@ namespace PubNubMessaging.Core
         RequestUriTooLong = 4140,
 		InternalServerError = 5000,
 		BadGateway = 5020,
+        ServiceUnavailable = 5030,
 		GatewayTimeout = 5040
 	}
 
@@ -552,6 +556,7 @@ namespace PubNubMessaging.Core
 			dictionaryCodes.Add(4140, "The URL request too long. Reduce the length by reducing subscription/presence channels or grant/revoke/audit channels/auth key list. Hint: You may spread the load across multiple PubNub instances to prevent this message.");
 			dictionaryCodes.Add(5000, "Internal Server Error. Please try again. If the issue continues, please contact PubNub support");
 			dictionaryCodes.Add(5020, "Bad Gateway. Please try again. If the issue continues, please contact PubNub support");
+            dictionaryCodes.Add(5030, "Service Unavailable. Please try again. If the issue continues, please contact PubNub support");
 			dictionaryCodes.Add(5040, "Gateway Timeout. Please try again. If the issue continues, please contact PubNub support");
 
 			//PubNub API ERROR CODES and PubNub Context description
