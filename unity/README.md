@@ -41,17 +41,11 @@ NOTE: The callback methods DisplayReturnMessage, DisplayConnectStatusMessage and
 
 #### Prerequisites
 + Install a free Full version of Unity 4 Pro from http://unity3d.com/unity/download/ (Unity 4 is recommended, but current/later versions should be ok). MonoDevelop IDE tool will be installed as part of Unity to write C# scripts.
-+ For Unity, JSONFX (1.4 mod by TowerOBricks) is needed for the serialization library. To use JSONFX we use the pre-processor directive. This JSON serialization works on all distort of Unity.
++ For Unity, JSONFX (1.4 mod by TowerOBricks) is needed for the serialization library. To use JSONFX we use the pre-processor directive `USE_JSONFX_UNITY_IOS` which works on all unity distros.
 
-`USE_JSONFX_UNITY_IOS`
+Please note the other serialization libraries used in the pubnubCore.cs and pubnubUnity.cs classes are the default from the builtin .NET class (activated when the pre-compiler directive USE_DOTNET_SERIALIZATION is used), the Newtonsoft.Json (activated when neither USE_JSONFX nor USE_DOTNET_SERIALIZATION is defined) and the latest version JSONFX (activated when the directive USE_JSONFX is defined) are not supported on unity. 
 
-Please note the other serialization libraries used in the pubnub.cs class are the default from the builtin .NET class (activated when the pre-compiler directive USE_DOTNET_SERIALIZATION is used) and Newtonsoft.Json (activated when neither USE_JSONFX nor USE_DOTNET_SERIALIZATION is defined). The directive USE_JSONFX uses the latest version of JSONFx, but this is not supported on unity. 
-
-`USE_JSONFX` works only for non-unity clients.
-
-The other pre-processor directive: 
-`USE_JSONFX_UNITY` (uses JSONFx 1.4 dll) works only for UNITY_STANDALONE or UNITY_WEBPLAYER or UNITY_ANDROID and NOT for UNITY_IOS. This directive is not-recommended to use in this version.
-
+The directive `USE_JSONFX_UNITY` (uses JSONFx 1.4 dll) works only for UNITY_STANDALONE or UNITY_WEBPLAYER or UNITY_ANDROID and NOT for UNITY_IOS. This directive is not recommended to use in this version.
 
 #### To run the unit tests, in addition to the above, you need to 
 1. Import UnityTestTools package (this is already present in the Pubnub client code under the path Assets/UnityTestTools) into your Assets. (https://www.assetstore.unity3d.com/#/content/13802)
