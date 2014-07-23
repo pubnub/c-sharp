@@ -7,6 +7,10 @@ After checking out the general setup video, [For iOS targets](https://vimeo.com/
 
 ### Important changes from previous version
 - We have removed the separate versions for Unity, and made this as a common version which  works on all unity distros. The update is an optimized version of the code which was used for Unity iOS. This version uses the JsonFx 1.4 library (mod by TowerOBricks, https://bitbucket.org/TowerOfBricks/jsonfx-for-unity3d/overview).  
+- Now the SDK uses only one pre-processor directive for all Unity distros
+i.e.`USE_JSONFX_UNITY_IOS`
+
+#### Changes in the earlier versions
 - UserState method parameters have been modified.
 - PAM auth method parameters have been modified.
 - Implements the features of Pubnub 3.6
@@ -14,16 +18,19 @@ After checking out the general setup video, [For iOS targets](https://vimeo.com/
 - If you had been using a previous version, your application might break due to signature difference.
 - Removes the dependency of .NET sockets.
 
-WE have modified the JsonFX pre processor directives: Now we have 3: 
-
-- `USE_JSONFX_UNITY` is for `UNITY_STANDALONE` or `UNITY_WEBPLAYER` or `UNITY_ANDROID`
-
-- `USE_JSONFX` for non-unity clients.
-
-- `USE_JSONFX_UNITY_IOS` is Unity IOS
-
 #### Cheatsheet to migrate to the new Error Callback implementation
 
+
+#####REPLACE
+```
+USE_JSONFX with USE_JSONFX_UNITY_IOS 
+
+or 
+
+USE_JSONFX_FOR_UNITY with USE_JSONFX_UNITY_IOS
+```
+
+#####REPLACE
 ```
 Old => pubnub.Subscribe<string> (channel, DisplayReturnMessage, DisplayConnectStatusMessage);
 
@@ -32,24 +39,19 @@ New (current) => pubnub.Subscribe<string> (channel, DisplayReturnMessage, Displa
 NOTE: The callback methods DisplayReturnMessage, DisplayConnectStatusMessage and DisplayErrorMessage (new callback parameter) are used in the example code for your review.
 ```
 
-#####REPLACE
-```
-USE_JSONFX with USE_JSONFX_UNITY and 
-
-USE_JSONFX_FOR_UNITY with USE_JSONFX_UNITY_IOS
-```
-
 #### Prerequisites
 + Install a free Full version of Unity 4 Pro from http://unity3d.com/unity/download/ (Unity 4 is recommended, but current/later versions should be ok). MonoDevelop IDE tool will be installed as part of Unity to write C# scripts.
-+ For Unity, JSONFX is needed for the serialization library. To use JSONFX we have defined 3 pre processor directives
++ For Unity, JSONFX (1.4 mod by TowerOBricks) is needed for the serialization library. To use JSONFX we use the pre-processor directive. This JSON serialization works on all distort of Unity.
 
-    * `USE_JSONFX_UNITY` is for `UNITY_STANDALONE` or `UNITY_WEBPLAYER` or `UNITY_ANDROID`
+`USE_JSONFX_UNITY_IOS`
 
-    * `USE_JSONFX` for non-unity clients.
+Please note the other serialization libraries used in the pubnub.cs class are the default from the builtin .NET class (activated when the pre-compiler directive USE_DOTNET_SERIALIZATION is used) and Newtonsoft.Json (activated when neither USE_JSONFX nor USE_DOTNET_SERIALIZATION is defined). The directive USE_JSONFX uses the latest version of JSONFx, but this is not supported on unity. 
 
-    * `USE_JSONFX_UNITY_IOS` is Unity IOS
+`USE_JSONFX` works only for non-unity clients.
 
-Please note the other serialization libraries used in the pubnub.cs class are the default from the builtin .NET class (activated when the pre-compiler directive USE_DOTNET_SERIALIZATION is used) and Newtonsoft.Json (activated when neither USE_JSONFX nor USE_DOTNET_SERIALIZATION is defined). Both of these libraries won't work with UNITY. So you need to be sure the pre-compiler variable USE_JSONFX is "defined" at the top of the pubnub.cs class (default behavior).
+The other pre-processor directive: 
+`USE_JSONFX_UNITY` (uses JSONFx 1.4 dll) works only for UNITY_STANDALONE or UNITY_WEBPLAYER or UNITY_ANDROID and NOT for UNITY_IOS. This directive is not-recommended to use in this version.
+
 
 #### To run the unit tests, in addition to the above, you need to 
 1. Import UnityTestTools package (this is already present in the Pubnub client code under the path Assets/UnityTestTools) into your Assets. (https://www.assetstore.unity3d.com/#/content/13802)
