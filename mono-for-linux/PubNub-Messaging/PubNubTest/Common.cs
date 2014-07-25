@@ -35,72 +35,71 @@ namespace PubNubMessaging.Tests
         /// or timeout occurs
         /// </summary>
         /// <param name="countdownSeconds">seconds to timeout</param>
-        public void WaitForResponse(int countdownSeconds = 20)
+        public void WaitForResponse (int countdownSeconds = 20)
         {
-            Timer timer = new Timer();
+            Timer timer = new Timer ();
             DateTime start = DateTime.UtcNow; 
-            DateTime endTime = start.AddSeconds(countdownSeconds); 
+            DateTime endTime = start.AddSeconds (countdownSeconds); 
             timer.Enabled = true;
-            timer.Start();
+            timer.Start ();
             timer.Elapsed += delegate(object sender, ElapsedEventArgs e) {
                 TimeSpan remainingTime = endTime - DateTime.UtcNow;
-                if (remainingTime < TimeSpan.Zero)
-                    {
-                        timer.Enabled = false; 
-                        DeliveryStatus = true;
-                    }
+                if (remainingTime < TimeSpan.Zero) {
+                    timer.Enabled = false; 
+                    DeliveryStatus = true;
+                }
             };
          
             while (!DeliveryStatus)
                 ;
-            timer.Stop();
+            timer.Stop ();
         }
 
-        public PubnubUnitTest CreateUnitTestInstance(string testClassName, string testCaseName)
+        public PubnubUnitTest CreateUnitTestInstance (string testClassName, string testCaseName)
         {
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            PubnubUnitTest unitTest = new PubnubUnitTest ();
             unitTest.TestClassName = testClassName;
             unitTest.TestCaseName = testCaseName;
             return unitTest;
         }
 
-        public void DisplayErrorMessage(PubnubClientError result)
+        public void DisplayErrorMessage (PubnubClientError result)
         {
             //Response = result;
-            Console.WriteLine(result.ToString());
+            Console.WriteLine (result.ToString ());
         }
 
-        public void DisplayReturnMessageDummy(object result)
+        public void DisplayReturnMessageDummy (object result)
         {
             //deliveryStatus = true;
             //Response = result;
-            Console.WriteLine(result.ToString());
+            Console.WriteLine (result.ToString ());
         }
 
-        public void DisplayReturnMessage(object result)
+        public void DisplayReturnMessage (object result)
         {
             DeliveryStatus = true;
             Response = result;
-            Console.WriteLine(result.ToString());
+            Console.WriteLine (result.ToString ());
         }
 
-        public void DisplayReturnMessage(string result)
+        public void DisplayReturnMessage (string result)
         {
             DeliveryStatus = true;
             Response = (object)result;
-            Console.WriteLine(result.ToString());
+            Console.WriteLine (result.ToString ());
         }
 
-        public long Timestamp(Pubnub pubnub)
+        public long Timestamp (Pubnub pubnub)
         {
             DeliveryStatus = false;
 
-            pubnub.Time(DisplayReturnMessage, DisplayReturnMessage);
+            pubnub.Time (DisplayReturnMessage, DisplayReturnMessage);
             while (!DeliveryStatus)
                 ;
 
             IList<object> fields = Response as IList<object>;
-            return Convert.ToInt64(fields [0].ToString());
+            return Convert.ToInt64 (fields [0].ToString ());
         }
 
         /// <summary>
@@ -108,35 +107,35 @@ namespace PubNubMessaging.Tests
         /// The functionality is based on the pre-compiler flag
         /// </summary>
         /// <param name="message">Message.</param>
-        public static T Deserialize<T>(string message)
+        public static T Deserialize<T> (string message)
         {
             object retMessage;
             #if (USE_JSONFX)
             var reader = new JsonFx.Json.JsonReader();
             retMessage = reader.Read<T>(message);
             #else
-            retMessage = JsonConvert.DeserializeObject<T>(message);
+            retMessage = JsonConvert.DeserializeObject<T> (message);
             #endif
             return (T)retMessage;
         }
-        public static T DeserializeUsingJSONFx<T>(string message)
+
+        public static T DeserializeUsingJSONFx<T> (string message)
         {
             object retMessage;
-            var reader = new JsonFx.Json.JsonReader();
-            retMessage = reader.Read<T>(message);
+            var reader = new JsonFx.Json.JsonReader ();
+            retMessage = reader.Read<T> (message);
             return (T)retMessage;
         }
 
-        private static byte[] ObjectToByteArray(Object obj)
+        private static byte[] ObjectToByteArray (Object obj)
         {
-            if(obj == null)
+            if (obj == null)
                 return null;
-            BinaryFormatter bf = new BinaryFormatter();
-            using (MemoryStream ms = new MemoryStream())
-                {
-                    bf.Serialize(ms, obj);
-                    return ms.ToArray();
-                }
+            BinaryFormatter bf = new BinaryFormatter ();
+            using (MemoryStream ms = new MemoryStream ()) {
+                bf.Serialize (ms, obj);
+                return ms.ToArray ();
+            }
         }
 
         /// <summary>
@@ -144,7 +143,7 @@ namespace PubNubMessaging.Tests
         /// The functionality is based on the pre-compiler flag
         /// </summary>
         /// <param name="message">Message.</param>
-        public static string Serialize(object message)
+        public static string Serialize (object message)
         {
             string retMessage;
             #if (USE_JSONFX)
@@ -181,18 +180,18 @@ namespace PubNubMessaging.Tests
             return PubnubCryptoBase.ConvertHexToUnicodeChars(builder.ToString());*/
             //}
             #else
-            retMessage = JsonConvert.SerializeObject(message);
+            retMessage = JsonConvert.SerializeObject (message);
             #endif
             return retMessage;
         }
 
-        public static string SerializeUsingJSONFx(object message)
+        public static string SerializeUsingJSONFx (object message)
         {
             string retMessage;
-            var writer = new JsonFx.Json.JsonWriter();
+            var writer = new JsonFx.Json.JsonWriter ();
 
-            retMessage = writer.Write(message);
-            retMessage = ConvertHexToUnicodeChars(retMessage);
+            retMessage = writer.Write (message);
+            retMessage = ConvertHexToUnicodeChars (retMessage);
             /*StringBuilder builder = new StringBuilder();
             using (TextWriter textWriter = new EncodingStringWriter(builder, Encoding.UTF8))
             {
@@ -210,14 +209,14 @@ namespace PubNubMessaging.Tests
         /// </summary>
         /// <returns>The lower case hex.</returns>
         /// <param name="value">Hex Value.</param>
-        private static string ConvertHexToUnicodeChars(string value)
+        private static string ConvertHexToUnicodeChars (string value)
         {
             //if(;
-            return Regex.Replace(
+            return Regex.Replace (
                 value,
                 @"\\u(?<Value>[a-zA-Z0-9]{4})",
                 m => {
-                    return ((char)int.Parse(m.Groups ["Value"].Value, NumberStyles.HexNumber)).ToString();
+                    return ((char)int.Parse (m.Groups ["Value"].Value, NumberStyles.HexNumber)).ToString ();
                 }     
             );
         }
@@ -239,8 +238,8 @@ namespace PubNubMessaging.Tests
         public long Timetoken = 13601488652764619;
         public string OperationName = "Publish";
         public string[] Channels = { "ch1" };
-        public PubnubDemoMessage DemoMessage = new PubnubDemoMessage();
-        public PubnubDemoMessage CustomMessage = new PubnubDemoMessage("This is a demo message");
+        public PubnubDemoMessage DemoMessage = new PubnubDemoMessage ();
+        public PubnubDemoMessage CustomMessage = new PubnubDemoMessage ("This is a demo message");
         //public XmlDocument SampleXml = new PubnubDemoMessage().TryXmlDemo();
     }
 
@@ -249,14 +248,14 @@ namespace PubNubMessaging.Tests
     {
         public string DefaultMessage = "~!@#$%^&*()_+ `1234567890-= qwertyuiop[]\\ {}| asdfghjkl;' :\" zxcvbnm,./ <>? ";
         //public string DefaultMessage = "\"";
-        public PubnubDemoMessage()
+        public PubnubDemoMessage ()
         {
         }
 
-        public PubnubDemoMessage(string message)
+        public PubnubDemoMessage (string message)
         {
             DefaultMessage = message;
-        }   
+        }
     
         /*public XmlDocument TryXmlDemo()
         {

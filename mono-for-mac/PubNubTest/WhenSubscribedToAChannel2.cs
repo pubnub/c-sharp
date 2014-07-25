@@ -15,8 +15,8 @@ namespace PubNubMessaging.Tests
     {
         void SubscribePublishAndParse (string message, Pubnub pubnub, Common common, string channel)
         {
-            Random r = new Random();
-            channel = "hello_world_sub" + r.Next(1000);
+            Random r = new Random ();
+            channel = "hello_world_sub" + r.Next (1000);
 
             pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
             Thread.Sleep (5000);
@@ -28,7 +28,7 @@ namespace PubNubMessaging.Tests
             if (common.Response != null) {
                 object[] deserializedMessage = Common.Deserialize<object[]> (common.Response.ToString ());
                 if (deserializedMessage != null) {
-                    Assert.True (message.Equals(deserializedMessage [0].ToString ()));
+                    Assert.True (message.Equals (deserializedMessage [0].ToString ()));
                 } else {
                     Assert.Fail ("Test not successful");
                 }
@@ -38,11 +38,11 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
 
-            pubnub.Unsubscribe<string>(channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            pubnub.Unsubscribe<string> (channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse(20);
+            common.WaitForResponse (20);
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
@@ -50,11 +50,11 @@ namespace PubNubMessaging.Tests
         {
 
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "",
-                "",
-                false);
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "",
+                                false);
             string channel = "hello_world";
 
             Common common = new Common ();
@@ -73,11 +73,11 @@ namespace PubNubMessaging.Tests
         {
 
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "",
-                "",
-                true);
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "",
+                                true);
             string channel = "hello_world";
 
             Common common = new Common ();
@@ -94,11 +94,11 @@ namespace PubNubMessaging.Tests
         {
 
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "",
-                "enigma",
-                true);
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "enigma",
+                                true);
             string channel = "hello_world";
 
             Common common = new Common ();
@@ -109,16 +109,17 @@ namespace PubNubMessaging.Tests
 
             SubscribePublishAndParse (message, pubnub, common, channel);
         }
+
         [Test]
         public void ThenItShouldReturnReceivedMessageSecret ()
         {
 
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "secret",
-                "",
-                false);
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "secret",
+                                "",
+                                false);
             string channel = "hello_world";
 
             Common common = new Common ();
@@ -129,16 +130,17 @@ namespace PubNubMessaging.Tests
 
             SubscribePublishAndParse (message, pubnub, common, channel);
         }
+
         [Test]
         public void ThenItShouldReturnReceivedMessageSecretSSL ()
         {
 
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "secret",
-                "",
-                true);
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "secret",
+                                "",
+                                true);
             string channel = "hello_world";
 
             Common common = new Common ();
@@ -149,16 +151,17 @@ namespace PubNubMessaging.Tests
 
             SubscribePublishAndParse (message, pubnub, common, channel);
         }
+
         [Test]
         public void ThenItShouldReturnReceivedMessageSecretCipher ()
         {
 
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "secret",
-                "engima",
-                false);
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "secret",
+                                "engima",
+                                false);
             string channel = "hello_world";
 
             Common common = new Common ();
@@ -175,11 +178,11 @@ namespace PubNubMessaging.Tests
         {
 
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "secret",
-                "enigma",
-                true);
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "secret",
+                                "enigma",
+                                true);
             string channel = "hello_world";
 
             Common common = new Common ();
@@ -196,11 +199,11 @@ namespace PubNubMessaging.Tests
         {
 
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "",
-                "enigma",
-                false);
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "enigma",
+                                false);
             string channel = "hello_world";
 
             Common common = new Common ();
@@ -217,11 +220,11 @@ namespace PubNubMessaging.Tests
         public void TestForEmojiSSL ()
         {
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "",
-                "",
-                true);
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "",
+                                true);
             string channel = "hello_world";
 
             Common common = new Common ();
@@ -237,11 +240,11 @@ namespace PubNubMessaging.Tests
         public void TestForEmojiCipher ()
         {
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "",
-                "enigma",
-                false);
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "enigma",
+                                false);
             string channel = "hello_world";
 
             Common common = new Common ();
@@ -258,11 +261,11 @@ namespace PubNubMessaging.Tests
         public void TestForEmoji ()
         {
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "",
-                "",
-                false);
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "",
+                                false);
             string channel = "hello_world";
 
             Common common = new Common ();
@@ -278,11 +281,11 @@ namespace PubNubMessaging.Tests
         public void TestForEmojiCipherSSL ()
         {
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "",
-                "enigma",
-                true);
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "enigma",
+                                true);
             string channel = "hello_world";
 
             Common common = new Common ();
@@ -298,11 +301,11 @@ namespace PubNubMessaging.Tests
         public void TestForEmojiSecret ()
         {
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "secret",
-                "",
-                false);
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "secret",
+                                "",
+                                false);
             string channel = "hello_world";
 
             Common common = new Common ();
@@ -319,11 +322,11 @@ namespace PubNubMessaging.Tests
         public void TestForEmojiCipherSecret ()
         {
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "secret",
-                "enigma",
-                false);
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "secret",
+                                "enigma",
+                                false);
             string channel = "hello_world";
 
             Common common = new Common ();
@@ -339,11 +342,11 @@ namespace PubNubMessaging.Tests
         public void TestForEmojiCipherSecretSSL ()
         {
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "secret",
-                "enigma",
-                true);
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "secret",
+                                "enigma",
+                                true);
             string channel = "hello_world";
 
             Common common = new Common ();
@@ -359,11 +362,11 @@ namespace PubNubMessaging.Tests
         public void TestForEmojiSecretSSL ()
         {
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "secret",
-                "",
-                true);
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "secret",
+                                "",
+                                true);
             string channel = "hello_world";
 
             Common common = new Common ();

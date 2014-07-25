@@ -13,906 +13,896 @@ namespace PubNubMessaging.Tests
     public class WhenDetailedHistoryIsRequested
     {
         [Test]
-        public void ItShouldReturnDetailedHistory()
+        public void ItShouldReturnDetailedHistory ()
         {
-            Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
-                          "",
-                          "",
-                          false
-                      );
+            Pubnub pubnub = new Pubnub (
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "",
+                                false
+                            );
             string channel = "hello_world_de1";
             string message = "Test Message";
       
-            Common common = new Common();
+            Common common = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "ItShouldReturnDetailedHistory");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "ItShouldReturnDetailedHistory");
       
             //publish a test message. 
-            pubnub.Publish(channel, message, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            pubnub.Publish (channel, message, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
-            common.WaitForResponse();
+            common.WaitForResponse ();
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, 1, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
-            common.WaitForResponse();
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, 1, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            common.WaitForResponse ();
 
-            ParseResponse(common.Response, 0, 0, message);
-            pubnub.EndPendingRequests();
+            ParseResponse (common.Response, 0, 0, message);
+            pubnub.EndPendingRequests ();
         }
 
-        public void SendMultipleIntMessages(int messageStart, int messageEnd, string channel, Pubnub pubnub)
+        public void SendMultipleIntMessages (int messageStart, int messageEnd, string channel, Pubnub pubnub)
         {
-            Common common = new Common();
+            Common common = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;   
 
-            for (int i = messageStart; i < messageEnd; i++)
-                {
-                    Thread.Sleep(2000);
-                    common.DeliveryStatus = false;
-                    string msg = i.ToString();
-                    pubnub.Publish(channel, msg, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            for (int i = messageStart; i < messageEnd; i++) {
+                Thread.Sleep (2000);
+                common.DeliveryStatus = false;
+                string msg = i.ToString ();
+                pubnub.Publish (channel, msg, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-                    common.WaitForResponse();
+                common.WaitForResponse ();
                     
-                    Console.WriteLine("Message # " + i.ToString() + " published");
-                }
+                Console.WriteLine ("Message # " + i.ToString () + " published");
+            }
         }
 
-        public void ParseResponse(object commonResponse, int messageStart, int messageEnd, string message)
+        public void ParseResponse (object commonResponse, int messageStart, int messageEnd, string message)
         {
-            if (commonResponse.Equals(null))
-                {
-                    Assert.Fail("Null response");
-                } else
-                {
-                    IList<object> fields = commonResponse as IList<object>;
+            if (commonResponse.Equals (null)) {
+                Assert.Fail ("Null response");
+            } else {
+                IList<object> fields = commonResponse as IList<object>;
 
-                    if (fields [0] != null)
-                        {
-                            ParseFields(fields, messageStart, messageEnd, message);
-                        }
-                }        
+                if (fields [0] != null) {
+                    ParseFields (fields, messageStart, messageEnd, message);
+                }
+            }        
         }
 
-        public void ParseFields(IList<object> fields, int messageStart, int messageEnd, string message)
+        public void ParseFields (IList<object> fields, int messageStart, int messageEnd, string message)
         {
             string response = "";
 
             var myObjectArray = (from item in fields
-                                    select item as object).ToArray();
+                                          select item as object).ToArray ();
             IList<object> enumerable = myObjectArray [0] as IList<object>;
-            if ((enumerable != null) && (enumerable.Count > 0))
-                {
-                    int j = messageStart;
-                    foreach (object element in enumerable)
-                        {
-                            response = element.ToString();
-                            if (messageStart != messageEnd)
-                                {
-                                    Console.WriteLine(String.Format("response :{0} :: j: {1}", response, j));
-                                    if (j < messageEnd)
-                                        Assert.AreEqual(j.ToString(), response);
-                                    j++;
-                                } else if (!message.Equals(""))
-                                {
-                                    Console.WriteLine("Response:" + response);
-                                    Assert.AreEqual(message, response);
-                                } else
-                                {
-                                    Console.WriteLine("Response:" + response);
-                                    Assert.IsNotEmpty(response);
-                                }
-                        }
-                } else
-                {
-                    Assert.Fail("No response");
+            if ((enumerable != null) && (enumerable.Count > 0)) {
+                int j = messageStart;
+                foreach (object element in enumerable) {
+                    response = element.ToString ();
+                    if (messageStart != messageEnd) {
+                        Console.WriteLine (String.Format ("response :{0} :: j: {1}", response, j));
+                        if (j < messageEnd)
+                            Assert.AreEqual (j.ToString (), response);
+                        j++;
+                    } else if (!message.Equals ("")) {
+                        Console.WriteLine ("Response:" + response);
+                        Assert.AreEqual (message, response);
+                    } else {
+                        Console.WriteLine ("Response:" + response);
+                        Assert.IsNotEmpty (response);
+                    }
                 }
+            } else {
+                Assert.Fail ("No response");
+            }
         }
 
         [Test]
-        public void DetailedHistoryExample()
+        public void DetailedHistoryExample ()
         {
-            Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
-                          "",
-                          "",
-                          false);
+            Pubnub pubnub = new Pubnub (
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "",
+                                false);
             string channel = "hello_world_de2";
 
             string message = "Test Message";
 
-            Common common = new Common();
+            Common common = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;
       
-            pubnub.Publish(channel, message, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
-            common.WaitForResponse();
+            pubnub.Publish (channel, message, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            common.WaitForResponse ();
       
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "DetailHistoryCount10ReturnsRecords");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "DetailHistoryCount10ReturnsRecords");
       
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, 10, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, 10, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse();
-            Console.WriteLine("\n*********** DetailedHistory Messages Received*********** ");
+            common.WaitForResponse ();
+            Console.WriteLine ("\n*********** DetailedHistory Messages Received*********** ");
 
-            ParseResponse(common.Response, 0, 0, "");
-            pubnub.EndPendingRequests();
+            ParseResponse (common.Response, 0, 0, "");
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
-        public void DetailedHistoryDecryptedExample()
+        public void DetailedHistoryDecryptedExample ()
         {
-            Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
-                          "",
-                          "enigma",
-                          false);
+            Pubnub pubnub = new Pubnub (
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "enigma",
+                                false);
             string channel = "hello_world_de3";
 
             string message = "Test Message";
 
-            Common common = new Common();
+            Common common = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;
       
-            pubnub.Publish(channel, message, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
-            common.WaitForResponse();
+            pubnub.Publish (channel, message, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            common.WaitForResponse ();
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "DetailedHistoryDecryptedExample");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "DetailedHistoryDecryptedExample");
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, 1, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, 1, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse();
-            Console.WriteLine("\n*********** DetailedHistory Messages Received*********** ");
+            common.WaitForResponse ();
+            Console.WriteLine ("\n*********** DetailedHistory Messages Received*********** ");
 
-            ParseResponse(common.Response, 0, 0, message);
-            pubnub.EndPendingRequests();
+            ParseResponse (common.Response, 0, 0, message);
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
-        public void TestEncryptedSecretDetailedHistoryParams()
+        public void TestEncryptedSecretDetailedHistoryParams ()
         {
-            Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
-                          "secretkey",
-                          "enigma",
-                          false);
+            Pubnub pubnub = new Pubnub (
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "secretkey",
+                                "enigma",
+                                false);
       
             string channel = "hello_world_de4";
       
             int totalMessages = 10;
       
-            Common common = new Common();
+            Common common = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;        
       
-            long starttime = common.Timestamp(pubnub);
+            long starttime = common.Timestamp (pubnub);
       
-            SendMultipleIntMessages(0, totalMessages / 2, channel, pubnub);
+            SendMultipleIntMessages (0, totalMessages / 2, channel, pubnub);
       
-            long midtime = common.Timestamp(pubnub);
+            long midtime = common.Timestamp (pubnub);
       
-            SendMultipleIntMessages(totalMessages / 2, totalMessages, channel, pubnub);
+            SendMultipleIntMessages (totalMessages / 2, totalMessages, channel, pubnub);
       
-            long endtime = common.Timestamp(pubnub);
+            long endtime = common.Timestamp (pubnub);
       
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestEncryptedSecretDetailedHistoryParams1");
-      
-            common.DeliveryStatus = false;
-            common.Response = null;
-            Console.WriteLine("DetailedHistory with start & end");
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
-      
-            common.WaitForResponse();
-      
-            Console.WriteLine("DetailedHistory with start & reverse = true");
-      
-            ParseResponse(common.Response, 0, totalMessages / 2, "");
-      
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestEncryptedSecretDetailedHistoryParams2");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestEncryptedSecretDetailedHistoryParams1");
       
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            Console.WriteLine ("DetailedHistory with start & end");
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
-            common.WaitForResponse();
+            common.WaitForResponse ();
       
-            Console.WriteLine("DetailedHistory with start & reverse = false");
+            Console.WriteLine ("DetailedHistory with start & reverse = true");
       
-            ParseResponse(common.Response, totalMessages / 2, totalMessages, "");
+            ParseResponse (common.Response, 0, totalMessages / 2, "");
       
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestEncryptedSecretDetailedHistoryParams3");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestEncryptedSecretDetailedHistoryParams2");
       
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
-            common.WaitForResponse();
+            common.WaitForResponse ();
       
-            Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
+            Console.WriteLine ("DetailedHistory with start & reverse = false");
       
-            ParseResponse(common.Response, 0, totalMessages / 2, "");
-            pubnub.EndPendingRequests();
+            ParseResponse (common.Response, totalMessages / 2, totalMessages, "");
+      
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestEncryptedSecretDetailedHistoryParams3");
+      
+            common.DeliveryStatus = false;
+            common.Response = null;
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+      
+            common.WaitForResponse ();
+      
+            Console.WriteLine ("\n******* DetailedHistory Messages Received ******* ");
+      
+            ParseResponse (common.Response, 0, totalMessages / 2, "");
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
-        public void TestUnencryptedSecretDetailedHistoryParams()
+        public void TestUnencryptedSecretDetailedHistoryParams ()
         {
-            Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
-                          "secretkey",
-                          "",
-                          false);
+            Pubnub pubnub = new Pubnub (
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "secretkey",
+                                "",
+                                false);
       
             string channel = "hello_world_de5";
       
             int totalMessages = 10;
       
-            Common common = new Common();
+            Common common = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;        
       
-            long starttime = common.Timestamp(pubnub);
+            long starttime = common.Timestamp (pubnub);
       
-            SendMultipleIntMessages(0, totalMessages / 2, channel, pubnub);
+            SendMultipleIntMessages (0, totalMessages / 2, channel, pubnub);
       
-            long midtime = common.Timestamp(pubnub);
+            long midtime = common.Timestamp (pubnub);
       
-            SendMultipleIntMessages(totalMessages / 2, totalMessages, channel, pubnub);
+            SendMultipleIntMessages (totalMessages / 2, totalMessages, channel, pubnub);
       
-            long endtime = common.Timestamp(pubnub);
+            long endtime = common.Timestamp (pubnub);
       
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestUnencryptedSecretDetailedHistoryParams1");
-      
-            common.DeliveryStatus = false;
-            common.Response = null;
-            Console.WriteLine("DetailedHistory with start & end");
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
-      
-            common.WaitForResponse();
-      
-            Console.WriteLine("DetailedHistory with start & reverse = true");
-      
-            ParseResponse(common.Response, 0, totalMessages / 2, "");
-      
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestUnencryptedSecretDetailedHistoryParams2");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestUnencryptedSecretDetailedHistoryParams1");
       
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            Console.WriteLine ("DetailedHistory with start & end");
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
-            common.WaitForResponse();
+            common.WaitForResponse ();
       
-            Console.WriteLine("DetailedHistory with start & reverse = false");
+            Console.WriteLine ("DetailedHistory with start & reverse = true");
       
-            ParseResponse(common.Response, totalMessages / 2, totalMessages, "");
+            ParseResponse (common.Response, 0, totalMessages / 2, "");
       
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestUnencryptedSecretDetailedHistoryParams3");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestUnencryptedSecretDetailedHistoryParams2");
       
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
-            common.WaitForResponse();
+            common.WaitForResponse ();
       
-            Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
+            Console.WriteLine ("DetailedHistory with start & reverse = false");
       
-            ParseResponse(common.Response, 0, totalMessages / 2, "");
-            pubnub.EndPendingRequests();
+            ParseResponse (common.Response, totalMessages / 2, totalMessages, "");
+      
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestUnencryptedSecretDetailedHistoryParams3");
+      
+            common.DeliveryStatus = false;
+            common.Response = null;
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+      
+            common.WaitForResponse ();
+      
+            Console.WriteLine ("\n******* DetailedHistory Messages Received ******* ");
+      
+            ParseResponse (common.Response, 0, totalMessages / 2, "");
+            pubnub.EndPendingRequests ();
         }
-    
+
         [Test]
-        public void TestUnencryptedDetailedHistoryParams()
+        public void TestUnencryptedDetailedHistoryParams ()
         {
-            Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "",
-                "",
-                false);
+            Pubnub pubnub = new Pubnub (
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "",
+                                false);
 
             string channel = "hello_world_de6";
 
             int totalMessages = 10;
 
-            Common common = new Common();
+            Common common = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;        
 
-            long starttime = common.Timestamp(pubnub);
+            long starttime = common.Timestamp (pubnub);
 
-            SendMultipleIntMessages(0, totalMessages / 2, channel, pubnub);
+            SendMultipleIntMessages (0, totalMessages / 2, channel, pubnub);
 
-            long midtime = common.Timestamp(pubnub);
+            long midtime = common.Timestamp (pubnub);
 
-            SendMultipleIntMessages(totalMessages / 2, totalMessages, channel, pubnub);
+            SendMultipleIntMessages (totalMessages / 2, totalMessages, channel, pubnub);
 
-            long endtime = common.Timestamp(pubnub);
+            long endtime = common.Timestamp (pubnub);
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestUnencryptedDetailedHistoryParams1");
-
-            common.DeliveryStatus = false;
-            common.Response = null;
-            Console.WriteLine("DetailedHistory with start & end");
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
-
-            common.WaitForResponse();
-
-            Console.WriteLine("DetailedHistory with start & reverse = true");
-
-            ParseResponse(common.Response, 0, totalMessages / 2, "");
-
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestUnencryptedDetailedHistoryParams2");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestUnencryptedDetailedHistoryParams1");
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            Console.WriteLine ("DetailedHistory with start & end");
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse();
+            common.WaitForResponse ();
 
-            Console.WriteLine("DetailedHistory with start & reverse = false");
+            Console.WriteLine ("DetailedHistory with start & reverse = true");
 
-            ParseResponse(common.Response, totalMessages / 2, totalMessages, "");
+            ParseResponse (common.Response, 0, totalMessages / 2, "");
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestUnencryptedDetailedHistoryParams3");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestUnencryptedDetailedHistoryParams2");
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse();
+            common.WaitForResponse ();
 
-            Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
+            Console.WriteLine ("DetailedHistory with start & reverse = false");
 
-            ParseResponse(common.Response, 0, totalMessages / 2, "");
-            pubnub.EndPendingRequests();
+            ParseResponse (common.Response, totalMessages / 2, totalMessages, "");
+
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestUnencryptedDetailedHistoryParams3");
+
+            common.DeliveryStatus = false;
+            common.Response = null;
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+
+            common.WaitForResponse ();
+
+            Console.WriteLine ("\n******* DetailedHistory Messages Received ******* ");
+
+            ParseResponse (common.Response, 0, totalMessages / 2, "");
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
-        public void TestEncryptedDetailedHistoryParams()
+        public void TestEncryptedDetailedHistoryParams ()
         {
-            Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "",
-                "enigma",
-                false);
+            Pubnub pubnub = new Pubnub (
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "enigma",
+                                false);
 
             string channel = "hello_world_de7";
 
             int totalMessages = 10;
 
-            Common common = new Common();
+            Common common = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;        
 
-            long starttime = common.Timestamp(pubnub);
+            long starttime = common.Timestamp (pubnub);
 
-            SendMultipleIntMessages(0, totalMessages / 2, channel, pubnub);
+            SendMultipleIntMessages (0, totalMessages / 2, channel, pubnub);
 
-            long midtime = common.Timestamp(pubnub);
+            long midtime = common.Timestamp (pubnub);
 
-            SendMultipleIntMessages(totalMessages / 2, totalMessages, channel, pubnub);
+            SendMultipleIntMessages (totalMessages / 2, totalMessages, channel, pubnub);
 
-            long endtime = common.Timestamp(pubnub);
+            long endtime = common.Timestamp (pubnub);
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestEncryptedDetailedHistoryParams1");
-
-            common.DeliveryStatus = false;
-            common.Response = null;
-            Thread.Sleep(2000);
-            Console.WriteLine("DetailedHistory with start & end");
-
-            pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
-
-            common.WaitForResponse();
-
-            Console.WriteLine("DetailedHistory with start & reverse = true");
-
-            ParseResponse(common.Response, 0, totalMessages / 2, "");
-
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestEncryptedDetailedHistoryParams2");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestEncryptedDetailedHistoryParams1");
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            Thread.Sleep (2000);
+            Console.WriteLine ("DetailedHistory with start & end");
 
-            common.WaitForResponse();
+            pubnub.DetailedHistory (channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-            Console.WriteLine("DetailedHistory with start & reverse = false");
+            common.WaitForResponse ();
 
-            ParseResponse(common.Response, totalMessages / 2, totalMessages, "");
+            Console.WriteLine ("DetailedHistory with start & reverse = true");
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestEncryptedDetailedHistoryParams3");
+            ParseResponse (common.Response, 0, totalMessages / 2, "");
+
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestEncryptedDetailedHistoryParams2");
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse();
+            common.WaitForResponse ();
 
-            Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
+            Console.WriteLine ("DetailedHistory with start & reverse = false");
 
-            ParseResponse(common.Response, 0, totalMessages / 2, "");
-            pubnub.EndPendingRequests();
+            ParseResponse (common.Response, totalMessages / 2, totalMessages, "");
+
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestEncryptedDetailedHistoryParams3");
+
+            common.DeliveryStatus = false;
+            common.Response = null;
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+
+            common.WaitForResponse ();
+
+            Console.WriteLine ("\n******* DetailedHistory Messages Received ******* ");
+
+            ParseResponse (common.Response, 0, totalMessages / 2, "");
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
-        public void TestUnencryptedDetailedHistory()
+        public void TestUnencryptedDetailedHistory ()
         {
-            Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "",
-                "",
-                false);
+            Pubnub pubnub = new Pubnub (
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "",
+                                false);
 
             string channel = "hello_world_de8";
             int totalMessages = 10;
 
-            Common common = new Common();
+            Common common = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;
 
-            long starttime = common.Timestamp(pubnub);
+            long starttime = common.Timestamp (pubnub);
 
-            SendMultipleIntMessages(0, totalMessages / 2, channel, pubnub);
+            SendMultipleIntMessages (0, totalMessages / 2, channel, pubnub);
 
-            long midtime = common.Timestamp(pubnub);
+            long midtime = common.Timestamp (pubnub);
 
-            SendMultipleIntMessages(totalMessages / 2, totalMessages, channel, pubnub);
+            SendMultipleIntMessages (totalMessages / 2, totalMessages, channel, pubnub);
 
-            long endtime = common.Timestamp(pubnub);
-            common.WaitForResponse();
+            long endtime = common.Timestamp (pubnub);
+            common.WaitForResponse ();
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestUnencryptedDetailedHistory");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestUnencryptedDetailedHistory");
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, totalMessages, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
-            common.WaitForResponse();
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, totalMessages, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            common.WaitForResponse ();
 
-            Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
+            Console.WriteLine ("\n******* DetailedHistory Messages Received ******* ");
 
-            ParseResponse(common.Response, 0, totalMessages, "");
-            pubnub.EndPendingRequests();
+            ParseResponse (common.Response, 0, totalMessages, "");
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
-        public void TestEncryptedDetailedHistory()
+        public void TestEncryptedDetailedHistory ()
         {
-            Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "",
-                "enigma",
-                false);
+            Pubnub pubnub = new Pubnub (
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "enigma",
+                                false);
             string channel = "hello_world_de9";
 
             int totalMessages = 10;
 
-            Common common = new Common();
+            Common common = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;
 
-            long starttime = common.Timestamp(pubnub);
+            long starttime = common.Timestamp (pubnub);
 
-            SendMultipleIntMessages(0, totalMessages, channel, pubnub);
+            SendMultipleIntMessages (0, totalMessages, channel, pubnub);
 
-            long midtime = common.Timestamp(pubnub);
+            long midtime = common.Timestamp (pubnub);
 
-            SendMultipleIntMessages(totalMessages, totalMessages / 2, channel, pubnub);
+            SendMultipleIntMessages (totalMessages, totalMessages / 2, channel, pubnub);
 
-            long endtime = common.Timestamp(pubnub);
-            common.WaitForResponse();
+            long endtime = common.Timestamp (pubnub);
+            common.WaitForResponse ();
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestEncryptedDetailedHistory");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestEncryptedDetailedHistory");
 
             common.Response = null;
             common.DeliveryStatus = false;
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, totalMessages, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, totalMessages, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse();
-            Console.WriteLine("\n*********** DetailedHistory Messages Received*********** ");
+            common.WaitForResponse ();
+            Console.WriteLine ("\n*********** DetailedHistory Messages Received*********** ");
 
-            ParseResponse(common.Response, 0, totalMessages, "");
-            pubnub.EndPendingRequests();
+            ParseResponse (common.Response, 0, totalMessages, "");
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
-        public void TestEncryptedSecretDetailedHistoryParamsSSL()
+        public void TestEncryptedSecretDetailedHistoryParamsSSL ()
         {
-            Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "secretkey",
-                "enigma",
-                true);
+            Pubnub pubnub = new Pubnub (
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "secretkey",
+                                "enigma",
+                                true);
 
             string channel = "hello_world_de10";
 
             int totalMessages = 10;
 
-            Common common = new Common();
+            Common common = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;        
 
-            long starttime = common.Timestamp(pubnub);
+            long starttime = common.Timestamp (pubnub);
 
-            SendMultipleIntMessages(0, totalMessages / 2, channel, pubnub);
+            SendMultipleIntMessages (0, totalMessages / 2, channel, pubnub);
 
-            long midtime = common.Timestamp(pubnub);
+            long midtime = common.Timestamp (pubnub);
 
-            SendMultipleIntMessages(totalMessages / 2, totalMessages, channel, pubnub);
+            SendMultipleIntMessages (totalMessages / 2, totalMessages, channel, pubnub);
 
-            long endtime = common.Timestamp(pubnub);
+            long endtime = common.Timestamp (pubnub);
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestEncryptedSecretDetailedHistoryParams1");
-
-            common.DeliveryStatus = false;
-            common.Response = null;
-            Console.WriteLine("DetailedHistory with start & end");
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
-
-            common.WaitForResponse();
-
-            Console.WriteLine("DetailedHistory with start & reverse = true");
-
-            ParseResponse(common.Response, 0, totalMessages / 2, "");
-
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestEncryptedSecretDetailedHistoryParams2");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestEncryptedSecretDetailedHistoryParams1");
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            Console.WriteLine ("DetailedHistory with start & end");
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse();
+            common.WaitForResponse ();
 
-            Console.WriteLine("DetailedHistory with start & reverse = false");
+            Console.WriteLine ("DetailedHistory with start & reverse = true");
 
-            ParseResponse(common.Response, totalMessages / 2, totalMessages, "");
+            ParseResponse (common.Response, 0, totalMessages / 2, "");
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestEncryptedSecretDetailedHistoryParams3");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestEncryptedSecretDetailedHistoryParams2");
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse();
+            common.WaitForResponse ();
 
-            Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
+            Console.WriteLine ("DetailedHistory with start & reverse = false");
 
-            ParseResponse(common.Response, 0, totalMessages / 2, "");
-            pubnub.EndPendingRequests();
+            ParseResponse (common.Response, totalMessages / 2, totalMessages, "");
+
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestEncryptedSecretDetailedHistoryParams3");
+
+            common.DeliveryStatus = false;
+            common.Response = null;
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+
+            common.WaitForResponse ();
+
+            Console.WriteLine ("\n******* DetailedHistory Messages Received ******* ");
+
+            ParseResponse (common.Response, 0, totalMessages / 2, "");
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
-        public void TestUnencryptedSecretDetailedHistoryParamsSSL()
+        public void TestUnencryptedSecretDetailedHistoryParamsSSL ()
         {
-            Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "secretkey",
-                "",
-                true);
+            Pubnub pubnub = new Pubnub (
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "secretkey",
+                                "",
+                                true);
 
             string channel = "hello_world_de11";
 
             int totalMessages = 10;
 
-            Common common = new Common();
+            Common common = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;        
 
-            long starttime = common.Timestamp(pubnub);
+            long starttime = common.Timestamp (pubnub);
 
-            SendMultipleIntMessages(0, totalMessages / 2, channel, pubnub);
+            SendMultipleIntMessages (0, totalMessages / 2, channel, pubnub);
 
-            long midtime = common.Timestamp(pubnub);
+            long midtime = common.Timestamp (pubnub);
 
-            SendMultipleIntMessages(totalMessages / 2, totalMessages, channel, pubnub);
+            SendMultipleIntMessages (totalMessages / 2, totalMessages, channel, pubnub);
 
-            long endtime = common.Timestamp(pubnub);
+            long endtime = common.Timestamp (pubnub);
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestUnencryptedSecretDetailedHistoryParams1");
-
-            common.DeliveryStatus = false;
-            common.Response = null;
-            Console.WriteLine("DetailedHistory with start & end");
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
-
-            common.WaitForResponse();
-
-            Console.WriteLine("DetailedHistory with start & reverse = true");
-
-            ParseResponse(common.Response, 0, totalMessages / 2, "");
-
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestUnencryptedSecretDetailedHistoryParams2");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestUnencryptedSecretDetailedHistoryParams1");
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            Console.WriteLine ("DetailedHistory with start & end");
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse();
+            common.WaitForResponse ();
 
-            Console.WriteLine("DetailedHistory with start & reverse = false");
+            Console.WriteLine ("DetailedHistory with start & reverse = true");
 
-            ParseResponse(common.Response, totalMessages / 2, totalMessages, "");
+            ParseResponse (common.Response, 0, totalMessages / 2, "");
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestUnencryptedSecretDetailedHistoryParams3");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestUnencryptedSecretDetailedHistoryParams2");
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse();
+            common.WaitForResponse ();
 
-            Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
+            Console.WriteLine ("DetailedHistory with start & reverse = false");
 
-            ParseResponse(common.Response, 0, totalMessages / 2, "");
-            pubnub.EndPendingRequests();
+            ParseResponse (common.Response, totalMessages / 2, totalMessages, "");
+
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestUnencryptedSecretDetailedHistoryParams3");
+
+            common.DeliveryStatus = false;
+            common.Response = null;
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+
+            common.WaitForResponse ();
+
+            Console.WriteLine ("\n******* DetailedHistory Messages Received ******* ");
+
+            ParseResponse (common.Response, 0, totalMessages / 2, "");
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
-        public void TestUnencryptedDetailedHistoryParamsSSL()
+        public void TestUnencryptedDetailedHistoryParamsSSL ()
         {
-            Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "",
-                "",
-                true);
+            Pubnub pubnub = new Pubnub (
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "",
+                                true);
 
             string channel = "hello_world_de12";
 
             int totalMessages = 10;
 
-            Common common = new Common();
+            Common common = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;        
 
-            long starttime = common.Timestamp(pubnub);
+            long starttime = common.Timestamp (pubnub);
 
-            SendMultipleIntMessages(0, totalMessages / 2, channel, pubnub);
+            SendMultipleIntMessages (0, totalMessages / 2, channel, pubnub);
 
-            long midtime = common.Timestamp(pubnub);
+            long midtime = common.Timestamp (pubnub);
 
-            SendMultipleIntMessages(totalMessages / 2, totalMessages, channel, pubnub);
+            SendMultipleIntMessages (totalMessages / 2, totalMessages, channel, pubnub);
 
-            long endtime = common.Timestamp(pubnub);
+            long endtime = common.Timestamp (pubnub);
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestUnencryptedDetailedHistoryParams1");
-
-            common.DeliveryStatus = false;
-            common.Response = null;
-            Console.WriteLine("DetailedHistory with start & end");
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
-
-            common.WaitForResponse();
-
-            Console.WriteLine("DetailedHistory with start & reverse = true");
-
-            ParseResponse(common.Response, 0, totalMessages / 2, "");
-
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestUnencryptedDetailedHistoryParams2");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestUnencryptedDetailedHistoryParams1");
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            Console.WriteLine ("DetailedHistory with start & end");
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse();
+            common.WaitForResponse ();
 
-            Console.WriteLine("DetailedHistory with start & reverse = false");
+            Console.WriteLine ("DetailedHistory with start & reverse = true");
 
-            ParseResponse(common.Response, totalMessages / 2, totalMessages, "");
+            ParseResponse (common.Response, 0, totalMessages / 2, "");
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestUnencryptedDetailedHistoryParams3");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestUnencryptedDetailedHistoryParams2");
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse();
+            common.WaitForResponse ();
 
-            Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
+            Console.WriteLine ("DetailedHistory with start & reverse = false");
 
-            ParseResponse(common.Response, 0, totalMessages / 2, "");
-            pubnub.EndPendingRequests();
+            ParseResponse (common.Response, totalMessages / 2, totalMessages, "");
+
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestUnencryptedDetailedHistoryParams3");
+
+            common.DeliveryStatus = false;
+            common.Response = null;
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+
+            common.WaitForResponse ();
+
+            Console.WriteLine ("\n******* DetailedHistory Messages Received ******* ");
+
+            ParseResponse (common.Response, 0, totalMessages / 2, "");
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
-        public void TestEncryptedDetailedHistoryParamsSSL()
+        public void TestEncryptedDetailedHistoryParamsSSL ()
         {
-            Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "",
-                "enigma",
-				true);
+            Pubnub pubnub = new Pubnub (
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "enigma",
+                                true);
 
             string channel = "hello_world2_de13";
 
             int totalMessages = 10;
 
-            Common common = new Common();
+            Common common = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;        
 
-            long starttime = common.Timestamp(pubnub);
+            long starttime = common.Timestamp (pubnub);
 
-            SendMultipleIntMessages(0, totalMessages / 2, channel, pubnub);
+            SendMultipleIntMessages (0, totalMessages / 2, channel, pubnub);
 
-            long midtime = common.Timestamp(pubnub);
+            long midtime = common.Timestamp (pubnub);
 
-            SendMultipleIntMessages(totalMessages / 2, totalMessages, channel, pubnub);
+            SendMultipleIntMessages (totalMessages / 2, totalMessages, channel, pubnub);
 
-            long endtime = common.Timestamp(pubnub);
+            long endtime = common.Timestamp (pubnub);
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestEncryptedDetailedHistoryParams1");
-
-            common.DeliveryStatus = false;
-            common.Response = null;
-            Console.WriteLine("DetailedHistory with start & end");
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
-
-            common.WaitForResponse();
-
-            Console.WriteLine("DetailedHistory with start & reverse = true");
-
-            ParseResponse(common.Response, 0, totalMessages / 2, "");
-
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestEncryptedDetailedHistoryParams2");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestEncryptedDetailedHistoryParams1");
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            Console.WriteLine ("DetailedHistory with start & end");
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse();
+            common.WaitForResponse ();
 
-            Console.WriteLine("DetailedHistory with start & reverse = false");
+            Console.WriteLine ("DetailedHistory with start & reverse = true");
 
-            ParseResponse(common.Response, totalMessages / 2, totalMessages, "");
+            ParseResponse (common.Response, 0, totalMessages / 2, "");
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestEncryptedDetailedHistoryParams3");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestEncryptedDetailedHistoryParams2");
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse();
+            common.WaitForResponse ();
 
-            Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
+            Console.WriteLine ("DetailedHistory with start & reverse = false");
 
-            ParseResponse(common.Response, 0, totalMessages / 2, "");
-            pubnub.EndPendingRequests();
+            ParseResponse (common.Response, totalMessages / 2, totalMessages, "");
+
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestEncryptedDetailedHistoryParams3");
+
+            common.DeliveryStatus = false;
+            common.Response = null;
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+
+            common.WaitForResponse ();
+
+            Console.WriteLine ("\n******* DetailedHistory Messages Received ******* ");
+
+            ParseResponse (common.Response, 0, totalMessages / 2, "");
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
-        public void TestUnencryptedDetailedHistorySSL()
+        public void TestUnencryptedDetailedHistorySSL ()
         {
-            Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "",
-                "",
-                true);
+            Pubnub pubnub = new Pubnub (
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "",
+                                true);
 
             string channel = "hello_world_de14";
             int totalMessages = 10;
 
-            Common common = new Common();
+            Common common = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;
 
-            long starttime = common.Timestamp(pubnub);
+            long starttime = common.Timestamp (pubnub);
 
-            SendMultipleIntMessages(0, totalMessages / 2, channel, pubnub);
+            SendMultipleIntMessages (0, totalMessages / 2, channel, pubnub);
 
-            long midtime = common.Timestamp(pubnub);
+            long midtime = common.Timestamp (pubnub);
 
-            SendMultipleIntMessages(totalMessages / 2, totalMessages, channel, pubnub);
+            SendMultipleIntMessages (totalMessages / 2, totalMessages, channel, pubnub);
 
-            long endtime = common.Timestamp(pubnub);
-            common.WaitForResponse();
+            long endtime = common.Timestamp (pubnub);
+            common.WaitForResponse ();
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestUnencryptedDetailedHistory");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestUnencryptedDetailedHistory");
 
             common.DeliveryStatus = false;
             common.Response = null;
 
-            Thread.Sleep(2000);
+            Thread.Sleep (2000);
 
-            pubnub.DetailedHistory(channel, totalMessages, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
-            common.WaitForResponse();
+            pubnub.DetailedHistory (channel, totalMessages, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            common.WaitForResponse ();
 
-            Console.WriteLine("\n******* DetailedHistory Messages Received ******* ");
+            Console.WriteLine ("\n******* DetailedHistory Messages Received ******* ");
 
-            ParseResponse(common.Response, 0, totalMessages, "");
-            pubnub.EndPendingRequests();
+            ParseResponse (common.Response, 0, totalMessages, "");
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
-        public void TestEncryptedDetailedHistorySSL()
+        public void TestEncryptedDetailedHistorySSL ()
         {
-            Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "",
-                "enigma",
-				true);
+            Pubnub pubnub = new Pubnub (
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "enigma",
+                                true);
             string channel = "hello_world_de15";
 
             int totalMessages = 10;
 
-            Common common = new Common();
+            Common common = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;
 
-            long starttime = common.Timestamp(pubnub);
+            long starttime = common.Timestamp (pubnub);
 
-            SendMultipleIntMessages(0, totalMessages, channel, pubnub);
+            SendMultipleIntMessages (0, totalMessages, channel, pubnub);
 
-            long midtime = common.Timestamp(pubnub);
+            long midtime = common.Timestamp (pubnub);
 
-            SendMultipleIntMessages(totalMessages, totalMessages / 2, channel, pubnub);
+            SendMultipleIntMessages (totalMessages, totalMessages / 2, channel, pubnub);
 
-            long endtime = common.Timestamp(pubnub);
-            common.WaitForResponse();
+            long endtime = common.Timestamp (pubnub);
+            common.WaitForResponse ();
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenDetailedHistoryIsRequested", "TestEncryptedDetailedHistory");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestEncryptedDetailedHistory");
 
             common.Response = null;
             common.DeliveryStatus = false;
-            Thread.Sleep(2000);
-            pubnub.DetailedHistory(channel, totalMessages, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            Thread.Sleep (2000);
+            pubnub.DetailedHistory (channel, totalMessages, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse();
-            Console.WriteLine("\n*********** DetailedHistory Messages Received*********** ");
+            common.WaitForResponse ();
+            Console.WriteLine ("\n*********** DetailedHistory Messages Received*********** ");
 
-            ParseResponse(common.Response, 0, totalMessages, "");
-            pubnub.EndPendingRequests();
+            ParseResponse (common.Response, 0, totalMessages, "");
+            pubnub.EndPendingRequests ();
         }
 
     }

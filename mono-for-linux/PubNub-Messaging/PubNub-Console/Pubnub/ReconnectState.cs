@@ -11,6 +11,7 @@ namespace PubNubMessaging.Core
         public Action<PubnubClientError> ErrorCallback;
         public Action<T> ConnectCallback;
         public object Timetoken;
+        public bool Reconnect;
 
         public ReconnectState ()
         {
@@ -18,6 +19,7 @@ namespace PubNubMessaging.Core
             Callback = null;
             ConnectCallback = null;
             Timetoken = null;
+            Reconnect = false;
         }
     }
     #endif

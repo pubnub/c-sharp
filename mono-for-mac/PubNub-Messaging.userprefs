@@ -1,12 +1,12 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="PubNub-Console/PubnubExample.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="PubNub-Console/Pubnub/PubnubMonoMac.cs">
     <Files>
-      <File FileName="PubNub-Console/PubnubExample.cs" Line="665" Column="21" />
-      <File FileName="PubNub-Console/Pubnub/PubnubCore.cs" Line="15" Column="26" />
-      <File FileName="PubNubTest/WhenAClientIsPresented.cs" Line="1" Column="1" />
+      <File FileName="PubNub-Console/Pubnub/PubnubCore.cs" Line="1" Column="1" />
+      <File FileName="PubNub-Console/Pubnub/PubnubMonoMac.cs" Line="486" Column="100" />
       <File FileName="PubNubTest/Common.cs" Line="1" Column="1" />
-      <File FileName="PubNub-Console/Pubnub/PubnubMonoMac.cs" Line="1" Column="1" />
+      <File FileName="PubNubTest/WhenAClientIsPresented.cs" Line="1" Column="1" />
+      <File FileName="PubNubTest/WhenSubscribedToAChannel.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
@@ -21,6 +21,9 @@
       <Breakpoint file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNubTest/WhenAClientIsPresented.cs" line="466" column="22" />
       <Breakpoint file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNub-Console/Pubnub/PubnubCore.cs" line="2081" column="1" />
       <Breakpoint file="/Users/Shared/Jenkins/Home/jobs/c-sharp/workspace/mono-for-mac/PubNub-Messaging-baseclass/PubNubTest/WhenAClientIsPresented.cs" line="653" column="89" />
+      <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/c-sharp-clients/mono-for-mac/PubNubTest/WhenSubscribedToAChannel.cs" line="319" column="1" />
+      <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/c-sharp-clients/mono-for-mac/PubNubTest/WhenSubscribedToAChannel.cs" line="324" column="1" />
+      <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/c-sharp-clients/mono-for-mac/PubNubTest/WhenSubscribedToAChannel.cs" line="330" column="1" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
