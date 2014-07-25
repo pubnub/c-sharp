@@ -13,14 +13,13 @@ namespace PubNubMessaging.Tests
         public static readonly string SubscribeKey = "demo";
         public static readonly string SecretKey = "demo";
 
-        static PubnubCommon()
+        static PubnubCommon ()
         {
-            if (PAMEnabled && !EnableStubTest)
-                {
-					PublishKey = "pam";
-					SubscribeKey = "pam";
-					SecretKey = "pam";
-                }
+            if (PAMEnabled && !EnableStubTest) {
+                PublishKey = "pam";
+                SubscribeKey = "pam";
+                SecretKey = "pam";
+            }
         }
     }
 }

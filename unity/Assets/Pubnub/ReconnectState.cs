@@ -2,7 +2,7 @@ using System;
 
 namespace PubNubMessaging.Core
 {
-		//#if(!UNITY_IOS && !UNITY_ANDROID)
+    //#if(!UNITY_IOS && !UNITY_ANDROID)
     public class ReconnectState<T>
     {
         public string[] Channels;
@@ -11,6 +11,7 @@ namespace PubNubMessaging.Core
         public Action<PubnubClientError> ErrorCallback;
         public Action<T> ConnectCallback;
         public object Timetoken;
+        public bool Reconnect;
 
         public ReconnectState ()
         {
@@ -18,8 +19,9 @@ namespace PubNubMessaging.Core
             Callback = null;
             ConnectCallback = null;
             Timetoken = null;
+            Reconnect = false;
         }
     }
-		//#endif
+    //#endif
 }
 

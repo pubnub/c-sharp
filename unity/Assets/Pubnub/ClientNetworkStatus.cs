@@ -27,6 +27,8 @@ namespace PubNubMessaging.Core
         private static ManualResetEvent mreSocketAsync = new ManualResetEvent(false);
         
 
+
+
 #elif(!UNITY_IOS && !UNITY_ANDROID && !UNITY_STANDALONE)
         private static ManualResetEventSlim mres = new ManualResetEventSlim (false);
         #endif
@@ -49,7 +51,7 @@ namespace PubNubMessaging.Core
                 _machineSuspendMode = value;
             }
         }
-				/*#if(__MonoCS__ && !UNITY_IOS && !UNITY_ANDROID)
+        /*#if(__MonoCS__ && !UNITY_IOS && !UNITY_ANDROID)
         static UdpClient udp;
         #endif*/
         #if(UNITY_IOS || UNITY_ANDROID || UNITY_STANDALONE || __MonoCS__)
@@ -101,7 +103,7 @@ namespace PubNubMessaging.Core
             state.ErrorCallback = errorCallback;
             state.Channels = channels;
             #if (UNITY_ANDROID || UNITY_IOS || UNITY_STANDALONE)
-            CheckSocketConnect<T>(state);
+            CheckSocketConnect<T> (state);
             #elif(__MonoCS__)
             CheckSocketConnect<T> (state);
             #else
@@ -135,7 +137,7 @@ namespace PubNubMessaging.Core
                     sae.Completed -= new EventHandler<SocketAsyncEventArgs>(socketAsync_Completed<T>);
                     socket.Close();
                 }
-				#elif (UNITY_IOS || UNITY_ANDROID)
+                #elif (UNITY_IOS || UNITY_ANDROID)
                 if(request!=null){
                     request.Abort();
                     request = null;
@@ -168,9 +170,9 @@ namespace PubNubMessaging.Core
                     } 
                 }
                 #elif(__MonoCS__ || UNITY_STANDALONE)
-                    using (UdpClient udp = new UdpClient ("pubsub.pubnub.com", 80)){
+                using (UdpClient udp = new UdpClient ("pubsub.pubnub.com", 80)) {
                     IPAddress localAddress = ((IPEndPoint)udp.Client.LocalEndPoint).Address;
-                    if (udp != null && udp.Client != null  && udp.Client.RemoteEndPoint != null) {
+                    if (udp != null && udp.Client != null && udp.Client.RemoteEndPoint != null) {
                         udp.Client.SendTimeout = HeartbeatInterval * 1000;
 
                         EndPoint remotepoint = udp.Client.RemoteEndPoint;
@@ -226,7 +228,7 @@ namespace PubNubMessaging.Core
 #if(UNITY_IOS)
                 GC.Collect();
 #endif
-                      }
+            }
 #if (!UNITY_ANDROID && !UNITY_IOS && !UNITY_STANDALONE)
             mres.Set ();
 #endif
@@ -237,7 +239,7 @@ namespace PubNubMessaging.Core
             PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType (ex);
             int statusCode = (int)errorType;
             string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription (errorType);
-            PubnubClientError error = new PubnubClientError (statusCode, PubnubErrorSeverity.Warn, true, ex.ToString(), ex, PubnubMessageSource.Client, null, null, errorDescription, string.Join (",", channels));
+            PubnubClientError error = new PubnubClientError (statusCode, PubnubErrorSeverity.Warn, true, ex.ToString (), ex, PubnubMessageSource.Client, null, null, errorDescription, string.Join (",", channels));
             GoToCallback (error, errorCallback);
 
             LoggingMethod.WriteToLog (string.Format ("DateTime {0} checkInternetStatus Error. {1}", DateTime.Now.ToString (), ex.ToString ()), LoggingMethod.LevelError);

@@ -67,7 +67,7 @@ namespace PubNubMessaging.Core
                 #if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || __IOS__ || MONODROID || __ANDROID__)
                 System.Diagnostics.Debug.WriteLine(logText);
                 #elif (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
-                print(logText);
+                print (logText);
                 UnityEngine.Debug.Log (logText);
                 #else
                 try {
@@ -305,7 +305,8 @@ namespace PubNubMessaging.Core
                 }
                 break;
             default:
-				UnityEngine.Debug.Log ("ATTENTION: webExceptionStatus = " + webExceptionStatus.ToString ());
+                UnityEngine.Debug.Log ("ATTENTION: webExceptionStatus = " + webExceptionStatus.ToString ());
+                ret = PubnubErrorCode.None;
                 break;
             }
             return ret;
@@ -333,8 +334,8 @@ namespace PubNubMessaging.Core
             } else if (errorType == "System.Runtime.InteropServices.SEHException" && errorMessage == "External component has thrown an exception.") {
                 ret = PubnubErrorCode.PubnubInterOpSEHException;
             } else {
-				UnityEngine.Debug.Log ("ATTENTION: Error Type = " + errorType);
-				UnityEngine.Debug.Log ("ATTENTION: Error Message = " + errorMessage);
+                UnityEngine.Debug.Log ("ATTENTION: Error Type = " + errorType);
+                UnityEngine.Debug.Log ("ATTENTION: Error Message = " + errorMessage);
                 ret = PubnubErrorCode.None;
             }
             return ret;
@@ -352,11 +353,9 @@ namespace PubNubMessaging.Core
                     ret = PubnubErrorCode.InvalidKey;
                 } else if (httpErrorCodeMessage.ToUpper () == "BADREQUEST") {
                     ret = PubnubErrorCode.BadRequest;
+                } else if (httpErrorCodeMessage.ToUpper () == "NO UUID SPECIFIED") {
+                    ret = PubnubErrorCode.NoUuidSpecified;
                 }
-				else if (httpErrorCodeMessage.ToUpper() == "NO UUID SPECIFIED")
-				{
-					ret = PubnubErrorCode.NoUuidSpecified;
-				}
                 break;
             case 401:
                 ret = PubnubErrorCode.InvalidSubscribeKey;
@@ -385,10 +384,14 @@ namespace PubNubMessaging.Core
             case 502:
                 ret = PubnubErrorCode.BadGateway;
                 break;
+            case 503:
+                ret = PubnubErrorCode.ServiceUnavailable;
+                break;
             case 504:
                 ret = PubnubErrorCode.GatewayTimeout;
                 break;
             default:
+                ret = PubnubErrorCode.None;
                 break;
             }
 
@@ -428,16 +431,16 @@ namespace PubNubMessaging.Core
         TimeOperationTimeout = 128,
         PubnubInterOpSEHException = 129,
         PubnubClientMachineSleep = 130,
-		SetUserStateTimeout = 131,
-		GetUserStateTimeout = 132,
-		WhereNowOperationTimeout = 133,
-		GlobalHereNowOperationTimeout = 134,
-		PAMAccessOperationTimeout = 135,
-		UserStateUnchanged = 136,
+        SetUserStateTimeout = 131,
+        GetUserStateTimeout = 132,
+        WhereNowOperationTimeout = 133,
+        GlobalHereNowOperationTimeout = 134,
+        PAMAccessOperationTimeout = 135,
+        UserStateUnchanged = 136,
         MessageTooLarge = 4000,
         BadRequest = 4001,
         InvalidKey = 4002,
-		NoUuidSpecified = 4003,
+        NoUuidSpecified = 4003,
         InvalidSubscribeKey = 4010,
         PamNotEnabled = 4020,
         Forbidden = 4030,
@@ -446,6 +449,7 @@ namespace PubNubMessaging.Core
         RequestUriTooLong = 4140,
         InternalServerError = 5000,
         BadGateway = 5020,
+        ServiceUnavailable = 5030,
         GatewayTimeout = 5040
     }
 
@@ -459,7 +463,7 @@ namespace PubNubMessaging.Core
             dictionaryCodes.Add (4000, "If you must publish a message greater than the default of max message size of 1.8K (post-URLEncoded) please enable the elastic message size feature from your admin portal at admin.pubnub.com.");
             dictionaryCodes.Add (4001, "Bad Request. Please check the entered inputs or web request URL");
             dictionaryCodes.Add (4002, "Invalid Key. Please verify your pub and sub keys");
-			dictionaryCodes.Add (4003, "No UUID specified. Please ensure that UUID is being passed to server for heartbeat");
+            dictionaryCodes.Add (4003, "No UUID specified. Please ensure that UUID is being passed to server for heartbeat");
             dictionaryCodes.Add (4010, "Please provide a valid subscribe key");
             dictionaryCodes.Add (4020, "PAM is not enabled for this keyset. Please contact PubNub support for instructions on enabling PAM.");
             dictionaryCodes.Add (4030, "Not authorized. Please ensure that the channel has the correct PAM permission, your authentication key is set correctly, then try again via unsub and re-sub. For further assistance, contact PubNub support.");
@@ -468,6 +472,7 @@ namespace PubNubMessaging.Core
             dictionaryCodes.Add (4140, "The URL request too long. Reduce the length by reducing subscription/presence channels or grant/revoke/audit channels/auth key list. Hint: You may spread the load across multiple PubNub instances to prevent this message.");
             dictionaryCodes.Add (5000, "Internal Server Error. Please try again. If the issue continues, please contact PubNub support");
             dictionaryCodes.Add (5020, "Bad Gateway. Please try again. If the issue continues, please contact PubNub support");
+            dictionaryCodes.Add (5030, "Service Unavailable. Please try again. If the issue continues, please contact PubNub support");
             dictionaryCodes.Add (5040, "Gateway Timeout. Please try again. If the issue continues, please contact PubNub support");
 
             //PubNub API ERROR CODES and PubNub Context description
@@ -504,7 +509,7 @@ namespace PubNubMessaging.Core
             dictionaryCodes.Add (133, "Timeout occured while running WhereNow. Please try again. If it continues, please contact PubNub support");
             dictionaryCodes.Add (134, "Timeout occured while running GlobalHereNow. Please try again. If it continues, please contact PubNub support");
             dictionaryCodes.Add (135, "Timeout occured while running PAM operations. Please try again. If it continues, please contact PubNub support");
-			dictionaryCodes.Add (136, "User State Unchanged");
+            dictionaryCodes.Add (136, "User State Unchanged");
             dictionaryCodes.Add (0, "Undocumented error. Please contact PubNub support with full error object details for further investigation");
         }
 
