@@ -96,7 +96,7 @@ namespace PubNubMessaging.Core
             else
             {
                 Console.WriteLine("Default demo subscribe key provided");
-                subscribeKey = "demo-36";
+                subscribeKey = "demo";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -112,7 +112,7 @@ namespace PubNubMessaging.Core
             else
             {
                 Console.WriteLine("Default demo publish key provided");
-                publishKey = "demo-36";
+                publishKey = "demo";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -128,7 +128,7 @@ namespace PubNubMessaging.Core
             else
             {
                 Console.WriteLine("Default demo Secret key provided");
-                secretKey = "demo-36";
+                secretKey = "demo";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -605,21 +605,21 @@ namespace PubNubMessaging.Core
                         Console.WriteLine("How many minutes do you want to allow Grant Access? Enter the number of minutes.");
                         Console.WriteLine("Default = 1440 minutes (24 hours). Press ENTER now to accept default value.");
                         string grantTimeLimit = Console.ReadLine();
-                        int grantTimeLimitInSeconds;
-                        Int32.TryParse(grantTimeLimit, out grantTimeLimitInSeconds);
-                        if (grantTimeLimitInSeconds == 0) grantTimeLimitInSeconds = 1440;
+                        int grantTimeLimitInMinutes;
+                        Int32.TryParse(grantTimeLimit, out grantTimeLimitInMinutes);
+                        if (grantTimeLimitInMinutes == 0) grantTimeLimitInMinutes = 1440;
 
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}",channel));
                         Console.WriteLine(string.Format("auth_key = {0}", authGrant));
                         Console.WriteLine(string.Format("Read Access = {0}", read.ToString()));
                         Console.WriteLine(string.Format("Write Access = {0}", write.ToString()));
-                        Console.WriteLine(string.Format("Grant Access Time Limit = {0}", grantTimeLimitInSeconds.ToString()));
+                        Console.WriteLine(string.Format("Grant Access Time Limit = {0}", grantTimeLimitInMinutes.ToString()));
                         Console.ResetColor();
                         Console.WriteLine();
 
                         Console.WriteLine("Running PamGrant()");
-                        pubnub.GrantAccess<string>(channel, authGrant, read, write, grantTimeLimitInSeconds, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.GrantAccess<string>(channel, authGrant, read, write, grantTimeLimitInMinutes, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "13":
                         Console.WriteLine("Enter CHANNEL name for PAM Audit");
@@ -680,21 +680,21 @@ namespace PubNubMessaging.Core
                         Console.WriteLine("How many minutes do you want to allow Grant Presence Access? Enter the number of minutes.");
                         Console.WriteLine("Default = 1440 minutes (24 hours). Press ENTER now to accept default value.");
                         string grantPresenceTimeLimit = Console.ReadLine();
-                        int grantPresenceTimeLimitInSeconds;
-                        Int32.TryParse(grantPresenceTimeLimit, out grantPresenceTimeLimitInSeconds);
-                        if (grantPresenceTimeLimitInSeconds == 0) grantPresenceTimeLimitInSeconds = 1440;
+                        int grantPresenceTimeLimitInMinutes;
+                        Int32.TryParse(grantPresenceTimeLimit, out grantPresenceTimeLimitInMinutes);
+                        if (grantPresenceTimeLimitInMinutes == 0) grantPresenceTimeLimitInMinutes = 1440;
 
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", channel));
                         Console.WriteLine(string.Format("auth_key = {0}", authGrantPresence));
                         Console.WriteLine(string.Format("Read Access = {0}", readPresence.ToString()));
                         Console.WriteLine(string.Format("Write Access = {0}", writePresence.ToString()));
-                        Console.WriteLine(string.Format("Grant Access Time Limit = {0}", grantPresenceTimeLimitInSeconds.ToString()));
+                        Console.WriteLine(string.Format("Grant Access Time Limit = {0}", grantPresenceTimeLimitInMinutes.ToString()));
                         Console.ResetColor();
                         Console.WriteLine();
 
                         Console.WriteLine("Running PAM GrantPresenceAccess()");
-                        pubnub.GrantPresenceAccess<string>(channel, authGrantPresence, readPresence, writePresence, grantPresenceTimeLimitInSeconds, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.GrantPresenceAccess<string>(channel, authGrantPresence, readPresence, writePresence, grantPresenceTimeLimitInMinutes, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "16":
                         Console.WriteLine("Enter CHANNEL name for PAM Presence Audit");

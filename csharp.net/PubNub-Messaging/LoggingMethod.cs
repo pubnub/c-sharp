@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Text;
 using System.Net;
@@ -70,9 +70,9 @@ namespace PubNubMessaging.Core
 		public static void WriteToLog(string logText, bool writeToLog)
 		{
 			if (writeToLog)
-			{
-				#if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || __IOS__ || MONODROID || __ANDROID__)
-				System.Diagnostics.Debug.WriteLine(logText);
+            {
+                #if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || __IOS__ || MONODROID || __ANDROID__ || NETFX_CORE)
+                System.Diagnostics.Debug.WriteLine(logText);
 				#elif (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
 				print(logText);
 				UnityEngine.Debug.Log (logText);
@@ -323,8 +323,8 @@ namespace PubNubMessaging.Core
 		{
 			PubnubErrorCode ret = PubnubErrorCode.None;
 			switch (webExceptionStatus)
-			{
-				#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE)
+            {
+                #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !NETFX_CORE)
 				case WebExceptionStatus.NameResolutionFailure:
 				ret = PubnubErrorCode.NameResolutionFailure;
 				break;
@@ -334,8 +334,8 @@ namespace PubNubMessaging.Core
 				case WebExceptionStatus.ServerProtocolViolation:
 				ret = PubnubErrorCode.ServerProtocolViolation;
 				break;
-				#endif
-				case WebExceptionStatus.RequestCanceled:
+                #endif
+                case WebExceptionStatus.RequestCanceled:
 				ret = PubnubErrorCode.WebRequestCanceled;
 				break;
 				case WebExceptionStatus.ConnectFailure:
@@ -348,7 +348,20 @@ namespace PubNubMessaging.Core
 				}
 				break;
 				default:
+#if NETFX_CORE
+                if (webExceptionStatus.ToString() == "NameResolutionFailure")
+                {
+                    ret = PubnubErrorCode.NameResolutionFailure;
+                }
+                else
+                {
+                    Debug.WriteLine("ATTENTION: webExceptionStatus = " + webExceptionStatus.ToString());
+                    ret = PubnubErrorCode.None;
+                }
+#else             
 				Debug.WriteLine("ATTENTION: webExceptionStatus = " + webExceptionStatus.ToString());
+                ret = PubnubErrorCode.None;
+#endif
 				break;
 			}
 			return ret;
@@ -453,10 +466,14 @@ namespace PubNubMessaging.Core
 				case 502:
 				ret = PubnubErrorCode.BadGateway;
 				break;
+                case 503:
+                ret = PubnubErrorCode.ServiceUnavailable;
+                break;
 				case 504:
 				ret = PubnubErrorCode.GatewayTimeout;
 				break;
 				default:
+                ret = PubnubErrorCode.None;
 				break;
 			}
 
@@ -516,6 +533,7 @@ namespace PubNubMessaging.Core
         RequestUriTooLong = 4140,
 		InternalServerError = 5000,
 		BadGateway = 5020,
+        ServiceUnavailable = 5030,
 		GatewayTimeout = 5040
 	}
 
@@ -538,6 +556,7 @@ namespace PubNubMessaging.Core
 			dictionaryCodes.Add(4140, "The URL request too long. Reduce the length by reducing subscription/presence channels or grant/revoke/audit channels/auth key list. Hint: You may spread the load across multiple PubNub instances to prevent this message.");
 			dictionaryCodes.Add(5000, "Internal Server Error. Please try again. If the issue continues, please contact PubNub support");
 			dictionaryCodes.Add(5020, "Bad Gateway. Please try again. If the issue continues, please contact PubNub support");
+            dictionaryCodes.Add(5030, "Service Unavailable. Please try again. If the issue continues, please contact PubNub support");
 			dictionaryCodes.Add(5040, "Gateway Timeout. Please try again. If the issue continues, please contact PubNub support");
 
 			//PubNub API ERROR CODES and PubNub Context description
