@@ -5,6 +5,8 @@
 /csharp.net/*.suo
 /windows-phone-*/*/packages/*
 /windows-phone-*/*/packages.config
+/windows-phone-*/*/*/bin/debug/*
+/windows-phone-*/*/*/obj/debug/*
 /windows-phone-*/*/bin/*
 /windows-phone-*/*/obj/*
 /windows-phone-*/*.suo

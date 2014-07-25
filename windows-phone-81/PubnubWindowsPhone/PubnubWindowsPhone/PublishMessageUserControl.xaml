@@ -1,0 +1,25 @@
+﻿<UserControl
+    x:Class="PubnubWindowsPhone.PublishMessageUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PubnubWindowsPhone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+
+    <Grid Height="570" Width="451">
+        <StackPanel HorizontalAlignment="Stretch" Margin="12,12,216,246" VerticalAlignment="Stretch">
+            <!-- Text for Large Message = Numerous questions remain about the origins of the chemical and what impact its apparent use could have on the ongoing Syrian civil war and international involvement in it.When asked if the intelligence community's conclusion pushed the situation across President Barack Obama's red line that could potentially trigger more U.S. involvement in the Syrian civil war, Hagel said it's too soon to say. We need all the facts. We need all the information, he said. What I've just given you is what our intelligence community has said they know. As I also said, they are still assessing and they are still looking at what happened, who was responsible and the other specifics that we'll need. In a letter sent to lawmakers before Hagel's announcement, the White House said that intelligence analysts have concluded with varying degrees of confidence that the Syrian regime has used chemical weapons on a small scale in Syria, specifically the chemical agent sarin. In the letter, signed by White House legislative affairs office Director Miguel Rodriguez, the White House said the chain of custody of the chemicals was not clear and that intelligence analysts could not confirm the circumstances under which the sarin was used, including the role of Syrian Preside qaz zaq WSX XSW CDE EDC RFV VFR TGB BGT YHN NHY UJM MJU IKM MKI NHJI IJHN" Width="229" Background="#8BEFDFDF-->
+            <TextBlock Text="Enter the message to Publish" FontSize="16" FontWeight="Bold" Foreground="Black" HorizontalAlignment="Left"></TextBlock>
+            <TextBox x:Name="txtPublish" Height="100" Text="" Foreground="Black" AcceptsReturn="True" HorizontalContentAlignment="Center" TextWrapping="Wrap" />
+
+            <TextBlock Text=""></TextBlock>
+
+            <Button Content="Send" x:Name="btnOK" Width="110" HorizontalContentAlignment="Center" Click="btnOK_Click" />
+            <Button Content="Cancel" x:Name="btnCancel" Width="110" HorizontalContentAlignment="Center" Click="btnCancel_Click" />
+        </StackPanel>
+
+    </Grid>
+</UserControl>

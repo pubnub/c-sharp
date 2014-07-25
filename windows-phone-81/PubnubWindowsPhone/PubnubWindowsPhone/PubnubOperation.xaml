@@ -1,0 +1,70 @@
+﻿<Page
+    x:Class="PubnubWindowsPhone.PubnubOperation"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PubnubWindowsPhone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid x:Name="LayoutRoot">
+
+        <Grid.ChildrenTransitions>
+            <TransitionCollection>
+                <EntranceThemeTransition/>
+            </TransitionCollection>
+        </Grid.ChildrenTransitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title Panel -->
+        <StackPanel Grid.Row="0" Margin="19,0,0,0">
+            <TextBlock Text="PubNub C# Windows Phone - Demo" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,12,0,0"/>
+        </StackPanel>
+
+        <!--TODO: Content should be placed within the following grid-->
+        <Grid Grid.Row="1" x:Name="ContentRoot" Margin="19,9.5,19,0">
+            <TextBlock Height="39" HorizontalAlignment="Left" Margin="34,16,0,0" Name="lblChannel" Text="Channel =" VerticalAlignment="Top" Width="124" FontSize="18" />
+            <TextBox Height="45" HorizontalAlignment="Left" Margin="150,0,0,0" Name="txtChannel" Text="my_channel_pandu" VerticalAlignment="Top" Width="281" />
+
+            <Button Content="Subscribe" Height="60" HorizontalAlignment="Left" Margin="5,45,0,0" Name="btnSubscribeConnect" VerticalAlignment="Top" Width="110" Click="btnSubscribe_Click" FontSize="18" />
+            <Button Content="Presence" Height="60" HorizontalAlignment="Left" Margin="128,45,0,0" Name="btnPresence" VerticalAlignment="Top" Width="110" Click="btnPresence_Click" FontSize="18" />
+            <Button Content="Publish" Height="60" HorizontalAlignment="Left" Margin="252,45,0,0" Name="btnPublish" VerticalAlignment="Top" Width="110" Click="btnPublish_Click" FontSize="18" />
+
+            <Button Content="History" Height="60" HorizontalAlignment="Left" Margin="5,98,0,0" Name="btnDetailedHistory" VerticalAlignment="Top" Width="110" Click="btnHistory_Click" FontSize="18" />
+            <Button Content="HereNow" Height="60" HorizontalAlignment="Left" Margin="130,98,0,0" Name="btnHereNow" VerticalAlignment="Top" Width="110" Click="btnHereNow_Click" FontSize="18" />
+            <Button Content="WhereNow" Height="60" HorizontalAlignment="Left" Margin="252,98,0,0" Name="btnWhereNow" VerticalAlignment="Top" Width="110" FontSize="18" Click="btnWhereNow_Click" />
+
+            <Button Content="Unsub" Height="60" HorizontalAlignment="Left" Margin="5,144,0,0" Name="btnUnsubscribe" VerticalAlignment="Top" Width="60" Click="btnUnsubscribe_Click" FontSize="18" MinWidth="80" />
+            <Button Content="Presence-Unsub" Height="60" HorizontalAlignment="Left" Margin="91,144,0,0" Name="btnPresenceUnsub" VerticalAlignment="Top" Width="160" Click="btnPresenceUnsub_Click" FontSize="18" />
+            <Button Content="Time" Height="60" HorizontalAlignment="Left" Margin="256,144,-4,0" Name="btnTime" VerticalAlignment="Top" Width="110" Click="btnTime_Click" FontSize="18" />
+
+            <Button Content="Disconnect/Retry" Height="60" HorizontalAlignment="Left" Margin="5,195,0,0" Name="btnDisconnectRetry" VerticalAlignment="Top" Width="170" FontSize="18" Click="btnDisconnectRetry_Click" />
+            <Button Content="Change UUID" Height="60" HorizontalAlignment="Left" Margin="196,195,-4,0" Name="btnChangeUUID" VerticalAlignment="Top" Width="170" FontSize="18" Click="btnChangeUUID_Click" />
+
+            <Button Content="Disable Network" Height="60" HorizontalAlignment="Left" Margin="5,245,0,0" Name="btnDisableNetwork" VerticalAlignment="Top" Width="170" FontSize="18" Click="btnDisableNetwork_Click" />
+            <Button Content="Enable Network" Height="60" HorizontalAlignment="Left" Margin="196,245,-4,0" Name="btnEnableNetwork" VerticalAlignment="Top" Width="170" FontSize="18" Click="btnEnableNetwork_Click" />
+
+            <Button Content="Grant" Height="60" HorizontalAlignment="Left" Margin="5,295,0,0" Name="btnGrant" VerticalAlignment="Top" Width="110" FontSize="18" Click="btnGrant_Click" />
+            <Button Content="Audit" Height="60" HorizontalAlignment="Left" Margin="132,295,0,0" Name="btnAudit" VerticalAlignment="Top" Width="110" FontSize="18" Click="btnAudit_Click" />
+            <Button Content="Revoke" Height="60" HorizontalAlignment="Left" Margin="256,295,-4,0" Name="btnRevoke" VerticalAlignment="Top" Width="110" FontSize="18" Click="btnRevoke_Click" />
+
+            <Button Content="Grant Presence" Height="60" HorizontalAlignment="Left" Margin="5,346,0,0" Name="btnGrantPresence" VerticalAlignment="Top" Width="170" FontSize="18" Click="btnGrantPresence_Click" />
+            <Button Content="Audit Presence" Height="60" HorizontalAlignment="Left" Margin="190,346,0,0" Name="btnAuditPresence" VerticalAlignment="Top" Width="170" FontSize="18" Click="btnAuditPresence_Click" />
+
+            <Button Content="GlobalHereNow" Height="60" HorizontalAlignment="Left" Margin="5,396,0,0" Name="btnGlobalHereNow" VerticalAlignment="Top" Width="170" FontSize="18" Click="btnGlobalHereNow_Click" />
+            <Button Content="User State" Height="60" HorizontalAlignment="Left" Margin="190,396,0,0" Name="btnUserState" VerticalAlignment="Top" Width="170" FontSize="18" Click="btnUserState_Click" />
+            
+            <TextBox HorizontalAlignment="Left" Margin="10,451,0,0" TextWrapping="Wrap" Name="txtResult" Text="" VerticalAlignment="Top" Width="350" Height="134" IsReadOnly="True" DoubleTapped="txtResult_DoubleTapped" IsHoldingEnabled="False" IsRightTapEnabled="False"/>
+
+            <!--<ScrollViewer Height="210" HorizontalAlignment="Stretch" Margin="23.5,472,23.5,0" Name="scrollViewerResult" VerticalAlignment="Top" Width="420" Background="#FFCCC6C6" BorderThickness="2" Foreground="#FF0D0D0D" ManipulationMode="Control" UseLayoutRounding="False" BorderBrush="SteelBlue" VerticalScrollBarVisibility="Visible" DoubleTap="scrollViewerResult_DoubleTap">
+                <StackPanel Name="messageStackPanel" Orientation="Vertical"></StackPanel>
+            </ScrollViewer>-->
+
+        </Grid>
+    </Grid>
+</Page>
