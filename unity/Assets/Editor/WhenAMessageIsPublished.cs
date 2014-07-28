@@ -483,7 +483,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        [ExpectedException (typeof(MissingFieldException))]
+        [ExpectedException (typeof(MissingMemberException))]
         public void Then2PublishKeyShouldNotBeEmptyAfterOverriden ()
         {
             Pubnub pubnub = new Pubnub (
@@ -533,7 +533,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        [ExpectedException (typeof(MissingFieldException))]
+        [ExpectedException (typeof(MissingMemberException))]
         public void TestNullShouldBeTreatedAsEmpty ()
         {
             Pubnub pubnub = new Pubnub (
