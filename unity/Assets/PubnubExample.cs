@@ -981,7 +981,7 @@ public class PubnubExample : MonoBehaviour
                 allowUserSettingsChange = false;
                 pubnub.Unsubscribe<string> (channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayDisconnectStatusMessage, DisplayErrorMessage);
             } else if ((PubnubState)pubnubState == PubnubState.PresenceUnsubscribe) {
-                AddToPubnubResultContainer ("Running Presence Subscribe");
+                AddToPubnubResultContainer ("Running Presence Unsubscribe");
                 allowUserSettingsChange = false;
                 pubnub.PresenceUnsubscribe<string> (channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayDisconnectStatusMessage, DisplayErrorMessage);
             } else if ((PubnubState)pubnubState == PubnubState.EnableNetwork) {
