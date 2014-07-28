@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="PollUserAnswer"
+    targetNamespace="pubnub-csharp-demo-epoll-1.0"
+    elementFormDefault="qualified"
+    xmlns="pubnub-csharp-demo-epoll-1.0"
+    xmlns:mstns="pubnub-csharp-demo-epoll-1.0"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+  <xs:element name="PollUserAnswer">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="QuestionID" type="xs:string"></xs:element>
+        <xs:element name="Question" type="xs:string"></xs:element>
+        <xs:element name="UserAnswer" type="xs:string"></xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+</xs:schema>

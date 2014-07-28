@@ -41,6 +41,16 @@
 /windows-store/*/PubnubWindowsStore/packages/*
 /windows-store/*/PubnubWindowsStore/*/bin/Debug/*
 /windows-store/*/PubnubWindowsStore/*/obj/Debug/*
+/demos/epoll/packages/*
+/demos/ePoll/WebPoll/bin/*.pdb
+/demos/ePoll/WebPoll/obj/*
+/demos/ePoll/WebPoll/Properties/PublishProfiles/*
+/demos/ePoll/WebPoll/*.user
+/demos/epoll/ePoll.UnitTests/bin/Debug/*.pdb
+/demos/epoll/ePoll.UnitTests/obj/*
+/demos/ePoll/ePoll.Types/Debug/bin/*.pdb
+/demos/ePoll/ePoll.Types/obj/*
+/demos/ePoll/ePoll.Types/Debug/*.pdb
 .DS_Store
 *.cache
 *.suo
