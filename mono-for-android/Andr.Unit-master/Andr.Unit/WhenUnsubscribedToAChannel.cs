@@ -14,7 +14,7 @@ namespace PubNubMessaging.Tests
         public void ThenNonExistentChannelShouldReturnNotSubscribed ()
         {
             Pubnub pubnub = new Pubnub (Common.PublishKey,
-                Common.SubscribeKey, "", "", false);
+                                Common.SubscribeKey, "", "", false);
 
             Common common = new Common ();
             common.DeliveryStatus = false;
@@ -33,14 +33,14 @@ namespace PubNubMessaging.Tests
             } else {
                 Assert.Fail ("ThenNonExistentChannelShouldReturnNotSubscribed failed");
             }
-			pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
         public void ThenShouldReturnUnsubscribedMessage ()
         {
             Pubnub pubnub = new Pubnub (Common.PublishKey,
-                Common.SubscribeKey, "", "", false);
+                                Common.SubscribeKey, "", "", false);
       
             Common common = new Common ();
             common.DeliveryStatus = false;
@@ -65,14 +65,14 @@ namespace PubNubMessaging.Tests
             } else {
                 Assert.Fail ("ThenShouldReturnUnsubscribedMessage failed");
             }    
-			pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
         public void ThenShouldReturnUnsubscribedMessageSSL ()
         {
             Pubnub pubnub = new Pubnub (Common.PublishKey,
-                Common.SubscribeKey, "", "", true);
+                                Common.SubscribeKey, "", "", true);
 
             Common common = new Common ();
             common.DeliveryStatus = false;
@@ -97,20 +97,20 @@ namespace PubNubMessaging.Tests
             } else {
                 Assert.Fail ("ThenShouldReturnUnsubscribedMessageSSl failed");
             }  
-			pubnub.EndPendingRequests();  
+            pubnub.EndPendingRequests ();  
         }
 
         [Test]
         public void TestUnsubscribePresence ()
         {
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
+                                Common.PublishKey,
+                                Common.SubscribeKey,
                                 "",
                                 "",
                                 false
                             );
-			string channel = "hello_world_unsub12";
+            string channel = "hello_world_unsub12";
             Common common = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;
@@ -118,7 +118,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenAClientIsPresented", "ThenPresenceShouldReturnReceivedMessage");
 
             pubnub.Presence<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessage, common.DisplayErrorMessage);
-            Thread.Sleep(3000);
+            Thread.Sleep (3000);
             common.WaitForResponse ();
             Common commonSubscribe = new Common ();
             common.DeliveryStatus = false;
@@ -171,20 +171,20 @@ namespace PubNubMessaging.Tests
                 }
                 //Assert.True(responseFields2 [0].ToString().Contains("leave"));
             }
-			pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
         public void TestUnsubscribePresenceSSL ()
         {
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
+                                Common.PublishKey,
+                                Common.SubscribeKey,
                                 "",
                                 "",
                                 true
                             );
-			string channel = "hello_world_unsub3";
+            string channel = "hello_world_unsub3";
             Common common = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;
@@ -196,7 +196,7 @@ namespace PubNubMessaging.Tests
             Common commonSubscribe = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;
-			Thread.Sleep(5000);
+            Thread.Sleep (5000);
             pubnub.Subscribe<string> (channel, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayErrorMessage);
 
             commonSubscribe.DeliveryStatus = false;

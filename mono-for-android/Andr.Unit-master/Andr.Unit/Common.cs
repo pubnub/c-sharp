@@ -26,12 +26,14 @@ using System.Collections;
 
 namespace PubNubMessaging.Tests
 {
-  public class Common
-  {
-        public static string PublishKey = "demo-36";
-        public static string SubscribeKey = "demo-36";
-        public static string SecretKey = "demo-36";
+    public class Common
+    {
+        public static string PublishKey = "demo";
+        public static string SubscribeKey = "demo";
+        public static string SecretKey = "demo";
+
         public object Response { get; set; }
+
         public bool DeliveryStatus  { get; set; }
 
         /// <summary>
@@ -39,99 +41,101 @@ namespace PubNubMessaging.Tests
         /// or timeout occurs
         /// </summary>
         /// <param name="countdownSeconds">seconds to timeout</param>
-        public void WaitForResponse(int countdownSeconds = 45)
+        public void WaitForResponse (int countdownSeconds = 45)
         {
-          Timer timer = new Timer();
-          DateTime start = DateTime.UtcNow; 
-          DateTime endTime = start.AddSeconds(countdownSeconds); 
-          timer.Enabled = true;
-          timer.Start();
-          timer.Elapsed += delegate(object sender, ElapsedEventArgs e) {
-              TimeSpan remainingTime=endTime-DateTime.UtcNow;
-              if(remainingTime<TimeSpan.Zero)
-              {
-                  timer.Enabled=false; 
-                  DeliveryStatus = true;
-              }
-         };
-         while (!DeliveryStatus);
-         timer.Stop();
+            Timer timer = new Timer ();
+            DateTime start = DateTime.UtcNow; 
+            DateTime endTime = start.AddSeconds (countdownSeconds); 
+            timer.Enabled = true;
+            timer.Start ();
+            timer.Elapsed += delegate(object sender, ElapsedEventArgs e) {
+                TimeSpan remainingTime = endTime - DateTime.UtcNow;
+                if (remainingTime < TimeSpan.Zero) {
+                    timer.Enabled = false; 
+                    DeliveryStatus = true;
+                }
+            };
+            while (!DeliveryStatus)
+                ;
+            timer.Stop ();
         }
 
-        public PubnubUnitTest CreateUnitTestInstance(string testClassName, string testCaseName)
+        public PubnubUnitTest CreateUnitTestInstance (string testClassName, string testCaseName)
         {
-        PubnubUnitTest unitTest = new PubnubUnitTest();
-        unitTest.TestClassName = testClassName;
-        unitTest.TestCaseName = testCaseName;
-        return unitTest;
+            PubnubUnitTest unitTest = new PubnubUnitTest ();
+            unitTest.TestClassName = testClassName;
+            unitTest.TestCaseName = testCaseName;
+            return unitTest;
         }
-      
-        public void DisplayErrorMessage(PubnubClientError result)
+
+        public void DisplayErrorMessage (PubnubClientError result)
         {
             //Response = result;
         }
 
-        public void DisplayReturnMessageDummy(object result)
+        public void DisplayReturnMessageDummy (object result)
         {
             //deliveryStatus = true;
             //Response = result;
         }
 
-        public void DisplayReturnMessage(object result)
+        public void DisplayReturnMessage (object result)
         {
             DeliveryStatus = true;
             Response = result;
         }
-        public void DisplayReturnMessage(string result)
+
+        public void DisplayReturnMessage (string result)
         {
             DeliveryStatus = true;
             Response = (object)result;
         }
 
-        public long Timestamp(Pubnub pubnub)
+        public long Timestamp (Pubnub pubnub)
         {
-          DeliveryStatus = false;
+            DeliveryStatus = false;
 
-          pubnub.Time(DisplayReturnMessage, DisplayReturnMessage);
-          while (!DeliveryStatus) ;
+            pubnub.Time (DisplayReturnMessage, DisplayReturnMessage);
+            while (!DeliveryStatus)
+                ;
 
-          IList<object> fields = Response as IList<object>;
-          return Convert.ToInt64(fields[0].ToString());
+            IList<object> fields = Response as IList<object>;
+            return Convert.ToInt64 (fields [0].ToString ());
         }
+
         /// <summary>
         /// Deserialize the specified message using either JSONFX or NEWTONSOFT.JSON.
         /// The functionality is based on the pre-compiler flag
         /// </summary>
         /// <param name="message">Message.</param>
-        public static T Deserialize<T>(string message)
-        {
-        object retMessage;
-        #if (USE_JSONFX)
-        var reader = new JsonFx.Json.JsonReader();
-        retMessage= reader.Read<T>(message);
-        #else
-        retMessage = JsonConvert.DeserializeObject<T>(message);
-        #endif
-        return (T)retMessage;
-        }
-
-        public static T DeserializeUsingJSONFx<T>(string message)
+        public static T Deserialize<T> (string message)
         {
             object retMessage;
+            #if (USE_JSONFX)
             var reader = new JsonFx.Json.JsonReader();
-            retMessage = reader.Read<T>(message);
+            retMessage= reader.Read<T>(message);
+            #else
+            retMessage = JsonConvert.DeserializeObject<T> (message);
+            #endif
             return (T)retMessage;
         }
 
-        private static byte[] ObjectToByteArray(Object obj)
+        public static T DeserializeUsingJSONFx<T> (string message)
         {
-            if(obj == null)
+            object retMessage;
+            var reader = new JsonFx.Json.JsonReader ();
+            retMessage = reader.Read<T> (message);
+            return (T)retMessage;
+        }
+
+        private static byte[] ObjectToByteArray (Object obj)
+        {
+            if (obj == null)
                 return null;
-            BinaryFormatter bf = new BinaryFormatter();
-            using (MemoryStream ms = new MemoryStream())
-            {
-                bf.Serialize(ms, obj);
-                return ms.ToArray();
+            BinaryFormatter bf = new BinaryFormatter ();
+            using (MemoryStream ms = new MemoryStream ()) {
+                bf.Serialize (ms, obj);
+                return ms.ToArray ();
             }
         }
 
@@ -140,26 +144,26 @@ namespace PubNubMessaging.Tests
         /// The functionality is based on the pre-compiler flag
         /// </summary>
         /// <param name="message">Message.</param>
-        public static string Serialize(object message)
-        {
-        string retMessage;
-        #if (USE_JSONFX)
-        var writer = new JsonFx.Json.JsonWriter();
-        retMessage= writer.Write(message);
-        retMessage = ConvertHexToUnicodeChars(retMessage);
-        #else
-        retMessage = JsonConvert.SerializeObject(message);
-        #endif
-        return retMessage;
-        }
-
-        public static string SerializeUsingJSONFx(object message)
+        public static string Serialize (object message)
         {
             string retMessage;
+            #if (USE_JSONFX)
             var writer = new JsonFx.Json.JsonWriter();
-
-            retMessage = writer.Write(message);
+            retMessage= writer.Write(message);
             retMessage = ConvertHexToUnicodeChars(retMessage);
+            #else
+            retMessage = JsonConvert.SerializeObject (message);
+            #endif
+            return retMessage;
+        }
+
+        public static string SerializeUsingJSONFx (object message)
+        {
+            string retMessage;
+            var writer = new JsonFx.Json.JsonWriter ();
+
+            retMessage = writer.Write (message);
+            retMessage = ConvertHexToUnicodeChars (retMessage);
             /*            StringBuilder builder = new StringBuilder();
             using (TextWriter textWriter = new EncodingStringWriter(builder, Encoding.UTF8))
             {
@@ -178,61 +182,62 @@ namespace PubNubMessaging.Tests
         /// </summary>
         /// <returns>The lower case hex.</returns>
         /// <param name="value">Hex Value.</param>
-        private static string ConvertHexToUnicodeChars( string value ) {
-        //if(;
-        return Regex.Replace(
-          value,
-          @"\\u(?<Value>[a-zA-Z0-9]{4})",
-          m => {
-          return ((char) int.Parse( m.Groups["Value"].Value, NumberStyles.HexNumber )).ToString();
-        }     
-        );
-     }
-  }
-
-  /// <summary>
-  /// Custom class for testing the encryption and decryption 
-  /// </summary>
-  class CustomClass
-  {
-    public string foo = "hi!"; 
-    public int [] bar = {1, 2, 3, 4, 5};
-  }
-
-  [Serializable]
-  class PubnubDemoObject
-  {
-    public double VersionID = 3.4;
-    public long Timetoken = 13601488652764619;
-    public string OperationName = "Publish";
-    public string[] Channels = { "ch1" };
-    public PubnubDemoMessage DemoMessage = new PubnubDemoMessage();
-    public PubnubDemoMessage CustomMessage = new PubnubDemoMessage("This is a demo message");
-
-    public XmlDocument SampleXml = new PubnubDemoMessage().TryXmlDemo();
-  }
-  
-  [Serializable]
-  class PubnubDemoMessage
-  {
-    public string DefaultMessage = "~!@#$%^&*()_+ `1234567890-= qwertyuiop[]\\ {}| asdfghjkl;' :\" zxcvbnm,./ <>? ";
-    //public string DefaultMessage = "\"";
-    public PubnubDemoMessage()
-    {
+        private static string ConvertHexToUnicodeChars (string value)
+        {
+            //if(;
+            return Regex.Replace (
+                value,
+                @"\\u(?<Value>[a-zA-Z0-9]{4})",
+                m => {
+                    return ((char)int.Parse (m.Groups ["Value"].Value, NumberStyles.HexNumber)).ToString ();
+                }     
+            );
+        }
     }
 
-    public PubnubDemoMessage(string message)
+    /// <summary>
+    /// Custom class for testing the encryption and decryption 
+    /// </summary>
+    class CustomClass
     {
-      DefaultMessage = message;
+        public string foo = "hi!";
+        public int[] bar = { 1, 2, 3, 4, 5 };
     }
 
-    public XmlDocument TryXmlDemo()
+    [Serializable]
+    class PubnubDemoObject
     {
-      XmlDocument xmlDocument = new XmlDocument();
-      xmlDocument.LoadXml("<DemoRoot><Person ID='ABCD123'><Name><First>John</First><Middle>P.</Middle><Last>Doe</Last></Name><Address><Street>123 Duck Street</Street><City>New City</City><State>New York</State><Country>United States</Country></Address></Person><Person ID='ABCD456'><Name><First>Peter</First><Middle>Z.</Middle><Last>Smith</Last></Name><Address><Street>12 Hollow Street</Street><City>Philadelphia</City><State>Pennsylvania</State><Country>United States</Country></Address></Person></DemoRoot>");
+        public double VersionID = 3.4;
+        public long Timetoken = 13601488652764619;
+        public string OperationName = "Publish";
+        public string[] Channels = { "ch1" };
+        public PubnubDemoMessage DemoMessage = new PubnubDemoMessage ();
+        public PubnubDemoMessage CustomMessage = new PubnubDemoMessage ("This is a demo message");
 
-      return xmlDocument;
+        public XmlDocument SampleXml = new PubnubDemoMessage ().TryXmlDemo ();
     }
-  }
+
+    [Serializable]
+    class PubnubDemoMessage
+    {
+        public string DefaultMessage = "~!@#$%^&*()_+ `1234567890-= qwertyuiop[]\\ {}| asdfghjkl;' :\" zxcvbnm,./ <>? ";
+        //public string DefaultMessage = "\"";
+        public PubnubDemoMessage ()
+        {
+        }
+
+        public PubnubDemoMessage (string message)
+        {
+            DefaultMessage = message;
+        }
+
+        public XmlDocument TryXmlDemo ()
+        {
+            XmlDocument xmlDocument = new XmlDocument ();
+            xmlDocument.LoadXml ("<DemoRoot><Person ID='ABCD123'><Name><First>John</First><Middle>P.</Middle><Last>Doe</Last></Name><Address><Street>123 Duck Street</Street><City>New City</City><State>New York</State><Country>United States</Country></Address></Person><Person ID='ABCD456'><Name><First>Peter</First><Middle>Z.</Middle><Last>Smith</Last></Name><Address><Street>12 Hollow Street</Street><City>Philadelphia</City><State>Pennsylvania</State><Country>United States</Country></Address></Person></DemoRoot>");
+
+            return xmlDocument;
+        }
+    }
 }
 

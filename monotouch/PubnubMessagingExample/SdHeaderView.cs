@@ -31,7 +31,7 @@ namespace PubnubMessagingExample
         static SdHeaderView ()
         {
         }
-        
+
         public SdHeaderView (string[] speedTestNames, string[] speedTestSorted)
         {
             BackgroundColor = UIColor.White;
@@ -44,9 +44,9 @@ namespace PubnubMessagingExample
         {
             this.SpeedTestNames = speedTestNames;
             this.SpeedTestSorted = speedTestSorted;
-            SetNeedsDisplay();
+            SetNeedsDisplay ();
         }
-    
+
         public override void Draw (RectangleF rect)
         {
             const int padright = 10;
@@ -55,7 +55,7 @@ namespace PubnubMessagingExample
             SizeF ssize;
 
             float fWidth = UIScreen.MainScreen.Bounds.Width;
-            this.Frame = new RectangleF(0, 0, fWidth, UIScreen.MainScreen.Bounds.Width);
+            this.Frame = new RectangleF (0, 0, fWidth, UIScreen.MainScreen.Bounds.Width);
 
             CGContext ctx = UIGraphics.GetCurrentContext ();
 
@@ -63,55 +63,49 @@ namespace PubnubMessagingExample
             float bw = Bounds.Width - offset;
 
             int cols = (int)(bw / boxWidth);
-            int rows = (int)(SpeedTestNames.Count() / cols);
+            int rows = (int)(SpeedTestNames.Count () / cols);
             int height = 23;
             
             UIColor.Black.SetColor ();
 
-            int counter =0;
-            int counterProg =0;
-            float x=offset, y=0;
-            for (int i =0; i<=rows; i++) {
+            int counter = 0;
+            int counterProg = 0;
+            float x = offset, y = 0;
+            for (int i = 0; i <= rows; i++) {
                 y += height;
                 counterProg = counter;
-                for (int j =0; j<cols; j++) {
-                    x=offset + j * boxWidth ;
-                    if(counter < SpeedTestNames.Count())
-                    {
+                for (int j = 0; j < cols; j++) {
+                    x = offset + j * boxWidth;
+                    if (counter < SpeedTestNames.Count ()) {
                         UIColor.White.SetFill ();
-                        ctx.SetLineWidth(1f);
-                        ctx.StrokeRect(new RectangleF(x-1, y, boxWidth, height));
-                        UIColor.FromRGB(235, 231, 213).SetFill ();
-                        ctx.FillRect(new RectangleF(x, y+1, boxWidth-2, height-2));
+                        ctx.SetLineWidth (1f);
+                        ctx.StrokeRect (new RectangleF (x - 1, y, boxWidth, height));
+                        UIColor.FromRGB (235, 231, 213).SetFill ();
+                        ctx.FillRect (new RectangleF (x, y + 1, boxWidth - 2, height - 2));
                         
                         UIColor.Black.SetFill ();
-                        DrawString ((SpeedTestSorted[counter]==null)?"":SpeedTestSorted[counter] + " MS", new PointF (x + offset, y+2), boxWidth-offset-2, font13b, UILineBreakMode.TailTruncation);
+                        DrawString ((SpeedTestSorted [counter] == null) ? "" : SpeedTestSorted [counter] + " MS", new PointF (x + offset, y + 2), boxWidth - offset - 2, font13b, UILineBreakMode.TailTruncation);
                         counter++;
-                    }
-                    else
-                    {
+                    } else {
                         break;
                     }
                 }
                 counter = counterProg;
                 y += height;
-                for (int j =0; j<cols; j++) {
-                    x=offset + j * boxWidth;
+                for (int j = 0; j < cols; j++) {
+                    x = offset + j * boxWidth;
                     
-                    if(counter < SpeedTestNames.Count())
-                    {
+                    if (counter < SpeedTestNames.Count ()) {
                         UIColor.White.SetFill ();
-                        ctx.SetLineWidth(1f);
-                        ctx.StrokeRect(new RectangleF(x-1, y, boxWidth, height));
-                        UIColor.FromRGB(207, 197, 161).SetFill ();
-                        ctx.FillRect(new RectangleF(x, y+1, boxWidth-2, height-2));
+                        ctx.SetLineWidth (1f);
+                        ctx.StrokeRect (new RectangleF (x - 1, y, boxWidth, height));
+                        UIColor.FromRGB (207, 197, 161).SetFill ();
+                        ctx.FillRect (new RectangleF (x, y + 1, boxWidth - 2, height - 2));
 
                         UIColor.Black.SetFill ();
-                        DrawString (SpeedTestNames[counter], new PointF (x+offset, y+2), boxWidth-offset, font13b, UILineBreakMode.TailTruncation);
+                        DrawString (SpeedTestNames [counter], new PointF (x + offset, y + 2), boxWidth - offset, font13b, UILineBreakMode.TailTruncation);
                         counter++;
-                    }
-                    else
-                    {
+                    } else {
                         break;
                     }
                 }

@@ -37,15 +37,18 @@ namespace PubnubMessagingExample
         string[] speedTestNames;
 
         string Channel {
-            get;set;
+            get;
+            set;
         }
-        
+
         string Cipher {
-            get;set;
+            get;
+            set;
         }
-        
+
         bool Ssl {
-            get;set;
+            get;
+            set;
         }
 
         public override void LoadView ()
@@ -85,59 +88,54 @@ namespace PubnubMessagingExample
                 bIphone = false;
             }
 
-            InitArrays();
+            InitArrays ();
 
-            perfHeader = new PerformanceHeader();
-            secOutput = new Section(perfHeader.View);
+            perfHeader = new PerformanceHeader ();
+            secOutput = new Section (perfHeader.View);
 
-            sdHeader = new SdHeader(speedTestNames, speedTestSorted);
+            sdHeader = new SdHeader (speedTestNames, speedTestSorted);
             sdHeader.View.Tag = 101;
 
-            graphHeader = new GraphHeader();
+            graphHeader = new GraphHeader ();
             graphHeader.View.Tag = 102;
 
-            UISegmentedControl segmentedControl = new UISegmentedControl();
+            UISegmentedControl segmentedControl = new UISegmentedControl ();
             segmentedControl.HorizontalAlignment = UIControlContentHorizontalAlignment.Center;
 
-            segmentedControl.Frame = new RectangleF(10, 20, UIScreen.MainScreen.Bounds.Width - 20, 40);
-            segmentedControl.InsertSegment("Graph", 0, false);
-            segmentedControl.InsertSegment("SD", 1, false);
+            segmentedControl.Frame = new RectangleF (10, 20, UIScreen.MainScreen.Bounds.Width - 20, 40);
+            segmentedControl.InsertSegment ("Graph", 0, false);
+            segmentedControl.InsertSegment ("SD", 1, false);
             segmentedControl.AutoresizingMask = UIViewAutoresizing.FlexibleWidth;
 
-            segmentedControl.AddSubview(graphHeader.View);
+            segmentedControl.AddSubview (graphHeader.View);
 
             segmentedControl.ValueChanged += (sender, e) => {
                 var selectedSegmentId = (sender as UISegmentedControl).SelectedSegment;
-                if (segmentedControl.SelectedSegment == 0)
-                {
-                    if(segmentedControl.ViewWithTag(101) != null)
-                    {
-                        segmentedControl.ViewWithTag(101).RemoveFromSuperview();
+                if (segmentedControl.SelectedSegment == 0) {
+                    if (segmentedControl.ViewWithTag (101) != null) {
+                        segmentedControl.ViewWithTag (101).RemoveFromSuperview ();
                     }
                     graphHeader.View.AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth;
-                    segmentedControl.AddSubview(graphHeader.View);
+                    segmentedControl.AddSubview (graphHeader.View);
 
-                }
-                else if (segmentedControl.SelectedSegment == 1)
-                {
-                    if(segmentedControl.ViewWithTag(102) != null)
-                    {
-                        segmentedControl.ViewWithTag(102).RemoveFromSuperview();
+                } else if (segmentedControl.SelectedSegment == 1) {
+                    if (segmentedControl.ViewWithTag (102) != null) {
+                        segmentedControl.ViewWithTag (102).RemoveFromSuperview ();
                     }
 
                     sdHeader.View.AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth;
-                    segmentedControl.AddSubview(sdHeader.View);
+                    segmentedControl.AddSubview (sdHeader.View);
                 }
             };
             segmentedControl.SelectedSegment = 0;
             segmentedControl.ControlStyle = UISegmentedControlStyle.Plain;
-            secOutput.Add(segmentedControl);
+            secOutput.Add (segmentedControl);
 
-            Section sectionSegmentedControl = new Section();
+            Section sectionSegmentedControl = new Section ();
             //sectionSegmentedControl.Add(segmentedControl);
 
             root = new RootElement (head) {
-                new Section("PubNub speed test"),
+                new Section ("PubNub speed test"),
                 secOutput,
                 //sectionSegmentedControl
             };
@@ -145,11 +143,11 @@ namespace PubnubMessagingExample
             Root = root;
             this.Root.UnevenRows = true;
             dvc = new DialogViewController (UITableViewStyle.Plain, root, true);
-            dvc.NavigationItem.RightBarButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel, delegate {
+            dvc.NavigationItem.RightBarButtonItem = new UIBarButtonItem (UIBarButtonSystemItem.Cancel, delegate {
                 pubnub.EndPendingRequests ();
                 runSpeedtest = false;
-                speedTestThread.Join(1000);
-                AppDelegate.navigation.PopToRootViewController(true);
+                speedTestThread.Join (1000);
+                AppDelegate.navigation.PopToRootViewController (true);
             });
             dvc.TableView.ScrollEnabled = true;
             dvc.TableView.SeparatorColor = UIColor.Clear;
@@ -166,47 +164,46 @@ namespace PubnubMessagingExample
         {
             speedTestSorted = new string[17];
             speedTestNames = new string[17];
-            speedTestNames[0] = "Fastest";
-            speedTestNames[1] = "2%";
-            speedTestNames[2] = "5%";
-            speedTestNames[3] = "10%";
-            speedTestNames[4] = "20%";
-            speedTestNames[5] = "25%";
-            speedTestNames[6] = "30%";
-            speedTestNames[7] = "40%";
-            speedTestNames[8] = "45%";
-            speedTestNames[9] = "50%";
-            speedTestNames[10] = "66%";
-            speedTestNames[11] = "75%";
-            speedTestNames[12] = "80%";
-            speedTestNames[13] = "90%";
-            speedTestNames[14] = "95%";
-            speedTestNames[15] = "98%";
-            speedTestNames[16] = "Slowest";
+            speedTestNames [0] = "Fastest";
+            speedTestNames [1] = "2%";
+            speedTestNames [2] = "5%";
+            speedTestNames [3] = "10%";
+            speedTestNames [4] = "20%";
+            speedTestNames [5] = "25%";
+            speedTestNames [6] = "30%";
+            speedTestNames [7] = "40%";
+            speedTestNames [8] = "45%";
+            speedTestNames [9] = "50%";
+            speedTestNames [10] = "66%";
+            speedTestNames [11] = "75%";
+            speedTestNames [12] = "80%";
+            speedTestNames [13] = "90%";
+            speedTestNames [14] = "95%";
+            speedTestNames [15] = "98%";
+            speedTestNames [16] = "Slowest";
         }
 
         void LaunchSpeedTest ()
         {
-            speedTestThread = new Thread(new ParameterizedThreadStart(RunSpeedTest));
+            speedTestThread = new Thread (new ParameterizedThreadStart (RunSpeedTest));
             runSpeedtest = true;
-            pubnub.Unsubscribe<string>(Channel, SpeedTestPublishReturnMessage, 
-                                       SpeedTestPublishReturnMessage, SpeedTestPublishReturnMessage, SpeedTestPublishReturnMessage);
-            pubnub.Subscribe<string>(Channel, SpeedTestSubscribeReturnMessage, 
-                                     SpeedTestPublishReturnMessage, SpeedTestPublishReturnMessage);
+            pubnub.Unsubscribe<string> (Channel, SpeedTestPublishReturnMessage, 
+                SpeedTestPublishReturnMessage, SpeedTestPublishReturnMessage, SpeedTestPublishReturnMessage);
+            pubnub.Subscribe<string> (Channel, SpeedTestSubscribeReturnMessage, 
+                SpeedTestPublishReturnMessage, SpeedTestPublishReturnMessage);
             speedTestThread.Name = "Pubnub Speedtest";
-            speedTestThread.Start();
+            speedTestThread.Start ();
         }
-        
+
         void RunSpeedTest (object obj)
         {
-            while (runSpeedtest) 
-            {
+            while (runSpeedtest) {
                 startTime = DateTime.Now.Ticks;
-                pubnub.Publish<string>(Channel, "Speed test message", SpeedTestPublishReturnMessage, SpeedTestPublishReturnMessage);
-                Thread.Sleep(200);
+                pubnub.Publish<string> (Channel, "Speed test message", SpeedTestPublishReturnMessage, SpeedTestPublishReturnMessage);
+                Thread.Sleep (200);
             }
         }
-        
+
         void SpeedTestPublishReturnMessage (string result)
         {
         }
@@ -218,50 +215,46 @@ namespace PubnubMessagingExample
         void SpeedTestSubscribeReturnMessage (string result)
         {
             long endTime = DateTime.Now.Ticks;
-            double lag =  Math.Round(((endTime - startTime) / 10000f),2);
+            double lag = Math.Round (((endTime - startTime) / 10000f), 2);
             
             if (lag > 0) {
-                if(speedTestValues == null)
-                    speedTestValues = new List<double>();
+                if (speedTestValues == null)
+                    speedTestValues = new List<double> ();
                 
                 speedTestValues.Add (lag);
-                try
-                {
-                    double max = Math.Round(speedTestValues.Max (), 2);
-                    double min = Math.Round(speedTestValues.Min (), 2); 
-                    double avg = Math.Round(speedTestValues.Average (), 2);
+                try {
+                    double max = Math.Round (speedTestValues.Max (), 2);
+                    double min = Math.Round (speedTestValues.Min (), 2); 
+                    double avg = Math.Round (speedTestValues.Average (), 2);
                     int total = speedTestValues.Count;
-                    speedTestValues.Sort();
+                    speedTestValues.Sort ();
 
-                    foreach (double value in speedTestValues)
-                    {
+                    foreach (double value in speedTestValues) {
                         //Console.WriteLine(value);
                     }
-                    speedTestSorted[0] = ((int)speedTestValues[0]).ToString();
-                    speedTestSorted[1] = ((int)GetMedianLow(speedTestValues, 0.02)).ToString();
-                    speedTestSorted[2] = ((int)GetMedianLow(speedTestValues, 0.05)).ToString();
-                    speedTestSorted[3] = ((int)GetMedianLow(speedTestValues, 0.1)).ToString();
-                    speedTestSorted[4] = ((int)GetMedianLow(speedTestValues, 0.2)).ToString();
-                    speedTestSorted[5] = ((int)GetMedianLow(speedTestValues, 0.25)).ToString();
-                    speedTestSorted[6] = ((int)GetMedianLow(speedTestValues, 0.30)).ToString();
-                    speedTestSorted[7] = ((int)GetMedianLow(speedTestValues, 0.40)).ToString();
-                    speedTestSorted[8] = ((int)GetMedianLow(speedTestValues, 0.45)).ToString();
-                    speedTestSorted[9] = ((int)GetMedianLow(speedTestValues, 0.50)).ToString();
-                    speedTestSorted[10] = ((int)GetMedianLow(speedTestValues, 0.66)).ToString();
-                    speedTestSorted[11] = ((int)GetMedianLow(speedTestValues, 0.75)).ToString();
-                    speedTestSorted[12] = ((int)GetMedianLow(speedTestValues, 0.80)).ToString();
-                    speedTestSorted[13] = ((int)GetMedianLow(speedTestValues, 0.90)).ToString();
-                    speedTestSorted[14] = ((int)GetMedianLow(speedTestValues, 0.95)).ToString();
-                    speedTestSorted[15] = ((int)GetMedianLow(speedTestValues, 0.98)).ToString();
-                    speedTestSorted[16] = ((int)speedTestValues[speedTestValues.Count - 1]).ToString();
+                    speedTestSorted [0] = ((int)speedTestValues [0]).ToString ();
+                    speedTestSorted [1] = ((int)GetMedianLow (speedTestValues, 0.02)).ToString ();
+                    speedTestSorted [2] = ((int)GetMedianLow (speedTestValues, 0.05)).ToString ();
+                    speedTestSorted [3] = ((int)GetMedianLow (speedTestValues, 0.1)).ToString ();
+                    speedTestSorted [4] = ((int)GetMedianLow (speedTestValues, 0.2)).ToString ();
+                    speedTestSorted [5] = ((int)GetMedianLow (speedTestValues, 0.25)).ToString ();
+                    speedTestSorted [6] = ((int)GetMedianLow (speedTestValues, 0.30)).ToString ();
+                    speedTestSorted [7] = ((int)GetMedianLow (speedTestValues, 0.40)).ToString ();
+                    speedTestSorted [8] = ((int)GetMedianLow (speedTestValues, 0.45)).ToString ();
+                    speedTestSorted [9] = ((int)GetMedianLow (speedTestValues, 0.50)).ToString ();
+                    speedTestSorted [10] = ((int)GetMedianLow (speedTestValues, 0.66)).ToString ();
+                    speedTestSorted [11] = ((int)GetMedianLow (speedTestValues, 0.75)).ToString ();
+                    speedTestSorted [12] = ((int)GetMedianLow (speedTestValues, 0.80)).ToString ();
+                    speedTestSorted [13] = ((int)GetMedianLow (speedTestValues, 0.90)).ToString ();
+                    speedTestSorted [14] = ((int)GetMedianLow (speedTestValues, 0.95)).ToString ();
+                    speedTestSorted [15] = ((int)GetMedianLow (speedTestValues, 0.98)).ToString ();
+                    speedTestSorted [16] = ((int)speedTestValues [speedTestValues.Count - 1]).ToString ();
 
 
-                    DisplayHeader(total, min, max, avg, lag);
-                    DisplaySd();
-                }
-                catch(Exception ex)
-                {
-                    Debug.WriteLine(ex.ToString());
+                    DisplayHeader (total, min, max, avg, lag);
+                    DisplaySd ();
+                } catch (Exception ex) {
+                    Debug.WriteLine (ex.ToString ());
                 }
             }
         }
@@ -279,11 +272,11 @@ namespace PubnubMessagingExample
             return valueList[Medlen + (int)Math.Floor(lenght * value)];
         }*/
 
-        public double GetMedianLow(List<double> valueList, double value)
+        public double GetMedianLow (List<double> valueList, double value)
         {
             int length = valueList.Count - 1;
             //double medlen = Math.Floor(length/2d);
-            return valueList[(int)Math.Floor(length * value)];
+            return valueList [(int)Math.Floor (length * value)];
         }
 
         /*public double GetMedian(List<long> valueList, double value)
@@ -296,9 +289,9 @@ namespace PubnubMessagingExample
         void DisplayHeader (int total, double min, double max, double avg, double lag)
         {
             ThreadPool.QueueUserWorkItem (delegate {
-                AppDelegate.navigation.BeginInvokeOnMainThread(delegate {
-                    perfHeader.Update(total.ToString(), min.ToString(), max.ToString(), avg.ToString(), lag.ToString());
-                    graphHeader.Update(total, min, max, avg, lag);
+                AppDelegate.navigation.BeginInvokeOnMainThread (delegate {
+                    perfHeader.Update (total.ToString (), min.ToString (), max.ToString (), avg.ToString (), lag.ToString ());
+                    graphHeader.Update (total, min, max, avg, lag);
                 });
             });
         }
@@ -306,8 +299,8 @@ namespace PubnubMessagingExample
         public void DisplaySd ()
         {
             ThreadPool.QueueUserWorkItem (delegate {
-                AppDelegate.navigation.BeginInvokeOnMainThread(delegate {
-                    sdHeader.Update(speedTestNames, speedTestSorted);
+                AppDelegate.navigation.BeginInvokeOnMainThread (delegate {
+                    sdHeader.Update (speedTestNames, speedTestSorted);
                 });
             });
         }

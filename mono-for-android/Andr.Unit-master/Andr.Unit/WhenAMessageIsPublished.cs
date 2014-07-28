@@ -17,8 +17,8 @@ namespace PubNubMessaging.Tests
         public void NullMessage ()
         {
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
+                                Common.PublishKey,
+                                Common.SubscribeKey,
                                 "",
                                 "",
                                 false
@@ -42,19 +42,19 @@ namespace PubNubMessaging.Tests
             } else {
                 Assert.Fail ("Null response");
             }
-			pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
         public void ThenItShouldReturnSuccessCodeAndInfoForEncryptedComplexMessage2 ()
         {
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
-                              "",
-                              "enigma",
-                              false
-                          );
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "enigma",
+                                false
+                            );
             string channel = "hello_world";
             object message = new PubnubDemoObject ();
 
@@ -77,19 +77,19 @@ namespace PubNubMessaging.Tests
             } else {
                 Assert.Fail ("Null response");
             }
-			pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
         public void ThenItShouldReturnSuccessCodeAndInfoForComplexMessage2WithSsl ()
         {
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
-                              "",
-                              "",
-                              true
-                          );
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "",
+                                true
+                            );
             string channel = "hello_world";
             object message = new PubnubDemoObject ();
             //object message = new CustomClass2();
@@ -106,7 +106,7 @@ namespace PubNubMessaging.Tests
             //wait till the response is received from the server
             common.WaitForResponse (45);
             if (common.Response != null) {
-                Console.WriteLine (" common.Response"+common.Response);
+                Console.WriteLine (" common.Response" + common.Response);
                 IList<object> fields = common.Response as IList<object>;
                 string sent = fields [1].ToString ();
                 string one = fields [0].ToString ();
@@ -115,15 +115,15 @@ namespace PubNubMessaging.Tests
             } else {
                 Assert.Fail ("Null response");
             }
-			pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
         public void ThenItShouldReturnSuccessCodeAndInfoForComplexMessage2 ()
         {
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
+                                Common.PublishKey,
+                                Common.SubscribeKey,
                                 "",
                                 "",
                                 false
@@ -144,7 +144,7 @@ namespace PubNubMessaging.Tests
             //wait till the response is received from the server
             common.WaitForResponse ();
             if (common.Response != null) {
-                Console.WriteLine (" common.Response"+common.Response);
+                Console.WriteLine (" common.Response" + common.Response);
                 IList<object> fields = common.Response as IList<object>;
                 string sent = fields [1].ToString ();
                 string one = fields [0].ToString ();
@@ -153,19 +153,19 @@ namespace PubNubMessaging.Tests
             } else {
                 Assert.Fail ("Null response");
             }
-			pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
         public void ThenItShouldReturnSuccessCodeAndInfoForComplexMessage ()
         {
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
-                              "",
-                              "",
-                              false
-                          );
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "",
+                                false
+                            );
             string channel = "hello_world";
             object message = new CustomClass ();
           
@@ -188,19 +188,19 @@ namespace PubNubMessaging.Tests
             } else {
                 Assert.Fail ("Null response");
             }
-			pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
         public void ThenItShouldReturnSuccessCodeAndInfoWhenEncrypted ()
         {
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
-                              "",
-                              "enigma",
-                              false
-                          );
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "enigma",
+                                false
+                            );
             string channel = "hello_world";
             string message = "Pubnub API Usage Example";
           
@@ -224,19 +224,19 @@ namespace PubNubMessaging.Tests
             } else {
                 Assert.Fail ("Null response");
             }
-			pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
         public void ThenItShouldReturnSuccessCodeAndInfoWhenEncryptedAndSecretKeyed ()
         {
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
-                              "secret",
-                              "enigma",
-                              false
-                          );
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "secret",
+                                "enigma",
+                                false
+                            );
             string channel = "hello_world";
             string message = "Pubnub API Usage Example";
           
@@ -260,15 +260,15 @@ namespace PubNubMessaging.Tests
             } else {
                 Assert.Fail ("Null response");
             }
-			pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
         public void ThenItShouldReturnSuccessCodeAndInfo ()
         {
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
+                                Common.PublishKey,
+                                Common.SubscribeKey,
                                 "",
                                 "",
                                 false
@@ -295,7 +295,7 @@ namespace PubNubMessaging.Tests
             } else {
                 Assert.Fail ("Null response");
             }
-			pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
@@ -337,7 +337,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        [ExpectedException (typeof(MissingFieldException))]
+        [ExpectedException (typeof(MissingMemberException))]
         public void ThenPublishKeyShouldNotBeEmptyAfterOverriden ()
         {
             Pubnub pubnub = new Pubnub (
@@ -351,7 +351,7 @@ namespace PubNubMessaging.Tests
             string message = "Pubnub API Usage Example";
             Common common = new Common ();
             Assert.True ((false).Equals (pubnub.Publish (channel, message, common.DisplayReturnMessage, common.DisplayReturnMessage)));
-			pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
@@ -388,7 +388,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        [ExpectedException (typeof(MissingFieldException))]
+        [ExpectedException (typeof(MissingMemberException))]
         public void NullShouldBeTreatedAsEmpty ()
         {
             Pubnub pubnub = new Pubnub (
@@ -408,8 +408,8 @@ namespace PubNubMessaging.Tests
         public void ThenLargeMessageShoudFailWithMessageTooLargeInfo ()
         {
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
+                                Common.PublishKey,
+                                Common.SubscribeKey,
                                 "",
                                 "",
                                 false

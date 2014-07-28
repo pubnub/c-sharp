@@ -10,11 +10,9 @@ using System.Globalization;
 
 #if (USE_JSONFX)
 using JsonFx.Json;
-
 #elif (USE_DOTNET_SERIALIZATION)
 using System.Runtime.Serialization.Json;
 using System.Web.Script.Serialization;
-
 #else
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -29,9 +27,9 @@ namespace PubNubMessaging.Tests
 {
     public class Common
     {
-        public static string PublishKey = "demo-36";
-        public static string SubscribeKey = "demo-36";
-        public static string SecretKey = "demo-36";
+        public static string PublishKey = "demo";
+        public static string SubscribeKey = "demo";
+        public static string SecretKey = "demo";
 
         public object Response { get; set; }
 
@@ -115,8 +113,8 @@ namespace PubNubMessaging.Tests
         {
             object retMessage;
             #if (USE_JSONFX)
-        var reader = new JsonFx.Json.JsonReader();
-        retMessage= reader.Read<T>(message);
+            var reader = new JsonFx.Json.JsonReader();
+            retMessage= reader.Read<T>(message);
             #else
             retMessage = JsonConvert.DeserializeObject<T> (message);
             #endif
@@ -143,9 +141,9 @@ namespace PubNubMessaging.Tests
         {
             string retMessage;
             #if (USE_JSONFX)
-        var writer = new JsonFx.Json.JsonWriter();
-        retMessage= writer.Write(message);
-        retMessage = ConvertHexToUnicodeChars(retMessage);
+            var writer = new JsonFx.Json.JsonWriter();
+            retMessage= writer.Write(message);
+            retMessage = ConvertHexToUnicodeChars(retMessage);
             #else
             retMessage = JsonConvert.SerializeObject (message);
             #endif

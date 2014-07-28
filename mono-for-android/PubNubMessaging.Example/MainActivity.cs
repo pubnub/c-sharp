@@ -177,7 +177,7 @@ namespace PubNubMessaging.Example
                 //"Del Local User State",
                 DeleteUserState ();
                 break;
-                /*case 19:
+            /*case 19:
                 //"View Local User State",
                 ViewLocalUserState ();
                 break;*/
@@ -498,7 +498,7 @@ namespace PubNubMessaging.Example
         {
             try {
                 SetEventArgs cea = ea as SetEventArgs;
-                if(cea.cds == CommonDialogStates.Auth){
+                if (cea.cds == CommonDialogStates.Auth) {
                     Display ("Setting Auth Key");
                     pubnub.AuthenticationKey = cea.valueToSet;
                     Display ("Auth Key set");
@@ -521,46 +521,41 @@ namespace PubNubMessaging.Example
                     Display ("Running Subscribe Revoke");
                     pubnub.GrantAccess<string> (channel, cea.valueToSet, false, false, DisplayReturnMessage, DisplayErrorMessage);
 
-                }else if (cea.cds == CommonDialogStates.ChangeUuid){
+                } else if (cea.cds == CommonDialogStates.ChangeUuid) {
                     Display ("Setting UUID");
-                    pubnub.ChangeUUID(cea.valueToSet);
-                    Display (string.Format("UUID set to {0}", pubnub.SessionUUID));
-                }else if (cea.cds == CommonDialogStates.WhereNow){
+                    pubnub.ChangeUUID (cea.valueToSet);
+                    Display (string.Format ("UUID set to {0}", pubnub.SessionUUID));
+                } else if (cea.cds == CommonDialogStates.WhereNow) {
                     Display ("Running where now");
                     pubnub.WhereNow<string> (cea.valueToSet, DisplayReturnMessage, DisplayErrorMessage);
-                }else if (cea.cds == CommonDialogStates.GetUserState){
+                } else if (cea.cds == CommonDialogStates.GetUserState) {
                     Display ("Running get user state");
                     pubnub.GetUserState<string> (cea.channel, cea.valueToSet, DisplayReturnMessage, DisplayErrorMessage);
-                }else if (cea.cds == CommonDialogStates.DeleteUserState){
+                } else if (cea.cds == CommonDialogStates.DeleteUserState) {
                     Display ("Running delete user state");
-                    pubnub.SetUserState<string>(cea.channel, new KeyValuePair<string, object>(cea.valueToSet, null), DisplayReturnMessage, DisplayErrorMessage);
-                }else if (cea.cds == CommonDialogStates.PresenceHeartbeat){
+                    pubnub.SetUserState<string> (cea.channel, new KeyValuePair<string, object> (cea.valueToSet, null), DisplayReturnMessage, DisplayErrorMessage);
+                } else if (cea.cds == CommonDialogStates.PresenceHeartbeat) {
                     Display ("Setting presence heartbeat");
                     //int check done in CommonDialogFragment
-                    pubnub.PresenceHeartbeat = int.Parse(cea.valueToSet);
-                    Display (string.Format("PresenceHeartbeat set to {0}", pubnub.PresenceHeartbeat));
-                }else if (cea.cds == CommonDialogStates.PresenceHeartbeatInterval){
+                    pubnub.PresenceHeartbeat = int.Parse (cea.valueToSet);
+                    Display (string.Format ("PresenceHeartbeat set to {0}", pubnub.PresenceHeartbeat));
+                } else if (cea.cds == CommonDialogStates.PresenceHeartbeatInterval) {
                     Display ("Setting presence interval");
                     //int check done in CommonDialogFragment
-                    pubnub.PresenceHeartbeatInterval = int.Parse(cea.valueToSet);
-                    Display (string.Format("PresenceHeartbeatInterval set to {0}", pubnub.PresenceHeartbeatInterval));
-                } else if (cea.cds == CommonDialogStates.AddUserStateKeyValue){
+                    pubnub.PresenceHeartbeatInterval = int.Parse (cea.valueToSet);
+                    Display (string.Format ("PresenceHeartbeatInterval set to {0}", pubnub.PresenceHeartbeatInterval));
+                } else if (cea.cds == CommonDialogStates.AddUserStateKeyValue) {
                     int valueInt;
                     double valueDouble;
 
-                    if (Int32.TryParse(cea.valueToSet2, out valueInt))
-                    {
-                        pubnub.SetUserState<string>(cea.channel, new KeyValuePair<string, object>(cea.valueToSet, valueInt), DisplayReturnMessage, DisplayErrorMessage);
+                    if (Int32.TryParse (cea.valueToSet2, out valueInt)) {
+                        pubnub.SetUserState<string> (cea.channel, new KeyValuePair<string, object> (cea.valueToSet, valueInt), DisplayReturnMessage, DisplayErrorMessage);
+                    } else if (Double.TryParse (cea.valueToSet2, out valueDouble)) {
+                        pubnub.SetUserState<string> (cea.channel, new KeyValuePair<string, object> (cea.valueToSet, valueDouble), DisplayReturnMessage, DisplayErrorMessage);
+                    } else {
+                        pubnub.SetUserState<string> (cea.channel, new KeyValuePair<string, object> (cea.valueToSet, cea.valueToSet2), DisplayReturnMessage, DisplayErrorMessage);
                     }
-                    else if (Double.TryParse(cea.valueToSet2, out valueDouble))
-                    {
-                        pubnub.SetUserState<string>(cea.channel, new KeyValuePair<string, object>(cea.valueToSet, valueDouble), DisplayReturnMessage, DisplayErrorMessage);
-                    }
-                    else
-                    {
-                        pubnub.SetUserState<string>(cea.channel, new KeyValuePair<string, object>(cea.valueToSet, cea.valueToSet2), DisplayReturnMessage, DisplayErrorMessage);
-                    }
-                } else if (cea.cds == CommonDialogStates.SetUserStateJson){
+                } else if (cea.cds == CommonDialogStates.SetUserStateJson) {
                     string jsonUserState = "";
                     if (string.IsNullOrEmpty (cea.valueToSet2)) {
                         //jsonUserState = ;
@@ -815,15 +810,15 @@ namespace PubNubMessaging.Example
     public class MyActionBarDrawerToggle : ActionBarDrawerToggle
     {
         public MyActionBarDrawerToggle (Activity activity,
-                                       DrawerLayout drawerLayout,
-                                       int drawerImageRes,
-                                       int openDrawerContentDescRes,
-                                       int closeDrawerContentDescRes)
+                                        DrawerLayout drawerLayout,
+                                        int drawerImageRes,
+                                        int openDrawerContentDescRes,
+                                        int closeDrawerContentDescRes)
             : base (activity,
-                   drawerLayout,
-                   drawerImageRes,
-                   openDrawerContentDescRes,
-                   closeDrawerContentDescRes)
+                    drawerLayout,
+                    drawerImageRes,
+                    openDrawerContentDescRes,
+                    closeDrawerContentDescRes)
         {
 
         }

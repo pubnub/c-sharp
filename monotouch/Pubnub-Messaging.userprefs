@@ -1,10 +1,8 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhoneRetina.7.1" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="PubnubMessagingExample/Pubnub_MessagingSub.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="PubnubMessaging/PubnubXamariniOS.cs">
     <Files>
-      <File FileName="PubnubMessagingExample/Pubnub_MessagingSub.cs" Line="348" Column="10" />
-      <File FileName="PubnubMessaging/ClientNetworkStatus.cs" Line="1" Column="1" />
-      <File FileName="../../Xamarin.Android/latest/PubNubMessaging.Example/MainActivity.cs" Line="633" Column="40" />
+      <File FileName="PubnubMessaging/PubnubXamariniOS.cs" Line="1248" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
@@ -17,6 +15,9 @@
     <MonoDevelop.MacDev.AppleDevelopmentTeam DeveloperId="NK6E38LY64" TeamId="Y9X42V6EK7" />
   </MonoDevelop.Ide.ItemProperties.Touch.Unit>
   <MonoDevelop.Ide.ItemProperties.PubnubMessagingExample>
+    <MonoDevelop.MacDev.AppleDevelopmentTeam DeveloperId="NK6E38LY64" TeamId="Y9X42V6EK7" />
+  </MonoDevelop.Ide.ItemProperties.PubnubMessagingExample>
+</Properties>  <MonoDevelop.Ide.ItemProperties.PubnubMessagingExample>
     <MonoDevelop.MacDev.AppleDevelopmentTeam DeveloperId="NK6E38LY64" TeamId="Y9X42V6EK7" />
   </MonoDevelop.Ide.ItemProperties.PubnubMessagingExample>
 </Properties>

@@ -11,6 +11,7 @@ namespace MonoTouch.SlideoutNavigation
     public class SlideoutNavigationController : UIViewController
     {
         #region private attributes
+
         private readonly ProxyNavigationController _internalMenuViewLeft;
         private readonly ProxyNavigationController _internalMenuViewRight;
         private readonly UIViewController _internalTopView;
@@ -31,8 +32,11 @@ namespace MonoTouch.SlideoutNavigation
         private bool _rightMenuShowing = true;
         private string _menuTextLeft = " Menu ";
         private string _menuTextRight = "Right Menu > ";
+
         #endregion private attributes
+
         #region public attributes
+
         /// <summary>
         /// Gets or sets the color of the background.
         /// </summary>
@@ -216,7 +220,9 @@ namespace MonoTouch.SlideoutNavigation
                 _internalMenuViewRight.SetNavigationBarHidden (!value, false);
             } 
         }
+
         #endregion public attributes
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SlideoutNavigationController"/> class.
         /// </summary>
@@ -248,7 +254,7 @@ namespace MonoTouch.SlideoutNavigation
             _tapGesture.NumberOfTapsRequired = 1;
 
             _panGesture = new UIPanGestureRecognizer {
-                Delegate = new SlideoutPanDelegate(this),
+                Delegate = new SlideoutPanDelegate (this),
                 MaximumNumberOfTouches = 1,
                 MinimumNumberOfTouches = 1
             };
@@ -297,8 +303,8 @@ namespace MonoTouch.SlideoutNavigation
 
                 ShowShadowWhileDragging ();
             } else if (!_ignorePan &&
-                (_panGesture.State == UIGestureRecognizerState.Ended ||
-                    _panGesture.State == UIGestureRecognizerState.Cancelled)) {
+                       (_panGesture.State == UIGestureRecognizerState.Ended ||
+                       _panGesture.State == UIGestureRecognizerState.Cancelled)) {
                 float velocity = _panGesture.VelocityInView (view).X;
 
                 if (Visible) {
@@ -308,12 +314,14 @@ namespace MonoTouch.SlideoutNavigation
                         UIView.Animate (SlideSpeed, 0, UIViewAnimationOptions.CurveEaseInOut,
                             () => {
                                 view.Frame = new RectangleF (SlideWidth, view.Frame.Y, view.Frame.Width, view.Frame.Height);
-                            }, () => { });
+                            }, () => {
+                        });
                     } else if (_rightMenuShowing) {
                         UIView.Animate (SlideSpeed, 0, UIViewAnimationOptions.CurveEaseInOut,
                             () => {
                                 view.Frame = new RectangleF (-SlideWidth, view.Frame.Y, view.Frame.Width, view.Frame.Height);
-                            }, () => { });
+                            }, () => {
+                        });
                     }
                 } else {
                     if (velocity > 800.0f || (view.Frame.X > (view.Frame.Width / 2))) {
@@ -325,7 +333,9 @@ namespace MonoTouch.SlideoutNavigation
                     } else {
                         UIView.Animate (SlideSpeed, 0, UIViewAnimationOptions.CurveEaseInOut,
                             () => {
-                                view.Frame = new RectangleF (0, 0, view.Frame.Width, view.Frame.Height); }, () => { });
+                                view.Frame = new RectangleF (0, 0, view.Frame.Width, view.Frame.Height);
+                            }, () => {
+                        });
                     }
                 }
             }
@@ -448,20 +458,20 @@ namespace MonoTouch.SlideoutNavigation
 
             _internalMenuViewLeft.View.Frame = new RectangleF (0, 0, SlideWidth, View.Frame.Height);
             if (MenuViewLeft != null)
-                MenuViewLeft.ViewWillAppear(true);
+                MenuViewLeft.ViewWillAppear (true);
 
             UIView view = _internalTopView.View;
             UIView.Animate (SlideSpeed, 0, UIViewAnimationOptions.CurveEaseInOut,
                 () => {
-                    view.Frame = new RectangleF (SlideWidth, 0, view.Frame.Width, view.Frame.Height); },
-                () =>
-                {
+                    view.Frame = new RectangleF (SlideWidth, 0, view.Frame.Width, view.Frame.Height);
+                },
+                () => {
                     if (view.Subviews.Length > 0)
                         view.Subviews [0].UserInteractionEnabled = false;
                     view.AddGestureRecognizer (_tapGesture);
 
                     if (MenuViewLeft != null)
-                        MenuViewLeft.ViewDidAppear(true);
+                        MenuViewLeft.ViewDidAppear (true);
                 });
         }
 
@@ -503,18 +513,19 @@ namespace MonoTouch.SlideoutNavigation
 
             _internalMenuViewRight.View.Frame = new RectangleF (View.Frame.Width - SlideWidth, 0, SlideWidth, View.Frame.Height);
             if (MenuViewRight != null)
-                MenuViewRight.ViewWillAppear(true);
+                MenuViewRight.ViewWillAppear (true);
 
             UIView view = _internalTopView.View;
             UIView.Animate (SlideSpeed, 0, UIViewAnimationOptions.CurveEaseInOut,
                 () => {
-                    view.Frame = new RectangleF (-SlideWidth, 0, view.Frame.Width, view.Frame.Height); },
+                    view.Frame = new RectangleF (-SlideWidth, 0, view.Frame.Width, view.Frame.Height);
+                },
                 () => {
                     if (view.Subviews.Length > 0)
                         view.Subviews [0].UserInteractionEnabled = false;
                     view.AddGestureRecognizer (_tapGesture);
                     if (MenuViewRight != null)
-                        MenuViewRight.ViewDidAppear(true);
+                        MenuViewRight.ViewDidAppear (true);
                 });
         }
 
@@ -571,9 +582,8 @@ namespace MonoTouch.SlideoutNavigation
             }
 
             _internalTopNavigation = new UINavigationController (view) {
-                View =
-                {
-                    Frame = new RectangleF(0, 0,
+                View = {
+                    Frame = new RectangleF (0, 0,
                         _internalTopView.View.Frame.Width,
                         _internalTopView.View.Frame.Height)
                 }
@@ -604,7 +614,8 @@ namespace MonoTouch.SlideoutNavigation
             UIView view = _internalTopView.View;
 
             NSAction animation = () => {
-                view.Frame = new RectangleF (0, 0, view.Frame.Width, view.Frame.Height); };
+                view.Frame = new RectangleF (0, 0, view.Frame.Width, view.Frame.Height);
+            };
             NSAction finished = () => {
                 if (view.Subviews.Length > 0)
                     view.Subviews [0].UserInteractionEnabled = true;
@@ -655,7 +666,9 @@ namespace MonoTouch.SlideoutNavigation
         {
             _internalTopNavigation.NavigationBar.SetBackgroundImage (image, metrics);
         }
+
         #region Nested type: ProxyNavigationController
+
         ///<summary>
         /// A proxy class for the navigation controller.
         /// This allows the menu view to make requests to the navigation controller
@@ -700,8 +713,11 @@ namespace MonoTouch.SlideoutNavigation
                 ParentController.SelectView (viewController);
             }
         }
+
         #endregion
+
         #region Nested type: SlideoutPanDelegate
+
         ///<summary>
         /// A custom UIGestureRecognizerDelegate activated only when the controller 
         /// is visible or touch is within the 44.0f boundary.
@@ -720,9 +736,10 @@ namespace MonoTouch.SlideoutNavigation
             public override bool ShouldReceiveTouch (UIGestureRecognizer recognizer, UITouch touch)
             {
                 return (_controller.Visible ||
-                    (touch.LocationInView (_controller._internalTopView.View).Y <= _controller.SlideHeight)) && (_controller.LeftMenuEnabled || _controller.RightMenuEnabled);
+                (touch.LocationInView (_controller._internalTopView.View).Y <= _controller.SlideHeight)) && (_controller.LeftMenuEnabled || _controller.RightMenuEnabled);
             }
         }
+
         #endregion
     }
 }

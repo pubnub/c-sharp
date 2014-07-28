@@ -19,25 +19,25 @@ namespace PubnubMessagingExample
         DrawingView dv;
         int chartHeight = 210;
         int chartWidth = 210;
-        
+
         public GraphHeaderView ()
         {
-            dv = new DrawingView(new RectangleF(0,0, chartWidth, chartHeight), 0, 0, 0);
+            dv = new DrawingView (new RectangleF (0, 0, chartWidth, chartHeight), 0, 0, 0);
             
-            this.AddSubview(dv );
+            this.AddSubview (dv);
         }
-        
+
         public void Update (int total, double min, double max, double avg, double lag)
         {
-            dv.Update(lag, max, min);
+            dv.Update (lag, max, min);
         }
 
         public override void LayoutSubviews ()
         {
-            dv.Frame = new RectangleF((Bounds.Width - chartWidth)/2, 10, chartWidth, chartHeight);
+            dv.Frame = new RectangleF ((Bounds.Width - chartWidth) / 2, 10, chartWidth, chartHeight);
         }
     }
-    
+
     public class DrawingView : UIView
     {
         UIFont font10 = UIFont.SystemFontOfSize (10);
@@ -48,40 +48,41 @@ namespace PubnubMessagingExample
         double max;
 
         double min;
-        
-        public DrawingView (RectangleF p, double lag, double max, double min) : base(p)
+
+        public DrawingView (RectangleF p, double lag, double max, double min) : base (p)
         {
             BackgroundColor = UIColor.White;
             this.lag = lag;
             this.max = max;
             this.min = min;
         }
-        
+
         public void Update (double lag, double max, double min)
         {
             this.min = min;
-            this.lag =  lag;
+            this.lag = lag;
             this.max = max;
-            SetNeedsDisplay();
+            SetNeedsDisplay ();
         }
 
-        private PointF GetCenterPoint(PointF p1, PointF p2)
+        private PointF GetCenterPoint (PointF p1, PointF p2)
         {
-            return new PointF((p2.X + p1.X) / 2, (p2.Y + p1.Y) / 2);
+            return new PointF ((p2.X + p1.X) / 2, (p2.Y + p1.Y) / 2);
         }
-        
-        private double GetSlope(PointF p1, PointF p2)
+
+        private double GetSlope (PointF p1, PointF p2)
         {
             if ((p2.Y - p1.Y) != 0)
                 return (p1.X - p2.X) / (p2.Y - p1.Y);
-            else return double.PositiveInfinity;
+            else
+                return double.PositiveInfinity;
         }
-        
-        private double GetIntersect(PointF p1, PointF p2)
+
+        private double GetIntersect (PointF p1, PointF p2)
         {
-            double slope = GetSlope(p1, p2);
-            PointF center = GetCenterPoint(p1, p2);
-            if (double.IsPositiveInfinity(slope))
+            double slope = GetSlope (p1, p2);
+            PointF center = GetCenterPoint (p1, p2);
+            if (double.IsPositiveInfinity (slope))
                 return 0;
             return center.Y - (slope * center.X);
         }
@@ -127,7 +128,7 @@ namespace PubnubMessagingExample
 
             //needle
             //double percentFromMaxValue = max / 100.0d;
-            max =1000;
+            max = 1000;
             double percentFromMaxValue = max / 100.0d;
 
             if (lag > max) {
@@ -135,25 +136,26 @@ namespace PubnubMessagingExample
             }
 
             //angle
-            double invertLag = ((max - min)/2 - lag) *2 + lag;
+            double invertLag = ((max - min) / 2 - lag) * 2 + lag;
             //Debug.WriteLine("lag: "+ lag.ToString() + " invlag:" + invLag.ToString());
-            double angle = 360 - Math.Round((double)invertLag / percentFromMaxValue* (90 / 100.0f)) * Math.PI / 180.0;
+            double angle = 360 - Math.Round ((double)invertLag / percentFromMaxValue * (90 / 100.0f)) * Math.PI / 180.0;
             //double angle2  = 360 - Math.Round((double)lag / percentFromMaxValue* (90 / 100.0f)) * Math.PI / 180.0;;
             //Debug.WriteLine("lagangle: "+ angle.ToString() + " invLagangle" + angle2.ToString());
             //double angle = WrapValue(lag, max);
             
             float distance = 80;
-            PointF p =  new PointF(distance * (float)Math.Cos(angle), distance * (float)Math.Sin(angle));
+            PointF p = new PointF (distance * (float)Math.Cos (angle), distance * (float)Math.Sin (angle));
             
             UIColor.Brown.SetStroke ();
             CGPath path1 = new CGPath ();
-            ctx.SetLineWidth(3);
+            ctx.SetLineWidth (3);
             
             PointF newPoint = new PointF (105 - p.X, 105 - p.Y);
             
             PointF[] linePoints = new PointF[] { 
                 newPoint,
-                new PointF (105, 105) };
+                new PointF (105, 105)
+            };
             
             path1.AddLines (linePoints);
             path1.CloseSubpath ();
@@ -164,22 +166,17 @@ namespace PubnubMessagingExample
             //caliberate
             UIColor.Brown.SetColor ();
             double theta = 0.0;
-            for (int i = 0; i < 360; i++)
-                
-            {
-                float bx4= (float)(x - 4 + (r -10) * (Math.Cos(theta * Math.PI / 180)));
-                float by4= (float)(y - 15 + (r - 10) * (Math.Sin(theta * Math.PI / 180)));
+            for (int i = 0; i < 360; i++) {
+                float bx4 = (float)(x - 4 + (r - 10) * (Math.Cos (theta * Math.PI / 180)));
+                float by4 = (float)(y - 15 + (r - 10) * (Math.Sin (theta * Math.PI / 180)));
 
-                if((theta > 160) && (theta <350))
-                {
+                if ((theta > 160) && (theta < 350)) {
                     UIColor.Black.SetColor ();
-                    DrawString (".", new PointF (bx4,by4), StringSize(".", font18b).Width, font18b, UILineBreakMode.TailTruncation);
-                }
-                else if (((theta >= 0) && (theta <40)) || ((theta >= 350) && (theta <= 360)))
-                {
+                    DrawString (".", new PointF (bx4, by4), StringSize (".", font18b).Width, font18b, UILineBreakMode.TailTruncation);
+                } else if (((theta >= 0) && (theta < 40)) || ((theta >= 350) && (theta <= 360))) {
                     //redline
                     UIColor.Red.SetColor ();
-                    DrawString (".", new PointF (bx4,by4), StringSize(".", font18b).Width, font18b, UILineBreakMode.TailTruncation);
+                    DrawString (".", new PointF (bx4, by4), StringSize (".", font18b).Width, font18b, UILineBreakMode.TailTruncation);
                 }
                 theta += 10.0;
 
@@ -193,8 +190,8 @@ namespace PubnubMessagingExample
             
             //speed in small circle
             UIColor.Black.SetFill ();
-            stringSize = StringSize (Convert.ToInt32(lag).ToString(), font18b);
-            DrawString (Convert.ToInt32(lag).ToString(), new PointF ((r * 2 - stringSize.Width) / 2 + 4, y + r / 2f - 15), stringSize.Width, font18b, UILineBreakMode.TailTruncation);
+            stringSize = StringSize (Convert.ToInt32 (lag).ToString (), font18b);
+            DrawString (Convert.ToInt32 (lag).ToString (), new PointF ((r * 2 - stringSize.Width) / 2 + 4, y + r / 2f - 15), stringSize.Width, font18b, UILineBreakMode.TailTruncation);
 
             //ms
             UIColor.Black.SetFill ();
