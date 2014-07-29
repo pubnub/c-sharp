@@ -523,6 +523,7 @@ namespace PubNubMessaging.Core
                 if (webEx.Response != null && asynchRequestState != null)
                 {
                     if (webEx.Response.GetType().ToString() == "System.Net.HttpWebResponse"
+                             || webEx.Response.GetType().ToString() == "MS.Internal.Modern.ClientHttpWebResponse"
                              || webEx.Response.GetType().ToString() == "System.Net.Browser.ClientHttpWebResponse")
                     {
                         currentHttpStatusCode = ((HttpWebResponse)webEx.Response).StatusCode;
