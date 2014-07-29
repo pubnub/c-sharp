@@ -1,0 +1,75 @@
+﻿body {
+    color: #5B5B5B;
+    font-family: "Helvetica Neue",Helvetica,"Myriad Pro",Arial,sans-serif;
+    font-size: 16px;
+    line-height: 1.5em;
+}
+
+table 
+{
+    border: 1px solid black;
+    width: 400px;
+}
+
+.welcome
+{
+    font-size: 20px;
+    color: #c70321;
+}
+
+.ralign
+{
+    text-align:right;
+}
+
+.question, .thanks, .error
+{
+    color: #4183C4;
+}
+
+.answers
+{
+    color: #5a25a2;
+}
+
+#btnVoteSubmit
+{
+    background-color: #c70321;
+    color: #ffffff;
+    font-family: "Helvetica Neue",Helvetica,"Myriad Pro",Arial,sans-serif;
+    font-size: 16px;
+}
+
+#divpollresult1
+{
+    text-align: right;
+}
+#divpollresult1, #divpollresult2
+{
+    text-align: center;
+}
+#divpollresult1 #btnPollResult
+{
+    background-color: #c70321;
+    color: #ffffff;
+    font-family: "Helvetica Neue",Helvetica,"Myriad Pro",Arial,sans-serif;
+    font-size: 10px;
+}
+
+#divpollresult2 #btnPollResult
+{
+    background-color: #c70321;
+    color: #ffffff;
+    font-family: "Helvetica Neue",Helvetica,"Myriad Pro",Arial,sans-serif;
+    font-size: 16px;
+}
+
+#votecontainer
+{
+    width: 400px;
+}
+
+.pollresult-left
+{
+    color: Red;
+}
