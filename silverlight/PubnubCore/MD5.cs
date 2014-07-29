@@ -1,6 +1,12 @@
 using System;
 using System.IO;
+#if NETFX_CORE
+using Windows.Security.Cryptography;
+using Windows.Security.Cryptography.Core;
+using Windows.Storage.Streams;
+#else
 using System.Security.Cryptography;
+#endif
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Globalization;
@@ -216,7 +222,7 @@ namespace PubNubMessaging.Core
 			// Transform as many times as possible.
 			if (count >= partLen)
 			{
-				Buffer.BlockCopy(input, offset, this.buffer, index, partLen);
+				System.Buffer.BlockCopy(input, offset, this.buffer, index, partLen);
 				Transform(this.buffer, 0);
 
 				for (i = partLen; i + 63 < count; i += 64)
@@ -228,7 +234,7 @@ namespace PubNubMessaging.Core
 				i = 0;
 
 			// Buffer remaining input 
-			Buffer.BlockCopy(input, offset + i, this.buffer, index, count - i);
+			System.Buffer.BlockCopy(input, offset + i, this.buffer, index, count - i);
 		}
 
 		/// <summary>
@@ -519,7 +525,7 @@ namespace PubNubMessaging.Core
 			HashCore(inputBuffer, inputOffset, inputCount);
 			if ((inputBuffer != outputBuffer) || (inputOffset != outputOffset))
 			{
-				Buffer.BlockCopy(inputBuffer, inputOffset, outputBuffer, outputOffset, inputCount);
+				System.Buffer.BlockCopy(inputBuffer, inputOffset, outputBuffer, outputOffset, inputCount);
 			}
 			return inputCount;
 		}
@@ -552,7 +558,7 @@ namespace PubNubMessaging.Core
 			HashCore(inputBuffer, inputOffset, inputCount);
 			HashValue = HashFinal();
 			byte[] buffer = new byte[inputCount];
-			Buffer.BlockCopy(inputBuffer, inputOffset, buffer, 0, inputCount);
+			System.Buffer.BlockCopy(inputBuffer, inputOffset, buffer, 0, inputCount);
 			this.State = 0;
 			return buffer;
 		}
@@ -647,7 +653,7 @@ namespace PubNubMessaging.Core
 		/// </summary>
 		/// <returns>The lower case hex.</returns>
 		/// <param name="value">Hex Value.</param>
-		protected string ConvertHexToUnicodeChars( string value ) {
+		public static string ConvertHexToUnicodeChars( string value ) {
 			//if(;
 			return Regex.Replace(
 				value,
@@ -699,11 +705,28 @@ namespace PubNubMessaging.Core
 			byte[] keyByte = encoding.GetBytes(secret);
 			byte[] messageBytes = encoding.GetBytes(message);
 
+#if NETFX_CORE
+            var hmacsha256 = MacAlgorithmProvider.OpenAlgorithm(MacAlgorithmNames.HmacSha256);
+            IBuffer valueBuffer = CryptographicBuffer.ConvertStringToBinary(message, BinaryStringEncoding.Utf8);
+            IBuffer buffKeyMaterial = CryptographicBuffer.ConvertStringToBinary(secret, BinaryStringEncoding.Utf8);
+
+            CryptographicKey cryptographicKey = hmacsha256.CreateKey(buffKeyMaterial);
+
+            // Sign the key and message together.
+            IBuffer bufferProtected = CryptographicEngine.Sign(cryptographicKey, valueBuffer);
+
+            DataReader dataReader = DataReader.FromBuffer(bufferProtected);
+            byte[] hashmessage = new byte[bufferProtected.Length];
+            dataReader.ReadBytes(hashmessage);
+
+            return Convert.ToBase64String(hashmessage).Replace('+', '-').Replace('/', '_');
+#else
 			using (var hmacsha256 = new HMACSHA256(keyByte))
 			{
 				byte[] hashmessage = hmacsha256.ComputeHash(messageBytes);
 				return Convert.ToBase64String(hashmessage).Replace('+', '-').Replace('/', '_');
 			}
+#endif
 		}
 
 

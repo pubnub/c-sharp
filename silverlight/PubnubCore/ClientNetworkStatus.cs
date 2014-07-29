@@ -1,6 +1,12 @@
-using System;
+﻿using System;
 using System.Threading;
+#if NETFX_CORE
+using Windows.Networking.Sockets;
+using Windows.Networking;
+using Windows.Foundation;
+#else
 using System.Net.Sockets;
+#endif
 using System.Net;
 
 namespace PubNubMessaging.Core
@@ -113,8 +119,8 @@ namespace PubNubMessaging.Core
 			state.Callback = callback;
 			state.ErrorCallback = errorCallback;
 			state.Channels = channels;
-			#if (UNITY_ANDROID || UNITY_IOS)
-			CheckSocketConnect<T>(state);
+            #if (UNITY_ANDROID || UNITY_IOS || NETFX_CORE)
+            CheckSocketConnect<T>(state);
 			#elif(__MonoCS__)
 			CheckSocketConnect<T>(state);
 			#else
@@ -149,7 +155,9 @@ namespace PubNubMessaging.Core
 					sae.Completed -= new EventHandler<SocketAsyncEventArgs>(socketAsync_Completed<T>);
 					socket.Close();
 				}
-				#elif (UNITY_IOS || UNITY_ANDROID)
+                #elif NETFX_CORE
+                CheckSocketConnectAsync();
+                #elif (UNITY_IOS || UNITY_ANDROID)
 				request = (HttpWebRequest)WebRequest.Create("http://pubsub.pubnub.com");
 				if(request!= null){
 					request.Timeout = HeartbeatInterval * 1000;
@@ -241,7 +249,19 @@ namespace PubNubMessaging.Core
 			#endif
 		}
 
-		static void ParseCheckSocketConnectException<T> (Exception ex, string[] channels, Action<PubnubClientError> errorCallback, Action<bool> callback)
+#if NETFX_CORE
+        private static async void CheckSocketConnectAsync()
+        {
+            try
+            {
+                DatagramSocket socket = new DatagramSocket();
+                await socket.ConnectAsync(new HostName("pubsub.pubnub.com"), "80");
+            }
+            catch { }
+        }
+#endif
+
+        static void ParseCheckSocketConnectException<T> (Exception ex, string[] channels, Action<PubnubClientError> errorCallback, Action<bool> callback)
 		{
 			PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(ex);
 			int statusCode = (int)errorType;
