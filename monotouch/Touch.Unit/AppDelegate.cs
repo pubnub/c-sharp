@@ -50,7 +50,7 @@ namespace MonoTouch.NUnit {
 
             //TODO:change before going live
             string ip = System.Net.IPAddress.Any.ToString();
-            runner.Writer = new TcpTextWriter ("10.96.97.4", 16384);
+            runner.Writer = new TcpTextWriter (ip, 16384);
 
 			// start running the test suites as soon as the application is loaded
             runner.AutoStart = true;
