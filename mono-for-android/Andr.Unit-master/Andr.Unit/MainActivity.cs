@@ -44,8 +44,8 @@ namespace Andr.Unit
             // you can use the default or set your own custom writer (e.g. save to web site and tweet it ;-)
 
             //TODO:change before going live
-            string ip = System.Net.IPAddress.Any.ToString();
-            Runner.Writer = new TcpTextWriter (ip, 16384);
+            //string ip = System.Net.IPAddress.Any.ToString();
+            Runner.Writer = new TcpTextWriter ("10.96.97.4", 16384);
             // start running the test suites as soon as the application is loaded
             Runner.AutoStart = true;
             // crash the application (to ensure it's ended) and return to springboard

@@ -238,7 +238,7 @@ namespace PubNubMessaging.Core
             PubnubClientError error = new PubnubClientError (statusCode, PubnubErrorSeverity.Warn, true, ex.ToString (), ex, PubnubMessageSource.Client, null, null, errorDescription, string.Join (",", channels));
             GoToCallback (error, errorCallback);
 
-            LoggingMethod.WriteToLog (string.Format ("DateTime {0} checkInternetStatus Error. {1}", DateTime.Now.ToString (), ex.ToString ()), LoggingMethod.LevelError);
+            LoggingMethod.WriteToLog (string.Format ("DateTime {0} checkInternetStatus Error. {1}", DateTime.Now.ToString (), ex.ToString ()), LoggingMethod.LevelWarning);
             callback (false);
         }
 

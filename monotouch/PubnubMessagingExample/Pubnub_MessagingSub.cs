@@ -687,6 +687,7 @@ namespace PubnubMessagingExample
                 elementSubText = "Enter channel name";
                 strHead = "Here now";
                 buttonTitle = "Here Now";
+
                 boolval1 = true;
             } else if (cds == CommonDialogStates.GlobalHereNow) {
                 elementText1 = "Show UUID";
@@ -740,9 +741,13 @@ namespace PubnubMessagingExample
                             }
                         } else if (cds == CommonDialogStates.HereNow) {
                             Display ("Running Here Now");
-                            string[] channels = entryText.Value.Split (',');//Channel.Split (',');
-                            foreach (string channel in channels) {
-                                pubnub.HereNow<string> (channel.Trim (), be1.Value, be2.Value, DisplayReturnMessage, DisplayErrorMessage);
+                            if(entryText.Value.Trim() != ""){
+                                string[] channels = entryText.Value.Split (',');//Channel.Split (',');
+                                foreach (string channel in channels) {
+                                    pubnub.HereNow<string> (channel.Trim (), be1.Value, be2.Value, DisplayReturnMessage, DisplayErrorMessage);
+                                }
+                            } else {
+                                Display ("Channel empty");
                             }
                         } else if (cds == CommonDialogStates.GlobalHereNow) {
                             pubnub.GlobalHereNow<string> (be1.Value, be2.Value, DisplayReturnMessage, DisplayErrorMessage);
