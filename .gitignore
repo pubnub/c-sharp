@@ -48,6 +48,8 @@
 /demos/ePoll/WebPoll/obj/*
 /demos/ePoll/WebPoll/Properties/PublishProfiles/*
 /demos/ePoll/WebPoll/*.user
+/demos/epoll/PubnubCore/bin/Debug/*.pdb
+/demos/epoll/PubnubCore/obj/*
 /demos/epoll/ePoll.UnitTests/bin/Debug/*.pdb
 /demos/epoll/ePoll.UnitTests/obj/*
 /demos/ePoll/ePoll.Types/Debug/bin/*.pdb

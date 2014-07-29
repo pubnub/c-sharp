@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ePoll", "ePoll\ePoll.csproj", "{67447D36-D130-44F0-9649-24B6D152CCEB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ePollWorker", "ePollWorker\ePollWorker.csproj", "{AF0E8C81-E878-4993-8697-EC2C2C39DC8F}"
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ePoll.UnitTests", "ePoll.UnitTests\ePoll.UnitTests.csproj", "{55EDD2E6-D16B-4373-9D41-4EDC34D10126}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebPoll", "WebPoll\WebPoll.csproj", "{0DC360C4-97FA-4267-8632-1226D283AA93}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubnubCore", "PubnubCore\PubnubCore.csproj", "{88C99D99-7707-4DD0-A75C-579C7C97A483}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,6 +85,16 @@ Global
 		{0DC360C4-97FA-4267-8632-1226D283AA93}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{0DC360C4-97FA-4267-8632-1226D283AA93}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{0DC360C4-97FA-4267-8632-1226D283AA93}.Release|x86.ActiveCfg = Release|Any CPU
+		{88C99D99-7707-4DD0-A75C-579C7C97A483}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88C99D99-7707-4DD0-A75C-579C7C97A483}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88C99D99-7707-4DD0-A75C-579C7C97A483}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{88C99D99-7707-4DD0-A75C-579C7C97A483}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{88C99D99-7707-4DD0-A75C-579C7C97A483}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{88C99D99-7707-4DD0-A75C-579C7C97A483}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88C99D99-7707-4DD0-A75C-579C7C97A483}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88C99D99-7707-4DD0-A75C-579C7C97A483}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{88C99D99-7707-4DD0-A75C-579C7C97A483}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{88C99D99-7707-4DD0-A75C-579C7C97A483}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
