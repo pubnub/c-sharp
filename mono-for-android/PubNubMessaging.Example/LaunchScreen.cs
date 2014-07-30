@@ -220,7 +220,7 @@ namespace PubNubMessaging.Example
 
                 mainActivity.PutExtra ("Cipher", txtCipher.Text.Trim ());
 
-                pubnub = new Pubnub ("pam", "pam", "pam", txtCipher.Text.Trim (), tbSsl.Checked);
+                pubnub = new Pubnub ("demo", "demo", "demo", txtCipher.Text.Trim (), tbSsl.Checked);
 
                 if (!String.IsNullOrWhiteSpace (txtCustomUuid.Text.Trim ())) {
                     pubnub.SessionUUID = txtCustomUuid.Text.Trim ();
