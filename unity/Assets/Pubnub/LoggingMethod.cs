@@ -355,6 +355,8 @@ namespace PubNubMessaging.Core
                     ret = PubnubErrorCode.BadRequest;
                 } else if (httpErrorCodeMessage.ToUpper () == "NO UUID SPECIFIED") {
                     ret = PubnubErrorCode.NoUuidSpecified;
+                } else if (httpErrorCodeMessage.ToUpper() == "INVALID TIMESTAMP") {
+                    ret = PubnubErrorCode.InvalidTimestamp;
                 }
                 break;
             case 401:
@@ -441,6 +443,7 @@ namespace PubNubMessaging.Core
         BadRequest = 4001,
         InvalidKey = 4002,
         NoUuidSpecified = 4003,
+        InvalidTimestamp = 4004,
         InvalidSubscribeKey = 4010,
         PamNotEnabled = 4020,
         Forbidden = 4030,
@@ -464,6 +467,7 @@ namespace PubNubMessaging.Core
             dictionaryCodes.Add (4001, "Bad Request. Please check the entered inputs or web request URL");
             dictionaryCodes.Add (4002, "Invalid Key. Please verify your pub and sub keys");
             dictionaryCodes.Add (4003, "No UUID specified. Please ensure that UUID is being passed to server for heartbeat");
+            dictionaryCodes.Add (4004, "Invalid Timestamp. Please try again. If the issue continues, please contact PubNub support");
             dictionaryCodes.Add (4010, "Please provide a valid subscribe key");
             dictionaryCodes.Add (4020, "PAM is not enabled for this keyset. Please contact PubNub support for instructions on enabling PAM.");
             dictionaryCodes.Add (4030, "Not authorized. Please ensure that the channel has the correct PAM permission, your authentication key is set correctly, then try again via unsub and re-sub. For further assistance, contact PubNub support.");
