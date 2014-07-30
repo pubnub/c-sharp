@@ -19,8 +19,8 @@ namespace PubNubMessaging.Tests
         public void ThenItShouldReturnTimeStamp ()
         {
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
+                                Common.PublishKey,
+                                Common.SubscribeKey,
                                 "",
                                 "",
                                 false
@@ -43,18 +43,18 @@ namespace PubNubMessaging.Tests
             response = fields [0].ToString ();
             Console.WriteLine ("Response:" + response);
             Assert.False (("0").Equals (response));
-			pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
         public void ThenItShouldReturnTimeStampSSL ()
         {
             Pubnub pubnub = new Pubnub (
-                Common.PublishKey,
-                Common.SubscribeKey,
+                                Common.PublishKey,
+                                Common.SubscribeKey,
                                 "",
                                 "",
-				true
+                                true
                             );
 
             Common common = new Common ();
@@ -74,7 +74,7 @@ namespace PubNubMessaging.Tests
             response = fields [0].ToString ();
             Console.WriteLine ("Response:" + response);
             Assert.False (("0").Equals (response));
-			pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests ();
         }
 
         private void ReturnTimeStampCallback (string result)

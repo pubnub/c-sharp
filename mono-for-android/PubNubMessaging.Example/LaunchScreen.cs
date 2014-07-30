@@ -30,7 +30,7 @@ namespace PubNubMessaging.Example
         EditText proxyServer;
         EditText proxyPort;
 
-        PubnubProxy proxy =  null;
+        PubnubProxy proxy = null;
         public static Pubnub pubnub = null;
 
         protected override void OnCreate (Bundle bundle)
@@ -46,23 +46,21 @@ namespace PubNubMessaging.Example
             btnProxy.Click += ProxySettingsHandler;
 
             tvProxy = FindViewById<TextView> (Resource.Id.tvProxy);
-            tvProxy.Text = SetProxyText(false);
+            tvProxy.Text = SetProxyText (false);
         }
 
         string SetProxyText (bool on)
         {
-            if(on)
-            {
-                return String.Format("{0} {1}", Resources.GetString (Resource.String.proxy), Resources.GetString(Resource.String.proxyOn)); 
-            }
-            else{
-                return String.Format("{0} {1}", Resources.GetString(Resource.String.proxy), Resources.GetString(Resource.String.proxyOff)); 
+            if (on) {
+                return String.Format ("{0} {1}", Resources.GetString (Resource.String.proxy), Resources.GetString (Resource.String.proxyOn)); 
+            } else {
+                return String.Format ("{0} {1}", Resources.GetString (Resource.String.proxy), Resources.GetString (Resource.String.proxyOff)); 
             }
         }
 
         void ProxySettingsHandler (object sender, EventArgs e)
         {
-            ShowProxySettings();
+            ShowProxySettings ();
         }
 
         void ShowProxySettings ()
@@ -91,18 +89,18 @@ namespace PubNubMessaging.Example
 
             if (proxy != null) {
                 tgProxy.Checked = true;
-                tvProxy.Text = SetProxyText(true);
+                tvProxy.Text = SetProxyText (true);
             } else {
                 tgProxy.Checked = false;
 
-                tvProxy.Text = SetProxyText(false);
+                tvProxy.Text = SetProxyText (false);
             }
 
             if ((proxy != null) && (!string.IsNullOrEmpty (proxy.ProxyServer))) {
                 proxyServer.Text = proxy.ProxyServer;
             }
-            if ((proxy != null) && (!string.IsNullOrEmpty (proxy.ProxyPort.ToString()))) {
-                proxyPort.Text = proxy.ProxyPort.ToString();
+            if ((proxy != null) && (!string.IsNullOrEmpty (proxy.ProxyPort.ToString ()))) {
+                proxyPort.Text = proxy.ProxyPort.ToString ();
             }
             if ((proxy != null) && (!string.IsNullOrEmpty (proxy.ProxyUserName))) {
                 proxyUsername.Text = proxy.ProxyUserName;
@@ -111,7 +109,7 @@ namespace PubNubMessaging.Example
                 proxyPassword.Text = proxy.ProxyPassword;
             }
 
-            dialog.Show();
+            dialog.Show ();
         }
 
         void DialogDismissHandler (object sender, EventArgs e)
@@ -148,12 +146,11 @@ namespace PubNubMessaging.Example
                 tvProxy.Text = SetProxyText (false);
                 tgProxy.Checked = false;
             }*/
-            if (!tgProxy.Checked) 
-            {
+            if (!tgProxy.Checked) {
                 proxyEnabled = false;
-                tvProxy.Text = SetProxyText(false);
+                tvProxy.Text = SetProxyText (false);
             } 
-            dialog.Dismiss();
+            dialog.Dismiss ();
         }
 
         void EnableProxy (object sender, EventArgs e)
@@ -162,14 +159,11 @@ namespace PubNubMessaging.Example
 
             bool errorFree = true;
 
-            if (!tgProxy.Checked) 
-            {
+            if (!tgProxy.Checked) {
                 proxyEnabled = false;
-                tvProxy.Text = SetProxyText(false);
+                tvProxy.Text = SetProxyText (false);
                 dialog.Dismiss ();
-            } 
-            else 
-            {
+            } else {
                 if (string.IsNullOrWhiteSpace (proxyServer.Text)) {
                     errorFree = false;
                     ShowAlert ("Please enter proxy server."); 
@@ -214,45 +208,37 @@ namespace PubNubMessaging.Example
                 EditText txtCipher = FindViewById<EditText> (Resource.Id.txtCipher);
                 EditText txtCustomUuid = FindViewById<EditText> (Resource.Id.txtCustomUuid);
 
-                var mainActivity = new Intent(this, typeof(MainActivity));
+                var mainActivity = new Intent (this, typeof(MainActivity));
 
-                mainActivity.PutExtra("Channel", txtChannel.Text.Trim());
+                mainActivity.PutExtra ("Channel", txtChannel.Text.Trim ());
 
-                if(tbSsl.Checked)
-                {
-                    mainActivity.PutExtra("SslOn", "true");
-                }
-                else{
-                    mainActivity.PutExtra("SslOn", "false");
+                if (tbSsl.Checked) {
+                    mainActivity.PutExtra ("SslOn", "true");
+                } else {
+                    mainActivity.PutExtra ("SslOn", "false");
                 }
 
-                mainActivity.PutExtra("Cipher", txtCipher.Text.Trim());
+                mainActivity.PutExtra ("Cipher", txtCipher.Text.Trim ());
 
-                pubnub = new Pubnub ("demo-36", "demo-36", "demo-36", txtCipher.Text.Trim(), tbSsl.Checked);
+                pubnub = new Pubnub ("pam", "pam", "pam", txtCipher.Text.Trim (), tbSsl.Checked);
 
-                if(!String.IsNullOrWhiteSpace (txtCustomUuid.Text.Trim()))
-                {
-                    pubnub.SessionUUID = txtCustomUuid.Text.Trim();
+                if (!String.IsNullOrWhiteSpace (txtCustomUuid.Text.Trim ())) {
+                    pubnub.SessionUUID = txtCustomUuid.Text.Trim ();
                 }
 
                 bool errorFree = true;
 
-                if(proxyEnabled)
-                {
-                    try
-                    {
+                if (proxyEnabled) {
+                    try {
                         pubnub.Proxy = proxy;
-                    }
-                    catch (MissingFieldException mse)
-                    {
+                    } catch (MissingMemberException mse) {
                         errorFree = false;
-                        Console.WriteLine(mse.Message);
+                        Console.WriteLine (mse.Message);
 
                         ShowAlert ("Proxy settings invalid, please re-enter the details."); 
                     }
                 }
-                if(errorFree)
-                {
+                if (errorFree) {
                     StartActivity (mainActivity);
                 }
             }
@@ -260,15 +246,14 @@ namespace PubNubMessaging.Example
 
         void ShowAlert (string message)
         {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.SetTitle(Android.Resource.String.DialogAlertTitle);
-            builder.SetIcon(Android.Resource.Drawable.IcDialogAlert);
-            builder.SetMessage(message);
-            builder.SetPositiveButton("OK", (sender, e) =>
-                {
-                });
+            AlertDialog.Builder builder = new AlertDialog.Builder (this);
+            builder.SetTitle (Android.Resource.String.DialogAlertTitle);
+            builder.SetIcon (Android.Resource.Drawable.IcDialogAlert);
+            builder.SetMessage (message);
+            builder.SetPositiveButton ("OK", (sender, e) => {
+            });
             
-            builder.Show();
+            builder.Show ();
         }
     }
 }

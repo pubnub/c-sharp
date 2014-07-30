@@ -21,10 +21,12 @@ using Android.OS;
 using Android.NUnitLite;
 using Android.NUnitLite.UI;
 
-namespace Andr.Unit {
+namespace Andr.Unit
+{
     
     [Activity (Label = "Xamarin's Andr.Unit", MainLauncher = true)]
-    public class MainActivity : RunnerActivity {
+    public class MainActivity : RunnerActivity
+    {
         
         protected override void OnCreate (Bundle bundle)
         {
@@ -38,14 +40,17 @@ namespace Andr.Unit {
             //Add (typeof (PubNubMessaging.Core.EncryptionTests).Assembly);
             // or in any assembly that you load (since JIT is available)
             
-			//#if false
+            //#if false
             // you can use the default or set your own custom writer (e.g. save to web site and tweet it ;-)
-			Runner.Writer = new TcpTextWriter ("10.96.67.0", 16384);
+
+            //TODO:change before going live
+            //string ip = System.Net.IPAddress.Any.ToString();
+            Runner.Writer = new TcpTextWriter ("10.96.97.4", 16384);
             // start running the test suites as soon as the application is loaded
             Runner.AutoStart = true;
             // crash the application (to ensure it's ended) and return to springboard
             Runner.TerminateAfterExecution = true;
-			//#endif
+            //#endif
             // you cannot add more assemblies once calling base
             base.OnCreate (bundle);
         }

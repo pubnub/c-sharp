@@ -11,15 +11,15 @@ namespace Launcher
         public static void Main (string[] args)
         {
             string exec = @" ";
-			string exportFile = @"/Users/Shared/Jenkins/tests/sim-results.log";
-            FileInfo lastReport= new FileInfo(exportFile);
+            string exportFile = @"/Users/Shared/Jenkins/tests/sim-results.log";
+            FileInfo lastReport = new FileInfo (exportFile);
             if (lastReport.Exists) {
                 lastReport.Delete ();
             }
             //Process.Start (new ProcessStartInfo (exec){ UseShellExecute = false });
 
-			Process.Start ("/bin/chmod", "+x /Users/Shared/Jenkins/git/c-sharp/monotouch/Launcher/bin/Debug/launch.sh");
-			Process p = new Process();                        
+            Process.Start ("/bin/chmod", "+x /Users/Shared/Jenkins/git/c-sharp/monotouch/Launcher/bin/Debug/launch.sh");
+            Process p = new Process ();                        
             //p.StartInfo.FileName = "/Applications/X code.app/Contents/Developer/usr/bin/make";
             //p.StartInfo.Arguments = @"-C '/Users/rajat-ml/Projects/Xamarin.iOS/3.5/Pubnub-Messaging modified tests/Touch.Unit' run run-simulator";
             //p.StartInfo.FileName = "mono";
@@ -29,9 +29,9 @@ namespace Launcher
             // Cl 2 Touch.Server.exe
             // cl 3 TouchUnit.app
             // Cl 4 exportFile
-			p.StartInfo.FileName = "/Users/Shared/Jenkins/git/c-sharp/monotouch/Launcher/bin/Debug/launch.sh";
+            p.StartInfo.FileName = "/Users/Shared/Jenkins/git/c-sharp/monotouch/Launcher/bin/Debug/launch.sh";
             p.StartInfo.UseShellExecute = false;
-            p.Start();
+            p.Start ();
 
             /*while(true){
                 if(lastReport.Exists){
@@ -42,7 +42,7 @@ namespace Launcher
                 }
             }*/
             Console.WriteLine ("Sleeping");
-            Thread.Sleep(900000);
+            Thread.Sleep (900000);
             if (!p.HasExited) {
                 Console.WriteLine ("Killing");
                 p.Kill ();

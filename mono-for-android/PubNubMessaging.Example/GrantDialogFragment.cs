@@ -42,7 +42,8 @@ namespace PubNubMessaging.Example
 
         CommonDialogStates cds;
 
-        public GrantDialogFragment(CommonDialogStates cds){
+        public GrantDialogFragment (CommonDialogStates cds)
+        {
             this.cds = cds;
         }
 
@@ -65,8 +66,8 @@ namespace PubNubMessaging.Example
                 FireEvent (iTtl, tbCanRead.Checked, tbCanWrite.Checked, IsPresenceGrant, txtauth.Text);
 
                 Dismiss ();
-            } else if ((cds == CommonDialogStates.HereNow) 
-                ||  (cds == CommonDialogStates.GlobalHereNow)) {
+            } else if ((cds == CommonDialogStates.HereNow)
+                       || (cds == CommonDialogStates.GlobalHereNow)) {
                 ToggleButton tbCanWrite = view.FindViewById<ToggleButton> (Resource.Id.tbWrite);
                 ToggleButton tbCanRead = view.FindViewById<ToggleButton> (Resource.Id.tbRead);
                 EditText txtval = view.FindViewById<EditText> (Resource.Id.txtttl);
@@ -78,9 +79,9 @@ namespace PubNubMessaging.Example
             }
         }
 
-        public void FireEvent(int iTtl, bool canRead, bool canWrite, bool isPresence, string channel){
-            if(GrantPerms != null)
-            {
+        public void FireEvent (int iTtl, bool canRead, bool canWrite, bool isPresence, string channel)
+        {
+            if (GrantPerms != null) {
                 GrantEventArgs cea = new GrantEventArgs ();
                 cea.valToSet2 = canRead;
                 cea.valToSet1 = canWrite;
@@ -88,17 +89,17 @@ namespace PubNubMessaging.Example
                 cea.isPresence = isPresence;
                 cea.cds = cds;
                 cea.channel = channel;
-                GrantPerms(this, cea);
+                GrantPerms (this, cea);
             }
         }
 
-        public override Android.Views.View OnCreateView(Android.Views.LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override Android.Views.View OnCreateView (Android.Views.LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             // Android 3.x+ still wants to show title: disable
-            Dialog.Window.RequestFeature(WindowFeatures.NoTitle);
+            Dialog.Window.RequestFeature (WindowFeatures.NoTitle);
 
             // Create our view
-            view = inflater.Inflate(Resource.Layout.GrantDialog, container, true);
+            view = inflater.Inflate (Resource.Layout.GrantDialog, container, true);
 
             if (cds == CommonDialogStates.Grant) {
 
@@ -116,7 +117,7 @@ namespace PubNubMessaging.Example
                 btnDismiss.Click += ButtonDismissClick;
             } else if (cds == CommonDialogStates.HereNow) {
                 var tvGrantLabel = view.FindViewById<TextView> (Resource.Id.tvGrantLabel);
-                tvGrantLabel.SetText(Resource.String.hereNow);
+                tvGrantLabel.SetText (Resource.String.hereNow);
 
                 lblInput1 = view.FindViewById<TextView> (Resource.Id.lblGrant1);
                 lblInput1.SetText (Resource.String.showUuid);
@@ -148,7 +149,7 @@ namespace PubNubMessaging.Example
                 btnDismiss.Click += ButtonDismissClick;
             } else if (cds == CommonDialogStates.GlobalHereNow) {
                 var tvGrantLabel = view.FindViewById<TextView> (Resource.Id.tvGrantLabel);
-                tvGrantLabel.SetText(Resource.String.globalHereNow);
+                tvGrantLabel.SetText (Resource.String.globalHereNow);
 
                 lblInput1 = view.FindViewById<TextView> (Resource.Id.lblGrant1);
                 lblInput1.SetText (Resource.String.showUuid);
@@ -183,28 +184,28 @@ namespace PubNubMessaging.Example
             return view;
         }
 
-        public override void OnResume()
+        public override void OnResume ()
         {
             // Auto size the dialog based on it's contents
-            Dialog.Window.SetLayout(LinearLayout.LayoutParams.WrapContent, LinearLayout.LayoutParams.WrapContent);
+            Dialog.Window.SetLayout (LinearLayout.LayoutParams.WrapContent, LinearLayout.LayoutParams.WrapContent);
             
             // Make sure there is no background behind our view
-            Dialog.Window.SetBackgroundDrawable(new ColorDrawable(Color.Transparent));
+            Dialog.Window.SetBackgroundDrawable (new ColorDrawable (Color.Transparent));
             
             // Disable standard dialog styling/frame/theme: our custom view should create full UI
-            SetStyle(Android.Support.V4.App.DialogFragment.StyleNoFrame, Android.Resource.Style.Theme);
+            SetStyle (Android.Support.V4.App.DialogFragment.StyleNoFrame, Android.Resource.Style.Theme);
             
-            base.OnResume();
+            base.OnResume ();
         }
 
         private void ButtonDismissClick (object sender, EventArgs e)
         {
-            Dismiss();
+            Dismiss ();
         }
-        
-        protected override void Dispose(bool disposing)
+
+        protected override void Dispose (bool disposing)
         {
-            base.Dispose(disposing);
+            base.Dispose (disposing);
 
             // Unwire event
             if (disposing)

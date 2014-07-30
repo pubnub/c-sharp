@@ -1,13 +1,8 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="PubNubMessaging.Example/MainActivity.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Android.And4.2.2" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="PubNubMessaging/ClientNetworkStatus.cs">
     <Files>
-      <File FileName="PubNubMessaging.Example/MainActivity.cs" Line="623" Column="28" />
-      <File FileName="PubNubMessaging.Example/Resources/values/Strings.xml" Line="1" Column="1" />
-      <File FileName="PubNubMessaging.Example/GrantDialogFragment.cs" Line="1" Column="1" />
-      <File FileName="PubNubMessaging.Example/CommonDialogFragment.cs" Line="1" Column="1" />
-      <File FileName="PubNubMessaging/ClientNetworkStatus.cs" Line="12" Column="44" />
-      <File FileName="PubNubMessaging.Example/LaunchScreen.cs" Line="231" Column="39" />
+      <File FileName="PubNubMessaging/ClientNetworkStatus.cs" Line="28" Column="9" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
@@ -15,6 +10,10 @@
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches>
     <Watch file="PubNub_Messaging/Pubnub.cs" line="1526" offsetX="915" offsetY="22880" expression="cert" liveUpdate="False" />
+  </MonoDevelop.Ide.DebuggingService.PinnedWatches>
+  <MonoDevelop.Ide.ItemProperties.Andr.Unit AndroidDeviceId-Release="emulator-5554" AndroidDeviceId-Debug="YT910F2NYE" />
+  <MonoDevelop.Ide.ItemProperties.PubNubMessaging.Example MonoForAntroid.PreferredDevice="AndArm" AndroidDeviceId-Debug="YT910F2NYE" />
+</Properties>aging/Pubnub.cs" line="1526" offsetX="915" offsetY="22880" expression="cert" liveUpdate="False" />
   </MonoDevelop.Ide.DebuggingService.PinnedWatches>
   <MonoDevelop.Ide.ItemProperties.PubNubMessaging.Example MonoForAntroid.PreferredDevice="AndArm" AndroidDeviceId-Debug="YT910F2NYE" />
   <MonoDevelop.Ide.ItemProperties.Andr.Unit AndroidDeviceId-Release="emulator-5554" AndroidDeviceId-Debug="YT910F2NYE" />

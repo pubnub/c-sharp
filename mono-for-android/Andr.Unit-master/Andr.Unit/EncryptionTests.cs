@@ -67,20 +67,20 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void TestYayDecryptionJSONFx()
+        public void TestYayDecryptionJSONFx ()
         {
-            PubnubCrypto pubnubCrypto = new PubnubCrypto("enigma");
+            PubnubCrypto pubnubCrypto = new PubnubCrypto ("enigma");
             //Non deserialized string
             string message = "\"Wi24KS4pcTzvyuGOHubiXg==\"";
 
             //Deserialize 
-            message = Common.DeserializeUsingJSONFx<string>(message);
+            message = Common.DeserializeUsingJSONFx<string> (message);
 
             //decrypt
-            string decrypted = pubnubCrypto.Decrypt(message);
+            string decrypted = pubnubCrypto.Decrypt (message);
             //deserialize again
-            message = Common.DeserializeUsingJSONFx<string>(decrypted);
-            Assert.True(("yay!").Equals(message));
+            message = Common.DeserializeUsingJSONFx<string> (decrypted);
+            Assert.True (("yay!").Equals (message));
         }
 
         /// <summary>
@@ -103,17 +103,17 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void TestYayEncryptionJSONFx()
+        public void TestYayEncryptionJSONFx ()
         {
-            PubnubCrypto pubnubCrypto = new PubnubCrypto("enigma");
+            PubnubCrypto pubnubCrypto = new PubnubCrypto ("enigma");
             //deserialized string
             string message = "yay!";
             //serialize the string
-            message = Common.SerializeUsingJSONFx(message);
-            Console.WriteLine(message);
+            message = Common.SerializeUsingJSONFx (message);
+            Console.WriteLine (message);
             //Encrypt
-            string encrypted = pubnubCrypto.Encrypt(message);
-            Assert.True(("Wi24KS4pcTzvyuGOHubiXg==").Equals(encrypted));
+            string encrypted = pubnubCrypto.Encrypt (message);
+            Assert.True (("Wi24KS4pcTzvyuGOHubiXg==").Equals (encrypted));
         }
 
         /// <summary>
@@ -135,16 +135,16 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void TestArrayEncryptionJSONFx()
+        public void TestArrayEncryptionJSONFx ()
         {
-            PubnubCrypto pubnubCrypto = new PubnubCrypto("enigma");
+            PubnubCrypto pubnubCrypto = new PubnubCrypto ("enigma");
             //create an empty array object
             object[] objArr = { };
-            string strArr = Common.SerializeUsingJSONFx(objArr);
+            string strArr = Common.SerializeUsingJSONFx (objArr);
             //Encrypt
-            string encrypted = pubnubCrypto.Encrypt(strArr);
+            string encrypted = pubnubCrypto.Encrypt (strArr);
 
-            Assert.True(("Ns4TB41JjT2NCXaGLWSPAQ==").Equals(encrypted));
+            Assert.True (("Ns4TB41JjT2NCXaGLWSPAQ==").Equals (encrypted));
         }
 
         /// <summary>
@@ -168,18 +168,18 @@ namespace PubNubMessaging.Tests
             Assert.True ((result).Equals (decrypted));
         }
 
-        public void TestArrayDecryptionUsingJSONFx()
+        public void TestArrayDecryptionUsingJSONFx ()
         {
-            PubnubCrypto pubnubCrypto = new PubnubCrypto("enigma");
+            PubnubCrypto pubnubCrypto = new PubnubCrypto ("enigma");
             //Input the deserialized string
             string message = "Ns4TB41JjT2NCXaGLWSPAQ==";
             //decrypt
-            string decrypted = pubnubCrypto.Decrypt(message);
+            string decrypted = pubnubCrypto.Decrypt (message);
             //create a serialized object
             object[] objArr = { };
-            string result = Common.SerializeUsingJSONFx(objArr);
+            string result = Common.SerializeUsingJSONFx (objArr);
             //compare the serialized object and the return of the Decrypt method
-            Assert.True(result.Equals(decrypted));
+            Assert.True (result.Equals (decrypted));
         }
 
         /// <summary>
@@ -202,17 +202,17 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void TestObjectEncryptionJSONFx()
+        public void TestObjectEncryptionJSONFx ()
         {
-            PubnubCrypto pubnubCrypto = new PubnubCrypto("enigma");
+            PubnubCrypto pubnubCrypto = new PubnubCrypto ("enigma");
             //create an object
-            Object obj = new Object();
+            Object obj = new Object ();
             //serialize
-            string strObj = Common.SerializeUsingJSONFx(obj);
+            string strObj = Common.SerializeUsingJSONFx (obj);
             //encrypt
-            string encrypted = pubnubCrypto.Encrypt(strObj);
+            string encrypted = pubnubCrypto.Encrypt (strObj);
 
-            Assert.True(("IDjZE9BHSjcX67RddfCYYg==").Equals(encrypted));
+            Assert.True (("IDjZE9BHSjcX67RddfCYYg==").Equals (encrypted));
         }
 
         /// <summary>
@@ -238,20 +238,21 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void TestObjectDecryptionJSONFx()
+        public void TestObjectDecryptionJSONFx ()
         {
-            PubnubCrypto pubnubCrypto = new PubnubCrypto("enigma");
+            PubnubCrypto pubnubCrypto = new PubnubCrypto ("enigma");
             //Deserialized
             string message = "IDjZE9BHSjcX67RddfCYYg==";
             //Decrypt
-            string decrypted = pubnubCrypto.Decrypt(message);
+            string decrypted = pubnubCrypto.Decrypt (message);
             //create an object
-            Object obj = new Object();
+            Object obj = new Object ();
             //Serialize the object
-            string result = Common.SerializeUsingJSONFx(obj);
+            string result = Common.SerializeUsingJSONFx (obj);
 
-            Assert.True(decrypted.Equals(result));
+            Assert.True (decrypted.Equals (result));
         }
+
         /// <summary>
         /// Tests my object encryption.
         /// The output is not serialized 
@@ -272,17 +273,17 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void TestMyObjectEncryptionJSONFx()
+        public void TestMyObjectEncryptionJSONFx ()
         {
-            PubnubCrypto pubnubCrypto = new PubnubCrypto("enigma");
+            PubnubCrypto pubnubCrypto = new PubnubCrypto ("enigma");
             //create an object of the custom class
-            CustomClass cc = new CustomClass();
+            CustomClass cc = new CustomClass ();
             //serialize it
-            string result = Common.SerializeUsingJSONFx(cc);
+            string result = Common.SerializeUsingJSONFx (cc);
             //encrypt it
-            string encrypted = pubnubCrypto.Encrypt(result);
+            string encrypted = pubnubCrypto.Encrypt (result);
 
-            Assert.True(("Zbr7pEF/GFGKj1rOstp0tWzA4nwJXEfj+ezLtAr8qqE=").Equals(encrypted));
+            Assert.True (("Zbr7pEF/GFGKj1rOstp0tWzA4nwJXEfj+ezLtAr8qqE=").Equals (encrypted));
         }
 
         /// <summary>
@@ -307,19 +308,19 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void TestMyObjectDecryptionJSONFx()
+        public void TestMyObjectDecryptionJSONFx ()
         {
-            PubnubCrypto pubnubCrypto = new PubnubCrypto("enigma");
+            PubnubCrypto pubnubCrypto = new PubnubCrypto ("enigma");
             //Deserialized
             string message = "Zbr7pEF/GFGKj1rOstp0tWzA4nwJXEfj+ezLtAr8qqE=";
             //Decrypt
-            string decrypted = pubnubCrypto.Decrypt(message);
+            string decrypted = pubnubCrypto.Decrypt (message);
             //create an object of the custom class
-            CustomClass cc = new CustomClass();
+            CustomClass cc = new CustomClass ();
             //Serialize it
-            string result = Common.SerializeUsingJSONFx(cc);
+            string result = Common.SerializeUsingJSONFx (cc);
 
-            Assert.True(decrypted.Equals(result));
+            Assert.True (decrypted.Equals (result));
         }
 
         /// <summary>
@@ -342,18 +343,19 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void TestPubNubEncryption2JSONFx()
+        public void TestPubNubEncryption2JSONFx ()
         {
-            PubnubCrypto pubnubCrypto = new PubnubCrypto("enigma");
+            PubnubCrypto pubnubCrypto = new PubnubCrypto ("enigma");
             //Deserialized
             string message = "Pubnub Messaging API 2";
             //serialize the message
-            message = Common.SerializeUsingJSONFx(message);
+            message = Common.SerializeUsingJSONFx (message);
             //encrypt
-            string encrypted = pubnubCrypto.Encrypt(message);
+            string encrypted = pubnubCrypto.Encrypt (message);
 
-            Assert.True(("f42pIQcWZ9zbTbH8cyLwB/tdvRxjFLOYcBNMVKeHS54=").Equals(encrypted));
+            Assert.True (("f42pIQcWZ9zbTbH8cyLwB/tdvRxjFLOYcBNMVKeHS54=").Equals (encrypted));
         }
+
         /// <summary>
         /// Tests the pub nub decryption2.
         /// Assumes that the input message is deserialized  
@@ -373,16 +375,16 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void TestPubNubDecryption2JSONFx()
+        public void TestPubNubDecryption2JSONFx ()
         {
-            PubnubCrypto pubnubCrypto = new PubnubCrypto("enigma");
+            PubnubCrypto pubnubCrypto = new PubnubCrypto ("enigma");
             //Deserialized string    
             string message = "f42pIQcWZ9zbTbH8cyLwB/tdvRxjFLOYcBNMVKeHS54=";
             //Decrypt
-            string decrypted = pubnubCrypto.Decrypt(message);
+            string decrypted = pubnubCrypto.Decrypt (message);
             //Deserialize
-            message = Common.DeserializeUsingJSONFx<string>(decrypted);
-            Assert.True(("Pubnub Messaging API 2").Equals(message));
+            message = Common.DeserializeUsingJSONFx<string> (decrypted);
+            Assert.True (("Pubnub Messaging API 2").Equals (message));
         }
 
         /// <summary>
@@ -405,17 +407,17 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void TestPubNubEncryption1JSONFX()
+        public void TestPubNubEncryption1JSONFX ()
         {
-            PubnubCrypto pubnubCrypto = new PubnubCrypto("enigma");
+            PubnubCrypto pubnubCrypto = new PubnubCrypto ("enigma");
             //non serialized string
             string message = "Pubnub Messaging API 1";
             //serialize
-            message = Common.SerializeUsingJSONFx(message);
+            message = Common.SerializeUsingJSONFx (message);
             //encrypt
-            string encrypted = pubnubCrypto.Encrypt(message);
+            string encrypted = pubnubCrypto.Encrypt (message);
 
-            Assert.True(("f42pIQcWZ9zbTbH8cyLwByD/GsviOE0vcREIEVPARR0=").Equals(encrypted));
+            Assert.True (("f42pIQcWZ9zbTbH8cyLwByD/GsviOE0vcREIEVPARR0=").Equals (encrypted));
         }
 
         /// <summary>
@@ -437,16 +439,16 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void TestPubNubDecryption1JSONFx()
+        public void TestPubNubDecryption1JSONFx ()
         {
-            PubnubCrypto pubnubCrypto = new PubnubCrypto("enigma");
+            PubnubCrypto pubnubCrypto = new PubnubCrypto ("enigma");
             //deserialized string
             string message = "f42pIQcWZ9zbTbH8cyLwByD/GsviOE0vcREIEVPARR0=";
             //decrypt
-            string decrypted = pubnubCrypto.Decrypt(message);
+            string decrypted = pubnubCrypto.Decrypt (message);
             //deserialize
-            message = Common.DeserializeUsingJSONFx<string>(decrypted);
-            Assert.True(("Pubnub Messaging API 1").Equals(message));
+            message = Common.DeserializeUsingJSONFx<string> (decrypted);
+            Assert.True (("Pubnub Messaging API 1").Equals (message));
         }
 
         /// <summary>
@@ -566,15 +568,15 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void TestUnicodeCharsEncryptionJSONFx()
+        public void TestUnicodeCharsEncryptionJSONFx ()
         {
-            PubnubCrypto pubnubCrypto = new PubnubCrypto("enigma");
+            PubnubCrypto pubnubCrypto = new PubnubCrypto ("enigma");
             string message = "漢語";
-            message = Common.SerializeUsingJSONFx(message);
-            Console.WriteLine(message);
-            string encrypted = pubnubCrypto.Encrypt(message);
-            Console.WriteLine(encrypted);
-            Assert.True(("+BY5/miAA8aeuhVl4d13Kg==").Equals(encrypted));
+            message = Common.SerializeUsingJSONFx (message);
+            Console.WriteLine (message);
+            string encrypted = pubnubCrypto.Encrypt (message);
+            Console.WriteLine (encrypted);
+            Assert.True (("+BY5/miAA8aeuhVl4d13Kg==").Equals (encrypted));
         }
 
         /// <summary>
@@ -596,16 +598,16 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void TestUnicodeCharsDecryptionJSONFx()
+        public void TestUnicodeCharsDecryptionJSONFx ()
         {
-            PubnubCrypto pubnubCrypto = new PubnubCrypto("enigma");
+            PubnubCrypto pubnubCrypto = new PubnubCrypto ("enigma");
             string message = "+BY5/miAA8aeuhVl4d13Kg==";
             //decrypt
-            string decrypted = pubnubCrypto.Decrypt(message);
+            string decrypted = pubnubCrypto.Decrypt (message);
             //deserialize
-            message = Common.DeserializeUsingJSONFx<string>(decrypted);
+            message = Common.DeserializeUsingJSONFx<string> (decrypted);
 
-            Assert.True(("漢語").Equals(message));
+            Assert.True (("漢語").Equals (message));
         }
 
         /// <summary>
@@ -627,16 +629,16 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void TestGermanCharsDecryptionJSONFx()
+        public void TestGermanCharsDecryptionJSONFx ()
         {
-            PubnubCrypto pubnubCrypto = new PubnubCrypto("enigma");
+            PubnubCrypto pubnubCrypto = new PubnubCrypto ("enigma");
             string message = "stpgsG1DZZxb44J7mFNSzg==";
             //decrypt
-            string decrypted = pubnubCrypto.Decrypt(message);
+            string decrypted = pubnubCrypto.Decrypt (message);
             //deserialize
-            message = Common.DeserializeUsingJSONFx<string>(decrypted);
+            message = Common.DeserializeUsingJSONFx<string> (decrypted);
 
-            Assert.True(("ÜÖ").Equals(message));
+            Assert.True (("ÜÖ").Equals (message));
         }
 
         /// <summary>
@@ -657,28 +659,28 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void TestGermanCharsEncryptionJSONFx()
+        public void TestGermanCharsEncryptionJSONFx ()
         {
-            PubnubCrypto pubnubCrypto = new PubnubCrypto("enigma");
+            PubnubCrypto pubnubCrypto = new PubnubCrypto ("enigma");
             string message = "ÜÖ";
-            message = Common.SerializeUsingJSONFx(message);
-            Console.WriteLine(message);
-            string encrypted = pubnubCrypto.Encrypt(message);
-            Console.WriteLine(encrypted);
+            message = Common.SerializeUsingJSONFx (message);
+            Console.WriteLine (message);
+            string encrypted = pubnubCrypto.Encrypt (message);
+            Console.WriteLine (encrypted);
 
-            Assert.True(("stpgsG1DZZxb44J7mFNSzg==").Equals(encrypted));
+            Assert.True (("stpgsG1DZZxb44J7mFNSzg==").Equals (encrypted));
         }
 
         [Test]
-        public void TestPAMSignature()
+        public void TestPAMSignature ()
         {
-            PubnubCrypto crypto = new PubnubCrypto("");
+            PubnubCrypto crypto = new PubnubCrypto ("");
             string secretKey = "secret";
             string message = "Pubnub Messaging 1";
 
-            string signature = crypto.PubnubAccessManagerSign(secretKey, message);
+            string signature = crypto.PubnubAccessManagerSign (secretKey, message);
 
-            Assert.True(("mIoxTVM2WAM5j-M2vlp9bVblDLoZQI5XIoYyQ48U0as=").Equals(signature));
+            Assert.True (("mIoxTVM2WAM5j-M2vlp9bVblDLoZQI5XIoYyQ48U0as=").Equals (signature));
         }
 
         static string EncodeNonAsciiCharacters (string value)

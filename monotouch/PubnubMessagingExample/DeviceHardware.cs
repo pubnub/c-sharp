@@ -5,11 +5,12 @@ using MonoTouch.UIKit;
 
 namespace PubnubMessagingExample
 {
-    public class DeviceHardware 
+    public class DeviceHardware
     {
         public const string HardwareProperty = "hw.machine";
-        
-        public enum HardwareVersion {
+
+        public enum HardwareVersion
+        {
             iPhone,
             iPhone3G,
             iPhone3GS,
@@ -33,27 +34,27 @@ namespace PubnubMessagingExample
             iPadSimulator,
             Unknown
         }
-        
-        [DllImport(MonoTouch.Constants.SystemLibrary)]
-        static internal extern int sysctlbyname([MarshalAs(UnmanagedType.LPStr)] string property, IntPtr output, IntPtr oldLen, IntPtr newp, uint newlen);
-        
+
+        [DllImport (MonoTouch.Constants.SystemLibrary)]
+        static internal extern int sysctlbyname ([MarshalAs (UnmanagedType.LPStr)] string property, IntPtr output, IntPtr oldLen, IntPtr newp, uint newlen);
+
         public static HardwareVersion Version {
             get {
-                var pLen = Marshal.AllocHGlobal(sizeof(int));
-                sysctlbyname(DeviceHardware.HardwareProperty, IntPtr.Zero, pLen, IntPtr.Zero, 0);
+                var pLen = Marshal.AllocHGlobal (sizeof(int));
+                sysctlbyname (DeviceHardware.HardwareProperty, IntPtr.Zero, pLen, IntPtr.Zero, 0);
                 
-                var length = Marshal.ReadInt32(pLen);
+                var length = Marshal.ReadInt32 (pLen);
                 
                 if (length == 0) {
-                    Marshal.FreeHGlobal(pLen);
+                    Marshal.FreeHGlobal (pLen);
                     
                     return HardwareVersion.Unknown;
                 }
                 
-                var pStr = Marshal.AllocHGlobal(length);
-                sysctlbyname(DeviceHardware.HardwareProperty, pStr, pLen, IntPtr.Zero, 0);
+                var pStr = Marshal.AllocHGlobal (length);
+                sysctlbyname (DeviceHardware.HardwareProperty, pStr, pLen, IntPtr.Zero, 0);
                 
-                var hardwareStr = Marshal.PtrToStringAnsi(pStr);
+                var hardwareStr = Marshal.PtrToStringAnsi (pStr);
                 var ret = HardwareVersion.Unknown;
                 
                 
@@ -68,7 +69,7 @@ namespace PubnubMessagingExample
                     ret = HardwareVersion.iPhone4;
                 else if (hardwareStr == "iPhone3,3")
                     ret = HardwareVersion.VerizoniPhone4;
-                else if(hardwareStr == "iPhone4,1")
+                else if (hardwareStr == "iPhone4,1")
                     ret = HardwareVersion.iPhone4S;
                 else if (hardwareStr == "iPad1,1")
                     ret = HardwareVersion.iPad;
@@ -94,15 +95,15 @@ namespace PubnubMessagingExample
                     ret = HardwareVersion.iPod3G;
                 else if (hardwareStr == "iPod4,1")
                     ret = HardwareVersion.iPod4G;
-                else if (hardwareStr == "i386" || hardwareStr=="x86_64") {
-                    if (UIDevice.CurrentDevice.Model.Contains("iPhone"))
+                else if (hardwareStr == "i386" || hardwareStr == "x86_64") {
+                    if (UIDevice.CurrentDevice.Model.Contains ("iPhone"))
                         ret = UIScreen.MainScreen.Bounds.Height * UIScreen.MainScreen.Scale == 960 || UIScreen.MainScreen.Bounds.Width * UIScreen.MainScreen.Scale == 960 ? HardwareVersion.iPhone4Simulator : HardwareVersion.iPhoneSimulator;
                     else
                         ret = HardwareVersion.iPadSimulator;
                 }
                 
-                Marshal.FreeHGlobal(pLen);
-                Marshal.FreeHGlobal(pStr);
+                Marshal.FreeHGlobal (pLen);
+                Marshal.FreeHGlobal (pStr);
                 
                 return ret;
             }

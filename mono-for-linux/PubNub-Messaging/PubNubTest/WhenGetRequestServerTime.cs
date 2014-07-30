@@ -11,65 +11,65 @@ namespace PubNubMessaging.Tests
     public class WhenGetRequestServerTime
     {
         [Test]
-        public void ThenItShouldReturnTimeStamp()
+        public void ThenItShouldReturnTimeStamp ()
         {
-            Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
+            Pubnub pubnub = new Pubnub (
+                                Common.PublishKey,
+                                Common.SubscribeKey,
                                 "",
                                 "",
                                 false
                             );
 
-            Common common = new Common();
+            Common common = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenGetRequestServerTime", "ThenItShouldReturnTimeStamp");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenGetRequestServerTime", "ThenItShouldReturnTimeStamp");
             ;
             
             string response = "";
 
-            pubnub.Time(common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            pubnub.Time (common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
            
-            common.WaitForResponse();
+            common.WaitForResponse ();
 
             IList<object> fields = common.Response as IList<object>;
-            response = fields [0].ToString();
-            Console.WriteLine("Response:" + response);
-            Assert.AreNotEqual("0", response);
-            pubnub.EndPendingRequests();
+            response = fields [0].ToString ();
+            Console.WriteLine ("Response:" + response);
+            Assert.AreNotEqual ("0", response);
+            pubnub.EndPendingRequests ();
         }
 
         [Test]
-        public void ThenItShouldReturnTimeStampSSL()
+        public void ThenItShouldReturnTimeStampSSL ()
         {
-            Pubnub pubnub = new Pubnub(
-                Common.PublishKey,
-                Common.SubscribeKey,
-                "",
-                "",
-                true
-            );
+            Pubnub pubnub = new Pubnub (
+                                Common.PublishKey,
+                                Common.SubscribeKey,
+                                "",
+                                "",
+                                true
+                            );
 
-            Common common = new Common();
+            Common common = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance("WhenGetRequestServerTime", "ThenItShouldReturnTimeStamp");
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenGetRequestServerTime", "ThenItShouldReturnTimeStamp");
             ;
 
             string response = "";
 
-            pubnub.Time(common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            pubnub.Time (common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse();
+            common.WaitForResponse ();
 
             IList<object> fields = common.Response as IList<object>;
-            response = fields [0].ToString();
-            Console.WriteLine("Response:" + response);
-            Assert.AreNotEqual("0", response);
-            pubnub.EndPendingRequests();
+            response = fields [0].ToString ();
+            Console.WriteLine ("Response:" + response);
+            Assert.AreNotEqual ("0", response);
+            pubnub.EndPendingRequests ();
         }
     }
 }
