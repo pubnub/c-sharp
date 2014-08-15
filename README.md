@@ -19,7 +19,15 @@ You can grab the cross-platform 3.6 version of PubNub for C# from Nuget.
 ### Microsoft Mobile
 [Windows Phone 7](windows-phone-7) (3.6)
 
-[Windows Phone 8](windows-phone-8) (3.6)
+[Windows Phone 8 ](windows-phone-8) (3.6)
+
+[Windows Phone 8.1 ](windows-phone-81) (3.6)
+
+
+### Windows Store
+[Windows Store 8.0](windows-store/windows8/PubnubWindowsStore)
+
+[Windows Store 8.1](windows-store/windows81/PubnubWindowsStore)
 
 ### Xamarin, Unity
 [Xamarin.Android / Mono for Android](mono-for-android) (3.6)
