@@ -1,3 +1,19 @@
+08-15-2014 - 3.6 - d45ee9
+. Full support for new Presence features! Heartbeat, State, Where Now, Global Here Now
+. Windows Phone 8.1, Windows 8, and 8.1 Store Client Support (Surface)
+. Fixed potential for memory leak during device sleep
+. Use explicitly provided PAM keys when performing PAM calls, not consumer key
+. Fixed an issue of delayed reconnect on Mono Touch
+. Only perform presence heartbeats when user sets heartbeat timeout
+. Clarify PAM TTLs are in minutes, not seconds, in variable names and comments
+. Fixed subscribe callback issue on JSONFX
+. Better handling of non-200 responses
+. Added a new demo - ePoll
+
+
+
+... See Git for changes since 5-26-13
+
 05-26-13
 . Modified README for overrideTcpKeepAlive doc deprecation 
 . Core update for Mono for Unity Changes
