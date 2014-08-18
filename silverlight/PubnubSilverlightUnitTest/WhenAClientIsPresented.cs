@@ -226,7 +226,9 @@ namespace PubnubSilverlight.UnitTest
                     string channel = "hello_my_channel";
 
                     EnqueueCallback(() => pubnub.Presence<string>(channel, ThenPresenceWithCustomUUIDShouldReturnMessage, PresenceUUIDDummyMethodForConnectCallback, DummyErrorCallback));
+                    mrePresence.WaitOne(310 * 1000);
 
+                    mrePresence = new ManualResetEvent(false);
                     //since presence expects from stimulus from sub/unsub...
                     EnqueueCallback(() =>
                     {
@@ -263,6 +265,7 @@ namespace PubnubSilverlight.UnitTest
         [Asynchronous]
         void PresenceUUIDDummyMethodForConnectCallback(string receivedMessage)
         {
+            mrePresence.Set();
         }
 
         [Asynchronous]

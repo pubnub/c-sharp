@@ -71,11 +71,14 @@ namespace PubnubSilverlight.UnitTest
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
                     object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
-                    var status = dictionary["status"].ToString();
-                    if (status == "200")
+                    if (serializedMessage.Length > 0)
                     {
-                        receivedGrantMessage = true;
+                        JContainer dictionary = serializedMessage[0] as JContainer;
+                        var status = dictionary["status"].ToString();
+                        if (status == "200")
+                        {
+                            receivedGrantMessage = true;
+                        }
                     }
                 }
             }

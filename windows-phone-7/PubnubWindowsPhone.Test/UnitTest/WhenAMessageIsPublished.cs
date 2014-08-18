@@ -562,7 +562,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     {
                         pubnub.Publish<string>(channel, message, null, DummyErrorCallback);
                     }
-                    catch (MissingFieldException)
+                    catch (MissingMemberException)
                     {
                         isExpectedException = true;
                     }
