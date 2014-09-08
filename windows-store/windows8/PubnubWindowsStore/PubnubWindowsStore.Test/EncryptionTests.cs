@@ -4,25 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using PubNubMessaging.Core;
+using NUnit.Framework;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Globalization;
-using System.Text;
-using System.Text.RegularExpressions;
 
+using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace PubnubWindowsStore.Test
 {
-    [TestClass]
+    [TestFixture]
     public class EncryptionTests
     {
         /// <summary>
         /// Tests the null encryption.
         /// The input is serialized
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestNullEncryption()
         {
 
@@ -49,7 +48,7 @@ namespace PubnubWindowsStore.Test
         /// Tests the null decryption.
         /// Assumes that the input message is  deserialized  
         /// </summary>        
-        [TestMethod]
+        [Test]
         public void TestNullDecryption()
         {
             bool isExpectedException = false;
@@ -75,7 +74,7 @@ namespace PubnubWindowsStore.Test
         /// Assumes that the input message is deserialized  
         /// Decrypted string should match yay!
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestYayDecryptionBasic()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
@@ -91,7 +90,7 @@ namespace PubnubWindowsStore.Test
         /// The output is not serialized
         /// Encrypted string should match q/xJqqN6qbiZMXYmiQC1Fw==
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestYayEncryptionBasic()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
@@ -107,7 +106,7 @@ namespace PubnubWindowsStore.Test
         /// Assumes that the input message is not deserialized  
         /// Decrypted and Deserialized string should match yay!
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestYayDecryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
@@ -127,7 +126,7 @@ namespace PubnubWindowsStore.Test
         /// The output is not serialized
         /// Encrypted string should match Wi24KS4pcTzvyuGOHubiXg==
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestYayEncryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
@@ -135,7 +134,7 @@ namespace PubnubWindowsStore.Test
             string message = "yay!";
             //serialize the string
             message = JsonConvert.SerializeObject(message);
-            
+
             //Encrypt
             string encryptedMessage = pc.Encrypt(message);
             Assert.AreEqual("Wi24KS4pcTzvyuGOHubiXg==", encryptedMessage);
@@ -146,7 +145,7 @@ namespace PubnubWindowsStore.Test
         /// The output is not serialized
         /// Encrypted string should match the serialized object
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestArrayEncryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
@@ -165,7 +164,7 @@ namespace PubnubWindowsStore.Test
         /// And the output message has to been deserialized.
         /// Decrypted string should match the serialized object
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestArrayDecryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
@@ -185,7 +184,7 @@ namespace PubnubWindowsStore.Test
         /// The output is not serialized
         /// Encrypted string should match the serialized object
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestObjectEncryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
@@ -203,7 +202,7 @@ namespace PubnubWindowsStore.Test
         /// And the output message has to be deserialized.
         /// Decrypted string should match the serialized object
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestObjectDecryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
@@ -222,7 +221,7 @@ namespace PubnubWindowsStore.Test
         /// The output is not serialized 
         /// Encrypted string should match the serialized object
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestMyObjectEncryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
@@ -240,7 +239,7 @@ namespace PubnubWindowsStore.Test
         /// The output is not deserialized
         /// Decrypted string should match the serialized object
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestMyObjectDecryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
@@ -261,7 +260,7 @@ namespace PubnubWindowsStore.Test
         /// The output is not serialized
         /// Encrypted string should match f42pIQcWZ9zbTbH8cyLwB/tdvRxjFLOYcBNMVKeHS54=
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestPubNubEncryption2()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
@@ -280,7 +279,7 @@ namespace PubnubWindowsStore.Test
         /// Assumes that the input message is deserialized  
         /// Decrypted and Deserialized string should match Pubnub Messaging API 2
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestPubNubDecryption2()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
@@ -298,7 +297,7 @@ namespace PubnubWindowsStore.Test
         /// The input is not serialized
         /// Encrypted string should match f42pIQcWZ9zbTbH8cyLwByD/GsviOE0vcREIEVPARR0=
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestPubNubEncryption1()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
@@ -316,7 +315,7 @@ namespace PubnubWindowsStore.Test
         /// Assumes that the input message is  deserialized  
         /// Decrypted and Deserialized string should match Pubnub Messaging API 1        
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestPubNubDecryption1()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
@@ -334,7 +333,7 @@ namespace PubnubWindowsStore.Test
         /// The input is serialized
         /// Encrypted string should match zMqH/RTPlC8yrAZ2UhpEgLKUVzkMI2cikiaVg30AyUu7B6J0FLqCazRzDOmrsFsF
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestStuffCanEncryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
@@ -349,7 +348,7 @@ namespace PubnubWindowsStore.Test
         /// Tests the stuffcan decryption.
         /// Assumes that the input message is  deserialized  
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestStuffcanDecryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
@@ -365,7 +364,7 @@ namespace PubnubWindowsStore.Test
         /// The input is serialized
         /// Encrypted string should match GsvkCYZoYylL5a7/DKhysDjNbwn+BtBtHj2CvzC4Y4g=
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestHashEncryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
@@ -380,7 +379,7 @@ namespace PubnubWindowsStore.Test
         /// Tests the hash decryption.
         /// Assumes that the input message is  deserialized  
         /// </summary>        
-        [TestMethod]
+        [Test]
         public void TestHashDecryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
@@ -395,16 +394,16 @@ namespace PubnubWindowsStore.Test
         /// Tests the unicode chars encryption.
         /// The input is not serialized
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestUnicodeCharsEncryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
             string message = "漢語";
 
             message = JsonConvert.SerializeObject(message);
-            
+
             string encryptedMessage = pc.Encrypt(message);
-            
+
             Assert.AreEqual("+BY5/miAA8aeuhVl4d13Kg==", encryptedMessage);
         }
 
@@ -413,7 +412,7 @@ namespace PubnubWindowsStore.Test
         /// Assumes that the input message is  deserialized  
         /// Decrypted and Deserialized string should match the unicode chars       
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestUnicodeCharsDecryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
@@ -431,7 +430,7 @@ namespace PubnubWindowsStore.Test
         /// Assumes that the input message is  deserialized  
         /// Decrypted and Deserialized string should match the unicode chars  
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestGermanCharsDecryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
@@ -446,20 +445,20 @@ namespace PubnubWindowsStore.Test
         /// Tests the german encryption.
         /// The input is not serialized
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestGermanCharsEncryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
             string message = "ÜÖ";
 
             message = JsonConvert.SerializeObject(message);
-            
+
             string encryptedMessage = pc.Encrypt(message);
-            
+
             Assert.AreEqual("stpgsG1DZZxb44J7mFNSzg==", encryptedMessage);
         }
 
-        [TestMethod]
+        [Test]
         public void TestPAMSignature()
         {
             PubnubCrypto crypto = new PubnubCrypto("");
@@ -474,7 +473,7 @@ namespace PubnubWindowsStore.Test
         /// <summary>
         /// Tests the cipher.
         /// </summary>
-        /*[TestMethod]
+        /*[Test]
         public void  TestCipher ()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
