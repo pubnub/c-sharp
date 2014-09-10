@@ -26,6 +26,7 @@ namespace PubNubMessaging.Tests
             if (!PubnubCommon.EnableStubTest)
             {
                 receivedAuditMessage = false;
+                auditManualEvent = new ManualResetEvent(false);
 
                 Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
                 pubnub.AuditAccess<string>(UserCallbackForCleanUpAccessAtUserLevel, ErrorCallbackForCleanUpAccessAtUserLevel);
@@ -45,6 +46,7 @@ namespace PubNubMessaging.Tests
             if (!PubnubCommon.EnableStubTest)
             {
                 receivedAuditMessage = false;
+                auditManualEvent = new ManualResetEvent(false);
 
                 Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
                 pubnub.AuditAccess<string>(UserCallbackForCleanUpAccessAtChannelLevel, ErrorCallbackForCleanUpAccessAtChannelLevel);
