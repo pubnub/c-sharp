@@ -1,4 +1,4 @@
-﻿//Build Date: July 22, 2014
+﻿//Build Date: September 11, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -113,10 +113,23 @@ namespace PubNubMessaging.Core
 		private string hereNowParameters = "";
 		private string setUserStateparameters = "";
 		private string globalHereNowParameters = "";
+        private string _pnsdkVersion = "csharp36";
 
 		#endregion
 
 		#region "Properties"
+
+        protected string Version
+        {
+            get
+            {
+                return _pnsdkVersion;
+            }
+            set
+            {
+                _pnsdkVersion = value;
+            }
+        }
 
 		internal int SubscribeTimeout 
         {
@@ -1215,6 +1228,14 @@ namespace PubNubMessaging.Core
 			if (!string.IsNullOrEmpty (_authenticationKey)) {
 				parameters = parameters + "&" + "auth=" + _authenticationKey;
 			}
+            if (parameters != "")
+            {
+                parameters = parameters + "&pnsdk=" + EncodeUricomponent(_pnsdkVersion, ResponseType.DetailedHistory, false);
+            }
+            else
+            {
+                parameters = "?pnsdk=" + EncodeUricomponent(_pnsdkVersion, ResponseType.DetailedHistory, false);
+            }
 
 			List<string> url = new List<string> ();
 
@@ -3319,7 +3340,8 @@ namespace PubNubMessaging.Core
 			}
 
 			queryStringBuilder.AppendFormat ("{0}", (queryStringBuilder.Length > 0) ? "&" : "");
-			queryStringBuilder.AppendFormat ("r={0}&timestamp={1}{2}&w={3}", Convert.ToInt32 (read), timeStamp.ToString (), (ttl > -1) ? "&ttl=" + ttl.ToString () : "", Convert.ToInt32 (write));
+            queryStringBuilder.AppendFormat("pnsdk={0}", EncodeUricomponent(_pnsdkVersion, ResponseType.GrantAccess, false));
+            queryStringBuilder.AppendFormat("&r={0}&timestamp={1}{2}&w={3}", Convert.ToInt32(read), timeStamp.ToString(), (ttl > -1) ? "&ttl=" + ttl.ToString() : "", Convert.ToInt32(write));
 
 			if (this.secretKey.Length > 0) 
             {
@@ -3365,7 +3387,8 @@ namespace PubNubMessaging.Core
 			if (!string.IsNullOrEmpty (channel)) {
 				queryStringBuilder.AppendFormat ("{0}channel={1}", (queryStringBuilder.Length > 0) ? "&" : "", EncodeUricomponent (channel, ResponseType.AuditAccess, false));
 			}
-			queryStringBuilder.AppendFormat ("{0}timestamp={1}", (queryStringBuilder.Length > 0) ? "&" : "", timeStamp.ToString ());
+            queryStringBuilder.AppendFormat("{0}pnsdk={1}", (queryStringBuilder.Length > 0) ? "&" : "", EncodeUricomponent(_pnsdkVersion, ResponseType.AuditAccess, false));
+            queryStringBuilder.AppendFormat("{0}timestamp={1}", (queryStringBuilder.Length > 0) ? "&" : "", timeStamp.ToString());
 
 			if (this.secretKey.Length > 0) {
 				StringBuilder string_to_sign = new StringBuilder ();
@@ -3771,7 +3794,7 @@ namespace PubNubMessaging.Core
 
 		private Uri BuildRestApiRequest<T> (List<string> urlComponents, ResponseType type, string uuid)
 		{
-			//bool queryParamExist = false;
+			bool queryParamExist = false;
 			StringBuilder url = new StringBuilder ();
 
 			if (string.IsNullOrEmpty (uuid)) {
@@ -3803,7 +3826,7 @@ namespace PubNubMessaging.Core
 
 			if (type == ResponseType.Presence || type == ResponseType.Subscribe || type == ResponseType.Leave) 
             {
-				//queryParamExist = true;
+				queryParamExist = true;
 				url.AppendFormat("?uuid={0}", uuid);
 				url.Append(subscribeParameters);
 				if (!string.IsNullOrEmpty(_authenticationKey)) {
@@ -3812,11 +3835,12 @@ namespace PubNubMessaging.Core
 				if (_pubnubPresenceHeartbeatInSeconds != 0) {
 					url.AppendFormat("&heartbeat={0}", _pubnubPresenceHeartbeatInSeconds);
 				}
+                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false));
 			}
 
 			if (type == ResponseType.PresenceHeartbeat) 
             {
-				//queryParamExist = true;
+				queryParamExist = true;
 				url.AppendFormat("?uuid={0}", uuid);
 				url.Append(presenceHeartbeatParameters);
 				if (_pubnubPresenceHeartbeatInSeconds != 0) 
@@ -3827,62 +3851,91 @@ namespace PubNubMessaging.Core
                 {
 					url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false));
 				}
+                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false));
 			}
 			if (type == ResponseType.SetUserState) 
             {
-				//queryParamExist = true;
+				queryParamExist = true;
 				url.Append(setUserStateparameters);
 				if (!string.IsNullOrEmpty(_authenticationKey)) 
                 {
 					url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false));
 				}
+                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false));
 			}
 			if (type == ResponseType.GetUserState) 
             {
-				if (!string.IsNullOrEmpty (_authenticationKey)) 
+                queryParamExist = true;
+                if (!string.IsNullOrEmpty(_authenticationKey))
                 {
-					//queryParamExist = true;
-					url.AppendFormat ("?auth={0}", EncodeUricomponent(_authenticationKey, type, false));
-				}
+                    url.AppendFormat("?auth={0}", EncodeUricomponent(_authenticationKey, type, false));
+                    url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false));
+                }
+                else
+                {
+                    url.AppendFormat("?pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false));
+                }
 
 			}
 
 			if (type == ResponseType.Here_Now) 
             {
-				url.Append(hereNowParameters);
+                queryParamExist = true;
+                url.Append(hereNowParameters);
 				if (!string.IsNullOrEmpty(_authenticationKey)) 
                 {
-					//queryParamExist = true;
 					url.AppendFormat ("&auth={0}", EncodeUricomponent(_authenticationKey, type, false));
 				}
+                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false));
 			}
 			if (type == ResponseType.GlobalHere_Now) 
             {
-				url.Append(globalHereNowParameters);
+                queryParamExist = true;
+                url.Append(globalHereNowParameters);
 				if (!string.IsNullOrEmpty(_authenticationKey)) 
                 {
-					//queryParamExist = true;
 					url.AppendFormat ("&auth={0}", EncodeUricomponent(_authenticationKey, type, false));
 				}
+                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false));
 			}
 			if (type == ResponseType.Where_Now) 
             {
-				if (!string.IsNullOrEmpty(_authenticationKey)) {
-					//queryParamExist = true;
-					url.AppendFormat ("?auth={0}", EncodeUricomponent(_authenticationKey, type, false));
-				}
+                queryParamExist = true;
+                if (!string.IsNullOrEmpty(_authenticationKey))
+                {
+                    url.AppendFormat("?auth={0}", EncodeUricomponent(_authenticationKey, type, false));
+                    url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false));
+                }
+                else
+                {
+                    url.AppendFormat("?pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false));
+                }
 			}
 
-			if (type == ResponseType.Publish && !string.IsNullOrEmpty(_authenticationKey)) 
+			if (type == ResponseType.Publish) 
             {
-				//queryParamExist = true;
-				url.AppendFormat("?auth={0}", EncodeUricomponent(_authenticationKey, type, false));
+				queryParamExist = true;
+                if (!string.IsNullOrEmpty(_authenticationKey))
+                {
+                    url.AppendFormat("?auth={0}", EncodeUricomponent(_authenticationKey, type, false));
+                    url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false));
+                }
+                else
+                {
+                    url.AppendFormat("?pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false));
+                }
 			}
 
 			if (type == ResponseType.DetailedHistory || type == ResponseType.GrantAccess || type == ResponseType.AuditAccess || type == ResponseType.RevokeAccess) {
 				url.Append(parameters);
-				//queryParamExist = true;
+				queryParamExist = true;
 			}
+
+            if (!queryParamExist)
+            {
+                url.AppendFormat("?pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false));
+            }
+
 
 			Uri requestUri = new Uri (url.ToString());
 
