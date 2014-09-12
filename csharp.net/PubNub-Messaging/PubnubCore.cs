@@ -1,4 +1,4 @@
-﻿//Build Date: September 11, 2014
+﻿//Build Date: September 12, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -113,7 +113,7 @@ namespace PubNubMessaging.Core
 		private string hereNowParameters = "";
 		private string setUserStateparameters = "";
 		private string globalHereNowParameters = "";
-        private string _pnsdkVersion = "csharp36";
+        private string _pnsdkVersion = "PubNub-CSharp-.NET-3.6.0.2";
 
 		#endregion
 
