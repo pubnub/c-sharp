@@ -29,7 +29,7 @@ You can only use Newtonsoft.Json as the serialization library, JsonFx and System
 Limitations of Newtonsoft.Json: Newtonsoft.Json doesn't support the serialization for type XmlDocument on this platform. 
 
 
-## Object Cleanup
+### Object Cleanup
 
 For best performance after completion of all intended operations, please call the EndPendingRequests() method
 of the Pubnub instance, and assign it to null. This will help ensure speedy resources cleanup when you are done
@@ -328,7 +328,7 @@ NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ## Variables Reference
 
 ```c#
-overrideTcpKeepAlive = false 
+overrideTcpKeepAlive = true 
 ```
 
 This variable default value is set to false to consider "request.ServicePoint.SetTcpKeepAlive()" method in the code. For mono framework 2.10.9 stable release, SetTcpKeepAlive() is not supported. To support Mono, set the value of "overrideTcpKeepAlive" to true
@@ -361,7 +361,7 @@ This variable is to set the maximum number of re-tries for re-connect to check i
 _pubnubWebRequestRetryIntervalInSeconds = 10 
 ```
 
-This variable is to set the wait time for re-subscribe and re-presence, if the previous subscribe or presence fail. This variable is valid only when "overrideTcpKeepAlive" = false
+This variable is to set the wait time for re-subscribe and re-presence, if the previous subscribe or presence fail. 
  
 If there is no internet/network connection after "pubnubNetworkCheckRetries" attempts for subscribe, "Unsubscribed after 50 failed retries" message will be sent and unsubscribe occurs automatically. Similary for presence, "Presence-unsubscribed after 50 failed retries"
  
@@ -391,13 +391,15 @@ pubnubEnableProxyConfig = false
 ```
 
 This variable default value is set to false assuming Pubnub code don't need internet access through proxy. If proxy access is needed due to corporate policy, set the value of "pubnubEnableProxyConfig" to true and set the Pubnub property "Proxy" to the type PubnubProxy similar to the following code snippet.
+```c#
+
           PubnubProxy proxy = new PubnubProxy();
           proxy.ProxyServer = <<Proxy Host or Server Name>>;
           proxy.ProxyPort = <<Proxy Port Number>>;
           proxy.ProxyUserName = << User Name of the proxy server account holder >>;
           proxy.ProxyPassword = << Password of the proxy server account holder >>;
           pubnub.Proxy = proxy;
-At this time, Proxy feature is not supported for windows phone 7.1.
+```
 
 ```c#
 pubnubLogLevel = LoggingMethod.Level.Off
