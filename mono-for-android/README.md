@@ -24,7 +24,7 @@ Andr.Unit-master contains the Unit test cases. Run the project to see the unit t
 Please ensure that in order to run on Mono the constant in the pubnub.cs file should be set to "true"
 overrideTcpKeepAlive = true;
 
-When creating a new project or a new configuration please add a compiler flag by going into the "Options -> Compiler -> Define Symbols" and adding "MONODROID;" to it.
+When creating a new project or a new configuration please add a compiler flag by going into the "Options -> Compiler -> Define Symbols" and adding "MONODROID;" to it. The app will also need the "INTERNET" permission.
 
 You can use either Newtonsoft.Json (recommended) or JsonFx as the serialization library. The example project has the references for both Newtonsoft.Json and JsonFx. You can retain either one.
 
