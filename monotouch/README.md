@@ -261,8 +261,8 @@ private static void DisplaySubscribeConnectStatusMessage(string result)
   }
 }
 ```
-
-```Display method can something like this: 
+### Display method can something like this: 
+```
 public void Display (string strText)
         {
             StyledMultilineElement sme = new StyledMultilineElement (strText) {
@@ -289,6 +289,7 @@ public void Display (string strText)
         }
 
 ```
+
 
 ### PAM: Grant and revoke access for subscribes
 

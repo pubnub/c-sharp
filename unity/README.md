@@ -378,13 +378,15 @@ private static void DisplaySubscribeConnectStatusMessage(string result)
 }
 ```
 
-```Display method can something like this: 
+### Display method can something like this: 
+```
 public void Display (string strText)
         {
             UnityEngine.Debug.Log (string.Format ("CALLBACK LOG: {0}", strText));
         }
 
 ```
+
 
 ### PAM: Grant and revoke access for subscribes
 
