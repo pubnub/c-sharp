@@ -493,7 +493,7 @@ public class PubnubExample : MonoBehaviour
                 int iInterval;
 
                 Int32.TryParse (input, out iInterval);
-                if (iInterval == 0) {
+                if (iInterval < 0) {
                     AddToPubnubResultContainer ("ALERT: Please enter an integer value.");
                 } else {
                     pubnub.PresenceHeartbeat = int.Parse (input);
@@ -920,8 +920,8 @@ public class PubnubExample : MonoBehaviour
     /// <param name="pubnubState">Pubnub state.</param>
     void AsyncOrNonAsyncCall (PubnubState pubnubState)
     {
-#if(UNITY_IOS)
-        if(pubnubState == PubnubState.DisconnectRetry)
+//#if(UNITY_IOS)
+        /*if(pubnubState == PubnubState.DisconnectRetry)
         {
             if(!requestInProcess)
             {
@@ -932,10 +932,29 @@ public class PubnubExample : MonoBehaviour
         else
         {
             DoAction(pubnubState);
-        }
+        }*/
+        //ThreadPool.QueueUserWorkItem (new WaitCallback (DoAction), pubnubState);
+//#elif(UNITY_ANDROID)
+#if(UNITY_IOS || UNITY_ANDROID)
+        Thread requestThread = new Thread (delegate (object state) {
+            DoAction(pubnubState);
+        }); 
+        requestThread.Name = "requestThread";
+        requestThread.Start ();
 #else
+        /*if(pubnubState == PubnubState.Subscribe){
+            StartCoroutine (RunCoroutine ());
+        }*/
+
         ThreadPool.QueueUserWorkItem (new WaitCallback (DoAction), pubnubState);
 #endif
+    }
+
+    public IEnumerator RunCoroutine (){
+        AddToPubnubResultContainer ("Running Subscribe");
+        allowUserSettingsChange = false;
+        pubnub.Subscribe<string> (channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
+        yield return null;
     }
 
     void Awake ()
@@ -1125,7 +1144,7 @@ public class PubnubExample : MonoBehaviour
     {
         if (pubnub == null)
             return;
-
+        //this.transform.Rotate(new Vector3(0,1,0));
         try {
             //UnityEngine.Debug.Log(DateTime.Now.ToLongTimeString() + " Update called " + pubnubApiResult.Length.ToString());            
             string recordTest;

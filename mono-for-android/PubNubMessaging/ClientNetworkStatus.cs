@@ -25,7 +25,7 @@ namespace PubNubMessaging.Core
         #if (SILVERLIGHT  || WINDOWS_PHONE)
         private static ManualResetEvent mres = new ManualResetEvent(false);
         private static ManualResetEvent mreSocketAsync = new ManualResetEvent(false);
-        #elif(!UNITY_IOS && !UNITY_ANDROID)
+        #elif(!UNITY_IOS && !UNITY_ANDROID && !MONODROID && !__ANDROID__)
         private static ManualResetEventSlim mres = new ManualResetEventSlim (false);
         #endif
         internal static bool SimulateNetworkFailForTesting {
@@ -98,7 +98,7 @@ namespace PubNubMessaging.Core
             state.Callback = callback;
             state.ErrorCallback = errorCallback;
             state.Channels = channels;
-            #if (UNITY_ANDROID || UNITY_IOS)
+            #if (UNITY_ANDROID || UNITY_IOS || MONODROID || __ANDROID__)
             CheckSocketConnect<T>(state);
             #elif(__MonoCS__)
             CheckSocketConnect<T> (state);
@@ -108,7 +108,7 @@ namespace PubNubMessaging.Core
 
             #if (SILVERLIGHT || WINDOWS_PHONE)
             mres.WaitOne();
-            #elif(!UNITY_ANDROID && !UNITY_IOS)
+            #elif(!UNITY_ANDROID && !UNITY_IOS && !MONODROID && !__ANDROID__)
             mres.Wait ();
             #endif
         }
@@ -133,7 +133,7 @@ namespace PubNubMessaging.Core
                     sae.Completed -= new EventHandler<SocketAsyncEventArgs>(socketAsync_Completed<T>);
                     socket.Close();
                 }
-                #elif (UNITY_IOS || UNITY_ANDROID)
+                #elif (UNITY_IOS || UNITY_ANDROID || MONODROID || __ANDROID__)
                 if(request!=null){
                     request.Abort();
                     request = null;
@@ -191,7 +191,7 @@ namespace PubNubMessaging.Core
                 }
                 #endif
             }
-            #if (UNITY_IOS || UNITY_ANDROID)
+            #if (UNITY_IOS || UNITY_ANDROID || MONODROID || __ANDROID__)
             catch (WebException webEx){
 
                 if(webEx.Message.Contains("404")){
@@ -225,7 +225,7 @@ namespace PubNubMessaging.Core
                 GC.Collect();
                 #endif
             }
-            #if (!UNITY_ANDROID && !UNITY_IOS)
+            #if (!UNITY_ANDROID && !UNITY_IOS && !MONODROID && !__ANDROID__)
             mres.Set ();
             #endif
         }

@@ -1,5 +1,5 @@
-//ver3.6
-//Build Date: Jul 23, 2014
+//ver3.6.1
+//Build Date: Sep 16, 2014
 //#define USE_JSONFX
 using System;
 using System.Text;
@@ -16,10 +16,11 @@ using System.Linq;
 
 namespace PubNubMessaging.Core
 {
-    internal class PubnubMonoMac : PubnubCore
+    internal class PubnubMonoLinux : PubnubCore
     {
         #region "Constants"
 
+        // 0: off, 1: error, 2: info, 3: verbose, 4: warning
         const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Info;
         const PubnubErrorFilter.Level errorLevel = PubnubErrorFilter.Level.Info;
         protected bool pubnubEnableProxyConfig = true;
@@ -53,23 +54,23 @@ namespace PubNubMessaging.Core
         #region "Constructors and destructors"
 
         #if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
-        ~PubnubMonoMac ()
+        ~PubnubMonoLinux ()
         {
             //detach
             SystemEvents.PowerModeChanged -= new PowerModeChangedEventHandler (SystemEvents_PowerModeChanged);
         }
         #endif
-        public PubnubMonoMac (string publishKey, string subscribeKey) :
+        public PubnubMonoLinux (string publishKey, string subscribeKey) :
             base (publishKey, subscribeKey)
         {
         }
 
-        public PubnubMonoMac (string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn) :
+        public PubnubMonoLinux (string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn) :
             base (publishKey, subscribeKey, secretKey, cipherKey, sslOn)
         {
         }
 
-        public PubnubMonoMac (string publishKey, string subscribeKey, string secretKey) :
+        public PubnubMonoLinux (string publishKey, string subscribeKey, string secretKey) :
             base (publishKey, subscribeKey, secretKey)
         {
         }
@@ -91,14 +92,17 @@ namespace PubNubMessaging.Core
         protected override void ProcessResponseCallbackWebExceptionHandler<T> (WebException webEx, RequestState<T> asynchRequestState, string channel)
         {
             bool reconnect = false;
-            LoggingMethod.WriteToLog (string.Format ("DateTime {0}, WebException: {1}", DateTime.Now.ToString (), webEx.ToString ()), LoggingMethod.LevelError);
+            if (webEx.ToString ().Contains ("Aborted")) {
+                LoggingMethod.WriteToLog (string.Format ("DateTime {0}, WebException: {1}", DateTime.Now.ToString (), webEx.ToString ()), LoggingMethod.LevelInfo);
+            } else {
+                LoggingMethod.WriteToLog (string.Format ("DateTime {0}, WebException: {1}", DateTime.Now.ToString (), webEx.ToString ()), LoggingMethod.LevelError);
+            }
             if (asynchRequestState != null) {
                 if (asynchRequestState.Response != null)
                     asynchRequestState.Response.Close ();
                 if (asynchRequestState.Request != null)
                     TerminatePendingWebRequest (asynchRequestState);
             }
-            //#elif (!SILVERLIGHT)
             reconnect = HandleWebException (webEx, asynchRequestState, channel);
 
             UrlRequestCommonExceptionHandler<T> (asynchRequestState.Type, asynchRequestState.Channels, asynchRequestState.Timeout,
@@ -387,7 +391,11 @@ namespace PubNubMessaging.Core
                     base.channelInternetStatus [channel] = false;
                 }
             }
-            Thread.Sleep (base.NetworkCheckRetryInterval * 1000);
+            if (webEx.ToString ().Contains ("Aborted")) {
+                Thread.Sleep (1 * 1000);
+            } else {
+                Thread.Sleep (base.NetworkCheckRetryInterval * 1000);
+            }
             return reconnect;
         }
 
@@ -434,7 +442,7 @@ namespace PubNubMessaging.Core
 
         #region "Overridden methods"
 
-        protected override string EncodeUricomponent (string s, ResponseType type, bool ignoreComma)
+        protected override string EncodeUricomponent (string s, ResponseType type, bool ignoreComma, bool ignorePercent2fEncode)
         {
             string encodedUri = "";
             StringBuilder o = new StringBuilder ();
@@ -458,7 +466,10 @@ namespace PubNubMessaging.Core
             }
             encodedUri = o.ToString ();
             if (type == ResponseType.Here_Now || type == ResponseType.DetailedHistory || type == ResponseType.Leave) {
-                encodedUri = encodedUri.Replace ("%2F", "%252F");
+                if (!ignorePercent2fEncode)
+                {
+                    encodedUri = encodedUri.Replace("%2F", "%252F");
+                }
             }
 
             return encodedUri;
@@ -467,6 +478,7 @@ namespace PubNubMessaging.Core
         protected override sealed void Init (string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
         {
             LoggingMethod.LogLevel = pubnubLogLevel;
+            base.Version = "PubNub-CSharp-MonoLinux/3.6";
             string configuredLogLevel = ConfigurationManager.AppSettings ["PubnubMessaging.LogLevel"];
             int logLevelValue;
             if (!Int32.TryParse (configuredLogLevel, out logLevelValue)) {
@@ -483,13 +495,13 @@ namespace PubNubMessaging.Core
                 base.PubnubErrorLevel = (PubnubErrorFilter.Level)errorFilterValue;
             }
 
-            LoggingMethod.WriteToLog("Ver 3.6, Build Date: Jul 23, 2014", LoggingMethod.LevelInfo);
+            LoggingMethod.WriteToLog("Ver 3.6, Build Date: Sep 16, 2014", LoggingMethod.LevelInfo);
             #if (USE_JSONFX)
-			LoggingMethod.WriteToLog("Using USE_JSONFX", LoggingMethod.LevelInfo);
-			this.JsonPluggableLibrary = new JsonFXDotNet();
+            LoggingMethod.WriteToLog("Using USE_JSONFX", LoggingMethod.LevelInfo);
+            this.JsonPluggableLibrary = new JsonFXDotNet();
             #elif (USE_DOTNET_SERIALIZATION)
-			LoggingMethod.WriteToLog("Using USE_DOTNET_SERIALIZATION", LoggingMethod.LevelInfo);
-			this.JsonPluggableLibrary = new JscriptSerializer();   
+            LoggingMethod.WriteToLog("Using USE_DOTNET_SERIALIZATION", LoggingMethod.LevelInfo);
+            this.JsonPluggableLibrary = new JscriptSerializer();   
             #else
             LoggingMethod.WriteToLog ("Using NewtonsoftJsonDotNet", LoggingMethod.LevelInfo);
             base.JsonPluggableLibrary = new NewtonsoftJsonDotNet ();
@@ -586,7 +598,7 @@ namespace PubNubMessaging.Core
                         nonSubscribeRequestThread.Name= "nonSubscribeRequestThread";
                         nonSubscribeRequestThread.Start ();
                         StartTimeoutThread <T>(pubnubRequestState, false);
-                }	
+                }    
             #endif
             }
             #elif(__MonoCS__)
@@ -738,13 +750,13 @@ namespace PubNubMessaging.Core
             return isUnsafe;
         }
         #endif
+
         #if (__MonoCS__ && !UNITY_ANDROID && !UNITY_IOS)
         string CreateRequest (Uri requestUri)
         {
             StringBuilder requestBuilder = new StringBuilder ();
             requestBuilder.Append ("GET ");
             requestBuilder.Append (requestUri.OriginalString);
-
             if (ssl) {
                 requestBuilder.Append (string.Format (" HTTP/1.1\r\nConnection: close\r\nHost: {0}:443\r\n\r\n", this._domainName));
             } else {
@@ -1177,7 +1189,7 @@ namespace PubNubMessaging.Core
         protected HttpWebRequest SetUserAgent (HttpWebRequest req, bool keepAliveRequest, OperatingSystem userOS)
         {
             req.KeepAlive = keepAliveRequest;
-            req.UserAgent = string.Format ("ua_string=({0}) PubNub-csharp/3.6", userOS.VersionString);
+            req.UserAgent = string.Format ("ua_string=({0}) PubNub-csharp-MonoLinux/3.6.1", userOS.VersionString);
             return req;
         }
 
@@ -1189,7 +1201,6 @@ namespace PubNubMessaging.Core
             }
             return req;
         }
-
     }
     #endregion
     #region "PubnubWebRequest"

@@ -1,4 +1,6 @@
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace PubNubMessaging.Core
 {
@@ -19,7 +21,7 @@ namespace PubNubMessaging.Core
 
         public bool Publish (string channel, object message, Action<object> userCallback, Action<PubnubClientError> errorCallback)
         {
-            return pubnub.Publish (channel, message, userCallback, errorCallback);
+            return pubnub.Publish (channel, message, userCallback, errorCallback);;
         }
 
         public bool Publish<T> (string channel, object message, Action<T> userCallback, Action<PubnubClientError> errorCallback)
@@ -204,32 +206,44 @@ namespace PubNubMessaging.Core
 
         public void SetUserState<T> (string channel, string uuid, string jsonUserState, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
-            pubnub.SetUserState<T> (channel, uuid, jsonUserState, userCallback, errorCallback);
+            ThreadPool.QueueUserWorkItem (delegate(object state) {
+                pubnub.SetUserState<T> (channel, uuid, jsonUserState, userCallback, errorCallback);
+            });
         }
 
         public void SetUserState<T> (string channel, string jsonUserState, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
-            pubnub.SetUserState<T> (channel, "", jsonUserState, userCallback, errorCallback);
+            ThreadPool.QueueUserWorkItem (delegate(object state) {
+                pubnub.SetUserState<T> (channel, "", jsonUserState, userCallback, errorCallback);
+            });
         }
 
         public void SetUserState<T> (string channel, string uuid, System.Collections.Generic.KeyValuePair<string, object> keyValuePair, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
-            pubnub.SetUserState<T> (channel, uuid, keyValuePair, userCallback, errorCallback);
+            ThreadPool.QueueUserWorkItem (delegate(object state) {
+                pubnub.SetUserState<T> (channel, uuid, keyValuePair, userCallback, errorCallback);
+            });
         }
 
         public void SetUserState<T> (string channel, System.Collections.Generic.KeyValuePair<string, object> keyValuePair, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
-            pubnub.SetUserState<T> (channel, "", keyValuePair, userCallback, errorCallback);
+            ThreadPool.QueueUserWorkItem (delegate(object state) {
+                pubnub.SetUserState<T> (channel, "", keyValuePair, userCallback, errorCallback);
+            });
         }
 
         public void GetUserState<T> (string channel, string uuid, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
-            pubnub.GetUserState<T> (channel, uuid, userCallback, errorCallback);
+            ThreadPool.QueueUserWorkItem (delegate(object state) {
+                pubnub.GetUserState<T> (channel, uuid, userCallback, errorCallback);
+            });
         }
 
         public void GetUserState<T> (string channel, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
-            pubnub.GetUserState<T> (channel, "", userCallback, errorCallback);
+            ThreadPool.QueueUserWorkItem (delegate(object state) {
+                pubnub.GetUserState<T> (channel, "", userCallback, errorCallback);
+            });
         }
 
         #endregion
@@ -238,7 +252,9 @@ namespace PubNubMessaging.Core
 
         public void TerminateCurrentSubscriberRequest ()
         {
-            pubnub.TerminateCurrentSubscriberRequest ();
+            ThreadPool.QueueUserWorkItem (delegate(object state) {
+                pubnub.TerminateCurrentSubscriberRequest ();
+            });
         }
 
         public void EnableSimulateNetworkFailForTestingOnly ()
@@ -263,7 +279,9 @@ namespace PubNubMessaging.Core
 
         public void EndPendingRequests ()
         {
-            pubnub.EndPendingRequests ();
+            ThreadPool.QueueUserWorkItem (delegate(object state) {
+                pubnub.EndPendingRequests ();
+            });
         }
 
         public Guid GenerateGuid ()

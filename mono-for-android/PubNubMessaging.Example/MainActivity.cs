@@ -10,6 +10,7 @@ using Android.Content.PM;
 using Android.Content.Res;
 using Android.Support.V4.Widget;
 using Android.Support.V4.App;
+using System.Threading;
 
 //TODO
 //layout-large
@@ -371,8 +372,10 @@ namespace PubNubMessaging.Example
         public void Subscribe ()
         {
             Display ("Running Subscribe");
-            pubnub.Subscribe<string> (channel, DisplayReturnMessage, 
-                DisplayConnectStatusMessage, DisplayErrorMessage);
+            ThreadPool.QueueUserWorkItem (o => 
+                pubnub.Subscribe<string> (channel, DisplayReturnMessage, 
+                    DisplayConnectStatusMessage, DisplayErrorMessage)
+            );
         }
 
         public void Publish ()
@@ -389,9 +392,12 @@ namespace PubNubMessaging.Example
             alert.SetPositiveButton ("OK", (sender, e) => {
                 Display ("Running Publish");
                 string[] channels = channel.Split (',');
+                string mess = input.Text;
                 foreach (string channelToCall in channels) {
-                    pubnub.Publish<string> (channelToCall.Trim (), input.Text, 
-                        DisplayReturnMessage, DisplayErrorMessage);
+                    ThreadPool.QueueUserWorkItem (o => 
+                        pubnub.Publish<string> (channelToCall.Trim (), mess, 
+                            DisplayReturnMessage, DisplayErrorMessage)
+                    );
                 }
             });
             
@@ -404,7 +410,9 @@ namespace PubNubMessaging.Example
         public void Presence ()
         {
             Display ("Running Presence");
-            pubnub.Presence<string> (channel, DisplayReturnMessage, null, DisplayErrorMessage);
+            ThreadPool.QueueUserWorkItem (o => 
+                pubnub.Presence<string> (channel, DisplayReturnMessage, null, DisplayErrorMessage)
+            );
         }
 
         public void DetailedHistory ()
@@ -412,7 +420,9 @@ namespace PubNubMessaging.Example
             Display ("Running Detailed History");
             string[] channels = channel.Split (',');
             foreach (string channelToCall in channels) {
-                pubnub.DetailedHistory<string> (channelToCall.Trim (), 100, DisplayReturnMessage, DisplayErrorMessage);
+                ThreadPool.QueueUserWorkItem (o => 
+                    pubnub.DetailedHistory<string> (channelToCall.Trim (), 100, DisplayReturnMessage, DisplayErrorMessage)
+                );
             }
         }
 
@@ -432,21 +442,27 @@ namespace PubNubMessaging.Example
         public void Unsub ()
         {
             Display ("Running unsubscribe");
-            pubnub.Unsubscribe<string> (channel, DisplayReturnMessage, DisplayReturnMessage, 
-                DisplayReturnMessage, DisplayErrorMessage);
+            ThreadPool.QueueUserWorkItem (o => 
+                pubnub.Unsubscribe<string> (channel, DisplayReturnMessage, DisplayReturnMessage, 
+                    DisplayReturnMessage, DisplayErrorMessage)
+            );
         }
 
         public void UnsubPresence ()
         {
             Display ("Running presence-unsubscribe");
-            pubnub.PresenceUnsubscribe<string> (channel, DisplayReturnMessage, DisplayReturnMessage, 
-                DisplayReturnMessage, DisplayErrorMessage);
+            ThreadPool.QueueUserWorkItem (o => 
+                pubnub.PresenceUnsubscribe<string> (channel, DisplayReturnMessage, DisplayReturnMessage, 
+                    DisplayReturnMessage, DisplayErrorMessage)
+            );
         }
 
         public void GetTime ()
         {
             Display ("Running Time");
-            pubnub.Time<string> (DisplayReturnMessage, DisplayErrorMessage);
+            ThreadPool.QueueUserWorkItem (o => 
+                pubnub.Time<string> (DisplayReturnMessage, DisplayErrorMessage)
+            );
         }
 
         public void SubscribeGrant ()
@@ -498,6 +514,7 @@ namespace PubNubMessaging.Example
         {
             try {
                 SetEventArgs cea = ea as SetEventArgs;
+
                 if (cea.cds == CommonDialogStates.Auth) {
                     Display ("Setting Auth Key");
                     pubnub.AuthenticationKey = cea.valueToSet;
@@ -505,21 +522,28 @@ namespace PubNubMessaging.Example
                 } else if (cea.cds == CommonDialogStates.AuditSubscribe) {
 
                     Display ("Running Subscribe Audit");
-                    pubnub.AuditAccess<string> (channel, cea.valueToSet, DisplayReturnMessage, DisplayErrorMessage);
-
+                    ThreadPool.QueueUserWorkItem (o => 
+                        pubnub.AuditAccess<string> (channel, cea.valueToSet, DisplayReturnMessage, DisplayErrorMessage)
+                    );
                 } else if (cea.cds == CommonDialogStates.AuditPresence) {
 
                     Display ("Running Presence Audit");
-                    pubnub.AuditPresenceAccess<string> (channel, cea.valueToSet, DisplayReturnMessage, DisplayErrorMessage);
+                    ThreadPool.QueueUserWorkItem (o => 
+                        pubnub.AuditPresenceAccess<string> (channel, cea.valueToSet, DisplayReturnMessage, DisplayErrorMessage)
+                    );
 
                 } else if (cea.cds == CommonDialogStates.RevokePresence) {
                     Display ("Running Presence Revoke");
-                    pubnub.GrantPresenceAccess<string> (channel, cea.valueToSet, false, false, DisplayReturnMessage, DisplayErrorMessage);
+                    ThreadPool.QueueUserWorkItem (o => 
+                        pubnub.GrantPresenceAccess<string> (channel, cea.valueToSet, false, false, DisplayReturnMessage, DisplayErrorMessage)
+                    );
 
                 } else if (cea.cds == CommonDialogStates.RevokeSubscribe) {
 
                     Display ("Running Subscribe Revoke");
-                    pubnub.GrantAccess<string> (channel, cea.valueToSet, false, false, DisplayReturnMessage, DisplayErrorMessage);
+                    ThreadPool.QueueUserWorkItem (o => 
+                        pubnub.GrantAccess<string> (channel, cea.valueToSet, false, false, DisplayReturnMessage, DisplayErrorMessage)
+                    );
 
                 } else if (cea.cds == CommonDialogStates.ChangeUuid) {
                     Display ("Setting UUID");
@@ -527,17 +551,24 @@ namespace PubNubMessaging.Example
                     Display (string.Format ("UUID set to {0}", pubnub.SessionUUID));
                 } else if (cea.cds == CommonDialogStates.WhereNow) {
                     Display ("Running where now");
-                    pubnub.WhereNow<string> (cea.valueToSet, DisplayReturnMessage, DisplayErrorMessage);
+                    ThreadPool.QueueUserWorkItem (o => 
+                        pubnub.WhereNow<string> (cea.valueToSet, DisplayReturnMessage, DisplayErrorMessage)
+                    );
                 } else if (cea.cds == CommonDialogStates.GetUserState) {
                     Display ("Running get user state");
-                    pubnub.GetUserState<string> (cea.channel, cea.valueToSet, DisplayReturnMessage, DisplayErrorMessage);
+                    ThreadPool.QueueUserWorkItem (o => 
+                        pubnub.GetUserState<string> (cea.channel, cea.valueToSet, DisplayReturnMessage, DisplayErrorMessage)
+                    );
                 } else if (cea.cds == CommonDialogStates.DeleteUserState) {
                     Display ("Running delete user state");
-                    pubnub.SetUserState<string> (cea.channel, new KeyValuePair<string, object> (cea.valueToSet, null), DisplayReturnMessage, DisplayErrorMessage);
+                    ThreadPool.QueueUserWorkItem (o => 
+                        pubnub.SetUserState<string> (cea.channel, new KeyValuePair<string, object> (cea.valueToSet, null), DisplayReturnMessage, DisplayErrorMessage)
+                    );
                 } else if (cea.cds == CommonDialogStates.PresenceHeartbeat) {
                     Display ("Setting presence heartbeat");
                     //int check done in CommonDialogFragment
                     pubnub.PresenceHeartbeat = int.Parse (cea.valueToSet);
+
                     Display (string.Format ("PresenceHeartbeat set to {0}", pubnub.PresenceHeartbeat));
                 } else if (cea.cds == CommonDialogStates.PresenceHeartbeatInterval) {
                     Display ("Setting presence interval");
@@ -549,11 +580,17 @@ namespace PubNubMessaging.Example
                     double valueDouble;
 
                     if (Int32.TryParse (cea.valueToSet2, out valueInt)) {
-                        pubnub.SetUserState<string> (cea.channel, new KeyValuePair<string, object> (cea.valueToSet, valueInt), DisplayReturnMessage, DisplayErrorMessage);
+                        ThreadPool.QueueUserWorkItem (o => 
+                            pubnub.SetUserState<string> (cea.channel, new KeyValuePair<string, object> (cea.valueToSet, valueInt), DisplayReturnMessage, DisplayErrorMessage)
+                        );
                     } else if (Double.TryParse (cea.valueToSet2, out valueDouble)) {
-                        pubnub.SetUserState<string> (cea.channel, new KeyValuePair<string, object> (cea.valueToSet, valueDouble), DisplayReturnMessage, DisplayErrorMessage);
+                        ThreadPool.QueueUserWorkItem (o => 
+                            pubnub.SetUserState<string> (cea.channel, new KeyValuePair<string, object> (cea.valueToSet, valueDouble), DisplayReturnMessage, DisplayErrorMessage)
+                        );
                     } else {
-                        pubnub.SetUserState<string> (cea.channel, new KeyValuePair<string, object> (cea.valueToSet, cea.valueToSet2), DisplayReturnMessage, DisplayErrorMessage);
+                        ThreadPool.QueueUserWorkItem (o => 
+                            pubnub.SetUserState<string> (cea.channel, new KeyValuePair<string, object> (cea.valueToSet, cea.valueToSet2), DisplayReturnMessage, DisplayErrorMessage)
+                        );
                     }
                 } else if (cea.cds == CommonDialogStates.SetUserStateJson) {
                     string jsonUserState = "";
@@ -562,7 +599,9 @@ namespace PubNubMessaging.Example
                     } else {
                         jsonUserState = cea.valueToSet2;
                     }
-                    pubnub.SetUserState<string> (cea.channel, cea.valueToSet, jsonUserState, DisplayReturnMessage, DisplayErrorMessage);
+                    ThreadPool.QueueUserWorkItem (o => 
+                        pubnub.SetUserState<string> (cea.channel, cea.valueToSet, jsonUserState, DisplayReturnMessage, DisplayErrorMessage)
+                    );
                 }
             } catch (Exception ex) {
                 Display (ex.Message);
@@ -587,15 +626,23 @@ namespace PubNubMessaging.Example
                 if (cea.cds == CommonDialogStates.Grant) {
                     if (cea.isPresence) {
                         Display ("Running Presence Grant");
-                        pubnub.GrantPresenceAccess<string> (channel, cea.channel, cea.valToSet2, cea.valToSet1, cea.ttl, DisplayReturnMessage, DisplayErrorMessage);
+                        ThreadPool.QueueUserWorkItem (o => 
+                            pubnub.GrantPresenceAccess<string> (channel, cea.channel, cea.valToSet2, cea.valToSet1, cea.ttl, DisplayReturnMessage, DisplayErrorMessage)
+                        );
                     } else {
                         Display ("Running Subscribe Grant");
-                        pubnub.GrantAccess<string> (channel, cea.channel, cea.valToSet2, cea.valToSet1, cea.ttl, DisplayReturnMessage, DisplayErrorMessage);
+                        ThreadPool.QueueUserWorkItem (o => 
+                            pubnub.GrantAccess<string> (channel, cea.channel, cea.valToSet2, cea.valToSet1, cea.ttl, DisplayReturnMessage, DisplayErrorMessage)
+                        );
                     }
                 } else if (cea.cds == CommonDialogStates.HereNow) {
-                    pubnub.HereNow<string> (cea.channel, cea.valToSet2, cea.valToSet1, DisplayReturnMessage, DisplayErrorMessage);
+                    ThreadPool.QueueUserWorkItem (o => 
+                        pubnub.HereNow<string> (cea.channel, cea.valToSet2, cea.valToSet1, DisplayReturnMessage, DisplayErrorMessage)
+                    );
                 } else if (cea.cds == CommonDialogStates.GlobalHereNow) {
-                    pubnub.GlobalHereNow<string> (cea.valToSet2, cea.valToSet1, DisplayReturnMessage, DisplayErrorMessage);
+                    ThreadPool.QueueUserWorkItem (o => 
+                        pubnub.GlobalHereNow<string> (cea.valToSet2, cea.valToSet1, DisplayReturnMessage, DisplayErrorMessage)
+                    );
                 } 
             } catch (Exception ex) {
                 Display (ex.Message);

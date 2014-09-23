@@ -53,11 +53,11 @@
     <Compile Include="PubnubExample.cs" />
     <Compile Include="Pubnub\Pubnub.cs" />
     <Compile Include="Pubnub\PubnubCore.cs" />
-    <Compile Include="Pubnub\PubnubMonoMac.cs" />
     <Compile Include="Pubnub\MD5.cs" />
     <Compile Include="Pubnub\LoggingMethod.cs" />
     <Compile Include="Pubnub\ClientNetworkStatus.cs" />
     <Compile Include="Pubnub\ReconnectState.cs" />
+    <Compile Include="Pubnub\PubnubMonoLinux.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
