@@ -1,12 +1,13 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="PubNub-Console/Pubnub/PubnubMonoMac.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="PubNub-Console/Pubnub/PubnubCore.cs">
     <Files>
-      <File FileName="PubNub-Console/Pubnub/PubnubCore.cs" Line="1" Column="1" />
-      <File FileName="PubNub-Console/Pubnub/PubnubMonoMac.cs" Line="486" Column="100" />
+      <File FileName="PubNub-Console/Pubnub/PubnubCore.cs" Line="10" Column="10" />
+      <File FileName="PubNub-Console/Pubnub/PubnubMonoMac.cs" Line="12" Column="12" />
       <File FileName="PubNubTest/Common.cs" Line="1" Column="1" />
       <File FileName="PubNubTest/WhenAClientIsPresented.cs" Line="1" Column="1" />
       <File FileName="PubNubTest/WhenSubscribedToAChannel.cs" Line="1" Column="1" />
+      <File FileName="PubNub-Console/PubnubExample.cs" Line="51" Column="51" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
@@ -24,6 +25,8 @@
       <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/c-sharp-clients/mono-for-mac/PubNubTest/WhenSubscribedToAChannel.cs" line="319" column="1" />
       <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/c-sharp-clients/mono-for-mac/PubNubTest/WhenSubscribedToAChannel.cs" line="324" column="1" />
       <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/c-sharp-clients/mono-for-mac/PubNubTest/WhenSubscribedToAChannel.cs" line="330" column="1" />
+      <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/c-sharp-clients/mono-for-mac/PubNub-Console/Pubnub/PubnubCore.cs" line="3873" column="1" />
+      <Breakpoint file="/Volumes/Macintosh/Users/rajatkalsy/Projects/Client/ODesk/pubnub/c-sharp-clients/mono-for-mac/PubNub-Console/Pubnub/PubnubCore.cs" line="3889" column="1" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

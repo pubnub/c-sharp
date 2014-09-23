@@ -1,15 +1,16 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhone" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneDeviceTarget.Iph" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="PubnubMessaging.Tests/WhenSubscribedToAChannel.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="PubnubMessagingExample/Pubnub_MessagingMain.cs">
     <Files>
-      <File FileName="PubnubMessaging/PubnubXamariniOS.cs" Line="379" Column="9" />
-      <File FileName="PubnubMessagingExample/Pubnub_MessagingMain.cs" Line="1" Column="1" />
-      <File FileName="PubnubMessagingExample/Pubnub_MessagingSub.cs" Line="677" Column="33" />
-      <File FileName="PubnubMessaging/PubnubCore.cs" Line="1" Column="1" />
-      <File FileName="../../../../../Volumes/VMware Shared Folders/pubnub/git-master/c-sharp/csharp.net/PubNub-Messaging/PubnubWin.cs" Line="324" Column="51" />
-      <File FileName="../o/unity/Assets/PubnubExample.cs" Line="18" Column="14" />
-      <File FileName="PubnubMessaging/ClientNetworkStatus.cs" Line="243" Column="10" />
-      <File FileName="PubnubMessaging.Tests/WhenSubscribedToAChannel.cs" Line="321" Column="48" />
+      <File FileName="PubnubMessaging/PubnubXamariniOS.cs" Line="1" Column="1" />
+      <File FileName="PubnubMessagingExample/Pubnub_MessagingMain.cs" Line="151" Column="15" />
+      <File FileName="PubnubMessagingExample/Pubnub_MessagingSub.cs" Line="663" Column="40" />
+      <File FileName="PubnubMessaging/PubnubCore.cs" Line="16" Column="16" />
+      <File FileName="../../../../../Volumes/VMware Shared Folders/pubnub/git-master/c-sharp/csharp.net/PubNub-Messaging/PubnubWin.cs" Line="1" Column="1" />
+      <File FileName="PubnubMessaging/ClientNetworkStatus.cs" Line="1" Column="1" />
+      <File FileName="PubnubMessaging.Tests/WhenSubscribedToAChannel.cs" Line="1" Column="1" />
+      <File FileName="PubnubMessaging/LoggingMethod.cs" Line="1" Column="1" />
+      <File FileName="PubnubMessaging/Pubnub.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
@@ -18,10 +19,10 @@
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <MonoDevelop.Ide.ItemProperties.PubnubMessagingExample>
-    <MonoDevelop.MacDev.AppleDevelopmentTeam DeveloperId="NK6E38LY64" TeamId="Y9X42V6EK7" />
-  </MonoDevelop.Ide.ItemProperties.PubnubMessagingExample>
   <MonoDevelop.Ide.ItemProperties.Touch.Unit>
     <MonoDevelop.MacDev.AppleDevelopmentTeam DeveloperId="NK6E38LY64" TeamId="Y9X42V6EK7" />
   </MonoDevelop.Ide.ItemProperties.Touch.Unit>
+  <MonoDevelop.Ide.ItemProperties.PubnubMessagingExample>
+    <MonoDevelop.MacDev.AppleDevelopmentTeam DeveloperId="NK6E38LY64" TeamId="Y9X42V6EK7" />
+  </MonoDevelop.Ide.ItemProperties.PubnubMessagingExample>
 </Properties>
