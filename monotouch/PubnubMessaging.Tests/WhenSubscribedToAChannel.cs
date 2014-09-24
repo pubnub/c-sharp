@@ -456,7 +456,7 @@ namespace PubNubMessaging.Tests
 
         }
 
-        //[Test]
+        [Test]
         public void ThenSubscriberShouldBeAbleToReceiveManyMessages ()
         {
             Pubnub pubnub = new Pubnub (Common.PublishKey,
