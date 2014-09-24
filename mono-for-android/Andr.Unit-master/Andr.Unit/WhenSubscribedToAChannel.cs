@@ -337,7 +337,7 @@ namespace PubNubMessaging.Tests
             pubnub.EndPendingRequests ();
         }
 
-        [Test]
+        //[Test]
         public void ThenSubscriberShouldBeAbleToReceiveManyMessages ()
         {
             Pubnub pubnub = new Pubnub (Common.PublishKey,

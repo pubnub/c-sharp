@@ -160,6 +160,8 @@ namespace PubnubMessagingExample
         string Channel {
             get;
             set;
+            //get { return newChannels.Text; }
+            //set { newChannels.Text = value; }
         }
 
         string Cipher {
@@ -226,7 +228,9 @@ namespace PubnubMessagingExample
 
             tap.CancelsTouchesInView = false;
             dvc.NavigationItem.RightBarButtonItem = new UIBarButtonItem (UIBarButtonSystemItem.Cancel, delegate {
-                pubnub.EndPendingRequests ();
+                InvokeInBackground(() => {
+                    pubnub.EndPendingRequests ();
+                });
                 AppDelegate.navigation.PopToRootViewController (true);
             });
             Menu = new SlideoutNavigationController ();
@@ -237,6 +241,7 @@ namespace PubnubMessagingExample
             AppDelegate.navigation.PushViewController (Menu, true);
             Menu.ShowMenuLeft ();
             newChannels.Text = Channel;
+
         }
 
         UIView CreateHeaderView (int iViewHeight)
@@ -277,7 +282,10 @@ namespace PubnubMessagingExample
         public void Subscribe ()
         {
             Display ("Running Subscribe");
-            pubnub.Subscribe<string> (Channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
+            Channel = newChannels.Text;
+            InvokeInBackground(() => {
+                pubnub.Subscribe<string> (Channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
+            });
         }
 
         public void Publish ()
@@ -293,9 +301,12 @@ namespace PubnubMessagingExample
                     if (alert.GetTextField (0) != null) {
                         string input = alert.GetTextField (0).Text;
                         Display ("Running Publish");
+                        Channel = newChannels.Text;
                         string[] channels = Channel.Split (',');
                         foreach (string channel in channels) {
-                            pubnub.Publish<string> (channel.Trim (), input, DisplayReturnMessage, DisplayErrorMessage);
+                            InvokeInBackground(() => {
+                                pubnub.Publish<string> (channel.Trim (), input, DisplayReturnMessage, DisplayErrorMessage);
+                            });
                         }
                     }
                 }           
@@ -308,9 +319,13 @@ namespace PubnubMessagingExample
             InputAlertView iav = (InputAlertView)sender;
             if ((iav != null) && (!String.IsNullOrWhiteSpace (iav.EnteredText))) {
                 Display ("Running Publish");
+                Channel = newChannels.Text;
                 string[] channels = Channel.Split (',');
+
                 foreach (string channel in channels) {
-                    pubnub.Publish<string> (channel.Trim (), iav.EnteredText, DisplayReturnMessage, DisplayErrorMessage);
+                    InvokeInBackground(() => {
+                        pubnub.Publish<string> (channel.Trim (), iav.EnteredText, DisplayReturnMessage, DisplayErrorMessage);
+                    });
                 }
             }
         }
@@ -318,15 +333,21 @@ namespace PubnubMessagingExample
         public void Presence ()
         {
             Display ("Running Presence");
-            pubnub.Presence<string> (Channel, DisplayReturnMessage, null, DisplayErrorMessage);
+            Channel = newChannels.Text;
+            InvokeInBackground (() => {
+                pubnub.Presence<string> (Channel, DisplayReturnMessage, null, DisplayErrorMessage);
+            });
         }
 
         public void DetailedHistory ()
         {
             Display ("Running Detailed History");
+            Channel = newChannels.Text;
             string[] channels = Channel.Split (',');
             foreach (string channel in channels) {
-                pubnub.DetailedHistory<string> (channel.Trim (), 100, DisplayReturnMessage, DisplayErrorMessage);
+                InvokeInBackground (() => {
+                    pubnub.DetailedHistory<string> (channel.Trim (), 100, DisplayReturnMessage, DisplayErrorMessage);
+                });
             }
         }
 
@@ -338,23 +359,31 @@ namespace PubnubMessagingExample
         public void Unsub ()
         {
             Display ("Running unsubscribe");
-            pubnub.Unsubscribe<string> (Channel, DisplayReturnMessage, 
-                DisplayConnectStatusMessage, DisplayConnectStatusMessage, 
-                DisplayErrorMessage);
+            Channel = newChannels.Text;
+            InvokeInBackground (() => {
+                pubnub.Unsubscribe<string> (Channel, DisplayReturnMessage, 
+                    DisplayConnectStatusMessage, DisplayConnectStatusMessage, 
+                    DisplayErrorMessage);
+            });
         }
 
         public void UnsubPresence ()
         {
             Display ("Running presence-unsubscribe");
-            pubnub.PresenceUnsubscribe<string> (Channel, DisplayReturnMessage, 
-                DisplayConnectStatusMessage, DisplayConnectStatusMessage, 
-                DisplayErrorMessage);
+            Channel = newChannels.Text;
+            InvokeInBackground (() => {
+                pubnub.PresenceUnsubscribe<string> (Channel, DisplayReturnMessage, 
+                    DisplayConnectStatusMessage, DisplayConnectStatusMessage, 
+                    DisplayErrorMessage);
+            });
         }
 
         public void GetTime ()
         {
             Display ("Running Time");
-            pubnub.Time<string> (DisplayReturnMessage, DisplayErrorMessage);
+            InvokeInBackground (() => {
+                pubnub.Time<string> (DisplayReturnMessage, DisplayErrorMessage);
+            });
         }
 
         public void SubscribeGrant ()
@@ -525,31 +554,48 @@ namespace PubnubMessagingExample
                 },
                 new Section ("") {
                     new StyledStringElement (buttonTitle, () => {
+                        string entryText1Val = entryText1.Value;
+                        string entryText2Val = entryText2.Value;
+
                         if (cds == CommonDialogStates.SetUserStateKeyPair) {
+                            string entryText3Val = entryText3.Value;
                             Display ("Setting user state");
                             int valueInt;
                             double valueDouble;
-                            if (Int32.TryParse (entryText3.Value, out valueInt)) {
-                                pubnub.SetUserState<string> (entryText1.Value, new KeyValuePair<string, object> (entryText2.Value, valueInt), DisplayReturnMessage, DisplayErrorMessage);
-                            } else if (Double.TryParse (entryText3.Value, out valueDouble)) {
-                                pubnub.SetUserState<string> (entryText1.Value, new KeyValuePair<string, object> (entryText2.Value, valueDouble), DisplayReturnMessage, DisplayErrorMessage);
+                            if (Int32.TryParse (entryText3Val, out valueInt)) {
+                                InvokeInBackground(() => {
+                                    pubnub.SetUserState<string> (entryText1Val, new KeyValuePair<string, object> (entryText2Val, valueInt), DisplayReturnMessage, DisplayErrorMessage);
+                                });
+                            } else if (Double.TryParse (entryText3Val, out valueDouble)) {
+                                InvokeInBackground(() => {
+                                    pubnub.SetUserState<string> (entryText1Val, new KeyValuePair<string, object> (entryText2Val, valueDouble), DisplayReturnMessage, DisplayErrorMessage);
+                                });
                             } else {
-                                pubnub.SetUserState<string> (entryText1.Value, new KeyValuePair<string, object> (entryText2.Value, entryText3.Value), DisplayReturnMessage, DisplayErrorMessage);
+                                InvokeInBackground(() => {
+                                    pubnub.SetUserState<string> (entryText1Val, new KeyValuePair<string, object> (entryText2Val, entryText3Val), DisplayReturnMessage, DisplayErrorMessage);
+                                });
                             }
                         } else if (cds == CommonDialogStates.DeleteUserState) {
-                            pubnub.SetUserState<string> (entryText1.Value, new KeyValuePair<string, object> (entryText2.Value, null), DisplayReturnMessage, DisplayErrorMessage);
+                            InvokeInBackground(() => {
+                                pubnub.SetUserState<string> (entryText1Val, new KeyValuePair<string, object> (entryText2Val, null), DisplayReturnMessage, DisplayErrorMessage);
+                            });
                         } else if (cds == CommonDialogStates.SetUserStateJson) {
                             Display ("Setting user state");
+                            string entryText3Val = entryText3.Value;
                             string jsonUserState = "";
-                            if (string.IsNullOrEmpty (entryText2.Value)) {
+                            if (string.IsNullOrEmpty (entryText2Val)) {
                                 //jsonUserState = pubnub.GetUserState (entryText1.Value);
                             } else {
-                                jsonUserState = entryText2.Value;
+                                jsonUserState = entryText2Val;
                             }
-                            pubnub.SetUserState<string> (entryText1.Value, entryText3.Value, jsonUserState, DisplayReturnMessage, DisplayErrorMessage);
+                            InvokeInBackground(() => {
+                                pubnub.SetUserState<string> (entryText1Val, entryText3Val, jsonUserState, DisplayReturnMessage, DisplayErrorMessage);
+                            });
                         } else if (cds == CommonDialogStates.GetUserState) {
                             Display ("Running get user state");
-                            pubnub.GetUserState<string> (entryText1.Value, entryText2.Value, DisplayReturnMessage, DisplayErrorMessage);
+                            InvokeInBackground(() => {
+                                pubnub.GetUserState<string> (entryText1Val, entryText2Val, DisplayReturnMessage, DisplayErrorMessage);
+                            });
                         }
 
                         AppDelegate.navigation.PopViewControllerAnimated (true);
@@ -605,41 +651,60 @@ namespace PubnubMessagingExample
                 if (e.ButtonIndex == 0) {
                     if (alert.GetTextField (0) != null) {
                         string input = alert.GetTextField (0).Text;
+                        Channel = newChannels.Text;
                         if (cds == CommonDialogStates.Auth) {
-                            pubnub.AuthenticationKey = input;
+                            InvokeInBackground(() => {
+                                pubnub.AuthenticationKey = input;
+                            });
                             Display ("Auth Key Set");
                         } else if (cds == CommonDialogStates.AuditSubscribe) {
                             Display ("Running Subscribe Audit");
-                            pubnub.AuditAccess<string> (Channel, input, DisplayReturnMessage, DisplayErrorMessage);
+                            InvokeInBackground(() => {
+                                pubnub.AuditAccess<string> (Channel, input, DisplayReturnMessage, DisplayErrorMessage);
+                            });
                         } else if (cds == CommonDialogStates.AuditPresence) {
                             Display ("Running Presence Audit");
-                            pubnub.AuditPresenceAccess<string> (Channel, input, DisplayReturnMessage, DisplayErrorMessage);
+                            InvokeInBackground(() => {
+                                pubnub.AuditPresenceAccess<string> (Channel, input, DisplayReturnMessage, DisplayErrorMessage);
+                            });
                         } else if (cds == CommonDialogStates.RevokePresence) {
                             Display ("Running Presence Revoke");
-                            pubnub.GrantPresenceAccess<string> (Channel, input, false, false, DisplayReturnMessage, DisplayErrorMessage);
+                            InvokeInBackground(() => {
+                                pubnub.GrantPresenceAccess<string> (Channel, input, false, false, DisplayReturnMessage, DisplayErrorMessage);
+                            });
                         } else if (cds == CommonDialogStates.RevokeSubscribe) {
                             Display ("Running Subscribe Revoke");
-                            pubnub.GrantAccess<string> (Channel, input, false, false, DisplayReturnMessage, DisplayErrorMessage);
+                            InvokeInBackground(() => {
+                                pubnub.GrantAccess<string> (Channel, input, false, false, DisplayReturnMessage, DisplayErrorMessage);
+                            });
                         } else if ((cds == CommonDialogStates.PresenceHeartbeat) || (cds == CommonDialogStates.PresenceHeartbeatInterval)) {
                             int iVal;
                             Int32.TryParse (input, out iVal);
                             if (iVal != 0) {
                                 if (isHeartbeatInterval) {
-                                    pubnub.PresenceHeartbeatInterval = iVal;
+                                    InvokeInBackground(() => {
+                                        pubnub.PresenceHeartbeatInterval = iVal;
+                                    });
                                     Display (string.Format ("Presence Heartbeat Interval set to {0}", pubnub.PresenceHeartbeatInterval));
                                 } else {
-                                    pubnub.PresenceHeartbeat = iVal;
+                                    InvokeInBackground(() => {
+                                        pubnub.PresenceHeartbeat = iVal;
+                                    });
                                     Display (string.Format ("Presence Heartbeat set to {0}", pubnub.PresenceHeartbeat));
                                 }
                             } else {
                                 Display (string.Format ("Value not numeric"));
                             }
                         } else if (cds == CommonDialogStates.ChangeUuid) {
-                            pubnub.ChangeUUID (input);
+                            InvokeInBackground(() => {
+                                pubnub.ChangeUUID (input);
+                            });
                             Display (string.Format ("UUID set to {0}", pubnub.SessionUUID));
                         } else if (cds == CommonDialogStates.WhereNow) {
                             Display ("Running where now");
-                            pubnub.WhereNow<string> (input, DisplayReturnMessage, DisplayErrorMessage);
+                            InvokeInBackground(() => {
+                                pubnub.WhereNow<string> (input, DisplayReturnMessage, DisplayErrorMessage);
+                            });
                         }
                     }
                 }           
@@ -725,32 +790,47 @@ namespace PubnubMessagingExample
                 },
                 new Section ("") {
                     new StyledStringElement (buttonTitle, () => {
+                        bool be1Val = be1.Value;
+                        bool be2Val = be2.Value;
+
+                        Channel = newChannels.Text;
                         if ((cds == CommonDialogStates.PresenceGrant) || (cds == CommonDialogStates.SubscribeGrant)) {
+                            string entryTextVal = entryText.Value;
+                            string entryText2Val = entryText2.Value;
                             int iTtl;
-                            Int32.TryParse (entryText.Value, out iTtl);
+                            Int32.TryParse (entryTextVal, out iTtl);
                             if (iTtl == 0) {
                                 iTtl = 1440;
-                                entryText.Value = "1440";
+                                entryTextVal = "1440";
                             }
                             if (isPresenceGrant) {
                                 Display ("Running Presence Grant");
-                                pubnub.GrantPresenceAccess<string> (Channel, entryText2.Value, be1.Value, be2.Value, iTtl, DisplayReturnMessage, DisplayErrorMessage);
+                                InvokeInBackground(() => {
+                                    pubnub.GrantPresenceAccess<string> (Channel, entryText2Val, be1Val, be2Val, iTtl, DisplayReturnMessage, DisplayErrorMessage);
+                                });
                             } else {
                                 Display ("Running Subscribe Grant");
-                                pubnub.GrantAccess<string> (Channel, entryText2.Value, be1.Value, be2.Value, iTtl, DisplayReturnMessage, DisplayErrorMessage);
+                                InvokeInBackground(() => {
+                                    pubnub.GrantAccess<string> (Channel, entryText2Val, be1Val, be2Val, iTtl, DisplayReturnMessage, DisplayErrorMessage);
+                                });
                             }
                         } else if (cds == CommonDialogStates.HereNow) {
                             Display ("Running Here Now");
-                            if(entryText.Value.Trim() != ""){
-                                string[] channels = entryText.Value.Split (',');//Channel.Split (',');
+                            string entryTextVal = entryText.Value;
+                            if(entryTextVal.Trim() != ""){
+                                string[] channels = entryTextVal.Split (',');//Channel.Split (',');
                                 foreach (string channel in channels) {
-                                    pubnub.HereNow<string> (channel.Trim (), be1.Value, be2.Value, DisplayReturnMessage, DisplayErrorMessage);
+                                    InvokeInBackground(() => {
+                                        pubnub.HereNow<string> (channel.Trim (), be1Val, be2Val, DisplayReturnMessage, DisplayErrorMessage);
+                                    });
                                 }
                             } else {
                                 Display ("Channel empty");
                             }
                         } else if (cds == CommonDialogStates.GlobalHereNow) {
-                            pubnub.GlobalHereNow<string> (be1.Value, be2.Value, DisplayReturnMessage, DisplayErrorMessage);
+                            InvokeInBackground(() => {
+                                pubnub.GlobalHereNow<string> (be1Val, be2Val, DisplayReturnMessage, DisplayErrorMessage);
+                            });
                         }
 
                         AppDelegate.navigation.PopViewControllerAnimated (true);

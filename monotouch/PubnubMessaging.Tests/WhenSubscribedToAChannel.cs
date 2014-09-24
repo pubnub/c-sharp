@@ -228,6 +228,133 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public void TestForComplexMessageAsObject ()
+        {
+            Pubnub pubnub = new Pubnub (
+                Common.PublishKey,
+                Common.SubscribeKey,
+                "",
+                "",
+                false);
+            string channel = "hello_world";
+
+            Common common = new Common ();
+            common.DeliveryStatus = false;
+            common.Response = null;
+
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenSubscribedToAChannel", "SubscribeComplexMessageAsObject");
+
+            SubscribePublishAndParseComplexObject (pubnub, common, channel);
+        }
+
+        [Test]
+        public void TestForComplexMessageSSLAsObject ()
+        {
+            Pubnub pubnub = new Pubnub (
+                Common.PublishKey,
+                Common.SubscribeKey,
+                "",
+                "",
+                true);
+            string channel = "hello_world";
+
+            Common common = new Common ();
+            common.DeliveryStatus = false;
+            common.Response = null;
+
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenSubscribedToAChannel", "SubscribeComplexMessageAsObjectWithSSL");
+
+            SubscribePublishAndParseComplexObject (pubnub, common, channel);
+        }
+
+        void SubscribePublishAndParseComplexObject (Pubnub pubnub, Common common, string channel)
+        {
+            CustomClass message = new CustomClass ();
+
+            Random r = new Random ();
+            channel = "hello_world_sub" + r.Next (1000);
+
+            pubnub.Subscribe<object> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
+            Thread.Sleep (5000);
+
+            pubnub.Publish (channel, (object)message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
+
+            common.WaitForResponse ();
+
+            if (common.Response != null) {
+                List<object> lst = common.Response as List<object>;
+                Console.WriteLine (lst [0].ToString ());
+                Console.WriteLine (lst [1].ToString ());
+                if (lst.Count == 3)
+                    Console.WriteLine (lst [2].ToString ());
+                if (lst.Count == 4)
+                    Console.WriteLine (lst [3].ToString ());
+                Console.WriteLine ();
+
+
+                //object[] fields = Common.Deserialize<object[]> (common.Response.ToString ());
+
+                if (lst [0] != null) {
+                    //var myObjectArray = (from item in lst [0]
+                    //  select item as object).ToArray ();
+
+                    CustomClass cc = new CustomClass ();
+
+                    //If the custom class is serialized with jsonfx the response is received as a dictionary and
+                    //on deserialization with Newtonsoft.Json we get an error.
+                    //As a work around we parse the dictionary object.   
+                    var dict = lst [0] as IDictionary;
+
+                    if ((dict != null) && (dict.Count > 1)) {
+                        cc.foo = (string)dict ["foo"];
+                        cc.bar = (int[])dict ["bar"];
+                    } else {
+                        #if (USE_JSONFX)
+                        Type valueType = lst [0].GetType ();
+                        var expectedType = typeof(System.Dynamic.ExpandoObject);
+                        if (expectedType.IsAssignableFrom (valueType)) {
+                        dynamic x = lst [0];
+                        cc.foo = x.foo;
+                        cc.bar = x.bar;
+                        #else
+                        Type valueType = lst [0].GetType ();
+                        var expectedType = typeof(Newtonsoft.Json.Linq.JObject);
+                        if(expectedType.IsAssignableFrom (valueType)) {
+                            //dynamic x = lst [0];
+                            var x = lst [0] as Newtonsoft.Json.Linq.JToken;
+                            cc.foo = (string)x["foo"];
+                            int iCount=0;
+                            foreach (Newtonsoft.Json.Linq.JToken arr in x["bar"]){
+                                cc.bar[iCount] = (int)arr;
+                                iCount++;
+                            }
+                        #endif
+                        } else {
+                            cc = Common.Deserialize<CustomClass> (lst [0].ToString());
+                        }
+                    }  
+                    if (cc.bar.SequenceEqual (message.bar) && cc.foo.Equals (message.foo)) {
+                        Assert.True (true, "Complex message test successful");
+                    } else {
+                        Assert.Fail ("Complex message test not successful");
+                    }
+                } else {
+                    Assert.Fail ("No response1");
+                }
+            } else {
+                Assert.Fail ("No response");
+            }
+            common.DeliveryStatus = false;
+            common.Response = null;
+
+            pubnub.Unsubscribe<string> (channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+
+            common.WaitForResponse (20);
+
+            pubnub.EndPendingRequests ();
+        }
+
+        [Test]
         public void ThenSubscribeShouldReturnConnectStatus ()
         {
             Pubnub pubnub = new Pubnub (Common.PublishKey,

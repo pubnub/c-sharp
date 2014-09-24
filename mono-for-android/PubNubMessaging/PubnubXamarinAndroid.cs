@@ -1,5 +1,5 @@
-//ver3.6
-//Build Date: Jul 28, 2014
+//ver3.6.1
+//Build Date: Sep 18, 2014
 //#define USE_JSONFX
 using System;
 using System.Text;
@@ -22,6 +22,7 @@ namespace PubNubMessaging.Core
 
         #region "Constants and Globals"
 
+        // 0: off, 1: error, 2: info, 3: verbose, 4: warning
         const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Info;
         const PubnubErrorFilter.Level errorLevel = PubnubErrorFilter.Level.Info;
         protected bool pubnubEnableProxyConfig = true;
@@ -86,14 +87,17 @@ namespace PubNubMessaging.Core
         protected override void ProcessResponseCallbackWebExceptionHandler<T> (WebException webEx, RequestState<T> asynchRequestState, string channel)
         {
             bool reconnect = false;
-            LoggingMethod.WriteToLog (string.Format ("DateTime {0}, WebException: {1}", DateTime.Now.ToString (), webEx.ToString ()), LoggingMethod.LevelError);
+            if (webEx.ToString ().Contains ("Aborted")) {
+                LoggingMethod.WriteToLog (string.Format ("DateTime {0}, WebException: {1}", DateTime.Now.ToString (), webEx.ToString ()), LoggingMethod.LevelInfo);
+            } else {
+                LoggingMethod.WriteToLog (string.Format ("DateTime {0}, WebException: {1}", DateTime.Now.ToString (), webEx.ToString ()), LoggingMethod.LevelError);
+            }
             if (asynchRequestState != null) {
                 if (asynchRequestState.Response != null)
                     asynchRequestState.Response.Close ();
                 if (asynchRequestState.Request != null)
                     TerminatePendingWebRequest (asynchRequestState);
             }
-            //#elif (!SILVERLIGHT)
             reconnect = HandleWebException (webEx, asynchRequestState, channel);
 
             UrlRequestCommonExceptionHandler<T> (asynchRequestState.Type, asynchRequestState.Channels, asynchRequestState.Timeout,
@@ -378,12 +382,16 @@ namespace PubNubMessaging.Core
                         string multiChannel = (asynchRequestState.Channels != null) ? string.Join (",", asynchRequestState.Channels) : "";
                         LoggingMethod.WriteToLog (string.Format ("DateTime {0} {1} channel = {2} _urlRequest - Internet connection retry {3} of {4}", DateTime.Now.ToString (), asynchRequestState.Type, multiChannel, base.channelInternetRetry [channel], base.NetworkCheckMaxRetries), LoggingMethod.LevelInfo);
                         string message = string.Format ("Detected internet connection problem. Retrying connection attempt {0} of {1}", base.channelInternetRetry [channel], base.NetworkCheckMaxRetries);
-                        CallErrorCallback (PubnubErrorSeverity.Warn, PubnubMessageSource.Client, multiChannel, asynchRequestState.ErrorCallback, message, PubnubErrorCode.NoInternetRetryConnect, null, null);
+                        CallErrorCallback (PubnubErrorSeverity.Info, PubnubMessageSource.Client, multiChannel, asynchRequestState.ErrorCallback, message, PubnubErrorCode.NoInternetRetryConnect, null, null);
                     }
                     base.channelInternetStatus [channel] = false;
                 }
             }
-            Thread.Sleep (base.NetworkCheckRetryInterval * 1000);
+            if (webEx.ToString ().Contains ("Aborted")) {
+                Thread.Sleep (1 * 1000);
+            } else {
+                Thread.Sleep (base.NetworkCheckRetryInterval * 1000);
+            }
             return reconnect;
         }
 
@@ -424,7 +432,7 @@ namespace PubNubMessaging.Core
 
         #region "Overridden methods"
 
-        protected override string EncodeUricomponent (string s, ResponseType type, bool ignoreComma)
+        protected override string EncodeUricomponent (string s, ResponseType type, bool ignoreComma, bool ignorePercent2fEncode)
         {
             string encodedUri = "";
             StringBuilder o = new StringBuilder ();
@@ -448,7 +456,9 @@ namespace PubNubMessaging.Core
             }
             encodedUri = o.ToString ();
             if (type == ResponseType.Here_Now || type == ResponseType.DetailedHistory || type == ResponseType.Leave) {
-                encodedUri = encodedUri.Replace ("%2F", "%252F");
+                if (!ignorePercent2fEncode) {
+                    encodedUri = encodedUri.Replace ("%2F", "%252F");
+                }
             }
 
             return encodedUri;
@@ -456,6 +466,10 @@ namespace PubNubMessaging.Core
 
         protected override sealed void Init (string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
         {
+            base.Version = "PubNub-CSharp-Xamarin.Android/3.6.1";
+            LoggingMethod.LogLevel = pubnubLogLevel;
+            base.PubnubLogLevel = pubnubLogLevel;
+            base.PubnubErrorLevel = errorLevel;
             #if (USE_JSONFX) || (USE_JSONFX_UNITY)
             LoggingMethod.WriteToLog ("Using USE_JSONFX", LoggingMethod.LevelInfo);
             this.JsonPluggableLibrary = new JsonFXDotNet ();
@@ -473,10 +487,7 @@ namespace PubNubMessaging.Core
             base.JsonPluggableLibrary = new NewtonsoftJsonDotNet ();
             #endif
 
-            LoggingMethod.WriteToLog ("Ver 3.6, Build Date: Jul 28, 2014", LoggingMethod.LevelInfo);
-            LoggingMethod.LogLevel = pubnubLogLevel;
-            base.PubnubLogLevel = pubnubLogLevel;
-            base.PubnubErrorLevel = errorLevel;
+            LoggingMethod.WriteToLog ("Ver 3.6.1, Build Date: Sep 18, 2014", LoggingMethod.LevelInfo);
 
             base.publishKey = publishKey;
             base.secretKey = secretKey;
@@ -527,6 +538,10 @@ namespace PubNubMessaging.Core
 
         protected override void TimerWhenOverrideTcpKeepAlive<T> (Uri requestUri, RequestState<T> pubnubRequestState)
         {
+            if (base.localClientHeartBeatTimer != null) {
+                base.localClientHeartBeatTimer.Dispose ();
+                base.localClientHeartBeatTimer = null;
+            }
             base.localClientHeartBeatTimer = new Timer (new TimerCallback (OnPubnubLocalClientHeartBeatTimeoutCallback<T>), pubnubRequestState, 0,
                 base.LocalClientHeartbeatInterval * 1000);
 
@@ -736,7 +751,7 @@ namespace PubNubMessaging.Core
             SslStream sslStream = new SslStream (netStream, true, Validator, null);
 #elif(UNITY_ANDROID|| MONOTOUCH || __IOS__)
             ServicePointManager.ServerCertificateValidationCallback = ValidatorUnity;
-            slStream sslStream = new SslStream(netStream, true, ValidatorUnity, null);
+            SslStream sslStream = new SslStream(netStream, true, ValidatorUnity, null);
 #else
             SslStream sslStream = new SslStream (netStream);
 #endif
@@ -1047,7 +1062,7 @@ namespace PubNubMessaging.Core
         protected HttpWebRequest SetUserAgent (HttpWebRequest req, bool keepAliveRequest, OperatingSystem userOS)
         {
             req.KeepAlive = keepAliveRequest;
-            req.UserAgent = string.Format ("ua_string=({0}) PubNub-csharp/3.6", userOS.VersionString);
+            req.UserAgent = string.Format ("ua_string=({0}) PubNub-csharp-Xamarin.Android/3.6.1", userOS.VersionString);
             return req;
         }
 
