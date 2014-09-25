@@ -34,6 +34,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
             if (PubnubCommon.PAMEnabled)
             {
+                auditManualEvent = new ManualResetEvent(false);
                 pubnub.AuditAccess<string>(AccessToSubKeyLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
@@ -66,6 +67,7 @@ namespace PubNubMessaging.Tests
 
             if (PubnubCommon.PAMEnabled)
             {
+                auditManualEvent = new ManualResetEvent(false);
                 pubnub.AuditAccess<string>(channel, AccessToChannelLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 

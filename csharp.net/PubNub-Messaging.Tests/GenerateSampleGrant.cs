@@ -29,6 +29,7 @@ namespace PubNubMessaging.Tests
                 Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
                 for (int index = 0; index < sampleCount; index++)
                 {
+                    grantManualEvent = new ManualResetEvent(false);
                     string channelName = string.Format("csharp-pam-ul-channel-{0}", index);
                     pubnub.AuthenticationKey = string.Format("csharp-pam-authkey-0-{0},csharp-pam-authkey-1-{1}", index, index);
                     pubnub.GrantAccess<string>(channelName, true, true, UserCallbackForSampleGrantAtUserLevel, ErrorCallbackForSampleGrantAtUserLevel);
@@ -53,6 +54,7 @@ namespace PubNubMessaging.Tests
                 Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
                 for (int index = 0; index < sampleCount; index++)
                 {
+                    grantManualEvent = new ManualResetEvent(false);
                     string channelName = string.Format("csharp-pam-cl-channel-{0}", index);
                     pubnub.GrantAccess<string>(channelName, true, true, UserCallbackForSampleGrantAtChannelLevel, ErrorCallbackForSampleGrantAtChannelLevel);
                     grantManualEvent.WaitOne();
