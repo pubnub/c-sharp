@@ -421,6 +421,18 @@ namespace PubNubMessaging.Core
                         Console.WriteLine(string.Format("Channel = {0}",channel));
                         Console.ResetColor();
 
+                        Console.WriteLine("Store In History? Enter Y for Yes or N for No. To accept default(Y), just press ENTER");
+                        string storeInHistory = Console.ReadLine();
+                        bool store = true;
+                        if (storeInHistory.ToLower() == "n")
+                        {
+                            store = false;
+                        }
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Store In History = {0}", storeInHistory));
+                        Console.ResetColor();
+
                         /* TO TEST SMALL TEXT PUBLISH ONLY */
                         Console.WriteLine("Enter the message for publish and press ENTER key to submit");
                         //string publishMsg = Console.ReadLine();
@@ -446,11 +458,11 @@ namespace PubNubMessaging.Core
                         int intData;
                         if (int.TryParse(publishMsg, out intData)) //capture numeric data
                         {
-                            pubnub.Publish<string>(channel, intData, DisplayReturnMessage, DisplayErrorMessage);
+                            pubnub.Publish<string>(channel, intData, store, DisplayReturnMessage, DisplayErrorMessage);
                         }
                         else if (double.TryParse(publishMsg, out doubleData)) //capture numeric data
                         {
-                            pubnub.Publish<string>(channel, doubleData, DisplayReturnMessage, DisplayErrorMessage);
+                            pubnub.Publish<string>(channel, doubleData, store, DisplayReturnMessage, DisplayErrorMessage);
                         }
                         else
                         {
@@ -460,20 +472,20 @@ namespace PubNubMessaging.Core
                                 string strMsg = publishMsg.Substring(1, publishMsg.Length - 2);
                                 if (int.TryParse(strMsg, out intData))
                                 {
-                                    pubnub.Publish<string>(channel, strMsg, DisplayReturnMessage, DisplayErrorMessage);
+                                    pubnub.Publish<string>(channel, strMsg, store, DisplayReturnMessage, DisplayErrorMessage);
                                 }
                                 else if (double.TryParse(strMsg, out doubleData))
                                 {
-                                    pubnub.Publish<string>(channel, strMsg, DisplayReturnMessage, DisplayErrorMessage);
+                                    pubnub.Publish<string>(channel, strMsg, store, DisplayReturnMessage, DisplayErrorMessage);
                                 }
                                 else
                                 {
-                                    pubnub.Publish<string>(channel, publishMsg, DisplayReturnMessage, DisplayErrorMessage);
+                                    pubnub.Publish<string>(channel, publishMsg, store, DisplayReturnMessage, DisplayErrorMessage);
                                 }
                             }
                             else
                             {
-                                pubnub.Publish<string>(channel, publishMsg, DisplayReturnMessage, DisplayErrorMessage);
+                                pubnub.Publish<string>(channel, publishMsg, store, DisplayReturnMessage, DisplayErrorMessage);
                             }
                         }
                         break;
