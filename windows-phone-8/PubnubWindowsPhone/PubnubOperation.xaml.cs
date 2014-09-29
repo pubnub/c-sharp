@@ -192,10 +192,10 @@ namespace PubnubWindowsPhone
             StackPanel publishStackPanel = new StackPanel();
             publishStackPanel.Background = new SolidColorBrush(Colors.Blue);
             publishStackPanel.Width = 300;
-            publishStackPanel.Height = 300;
+            publishStackPanel.Height = 400;
 
             publishPopup = new Popup();
-            publishPopup.Height = 300;
+            publishPopup.Height = 400;
             publishPopup.Width = 300;
             publishPopup.VerticalOffset = 100;
             publishPopup.HorizontalOffset = 100;
@@ -209,7 +209,8 @@ namespace PubnubWindowsPhone
             {
                 publishPopup.IsOpen = false;
                 string publishedMessage = control.txtPublish.Text;
-                pubnub.Publish<string>(channel, publishedMessage, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                bool storeInHistory = control.chkStoreInHistory.IsChecked.Value;
+                pubnub.Publish<string>(channel, publishedMessage, storeInHistory, PubnubCallbackResult, PubnubDisplayErrorMessage);
                 TextBlock textBlock = new TextBlock();
                 textBlock.Text = string.Format("Publishing {0}\n", publishedMessage);
                 messageStackPanel.Children.Add(textBlock);
