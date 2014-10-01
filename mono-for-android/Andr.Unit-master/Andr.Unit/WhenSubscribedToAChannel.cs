@@ -179,7 +179,7 @@ namespace PubNubMessaging.Tests
             CustomClass message = new CustomClass ();
 
             pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
-            Thread.Sleep (5000);
+            Thread.Sleep (2000);
 
             pubnub.Publish (channel, (object)message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
 
@@ -192,6 +192,109 @@ namespace PubNubMessaging.Tests
                 if (fields [0] != null) {
                     var myObjectArray = (from item in fields
                                                         select item as object).ToArray ();
+
+                    CustomClass cc = new CustomClass ();
+
+                    //If the custom class is serialized with jsonfx the response is received as a dictionary and
+                    //on deserialization with Newtonsoft.Json we get an error.
+                    //As a work around we parse the dictionary object.   
+                    var dict = myObjectArray [0] as IDictionary;
+
+                    if ((dict != null) && (dict.Count > 1)) {
+                        cc.foo = (string)dict ["foo"];
+                        cc.bar = (int[])dict ["bar"];
+                    } else {
+                        Type valueType = myObjectArray [0].GetType ();
+                        var expectedType = typeof(System.Dynamic.ExpandoObject);
+                        if (expectedType.IsAssignableFrom (valueType)) {
+                            dynamic x = myObjectArray [0];
+                            cc.foo = x.foo;
+                            cc.bar = x.bar;
+                        } else {
+                            cc = Common.Deserialize<CustomClass> (myObjectArray [0].ToString ());
+                        }
+                    }  
+                    if (cc.bar.SequenceEqual (message.bar) && cc.foo.Equals (message.foo)) {
+                        Assert.True (true, "Complex message test successful");
+                    } else {
+                        Assert.Fail ("Complex message test not successful");
+                    }
+                } else {
+                    Assert.Fail ("No response");
+                }
+            } else {
+                Assert.Fail ("No response");
+            }
+            common.DeliveryStatus = false;
+            common.Response = null;
+
+            pubnub.Unsubscribe<string> (channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+
+            common.WaitForResponse (20);
+
+            pubnub.EndPendingRequests ();
+        }
+
+        [Test]
+        public void TestForComplexMessageAsObject ()
+        {
+            Pubnub pubnub = new Pubnub (
+                Common.PublishKey,
+                Common.SubscribeKey,
+                "",
+                "",
+                false);
+            string channel = "hello_world";
+
+            Common common = new Common ();
+            common.DeliveryStatus = false;
+            common.Response = null;
+
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenSubscribedToAChannel", "SubscribeComplexMessageAsObject");
+
+            SubscribePublishAndParseComplexObject (pubnub, common, channel);
+        }
+
+        [Test]
+        public void TestForComplexMessageSSLAsObject ()
+        {
+            Pubnub pubnub = new Pubnub (
+                Common.PublishKey,
+                Common.SubscribeKey,
+                "",
+                "",
+                true);
+            string channel = "hello_world";
+
+            Common common = new Common ();
+            common.DeliveryStatus = false;
+            common.Response = null;
+
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenSubscribedToAChannel", "SubscribeComplexMessageAsObjectWithSSL");
+
+            SubscribePublishAndParseComplexObject (pubnub, common, channel);
+        }
+
+        void SubscribePublishAndParseComplexObject (Pubnub pubnub, Common common, string channel)
+        {
+            Random r = new Random ();
+            channel = "hello_world_sub" + r.Next (1000);
+            CustomClass message = new CustomClass ();
+
+            pubnub.Subscribe<object> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
+            Thread.Sleep (2000);
+
+            pubnub.Publish (channel, (object)message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
+
+            common.WaitForResponse ();
+
+            if (common.Response != null) {
+                Console.WriteLine ("response:" + common.Response.ToString ());
+                object[] fields = Common.Deserialize<object[]> (common.Response.ToString ());
+
+                if (fields [0] != null) {
+                    var myObjectArray = (from item in fields
+                        select item as object).ToArray ();
 
                     CustomClass cc = new CustomClass ();
 
@@ -353,7 +456,7 @@ namespace PubNubMessaging.Tests
             string channel = "testChannel";
 
             pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
-            Thread.Sleep (1000);
+            Thread.Sleep (500);
            
             int iPassCount = 0;
             for (int i = 0; i < 10; i++) {

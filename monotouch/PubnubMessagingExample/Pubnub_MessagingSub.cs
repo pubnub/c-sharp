@@ -135,6 +135,7 @@ namespace PubnubMessagingExample
 
         public enum CommonDialogStates
         {
+            Publish,
             HereNow,
             Auth,
             PresenceHeartbeat,
@@ -288,7 +289,7 @@ namespace PubnubMessagingExample
             });
         }
 
-        public void Publish ()
+        /*public void Publish ()
         {
             UIAlertView alert = new UIAlertView ();
             alert.AlertViewStyle = UIAlertViewStyle.PlainTextInput;
@@ -328,7 +329,12 @@ namespace PubnubMessagingExample
                     });
                 }
             }
+        }*/
+
+        public void Publish (){
+            ShowAlertType2 (CommonDialogStates.Publish);
         }
+
 
         public void Presence ()
         {
@@ -718,6 +724,7 @@ namespace PubnubMessagingExample
             bool showEntryText = true;
             bool showEntryText2 = false;
             bool boolval1 = false;
+            bool showBool = true;
             UIKeyboardType keyboardType = UIKeyboardType.Default;
 
             string strHead = "", elementText1 = "", elementText2 = "", 
@@ -761,10 +768,25 @@ namespace PubnubMessagingExample
                 buttonTitle = "Global Here Now";
                 showEntryText = false;
                 boolval1 = true;
+            } else if (cds == CommonDialogStates.Publish) {
+                elementText1 = "Store in history";
+                elementText4 = "Channel";
+                elementSubText2 = "Enter channel name";
+                elementText3 = "Message";
+                elementSubText = "Enter message";
+                strHead = "Publish";
+                buttonTitle = "Publish";
+                showEntryText = true;
+                showEntryText2 = true;
+                boolval1 = true;
+                showBool = false;
             }
 
             BooleanElement be1 = new BooleanElement (elementText1, boolval1);
-            BooleanElement be2 = new BooleanElement (elementText2, false);
+            BooleanElement be2 = null;
+            if (showBool) {
+                be2 = new BooleanElement (elementText2, false);
+            }
 
             EntryElement entryText = null;
             EntryElement entryText2 = null;
@@ -791,12 +813,12 @@ namespace PubnubMessagingExample
                 new Section ("") {
                     new StyledStringElement (buttonTitle, () => {
                         bool be1Val = be1.Value;
-                        bool be2Val = be2.Value;
 
                         Channel = newChannels.Text;
                         if ((cds == CommonDialogStates.PresenceGrant) || (cds == CommonDialogStates.SubscribeGrant)) {
                             string entryTextVal = entryText.Value;
                             string entryText2Val = entryText2.Value;
+                            bool be2Val = be2.Value;
                             int iTtl;
                             Int32.TryParse (entryTextVal, out iTtl);
                             if (iTtl == 0) {
@@ -817,6 +839,7 @@ namespace PubnubMessagingExample
                         } else if (cds == CommonDialogStates.HereNow) {
                             Display ("Running Here Now");
                             string entryTextVal = entryText.Value;
+                            bool be2Val = be2.Value;
                             if(entryTextVal.Trim() != ""){
                                 string[] channels = entryTextVal.Split (',');//Channel.Split (',');
                                 foreach (string channel in channels) {
@@ -828,9 +851,22 @@ namespace PubnubMessagingExample
                                 Display ("Channel empty");
                             }
                         } else if (cds == CommonDialogStates.GlobalHereNow) {
+                            bool be2Val = be2.Value;
                             InvokeInBackground(() => {
                                 pubnub.GlobalHereNow<string> (be1Val, be2Val, DisplayReturnMessage, DisplayErrorMessage);
                             });
+                        } else if (cds == CommonDialogStates.Publish) {
+                            Display ("Running Publish");
+                            string entryTextVal = entryText.Value;
+                            string entryText2Val = entryText2.Value;
+
+                            string[] channels = entryText2Val.Split (',');
+
+                            foreach (string channel in channels) {
+                                InvokeInBackground(() => {
+                                    pubnub.Publish<string> (channel.Trim (), entryTextVal, be1Val, DisplayReturnMessage, DisplayErrorMessage);
+                                });
+                            }
                         }
 
                         AppDelegate.navigation.PopViewControllerAnimated (true);
@@ -871,20 +907,17 @@ namespace PubnubMessagingExample
             };
             ThreadPool.QueueUserWorkItem (delegate {
                 
-                System.Threading.Thread.Sleep (2000);
+                System.Threading.Thread.Sleep (500);
                 
                 AppDelegate.navigation.BeginInvokeOnMainThread (delegate {
                     if (secOutput.Count > 20) {
-                        secOutput.RemoveRange (0, 10);
+                        secOutput.RemoveRange (20, secOutput.Count-1);
                     }
                     if (secOutput.Count > 0) {
-                        secOutput.Insert (secOutput.Count, sme);
+                        secOutput.Insert (0, sme);
                     } else {
                         secOutput.Add (sme);
-                    }
-                    this.TableView.ReloadData ();
-                    var lastIndexPath = this.root.Last () [this.root.Last ().Count - 1].IndexPath;
-                    this.TableView.ScrollToRow (lastIndexPath, UITableViewScrollPosition.Middle, true);    
+                    }                
                 });
             });
         }

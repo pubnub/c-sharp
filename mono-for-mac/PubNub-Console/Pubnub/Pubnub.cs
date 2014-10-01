@@ -19,14 +19,24 @@ namespace PubNubMessaging.Core
             pubnub.Subscribe (channel, userCallback, connectCallback, errorCallback);
         }
 
-        public bool Publish (string channel, object message, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        public bool Publish(string channel, object message, Action<object> userCallback, Action<PubnubClientError> errorCallback)
         {
-            return pubnub.Publish (channel, message, userCallback, errorCallback);;
+            return pubnub.Publish(channel, message, true, userCallback, errorCallback);
         }
 
-        public bool Publish<T> (string channel, object message, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        public bool Publish<T>(string channel, object message, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
-            return pubnub.Publish<T> (channel, message, userCallback, errorCallback);
+            return pubnub.Publish<T>(channel, message, true, userCallback, errorCallback);
+        }
+
+        public bool Publish(string channel, object message, bool storeInHistory, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return pubnub.Publish(channel, message, storeInHistory, userCallback, errorCallback);
+        }
+
+        public bool Publish<T>(string channel, object message, bool storeInHistory, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return pubnub.Publish<T>(channel, message, storeInHistory, userCallback, errorCallback);
         }
 
         public void Presence<T> (string channel, Action<T> userCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback)

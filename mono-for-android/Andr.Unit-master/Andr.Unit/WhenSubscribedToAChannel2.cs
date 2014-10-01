@@ -19,7 +19,7 @@ namespace PubNubMessaging.Tests
             channel = "hello_world_sub" + r.Next (1000);
 
             pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
-            Thread.Sleep (5000);
+            Thread.Sleep (2000);
 
             pubnub.Publish (channel, message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
 

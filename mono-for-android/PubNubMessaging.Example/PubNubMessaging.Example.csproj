@@ -85,6 +85,7 @@
     <AndroidResource Include="Resources\drawable\customdialog.9.png" />
     <AndroidResource Include="Resources\layout\GrantDialog.axml" />
     <AndroidResource Include="Resources\layout\AuthKey.axml" />
+    <AndroidResource Include="Resources\drawable\border.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>

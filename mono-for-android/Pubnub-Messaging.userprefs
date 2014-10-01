@@ -1,16 +1,17 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Android.YT910F2NYE" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="PubNubMessaging.Example/LaunchScreen.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Android.And4.2.2" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="PubNubMessaging.Example/GrantDialogFragment.cs">
     <Files>
-      <File FileName="PubNubMessaging/PubnubXamarinAndroid.cs" Line="1" Column="1" />
-      <File FileName="PubNubMessaging.Example/MainActivity.cs" Line="1" Column="1" />
-      <File FileName="PubNubMessaging/LoggingMethod.cs" Line="1" Column="1" />
-      <File FileName="PubNubMessaging/ClientNetworkStatus.cs" Line="164" Column="30" />
-      <File FileName="PubNubMessaging.Example/LaunchScreen.cs" Line="223" Column="43" />
+      <File FileName="PubNubMessaging.Example/MainActivity.cs" Line="666" Column="59" />
+      <File FileName="PubNubMessaging.Example/GrantDialogFragment.cs" Line="29" Column="6" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.ItemProperties.PubNubMessaging.Example MonoForAntroid.PreferredDevice="AndArm" />
+</Properties>   <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>onoForAntroid.PreferredDevice="AndArm" AndroidDeviceId-Debug="YT910F2NYE" />

@@ -38,7 +38,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenAClientIsPresented", "ThenPresenceShouldReturnReceivedMessage");
 
             pubnub.Presence<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessage, common.DisplayErrorMessage);
-            Thread.Sleep (3000);
+            Thread.Sleep (500);
             Common commonSubscribe = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;
@@ -85,7 +85,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenAClientIsPresented", "ThenPresenceShouldReturnReceivedMessage");
 
             pubnub.Presence<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessage, common.DisplayErrorMessage);
-            Thread.Sleep (3000);
+            Thread.Sleep (500);
             Common commonSubscribe = new Common ();
             common.DeliveryStatus = false;
             common.Response = null;
@@ -294,7 +294,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestClassName = "WhenAClientIsPresented";
             unitTest.TestCaseName = unitTestCaseName;
             pubnub.PubnubUnitTest = unitTest;
-            Thread.Sleep (3000);
+            Thread.Sleep (500);
             pubnub.HereNow (channel, userCallback, errorCallback);
 
             //pubnub.Unsubscribe<string>(channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy);
@@ -410,7 +410,7 @@ namespace PubNubMessaging.Tests
             //pubnub.SetLocalUserState(channel, "testkey", "testval");
             pubnub.SetUserState<string> (channel, "{\"testkey\":\"testval\"}", commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayErrorMessage);
             commonSubscribe.WaitForResponse (30);
-            Thread.Sleep (3000);
+            Thread.Sleep (500);
             pubnub.HereNow<T> (channel, true, true, userCallback, errorCallback);
 
             //pubnub.Unsubscribe<string>(channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy);
@@ -666,7 +666,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.Subscribe<string> (channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessage);
             commonSubscribe.WaitForResponse (30);
-            Thread.Sleep (10000);
+            Thread.Sleep (5000);
 
             //while (!commonSubscribe.DeliveryStatus);
             //commonSubscribe.WaitForResponse (30);
