@@ -380,6 +380,12 @@ namespace PubNubMessaging.Example
 
         public void Publish ()
         {
+            var dialog = new GrantDialogFragment (CommonDialogStates.Publish);
+            dialog.GrantPerms += HandleGrantPerms;
+            dialog.Show (SupportFragmentManager, "dialog");
+        }
+        /*public void Publish ()
+        {
             AlertDialog.Builder alert = new AlertDialog.Builder (this);
             
             alert.SetTitle ("Publish");
@@ -405,7 +411,7 @@ namespace PubNubMessaging.Example
             });
             alert.Show ();
             //this.RunOnUiThread(() => alert.Show());
-        }
+        }*/
 
         public void Presence ()
         {
@@ -643,7 +649,17 @@ namespace PubNubMessaging.Example
                     ThreadPool.QueueUserWorkItem (o => 
                         pubnub.GlobalHereNow<string> (cea.valToSet2, cea.valToSet1, DisplayReturnMessage, DisplayErrorMessage)
                     );
-                } 
+                } else if (cea.cds == CommonDialogStates.Publish){
+                    Display ("Running Publish");
+                    string[] channels = cea.channel.Split (',');
+                    string mess = cea.message;
+                    foreach (string channelToCall in channels) {
+                        ThreadPool.QueueUserWorkItem (o => 
+                            pubnub.Publish<string> (channelToCall.Trim (), mess, cea.valToSet2,
+                                DisplayReturnMessage, DisplayErrorMessage)
+                        );
+                    }
+                }
             } catch (Exception ex) {
                 Display (ex.Message);
             } finally {

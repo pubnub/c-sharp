@@ -213,7 +213,7 @@ namespace PubNubMessaging.Tests
             CustomClass message = new CustomClass ();
 
             pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
-            Thread.Sleep (5000);
+            Thread.Sleep (3000);
             pubnub.NonSubscribeTimeout = 30;
             pubnub.Publish (channel, (object)message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
             pubnub.NonSubscribeTimeout = 15;
@@ -322,7 +322,7 @@ namespace PubNubMessaging.Tests
             channel = "hello_world_sub" + r.Next (1000);
 
             pubnub.Subscribe<object> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
-            Thread.Sleep (5000);
+            Thread.Sleep (3000);
 
             pubnub.Publish (channel, (object)message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
 

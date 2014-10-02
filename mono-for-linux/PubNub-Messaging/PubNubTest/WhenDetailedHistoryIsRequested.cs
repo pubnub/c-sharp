@@ -13,6 +13,50 @@ namespace PubNubMessaging.Tests
     public class WhenDetailedHistoryIsRequested
     {
         [Test]
+        public void ItShouldReturnDetailedHistoryNoStore ()
+        {
+            Pubnub pubnub = new Pubnub (
+                Common.PublishKey,
+                Common.SubscribeKey,
+                "",
+                "",
+                false
+            );
+            string channel = "hello_world_de1";
+            string message = "Test Message No Store";
+
+            Common common = new Common ();
+            common.DeliveryStatus = false;
+            common.Response = null;
+
+            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "ItShouldReturnDetailedHistory");
+
+            //publish a test message. 
+            pubnub.Publish (channel, message, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+
+            common.WaitForResponse ();
+
+            common.DeliveryStatus = false;
+            common.Response = null;
+            //Thread.Sleep (2000);
+            pubnub.DetailedHistory<string> (channel, 1, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            common.WaitForResponse ();
+
+            ParseResponseNoStore (common.Response.ToString(), message);
+            pubnub.EndPendingRequests ();
+        }
+
+        public void ParseResponseNoStore (string commonResponse, string message)
+        {
+            if (commonResponse.Equals (null)) {
+                Assert.Fail ("Null response");
+            } else {
+                Console.WriteLine ("resp:" + commonResponse);
+                Assert.IsTrue (!commonResponse.ToString ().Contains (message));
+            }        
+        }
+
+        [Test]
         public void ItShouldReturnDetailedHistory ()
         {
             Pubnub pubnub = new Pubnub (
@@ -38,7 +82,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, 1, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
             common.WaitForResponse ();
 
@@ -53,7 +97,7 @@ namespace PubNubMessaging.Tests
             common.Response = null;   
 
             for (int i = messageStart; i < messageEnd; i++) {
-                Thread.Sleep (2000);
+
                 common.DeliveryStatus = false;
                 string msg = i.ToString ();
                 pubnub.Publish (channel, msg, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
@@ -61,6 +105,7 @@ namespace PubNubMessaging.Tests
                 common.WaitForResponse ();
                     
                 Console.WriteLine ("Message # " + i.ToString () + " published");
+                Thread.Sleep (500);
             }
         }
 
@@ -130,7 +175,7 @@ namespace PubNubMessaging.Tests
       
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, 10, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse ();
@@ -164,7 +209,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, 1, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse ();
@@ -207,7 +252,7 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
             Console.WriteLine ("DetailedHistory with start & end");
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
             common.WaitForResponse ();
@@ -220,7 +265,7 @@ namespace PubNubMessaging.Tests
       
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
             common.WaitForResponse ();
@@ -233,7 +278,7 @@ namespace PubNubMessaging.Tests
       
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
             common.WaitForResponse ();
@@ -277,7 +322,7 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
             Console.WriteLine ("DetailedHistory with start & end");
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
             common.WaitForResponse ();
@@ -290,7 +335,7 @@ namespace PubNubMessaging.Tests
       
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
             common.WaitForResponse ();
@@ -303,7 +348,7 @@ namespace PubNubMessaging.Tests
       
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
       
             common.WaitForResponse ();
@@ -347,7 +392,7 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
             Console.WriteLine ("DetailedHistory with start & end");
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse ();
@@ -360,7 +405,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse ();
@@ -373,7 +418,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse ();
@@ -416,7 +461,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             Console.WriteLine ("DetailedHistory with start & end");
 
             pubnub.DetailedHistory (channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
@@ -431,7 +476,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse ();
@@ -444,7 +489,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse ();
@@ -487,7 +532,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, totalMessages, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
             common.WaitForResponse ();
 
@@ -529,7 +574,7 @@ namespace PubNubMessaging.Tests
 
             common.Response = null;
             common.DeliveryStatus = false;
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, totalMessages, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse ();
@@ -572,7 +617,7 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
             Console.WriteLine ("DetailedHistory with start & end");
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse ();
@@ -585,7 +630,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse ();
@@ -598,7 +643,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse ();
@@ -642,7 +687,7 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
             Console.WriteLine ("DetailedHistory with start & end");
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse ();
@@ -655,7 +700,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse ();
@@ -668,7 +713,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse ();
@@ -712,7 +757,7 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
             Console.WriteLine ("DetailedHistory with start & end");
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse ();
@@ -725,7 +770,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse ();
@@ -738,7 +783,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse ();
@@ -782,7 +827,7 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
             Console.WriteLine ("DetailedHistory with start & end");
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse ();
@@ -795,7 +840,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse ();
@@ -808,7 +853,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, midtime, -1, totalMessages / 2, false, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse ();
@@ -852,7 +897,7 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
 
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
 
             pubnub.DetailedHistory (channel, totalMessages, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
             common.WaitForResponse ();
@@ -895,7 +940,7 @@ namespace PubNubMessaging.Tests
 
             common.Response = null;
             common.DeliveryStatus = false;
-            Thread.Sleep (2000);
+            //Thread.Sleep (2000);
             pubnub.DetailedHistory (channel, totalMessages, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse ();

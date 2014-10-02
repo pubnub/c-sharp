@@ -386,6 +386,18 @@ namespace PubNubMessaging.Core
                     Console.WriteLine (string.Format ("Channel = {0}", channel));
                     Console.ResetColor ();
 
+                    Console.WriteLine("Store In History? Enter Y for Yes or N for No. To accept default(Y), just press ENTER");
+                    string storeInHistory = Console.ReadLine();
+                    bool store = true;
+                    if (storeInHistory.ToLower() == "n")
+                    {
+                        store = false;
+                    }
+
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.WriteLine(string.Format("Store In History = {0}", storeInHistory));
+                    Console.ResetColor();
+
 					/*					 TO TEST SMALL TEXT PUBLISH ONLY */
                     Console.WriteLine ("Enter the message for publish and press ENTER key to submit");
                     string publishMsg = Console.ReadLine ();
@@ -408,22 +420,22 @@ namespace PubNubMessaging.Core
                     double doubleData;
                     int intData;
                     if (int.TryParse (publishMsg, out intData)) { //capture numeric data
-                        pubnub.Publish<string> (channel, intData, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.Publish<string> (channel, intData, store, DisplayReturnMessage, DisplayErrorMessage);
                     } else if (double.TryParse (publishMsg, out doubleData)) { //capture numeric data
-                        pubnub.Publish<string> (channel, doubleData, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.Publish<string> (channel, doubleData, store, DisplayReturnMessage, DisplayErrorMessage);
                     } else {
                         //check whether any numeric is sent in double quotes
                         if (publishMsg.IndexOf ("\"") == 0 && publishMsg.LastIndexOf ("\"") == publishMsg.Length - 1) {
                             string strMsg = publishMsg.Substring (1, publishMsg.Length - 2);
                             if (int.TryParse (strMsg, out intData)) {
-                                pubnub.Publish<string> (channel, strMsg, DisplayReturnMessage, DisplayErrorMessage);
+                                pubnub.Publish<string> (channel, strMsg, store, DisplayReturnMessage, DisplayErrorMessage);
                             } else if (double.TryParse (strMsg, out doubleData)) {
-                                pubnub.Publish<string> (channel, strMsg, DisplayReturnMessage, DisplayErrorMessage);
+                                pubnub.Publish<string> (channel, strMsg, store, DisplayReturnMessage, DisplayErrorMessage);
                             } else {
-                                pubnub.Publish<string> (channel, publishMsg, DisplayReturnMessage, DisplayErrorMessage);
+                                pubnub.Publish<string> (channel, publishMsg, store, DisplayReturnMessage, DisplayErrorMessage);
                             }
                         } else {
-                            pubnub.Publish<string> (channel, publishMsg, DisplayReturnMessage, DisplayErrorMessage);
+                            pubnub.Publish<string> (channel, publishMsg, store, DisplayReturnMessage, DisplayErrorMessage);
                             //pubnub2.Publish<string>(channel, publishMsg, DisplayReturnMessage, DisplayErrorMessage);
                         }
                     }
@@ -562,22 +574,22 @@ namespace PubNubMessaging.Core
                     Console.WriteLine ("How many minutes do you want to allow Grant Access? Enter the number of minutes.");
                     Console.WriteLine ("Default = 1440 minutes (24 hours). Press ENTER now to accept default value.");
                     string grantTimeLimit = Console.ReadLine ();
-                    int grantTimeLimitInSeconds;
-                    Int32.TryParse (grantTimeLimit, out grantTimeLimitInSeconds);
-                    if (grantTimeLimitInSeconds == 0)
-                        grantTimeLimitInSeconds = 1440;
+                    int grantTimeLimitInMinutes;
+                    Int32.TryParse (grantTimeLimit, out grantTimeLimitInMinutes);
+                    if (grantTimeLimitInMinutes == 0)
+                        grantTimeLimitInMinutes = 1440;
 
                     Console.ForegroundColor = ConsoleColor.Blue;
                     Console.WriteLine (string.Format ("Channel = {0}", channel));
                     Console.WriteLine (string.Format ("auth_key = {0}", authGrant));
                     Console.WriteLine (string.Format ("Read Access = {0}", read.ToString ()));
                     Console.WriteLine (string.Format ("Write Access = {0}", write.ToString ()));
-                    Console.WriteLine (string.Format ("Grant Access Time Limit = {0}", grantTimeLimitInSeconds.ToString ()));
+                    Console.WriteLine (string.Format ("Grant Access Time Limit = {0}", grantTimeLimitInMinutes.ToString ()));
                     Console.ResetColor ();
                     Console.WriteLine ();
 
                     Console.WriteLine ("Running PamGrant()");
-                    pubnub.GrantAccess<string> (channel, authGrant, read, write, grantTimeLimitInSeconds, DisplayReturnMessage, DisplayErrorMessage);
+                    pubnub.GrantAccess<string> (channel, authGrant, read, write, grantTimeLimitInMinutes, DisplayReturnMessage, DisplayErrorMessage);
                     break;
                 case "13":
                     Console.WriteLine ("Enter CHANNEL name for PAM Audit");
@@ -638,22 +650,22 @@ namespace PubNubMessaging.Core
                     Console.WriteLine ("How many minutes do you want to allow Grant Presence Access? Enter the number of minutes.");
                     Console.WriteLine ("Default = 1440 minutes (24 hours). Press ENTER now to accept default value.");
                     string grantPresenceTimeLimit = Console.ReadLine ();
-                    int grantPresenceTimeLimitInSeconds;
-                    Int32.TryParse (grantPresenceTimeLimit, out grantPresenceTimeLimitInSeconds);
-                    if (grantPresenceTimeLimitInSeconds == 0)
-                        grantPresenceTimeLimitInSeconds = 1440;
+                    int grantPresenceTimeLimitInMinutes;
+                    Int32.TryParse (grantPresenceTimeLimit, out grantPresenceTimeLimitInMinutes);
+                    if (grantPresenceTimeLimitInMinutes == 0)
+                        grantPresenceTimeLimitInMinutes = 1440;
 
                     Console.ForegroundColor = ConsoleColor.Blue;
                     Console.WriteLine (string.Format ("Channel = {0}", channel));
                     Console.WriteLine (string.Format ("auth_key = {0}", authGrantPresence));
                     Console.WriteLine (string.Format ("Read Access = {0}", readPresence.ToString ()));
                     Console.WriteLine (string.Format ("Write Access = {0}", writePresence.ToString ()));
-                    Console.WriteLine (string.Format ("Grant Access Time Limit = {0}", grantPresenceTimeLimitInSeconds.ToString ()));
+                    Console.WriteLine (string.Format ("Grant Access Time Limit = {0}", grantPresenceTimeLimitInMinutes.ToString ()));
                     Console.ResetColor ();
                     Console.WriteLine ();
 
                     Console.WriteLine ("Running PAM GrantPresenceAccess()");
-                    pubnub.GrantPresenceAccess<string> (channel, authGrantPresence, readPresence, writePresence, grantPresenceTimeLimitInSeconds, DisplayReturnMessage, DisplayErrorMessage);
+                    pubnub.GrantPresenceAccess<string> (channel, authGrantPresence, readPresence, writePresence, grantPresenceTimeLimitInMinutes, DisplayReturnMessage, DisplayErrorMessage);
                     break;
                 case "16":
                     Console.WriteLine ("Enter CHANNEL name for PAM Presence Audit");

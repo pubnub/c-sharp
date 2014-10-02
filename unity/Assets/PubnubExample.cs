@@ -83,8 +83,9 @@ public class PubnubExample : MonoBehaviour
     string text1 = "";
     string text2 = "";
     string text3 = "";
+    bool storeInHistory = true;
 
-    Rect publishWindowRect = new Rect (60, 365, 300, 150);
+    Rect publishWindowRect = new Rect (60, 365, 300, 180);
     Rect authWindowRect = new Rect (60, 365, 300, 200);
     Rect textWindowRect = new Rect (60, 365, 300, 250);
     Rect textWindowRect2 = new Rect (60, 365, 300, 250);
@@ -1081,18 +1082,19 @@ public class PubnubExample : MonoBehaviour
     {
         GUI.Label (new Rect (10, 25, 100, 25), "Enter Message");
 
-
         publishedMessage = GUI.TextArea (new Rect (110, 25, 150, 60), publishedMessage, 2000);
+		storeInHistory = GUI.Toggle (new Rect (10, 100, 150, 25), storeInHistory, "Store in History");
+
         //publishedMessage = "Text with 😜 emoji 🎉.";
         string stringMessage = publishedMessage;
-        if (GUI.Button (new Rect (30, 100, 100, 30), "Publish")) {
+        if (GUI.Button (new Rect (30, 130, 100, 30), "Publish")) {
             //stringMessage = "Text with 😜 emoji 🎉.";
-            pubnub.Publish<string> (channel, stringMessage, DisplayReturnMessage, DisplayErrorMessage);
+            pubnub.Publish<string> (channel, stringMessage, storeInHistory, DisplayReturnMessage, DisplayErrorMessage);
             publishedMessage = "";
             showPublishPopupWindow = false;
         }
 
-        if (GUI.Button (new Rect (150, 100, 100, 30), "Cancel")) {
+        if (GUI.Button (new Rect (150, 130, 100, 30), "Cancel")) {
             showPublishPopupWindow = false;
         }
         GUI.DragWindow (new Rect (0, 0, 800, 400));

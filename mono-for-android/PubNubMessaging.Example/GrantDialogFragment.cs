@@ -18,6 +18,7 @@ namespace PubNubMessaging.Example
     {
         internal int ttl;
         internal string channel;
+        internal string message;
         internal bool valToSet1;
         internal bool valToSet2;
         internal bool isPresence;
@@ -31,7 +32,7 @@ namespace PubNubMessaging.Example
         Button btnDismiss;
         Button btnGrant;
         TextView lblInput1, lblInput2, lblInput3, lblAuth;
-        ToggleButton tbRead;
+        ToggleButton tbRead, tbWrite;
         EditText txtVal, txtauth;
         View view;
 
@@ -63,23 +64,31 @@ namespace PubNubMessaging.Example
                     txtttl.Text = "1440";
                 }
 
-                FireEvent (iTtl, tbCanRead.Checked, tbCanWrite.Checked, IsPresenceGrant, txtauth.Text);
+                FireEvent (iTtl, tbCanRead.Checked, tbCanWrite.Checked, IsPresenceGrant, txtauth.Text, "");
 
                 Dismiss ();
             } else if ((cds == CommonDialogStates.HereNow)
-                       || (cds == CommonDialogStates.GlobalHereNow)) {
+                || (cds == CommonDialogStates.GlobalHereNow)) {
                 ToggleButton tbCanWrite = view.FindViewById<ToggleButton> (Resource.Id.tbWrite);
                 ToggleButton tbCanRead = view.FindViewById<ToggleButton> (Resource.Id.tbRead);
                 EditText txtval = view.FindViewById<EditText> (Resource.Id.txtttl);
 
-                FireEvent (0, tbCanRead.Checked, tbCanWrite.Checked, IsPresenceGrant, txtval.Text);
+                FireEvent (0, tbCanRead.Checked, tbCanWrite.Checked, IsPresenceGrant, txtval.Text, "");
+
+                Dismiss ();
+            } else if (cds == CommonDialogStates.Publish) {
+                ToggleButton tbStore = view.FindViewById<ToggleButton> (Resource.Id.tbRead);
+                EditText txtchannel = view.FindViewById<EditText> (Resource.Id.txtauth);
+                EditText txtval = view.FindViewById<EditText> (Resource.Id.txtttl);
+
+                FireEvent (0, tbStore.Checked, false, IsPresenceGrant, txtchannel.Text, txtval.Text);
 
                 Dismiss ();
 
             }
         }
 
-        public void FireEvent (int iTtl, bool canRead, bool canWrite, bool isPresence, string channel)
+        public void FireEvent (int iTtl, bool canRead, bool canWrite, bool isPresence, string channel, string message)
         {
             if (GrantPerms != null) {
                 GrantEventArgs cea = new GrantEventArgs ();
@@ -89,6 +98,7 @@ namespace PubNubMessaging.Example
                 cea.isPresence = isPresence;
                 cea.cds = cds;
                 cea.channel = channel;
+                cea.message = message;
                 GrantPerms (this, cea);
             }
         }
@@ -143,6 +153,38 @@ namespace PubNubMessaging.Example
                 // Handle dismiss button click
                 btnGrant = view.FindViewById<Button> (Resource.Id.btnGrant);
                 btnGrant.SetText (Resource.String.hereNow);
+                btnGrant.Click += ButtonGrantClick;
+
+                btnDismiss = view.FindViewById<Button> (Resource.Id.btnCancel);
+                btnDismiss.Click += ButtonDismissClick;
+            } else if (cds == CommonDialogStates.Publish) {
+                var tvGrantLabel = view.FindViewById<TextView> (Resource.Id.tvGrantLabel);
+                tvGrantLabel.SetText (Resource.String.publish);
+
+                lblInput1 = view.FindViewById<TextView> (Resource.Id.lblGrant1);
+                lblInput1.SetText (Resource.String.inStore);
+
+                lblInput3 = view.FindViewById<TextView> (Resource.Id.lblGrant3);
+                lblInput3.SetText (Resource.String.message);
+
+                tbRead = view.FindViewById<ToggleButton> (Resource.Id.tbRead);
+                tbRead.Checked = true;
+
+                lblInput2 = view.FindViewById<TextView> (Resource.Id.lblGrant2);
+                lblInput2.Visibility = ViewStates.Invisible;
+
+                tbWrite = view.FindViewById<ToggleButton> (Resource.Id.tbWrite);
+                tbWrite.Visibility = ViewStates.Invisible;
+
+                lblAuth = view.FindViewById<TextView> (Resource.Id.lblinput1);
+                lblAuth.SetText (Resource.String.channel);
+
+                txtVal = view.FindViewById<EditText> (Resource.Id.txtttl);
+                txtVal.InputType = Android.Text.InputTypes.TextFlagAutoComplete;
+
+                // Handle dismiss button click
+                btnGrant = view.FindViewById<Button> (Resource.Id.btnGrant);
+                btnGrant.SetText (Resource.String.publish);
                 btnGrant.Click += ButtonGrantClick;
 
                 btnDismiss = view.FindViewById<Button> (Resource.Id.btnCancel);

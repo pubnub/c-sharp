@@ -24,6 +24,7 @@ namespace PubNubMessaging.Example
 
     public enum CommonDialogStates
     {
+        Publish,
         HereNow,
         Auth,
         PresenceHeartbeat,
