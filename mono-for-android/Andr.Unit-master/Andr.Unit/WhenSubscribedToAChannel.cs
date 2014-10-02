@@ -391,7 +391,7 @@ namespace PubNubMessaging.Tests
         }
 
 
-        [Test]
+        //[Test]
         public void ThenMultiSubscribeShouldReturnConnectStatus ()
         {
             Pubnub pubnub = new Pubnub (Common.PublishKey,
