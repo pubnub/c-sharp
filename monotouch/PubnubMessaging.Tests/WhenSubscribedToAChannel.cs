@@ -472,7 +472,7 @@ namespace PubNubMessaging.Tests
             string channel = "testChannel";
 
             pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
-            Thread.Sleep (500);
+            Thread.Sleep (1500);
            
             int iPassCount = 0;
             for (int i = 0; i < 10; i++) {
