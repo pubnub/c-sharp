@@ -23,7 +23,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.Publish (channel, message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse ();
+            common.WaitForResponse (30);
 
             if (common.Response != null) {
                 object[] deserializedMessage = Common.Deserialize<object[]> (common.Response.ToString ());
@@ -40,7 +40,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.Unsubscribe<string> (channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse (20);
+            common.WaitForResponse (30);
 
             pubnub.EndPendingRequests ();
 

@@ -179,7 +179,7 @@ namespace PubNubMessaging.Tests
             CustomClass message = new CustomClass ();
 
             pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
-            Thread.Sleep (2000);
+            Thread.Sleep (2500);
 
             pubnub.Publish (channel, (object)message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
 
@@ -230,7 +230,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.Unsubscribe<string> (channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse (20);
+            common.WaitForResponse (30);
 
             pubnub.EndPendingRequests ();
         }
@@ -290,31 +290,39 @@ namespace PubNubMessaging.Tests
 
             if (common.Response != null) {
                 Console.WriteLine ("response:" + common.Response.ToString ());
-                object[] fields = Common.Deserialize<object[]> (common.Response.ToString ());
+                List<object> lst = common.Response as List<object>;
+                Console.WriteLine (lst [0].ToString ());
+                Console.WriteLine (lst [1].ToString ());
+                if (lst.Count == 3)
+                    Console.WriteLine (lst [2].ToString ());
+                if (lst.Count == 4)
+                    Console.WriteLine (lst [3].ToString ());
+                Console.WriteLine ();
 
-                if (fields [0] != null) {
-                    var myObjectArray = (from item in fields
-                        select item as object).ToArray ();
+                if (lst [0] != null) {
+                    //var myObjectArray = (from item in fields
+                      //  select item as object).ToArray ();
 
                     CustomClass cc = new CustomClass ();
 
                     //If the custom class is serialized with jsonfx the response is received as a dictionary and
                     //on deserialization with Newtonsoft.Json we get an error.
                     //As a work around we parse the dictionary object.   
-                    var dict = myObjectArray [0] as IDictionary;
+                    //var dict = myObjectArray [0] as IDictionary;
+                    var dict = lst [0] as IDictionary;
 
                     if ((dict != null) && (dict.Count > 1)) {
                         cc.foo = (string)dict ["foo"];
                         cc.bar = (int[])dict ["bar"];
                     } else {
-                        Type valueType = myObjectArray [0].GetType ();
+                        Type valueType = lst [0].GetType ();
                         var expectedType = typeof(System.Dynamic.ExpandoObject);
                         if (expectedType.IsAssignableFrom (valueType)) {
-                            dynamic x = myObjectArray [0];
+                            dynamic x = lst [0];
                             cc.foo = x.foo;
                             cc.bar = x.bar;
                         } else {
-                            cc = Common.Deserialize<CustomClass> (myObjectArray [0].ToString ());
+                            cc = Common.Deserialize<CustomClass> (lst [0].ToString ());
                         }
                     }  
                     if (cc.bar.SequenceEqual (message.bar) && cc.foo.Equals (message.foo)) {
@@ -456,7 +464,7 @@ namespace PubNubMessaging.Tests
             string channel = "testChannel";
 
             pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
-            Thread.Sleep (500);
+            Thread.Sleep (1500);
            
             int iPassCount = 0;
             for (int i = 0; i < 10; i++) {
