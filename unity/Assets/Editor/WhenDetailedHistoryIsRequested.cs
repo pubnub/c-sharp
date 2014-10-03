@@ -112,7 +112,7 @@ namespace PubNubMessaging.Tests
         public void ParseResponse (object commonResponse, int messageStart, int messageEnd, string message)
         {
             if (commonResponse.Equals (null)) {
-                Assert.Fail ("Null response");
+                Assert.Fail ("No response: " + common.ErrorResponse);
             } else {
                 IList<object> fields = commonResponse as IList<object>;
 

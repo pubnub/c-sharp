@@ -34,7 +34,7 @@ namespace PubNubMessaging.Tests
                     Assert.Fail (string.Format ("Test not successful {0}, {1}", message, common.Response.ToString ()));
                 }
             } else {
-                Assert.Fail ("No response " + common.Response);
+                Assert.Fail ("No response: " + common.ErrorResponse);
             }
             common.DeliveryStatus = false;
             common.Response = null;

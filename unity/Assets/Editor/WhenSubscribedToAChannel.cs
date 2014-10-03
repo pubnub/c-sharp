@@ -251,10 +251,10 @@ namespace PubNubMessaging.Tests
                         Assert.Fail ("Complex message test not successful");
                     }
                 } else {
-                    Assert.Fail ("No response");
+                    Assert.Fail ("No response: " + common.ErrorResponse);
                 }
             } else {
-                Assert.Fail ("No response");
+                Assert.Fail ("No response: " + common.ErrorResponse);
             }
             common.DeliveryStatus = false;
             common.Response = null;
@@ -355,10 +355,10 @@ namespace PubNubMessaging.Tests
                         Assert.Fail ("Complex message test not successful");
                     }
                 } else {
-                    Assert.Fail ("No response1");
+                    Assert.Fail ("No response1: " + common.ErrorResponse);
                 }
             } else {
-                Assert.Fail ("No response");
+                Assert.Fail ("No response: " + common.ErrorResponse);
             }
             common.DeliveryStatus = false;
             common.Response = null;

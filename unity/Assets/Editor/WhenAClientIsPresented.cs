@@ -417,7 +417,7 @@ namespace PubNubMessaging.Tests
         public void ParseResponse (object commonResponse, Pubnub pubnub)
         {
             if (commonResponse.Equals (null)) {
-                Assert.Fail ("Null response");
+                Assert.Fail ("No response: " + common.ErrorResponse);
             } else {
                 bool found = false;
                 IList<object> responseFields = commonResponse as IList<object>;

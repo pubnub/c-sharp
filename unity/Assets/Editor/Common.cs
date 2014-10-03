@@ -36,7 +36,8 @@ namespace PubNubMessaging.Tests
         public static string SubscribeKey = "demo-36";
         public static string SecretKey = "demo-36";
 
-        public object Response { get; set; }
+        public string Response { get; set; }
+        public object ErrorResponse { get; set; }
 
         public bool DeliveryStatus  { get; set; }
 
@@ -81,7 +82,7 @@ namespace PubNubMessaging.Tests
 
         public void DisplayErrorMessage (PubnubClientError result)
         {
-            //Response = result;
+            ErrorResponse = result.ToStirng();
             //DeliveryStatus = true;
             UnityEngine.Debug.Log ("DisplayErrorMessage:" + result.ToString ());
         }
@@ -90,6 +91,7 @@ namespace PubNubMessaging.Tests
         {
             //deliveryStatus = true;
             //Response = result;
+            ErrorResponse = result.ToStirng();
             UnityEngine.Debug.Log ("DisplayReturnMessageDummy:" + result.ToString ());
         }
 
