@@ -82,7 +82,7 @@ namespace PubNubMessaging.Tests
 
         public void DisplayErrorMessage (PubnubClientError result)
         {
-			ErrorResponse = result.ToString();
+			ErrorResponse = result.Description;
             //DeliveryStatus = true;
             UnityEngine.Debug.Log ("DisplayErrorMessage:" + result.ToString ());
         }

@@ -9,9 +9,9 @@ namespace PubNubMessaging.Tests
     {
         public const bool PAMEnabled = true;
         public const bool EnableStubTest = false;
-        public static readonly string PublishKey = "demo";
-        public static readonly string SubscribeKey = "demo";
-        public static readonly string SecretKey = "demo";
+        public static readonly string PublishKey = "demo-36";
+        public static readonly string SubscribeKey = "demo-36";
+        public static readonly string SecretKey = "demo-36";
 
         static PubnubCommon ()
         {
