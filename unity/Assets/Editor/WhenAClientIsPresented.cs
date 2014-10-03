@@ -408,7 +408,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestClassName = "WhenAClientIsPresented";
             unitTest.TestCaseName = unitTestCaseName;
             pubnub.PubnubUnitTest = unitTest;
-            Thread.Sleep (500);
+            Thread.Sleep (1500);
             pubnub.HereNow (channel, userCallback, errorCallback);
 
             //pubnub.Unsubscribe<string> (channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy);

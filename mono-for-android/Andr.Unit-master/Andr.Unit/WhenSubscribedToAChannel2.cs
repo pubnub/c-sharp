@@ -19,11 +19,11 @@ namespace PubNubMessaging.Tests
             channel = "hello_world_sub" + r.Next (1000);
 
             pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
-            Thread.Sleep (2000);
+            Thread.Sleep (2500);
 
             pubnub.Publish (channel, message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse (30);
+            common.WaitForResponse (35);
 
             if (common.Response != null) {
                 object[] deserializedMessage = Common.Deserialize<object[]> (common.Response.ToString ());
@@ -40,7 +40,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.Unsubscribe<string> (channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse (30);
+            common.WaitForResponse (20);
 
             pubnub.EndPendingRequests ();
 

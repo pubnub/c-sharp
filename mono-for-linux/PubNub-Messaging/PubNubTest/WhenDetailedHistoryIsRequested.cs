@@ -392,7 +392,7 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
             Console.WriteLine ("DetailedHistory with start & end");
-            //Thread.Sleep (2000);
+            Thread.Sleep (1000);
             pubnub.DetailedHistory (channel, starttime, midtime, totalMessages / 2, true, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse ();

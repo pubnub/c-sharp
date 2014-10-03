@@ -487,7 +487,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
-            //Thread.Sleep (2000);
+            Thread.Sleep (1000);
             pubnub.DetailedHistory (channel, totalMessages, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
             common.WaitForResponse ();
       

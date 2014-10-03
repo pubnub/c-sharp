@@ -153,6 +153,7 @@ namespace PubNubMessaging.Tests
 
             common.DeliveryStatus = false;
             common.Response = null;
+            Thread.Sleep (2000);
             pubnub.Unsubscribe<string> (channel, commonUnsubscribe.DisplayReturnMessageDummy, commonUnsubscribe.DisplayReturnMessageDummy, commonUnsubscribe.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
             common.WaitForResponse ();

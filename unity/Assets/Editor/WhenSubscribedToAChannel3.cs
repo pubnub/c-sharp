@@ -18,13 +18,13 @@ namespace PubNubMessaging.Tests
             channel = "hello_world_sub" + r.Next (1000);
 
             pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
-            Thread.Sleep (500);
+            Thread.Sleep (2500);
             pubnub.NonSubscribeTimeout = 30;
 
             pubnub.Publish (channel, message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
             pubnub.NonSubscribeTimeout = 15;
 
-            common.WaitForResponse ();
+            common.WaitForResponse (35);
 
             if (common.Response != null) {
                 object[] deserializedMessage = Common.Deserialize<object[]> (common.Response.ToString ());

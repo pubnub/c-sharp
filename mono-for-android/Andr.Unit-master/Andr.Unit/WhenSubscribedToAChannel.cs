@@ -183,7 +183,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.Publish (channel, (object)message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse ();
+            common.WaitForResponse (35);
 
             if (common.Response != null) {
                 Console.WriteLine ("response:" + common.Response.ToString ());
@@ -230,7 +230,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.Unsubscribe<string> (channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
 
-            common.WaitForResponse (30);
+            common.WaitForResponse (20);
 
             pubnub.EndPendingRequests ();
         }
