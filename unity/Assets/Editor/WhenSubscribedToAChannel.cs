@@ -212,7 +212,8 @@ namespace PubNubMessaging.Tests
 
             CustomClass message = new CustomClass ();
 
-            pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
+			Thread.Sleep (1000);
+			pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
             Thread.Sleep (3000);
             pubnub.NonSubscribeTimeout = 30;
             pubnub.Publish (channel, (object)message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);

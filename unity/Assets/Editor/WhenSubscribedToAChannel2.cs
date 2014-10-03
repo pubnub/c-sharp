@@ -17,7 +17,7 @@ namespace PubNubMessaging.Tests
         {
             Random r = new Random ();
             channel = "hello_world_sub" + r.Next (1000);
-
+			Thread.Sleep (1000);
             pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
             Thread.Sleep (2500);
             pubnub.NonSubscribeTimeout = 30;

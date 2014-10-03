@@ -17,7 +17,7 @@ namespace PubNubMessaging.Tests
         bool receivedGrantMessage = false;
         int sampleCount = 10;
 
-        [Test]
+        //[Test]
         public void AtUserLevel ()
         {
             if (!PubnubCommon.EnableStubTest) {
