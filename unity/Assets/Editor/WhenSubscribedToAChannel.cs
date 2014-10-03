@@ -212,8 +212,9 @@ namespace PubNubMessaging.Tests
 
             CustomClass message = new CustomClass ();
 
-            pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
-            Thread.Sleep (5000);
+			Thread.Sleep (1000);
+			pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
+            Thread.Sleep (3000);
             pubnub.NonSubscribeTimeout = 30;
             pubnub.Publish (channel, (object)message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
             pubnub.NonSubscribeTimeout = 15;
@@ -251,10 +252,10 @@ namespace PubNubMessaging.Tests
                         Assert.Fail ("Complex message test not successful");
                     }
                 } else {
-                    Assert.Fail ("No response");
+                    Assert.Fail ("No response: " + common.ErrorResponse);
                 }
             } else {
-                Assert.Fail ("No response");
+                Assert.Fail ("No response: " + common.ErrorResponse);
             }
             common.DeliveryStatus = false;
             common.Response = null;
@@ -322,7 +323,7 @@ namespace PubNubMessaging.Tests
             channel = "hello_world_sub" + r.Next (1000);
 
             pubnub.Subscribe<object> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
-            Thread.Sleep (5000);
+            Thread.Sleep (3000);
 
             pubnub.Publish (channel, (object)message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
 
@@ -355,10 +356,10 @@ namespace PubNubMessaging.Tests
                         Assert.Fail ("Complex message test not successful");
                     }
                 } else {
-                    Assert.Fail ("No response1");
+                    Assert.Fail ("No response1: " + common.ErrorResponse);
                 }
             } else {
-                Assert.Fail ("No response");
+                Assert.Fail ("No response: " + common.ErrorResponse);
             }
             common.DeliveryStatus = false;
             common.Response = null;

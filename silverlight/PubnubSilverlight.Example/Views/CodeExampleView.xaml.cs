@@ -149,11 +149,12 @@ namespace PubnubSilverlight
                     Console.WriteLine("Running publish()");
 
                     string publishedMessage = publishView.Message.Text;
+                    bool storeInHistory = publishView.chkStoreInHistory.IsChecked.Value;
                     if (authKey.Trim() != "")
                     {
                         pubnub.AuthenticationKey = authKey;
                     }
-                    pubnub.Publish<string>(channel, publishedMessage, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    pubnub.Publish<string>(channel, publishedMessage, storeInHistory, DisplayUserCallbackMessage, DisplayErrorMessage);
                 }
             };
         }

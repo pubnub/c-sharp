@@ -1,4 +1,4 @@
-﻿//Build Date: September 12, 2014
+﻿//Build Date: September 29, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -1259,6 +1259,47 @@ namespace PubNubMessaging.Core
 
 		#region "Publish"
 
+        public bool Publish<T>(string channel, object message, bool storeInHistory, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
+            {
+                throw new ArgumentException("Missing Channel or Message");
+            }
+
+            if (string.IsNullOrEmpty(this.publishKey) || string.IsNullOrEmpty(this.publishKey.Trim()) || this.publishKey.Length <= 0)
+            {
+                throw new MissingMemberException("Invalid publish key");
+            }
+            if (userCallback == null)
+            {
+                throw new ArgumentException("Missing userCallback");
+            }
+            if (errorCallback == null)
+            {
+                throw new ArgumentException("Missing errorCallback");
+            }
+            if (_jsonPluggableLibrary == null)
+            {
+                throw new NullReferenceException("Missing Json Pluggable Library for Pubnub Instance");
+            }
+
+            Uri request = BuildPublishRequest(channel, message, storeInHistory);
+
+            RequestState<T> requestState = new RequestState<T>();
+            requestState.Channels = new string[] { channel };
+            requestState.Type = ResponseType.Publish;
+            requestState.UserCallback = userCallback;
+            requestState.ErrorCallback = errorCallback;
+            requestState.Reconnect = false;
+
+            return UrlProcessRequest<T>(request, requestState);
+        }
+
+        public bool Publish(string channel, object message, bool storeInHistory, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return Publish<object>(channel, message, storeInHistory, userCallback, errorCallback);
+        }
+
 		/// <summary>
 		/// Publish
 		/// Send a message to a channel
@@ -1269,43 +1310,19 @@ namespace PubNubMessaging.Core
 		/// <returns></returns>
 		public bool Publish (string channel, object message, Action<object> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			return Publish<object> (channel, message, userCallback, errorCallback);
+			return Publish<object> (channel, message, true, userCallback, errorCallback);
 		}
 
 		public bool Publish<T> (string channel, object message, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			if (string.IsNullOrEmpty (channel) || string.IsNullOrEmpty (channel.Trim ()) || message == null) {
-				throw new ArgumentException ("Missing Channel or Message");
-			}
-
-			if (string.IsNullOrEmpty (this.publishKey) || string.IsNullOrEmpty (this.publishKey.Trim ()) || this.publishKey.Length <= 0) {
-                throw new MissingMemberException("Invalid publish key");
-			}
-			if (userCallback == null) {
-				throw new ArgumentException ("Missing userCallback");
-			}
-			if (errorCallback == null) {
-				throw new ArgumentException ("Missing errorCallback");
-			}
-			if (_jsonPluggableLibrary == null) {
-				throw new NullReferenceException ("Missing Json Pluggable Library for Pubnub Instance");
-			}
-
-			Uri request = BuildPublishRequest (channel, message);
-
-			RequestState<T> requestState = new RequestState<T> ();
-			requestState.Channels = new string[] { channel };
-			requestState.Type = ResponseType.Publish;
-			requestState.UserCallback = userCallback;
-			requestState.ErrorCallback = errorCallback;
-			requestState.Reconnect = false;
-
-			return UrlProcessRequest<T> (request, requestState); 
+            return Publish<T>(channel, message, true, userCallback, errorCallback);
 		}
 
-		private Uri BuildPublishRequest (string channel, object originalMessage)
+		private Uri BuildPublishRequest (string channel, object originalMessage, bool storeInHistory)
 		{
 			string message = (_enableJsonEncodingForPublish) ? JsonEncodePublishMsg (originalMessage) : originalMessage.ToString ();
+
+            parameters = (storeInHistory) ? "" : "store=0";
 
 			// Generate String to Sign
 			string signature = "0";
@@ -3933,6 +3950,10 @@ namespace PubNubMessaging.Core
             {
 				queryParamExist = true;
                 url.AppendFormat("?uuid={0}", uuid);
+                if (parameters != "")
+                {
+                    url.AppendFormat("&{0}", parameters);
+                }
                 if (!string.IsNullOrEmpty(_authenticationKey))
                 {
                     url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));

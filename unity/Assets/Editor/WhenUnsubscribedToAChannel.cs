@@ -206,7 +206,7 @@ namespace PubNubMessaging.Tests
 
             string response = "";
             if (common.Response == null) {
-                Assert.Fail ("Null response");
+                Assert.Fail ("No response: " + common.ErrorResponse);
             } else {
                 //IList<object> responseFields = common.Response as IList<object>;
                 object[] responseFields = Common.Deserialize<object[]> (common.Response.ToString ());

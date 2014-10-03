@@ -3,14 +3,9 @@
   <MonoDevelop.Ide.Workbench ActiveDocument="PubnubMessagingExample/Pubnub_MessagingMain.cs">
     <Files>
       <File FileName="PubnubMessaging/PubnubXamariniOS.cs" Line="1" Column="1" />
-      <File FileName="PubnubMessagingExample/Pubnub_MessagingMain.cs" Line="151" Column="15" />
-      <File FileName="PubnubMessagingExample/Pubnub_MessagingSub.cs" Line="663" Column="40" />
-      <File FileName="PubnubMessaging/PubnubCore.cs" Line="16" Column="16" />
-      <File FileName="../../../../../Volumes/VMware Shared Folders/pubnub/git-master/c-sharp/csharp.net/PubNub-Messaging/PubnubWin.cs" Line="1" Column="1" />
-      <File FileName="PubnubMessaging/ClientNetworkStatus.cs" Line="1" Column="1" />
       <File FileName="PubnubMessaging.Tests/WhenSubscribedToAChannel.cs" Line="1" Column="1" />
-      <File FileName="PubnubMessaging/LoggingMethod.cs" Line="1" Column="1" />
-      <File FileName="PubnubMessaging/Pubnub.cs" Line="1" Column="1" />
+      <File FileName="PubnubMessagingExample/Pubnub_MessagingSub.cs" Line="805" Column="13" />
+      <File FileName="PubnubMessagingExample/Pubnub_MessagingMain.cs" Line="143" Column="9" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

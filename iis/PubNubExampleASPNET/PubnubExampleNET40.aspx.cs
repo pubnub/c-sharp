@@ -392,6 +392,7 @@ namespace PubNubMessaging
             CheckUserInputs();
             channel = txtChannel.Text;
             string messageToBePublished = txtPublishMessage.Text;
+            bool storeInHistory = chkStoreInHistory.Checked;
             string pamAuthKey = txtPAMAuthKey.Text.Trim();
             UpdateTimer.Enabled = true;
 
@@ -407,7 +408,7 @@ namespace PubNubMessaging
                     pubnub.DetailedHistory<string>(channel, 10, DisplayUserCallbackMessage, DisplayErrorMessage);
                     break;
                 case "publish":
-                    pubnub.Publish<string>(channel, messageToBePublished, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    pubnub.Publish<string>(channel, messageToBePublished, storeInHistory, DisplayUserCallbackMessage, DisplayErrorMessage);
                     txtPublishMessage.Text = "";
                     lblErrorMessage.Text = "";
                     break;

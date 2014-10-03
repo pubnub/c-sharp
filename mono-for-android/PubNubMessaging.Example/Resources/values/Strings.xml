@@ -16,7 +16,9 @@
     <string name="subscribe">Subscribe</string>
     <string name="subscribeConnCallback">Subscribe - Connect Callback</string>
     <string name="publish">Publish</string>
+    <string name="inStore">Store In History</string>
     <string name="presence">Presence</string>
+    <string name="message">Message</string>
     <string name="herenow">HereNow</string>
     <string name="detailedHistory">Detailed History</string>
     <string name="time">Time</string>

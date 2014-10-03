@@ -398,6 +398,7 @@
                                                                     Enter message to publish:</div>
                                                                 <div class="PopupBody">
                                                                     <p>
+                                                                        <asp:CheckBox ID="chkStoreInHistory" Text="Store In History" Checked="true"  runat="server"/>
                                                                         <asp:TextBox ID="txtPublishMessage" TextMode="MultiLine" runat="server" Height="180px"
                                                                             Width="98%" Wrap="true"></asp:TextBox>
                                                                         <asp:Label ID="lblErrorMessage" Text="" runat="server" Font-Names="verdana" ForeColor="Red"

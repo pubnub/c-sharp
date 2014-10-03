@@ -342,10 +342,10 @@ namespace PubnubWindowsPhone
             StackPanel publishStackPanel = new StackPanel();
             publishStackPanel.Background = new SolidColorBrush(Colors.Blue);
             publishStackPanel.Width = 300;
-            publishStackPanel.Height = 300;
+            publishStackPanel.Height = 400;
 
             publishPopup = new Popup();
-            publishPopup.Height = 300;
+            publishPopup.Height = 400;
             publishPopup.Width = 300;
             publishPopup.VerticalOffset = 100;
             publishPopup.HorizontalOffset = 10;
@@ -365,6 +365,9 @@ namespace PubnubWindowsPhone
                     TextBox txtPublish = control.FindName("txtPublish") as TextBox;
                     string publishMsg = (txtPublish != null) ? txtPublish.Text : "";
 
+                    CheckBox chkStoreInHistory = control.FindName("chkStoreInHistory") as CheckBox;
+                    bool storeInHistory = (chkStoreInHistory != null) ? chkStoreInHistory.IsChecked.Value : true;
+
                     if (publishMsg != "")
                     {
                         DisplayMessageInTextBox("Running Publish:");
@@ -373,15 +376,15 @@ namespace PubnubWindowsPhone
                         int intData;
                         if (int.TryParse(publishMsg, out intData)) //capture numeric data
                         {
-                            pubnub.Publish<string>(channel, intData, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                            pubnub.Publish<string>(channel, intData, storeInHistory, PubnubCallbackResult, PubnubDisplayErrorMessage);
                         }
                         else if (double.TryParse(publishMsg, out doubleData)) //capture numeric data
                         {
-                            pubnub.Publish<string>(channel, doubleData, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                            pubnub.Publish<string>(channel, doubleData, storeInHistory, PubnubCallbackResult, PubnubDisplayErrorMessage);
                         }
                         else
                         {
-                            pubnub.Publish<string>(channel, publishMsg, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                            pubnub.Publish<string>(channel, publishMsg, storeInHistory, PubnubCallbackResult, PubnubDisplayErrorMessage);
                         }
                     }
                 }
