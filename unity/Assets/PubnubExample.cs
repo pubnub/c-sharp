@@ -49,7 +49,9 @@ public class PubnubExample : MonoBehaviour
     bool ssl = false;
     bool resumeOnReconnect = true;
     string cipherKey = "";
-    string secretKey = "";
+    string secretKey = "demo";
+    string publishKey = "demo";
+    string subscribeKey = "demo";
     string uuid = Guid.NewGuid ().ToString ();
     string subscribeTimeoutInSeconds = "310";
     string operationTimeoutInSeconds = "45";
@@ -168,6 +170,20 @@ public class PubnubExample : MonoBehaviour
 
         fTop = fTopInit + 3 * fRowHeight;
         fLeft = fLeftInit;
+        GUI.Label (new Rect (fLeft, fTop, 70, fHeight), "Subscribe Key");
+
+        fLeft = fLeft + 75;
+        subscribeKey = GUI.TextField (new Rect (fLeft, fTop, 130, fHeight), subscribeKey);
+
+        fLeft = fLeft + 145;
+        GUI.Label (new Rect (fLeft, fTop, 70, fHeight), "Publish Key");
+
+        fLeft = fLeft + 85;
+        publishKey = GUI.TextField (new Rect (fLeft, fTop, 130, fHeight), publishKey);
+
+
+        fTop = fTopInit + 4 * fRowHeight;
+        fLeft = fLeftInit;
         GUI.Label (new Rect (fLeft, fTop, 70, fHeight), "Secret Key");
         fLeft = fLeft + 75;
         secretKey = GUI.TextField (new Rect (fLeft, fTop, 130, fHeight), secretKey);
@@ -179,7 +195,7 @@ public class PubnubExample : MonoBehaviour
         subscribeTimeoutInSeconds = GUI.TextField (new Rect (fLeft, fTop, 30, fHeight), subscribeTimeoutInSeconds, 6);
         subscribeTimeoutInSeconds = Regex.Replace (subscribeTimeoutInSeconds, "[^0-9]", "");
 
-        fTop = fTopInit + 4 * fRowHeight;
+        fTop = fTopInit + 5 * fRowHeight;
         fLeft = fLeftInit;
         GUI.Label (new Rect (fLeft, fTop, 160, fHeight), "MAX retries");
 
@@ -194,7 +210,7 @@ public class PubnubExample : MonoBehaviour
         operationTimeoutInSeconds = GUI.TextField (new Rect (fLeft, fTop, 30, fHeight), operationTimeoutInSeconds, 6);
         operationTimeoutInSeconds = Regex.Replace (operationTimeoutInSeconds, "[^0-9]", "");
 
-        fTop = fTopInit + 5 * fRowHeight;
+        fTop = fTopInit + 6 * fRowHeight;
         fLeft = fLeftInit;
         GUI.Label (new Rect (fLeft, fTop, 160, fHeight), "Retry Interval (secs)");
 
@@ -274,7 +290,7 @@ public class PubnubExample : MonoBehaviour
             GUI.backgroundColor = new Color (1, 1, 1, 1);
         }
 
-        fTop = fTopInit + 6 * fRowHeight;
+        fTop = fTopInit + 7 * fRowHeight;
         fLeft = fLeftInit;
         scrollPosition = GUI.BeginScrollView (new Rect (fLeft, fTop, 430, 420), scrollPosition, new Rect (fLeft, fTop, 430, 420), false, true);
         GUI.enabled = false;
@@ -631,7 +647,7 @@ public class PubnubExample : MonoBehaviour
             if (state == PubnubState.GrantSubscribe) {
                 int iTtl;
                 Int32.TryParse (valueToSetSubs, out iTtl);
-                if (iTtl == 0)
+                if (iTtl < 0)
                     iTtl = 1440;
                 try {
                     pubnub.GrantAccess<string> (channel, valueToSetAuthKey, toggle1, toggle2, iTtl, DisplayReturnMessage, DisplayErrorMessage);
@@ -641,7 +657,7 @@ public class PubnubExample : MonoBehaviour
             } else if (state == PubnubState.GrantPresence) {
                 int iTtl;
                 Int32.TryParse (valueToSetSubs, out iTtl);
-                if (iTtl == 0)
+                if (iTtl < 0)
                     iTtl = 1440;
                 try {
                     pubnub.GrantPresenceAccess<string> (channel, valueToSetAuthKey, toggle1, toggle2, iTtl, DisplayReturnMessage, DisplayErrorMessage);
@@ -1067,7 +1083,7 @@ public class PubnubExample : MonoBehaviour
     void InstantiatePubnub ()
     {
         if (pubnub == null) {
-            pubnub = new Pubnub ("demo", "demo", "demo", cipherKey, ssl);
+            pubnub = new Pubnub (publishKey, subscribeKey, secretKey, cipherKey, ssl);
             pubnub.SessionUUID = uuid;
             pubnub.SubscribeTimeout = int.Parse (subscribeTimeoutInSeconds);
             pubnub.NonSubscribeTimeout = int.Parse (operationTimeoutInSeconds);

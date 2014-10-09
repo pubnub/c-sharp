@@ -1,9 +1,11 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Android.And4.2.2" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="PubNubMessaging.Example/GrantDialogFragment.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Android.YT910F2NYE" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="PubNubMessaging.Example/LaunchScreen.cs">
     <Files>
-      <File FileName="PubNubMessaging.Example/MainActivity.cs" Line="666" Column="59" />
-      <File FileName="PubNubMessaging.Example/GrantDialogFragment.cs" Line="29" Column="6" />
+      <File FileName="PubNubMessaging.Example/MainActivity.cs" Line="256" Column="13" />
+      <File FileName="PubNubMessaging.Example/GrantDialogFragment.cs" Line="1" Column="1" />
+      <File FileName="PubNubMessaging.Example/LaunchScreen.cs" Line="48" Column="13" />
+      <File FileName="PubNubMessaging.Example/Resources/values/Strings.xml" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
@@ -11,10 +13,7 @@
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.ItemProperties.PubNubMessaging.Example MonoForAntroid.PreferredDevice="AndArm" />
-</Properties>   <BreakpointStore />
-  </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-</Properties>onoForAntroid.PreferredDevice="AndArm" AndroidDeviceId-Debug="YT910F2NYE" />
+</Properties>roidDeviceId-Debug="YT910F2NYE" />
 </Properties>aging/Pubnub.cs" line="1526" offsetX="915" offsetY="22880" expression="cert" liveUpdate="False" />
   </MonoDevelop.Ide.DebuggingService.PinnedWatches>
   <MonoDevelop.Ide.ItemProperties.PubNubMessaging.Example MonoForAntroid.PreferredDevice="AndArm" AndroidDeviceId-Debug="YT910F2NYE" />

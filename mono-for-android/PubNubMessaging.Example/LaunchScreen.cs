@@ -30,6 +30,10 @@ namespace PubNubMessaging.Example
         EditText proxyServer;
         EditText proxyPort;
 
+        EditText txtSubKey;
+        EditText txtPubKey;
+        EditText txtSecKey;
+
         PubnubProxy proxy = null;
         public static Pubnub pubnub = null;
 
@@ -47,6 +51,13 @@ namespace PubNubMessaging.Example
 
             tvProxy = FindViewById<TextView> (Resource.Id.tvProxy);
             tvProxy.Text = SetProxyText (false);
+
+            txtSubKey = FindViewById<EditText> (Resource.Id.txtSubKey);
+            txtSubKey.Text = "demo";
+            txtPubKey = FindViewById<EditText> (Resource.Id.txtPubKey);
+            txtPubKey.Text = "demo";
+            txtSecKey = FindViewById<EditText> (Resource.Id.txtSecKey);
+            txtSecKey.Text = "demo";
         }
 
         string SetProxyText (bool on)
@@ -198,7 +209,6 @@ namespace PubNubMessaging.Example
 
         void LaunchClick (object sender, EventArgs e)
         {
-
             EditText txtChannel = FindViewById<EditText> (Resource.Id.txtChannel);
             if (String.IsNullOrWhiteSpace (txtChannel.Text.Trim ())) {
                 ShowAlert ("Please enter a channel name");
@@ -220,7 +230,7 @@ namespace PubNubMessaging.Example
 
                 mainActivity.PutExtra ("Cipher", txtCipher.Text.Trim ());
 
-                pubnub = new Pubnub ("demo", "demo", "demo", txtCipher.Text.Trim (), tbSsl.Checked);
+                pubnub = new Pubnub (txtPubKey.Text.Trim (), txtSubKey.Text.Trim (), txtSecKey.Text.Trim (), txtCipher.Text.Trim (), tbSsl.Checked);
 
                 if (!String.IsNullOrWhiteSpace (txtCustomUuid.Text.Trim ())) {
                     pubnub.SessionUUID = txtCustomUuid.Text.Trim ();
