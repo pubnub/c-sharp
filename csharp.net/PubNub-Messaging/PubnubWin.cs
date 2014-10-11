@@ -602,7 +602,7 @@ namespace PubNubMessaging.Core
                                 else if (base.JsonPluggableLibrary.IsDictionaryCompatible(jsonString))
                                 {
                                     Dictionary<string, object> deserializeStatus = base.JsonPluggableLibrary.DeserializeToDictionaryOfObject(jsonString);
-                                    string statusMessage = deserializeStatus.ContainsKey("message") ? deserializeStatus["message"].ToString() : jsonString;
+                                    string statusMessage = deserializeStatus.ContainsKey("message") ? deserializeStatus["message"].ToString() : (deserializeStatus.ContainsKey("error") ? deserializeStatus["error"].ToString() : jsonString);
                                     PubnubErrorCode pubnubErrorType = PubnubErrorCodeHelper.GetErrorType((int)currentHttpStatusCode, statusMessage);
                                     pubnubStatusCode = (int)pubnubErrorType;
                                     errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(pubnubErrorType);
