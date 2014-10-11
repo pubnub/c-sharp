@@ -857,7 +857,6 @@ namespace PubnubWindowsPhone
             pushNotificationPopup.IsOpen = true;
             control.btnOK.Click += (s, args) =>
             {
-                string msg = "";
                 pushNotificationPopup.IsOpen = false;
                 ResponseType type;
                 //currentPushReqType
@@ -866,36 +865,27 @@ namespace PubnubWindowsPhone
                     type = ResponseType.PushRegister;
                     currentPushReqType = type;
                     ProcessPushRequestType(type, channel);
-                    msg = "Running Register Device";
                 }
                 else if (control.radRUnegisterDevice.IsChecked.Value)
                 {
                     type = ResponseType.PushUnregister;
                     currentPushReqType = type;
                     ProcessPushRequestType(type, channel);
-                    msg = "Running Unregister Device";
                 }
                 else if (control.radRemoveChannel.IsChecked.Value)
                 {
                     type = ResponseType.PushRemove;
                     currentPushReqType = type;
                     ProcessPushRequestType(type, channel);
-                    msg = "Running remove channel from push";
                 }
                 else if (control.radGetChannels.IsChecked.Value)
                 {
                     type = ResponseType.PushGet;
                     currentPushReqType = type;
                     ProcessPushRequestType(type, channel);
-                    msg = "Running get channels for push";
 
                 }
 
-                TextBlock textBlock = new TextBlock();
-                textBlock.Text = msg;
-                messageStackPanel.Children.Add(textBlock);
-                scrollViewerResult.UpdateLayout();
-                scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
                 pushNotificationPopup = null;
                 this.IsEnabled = true;
             };
@@ -926,6 +916,7 @@ namespace PubnubWindowsPhone
                 }
 
                 string pubnubChannel = txtChannel.Text;
+                string msg = "";
                 // Display the new URI for testing purposes.   Normally, the URI would be passed back to your web service at this point.
                 System.Diagnostics.Debug.WriteLine(e.ChannelUri.ToString());
                 ResponseType type = currentPushReqType;
@@ -933,20 +924,29 @@ namespace PubnubWindowsPhone
                 {
                     case ResponseType.PushRegister:
                         pubnub.RegisterDeviceForPush<string>(pubnubChannel, PushTypeService.MPNS, e.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        msg = "Running Register Device";
                         break;
                     case ResponseType.PushUnregister:
                         pubnub.UnregisterDeviceForPush<string>(PushTypeService.MPNS, e.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        msg = "Running Unregister Device";
                         break;
                     case ResponseType.PushRemove:
                         pubnub.RemoveChannelForDevicePush<string>(pubnubChannel, PushTypeService.MPNS, e.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        msg = "Running remove channel from push";
                         break;
                     case ResponseType.PushGet:
                         pubnub.GetChannelsForDevicePush<string>(PushTypeService.MPNS, e.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        msg = "Running get channels for push";
                         break;
                     default:
                         break;
                 }
-                
+
+                TextBlock textBlock = new TextBlock();
+                textBlock.Text = msg;
+                messageStackPanel.Children.Add(textBlock);
+                scrollViewerResult.UpdateLayout();
+                scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
                 //MessageBox.Show(String.Format("Channel Uri is {0}", e.ChannelUri.ToString()));
             });
         }
@@ -1020,26 +1020,39 @@ namespace PubnubWindowsPhone
                 // Register for this notification only if you need to receive the notifications while your application is running.
                 microsoftPushChannel.ShellToastNotificationReceived += new EventHandler<NotificationEventArgs>(PushChannel_ShellToastNotificationReceived);
 
-                // Display the URI for testing purposes. Normally, the URI would be passed back to your web service at this point.
-                System.Diagnostics.Debug.WriteLine(microsoftPushChannel.ChannelUri.ToString());
-                switch (type)
+                if (microsoftPushChannel.ChannelUri != null)
                 {
-                    case ResponseType.PushRegister:
-                        pubnub.RegisterDeviceForPush<string>(pubnubChannel, PushTypeService.MPNS, microsoftPushChannel.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
-                        break;
-                    case ResponseType.PushUnregister:
-                        pubnub.UnregisterDeviceForPush<string>(PushTypeService.MPNS, microsoftPushChannel.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
-                        break;
-                    case ResponseType.PushRemove:
-                        pubnub.RemoveChannelForDevicePush<string>(pubnubChannel, PushTypeService.MPNS, microsoftPushChannel.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
-                        break;
-                    case ResponseType.PushGet:
-                        pubnub.GetChannelsForDevicePush<string>(PushTypeService.MPNS, microsoftPushChannel.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
-                        break;
-                    default:
-                        break;
+                    // Display the URI for testing purposes. Normally, the URI would be passed back to your web service at this point.
+                    System.Diagnostics.Debug.WriteLine(microsoftPushChannel.ChannelUri.ToString());
+                    string msg = "";
+                    switch (type)
+                    {
+                        case ResponseType.PushRegister:
+                            pubnub.RegisterDeviceForPush<string>(pubnubChannel, PushTypeService.MPNS, microsoftPushChannel.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                            msg = "Running Register Device";
+                            break;
+                        case ResponseType.PushUnregister:
+                            pubnub.UnregisterDeviceForPush<string>(PushTypeService.MPNS, microsoftPushChannel.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                            msg = "Running Unregister Device";
+                            break;
+                        case ResponseType.PushRemove:
+                            pubnub.RemoveChannelForDevicePush<string>(pubnubChannel, PushTypeService.MPNS, microsoftPushChannel.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                            msg = "Running remove channel from push";
+                            break;
+                        case ResponseType.PushGet:
+                            pubnub.GetChannelsForDevicePush<string>(PushTypeService.MPNS, microsoftPushChannel.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                            msg = "Running get channels for push";
+                            break;
+                        default:
+                            break;
+                    }
+                    TextBlock textBlock = new TextBlock();
+                    textBlock.Text = msg;
+                    messageStackPanel.Children.Add(textBlock);
+                    scrollViewerResult.UpdateLayout();
+                    scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
+                    //MessageBox.Show(String.Format("Channel Uri is {0}", microsoftPushChannel.ChannelUri.ToString()));
                 }
-                //MessageBox.Show(String.Format("Channel Uri is {0}", microsoftPushChannel.ChannelUri.ToString()));
 
             }
 
