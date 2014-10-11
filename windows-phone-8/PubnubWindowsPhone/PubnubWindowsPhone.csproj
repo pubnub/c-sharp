@@ -118,6 +118,9 @@
     <Compile Include="PubnubOperation.xaml.cs" />
     <Compile Include="PubnubTimeoutSettings.xaml.cs" />
     <Compile Include="PubnubWin.cs" />
+    <Compile Include="PushNotificationUserControl.xaml.cs">
+      <DependentUpon>PushNotificationUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ReconnectState.cs" />
     <Compile Include="Resources\AppResources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -167,6 +170,10 @@
     <Page Include="PubnubTimeoutSettings.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PushNotificationUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserStateUserControl.xaml">
       <SubType>Designer</SubType>

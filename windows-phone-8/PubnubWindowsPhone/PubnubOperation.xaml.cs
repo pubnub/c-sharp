@@ -13,6 +13,8 @@ using Microsoft.Phone.Controls;
 using PubNubMessaging.Core;
 using System.Windows.Controls.Primitives;
 
+using Microsoft.Phone.Notification;
+using System.Text;
 
 namespace PubnubWindowsPhone
 {
@@ -45,6 +47,10 @@ namespace PubnubWindowsPhone
         Popup globalHereNowPopup = null;
         Popup userStatePopup = null;
         Popup changeUUIDPopup = null;
+        Popup pushNotificationPopup = null;
+
+        string microsoftChannelName = "pushSampleChannel";
+        ResponseType currentPushReqType;
 
         public PubnubOperation()
         {
@@ -192,11 +198,11 @@ namespace PubnubWindowsPhone
             StackPanel publishStackPanel = new StackPanel();
             publishStackPanel.Background = new SolidColorBrush(Colors.Blue);
             publishStackPanel.Width = 300;
-            publishStackPanel.Height = 400;
+            publishStackPanel.Height = 550;
 
             publishPopup = new Popup();
             publishPopup.Height = 400;
-            publishPopup.Width = 300;
+            publishPopup.Width = 550;
             publishPopup.VerticalOffset = 100;
             publishPopup.HorizontalOffset = 100;
             PublishMessageUserControl control = new PublishMessageUserControl();
@@ -208,9 +214,39 @@ namespace PubnubWindowsPhone
             control.btnOK.Click += (s, args) =>
             {
                 publishPopup.IsOpen = false;
-                string publishedMessage = control.txtPublish.Text;
-                bool storeInHistory = control.chkStoreInHistory.IsChecked.Value;
-                pubnub.Publish<string>(channel, publishedMessage, storeInHistory, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                string publishedMessage = "";
+                if (control.radNormalPublish.IsChecked.Value)
+                {
+                    publishedMessage = control.txtPublish.Text;
+                    bool storeInHistory = control.chkStoreInHistory.IsChecked.Value;
+                    pubnub.Publish<string>(channel, publishedMessage, storeInHistory, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+                else if (control.radToastPublish.IsChecked.Value)
+                {
+                    ToastNotification toast = new ToastNotification();
+                    toast.type = "toast";
+                    toast.text1 = "hardcode message";
+                    Dictionary<string, object> dicToast = new Dictionary<string, object>();
+                    dicToast.Add("pn_mpns", toast);
+                    //dicToast.Add("debug", "false");
+                    pubnub.EnableDebugForPushPublish = true;
+                    pubnub.Publish<string>(channel, dicToast, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+                else if (control.radTilePublish.IsChecked.Value)
+                {
+                    TileNotification tile = new TileNotification();
+                    tile.type = "tile";
+                    tile.title = "front title";
+                    tile.count = "2";
+                    tile.back_title = "back title";
+                    tile.content = "back message";
+                    Dictionary<string, object> dicTile = new Dictionary<string, object>();
+                    dicTile.Add("pn_mpns", tile);
+                    //dicTile.Add("debug", "false");
+                    pubnub.EnableDebugForPushPublish = true;
+                    pubnub.Publish<string>(channel, dicTile, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+
                 TextBlock textBlock = new TextBlock();
                 textBlock.Text = string.Format("Publishing {0}\n", publishedMessage);
                 messageStackPanel.Children.Add(textBlock);
@@ -795,5 +831,218 @@ namespace PubnubWindowsPhone
             };
         }
 
+        private void btnPush_Click(object sender, RoutedEventArgs e)
+        {
+            channel = txtChannel.Text;
+            this.IsEnabled = false;
+            Border border = new Border();
+            border.BorderBrush = new SolidColorBrush(Colors.Black);
+            border.BorderThickness = new Thickness(5.0);
+
+            StackPanel pushNotificationStackPanel = new StackPanel();
+            pushNotificationStackPanel.Background = new SolidColorBrush(Colors.Blue);
+            pushNotificationStackPanel.Width = 400;
+            pushNotificationStackPanel.Height = 400;
+
+            pushNotificationPopup = new Popup();
+            pushNotificationPopup.Height = 300;
+            pushNotificationPopup.Width = 300;
+            pushNotificationPopup.VerticalOffset = 20;
+            pushNotificationPopup.HorizontalOffset = 20;
+            PushNotificationUserControl control = new PushNotificationUserControl();
+            pushNotificationStackPanel.Children.Add(control);
+            border.Child = pushNotificationStackPanel;
+
+            pushNotificationPopup.Child = border;
+            pushNotificationPopup.IsOpen = true;
+            control.btnOK.Click += (s, args) =>
+            {
+                string msg = "";
+                pushNotificationPopup.IsOpen = false;
+                ResponseType type;
+                //currentPushReqType
+                if (control.radRegisterDevice.IsChecked.Value)
+                {
+                    type = ResponseType.PushRegister;
+                    currentPushReqType = type;
+                    ProcessPushRequestType(type, channel);
+                    msg = "Running Register Device";
+                }
+                else if (control.radRUnegisterDevice.IsChecked.Value)
+                {
+                    type = ResponseType.PushUnregister;
+                    currentPushReqType = type;
+                    ProcessPushRequestType(type, channel);
+                    msg = "Running Unregister Device";
+                }
+                else if (control.radRemoveChannel.IsChecked.Value)
+                {
+                    type = ResponseType.PushRemove;
+                    currentPushReqType = type;
+                    ProcessPushRequestType(type, channel);
+                    msg = "Running remove channel from push";
+                }
+                else if (control.radGetChannels.IsChecked.Value)
+                {
+                    type = ResponseType.PushGet;
+                    currentPushReqType = type;
+                    ProcessPushRequestType(type, channel);
+                    msg = "Running get channels for push";
+
+                }
+
+                TextBlock textBlock = new TextBlock();
+                textBlock.Text = msg;
+                messageStackPanel.Children.Add(textBlock);
+                scrollViewerResult.UpdateLayout();
+                scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
+                pushNotificationPopup = null;
+                this.IsEnabled = true;
+            };
+            control.btnCancel.Click += (s, args) =>
+            {
+                pushNotificationPopup.IsOpen = false;
+                pushNotificationPopup = null;
+                this.IsEnabled = true;
+            };
+
+        }
+
+        void PushChannel_ChannelUriUpdated(object sender, NotificationChannelUriEventArgs e)
+        {
+
+            Dispatcher.BeginInvoke(() =>
+            {
+                HttpNotificationChannel microsoftPushChannel;
+                microsoftPushChannel = HttpNotificationChannel.Find(microsoftChannelName);
+                if (!microsoftPushChannel.IsShellTileBound)
+                {
+                    microsoftPushChannel.BindToShellTile();
+                }
+
+                if (!microsoftPushChannel.IsShellToastBound)
+                {
+                    microsoftPushChannel.BindToShellToast();
+                }
+
+                string pubnubChannel = txtChannel.Text;
+                // Display the new URI for testing purposes.   Normally, the URI would be passed back to your web service at this point.
+                System.Diagnostics.Debug.WriteLine(e.ChannelUri.ToString());
+                ResponseType type = currentPushReqType;
+                switch (type)
+                {
+                    case ResponseType.PushRegister:
+                        pubnub.RegisterDeviceForPush<string>(pubnubChannel, PushTypeService.MPNS, e.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        break;
+                    case ResponseType.PushUnregister:
+                        pubnub.UnregisterDeviceForPush<string>(PushTypeService.MPNS, e.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        break;
+                    case ResponseType.PushRemove:
+                        pubnub.RemoveChannelForDevicePush<string>(pubnubChannel, PushTypeService.MPNS, e.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        break;
+                    case ResponseType.PushGet:
+                        pubnub.GetChannelsForDevicePush<string>(PushTypeService.MPNS, e.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        break;
+                    default:
+                        break;
+                }
+                
+                //MessageBox.Show(String.Format("Channel Uri is {0}", e.ChannelUri.ToString()));
+            });
+        }
+
+        void PushChannel_ErrorOccurred(object sender, NotificationChannelErrorEventArgs e)
+        {
+            // Error handling logic for your particular application would be here.
+            Dispatcher.BeginInvoke(() =>
+                MessageBox.Show(String.Format("A push notification {0} error occurred.  {1} ({2}) {3}",
+                    e.ErrorType, e.Message, e.ErrorCode, e.ErrorAdditionalData))
+                    );
+        }
+
+        void PushChannel_ShellToastNotificationReceived(object sender, NotificationEventArgs e)
+        {
+            StringBuilder message = new StringBuilder();
+            string relativeUri = string.Empty;
+
+            message.AppendFormat("Received Toast {0}:\n", DateTime.Now.ToShortTimeString());
+
+            // Parse out the information that was part of the message.
+            foreach (string key in e.Collection.Keys)
+            {
+                message.AppendFormat("{0}: {1}\n", key, e.Collection[key]);
+
+                if (string.Compare(
+                    key,
+                    "wp:Param",
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    System.Globalization.CompareOptions.IgnoreCase) == 0)
+                {
+                    relativeUri = e.Collection[key];
+                }
+            }
+
+            // Display a dialog of all the fields in the toast.
+            Dispatcher.BeginInvoke(() => MessageBox.Show(message.ToString()));
+
+        }
+
+        void ProcessPushRequestType(ResponseType type, string pubnubChannel)
+        {
+            HttpNotificationChannel microsoftPushChannel;
+
+            microsoftPushChannel = HttpNotificationChannel.Find(microsoftChannelName);
+
+            if (microsoftPushChannel == null)
+            {
+                microsoftPushChannel = new HttpNotificationChannel(microsoftChannelName);
+
+                // Register for all the events before attempting to open the channel.
+                microsoftPushChannel.ChannelUriUpdated += new EventHandler<NotificationChannelUriEventArgs>(PushChannel_ChannelUriUpdated);
+                microsoftPushChannel.ErrorOccurred += new EventHandler<NotificationChannelErrorEventArgs>(PushChannel_ErrorOccurred);
+
+                // Register for this notification only if you need to receive the notifications while your application is running.
+                microsoftPushChannel.ShellToastNotificationReceived += new EventHandler<NotificationEventArgs>(PushChannel_ShellToastNotificationReceived);
+
+                microsoftPushChannel.Open();
+
+                // Bind this new channel for toast events.
+                microsoftPushChannel.BindToShellToast();
+                microsoftPushChannel.BindToShellTile();
+
+            }
+            else
+            {
+                // The channel was already open, so just register for all the events.
+                microsoftPushChannel.ChannelUriUpdated += new EventHandler<NotificationChannelUriEventArgs>(PushChannel_ChannelUriUpdated);
+                microsoftPushChannel.ErrorOccurred += new EventHandler<NotificationChannelErrorEventArgs>(PushChannel_ErrorOccurred);
+
+                // Register for this notification only if you need to receive the notifications while your application is running.
+                microsoftPushChannel.ShellToastNotificationReceived += new EventHandler<NotificationEventArgs>(PushChannel_ShellToastNotificationReceived);
+
+                // Display the URI for testing purposes. Normally, the URI would be passed back to your web service at this point.
+                System.Diagnostics.Debug.WriteLine(microsoftPushChannel.ChannelUri.ToString());
+                switch (type)
+                {
+                    case ResponseType.PushRegister:
+                        pubnub.RegisterDeviceForPush<string>(pubnubChannel, PushTypeService.MPNS, microsoftPushChannel.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        break;
+                    case ResponseType.PushUnregister:
+                        pubnub.UnregisterDeviceForPush<string>(PushTypeService.MPNS, microsoftPushChannel.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        break;
+                    case ResponseType.PushRemove:
+                        pubnub.RemoveChannelForDevicePush<string>(pubnubChannel, PushTypeService.MPNS, microsoftPushChannel.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        break;
+                    case ResponseType.PushGet:
+                        pubnub.GetChannelsForDevicePush<string>(PushTypeService.MPNS, microsoftPushChannel.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        break;
+                    default:
+                        break;
+                }
+                //MessageBox.Show(String.Format("Channel Uri is {0}", microsoftPushChannel.ChannelUri.ToString()));
+
+            }
+
+        }
     }
 }
