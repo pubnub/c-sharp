@@ -324,6 +324,12 @@ pubnub.AuditPresenceAccess<string>(channel="mychannel",DisplayReturnMessage, Dis
 NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
 
+### Logging
+
+To capture the error/info messages from ErrorCallback, set config file appSettings key PubnubMessaging.PubnubErrorFilterLevel = "3" (Info). Other available values are 2 (Warning) and 1 (Critical). If config file support is not available for your client, refer errorLevel variable from Variables Reference section.
+For troubleshooting purpose, low level logging option is also available. For this set config file appSettings key PubnubMessaging.LogLevel = "3" (Verbose). Other available values are 0 (Off), 1 (Error), 2 (Info) and 4 (Warning). If config file support is not available for your client, refer pubnubLogLevel variable from Variables Reference section.
+
+
 
 ## Running the Interactive Demo App
 
@@ -349,6 +355,7 @@ NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 5. Set Target Framework to 3.5 or 4
 6. Save the project
 7. CTRL-F5 or F5 to run it
+
 
 ## Variables Reference
 

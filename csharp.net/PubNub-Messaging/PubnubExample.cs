@@ -616,10 +616,17 @@ namespace PubNubMessaging.Core
                         bool write = (writeAccess.ToLower() == "n") ? false : true;
                         Console.WriteLine("How many minutes do you want to allow Grant Access? Enter the number of minutes.");
                         Console.WriteLine("Default = 1440 minutes (24 hours). Press ENTER now to accept default value.");
-                        string grantTimeLimit = Console.ReadLine();
                         int grantTimeLimitInMinutes;
-                        Int32.TryParse(grantTimeLimit, out grantTimeLimitInMinutes);
-                        if (grantTimeLimitInMinutes == 0) grantTimeLimitInMinutes = 1440;
+                        string grantTimeLimit = Console.ReadLine();
+                        if (string.IsNullOrEmpty(grantTimeLimit.Trim()))
+                        {
+                            grantTimeLimitInMinutes = 1440;
+                        }
+                        else
+                        {
+                            Int32.TryParse(grantTimeLimit, out grantTimeLimitInMinutes);
+                            if (grantTimeLimitInMinutes < 0) grantTimeLimitInMinutes = 1440;
+                        }
 
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}",channel));
@@ -691,10 +698,17 @@ namespace PubNubMessaging.Core
                         bool writePresence = (writePresenceAccess.ToLower() == "n") ? false : true;
                         Console.WriteLine("How many minutes do you want to allow Grant Presence Access? Enter the number of minutes.");
                         Console.WriteLine("Default = 1440 minutes (24 hours). Press ENTER now to accept default value.");
-                        string grantPresenceTimeLimit = Console.ReadLine();
                         int grantPresenceTimeLimitInMinutes;
-                        Int32.TryParse(grantPresenceTimeLimit, out grantPresenceTimeLimitInMinutes);
-                        if (grantPresenceTimeLimitInMinutes == 0) grantPresenceTimeLimitInMinutes = 1440;
+                        string grantPresenceTimeLimit = Console.ReadLine();
+                        if (string.IsNullOrEmpty(grantPresenceTimeLimit.Trim()))
+                        {
+                            grantPresenceTimeLimitInMinutes = 1440;
+                        }
+                        else
+                        {
+                            Int32.TryParse(grantPresenceTimeLimit, out grantPresenceTimeLimitInMinutes);
+                            if (grantPresenceTimeLimitInMinutes < 0) grantPresenceTimeLimitInMinutes = 1440;
+                        }
 
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", channel));
