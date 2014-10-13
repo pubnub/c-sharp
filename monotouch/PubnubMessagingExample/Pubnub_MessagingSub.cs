@@ -821,7 +821,7 @@ namespace PubnubMessagingExample
                             bool be2Val = be2.Value;
                             int iTtl;
                             Int32.TryParse (entryTextVal, out iTtl);
-                            if (iTtl == 0) {
+                            if (iTtl < 0) {
                                 iTtl = 1440;
                                 entryTextVal = "1440";
                             }

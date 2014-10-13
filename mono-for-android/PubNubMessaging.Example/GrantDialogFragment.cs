@@ -59,7 +59,7 @@ namespace PubNubMessaging.Example
                 int iTtl;
 
                 Int32.TryParse (txtttl.Text, out iTtl);
-                if (iTtl == 0) {
+                if (iTtl < 0) {
                     iTtl = 1440;
                     txtttl.Text = "1440";
                 }

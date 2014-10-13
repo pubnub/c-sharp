@@ -3,6 +3,9 @@
     <string name="customUuid">Enter custom UUID or leave blank to use the default UUID</string>
     <string name="enableproxy">Enable Proxy</string>
     <string name="proxy">Proxy</string>
+    <string name="subKey">Subscribe Key</string>
+    <string name="pubKey">Publish Key</string>
+    <string name="secKey">Secret Key</string>
     <string name="setProxy">Set</string>
     <string name="proxyOn">On</string>
     <string name="proxyOff">Off</string>

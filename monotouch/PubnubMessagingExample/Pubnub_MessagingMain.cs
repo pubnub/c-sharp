@@ -46,6 +46,18 @@ namespace PubnubMessagingExample
             };
             headerMultipleChannels.Text = "Enter multiple channel names separated by comma";
 
+            EntryElement entrySubscribeKey = new EntryElement ("Subscribe Key", "Enter Subscribe Key", "demo");
+            entrySubscribeKey.AutocapitalizationType = UITextAutocapitalizationType.None;
+            entrySubscribeKey.AutocorrectionType = UITextAutocorrectionType.No;
+
+            EntryElement entryPublishKey = new EntryElement ("Publish Key", "Enter Publish Key", "demo");
+            entryPublishKey.AutocapitalizationType = UITextAutocapitalizationType.None;
+            entryPublishKey.AutocorrectionType = UITextAutocorrectionType.No;
+
+            EntryElement entrySecretKey = new EntryElement ("Secret Key", "Enter Secret Key", "demo");
+            entrySecretKey.AutocapitalizationType = UITextAutocapitalizationType.None;
+            entrySecretKey.AutocorrectionType = UITextAutocorrectionType.No;
+
             EntryElement entryChannelName = new EntryElement ("Channel(s)", "Enter Channel Name", "");
             entryChannelName.AutocapitalizationType = UITextAutocapitalizationType.None;
             entryChannelName.AutocorrectionType = UITextAutocorrectionType.No;
@@ -78,6 +90,15 @@ namespace PubnubMessagingExample
                 },
                 new Section (headerMultipleChannels) {
                 },
+                new Section ("Enter Subscribe Key.") {
+                    entrySubscribeKey
+                },
+                new Section ("Enter Publish key.") {
+                    entryPublishKey
+                },
+                new Section ("Enter Secret key.") {
+                    entrySecretKey
+                },
                 new Section () {
                     entryChannelName,
                     sslEnabled
@@ -106,7 +127,8 @@ namespace PubnubMessagingExample
                         bool errorFree = true;
                         errorFree = ValidateAndInitPubnub (entryChannelName.Value, entryCipher.Value, sslEnabled.Value, 
                             entryCustonUuid.Value, proxyEnabled.Value, entryProxyPort.Value,
-                            entryProxyUser.Value, entryProxyServer.Value, entryProxyPassword.Value
+                            entryProxyUser.Value, entryProxyServer.Value, entryProxyPassword.Value, 
+                            entrySubscribeKey.Value, entryPublishKey.Value, entrySecretKey.Value
                         );
 
                         if (errorFree) {
@@ -143,7 +165,8 @@ namespace PubnubMessagingExample
 
         bool ValidateAndInitPubnub (string channelName, string cipher, bool ssl, 
                                     string customUuid, bool proxyEnabled, string proxyPort,
-                                    string proxyUser, string proxyServer, string proxyPass
+                                    string proxyUser, string proxyServer, string proxyPass,
+                                    string subscribeKey, string publishKey, string secretKey
         )
         {
             bool errorFree = true;
@@ -153,7 +176,7 @@ namespace PubnubMessagingExample
             }
             
             if (errorFree) {
-                pubnub = new Pubnub ("demo", "demo", "demo", cipher, ssl);
+                pubnub = new Pubnub (publishKey, subscribeKey, secretKey, cipher, ssl);
                 if (!String.IsNullOrWhiteSpace (customUuid.Trim ())) {
                     pubnub.SessionUUID = customUuid.Trim ();
                 }
