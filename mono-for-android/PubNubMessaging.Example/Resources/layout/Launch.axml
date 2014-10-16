@@ -7,6 +7,57 @@
     <TableRow>
         <TextView
             android:layout_column="0"
+            android:text="@string/subKey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+    </TableRow>
+    <TableRow>
+        <EditText
+            android:layout_column="0"
+            android:layout_span="2"
+            android:id="@+id/txtSubKey"
+            android:background="#FFF"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </TableRow>
+    <TableRow>
+        <TextView
+            android:layout_column="0"
+            android:text="@string/pubKey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+    </TableRow>
+    <TableRow>
+        <EditText
+            android:layout_column="0"
+            android:layout_span="2"
+            android:id="@+id/txtPubKey"
+            android:background="#FFF"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </TableRow>
+    <TableRow>
+        <TextView
+            android:layout_column="0"
+            android:text="@string/secKey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+    </TableRow>
+    <TableRow>
+        <EditText
+            android:layout_column="0"
+            android:layout_span="2"
+            android:id="@+id/txtSecKey"
+            android:background="#FFF"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </TableRow>
+    <TableRow>
+        <TextView
+            android:layout_column="0"
             android:text="@string/channel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

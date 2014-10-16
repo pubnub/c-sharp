@@ -4,8 +4,8 @@
     <Files>
       <File FileName="PubnubMessaging/PubnubXamariniOS.cs" Line="1" Column="1" />
       <File FileName="PubnubMessaging.Tests/WhenSubscribedToAChannel.cs" Line="1" Column="1" />
-      <File FileName="PubnubMessagingExample/Pubnub_MessagingSub.cs" Line="805" Column="13" />
-      <File FileName="PubnubMessagingExample/Pubnub_MessagingMain.cs" Line="143" Column="9" />
+      <File FileName="PubnubMessagingExample/Pubnub_MessagingSub.cs" Line="1" Column="1" />
+      <File FileName="PubnubMessagingExample/Pubnub_MessagingMain.cs" Line="96" Column="12" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
@@ -14,10 +14,10 @@
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <MonoDevelop.Ide.ItemProperties.Touch.Unit>
-    <MonoDevelop.MacDev.AppleDevelopmentTeam DeveloperId="NK6E38LY64" TeamId="Y9X42V6EK7" />
-  </MonoDevelop.Ide.ItemProperties.Touch.Unit>
   <MonoDevelop.Ide.ItemProperties.PubnubMessagingExample>
     <MonoDevelop.MacDev.AppleDevelopmentTeam DeveloperId="NK6E38LY64" TeamId="Y9X42V6EK7" />
   </MonoDevelop.Ide.ItemProperties.PubnubMessagingExample>
+  <MonoDevelop.Ide.ItemProperties.Touch.Unit>
+    <MonoDevelop.MacDev.AppleDevelopmentTeam DeveloperId="NK6E38LY64" TeamId="Y9X42V6EK7" />
+  </MonoDevelop.Ide.ItemProperties.Touch.Unit>
 </Properties>
