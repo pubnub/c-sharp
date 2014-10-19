@@ -359,7 +359,7 @@ namespace PubNubMessaging.Core
             Console.WriteLine("");
             while (!exitFlag)
             {
-                if (currentUserChoice < 1 || (currentUserChoice > 35 && currentUserChoice != 99))
+                if (currentUserChoice < 1 || (currentUserChoice > 37 && currentUserChoice != 99))
                 {
                     Console.WriteLine("ENTER 1 FOR Subscribe");
                     Console.WriteLine("ENTER 2 FOR Publish");
@@ -395,7 +395,9 @@ namespace PubNubMessaging.Core
                     Console.WriteLine("Enter 32 FOR Push - Remove Channel");
                     Console.WriteLine("Enter 33 FOR Push - Get Current Channels");
                     Console.WriteLine("Enter 34 FOR Push - Publish Toast message");
-                    Console.WriteLine("Enter 35 FOR Push - Publish Tile message");
+                    Console.WriteLine("Enter 35 FOR Push - Publish Flip Tile message");
+                    Console.WriteLine("Enter 36 FOR Push - Publish Cycle Tile message");
+                    Console.WriteLine("Enter 37 FOR Push - Publish Iconic Tile message");
                     Console.WriteLine("ENTER 99 FOR EXIT OR QUIT");
 
                     userinput = Console.ReadLine();
@@ -1021,7 +1023,6 @@ namespace PubNubMessaging.Core
                         Console.ResetColor();
 
                         ToastNotification toast = new ToastNotification();
-                        toast.type = "toast";
                         toast.text1 = text1;
                         Dictionary<string, object> dicToast = new Dictionary<string, object>();
                         dicToast.Add("pn_mpns", toast);
@@ -1031,48 +1032,137 @@ namespace PubNubMessaging.Core
                         pubnub.Publish<string>(toastChannel, dicToast, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "35":
-                        //Tile message publish
+                        //Flip Tile message publish
                         Console.WriteLine("Enter channel name");
-                        string tileChannel = Console.ReadLine();
+                        string flipTileChannel = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", tileChannel));
+                        Console.WriteLine(string.Format("Channel = {0}", flipTileChannel));
                         Console.ResetColor();
 
-                        Console.WriteLine("Enter front title for Tile");
-                        string frontTitle = Console.ReadLine();
+                        Console.WriteLine("Enter front title for Flip Tile");
+                        string flipFrontTitle = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Front Title = {0}", frontTitle));
+                        Console.WriteLine(string.Format("Front Title = {0}", flipFrontTitle));
                         Console.ResetColor();
 
-                        Console.WriteLine("Enter back title for Tile");
-                        string backTitle = Console.ReadLine();
+                        Console.WriteLine("Enter back title for Flip Tile");
+                        string flipBackTitle = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Back Title = {0}", backTitle));
+                        Console.WriteLine(string.Format("Back Title = {0}", flipBackTitle));
                         Console.ResetColor();
 
-                        Console.WriteLine("Enter content for Tile");
-                        string content = Console.ReadLine();
+                        Console.WriteLine("Enter back content for Flip Tile");
+                        string flipBackContent = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Content = {0}", content));
+                        Console.WriteLine(string.Format("Back Content = {0}", flipBackContent));
                         Console.ResetColor();
 
-                        Console.WriteLine("Enter count for Tile");
-                        string count = Console.ReadLine();
+                        Console.WriteLine("Enter numeric count for Flip Tile. Invalid entry will be set to null");
+                        string stringFlipCount = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Count = {0}", count));
+                        Console.WriteLine(string.Format("Count = {0}", stringFlipCount));
                         Console.ResetColor();
+                        int? flipTileCount  = null;
+                        if (!string.IsNullOrEmpty(stringFlipCount) && stringFlipCount.Trim().Length > 0)
+                        {
+                            int outValue;
+                            flipTileCount = int.TryParse(stringFlipCount, out outValue) ? (int?)outValue : null;
+                        }
 
-                        TileNotification tile = new TileNotification();
-                        tile.type = "tile";
-                        tile.title = frontTitle;
-                        tile.count = count;
-                        tile.back_title = backTitle;
-                        tile.content = content;
-                        Dictionary<string, object> dicTile = new Dictionary<string, object>();
-                        dicTile.Add("pn_mpns", tile);
+                        FlipTileNotification flipTile = new FlipTileNotification();
+                        flipTile.title = flipFrontTitle;
+                        flipTile.count = flipTileCount;
+                        flipTile.back_title = flipBackTitle;
+                        flipTile.back_content = flipBackContent;
+                        Dictionary<string, object> dicFlipTile = new Dictionary<string, object>();
+                        dicFlipTile.Add("pn_mpns", flipTile);
 
                         pubnub.EnableDebugForPushPublish = true;
-                        pubnub.Publish<string>(tileChannel, dicTile, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.Publish<string>(flipTileChannel, dicFlipTile, DisplayReturnMessage, DisplayErrorMessage);
+                        break;
+                    case "36":
+                        //Cycle Tile message publish
+                        Console.WriteLine("Enter channel name");
+                        string cycleTileChannel = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}", cycleTileChannel));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter front title for Cycle Tile");
+                        string cycleFrontTitle = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Front Title = {0}", cycleFrontTitle));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter numeric count for Cycle Tile. Invalid entry will be set to null");
+                        string stringCycleCount = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Count = {0}", stringCycleCount));
+                        Console.ResetColor();
+                        int? cycleTileCount = null;
+                        if (!string.IsNullOrEmpty(stringCycleCount) && stringCycleCount.Trim().Length > 0)
+                        {
+                            int outValue;
+                            cycleTileCount = int.TryParse(stringCycleCount, out outValue) ? (int?)outValue : null;
+                        }
+
+                        Console.WriteLine("Enter first image fully qualified URI/device local Path for Cycle Tile");
+                        string imageCycleTile1 = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Back Content = {0}", imageCycleTile1));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter second image fully qualified URI/device local Path for Cycle Tile");
+                        string imageCycleTile2 = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Back Content = {0}", imageCycleTile2));
+                        Console.ResetColor();
+
+
+                        CycleTileNotification cycleTile = new CycleTileNotification();
+                        cycleTile.title = cycleFrontTitle;
+                        cycleTile.count = cycleTileCount;
+                        cycleTile.images = new string[] { imageCycleTile1, imageCycleTile2 };
+                        Dictionary<string, object> dicCycleTile = new Dictionary<string, object>();
+                        dicCycleTile.Add("pn_mpns", cycleTile);
+
+                        pubnub.EnableDebugForPushPublish = true;
+                        pubnub.Publish<string>(cycleTileChannel, dicCycleTile, DisplayReturnMessage, DisplayErrorMessage);
+                        break;
+                    case "37":
+                        //Iconic Tile message publish
+                        Console.WriteLine("Enter channel name");
+                        string iconicTileChannel = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}", iconicTileChannel));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter front title for Cycle Tile");
+                        string iconicFrontTitle = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Front Title = {0}", iconicFrontTitle));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter numeric count for Iconic Tile. Invalid entry will be set to null");
+                        string stringIconicCount = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Count = {0}", stringIconicCount));
+                        Console.ResetColor();
+                        int? iconicTileCount = null;
+                        if (!string.IsNullOrEmpty(stringIconicCount) && stringIconicCount.Trim().Length > 0)
+                        {
+                            int outValue;
+                            iconicTileCount = int.TryParse(stringIconicCount, out outValue) ? (int?)outValue : null;
+                        }
+
+                        IconicTileNotification iconicTile = new IconicTileNotification();
+                        iconicTile.title = iconicFrontTitle;
+                        iconicTile.count = iconicTileCount;
+                        Dictionary<string, object> dicIconicTile = new Dictionary<string, object>();
+                        dicIconicTile.Add("pn_mpns", iconicTile);
+
+                        pubnub.EnableDebugForPushPublish = true;
+                        pubnub.Publish<string>(iconicTileChannel, dicIconicTile, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     default:
                         Console.ForegroundColor = ConsoleColor.Red;

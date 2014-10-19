@@ -1,4 +1,4 @@
-﻿//Build Date: October 08, 2014
+﻿//Build Date: October 19, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -5123,19 +5123,51 @@ namespace PubNubMessaging.Core
 
     public class ToastNotification
     {
-        public string type = "";
+        public string type = "toast";
         public string text1 = "";
         public string text2 = "";
         public string param = "";
     }
 
-    public class TileNotification
+    public class FlipTileNotification
     {
-        public string type = "";
+        public string type = "flip";
+        public int delay = 0;
         public string title = "";
-        public string count = "";
+        public int? count = 0;
+        public string small_background_image = "";
+        public string background_image = "";
+        public string back_background_image = "";
+        public string back_content = "";
         public string back_title = "";
-        public string content = "";
+        public string wide_background_image = "";
+        public string wide_back_background_image = "";
+        public string wide_back_content = "";
+    }
+
+
+    public class CycleTileNotification
+    {
+        public string type = "cycle";
+        public int delay = 0;
+        public string title = "";
+        public int? count = 0;
+        public string small_background_image = "";
+        public string[] images = null;
+    }
+
+    public class IconicTileNotification
+    {
+        public string type = "iconic";
+        public int delay = 0;
+        public string title = "";
+        public int? count = 0;
+        public string icon_image = "";
+        public string small_icon_image = "";
+        public string background_color = "";
+        public string wide_content_1 = "";
+        public string wide_content_2 = "";
+        public string wide_content_3 = "";
     }
 
     #endregion
