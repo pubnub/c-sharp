@@ -198,10 +198,10 @@ namespace PubnubWindowsPhone
             StackPanel publishStackPanel = new StackPanel();
             publishStackPanel.Background = new SolidColorBrush(Colors.Blue);
             publishStackPanel.Width = 300;
-            publishStackPanel.Height = 550;
+            publishStackPanel.Height = 600;
 
             publishPopup = new Popup();
-            publishPopup.Height = 400;
+            publishPopup.Height = 600;
             publishPopup.Width = 550;
             publishPopup.VerticalOffset = 100;
             publishPopup.HorizontalOffset = 100;
@@ -224,25 +224,49 @@ namespace PubnubWindowsPhone
                 else if (control.radToastPublish.IsChecked.Value)
                 {
                     ToastNotification toast = new ToastNotification();
-                    toast.type = "toast";
+                    //toast.type = "toast";
                     toast.text1 = "hardcode message";
                     Dictionary<string, object> dicToast = new Dictionary<string, object>();
                     dicToast.Add("pn_mpns", toast);
-                    //dicToast.Add("debug", "false");
+                    
                     pubnub.EnableDebugForPushPublish = true;
                     pubnub.Publish<string>(channel, dicToast, PubnubCallbackResult, PubnubDisplayErrorMessage);
                 }
-                else if (control.radTilePublish.IsChecked.Value)
+                else if (control.radFlipTilePublish.IsChecked.Value)
                 {
-                    TileNotification tile = new TileNotification();
-                    tile.type = "tile";
+                    FlipTileNotification tile = new FlipTileNotification();
                     tile.title = "front title";
-                    tile.count = "2";
+                    tile.count = 2;
                     tile.back_title = "back title";
-                    tile.content = "back message";
+                    tile.back_content = "back message";
                     Dictionary<string, object> dicTile = new Dictionary<string, object>();
                     dicTile.Add("pn_mpns", tile);
-                    //dicTile.Add("debug", "false");
+                    
+                    pubnub.EnableDebugForPushPublish = true;
+                    pubnub.Publish<string>(channel, dicTile, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+                else if (control.radCycleTilePublish.IsChecked.Value)
+                {
+                    CycleTileNotification tile = new CycleTileNotification();
+                    tile.title = "front title";
+                    tile.count = 2;
+                    tile.images = new string[] { "Images/Blue.jpg", "Images/Green.jpg" };
+                    
+                    Dictionary<string, object> dicTile = new Dictionary<string, object>();
+                    dicTile.Add("pn_mpns", tile);
+                    
+                    pubnub.EnableDebugForPushPublish = true;
+                    pubnub.Publish<string>(channel, dicTile, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+                else if (control.radIconicTilePublish.IsChecked.Value)
+                {
+                    IconicTileNotification tile = new IconicTileNotification();
+                    tile.title = "front title";
+                    tile.count = 2;
+                    
+                    Dictionary<string, object> dicTile = new Dictionary<string, object>();
+                    dicTile.Add("pn_mpns", tile);
+
                     pubnub.EnableDebugForPushPublish = true;
                     pubnub.Publish<string>(channel, dicTile, PubnubCallbackResult, PubnubDisplayErrorMessage);
                 }
