@@ -1069,11 +1069,25 @@ namespace PubNubMessaging.Core
                             flipTileCount = int.TryParse(stringFlipCount, out outValue) ? (int?)outValue : null;
                         }
 
+                        Console.WriteLine("Enter background image path with fully qualified URI or device local relative Path for Flip Tile");
+                        string imageBackground = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Small Background Image = {0}", imageBackground));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter Back background image path with fully qualified URI or device local relative Path for Flip Tile");
+                        string imageBackBackground = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Small Background Image = {0}", imageBackBackground));
+                        Console.ResetColor();
+
                         FlipTileNotification flipTile = new FlipTileNotification();
                         flipTile.title = flipFrontTitle;
                         flipTile.count = flipTileCount;
                         flipTile.back_title = flipBackTitle;
                         flipTile.back_content = flipBackContent;
+                        flipTile.background_image = imageBackground;
+                        flipTile.back_background_image = imageBackBackground;
                         Dictionary<string, object> dicFlipTile = new Dictionary<string, object>();
                         dicFlipTile.Add("pn_mpns", flipTile);
 
@@ -1109,13 +1123,13 @@ namespace PubNubMessaging.Core
                         Console.WriteLine("Enter first image fully qualified URI/device local Path for Cycle Tile");
                         string imageCycleTile1 = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Back Content = {0}", imageCycleTile1));
+                        Console.WriteLine(string.Format("First Image Path = {0}", imageCycleTile1));
                         Console.ResetColor();
 
                         Console.WriteLine("Enter second image fully qualified URI/device local Path for Cycle Tile");
                         string imageCycleTile2 = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Back Content = {0}", imageCycleTile2));
+                        Console.WriteLine(string.Format("Second Image Path = {0}", imageCycleTile2));
                         Console.ResetColor();
 
 
