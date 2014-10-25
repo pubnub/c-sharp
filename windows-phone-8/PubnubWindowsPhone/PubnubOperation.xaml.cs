@@ -239,8 +239,8 @@ namespace PubnubWindowsPhone
                     tile.count = 2;
                     tile.back_title = "back title";
                     tile.back_content = "back message";
-                    tile.back_background_image = "pubnub2.png";
-                    tile.background_image = "pubnub3.png";
+                    tile.back_background_image = "Assets/Tiles/pubnub2.png";
+                    tile.background_image = "Assets/Tiles/pubnub3.png";
                     Dictionary<string, object> dicTile = new Dictionary<string, object>();
                     dicTile.Add("pn_mpns", tile);
                     
