@@ -1,4 +1,4 @@
-﻿//Build Date: October 19, 2014
+﻿//Build Date: October 27, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -95,7 +95,8 @@ namespace PubNubMessaging.Core
 		protected System.Threading.Timer localClientHeartBeatTimer;
 		protected System.Threading.Timer presenceHeartbeatTimer = null;
 		protected static bool pubnetSystemActive = true;
-		// History of Messages (Obsolete)
+        protected Uri pushRemoteImageDomainUri = new Uri("http://cdn.flaticon.com");
+        // History of Messages (Obsolete)
 		private List<object> _history = new List<object>();
 
         public List<object> History { get { return _history; } set { _history = value; RaisePropertyChanged("History"); } }
@@ -108,7 +109,7 @@ namespace PubNubMessaging.Core
 		protected string secretKey = "";
 		protected string cipherKey = "";
 		protected bool ssl = false;
-		protected string parameters = "";
+        protected string parameters = "";
 		private string subscribeParameters = "";
 		private string presenceHeartbeatParameters = "";
 		private string hereNowParameters = "";
@@ -389,6 +390,18 @@ namespace PubNubMessaging.Core
                 PubnubErrorFilter.ErrorLevel = _errorLevel;
 			}
 		}
+
+        public Uri PushRemoteImageDomainUri
+        {
+            get
+            {
+                return pushRemoteImageDomainUri;
+            }
+            set
+            {
+                pushRemoteImageDomainUri = value;
+            }
+        }
 
 		#endregion
 

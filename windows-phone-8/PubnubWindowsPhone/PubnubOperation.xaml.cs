@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
 using System.Windows;
@@ -234,13 +235,15 @@ namespace PubnubWindowsPhone
                 }
                 else if (control.radFlipTilePublish.IsChecked.Value)
                 {
+                    pubnub.PushRemoteImageDomainUri = new Uri("http://cdn.flaticon.com");
+
                     FlipTileNotification tile = new FlipTileNotification();
                     tile.title = "front title";
                     tile.count = 2;
                     tile.back_title = "back title";
                     tile.back_content = "back message";
                     tile.back_background_image = "Assets/Tiles/pubnub2.png";
-                    tile.background_image = "Assets/Tiles/pubnub3.png";
+                    tile.background_image = "http://cdn.flaticon.com/png/256/37985.png";
                     Dictionary<string, object> dicTile = new Dictionary<string, object>();
                     dicTile.Add("pn_mpns", tile);
                     
@@ -933,12 +936,35 @@ namespace PubnubWindowsPhone
                 microsoftPushChannel = HttpNotificationChannel.Find(microsoftChannelName);
                 if (!microsoftPushChannel.IsShellTileBound)
                 {
-                    microsoftPushChannel.BindToShellTile();
+                    //microsoftPushChannel.UnbindToShellTile();
+
+                    if (pubnub.PushRemoteImageDomainUri != null)
+                    {
+                        Collection<Uri> uriCollection = new Collection<Uri>();
+                        uriCollection.Add(pubnub.PushRemoteImageDomainUri);
+                        microsoftPushChannel.BindToShellTile(uriCollection);
+                    }
+                    else
+                    {
+                        microsoftPushChannel.BindToShellTile();
+                    }
                 }
 
                 if (!microsoftPushChannel.IsShellToastBound)
                 {
                     microsoftPushChannel.BindToShellToast();
+
+                    if (pubnub.PushRemoteImageDomainUri != null)
+                    {
+                        Collection<Uri> uriCollection = new Collection<Uri>();
+                        uriCollection.Add(pubnub.PushRemoteImageDomainUri);
+                        microsoftPushChannel.BindToShellTile(uriCollection);
+                    }
+                    else
+                    {
+                        microsoftPushChannel.BindToShellTile();
+                    }
+
                 }
 
                 string pubnubChannel = txtChannel.Text;
