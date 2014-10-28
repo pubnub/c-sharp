@@ -465,6 +465,20 @@ namespace PubNubMessaging.Core
                 pubnub.EnableDebugForPushPublish = value;
             }
         }
+
+        public Uri PushRemoteImageDomainUri
+        {
+            get
+            {
+                return pubnub.PushRemoteImageDomainUri;
+            }
+
+            set
+            {
+                pubnub.PushRemoteImageDomainUri = value;
+            }
+        }
+
 		#endregion
 
 		#region "Constructors"

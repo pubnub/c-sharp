@@ -1081,6 +1081,8 @@ namespace PubNubMessaging.Core
                         Console.WriteLine(string.Format("Small Background Image = {0}", imageBackBackground));
                         Console.ResetColor();
 
+                        pubnub.PushRemoteImageDomainUri = new Uri("http://cdn.flaticon.com");
+
                         FlipTileNotification flipTile = new FlipTileNotification();
                         flipTile.title = flipFrontTitle;
                         flipTile.count = flipTileCount;
