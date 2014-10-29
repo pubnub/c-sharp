@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace PubNubMessaging.Core
 {
@@ -466,7 +467,7 @@ namespace PubNubMessaging.Core
             }
         }
 
-        public Uri PushRemoteImageDomainUri
+        public Collection<Uri> PushRemoteImageDomainUri
         {
             get
             {

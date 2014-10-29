@@ -235,14 +235,14 @@ namespace PubnubWindowsPhone
                 }
                 else if (control.radFlipTilePublish.IsChecked.Value)
                 {
-                    pubnub.PushRemoteImageDomainUri = new Uri("http://cdn.flaticon.com");
+                    pubnub.PushRemoteImageDomainUri.Add(new Uri("http://cdn.flaticon.com"));
 
                     FlipTileNotification tile = new FlipTileNotification();
                     tile.title = "front title";
-                    tile.count = 2;
+                    tile.count = 6;
                     tile.back_title = "back title";
                     tile.back_content = "back message";
-                    tile.back_background_image = "Assets/Tiles/pubnub2.png";
+                    tile.back_background_image = "Assets/Tiles/pubnub3.png";
                     tile.background_image = "http://cdn.flaticon.com/png/256/37985.png";
                     Dictionary<string, object> dicTile = new Dictionary<string, object>();
                     dicTile.Add("pn_mpns", tile);
@@ -893,6 +893,7 @@ namespace PubnubWindowsPhone
                 {
                     type = ResponseType.PushRegister;
                     currentPushReqType = type;
+                    pubnub.PushRemoteImageDomainUri.Add(new Uri("http://cdn.flaticon.com")); 
                     ProcessPushRequestType(type, channel);
                 }
                 else if (control.radRUnegisterDevice.IsChecked.Value)
@@ -932,40 +933,36 @@ namespace PubnubWindowsPhone
 
             Dispatcher.BeginInvoke(() =>
             {
-                HttpNotificationChannel microsoftPushChannel;
-                microsoftPushChannel = HttpNotificationChannel.Find(microsoftChannelName);
-                if (!microsoftPushChannel.IsShellTileBound)
-                {
-                    //microsoftPushChannel.UnbindToShellTile();
+                //HttpNotificationChannel microsoftPushChannel;
+                //microsoftPushChannel = HttpNotificationChannel.Find(microsoftChannelName);
+                //if (!microsoftPushChannel.IsShellTileBound)
+                //{
+                //    //microsoftPushChannel.UnbindToShellTile();
 
-                    if (pubnub.PushRemoteImageDomainUri != null)
-                    {
-                        Collection<Uri> uriCollection = new Collection<Uri>();
-                        uriCollection.Add(pubnub.PushRemoteImageDomainUri);
-                        microsoftPushChannel.BindToShellTile(uriCollection);
-                    }
-                    else
-                    {
-                        microsoftPushChannel.BindToShellTile();
-                    }
-                }
+                //    if (pubnub.PushRemoteImageDomainUri != null && pubnub.PushRemoteImageDomainUri.Count > 0)
+                //    {
+                //        microsoftPushChannel.BindToShellTile(pubnub.PushRemoteImageDomainUri);
+                //    }
+                //    else
+                //    {
+                //        microsoftPushChannel.BindToShellTile();
+                //    }
+                //}
 
-                if (!microsoftPushChannel.IsShellToastBound)
-                {
-                    microsoftPushChannel.BindToShellToast();
+                //if (!microsoftPushChannel.IsShellToastBound)
+                //{
+                //    microsoftPushChannel.BindToShellToast();
 
-                    if (pubnub.PushRemoteImageDomainUri != null)
-                    {
-                        Collection<Uri> uriCollection = new Collection<Uri>();
-                        uriCollection.Add(pubnub.PushRemoteImageDomainUri);
-                        microsoftPushChannel.BindToShellTile(uriCollection);
-                    }
-                    else
-                    {
-                        microsoftPushChannel.BindToShellTile();
-                    }
+                //    if (pubnub.PushRemoteImageDomainUri != null && pubnub.PushRemoteImageDomainUri.Count > 0)
+                //    {
+                //        microsoftPushChannel.BindToShellTile(pubnub.PushRemoteImageDomainUri);
+                //    }
+                //    else
+                //    {
+                //        microsoftPushChannel.BindToShellTile();
+                //    }
 
-                }
+                //}
 
                 string pubnubChannel = txtChannel.Text;
                 string msg = "";
@@ -1060,7 +1057,16 @@ namespace PubnubWindowsPhone
 
                 // Bind this new channel for toast events.
                 microsoftPushChannel.BindToShellToast();
-                microsoftPushChannel.BindToShellTile();
+
+                if (pubnub.PushRemoteImageDomainUri != null && pubnub.PushRemoteImageDomainUri.Count > 0)
+                {
+                    microsoftPushChannel.BindToShellTile(pubnub.PushRemoteImageDomainUri);
+                }
+                else
+                {
+                    microsoftPushChannel.BindToShellTile();
+                }
+
 
             }
             else
