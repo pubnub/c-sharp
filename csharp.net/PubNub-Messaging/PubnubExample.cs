@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.ComponentModel;
@@ -1081,7 +1082,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine(string.Format("Small Background Image = {0}", imageBackBackground));
                         Console.ResetColor();
 
-                        pubnub.PushRemoteImageDomainUri = new Uri("http://cdn.flaticon.com");
+                        pubnub.PushRemoteImageDomainUri.Add(new Uri("http://cdn.flaticon.com"));
 
                         FlipTileNotification flipTile = new FlipTileNotification();
                         flipTile.title = flipFrontTitle;
