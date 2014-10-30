@@ -48,7 +48,7 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="20,250,19,0" Name="spnlInput5" HorizontalAlignment="Stretch" VerticalAlignment="Top">
                 <TextBlock Name="lblSecret" VerticalAlignment="Center" Text="Secret Key"></TextBlock>
-                <TextBox Name="txtSecret" Text="" Width="236"></TextBox>
+                <TextBox Name="txtSecret" Text="demo-36" Width="236"></TextBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="20,310,19,0" Name="spnlInput6" HorizontalAlignment="Stretch" VerticalAlignment="Top">
                 <TextBlock Name="lblUUID" VerticalAlignment="Center" Text="Session UUID"></TextBlock>
@@ -56,7 +56,7 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="20,370,19,0" Name="spnlInput7" HorizontalAlignment="Stretch" VerticalAlignment="Top">
                 <TextBlock Name="lblOrigin" VerticalAlignment="Center" Text="Origin"></TextBlock>
-                <TextBox Name="txtOrigin" Text="dara24.devbuild.pubnub.com" Width="300"></TextBox>
+                <TextBox Name="txtOrigin" Text="pubsub.pubnub.com" Width="300"></TextBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="20,430,19,0" Name="spnlInput8" HorizontalAlignment="Stretch" VerticalAlignment="Top">
                 <TextBlock Name="lblAuthKey" VerticalAlignment="Center" Text="Auth Key"></TextBlock>
