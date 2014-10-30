@@ -41,13 +41,13 @@ namespace PubNubMessaging.Core
             Console.WriteLine("      NETWORK ERROR MESSAGE WILL BE SENT");
             Console.WriteLine();
 
-            Console.WriteLine("Enter Pubnub Origin. Default Origin = dara24.devbuild.pubnub.com"); //TODO
+            Console.WriteLine("Enter Pubnub Origin. Default Origin = pubsub.pubnub.com"); //TODO
             Console.WriteLine("If you want to accept default value, press ENTER.");
             string origin = Console.ReadLine();
             Console.ForegroundColor = ConsoleColor.Blue;
             if (origin.Trim() == "")
             {
-                origin = "dara24.devbuild.pubnub.com"; // "pubsub.pubnub.com";
+                origin = "pubsub.pubnub.com";
                 Console.WriteLine("Default Origin selected");
             }
             else
@@ -97,7 +97,7 @@ namespace PubNubMessaging.Core
             else
             {
                 Console.WriteLine("Default demo subscribe key provided");
-                subscribeKey = "demo-36";
+                subscribeKey = "demo";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -113,7 +113,7 @@ namespace PubNubMessaging.Core
             else
             {
                 Console.WriteLine("Default demo publish key provided");
-                publishKey = "demo-36";
+                publishKey = "demo";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -129,7 +129,7 @@ namespace PubNubMessaging.Core
             else
             {
                 Console.WriteLine("Default demo Secret key provided");
-                secretKey = "demo-36";
+                secretKey = "demo";
             }
             Console.ResetColor();
             Console.WriteLine();
