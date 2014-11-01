@@ -255,7 +255,7 @@ namespace PubnubWindowsPhone
                     CycleTileNotification tile = new CycleTileNotification();
                     tile.title = "front title";
                     tile.count = 2;
-                    tile.images = new string[] { "Images/Blue.jpg", "Images/Green.jpg" };
+                    tile.images = new string[] { "Assets/Tiles/pubnub1.png", "Assets/Tiles/pubnub2.png", "Assets/Tiles/pubnub3.png", "Assets/Tiles/pubnub4.png" };
                     
                     Dictionary<string, object> dicTile = new Dictionary<string, object>();
                     dicTile.Add("pn_mpns", tile);
@@ -268,6 +268,7 @@ namespace PubnubWindowsPhone
                     IconicTileNotification tile = new IconicTileNotification();
                     tile.title = "front title";
                     tile.count = 2;
+                    tile.wide_content_1 = "my wide content";
                     
                     Dictionary<string, object> dicTile = new Dictionary<string, object>();
                     dicTile.Add("pn_mpns", tile);

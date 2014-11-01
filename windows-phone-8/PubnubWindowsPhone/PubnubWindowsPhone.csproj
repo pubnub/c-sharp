@@ -214,6 +214,10 @@
     <Content Include="Assets\Tiles\pubnub2.png" />
     <Content Include="Assets\Tiles\pubnub3.png" />
     <Content Include="Assets\Tiles\pubnub4.png" />
+    <Content Include="Assets\Tiles\pubnub5.png" />
+    <Content Include="Assets\Tiles\pubnub6.png" />
+    <Content Include="Assets\Tiles\pubnub7.png" />
+    <Content Include="Assets\Tiles\pubnub8.png" />
     <Content Include="Images\Blue.jpg" />
     <Content Include="Images\Green.jpg" />
     <Content Include="Images\Red.jpg" />
