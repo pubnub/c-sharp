@@ -1123,23 +1123,17 @@ namespace PubNubMessaging.Core
                             cycleTileCount = int.TryParse(stringCycleCount, out outValue) ? (int?)outValue : null;
                         }
 
-                        Console.WriteLine("Enter first image fully qualified URI/device local Path for Cycle Tile");
-                        string imageCycleTile1 = Console.ReadLine();
+                        Console.WriteLine("Enter image path (fully qualified URI/device local Path) for Cycle Tile");
+                        Console.WriteLine("Multiple image paths can be entered with comma delimiter");
+                        string imageCycleTile = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("First Image Path = {0}", imageCycleTile1));
+                        Console.WriteLine(string.Format("Image Path(s) = {0}", imageCycleTile));
                         Console.ResetColor();
-
-                        Console.WriteLine("Enter second image fully qualified URI/device local Path for Cycle Tile");
-                        string imageCycleTile2 = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Second Image Path = {0}", imageCycleTile2));
-                        Console.ResetColor();
-
 
                         CycleTileNotification cycleTile = new CycleTileNotification();
                         cycleTile.title = cycleFrontTitle;
                         cycleTile.count = cycleTileCount;
-                        cycleTile.images = new string[] { imageCycleTile1, imageCycleTile2 };
+                        cycleTile.images = imageCycleTile.Split(','); // new string[] { imageCycleTile };
                         Dictionary<string, object> dicCycleTile = new Dictionary<string, object>();
                         dicCycleTile.Add("pn_mpns", cycleTile);
 
@@ -1154,7 +1148,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine(string.Format("Channel = {0}", iconicTileChannel));
                         Console.ResetColor();
 
-                        Console.WriteLine("Enter front title for Cycle Tile");
+                        Console.WriteLine("Enter front title for Iconic Tile");
                         string iconicFrontTitle = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Front Title = {0}", iconicFrontTitle));
@@ -1172,9 +1166,16 @@ namespace PubNubMessaging.Core
                             iconicTileCount = int.TryParse(stringIconicCount, out outValue) ? (int?)outValue : null;
                         }
 
+                        Console.WriteLine("Enter Content1 for Iconic Tile.");
+                        string iconicTileContent1 = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("iconicTileContent1 = {0}", iconicTileContent1));
+                        Console.ResetColor();
+
                         IconicTileNotification iconicTile = new IconicTileNotification();
                         iconicTile.title = iconicFrontTitle;
                         iconicTile.count = iconicTileCount;
+                        iconicTile.wide_content_1 = iconicTileContent1;
                         Dictionary<string, object> dicIconicTile = new Dictionary<string, object>();
                         dicIconicTile.Add("pn_mpns", iconicTile);
 
