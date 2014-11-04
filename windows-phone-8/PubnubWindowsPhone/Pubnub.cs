@@ -480,6 +480,18 @@ namespace PubNubMessaging.Core
             }
         }
 
+        public string PushServiceName
+        {
+            get
+            {
+                return pubnub.PushServiceName;
+            }
+
+            set
+            {
+                pubnub.PushServiceName = value;
+            }
+        }
 		#endregion
 
 		#region "Constructors"

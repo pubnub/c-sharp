@@ -1045,7 +1045,7 @@ namespace PubnubWindowsPhone
 
             if (microsoftPushChannel == null)
             {
-                microsoftPushChannel = new HttpNotificationChannel(microsoftChannelName);
+                microsoftPushChannel = new HttpNotificationChannel(microsoftChannelName, pubnub.PushServiceName);
 
                 // Register for all the events before attempting to open the channel.
                 microsoftPushChannel.ChannelUriUpdated += new EventHandler<NotificationChannelUriEventArgs>(PushChannel_ChannelUriUpdated);

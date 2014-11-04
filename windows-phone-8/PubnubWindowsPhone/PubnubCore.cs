@@ -1,4 +1,4 @@
-﻿//Build Date: October 29, 2014
+﻿//Build Date: November 04, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -121,6 +121,7 @@ namespace PubNubMessaging.Core
         private string pushGetChannelsParameters = "";
         private string pushUnregisterDeviceParameters = "";
         private string _pnsdkVersion = "PubNub-CSharp-.NET/3.6.0.2";
+        private string _pushServiceName = "push.pubnub.com";
 
 		#endregion
 
@@ -401,6 +402,19 @@ namespace PubNubMessaging.Core
             set
             {
                 pushRemoteImageDomainUri = value;
+            }
+        }
+
+        public string PushServiceName
+        {
+            get
+            {
+                return _pushServiceName;
+            }
+
+            set
+            {
+                _pushServiceName = value;
             }
         }
 
