@@ -341,12 +341,12 @@ namespace PubnubWindowsPhone
 
             StackPanel publishStackPanel = new StackPanel();
             publishStackPanel.Background = new SolidColorBrush(Colors.Blue);
-            publishStackPanel.Width = 300;
-            publishStackPanel.Height = 400;
+            publishStackPanel.Width = 320;
+            publishStackPanel.Height = 550;
 
             publishPopup = new Popup();
-            publishPopup.Height = 400;
-            publishPopup.Width = 300;
+            publishPopup.Height = 550;
+            publishPopup.Width = 320;
             publishPopup.VerticalOffset = 100;
             publishPopup.HorizontalOffset = 10;
 
@@ -362,30 +362,96 @@ namespace PubnubWindowsPhone
             {
                 if (control.IsOKButtonEntered)
                 {
-                    TextBox txtPublish = control.FindName("txtPublish") as TextBox;
-                    string publishMsg = (txtPublish != null) ? txtPublish.Text : "";
-
-                    CheckBox chkStoreInHistory = control.FindName("chkStoreInHistory") as CheckBox;
-                    bool storeInHistory = (chkStoreInHistory != null) ? chkStoreInHistory.IsChecked.Value : true;
-
-                    if (publishMsg != "")
+                    RadioButton radNormalPublish = control.FindName("radNormalPublish") as RadioButton;
+                    if (radNormalPublish != null && radNormalPublish.IsChecked.Value)
                     {
-                        DisplayMessageInTextBox("Running Publish:");
+                        TextBox txtPublish = control.FindName("txtPublish") as TextBox;
+                        string publishMsg = (txtPublish != null) ? txtPublish.Text : "";
 
-                        double doubleData;
-                        int intData;
-                        if (int.TryParse(publishMsg, out intData)) //capture numeric data
+                        CheckBox chkStoreInHistory = control.FindName("chkStoreInHistory") as CheckBox;
+                        bool storeInHistory = (chkStoreInHistory != null) ? chkStoreInHistory.IsChecked.Value : true;
+
+                        if (publishMsg != "")
                         {
-                            pubnub.Publish<string>(channel, intData, storeInHistory, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                            DisplayMessageInTextBox("Running Publish:");
+
+                            double doubleData;
+                            int intData;
+                            if (int.TryParse(publishMsg, out intData)) //capture numeric data
+                            {
+                                pubnub.Publish<string>(channel, intData, storeInHistory, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                            }
+                            else if (double.TryParse(publishMsg, out doubleData)) //capture numeric data
+                            {
+                                pubnub.Publish<string>(channel, doubleData, storeInHistory, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                            }
+                            else
+                            {
+                                pubnub.Publish<string>(channel, publishMsg, storeInHistory, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                            }
                         }
-                        else if (double.TryParse(publishMsg, out doubleData)) //capture numeric data
-                        {
-                            pubnub.Publish<string>(channel, doubleData, storeInHistory, PubnubCallbackResult, PubnubDisplayErrorMessage);
-                        }
-                        else
-                        {
-                            pubnub.Publish<string>(channel, publishMsg, storeInHistory, PubnubCallbackResult, PubnubDisplayErrorMessage);
-                        }
+                    }
+
+                    RadioButton radToastPublish = control.FindName("radToastPublish") as RadioButton;
+                    if (radToastPublish != null && radToastPublish.IsChecked.Value)
+                    {
+                        ToastNotification toast = new ToastNotification();
+                        toast.text1 = "hardcode message";
+                        Dictionary<string, object> dicToast = new Dictionary<string, object>();
+                        dicToast.Add("pn_mpns", toast);
+
+                        pubnub.EnableDebugForPushPublish = true;
+                        pubnub.Publish<string>(channel, dicToast, PubnubCallbackResult, PubnubDisplayErrorMessage);
+
+                    }
+                    
+                    RadioButton radFlipTilePublish = control.FindName("radFlipTilePublish") as RadioButton;
+                    if (radFlipTilePublish != null && radFlipTilePublish.IsChecked.Value)
+                    {
+                        pubnub.PushRemoteImageDomainUri.Add(new Uri("http://cdn.flaticon.com"));
+
+                        FlipTileNotification tile = new FlipTileNotification();
+                        tile.title = "front title";
+                        tile.count = 6;
+                        tile.back_title = "back title";
+                        tile.back_content = "back message";
+                        tile.back_background_image = "Assets/Tiles/pubnub3.png";
+                        tile.background_image = "http://cdn.flaticon.com/png/256/37985.png";
+                        Dictionary<string, object> dicTile = new Dictionary<string, object>();
+                        dicTile.Add("pn_mpns", tile);
+
+                        pubnub.EnableDebugForPushPublish = true;
+                        pubnub.Publish<string>(channel, dicTile, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                    }
+
+                    RadioButton radCycleTilePublish = control.FindName("radCycleTilePublish") as RadioButton;
+                    if (radCycleTilePublish != null && radCycleTilePublish.IsChecked.Value)
+                    {
+                        CycleTileNotification tile = new CycleTileNotification();
+                        tile.title = "front title";
+                        tile.count = 2;
+                        tile.images = new string[] { "Assets/Tiles/pubnub1.png", "Assets/Tiles/pubnub2.png", "Assets/Tiles/pubnub3.png", "Assets/Tiles/pubnub4.png" };
+
+                        Dictionary<string, object> dicTile = new Dictionary<string, object>();
+                        dicTile.Add("pn_mpns", tile);
+
+                        pubnub.EnableDebugForPushPublish = true;
+                        pubnub.Publish<string>(channel, dicTile, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                    }
+
+                    RadioButton radIconicTilePublish = control.FindName("radIconicTilePublish") as RadioButton;
+                    if (radIconicTilePublish != null && radIconicTilePublish.IsChecked.Value)
+                    {
+                        IconicTileNotification tile = new IconicTileNotification();
+                        tile.title = "front title";
+                        tile.count = 2;
+                        tile.wide_content_1 = "my wide content";
+
+                        Dictionary<string, object> dicTile = new Dictionary<string, object>();
+                        dicTile.Add("pn_mpns", tile);
+
+                        pubnub.EnableDebugForPushPublish = true;
+                        pubnub.Publish<string>(channel, dicTile, PubnubCallbackResult, PubnubDisplayErrorMessage);
                     }
                 }
                 publishPopup = null;
