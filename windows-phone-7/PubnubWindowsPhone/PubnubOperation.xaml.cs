@@ -192,11 +192,11 @@ namespace PubnubWindowsPhone
             StackPanel publishStackPanel = new StackPanel();
             publishStackPanel.Background = new SolidColorBrush(Colors.Blue);
             publishStackPanel.Width = 300;
-            publishStackPanel.Height = 400;
+            publishStackPanel.Height = 600;
 
             publishPopup = new Popup();
-            publishPopup.Height = 400;
-            publishPopup.Width = 300;
+            publishPopup.Height = 600;
+            publishPopup.Width = 550;
             publishPopup.VerticalOffset = 100;
             publishPopup.HorizontalOffset = 100;
             PublishMessageUserControl control = new PublishMessageUserControl();
@@ -208,9 +208,69 @@ namespace PubnubWindowsPhone
             control.btnOK.Click += (s, args) =>
             {
                 publishPopup.IsOpen = false;
-                string publishedMessage = control.txtPublish.Text;
-                bool storeInHistory = control.chkStoreInHistory.IsChecked.Value;
-                pubnub.Publish<string>(channel, publishedMessage, storeInHistory, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                string publishedMessage = "";
+
+                if (control.radNormalPublish.IsChecked.Value)
+                {
+                    publishedMessage = control.txtPublish.Text;
+                    bool storeInHistory = control.chkStoreInHistory.IsChecked.Value;
+                    pubnub.Publish<string>(channel, publishedMessage, storeInHistory, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+                else if (control.radToastPublish.IsChecked.Value)
+                {
+                    ToastNotification toast = new ToastNotification();
+                    //toast.type = "toast";
+                    toast.text1 = "hardcode message";
+                    Dictionary<string, object> dicToast = new Dictionary<string, object>();
+                    dicToast.Add("pn_mpns", toast);
+
+                    pubnub.EnableDebugForPushPublish = true;
+                    pubnub.Publish<string>(channel, dicToast, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+                else if (control.radFlipTilePublish.IsChecked.Value)
+                {
+                    pubnub.PushRemoteImageDomainUri.Add(new Uri("http://cdn.flaticon.com"));
+
+                    FlipTileNotification tile = new FlipTileNotification();
+                    tile.title = "front title";
+                    tile.count = 6;
+                    tile.back_title = "back title";
+                    tile.back_content = "back message";
+                    tile.back_background_image = "Assets/Tiles/pubnub3.png";
+                    tile.background_image = "http://cdn.flaticon.com/png/256/37985.png";
+                    Dictionary<string, object> dicTile = new Dictionary<string, object>();
+                    dicTile.Add("pn_mpns", tile);
+
+                    pubnub.EnableDebugForPushPublish = true;
+                    pubnub.Publish<string>(channel, dicTile, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+                else if (control.radCycleTilePublish.IsChecked.Value)
+                {
+                    CycleTileNotification tile = new CycleTileNotification();
+                    tile.title = "front title";
+                    tile.count = 2;
+                    tile.images = new string[] { "Assets/Tiles/pubnub1.png", "Assets/Tiles/pubnub2.png", "Assets/Tiles/pubnub3.png", "Assets/Tiles/pubnub4.png" };
+
+                    Dictionary<string, object> dicTile = new Dictionary<string, object>();
+                    dicTile.Add("pn_mpns", tile);
+
+                    pubnub.EnableDebugForPushPublish = true;
+                    pubnub.Publish<string>(channel, dicTile, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+                else if (control.radIconicTilePublish.IsChecked.Value)
+                {
+                    IconicTileNotification tile = new IconicTileNotification();
+                    tile.title = "front title";
+                    tile.count = 2;
+                    tile.wide_content_1 = "my wide content";
+
+                    Dictionary<string, object> dicTile = new Dictionary<string, object>();
+                    dicTile.Add("pn_mpns", tile);
+
+                    pubnub.EnableDebugForPushPublish = true;
+                    pubnub.Publish<string>(channel, dicTile, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+                
                 TextBlock textBlock = new TextBlock();
                 textBlock.Text = string.Format("Publishing {0}\n", publishedMessage);
                 messageStackPanel.Children.Add(textBlock);
