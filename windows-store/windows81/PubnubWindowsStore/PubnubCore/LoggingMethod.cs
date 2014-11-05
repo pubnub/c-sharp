@@ -438,6 +438,10 @@ namespace PubNubMessaging.Core
                 {
                     ret = PubnubErrorCode.InvalidTimestamp;
                 }
+                else if (httpErrorCodeMessage.ToUpper() == "INVALID TYPE ARGUMENT")
+                {
+                    ret = PubnubErrorCode.InvalidTypeArgument;
+                }
 				break;
 				case 401:
 				ret = PubnubErrorCode.InvalidSubscribeKey;
@@ -524,12 +528,14 @@ namespace PubNubMessaging.Core
         GlobalHereNowOperationTimeout = 134,
         PAMAccessOperationTimeout = 135,
         UserStateUnchanged = 136,
+        PushNotificationTimeout = 137,
 
 		MessageTooLarge = 4000,
 		BadRequest = 4001,
 		InvalidKey = 4002,
         NoUuidSpecified = 4003,
         InvalidTimestamp = 4004,
+        InvalidTypeArgument = 4005,
 		InvalidSubscribeKey = 4010,
 		PamNotEnabled = 4020,
 		Forbidden = 4030,
@@ -554,6 +560,7 @@ namespace PubNubMessaging.Core
 			dictionaryCodes.Add(4002, "Invalid Key. Please verify your pub and sub keys");
             dictionaryCodes.Add(4003, "No UUID specified. Please ensure that UUID is being passed to server for heartbeat");
             dictionaryCodes.Add(4004, "Invalid Timestamp. Please try again. If the issue continues, please contact PubNub support");
+            dictionaryCodes.Add(4005, "Invalid Key. Please verify your pub and sub keys");
 			dictionaryCodes.Add(4010, "Please provide a valid subscribe key");
 			dictionaryCodes.Add(4020, "PAM is not enabled for this keyset. Please contact PubNub support for instructions on enabling PAM.");
 			dictionaryCodes.Add(4030, "Not authorized. Please ensure that the channel has the correct PAM permission, your authentication key is set correctly, then try again via unsub and re-sub. For further assistance, contact PubNub support.");
@@ -600,6 +607,7 @@ namespace PubNubMessaging.Core
             dictionaryCodes.Add(134, "Timeout occured while running GlobalHereNow. Please try again. If it continues, please contact PubNub support");
             dictionaryCodes.Add(135, "Timeout occured while running PAM operations. Please try again. If it continues, please contact PubNub support");
             dictionaryCodes.Add(136, "User State Unchanged");
+            dictionaryCodes.Add(137, "Timeout occured while registering device for push notifications. Please try again. If it continues, please contact PubNub support");
 			dictionaryCodes.Add(0, "Undocumented error. Please contact PubNub support with full error object details for further investigation");
 		}
 
