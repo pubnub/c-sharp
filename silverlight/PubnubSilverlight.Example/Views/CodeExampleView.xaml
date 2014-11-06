@@ -47,6 +47,8 @@
                         <RowDefinition Height="3" />
                         <RowDefinition />
                         <RowDefinition Height="3" />
+                        <RowDefinition />
+                        <RowDefinition Height="3" />
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Column="0" Grid.Row="0" Name="lblSubKey" Text="Sub Key" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
@@ -69,6 +71,9 @@
 
                     <TextBlock Grid.Column="0" Grid.Row="12" Name="lblAuthKeyPAM" Text="AuthKey(for PAM methods)" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
                     <TextBox Grid.Column="1" Grid.Row="12" Name="txtAuthKeyPAM" Text="" Width="110" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" />
+
+                    <TextBlock Grid.Column="0" Grid.Row="14" Name="lblOrigin" Text="Origin" VerticalAlignment="Center" FontFamily="Verdana" FontSize="12" />
+                    <TextBox Grid.Column="1" Grid.Row="14" Name="txtOrigin" Text="pubsub.pubnub.com" Width="110" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Verdana" FontSize="12" />
                 </Grid>
             </StackPanel>
             
