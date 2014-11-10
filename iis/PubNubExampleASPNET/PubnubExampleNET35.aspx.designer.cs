@@ -391,6 +391,15 @@ namespace PubNubMessaging {
         protected global::System.Web.UI.WebControls.Panel popUpPanelPublishMessage;
         
         /// <summary>
+        /// radNormalPublish control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButton radNormalPublish;
+        
+        /// <summary>
         /// chkStoreInHistory control.
         /// </summary>
         /// <remarks>
@@ -407,6 +416,42 @@ namespace PubNubMessaging {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox txtPublishMessage;
+        
+        /// <summary>
+        /// radToastPublish control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButton radToastPublish;
+        
+        /// <summary>
+        /// radFlipTilePublish control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButton radFlipTilePublish;
+        
+        /// <summary>
+        /// radCycleTilePublish control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButton radCycleTilePublish;
+        
+        /// <summary>
+        /// radIconicTilePublish control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButton radIconicTilePublish;
         
         /// <summary>
         /// lblErrorMessage control.

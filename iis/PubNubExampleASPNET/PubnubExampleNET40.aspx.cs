@@ -391,7 +391,6 @@ namespace PubNubMessaging
         {
             CheckUserInputs();
             channel = txtChannel.Text;
-            string messageToBePublished = txtPublishMessage.Text;
             bool storeInHistory = chkStoreInHistory.Checked;
             string pamAuthKey = txtPAMAuthKey.Text.Trim();
             UpdateTimer.Enabled = true;
@@ -408,7 +407,65 @@ namespace PubNubMessaging
                     pubnub.DetailedHistory<string>(channel, 10, DisplayUserCallbackMessage, DisplayErrorMessage);
                     break;
                 case "publish":
-                    pubnub.Publish<string>(channel, messageToBePublished, storeInHistory, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    if (radNormalPublish.Checked)
+                    {
+                        string messageToBePublished = txtPublishMessage.Text;
+                        pubnub.Publish<string>(channel, messageToBePublished, storeInHistory, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    }
+                    else if (radToastPublish.Checked)
+                    {
+                        ToastNotification toast = new ToastNotification();
+                        //toast.type = "toast";
+                        toast.text1 = "hardcode message";
+                        Dictionary<string, object> dicToast = new Dictionary<string, object>();
+                        dicToast.Add("pn_mpns", toast);
+
+                        pubnub.EnableDebugForPushPublish = true;
+                        pubnub.Publish<string>(channel, dicToast, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    }
+                    else if (radFlipTilePublish.Checked)
+                    {
+                        pubnub.PushRemoteImageDomainUri.Add(new Uri("http://cdn.flaticon.com"));
+
+                        FlipTileNotification tile = new FlipTileNotification();
+                        tile.title = "front title";
+                        tile.count = 6;
+                        tile.back_title = "back title";
+                        tile.back_content = "back message";
+                        tile.back_background_image = "Assets/Tiles/pubnub3.png";
+                        tile.background_image = "http://cdn.flaticon.com/png/256/37985.png";
+                        Dictionary<string, object> dicTile = new Dictionary<string, object>();
+                        dicTile.Add("pn_mpns", tile);
+
+                        pubnub.EnableDebugForPushPublish = true;
+                        pubnub.Publish<string>(channel, dicTile, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    }
+                    else if (radCycleTilePublish.Checked)
+                    {
+                        CycleTileNotification tile = new CycleTileNotification();
+                        tile.title = "front title";
+                        tile.count = 2;
+                        tile.images = new string[] { "Assets/Tiles/pubnub1.png", "Assets/Tiles/pubnub2.png", "Assets/Tiles/pubnub3.png", "Assets/Tiles/pubnub4.png" };
+
+                        Dictionary<string, object> dicTile = new Dictionary<string, object>();
+                        dicTile.Add("pn_mpns", tile);
+
+                        pubnub.EnableDebugForPushPublish = true;
+                        pubnub.Publish<string>(channel, dicTile, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    }
+                    else if (radIconicTilePublish.Checked)
+                    {
+                        IconicTileNotification tile = new IconicTileNotification();
+                        tile.title = "front title";
+                        tile.count = 2;
+                        tile.wide_content_1 = "my wide content";
+
+                        Dictionary<string, object> dicTile = new Dictionary<string, object>();
+                        dicTile.Add("pn_mpns", tile);
+
+                        pubnub.EnableDebugForPushPublish = true;
+                        pubnub.Publish<string>(channel, dicTile, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    }
                     txtPublishMessage.Text = "";
                     lblErrorMessage.Text = "";
                     break;
@@ -548,20 +605,14 @@ namespace PubNubMessaging
 
         protected void btnOkay_OnClick(object sender, EventArgs e)
         {
-            if (txtPublishMessage.Text.Trim() != "")
-            {
-                btnReset.Enabled = true;
+            btnReset.Enabled = true;
 
-                lblErrorMessage.Text = "";
+            lblErrorMessage.Text = "";
 
-                publishModalPopupExtender.Hide();
+            publishModalPopupExtender.Hide();
 
-                ProcessPubnubRequest("publish");
-            }
-            else
-            {
-                lblErrorMessage.Text = "* Message cannot be blank.";
-            }
+            ProcessPubnubRequest("publish");
+
             UpdatePanelLeft.Update();
         }
 
