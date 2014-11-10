@@ -72,6 +72,7 @@ namespace PubnubWindowsPhone
             pubnub.AuthenticationKey = authKey;
             pubnub.PresenceHeartbeat = presenceHeartbeat;
             pubnub.PresenceHeartbeatInterval = presenceHeartbeatInterval;
+            pubnub.PushServiceName = ""; //overriding default push service name to use non-ssl for push
         }
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
@@ -1045,7 +1046,14 @@ namespace PubnubWindowsPhone
 
             if (microsoftPushChannel == null)
             {
-                microsoftPushChannel = new HttpNotificationChannel(microsoftChannelName, pubnub.PushServiceName);
+                if (!string.IsNullOrEmpty(pubnub.PushServiceName))
+                {
+                    microsoftPushChannel = new HttpNotificationChannel(microsoftChannelName, pubnub.PushServiceName);
+                }
+                else
+                {
+                    microsoftPushChannel = new HttpNotificationChannel(microsoftChannelName);
+                }
 
                 // Register for all the events before attempting to open the channel.
                 microsoftPushChannel.ChannelUriUpdated += new EventHandler<NotificationChannelUriEventArgs>(PushChannel_ChannelUriUpdated);
