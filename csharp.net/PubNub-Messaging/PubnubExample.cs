@@ -986,24 +986,24 @@ namespace PubNubMessaging.Core
                         Console.WriteLine(string.Format("Channel = {0}", pushRegisterChannel));
                         Console.ResetColor();
 
-                        Console.WriteLine("Enter Device URI for MPNS");
-                        string registerDeviceURI = Console.ReadLine();
+                        Console.WriteLine("Enter Push Token for MPNS");
+                        string pushToken = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("URI = {0}", registerDeviceURI));
+                        Console.WriteLine(string.Format("Push Token = {0}", pushToken));
                         Console.ResetColor();
 
                         Console.WriteLine("Running RegisterDeviceForPush()");
-                        pubnub.RegisterDeviceForPush<string>(pushRegisterChannel, PushTypeService.MPNS, new Uri(registerDeviceURI), DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.RegisterDeviceForPush<string>(pushRegisterChannel, PushTypeService.MPNS, pushToken, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "31":
-                        Console.WriteLine("Enter Device URI for MPNS");
-                        string unRegisterDeviceURI = Console.ReadLine();
+                        Console.WriteLine("Enter Push Token for MPNS");
+                        string unRegisterPushToken = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("URI = {0}", unRegisterDeviceURI));
+                        Console.WriteLine(string.Format("Push Token = {0}", unRegisterPushToken));
                         Console.ResetColor();
 
                         Console.WriteLine("Running UnregisterDeviceForPush()");
-                        pubnub.UnregisterDeviceForPush<string>(PushTypeService.MPNS, new Uri(unRegisterDeviceURI), DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.UnregisterDeviceForPush<string>(PushTypeService.MPNS, unRegisterPushToken, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "32":
                         Console.WriteLine("Enter channel name");
@@ -1012,24 +1012,24 @@ namespace PubNubMessaging.Core
                         Console.WriteLine(string.Format("Channel = {0}", pushRemoveChannel));
                         Console.ResetColor();
 
-                        Console.WriteLine("Enter Device URI for MPNS");
-                        string pushRemoveURI = Console.ReadLine();
+                        Console.WriteLine("Enter Push Token for MPNS");
+                        string pushTokenRemove = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("URI = {0}", pushRemoveURI));
+                        Console.WriteLine(string.Format("Push Token = {0}", pushTokenRemove));
                         Console.ResetColor();
 
                         Console.WriteLine("Running RegisterDeviceForPush()");
-                        pubnub.RemoveChannelForDevicePush<string>(pushRemoveChannel, PushTypeService.MPNS, new Uri(pushRemoveURI), DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.RemoveChannelForDevicePush<string>(pushRemoveChannel, PushTypeService.MPNS, pushTokenRemove, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "33":
-                        Console.WriteLine("Enter Device URI for MPNS");
-                        string pushGetChannelURI = Console.ReadLine();
+                        Console.WriteLine("Enter Push Token for MPNS");
+                        string pushTokenGetChannel = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("URI = {0}", pushGetChannelURI));
+                        Console.WriteLine(string.Format("Push Token = {0}", pushTokenGetChannel));
                         Console.ResetColor();
 
                         Console.WriteLine("Running RegisterDeviceForPush()");
-                        pubnub.GetChannelsForDevicePush<string>(PushTypeService.MPNS, new Uri(pushGetChannelURI), DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.GetChannelsForDevicePush<string>(PushTypeService.MPNS, pushTokenGetChannel, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "34": 
                         //Toast message publish
