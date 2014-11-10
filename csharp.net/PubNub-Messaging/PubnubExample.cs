@@ -442,6 +442,28 @@ namespace PubNubMessaging.Core
                         Console.WriteLine(string.Format("Store In History = {0}", storeInHistory));
                         Console.ResetColor();
 
+
+
+
+                        Console.WriteLine("Direct JSON String? Enter Y for Yes or N for No. To accept default(N), just press ENTER");
+                        string directJson = Console.ReadLine();
+                        bool jsonPublish = false;
+                        if (directJson.ToLower() == "y")
+                        {
+                            jsonPublish = true;
+                            pubnub.EnableJsonEncodingForPublish = false;
+                        }
+                        else
+                        {
+                            pubnub.EnableJsonEncodingForPublish = true;
+                        }
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Direct JSON String = {0}", jsonPublish));
+                        Console.ResetColor();
+
+
+
                         /* TO TEST SMALL TEXT PUBLISH ONLY */
                         Console.WriteLine("Enter the message for publish and press ENTER key to submit");
                         //string publishMsg = Console.ReadLine();
