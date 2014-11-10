@@ -974,19 +974,19 @@ namespace PubnubWindowsPhone
                 switch (type)
                 {
                     case ResponseType.PushRegister:
-                        pubnub.RegisterDeviceForPush<string>(pubnubChannel, PushTypeService.MPNS, e.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        pubnub.RegisterDeviceForPush<string>(pubnubChannel, PushTypeService.MPNS, e.ChannelUri.ToString(), PubnubCallbackResult, PubnubDisplayErrorMessage);
                         msg = "Running Register Device";
                         break;
                     case ResponseType.PushUnregister:
-                        pubnub.UnregisterDeviceForPush<string>(PushTypeService.MPNS, e.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        pubnub.UnregisterDeviceForPush<string>(PushTypeService.MPNS, e.ChannelUri.ToString(), PubnubCallbackResult, PubnubDisplayErrorMessage);
                         msg = "Running Unregister Device";
                         break;
                     case ResponseType.PushRemove:
-                        pubnub.RemoveChannelForDevicePush<string>(pubnubChannel, PushTypeService.MPNS, e.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        pubnub.RemoveChannelForDevicePush<string>(pubnubChannel, PushTypeService.MPNS, e.ChannelUri.ToString(), PubnubCallbackResult, PubnubDisplayErrorMessage);
                         msg = "Running remove channel from push";
                         break;
                     case ResponseType.PushGet:
-                        pubnub.GetChannelsForDevicePush<string>(PushTypeService.MPNS, e.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        pubnub.GetChannelsForDevicePush<string>(PushTypeService.MPNS, e.ChannelUri.ToString(), PubnubCallbackResult, PubnubDisplayErrorMessage);
                         msg = "Running get channels for push";
                         break;
                     default:
@@ -1095,19 +1095,19 @@ namespace PubnubWindowsPhone
                     switch (type)
                     {
                         case ResponseType.PushRegister:
-                            pubnub.RegisterDeviceForPush<string>(pubnubChannel, PushTypeService.MPNS, microsoftPushChannel.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                            pubnub.RegisterDeviceForPush<string>(pubnubChannel, PushTypeService.MPNS, microsoftPushChannel.ChannelUri.ToString(), PubnubCallbackResult, PubnubDisplayErrorMessage);
                             msg = "Running Register Device";
                             break;
                         case ResponseType.PushUnregister:
-                            pubnub.UnregisterDeviceForPush<string>(PushTypeService.MPNS, microsoftPushChannel.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                            pubnub.UnregisterDeviceForPush<string>(PushTypeService.MPNS, microsoftPushChannel.ChannelUri.ToString(), PubnubCallbackResult, PubnubDisplayErrorMessage);
                             msg = "Running Unregister Device";
                             break;
                         case ResponseType.PushRemove:
-                            pubnub.RemoveChannelForDevicePush<string>(pubnubChannel, PushTypeService.MPNS, microsoftPushChannel.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                            pubnub.RemoveChannelForDevicePush<string>(pubnubChannel, PushTypeService.MPNS, microsoftPushChannel.ChannelUri.ToString(), PubnubCallbackResult, PubnubDisplayErrorMessage);
                             msg = "Running remove channel from push";
                             break;
                         case ResponseType.PushGet:
-                            pubnub.GetChannelsForDevicePush<string>(PushTypeService.MPNS, microsoftPushChannel.ChannelUri, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                            pubnub.GetChannelsForDevicePush<string>(PushTypeService.MPNS, microsoftPushChannel.ChannelUri.ToString(), PubnubCallbackResult, PubnubDisplayErrorMessage);
                             msg = "Running get channels for push";
                             break;
                         default:
