@@ -127,6 +127,7 @@
     <Compile Include="UnitTest\WhenGrantIsRequested.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="UnitTest\WhenPushIsRequested.cs" />
     <Compile Include="UnitTest\WhenSubscribedToAChannel.cs">
       <SubType>Code</SubType>
     </Compile>

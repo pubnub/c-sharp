@@ -225,7 +225,7 @@ namespace PubnubWindowsPhone
                 }
                 else if (control.radToastPublish.IsChecked.Value)
                 {
-                    ToastNotification toast = new ToastNotification();
+                    MpnsToastNotification toast = new MpnsToastNotification();
                     //toast.type = "toast";
                     toast.text1 = "hardcode message";
                     Dictionary<string, object> dicToast = new Dictionary<string, object>();
@@ -238,7 +238,7 @@ namespace PubnubWindowsPhone
                 {
                     pubnub.PushRemoteImageDomainUri.Add(new Uri("http://cdn.flaticon.com"));
 
-                    FlipTileNotification tile = new FlipTileNotification();
+                    MpnsFlipTileNotification tile = new MpnsFlipTileNotification();
                     tile.title = "front title";
                     tile.count = 6;
                     tile.back_title = "back title";
@@ -253,7 +253,7 @@ namespace PubnubWindowsPhone
                 }
                 else if (control.radCycleTilePublish.IsChecked.Value)
                 {
-                    CycleTileNotification tile = new CycleTileNotification();
+                    MpnsCycleTileNotification tile = new MpnsCycleTileNotification();
                     tile.title = "front title";
                     tile.count = 2;
                     tile.images = new string[] { "Assets/Tiles/pubnub1.png", "Assets/Tiles/pubnub2.png", "Assets/Tiles/pubnub3.png", "Assets/Tiles/pubnub4.png" };
@@ -266,7 +266,7 @@ namespace PubnubWindowsPhone
                 }
                 else if (control.radIconicTilePublish.IsChecked.Value)
                 {
-                    IconicTileNotification tile = new IconicTileNotification();
+                    MpnsIconicTileNotification tile = new MpnsIconicTileNotification();
                     tile.title = "front title";
                     tile.count = 2;
                     tile.wide_content_1 = "my wide content";
