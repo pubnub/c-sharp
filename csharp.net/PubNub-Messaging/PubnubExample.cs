@@ -1045,7 +1045,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine(string.Format("Text1 = {0}", text1));
                         Console.ResetColor();
 
-                        ToastNotification toast = new ToastNotification();
+                        MpnsToastNotification toast = new MpnsToastNotification();
                         toast.text1 = text1;
                         Dictionary<string, object> dicToast = new Dictionary<string, object>();
                         dicToast.Add("pn_mpns", toast);
@@ -1106,7 +1106,7 @@ namespace PubNubMessaging.Core
 
                         pubnub.PushRemoteImageDomainUri.Add(new Uri("http://cdn.flaticon.com"));
 
-                        FlipTileNotification flipTile = new FlipTileNotification();
+                        MpnsFlipTileNotification flipTile = new MpnsFlipTileNotification();
                         flipTile.title = flipFrontTitle;
                         flipTile.count = flipTileCount;
                         flipTile.back_title = flipBackTitle;
@@ -1152,7 +1152,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine(string.Format("Image Path(s) = {0}", imageCycleTile));
                         Console.ResetColor();
 
-                        CycleTileNotification cycleTile = new CycleTileNotification();
+                        MpnsCycleTileNotification cycleTile = new MpnsCycleTileNotification();
                         cycleTile.title = cycleFrontTitle;
                         cycleTile.count = cycleTileCount;
                         cycleTile.images = imageCycleTile.Split(','); // new string[] { imageCycleTile };
@@ -1194,7 +1194,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine(string.Format("iconicTileContent1 = {0}", iconicTileContent1));
                         Console.ResetColor();
 
-                        IconicTileNotification iconicTile = new IconicTileNotification();
+                        MpnsIconicTileNotification iconicTile = new MpnsIconicTileNotification();
                         iconicTile.title = iconicFrontTitle;
                         iconicTile.count = iconicTileCount;
                         iconicTile.wide_content_1 = iconicTileContent1;
