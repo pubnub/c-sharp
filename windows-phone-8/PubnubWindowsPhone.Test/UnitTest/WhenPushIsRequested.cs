@@ -58,7 +58,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             });
         }
 
-        //[TestMethod, Asynchronous]
+        [TestMethod, Asynchronous]
         public void ThenRegisterDeviceShouldReturnSuccess()
         {
             string channel = "hello_my_channel";
@@ -89,7 +89,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
 
         }
 
-        //[TestMethod, Asynchronous]
+        [TestMethod, Asynchronous]
         public void ThenUnregisterDeviceShouldReturnSuccess()
         {
             string pushToken = "http://sn1.notify.live.net/throttledthirdparty/01.00/AQG2MdvoLlZFT7-VJ2TJ5LnbAgAAAAADAQAAAAQUZm52OkRFNzg2NTMxMzlFMEZFNkMFBlVTU0MwMQ";
@@ -119,7 +119,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
 
         }
 
-        //[TestMethod, Asynchronous]
+        [TestMethod, Asynchronous]
         public void ThenRemoveChannelForDeviceShouldReturnSuccess()
         {
             string channel = "hello_my_channel";
@@ -150,7 +150,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
 
         }
 
-        //[TestMethod, Asynchronous]
+        [TestMethod, Asynchronous]
         public void ThenGetAllChannelsForDeviceShouldReturnSuccess()
         {
             string channel = "hello_my_channel";
