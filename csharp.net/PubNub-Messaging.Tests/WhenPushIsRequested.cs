@@ -165,7 +165,7 @@ namespace PubNubMessaging.Tests
 
         private void PublishCallbackResult(string result)
         {
-            if (!string.IsNullOrWhiteSpace(result))
+            if (!string.IsNullOrEmpty(result))
             {
                 object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
                 if (deserializedMessage is object[])
