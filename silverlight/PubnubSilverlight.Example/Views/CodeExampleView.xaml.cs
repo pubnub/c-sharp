@@ -34,6 +34,7 @@ namespace PubnubSilverlight
         static string cipherKey = "";
         static string authKey = "";
         static string uuid = "";
+        static string origin = "";
         static bool resumeOnReconnect = false;
 
         static int subscribeTimeoutInSeconds = 0;
@@ -66,6 +67,7 @@ namespace PubnubSilverlight
             authKey = txtAuthKey.Text;
             uuid = txtUUID.Text;
             resumeOnReconnect = chkResumeOnReconnect.IsChecked.Value;
+            origin = txtOrigin.Text;
 
             Int32.TryParse(txtSubscribeTimeout.Text, out subscribeTimeoutInSeconds);
             subscribeTimeoutInSeconds = (subscribeTimeoutInSeconds <= 0) ? 310 : subscribeTimeoutInSeconds;
@@ -99,6 +101,7 @@ namespace PubnubSilverlight
                 txtUUID.IsEnabled = false;
                 chkSSL.IsEnabled = false;
                 chkResumeOnReconnect.IsEnabled = false;
+                txtOrigin.IsEnabled = false;
 
                 txtSubscribeTimeout.IsEnabled = false;
                 txtNonSubscribeTimeout.IsEnabled = false;
@@ -111,6 +114,7 @@ namespace PubnubSilverlight
                 btnReset.IsEnabled = true;
             }
             pubnub.SessionUUID = uuid;
+            pubnub.Origin = origin;
             pubnub.SubscribeTimeout = subscribeTimeoutInSeconds;
             pubnub.NonSubscribeTimeout = operationTimeoutInSeconds;
             pubnub.NetworkCheckMaxRetries = networkMaxRetries;
@@ -144,18 +148,76 @@ namespace PubnubSilverlight
 
             publishView.Closed += (obj, args) => 
             {
-                if (publishView.DialogResult == true && publishView.Message.Text.Length > 0)
+                if (publishView.radNormalPublish.IsChecked.Value)
                 {
-                    Console.WriteLine("Running publish()");
-
-                    string publishedMessage = publishView.Message.Text;
-                    bool storeInHistory = publishView.chkStoreInHistory.IsChecked.Value;
-                    if (authKey.Trim() != "")
+                    if (publishView.DialogResult == true && publishView.Message.Text.Length > 0)
                     {
-                        pubnub.AuthenticationKey = authKey;
+                        Console.WriteLine("Running publish()");
+
+                        string publishedMessage = publishView.Message.Text;
+                        bool storeInHistory = publishView.chkStoreInHistory.IsChecked.Value;
+                        if (authKey.Trim() != "")
+                        {
+                            pubnub.AuthenticationKey = authKey;
+                        }
+                        pubnub.Publish<string>(channel, publishedMessage, storeInHistory, DisplayUserCallbackMessage, DisplayErrorMessage);
                     }
-                    pubnub.Publish<string>(channel, publishedMessage, storeInHistory, DisplayUserCallbackMessage, DisplayErrorMessage);
                 }
+                else if (publishView.radToastPublish.IsChecked.Value)
+                {
+                    MpnsToastNotification toast = new MpnsToastNotification();
+                    //toast.type = "toast";
+                    toast.text1 = "hardcode message";
+                    Dictionary<string, object> dicToast = new Dictionary<string, object>();
+                    dicToast.Add("pn_mpns", toast);
+
+                    pubnub.EnableDebugForPushPublish = true;
+                    pubnub.Publish<string>(channel, dicToast, DisplayUserCallbackMessage, DisplayErrorMessage);
+                }
+                else if (publishView.radFlipTilePublish.IsChecked.Value)
+                {
+                    pubnub.PushRemoteImageDomainUri.Add(new Uri("http://cdn.flaticon.com"));
+
+                    MpnsFlipTileNotification tile = new MpnsFlipTileNotification();
+                    tile.title = "front title";
+                    tile.count = 6;
+                    tile.back_title = "back title";
+                    tile.back_content = "back message";
+                    tile.back_background_image = "Assets/Tiles/pubnub3.png";
+                    tile.background_image = "http://cdn.flaticon.com/png/256/37985.png";
+                    Dictionary<string, object> dicTile = new Dictionary<string, object>();
+                    dicTile.Add("pn_mpns", tile);
+
+                    pubnub.EnableDebugForPushPublish = true;
+                    pubnub.Publish<string>(channel, dicTile, DisplayUserCallbackMessage, DisplayErrorMessage);
+                }
+                else if (publishView.radCycleTilePublish.IsChecked.Value)
+                {
+                    MpnsCycleTileNotification tile = new MpnsCycleTileNotification();
+                    tile.title = "front title";
+                    tile.count = 2;
+                    tile.images = new string[] { "Assets/Tiles/pubnub1.png", "Assets/Tiles/pubnub2.png", "Assets/Tiles/pubnub3.png", "Assets/Tiles/pubnub4.png" };
+
+                    Dictionary<string, object> dicTile = new Dictionary<string, object>();
+                    dicTile.Add("pn_mpns", tile);
+
+                    pubnub.EnableDebugForPushPublish = true;
+                    pubnub.Publish<string>(channel, dicTile, DisplayUserCallbackMessage, DisplayErrorMessage);
+                }
+                else if (publishView.radIconicTilePublish.IsChecked.Value)
+                {
+                    MpnsIconicTileNotification tile = new MpnsIconicTileNotification();
+                    tile.title = "front title";
+                    tile.count = 2;
+                    tile.wide_content_1 = "my wide content";
+
+                    Dictionary<string, object> dicTile = new Dictionary<string, object>();
+                    dicTile.Add("pn_mpns", tile);
+
+                    pubnub.EnableDebugForPushPublish = true;
+                    pubnub.Publish<string>(channel, dicTile, DisplayUserCallbackMessage, DisplayErrorMessage);
+                }
+
             };
         }
 

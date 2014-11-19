@@ -48,9 +48,10 @@
             <Button Content="Disable Network" Height="72" HorizontalAlignment="Left" Margin="10,255,0,0" Name="btnDisableNetwork" VerticalAlignment="Top" Width="240" FontSize="22" Click="btnDisableNetwork_Click" />
             <Button Content="Enable Network" Height="72" HorizontalAlignment="Left" Margin="249,255,0,0" Name="btnEnableNetwork" VerticalAlignment="Top" Width="207" FontSize="22" Click="btnEnableNetwork_Click" />
 
-            <Button Content="Grant" Height="72" HorizontalAlignment="Left" Margin="10,305,0,0" Name="btnGrant" VerticalAlignment="Top" Width="122" FontSize="22" Click="btnGrant_Click" />
-            <Button Content="Audit" Height="72" HorizontalAlignment="Left" Margin="132,305,0,0" Name="btnAudit" VerticalAlignment="Top" Width="117" FontSize="22" Click="btnAudit_Click" />
-            <Button Content="Revoke" Height="72" HorizontalAlignment="Left" Margin="250,305,0,0" Name="btnRevoke" VerticalAlignment="Top" Width="148" FontSize="22" Click="btnRevoke_Click" />
+            <Button Content="Grant" Height="72" HorizontalAlignment="Left" Margin="10,305,0,0" Name="btnGrant" VerticalAlignment="Top" Width="123" FontSize="22" Click="btnGrant_Click" />
+            <Button Content="Audit" Height="72" HorizontalAlignment="Left" Margin="113,305,0,0" Name="btnAudit" VerticalAlignment="Top" Width="117" FontSize="22" Click="btnAudit_Click" />
+            <Button Content="Revoke" Height="72" HorizontalAlignment="Left" Margin="211,305,0,0" Name="btnRevoke" VerticalAlignment="Top" Width="126" FontSize="22" Click="btnRevoke_Click" />
+            <Button Content="Push" Height="72" HorizontalAlignment="Left" Margin="318,305,0,0" x:Name="btnPush" VerticalAlignment="Top" Width="126" FontSize="22" Click="btnPush_Click" />
 
             <Button Content="Grant Presence" Height="72" HorizontalAlignment="Left" Margin="10,356,0,0" Name="btnGrantPresence" VerticalAlignment="Top" Width="201" FontSize="22" Click="btnGrantPresence_Click" />
             <Button Content="Audit Presence" Height="72" HorizontalAlignment="Left" Margin="198,356,0,0" Name="btnAuditPresence" VerticalAlignment="Top" Width="198" FontSize="22" Click="btnAuditPresence_Click" />
@@ -61,7 +62,7 @@
             <ScrollViewer Height="210" HorizontalAlignment="Stretch" Margin="23.5,472,23.5,0" Name="scrollViewerResult" VerticalAlignment="Top" Width="420" Background="#FFCCC6C6" BorderThickness="2" Foreground="#FF0D0D0D" ManipulationMode="Control" UseLayoutRounding="False" BorderBrush="SteelBlue" VerticalScrollBarVisibility="Visible" DoubleTap="scrollViewerResult_DoubleTap">
                 <StackPanel Name="messageStackPanel" Orientation="Vertical"></StackPanel>
             </ScrollViewer>
-            
+
         </Grid>
     </Grid>
 

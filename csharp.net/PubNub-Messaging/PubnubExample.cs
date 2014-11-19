@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.ComponentModel;
@@ -40,7 +41,7 @@ namespace PubNubMessaging.Core
             Console.WriteLine("      NETWORK ERROR MESSAGE WILL BE SENT");
             Console.WriteLine();
 
-            Console.WriteLine("Enter Pubnub Origin. Default Origin = pubsub.pubnub.com");
+            Console.WriteLine("Enter Pubnub Origin. Default Origin = pubsub.pubnub.com"); //TODO
             Console.WriteLine("If you want to accept default value, press ENTER.");
             string origin = Console.ReadLine();
             Console.ForegroundColor = ConsoleColor.Blue;
@@ -359,7 +360,7 @@ namespace PubNubMessaging.Core
             Console.WriteLine("");
             while (!exitFlag)
             {
-                if (currentUserChoice < 1 || (currentUserChoice > 30 && currentUserChoice != 99))
+                if (currentUserChoice < 1 || (currentUserChoice > 37 && currentUserChoice != 99))
                 {
                     Console.WriteLine("ENTER 1 FOR Subscribe");
                     Console.WriteLine("ENTER 2 FOR Publish");
@@ -390,6 +391,14 @@ namespace PubNubMessaging.Core
                     Console.WriteLine("Enter 27 FOR WhereNow");
                     Console.WriteLine("Enter 28 FOR GlobalHere_Now");
                     Console.WriteLine("Enter 29 TO change UUID. (Current value = {0})", pubnub.SessionUUID);
+                    Console.WriteLine("Enter 30 FOR Push - Register Device");
+                    Console.WriteLine("Enter 31 FOR Push - Unregister Device");
+                    Console.WriteLine("Enter 32 FOR Push - Remove Channel");
+                    Console.WriteLine("Enter 33 FOR Push - Get Current Channels");
+                    Console.WriteLine("Enter 34 FOR Push - Publish Toast message");
+                    Console.WriteLine("Enter 35 FOR Push - Publish Flip Tile message");
+                    Console.WriteLine("Enter 36 FOR Push - Publish Cycle Tile message");
+                    Console.WriteLine("Enter 37 FOR Push - Publish Iconic Tile message");
                     Console.WriteLine("ENTER 99 FOR EXIT OR QUIT");
 
                     userinput = Console.ReadLine();
@@ -432,6 +441,28 @@ namespace PubNubMessaging.Core
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Store In History = {0}", storeInHistory));
                         Console.ResetColor();
+
+
+
+
+                        Console.WriteLine("Direct JSON String? Enter Y for Yes or N for No. To accept default(N), just press ENTER");
+                        string directJson = Console.ReadLine();
+                        bool jsonPublish = false;
+                        if (directJson.ToLower() == "y")
+                        {
+                            jsonPublish = true;
+                            pubnub.EnableJsonEncodingForPublish = false;
+                        }
+                        else
+                        {
+                            pubnub.EnableJsonEncodingForPublish = true;
+                        }
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Direct JSON String = {0}", jsonPublish));
+                        Console.ResetColor();
+
+
 
                         /* TO TEST SMALL TEXT PUBLISH ONLY */
                         Console.WriteLine("Enter the message for publish and press ENTER key to submit");
@@ -947,6 +978,231 @@ namespace PubNubMessaging.Core
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine("UUID = {0}",pubnub.SessionUUID);
                         Console.ResetColor();
+                        break;
+                    case "30":
+                        Console.WriteLine("Enter channel name");
+                        string pushRegisterChannel = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}", pushRegisterChannel));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter Push Token for MPNS");
+                        string pushToken = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Push Token = {0}", pushToken));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Running RegisterDeviceForPush()");
+                        pubnub.RegisterDeviceForPush<string>(pushRegisterChannel, PushTypeService.MPNS, pushToken, DisplayReturnMessage, DisplayErrorMessage);
+                        break;
+                    case "31":
+                        Console.WriteLine("Enter Push Token for MPNS");
+                        string unRegisterPushToken = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Push Token = {0}", unRegisterPushToken));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Running UnregisterDeviceForPush()");
+                        pubnub.UnregisterDeviceForPush<string>(PushTypeService.MPNS, unRegisterPushToken, DisplayReturnMessage, DisplayErrorMessage);
+                        break;
+                    case "32":
+                        Console.WriteLine("Enter channel name");
+                        string pushRemoveChannel = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}", pushRemoveChannel));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter Push Token for MPNS");
+                        string pushTokenRemove = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Push Token = {0}", pushTokenRemove));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Running RegisterDeviceForPush()");
+                        pubnub.RemoveChannelForDevicePush<string>(pushRemoveChannel, PushTypeService.MPNS, pushTokenRemove, DisplayReturnMessage, DisplayErrorMessage);
+                        break;
+                    case "33":
+                        Console.WriteLine("Enter Push Token for MPNS");
+                        string pushTokenGetChannel = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Push Token = {0}", pushTokenGetChannel));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Running RegisterDeviceForPush()");
+                        pubnub.GetChannelsForDevicePush<string>(PushTypeService.MPNS, pushTokenGetChannel, DisplayReturnMessage, DisplayErrorMessage);
+                        break;
+                    case "34": 
+                        //Toast message publish
+                        Console.WriteLine("Enter channel name");
+                        string toastChannel = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}", toastChannel));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter title for Toast");
+                        string text1 = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Text1 = {0}", text1));
+                        Console.ResetColor();
+
+                        MpnsToastNotification toast = new MpnsToastNotification();
+                        toast.text1 = text1;
+                        Dictionary<string, object> dicToast = new Dictionary<string, object>();
+                        dicToast.Add("pn_mpns", toast);
+                        pubnub.EnableDebugForPushPublish = true;
+
+                        Console.WriteLine("Running Publish for Toast");
+                        pubnub.Publish<string>(toastChannel, dicToast, DisplayReturnMessage, DisplayErrorMessage);
+                        break;
+                    case "35":
+                        //Flip Tile message publish
+                        Console.WriteLine("Enter channel name");
+                        string flipTileChannel = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}", flipTileChannel));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter front title for Flip Tile");
+                        string flipFrontTitle = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Front Title = {0}", flipFrontTitle));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter back title for Flip Tile");
+                        string flipBackTitle = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Back Title = {0}", flipBackTitle));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter back content for Flip Tile");
+                        string flipBackContent = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Back Content = {0}", flipBackContent));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter numeric count for Flip Tile. Invalid entry will be set to null");
+                        string stringFlipCount = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Count = {0}", stringFlipCount));
+                        Console.ResetColor();
+                        int? flipTileCount  = null;
+                        if (!string.IsNullOrEmpty(stringFlipCount) && stringFlipCount.Trim().Length > 0)
+                        {
+                            int outValue;
+                            flipTileCount = int.TryParse(stringFlipCount, out outValue) ? (int?)outValue : null;
+                        }
+
+                        Console.WriteLine("Enter background image path with fully qualified URI or device local relative Path for Flip Tile");
+                        string imageBackground = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Small Background Image = {0}", imageBackground));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter Back background image path with fully qualified URI or device local relative Path for Flip Tile");
+                        string imageBackBackground = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Small Background Image = {0}", imageBackBackground));
+                        Console.ResetColor();
+
+                        pubnub.PushRemoteImageDomainUri.Add(new Uri("http://cdn.flaticon.com"));
+
+                        MpnsFlipTileNotification flipTile = new MpnsFlipTileNotification();
+                        flipTile.title = flipFrontTitle;
+                        flipTile.count = flipTileCount;
+                        flipTile.back_title = flipBackTitle;
+                        flipTile.back_content = flipBackContent;
+                        flipTile.background_image = imageBackground;
+                        flipTile.back_background_image = imageBackBackground;
+                        Dictionary<string, object> dicFlipTile = new Dictionary<string, object>();
+                        dicFlipTile.Add("pn_mpns", flipTile);
+
+                        pubnub.EnableDebugForPushPublish = true;
+                        pubnub.Publish<string>(flipTileChannel, dicFlipTile, DisplayReturnMessage, DisplayErrorMessage);
+                        break;
+                    case "36":
+                        //Cycle Tile message publish
+                        Console.WriteLine("Enter channel name");
+                        string cycleTileChannel = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}", cycleTileChannel));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter front title for Cycle Tile");
+                        string cycleFrontTitle = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Front Title = {0}", cycleFrontTitle));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter numeric count for Cycle Tile. Invalid entry will be set to null");
+                        string stringCycleCount = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Count = {0}", stringCycleCount));
+                        Console.ResetColor();
+                        int? cycleTileCount = null;
+                        if (!string.IsNullOrEmpty(stringCycleCount) && stringCycleCount.Trim().Length > 0)
+                        {
+                            int outValue;
+                            cycleTileCount = int.TryParse(stringCycleCount, out outValue) ? (int?)outValue : null;
+                        }
+
+                        Console.WriteLine("Enter image path (fully qualified URI/device local Path) for Cycle Tile");
+                        Console.WriteLine("Multiple image paths can be entered with comma delimiter");
+                        string imageCycleTile = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Image Path(s) = {0}", imageCycleTile));
+                        Console.ResetColor();
+
+                        MpnsCycleTileNotification cycleTile = new MpnsCycleTileNotification();
+                        cycleTile.title = cycleFrontTitle;
+                        cycleTile.count = cycleTileCount;
+                        cycleTile.images = imageCycleTile.Split(','); // new string[] { imageCycleTile };
+                        Dictionary<string, object> dicCycleTile = new Dictionary<string, object>();
+                        dicCycleTile.Add("pn_mpns", cycleTile);
+
+                        pubnub.EnableDebugForPushPublish = true;
+                        pubnub.Publish<string>(cycleTileChannel, dicCycleTile, DisplayReturnMessage, DisplayErrorMessage);
+                        break;
+                    case "37":
+                        //Iconic Tile message publish
+                        Console.WriteLine("Enter channel name");
+                        string iconicTileChannel = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}", iconicTileChannel));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter front title for Iconic Tile");
+                        string iconicFrontTitle = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Front Title = {0}", iconicFrontTitle));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter numeric count for Iconic Tile. Invalid entry will be set to null");
+                        string stringIconicCount = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Count = {0}", stringIconicCount));
+                        Console.ResetColor();
+                        int? iconicTileCount = null;
+                        if (!string.IsNullOrEmpty(stringIconicCount) && stringIconicCount.Trim().Length > 0)
+                        {
+                            int outValue;
+                            iconicTileCount = int.TryParse(stringIconicCount, out outValue) ? (int?)outValue : null;
+                        }
+
+                        Console.WriteLine("Enter Content1 for Iconic Tile.");
+                        string iconicTileContent1 = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("iconicTileContent1 = {0}", iconicTileContent1));
+                        Console.ResetColor();
+
+                        MpnsIconicTileNotification iconicTile = new MpnsIconicTileNotification();
+                        iconicTile.title = iconicFrontTitle;
+                        iconicTile.count = iconicTileCount;
+                        iconicTile.wide_content_1 = iconicTileContent1;
+                        Dictionary<string, object> dicIconicTile = new Dictionary<string, object>();
+                        dicIconicTile.Add("pn_mpns", iconicTile);
+
+                        pubnub.EnableDebugForPushPublish = true;
+                        pubnub.Publish<string>(iconicTileChannel, dicIconicTile, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     default:
                         Console.ForegroundColor = ConsoleColor.Red;

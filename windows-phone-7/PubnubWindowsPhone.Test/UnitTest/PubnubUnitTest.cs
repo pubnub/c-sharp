@@ -446,6 +446,74 @@ namespace PubnubWindowsPhone.Test.UnitTest
             return data;
         }
 
+        private Dictionary<string, string> LoadWhenPushIsRequestedThenRegisterDeviceShouldReturnSuccess()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/v1/push/sub-key/demo-36/devices/http%3A%252F%252Fsn1.notify.live.net%252Fthrottledthirdparty%252F01.00%252FAQG2MdvoLlZFT7-VJ2TJ5LnbAgAAAAADAQAAAAQUZm52OkRFNzg2NTMxMzlFMEZFNkMFBlVTU0MwMQ", "[1,\"Modified Channels\",\"hello_my_channel\"]");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenPushIsRequestedThenUnregisterDeviceShouldReturnSuccess()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/v1/push/sub-key/demo-36/devices/http%3A%252F%252Fsn1.notify.live.net%252Fthrottledthirdparty%252F01.00%252FAQG2MdvoLlZFT7-VJ2TJ5LnbAgAAAAADAQAAAAQUZm52OkRFNzg2NTMxMzlFMEZFNkMFBlVTU0MwMQ/remove", "[1,\"Removed Device\"]");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenPushIsRequestedThenRemoveChannelForDeviceShouldReturnSuccess()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/v1/push/sub-key/demo-36/devices/http%3A%252F%252Fsn1.notify.live.net%252Fthrottledthirdparty%252F01.00%252FAQG2MdvoLlZFT7-VJ2TJ5LnbAgAAAAADAQAAAAQUZm52OkRFNzg2NTMxMzlFMEZFNkMFBlVTU0MwMQ", "[1,\"Modified Channels\"]");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenPushIsRequestedThenGetAllChannelsForDeviceShouldReturnSuccess()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/v1/push/sub-key/demo-36/devices/http%3A%252F%252Fsn1.notify.live.net%252Fthrottledthirdparty%252F01.00%252FAQG2MdvoLlZFT7-VJ2TJ5LnbAgAAAAADAQAAAAQUZm52OkRFNzg2NTMxMzlFMEZFNkMFBlVTU0MwMQ", "[\"hello_my_channel\",\"\"]");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenPushIsRequestedThenPublishMpnsToastShouldReturnSuccess()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%7B%22pn_mpns%22%3A%7B%22type%22%3A%22toast%22%2C%22text1%22%3A%22hardcode%20message%22%2C%22text2%22%3A%22%22%2C%22param%22%3A%22%22%7D%2C%22pn_debug%22%3Atrue%7D", "[1,\"Sent\",\"13559014566792817\"]");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenPushIsRequestedThenPublishMpnsFlipTileShouldReturnSuccess()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+#if (SILVERLIGHT || WINDOWS_PHONE)
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%7B%22pn_mpns%22%3A%7B%22type%22%3A%22flip%22%2C%22delay%22%3A0%2C%22title%22%3A%22front%20title%22%2C%22count%22%3A6%2C%22small_background_image%22%3A%22%22%2C%22background_image%22%3A%22http%3A//cdn.flaticon.com/png/256/37985.png%22%2C%22back_background_image%22%3A%22Assets/Tiles/pubnub3.png%22%2C%22back_content%22%3A%22back%20message%22%2C%22back_title%22%3A%22back%20title%22%2C%22wide_background_image%22%3A%22%22%2C%22wide_back_background_image%22%3A%22%22%2C%22wide_back_content%22%3A%22%22%7D%2C%22pn_debug%22%3Atrue%7D", "[1,\"Sent\",\"13559014566792817\"]");
+#else
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%7B%22pn_mpns%22%3A%7B%22type%22%3A%22flip%22%2C%22delay%22%3A0%2C%22title%22%3A%22front%20title%22%2C%22count%22%3A6%2C%22small_background_image%22%3A%22%22%2C%22background_image%22%3A%22http%3A%2F%2Fcdn.flaticon.com%2Fpng%2F256%2F37985.png%22%2C%22back_background_image%22%3A%22Assets%2FTiles%2Fpubnub3.png%22%2C%22back_content%22%3A%22back%20message%22%2C%22back_title%22%3A%22back%20title%22%2C%22wide_background_image%22%3A%22%22%2C%22wide_back_background_image%22%3A%22%22%2C%22wide_back_content%22%3A%22%22%7D%2C%22pn_debug%22%3Atrue%7D",  "[1,\"Sent\",\"13559014566792817\"]");
+#endif
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenPushIsRequestedThenPublishMpnsCycleTileShouldReturnSuccess()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+#if (SILVERLIGHT || WINDOWS_PHONE)
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%7B%22pn_mpns%22%3A%7B%22type%22%3A%22cycle%22%2C%22delay%22%3A0%2C%22title%22%3A%22front%20title%22%2C%22count%22%3A2%2C%22small_background_image%22%3A%22%22%2C%22images%22%3A%5B%22Assets/Tiles/pubnub1.png%22%2C%22Assets/Tiles/pubnub2.png%22%2C%22Assets/Tiles/pubnub3.png%22%2C%22Assets/Tiles/pubnub4.png%22%5D%7D%2C%22pn_debug%22%3Atrue%7D", "[1,\"Sent\",\"13559014566792817\"]");
+#else
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%7B%22pn_mpns%22%3A%7B%22type%22%3A%22cycle%22%2C%22delay%22%3A0%2C%22title%22%3A%22front%20title%22%2C%22count%22%3A2%2C%22small_background_image%22%3A%22%22%2C%22images%22%3A%5B%22Assets%2FTiles%2Fpubnub1.png%22%2C%22Assets%2FTiles%2Fpubnub2.png%22%2C%22Assets%2FTiles%2Fpubnub3.png%22%2C%22Assets%2FTiles%2Fpubnub4.png%22%5D%7D%2C%22pn_debug%22%3Atrue%7D", "[1,\"Sent\",\"13559014566792817\"]");
+#endif
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenPushIsRequestedThenPublishMpnsIconicTileShouldReturnSuccess()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+#if (SILVERLIGHT || WINDOWS_PHONE)
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%7B%22pn_mpns%22%3A%7B%22type%22%3A%22iconic%22%2C%22delay%22%3A0%2C%22title%22%3A%22front%20title%22%2C%22count%22%3A2%2C%22icon_image%22%3A%22%22%2C%22small_icon_image%22%3A%22%22%2C%22background_color%22%3A%22%22%2C%22wide_content_1%22%3A%22my%20wide%20content%22%2C%22wide_content_2%22%3A%22%22%2C%22wide_content_3%22%3A%22%22%7D%2C%22pn_debug%22%3Atrue%7D", "[1,\"Sent\",\"13559014566792817\"]");
+#else
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%7B%22pn_mpns%22%3A%7B%22type%22%3A%22iconic%22%2C%22delay%22%3A0%2C%22title%22%3A%22front%20title%22%2C%22count%22%3A2%2C%22icon_image%22%3A%22%22%2C%22small_icon_image%22%3A%22%22%2C%22background_color%22%3A%22%22%2C%22wide_content_1%22%3A%22my%20wide%20content%22%2C%22wide_content_2%22%3A%22%22%2C%22wide_content_3%22%3A%22%22%7D%2C%22pn_debug%22%3Atrue%7D", "[1,\"Sent\",\"13559014566792817\"]");
+#endif
+            return data;
+        }
+
         public string GetStubResponse(HttpWebRequest request)
         {
             Uri requestUri = request.RequestUri;
@@ -645,6 +713,37 @@ namespace PubnubWindowsPhone.Test.UnitTest
                             break;
                         case "ThenRevokeAtUserLevelReturnSuccess":
                             responseDictionary = LoadWhenGrantIsRequestedThenRevokeAtUserLevelReturnSuccess();
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case "WhenPushIsRequested":
+                    switch (_testCaseName)
+                    {
+                        case "ThenRegisterDeviceShouldReturnSuccess":
+                            responseDictionary = LoadWhenPushIsRequestedThenRegisterDeviceShouldReturnSuccess();
+                            break;
+                        case "ThenUnregisterDeviceShouldReturnSuccess":
+                            responseDictionary = LoadWhenPushIsRequestedThenUnregisterDeviceShouldReturnSuccess();
+                            break;
+                        case "ThenRemoveChannelForDeviceShouldReturnSuccess":
+                            responseDictionary = LoadWhenPushIsRequestedThenRemoveChannelForDeviceShouldReturnSuccess();
+                            break;
+                        case "ThenGetAllChannelsForDeviceShouldReturnSuccess":
+                            responseDictionary = LoadWhenPushIsRequestedThenGetAllChannelsForDeviceShouldReturnSuccess();
+                            break;
+                        case "ThenPublishMpnsToastShouldReturnSuccess":
+                            responseDictionary = LoadWhenPushIsRequestedThenPublishMpnsToastShouldReturnSuccess();
+                            break;
+                        case "ThenPublishMpnsFlipTileShouldReturnSuccess":
+                            responseDictionary = LoadWhenPushIsRequestedThenPublishMpnsFlipTileShouldReturnSuccess();
+                            break;
+                        case "ThenPublishMpnsCycleTileShouldReturnSuccess":
+                            responseDictionary = LoadWhenPushIsRequestedThenPublishMpnsCycleTileShouldReturnSuccess();
+                            break;
+                        case "ThenPublishMpnsIconicTileShouldReturnSuccess":
+                            responseDictionary = LoadWhenPushIsRequestedThenPublishMpnsIconicTileShouldReturnSuccess();
                             break;
                         default:
                             break;

@@ -1,4 +1,4 @@
-﻿//Build Date: September 29, 2014
+﻿//Build Date: November 14, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -12,6 +12,7 @@ using System.Text;
 using System.Net;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 #if !NETFX_CORE
 using System.Security.Cryptography;
 #endif
@@ -79,6 +80,7 @@ namespace PubNubMessaging.Core
 		bool _uuidChanged = false;
 		protected bool overrideTcpKeepAlive = true;
 		bool _enableJsonEncodingForPublish = true;
+        bool _enableDebugForPushPublish = false;
 		LoggingMethod.Level _pubnubLogLevel = LoggingMethod.Level.Off;
 		PubnubErrorFilter.Level _errorLevel = PubnubErrorFilter.Level.Info;
 		protected ConcurrentDictionary<string, long> multiChannelSubscribe = new ConcurrentDictionary<string, long>();
@@ -94,7 +96,8 @@ namespace PubNubMessaging.Core
 		protected System.Threading.Timer localClientHeartBeatTimer;
 		protected System.Threading.Timer presenceHeartbeatTimer = null;
 		protected static bool pubnetSystemActive = true;
-		// History of Messages (Obsolete)
+        protected Collection<Uri> pushRemoteImageDomainUri = new Collection<Uri>();
+        // History of Messages (Obsolete)
 		private List<object> _history = new List<object>();
 
         public List<object> History { get { return _history; } set { _history = value; RaisePropertyChanged("History"); } }
@@ -107,13 +110,18 @@ namespace PubNubMessaging.Core
 		protected string secretKey = "";
 		protected string cipherKey = "";
 		protected bool ssl = false;
-		protected string parameters = "";
+        protected string parameters = "";
 		private string subscribeParameters = "";
 		private string presenceHeartbeatParameters = "";
 		private string hereNowParameters = "";
 		private string setUserStateparameters = "";
 		private string globalHereNowParameters = "";
+        private string pushRegisterDeviceParameters = "";
+        private string pushRemoveChannelParameters = "";
+        private string pushGetChannelsParameters = "";
+        private string pushUnregisterDeviceParameters = "";
         private string _pnsdkVersion = "PubNub-CSharp-.NET/3.6.0.2";
+        private string _pushServiceName = "push.pubnub.com";
 
 		#endregion
 
@@ -208,7 +216,19 @@ namespace PubNubMessaging.Core
 			}
 		}
 
-		public bool EnableJsonEncodingForPublish 
+        public bool EnableDebugForPushPublish
+        {
+            get
+            {
+                return _enableDebugForPushPublish;
+            }
+            set
+            {
+                _enableDebugForPushPublish = value;
+            }
+        }
+
+        public bool EnableJsonEncodingForPublish 
         {
 			get 
             {
@@ -372,6 +392,31 @@ namespace PubNubMessaging.Core
                 PubnubErrorFilter.ErrorLevel = _errorLevel;
 			}
 		}
+
+        public Collection<Uri> PushRemoteImageDomainUri
+        {
+            get
+            {
+                return pushRemoteImageDomainUri;
+            }
+            set
+            {
+                pushRemoteImageDomainUri = value;
+            }
+        }
+
+        public string PushServiceName
+        {
+            get
+            {
+                return _pushServiceName;
+            }
+
+            set
+            {
+                _pushServiceName = value;
+            }
+        }
 
 		#endregion
 
@@ -1257,7 +1302,247 @@ namespace PubNubMessaging.Core
 
 		#endregion
 
-		#region "Publish"
+        #region "Push"
+        public void RegisterDeviceForPush(string channel, PushTypeService pushType, string pushToken, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            RegisterDeviceForPush<object>(channel, pushType, pushToken, userCallback, errorCallback); 
+        }
+
+        public void RegisterDeviceForPush<T>(string channel, PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()))
+            {
+                throw new ArgumentException("Missing Channel");
+            }
+            if (pushType == PushTypeService.None)
+            {
+                throw new ArgumentException("Missing PushTypeService");
+            }
+            if (pushToken == null)
+            {
+                throw new ArgumentException("Missing Uri");
+            }
+            if (userCallback == null)
+            {
+                throw new ArgumentException("Missing userCallback");
+            }
+            if (errorCallback == null)
+            {
+                throw new ArgumentException("Missing errorCallback");
+            }
+
+            Uri request = BuildRegisterDevicePushRequest(channel, pushType, pushToken);
+
+            RequestState<T> requestState = new RequestState<T>();
+            requestState.Channels = new string[] { channel };
+            requestState.Type = ResponseType.PushRegister;
+            requestState.UserCallback = userCallback;
+            requestState.ErrorCallback = errorCallback;
+            requestState.Reconnect = false;
+
+            UrlProcessRequest<T>(request, requestState);
+        }
+
+        public void UnregisterDeviceForPush(PushTypeService pushType, string pushToken, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            UnregisterDeviceForPush<object>(pushType, pushToken, userCallback, errorCallback); 
+        }
+
+        public void UnregisterDeviceForPush<T>(PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            if (pushType == PushTypeService.None)
+            {
+                throw new ArgumentException("Missing PushTypeService");
+            }
+            if (pushToken == null)
+            {
+                throw new ArgumentException("Missing Uri");
+            }
+            if (userCallback == null)
+            {
+                throw new ArgumentException("Missing userCallback");
+            }
+            if (errorCallback == null)
+            {
+                throw new ArgumentException("Missing errorCallback");
+            }
+
+            Uri request = BuildUnregisterDevicePushRequest(pushType, pushToken);
+
+            RequestState<T> requestState = new RequestState<T>();
+            requestState.Type = ResponseType.PushUnregister;
+            requestState.UserCallback = userCallback;
+            requestState.ErrorCallback = errorCallback;
+            requestState.Reconnect = false;
+
+            UrlProcessRequest<T>(request, requestState);
+        }
+
+        public void RemoveChannelForDevicePush(string channel, PushTypeService pushType, string pushToken, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            RemoveChannelForDevicePush<object>(channel, pushType, pushToken, userCallback, errorCallback); 
+        }
+
+        public void RemoveChannelForDevicePush<T>(string channel, PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()))
+            {
+                throw new ArgumentException("Missing Channel");
+            }
+            if (pushType == PushTypeService.None)
+            {
+                throw new ArgumentException("Missing PushTypeService");
+            }
+            if (pushToken == null)
+            {
+                throw new ArgumentException("Missing Uri");
+            }
+            if (userCallback == null)
+            {
+                throw new ArgumentException("Missing userCallback");
+            }
+            if (errorCallback == null)
+            {
+                throw new ArgumentException("Missing errorCallback");
+            }
+
+            Uri request = BuildRemoveChannelPushRequest(channel, pushType, pushToken);
+
+            RequestState<T> requestState = new RequestState<T>();
+            requestState.Channels = new string[] { channel };
+            requestState.Type = ResponseType.PushRemove;
+            requestState.UserCallback = userCallback;
+            requestState.ErrorCallback = errorCallback;
+            requestState.Reconnect = false;
+
+            UrlProcessRequest<T>(request, requestState);
+        }
+
+        public void GetChannelsForDevicePush(PushTypeService pushType, string pushToken, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            GetChannelsForDevicePush<object>(pushType, pushToken, userCallback, errorCallback); 
+        }
+
+        public void GetChannelsForDevicePush<T>(PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            if (pushType == PushTypeService.None)
+            {
+                throw new ArgumentException("Missing PushTypeService");
+            }
+            if (pushToken == null)
+            {
+                throw new ArgumentException("Missing Uri");
+            }
+            if (userCallback == null)
+            {
+                throw new ArgumentException("Missing userCallback");
+            }
+            if (errorCallback == null)
+            {
+                throw new ArgumentException("Missing errorCallback");
+            }
+
+            Uri request = BuildGetChannelsPushRequest(pushType, pushToken);
+
+            RequestState<T> requestState = new RequestState<T>();
+            requestState.Type = ResponseType.PushGet;
+            requestState.UserCallback = userCallback;
+            requestState.ErrorCallback = errorCallback;
+            requestState.Reconnect = false;
+
+            UrlProcessRequest<T>(request, requestState);
+        }
+
+        private Uri BuildRegisterDevicePushRequest(string channel, PushTypeService pushType, string pushToken)
+        {
+            StringBuilder parameterBuilder = new StringBuilder();
+            pushRegisterDeviceParameters = "";
+
+            parameterBuilder.AppendFormat("?add={0}", EncodeUricomponent(channel, ResponseType.PushRegister, true, false));
+            parameterBuilder.AppendFormat("&type={0}", pushType.ToString().ToLower());
+            
+            pushRegisterDeviceParameters = parameterBuilder.ToString();
+
+            // Build URL
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("push");
+            url.Add("sub-key");
+            url.Add(this.subscribeKey);
+            url.Add("devices");
+            url.Add(pushToken.ToString());
+
+            return BuildRestApiRequest<Uri>(url, ResponseType.PushRegister);
+        }
+
+        private Uri BuildRemoveChannelPushRequest(string channel, PushTypeService pushType, string pushToken)
+        {
+            StringBuilder parameterBuilder = new StringBuilder();
+            pushRemoveChannelParameters = "";
+
+            parameterBuilder.AppendFormat("?remove={0}", EncodeUricomponent(channel, ResponseType.PushRemove, true, false));
+            parameterBuilder.AppendFormat("&type={0}", pushType.ToString().ToLower());
+
+            pushRemoveChannelParameters = parameterBuilder.ToString();
+
+            // Build URL
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("push");
+            url.Add("sub-key");
+            url.Add(this.subscribeKey);
+            url.Add("devices");
+            url.Add(pushToken.ToString());
+
+            return BuildRestApiRequest<Uri>(url, ResponseType.PushRemove);
+        }
+
+        private Uri BuildGetChannelsPushRequest(PushTypeService pushType, string pushToken)
+        {
+            StringBuilder parameterBuilder = new StringBuilder();
+            pushGetChannelsParameters = "";
+
+            parameterBuilder.AppendFormat("?type={0}", pushType.ToString().ToLower());
+
+            pushGetChannelsParameters = parameterBuilder.ToString();
+
+            // Build URL
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("push");
+            url.Add("sub-key");
+            url.Add(this.subscribeKey);
+            url.Add("devices");
+            url.Add(pushToken.ToString());
+
+            return BuildRestApiRequest<Uri>(url, ResponseType.PushGet);
+        }
+
+        private Uri BuildUnregisterDevicePushRequest(PushTypeService pushType, string pushToken)
+        {
+            StringBuilder parameterBuilder = new StringBuilder();
+            pushUnregisterDeviceParameters = "";
+
+            parameterBuilder.AppendFormat("?type={0}", pushType.ToString().ToLower());
+
+            pushUnregisterDeviceParameters = parameterBuilder.ToString();
+
+            // Build URL
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("push");
+            url.Add("sub-key");
+            url.Add(this.subscribeKey);
+            url.Add("devices");
+            url.Add(pushToken.ToString());
+            url.Add("remove");
+
+            return BuildRestApiRequest<Uri>(url, ResponseType.PushUnregister);
+        }
+        #endregion
+
+
+        #region "Publish"
 
         public bool Publish<T>(string channel, object message, bool storeInHistory, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
@@ -1281,6 +1566,16 @@ namespace PubNubMessaging.Core
             if (_jsonPluggableLibrary == null)
             {
                 throw new NullReferenceException("Missing Json Pluggable Library for Pubnub Instance");
+            }
+
+            if (_enableDebugForPushPublish)
+            {
+                if (message is Dictionary<string,object>)
+                {
+                    Dictionary<string, object> dicMessage = message as Dictionary<string, object>;
+                    dicMessage.Add("pn_debug", true);
+                    message = dicMessage;
+                }
             }
 
             Uri request = BuildPublishRequest(channel, message, storeInHistory);
@@ -1456,7 +1751,7 @@ namespace PubNubMessaging.Core
 				}
 			}
 			encodedUri = o.ToString ();
-			if (type == ResponseType.Here_Now || type == ResponseType.DetailedHistory || type == ResponseType.Leave || type == ResponseType.PresenceHeartbeat) 
+			if (type == ResponseType.Here_Now || type == ResponseType.DetailedHistory || type == ResponseType.Leave || type == ResponseType.PresenceHeartbeat || type == ResponseType.PushRegister || type == ResponseType.PushRemove || type == ResponseType.PushGet || type == ResponseType.PushUnregister) 
             {
                 if (!ignorePercent2fEncode)
                 {
@@ -2624,7 +2919,11 @@ namespace PubNubMessaging.Core
 				GlobalHereNowExceptionHandler<T> (requestTimeout, errorCallback);
 			} else if (type == ResponseType.Where_Now) {
 				WhereNowExceptionHandler<T> (channels [0], requestTimeout, errorCallback);
-			}
+            }
+            else if (type == ResponseType.PushRegister || type == ResponseType.PushRemove || type == ResponseType.PushGet || type == ResponseType.PushUnregister)
+            {
+                PushNotificationExceptionHandler<T>(channels, requestTimeout, errorCallback);
+            }
 		}
 
 		protected void MultiplexExceptionHandler<T> (ResponseType type, string[] channels, Action<T> userCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback, bool reconnectMaxTried, bool resumeOnReconnect)
@@ -2815,6 +3114,24 @@ namespace PubNubMessaging.Core
 			}
 		}
 
+        private void PushNotificationExceptionHandler<T>(string[] channels, bool requestTimeout, Action<PubnubClientError> errorCallback)
+        {
+            string channel = "";
+            if (channels != null)
+            {
+                channel = string.Join(",", channels);
+            }
+            if (requestTimeout)
+            {
+                string message = (requestTimeout) ? "Operation Timeout" : "Network connnect error";
+
+                LoggingMethod.WriteToLog(string.Format("DateTime {0}, PushExceptionHandler response={1}", DateTime.Now.ToString(), message), LoggingMethod.LevelInfo);
+
+                CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
+                    channel, errorCallback, message,
+                    PubnubErrorCode.PushNotificationTimeout, null, null);
+            }
+        }
 		#endregion
 
 		#region "Callbacks"
@@ -3114,6 +3431,14 @@ namespace PubNubMessaging.Core
 					GoToCallback<T> (result, userCallback);
 				}
 				break;
+            case ResponseType.PushRegister:
+            case ResponseType.PushRemove:
+            case ResponseType.PushGet:
+            case ResponseType.PushUnregister:
+				if (result != null && result.Count > 0) {
+					GoToCallback<T> (result, userCallback);
+				}
+                break;
 			default:
 				break;
 			}
@@ -3318,6 +3643,7 @@ namespace PubNubMessaging.Core
 		/// <returns></returns>
 		private string GetChannelName (List<string> urlComponents, ResponseType type)
 		{
+            //This method is not in use
 			string channelName = "";
 			switch (type) {
 			case ResponseType.Subscribe:
@@ -3712,6 +4038,12 @@ namespace PubNubMessaging.Core
 							result.Add (userStateDictionary);
 							result.Add (multiChannel);
 							break;
+                        case ResponseType.PushRegister:
+                        case ResponseType.PushRemove:
+                        case ResponseType.PushGet:
+                        case ResponseType.PushUnregister:
+							result.Add (multiChannel);
+                            break;
 						default:
 							break;
 						}
@@ -3961,6 +4293,32 @@ namespace PubNubMessaging.Core
                 url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
             }
 
+            if (type == ResponseType.PushRegister || type == ResponseType.PushRemove || type == ResponseType.PushGet || type == ResponseType.PushUnregister)
+            {
+                queryParamExist = true;
+                switch (type)
+                {
+                    case ResponseType.PushRegister:
+                        url.Append(pushRegisterDeviceParameters);
+                        break;
+                    case ResponseType.PushRemove:
+                        url.Append(pushRemoveChannelParameters);
+                        break;
+                    case ResponseType.PushUnregister:
+                        url.Append(pushUnregisterDeviceParameters);
+                        break;
+                    default:
+                        url.Append(pushGetChannelsParameters);
+                        break;
+                }
+                url.AppendFormat("&uuid={0}", uuid);
+                if (!string.IsNullOrEmpty(_authenticationKey))
+                {
+                    url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
+                }
+                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
+            }
+
 			if (type == ResponseType.DetailedHistory || type == ResponseType.GrantAccess || type == ResponseType.AuditAccess || type == ResponseType.RevokeAccess) {
 				url.Append(parameters);
 				queryParamExist = true;
@@ -3975,7 +4333,7 @@ namespace PubNubMessaging.Core
 
 			Uri requestUri = new Uri (url.ToString());
 
-			if ((type == ResponseType.Publish || type == ResponseType.Subscribe || type == ResponseType.Presence)) 
+			if (type == ResponseType.Publish || type == ResponseType.Subscribe || type == ResponseType.Presence)
             {
 				ForceCanonicalPathAndQuery(requestUri);
 			}
@@ -4713,7 +5071,11 @@ namespace PubNubMessaging.Core
 		SetUserState,
 		GetUserState,
 		Where_Now,
-		GlobalHere_Now
+		GlobalHere_Now,
+        PushRegister,
+        PushRemove,
+        PushGet,
+        PushUnregister
 	}
 
 	internal class InternetState<T>
@@ -4776,4 +5138,17 @@ namespace PubNubMessaging.Core
 		}
 	}
 	#endregion
+
+    #region "Pubnub Push Notification"
+    public enum PushTypeService
+    {
+        None,
+        MPNS, //MicrosoftPushNotificationService
+        WNS, //WindowsNotificationService,
+        GCM,
+        APNS
+    }
+
+    #endregion
+
 }

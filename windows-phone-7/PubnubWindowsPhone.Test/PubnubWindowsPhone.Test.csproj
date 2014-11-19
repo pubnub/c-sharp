@@ -98,6 +98,7 @@
     <Compile Include="UnitTest\WhenSubscribedToAChannel.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="WhenPushIsRequested.cs" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">

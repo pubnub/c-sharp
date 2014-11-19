@@ -398,16 +398,22 @@
                                                                     Enter message to publish:</div>
                                                                 <div class="PopupBody">
                                                                     <p>
+                                                                        <asp:RadioButton ID="radNormalPublish" GroupName="gPublish" Checked="true" Text="Normal" runat="server"/><br />
                                                                         <asp:CheckBox ID="chkStoreInHistory" Text="Store In History" Checked="true"  runat="server"/>
                                                                         <asp:TextBox ID="txtPublishMessage" TextMode="MultiLine" runat="server" Height="180px"
                                                                             Width="98%" Wrap="true"></asp:TextBox>
+
+                                                                        <asp:RadioButton ID="radToastPublish" GroupName="gPublish" Text="Send Toast" runat="server"/><br />
+                                                                        <asp:RadioButton ID="radFlipTilePublish" GroupName="gPublish" Text="Send Flip Tile" runat="server"/><br />
+                                                                        <asp:RadioButton ID="radCycleTilePublish" GroupName="gPublish" Text="Send Cycle Tile" runat="server"/><br />
+                                                                        <asp:RadioButton ID="radIconicTilePublish" GroupName="gPublish" Text="Send Iconic Tile" runat="server"/><br />
+
                                                                         <asp:Label ID="lblErrorMessage" Text="" runat="server" Font-Names="verdana" ForeColor="Red"
                                                                             Height="15px" Font-Size="X-Small"></asp:Label>
                                                                     </p>
                                                                 </div>
                                                                 <div class="PopupControls">
-                                                                    <asp:Button ID="btnOkay" Text="Publish" runat="server" OnClick="btnOkay_OnClick"
-                                                                        OnClientClick="if (!ValidateDataPublish()) { return false };" />
+                                                                    <asp:Button ID="btnOkay" Text="Publish" runat="server" OnClick="btnOkay_OnClick" />
                                                                     <input id="btnCancel" type="button" value="Cancel" />
                                                                 </div>
                                                             </div>
@@ -609,21 +615,6 @@
                 //updateTimer._startTimer();
             }
 
-            function ValidateDataPublish() {
-                var publishDataBox = $get('<%= txtPublishMessage.ClientID %>');
-                if (publishDataBox != null) {
-                    if (publishDataBox.value == '') {
-                        var errorPlaceHolder = $get('<%= lblErrorMessage.ClientID %>');
-                        if (errorPlaceHolder != null) {
-                            errorPlaceHolder.innerText = "* Message cannot be blank.";
-                        }
-                        return false;
-                    }
-                    else {
-                        return true;
-                    }
-                }
-            }
         </script>
         <br />
     </div>

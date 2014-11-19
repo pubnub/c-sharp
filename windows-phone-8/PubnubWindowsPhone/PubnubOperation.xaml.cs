@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
 using System.Windows;
@@ -13,6 +14,8 @@ using Microsoft.Phone.Controls;
 using PubNubMessaging.Core;
 using System.Windows.Controls.Primitives;
 
+using Microsoft.Phone.Notification;
+using System.Text;
 
 namespace PubnubWindowsPhone
 {
@@ -45,6 +48,10 @@ namespace PubnubWindowsPhone
         Popup globalHereNowPopup = null;
         Popup userStatePopup = null;
         Popup changeUUIDPopup = null;
+        Popup pushNotificationPopup = null;
+
+        string microsoftChannelName = "pushSampleChannel";
+        ResponseType currentPushReqType;
 
         public PubnubOperation()
         {
@@ -65,6 +72,7 @@ namespace PubnubWindowsPhone
             pubnub.AuthenticationKey = authKey;
             pubnub.PresenceHeartbeat = presenceHeartbeat;
             pubnub.PresenceHeartbeatInterval = presenceHeartbeatInterval;
+            pubnub.PushServiceName = ""; //overriding default push service name to use non-ssl for push
         }
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
@@ -192,11 +200,11 @@ namespace PubnubWindowsPhone
             StackPanel publishStackPanel = new StackPanel();
             publishStackPanel.Background = new SolidColorBrush(Colors.Blue);
             publishStackPanel.Width = 300;
-            publishStackPanel.Height = 400;
+            publishStackPanel.Height = 600;
 
             publishPopup = new Popup();
-            publishPopup.Height = 400;
-            publishPopup.Width = 300;
+            publishPopup.Height = 600;
+            publishPopup.Width = 550;
             publishPopup.VerticalOffset = 100;
             publishPopup.HorizontalOffset = 100;
             PublishMessageUserControl control = new PublishMessageUserControl();
@@ -208,9 +216,68 @@ namespace PubnubWindowsPhone
             control.btnOK.Click += (s, args) =>
             {
                 publishPopup.IsOpen = false;
-                string publishedMessage = control.txtPublish.Text;
-                bool storeInHistory = control.chkStoreInHistory.IsChecked.Value;
-                pubnub.Publish<string>(channel, publishedMessage, storeInHistory, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                string publishedMessage = "";
+                if (control.radNormalPublish.IsChecked.Value)
+                {
+                    publishedMessage = control.txtPublish.Text;
+                    bool storeInHistory = control.chkStoreInHistory.IsChecked.Value;
+                    pubnub.Publish<string>(channel, publishedMessage, storeInHistory, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+                else if (control.radToastPublish.IsChecked.Value)
+                {
+                    MpnsToastNotification toast = new MpnsToastNotification();
+                    //toast.type = "toast";
+                    toast.text1 = "hardcode message";
+                    Dictionary<string, object> dicToast = new Dictionary<string, object>();
+                    dicToast.Add("pn_mpns", toast);
+                    
+                    pubnub.EnableDebugForPushPublish = true;
+                    pubnub.Publish<string>(channel, dicToast, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+                else if (control.radFlipTilePublish.IsChecked.Value)
+                {
+                    pubnub.PushRemoteImageDomainUri.Add(new Uri("http://cdn.flaticon.com"));
+
+                    MpnsFlipTileNotification tile = new MpnsFlipTileNotification();
+                    tile.title = "front title";
+                    tile.count = 6;
+                    tile.back_title = "back title";
+                    tile.back_content = "back message";
+                    tile.back_background_image = "Assets/Tiles/pubnub3.png";
+                    tile.background_image = "http://cdn.flaticon.com/png/256/37985.png";
+                    Dictionary<string, object> dicTile = new Dictionary<string, object>();
+                    dicTile.Add("pn_mpns", tile);
+                    
+                    pubnub.EnableDebugForPushPublish = true;
+                    pubnub.Publish<string>(channel, dicTile, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+                else if (control.radCycleTilePublish.IsChecked.Value)
+                {
+                    MpnsCycleTileNotification tile = new MpnsCycleTileNotification();
+                    tile.title = "front title";
+                    tile.count = 2;
+                    tile.images = new string[] { "Assets/Tiles/pubnub1.png", "Assets/Tiles/pubnub2.png", "Assets/Tiles/pubnub3.png", "Assets/Tiles/pubnub4.png" };
+                    
+                    Dictionary<string, object> dicTile = new Dictionary<string, object>();
+                    dicTile.Add("pn_mpns", tile);
+                    
+                    pubnub.EnableDebugForPushPublish = true;
+                    pubnub.Publish<string>(channel, dicTile, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+                else if (control.radIconicTilePublish.IsChecked.Value)
+                {
+                    MpnsIconicTileNotification tile = new MpnsIconicTileNotification();
+                    tile.title = "front title";
+                    tile.count = 2;
+                    tile.wide_content_1 = "my wide content";
+                    
+                    Dictionary<string, object> dicTile = new Dictionary<string, object>();
+                    dicTile.Add("pn_mpns", tile);
+
+                    pubnub.EnableDebugForPushPublish = true;
+                    pubnub.Publish<string>(channel, dicTile, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+
                 TextBlock textBlock = new TextBlock();
                 textBlock.Text = string.Format("Publishing {0}\n", publishedMessage);
                 messageStackPanel.Children.Add(textBlock);
@@ -795,5 +862,267 @@ namespace PubnubWindowsPhone
             };
         }
 
+        private void btnPush_Click(object sender, RoutedEventArgs e)
+        {
+            channel = txtChannel.Text;
+            this.IsEnabled = false;
+            Border border = new Border();
+            border.BorderBrush = new SolidColorBrush(Colors.Black);
+            border.BorderThickness = new Thickness(5.0);
+
+            StackPanel pushNotificationStackPanel = new StackPanel();
+            pushNotificationStackPanel.Background = new SolidColorBrush(Colors.Blue);
+            pushNotificationStackPanel.Width = 400;
+            pushNotificationStackPanel.Height = 400;
+
+            pushNotificationPopup = new Popup();
+            pushNotificationPopup.Height = 300;
+            pushNotificationPopup.Width = 300;
+            pushNotificationPopup.VerticalOffset = 20;
+            pushNotificationPopup.HorizontalOffset = 20;
+            PushNotificationUserControl control = new PushNotificationUserControl();
+            pushNotificationStackPanel.Children.Add(control);
+            border.Child = pushNotificationStackPanel;
+
+            pushNotificationPopup.Child = border;
+            pushNotificationPopup.IsOpen = true;
+            control.btnOK.Click += (s, args) =>
+            {
+                pushNotificationPopup.IsOpen = false;
+                ResponseType type;
+                //currentPushReqType
+                if (control.radRegisterDevice.IsChecked.Value)
+                {
+                    type = ResponseType.PushRegister;
+                    currentPushReqType = type;
+                    pubnub.PushRemoteImageDomainUri.Add(new Uri("http://cdn.flaticon.com")); 
+                    ProcessPushRequestType(type, channel);
+                }
+                else if (control.radRUnegisterDevice.IsChecked.Value)
+                {
+                    type = ResponseType.PushUnregister;
+                    currentPushReqType = type;
+                    ProcessPushRequestType(type, channel);
+                }
+                else if (control.radRemoveChannel.IsChecked.Value)
+                {
+                    type = ResponseType.PushRemove;
+                    currentPushReqType = type;
+                    ProcessPushRequestType(type, channel);
+                }
+                else if (control.radGetChannels.IsChecked.Value)
+                {
+                    type = ResponseType.PushGet;
+                    currentPushReqType = type;
+                    ProcessPushRequestType(type, channel);
+
+                }
+
+                pushNotificationPopup = null;
+                this.IsEnabled = true;
+            };
+            control.btnCancel.Click += (s, args) =>
+            {
+                pushNotificationPopup.IsOpen = false;
+                pushNotificationPopup = null;
+                this.IsEnabled = true;
+            };
+
+        }
+
+        void PushChannel_ChannelUriUpdated(object sender, NotificationChannelUriEventArgs e)
+        {
+
+            Dispatcher.BeginInvoke(() =>
+            {
+                //HttpNotificationChannel microsoftPushChannel;
+                //microsoftPushChannel = HttpNotificationChannel.Find(microsoftChannelName);
+                //if (!microsoftPushChannel.IsShellTileBound)
+                //{
+                //    //microsoftPushChannel.UnbindToShellTile();
+
+                //    if (pubnub.PushRemoteImageDomainUri != null && pubnub.PushRemoteImageDomainUri.Count > 0)
+                //    {
+                //        microsoftPushChannel.BindToShellTile(pubnub.PushRemoteImageDomainUri);
+                //    }
+                //    else
+                //    {
+                //        microsoftPushChannel.BindToShellTile();
+                //    }
+                //}
+
+                //if (!microsoftPushChannel.IsShellToastBound)
+                //{
+                //    microsoftPushChannel.BindToShellToast();
+
+                //    if (pubnub.PushRemoteImageDomainUri != null && pubnub.PushRemoteImageDomainUri.Count > 0)
+                //    {
+                //        microsoftPushChannel.BindToShellTile(pubnub.PushRemoteImageDomainUri);
+                //    }
+                //    else
+                //    {
+                //        microsoftPushChannel.BindToShellTile();
+                //    }
+
+                //}
+
+                string pubnubChannel = txtChannel.Text;
+                string msg = "";
+                // Display the new URI for testing purposes.   Normally, the URI would be passed back to your web service at this point.
+                System.Diagnostics.Debug.WriteLine(e.ChannelUri.ToString());
+                ResponseType type = currentPushReqType;
+                switch (type)
+                {
+                    case ResponseType.PushRegister:
+                        pubnub.RegisterDeviceForPush<string>(pubnubChannel, PushTypeService.MPNS, e.ChannelUri.ToString(), PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        msg = "Running Register Device";
+                        break;
+                    case ResponseType.PushUnregister:
+                        pubnub.UnregisterDeviceForPush<string>(PushTypeService.MPNS, e.ChannelUri.ToString(), PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        msg = "Running Unregister Device";
+                        break;
+                    case ResponseType.PushRemove:
+                        pubnub.RemoveChannelForDevicePush<string>(pubnubChannel, PushTypeService.MPNS, e.ChannelUri.ToString(), PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        msg = "Running remove channel from push";
+                        break;
+                    case ResponseType.PushGet:
+                        pubnub.GetChannelsForDevicePush<string>(PushTypeService.MPNS, e.ChannelUri.ToString(), PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        msg = "Running get channels for push";
+                        break;
+                    default:
+                        break;
+                }
+
+                TextBlock textBlock = new TextBlock();
+                textBlock.Text = msg;
+                messageStackPanel.Children.Add(textBlock);
+                scrollViewerResult.UpdateLayout();
+                scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
+                //MessageBox.Show(String.Format("Channel Uri is {0}", e.ChannelUri.ToString()));
+            });
+        }
+
+        void PushChannel_ErrorOccurred(object sender, NotificationChannelErrorEventArgs e)
+        {
+            // Error handling logic for your particular application would be here.
+            Dispatcher.BeginInvoke(() =>
+                MessageBox.Show(String.Format("A push notification {0} error occurred.  {1} ({2}) {3}",
+                    e.ErrorType, e.Message, e.ErrorCode, e.ErrorAdditionalData))
+                    );
+        }
+
+        void PushChannel_ShellToastNotificationReceived(object sender, NotificationEventArgs e)
+        {
+            StringBuilder message = new StringBuilder();
+            string relativeUri = string.Empty;
+
+            message.AppendFormat("Received Toast {0}:\n", DateTime.Now.ToShortTimeString());
+
+            // Parse out the information that was part of the message.
+            foreach (string key in e.Collection.Keys)
+            {
+                message.AppendFormat("{0}: {1}\n", key, e.Collection[key]);
+
+                if (string.Compare(
+                    key,
+                    "wp:Param",
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    System.Globalization.CompareOptions.IgnoreCase) == 0)
+                {
+                    relativeUri = e.Collection[key];
+                }
+            }
+
+            // Display a dialog of all the fields in the toast.
+            Dispatcher.BeginInvoke(() => MessageBox.Show(message.ToString()));
+
+        }
+
+        void ProcessPushRequestType(ResponseType type, string pubnubChannel)
+        {
+            HttpNotificationChannel microsoftPushChannel;
+
+            microsoftPushChannel = HttpNotificationChannel.Find(microsoftChannelName);
+
+            if (microsoftPushChannel == null)
+            {
+                if (!string.IsNullOrEmpty(pubnub.PushServiceName))
+                {
+                    microsoftPushChannel = new HttpNotificationChannel(microsoftChannelName, pubnub.PushServiceName);
+                }
+                else
+                {
+                    microsoftPushChannel = new HttpNotificationChannel(microsoftChannelName);
+                }
+
+                // Register for all the events before attempting to open the channel.
+                microsoftPushChannel.ChannelUriUpdated += new EventHandler<NotificationChannelUriEventArgs>(PushChannel_ChannelUriUpdated);
+                microsoftPushChannel.ErrorOccurred += new EventHandler<NotificationChannelErrorEventArgs>(PushChannel_ErrorOccurred);
+
+                // Register for this notification only if you need to receive the notifications while your application is running.
+                microsoftPushChannel.ShellToastNotificationReceived += new EventHandler<NotificationEventArgs>(PushChannel_ShellToastNotificationReceived);
+
+                microsoftPushChannel.Open();
+
+                // Bind this new channel for toast events.
+                microsoftPushChannel.BindToShellToast();
+
+                if (pubnub.PushRemoteImageDomainUri != null && pubnub.PushRemoteImageDomainUri.Count > 0)
+                {
+                    microsoftPushChannel.BindToShellTile(pubnub.PushRemoteImageDomainUri);
+                }
+                else
+                {
+                    microsoftPushChannel.BindToShellTile();
+                }
+
+
+            }
+            else
+            {
+                // The channel was already open, so just register for all the events.
+                microsoftPushChannel.ChannelUriUpdated += new EventHandler<NotificationChannelUriEventArgs>(PushChannel_ChannelUriUpdated);
+                microsoftPushChannel.ErrorOccurred += new EventHandler<NotificationChannelErrorEventArgs>(PushChannel_ErrorOccurred);
+
+                // Register for this notification only if you need to receive the notifications while your application is running.
+                microsoftPushChannel.ShellToastNotificationReceived += new EventHandler<NotificationEventArgs>(PushChannel_ShellToastNotificationReceived);
+
+                if (microsoftPushChannel.ChannelUri != null)
+                {
+                    // Display the URI for testing purposes. Normally, the URI would be passed back to your web service at this point.
+                    System.Diagnostics.Debug.WriteLine(microsoftPushChannel.ChannelUri.ToString());
+                    string msg = "";
+                    switch (type)
+                    {
+                        case ResponseType.PushRegister:
+                            pubnub.RegisterDeviceForPush<string>(pubnubChannel, PushTypeService.MPNS, microsoftPushChannel.ChannelUri.ToString(), PubnubCallbackResult, PubnubDisplayErrorMessage);
+                            msg = "Running Register Device";
+                            break;
+                        case ResponseType.PushUnregister:
+                            pubnub.UnregisterDeviceForPush<string>(PushTypeService.MPNS, microsoftPushChannel.ChannelUri.ToString(), PubnubCallbackResult, PubnubDisplayErrorMessage);
+                            msg = "Running Unregister Device";
+                            break;
+                        case ResponseType.PushRemove:
+                            pubnub.RemoveChannelForDevicePush<string>(pubnubChannel, PushTypeService.MPNS, microsoftPushChannel.ChannelUri.ToString(), PubnubCallbackResult, PubnubDisplayErrorMessage);
+                            msg = "Running remove channel from push";
+                            break;
+                        case ResponseType.PushGet:
+                            pubnub.GetChannelsForDevicePush<string>(PushTypeService.MPNS, microsoftPushChannel.ChannelUri.ToString(), PubnubCallbackResult, PubnubDisplayErrorMessage);
+                            msg = "Running get channels for push";
+                            break;
+                        default:
+                            break;
+                    }
+                    TextBlock textBlock = new TextBlock();
+                    textBlock.Text = msg;
+                    messageStackPanel.Children.Add(textBlock);
+                    scrollViewerResult.UpdateLayout();
+                    scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
+                    //MessageBox.Show(String.Format("Channel Uri is {0}", microsoftPushChannel.ChannelUri.ToString()));
+                }
+
+            }
+
+        }
     }
 }
