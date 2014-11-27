@@ -360,7 +360,7 @@ namespace PubNubMessaging.Core
             Console.WriteLine("");
             while (!exitFlag)
             {
-                if (currentUserChoice < 1 || (currentUserChoice > 37 && currentUserChoice != 99))
+                if (currentUserChoice < 1 || (currentUserChoice > 40 && currentUserChoice != 99))
                 {
                     Console.WriteLine("ENTER 1 FOR Subscribe");
                     Console.WriteLine("ENTER 2 FOR Publish");
@@ -399,6 +399,9 @@ namespace PubNubMessaging.Core
                     Console.WriteLine("Enter 35 FOR Push - Publish Flip Tile message");
                     Console.WriteLine("Enter 36 FOR Push - Publish Cycle Tile message");
                     Console.WriteLine("Enter 37 FOR Push - Publish Iconic Tile message");
+                    Console.WriteLine("Enter 38 FOR Channel Group - Add channel(s)");
+                    Console.WriteLine("Enter 39 FOR Channel Group - Remove channel/group/namespace");
+                    Console.WriteLine("Enter 40 FOR Channel Group - Get channel(s)/namespace(s)");
                     Console.WriteLine("ENTER 99 FOR EXIT OR QUIT");
 
                     userinput = Console.ReadLine();
@@ -1203,6 +1206,110 @@ namespace PubNubMessaging.Core
 
                         pubnub.EnableDebugForPushPublish = true;
                         pubnub.Publish<string>(iconicTileChannel, dicIconicTile, DisplayReturnMessage, DisplayErrorMessage);
+                        break;
+                    case "38":
+                        Console.WriteLine("Enter namespace");
+                        string addChannelGroupNamespace = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("namespace = {0}", addChannelGroupNamespace));
+                        Console.ResetColor();
+                        
+                        Console.WriteLine("Enter channel group name");
+                        string addChannelGroupName = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("channel group name = {0}", addChannelGroupName));
+                        Console.ResetColor();
+                        
+
+                        Console.WriteLine("Enter CHANNEL name. Use comma to enter multiple channels.");
+                        channel = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}",channel));
+                        Console.ResetColor();
+                        Console.WriteLine();
+                        pubnub.AddChannelsToChannelGroup<string>(channel.Split(','), addChannelGroupNamespace, addChannelGroupName, DisplayReturnMessage, DisplayErrorMessage);
+                        break;
+                    case "39":
+                        Console.WriteLine("Enter namespace");
+                        string removeChannelGroupNamespace = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("namespace = {0}", removeChannelGroupNamespace));
+                        Console.ResetColor();
+
+                        
+                        Console.WriteLine("Do you want to remove the namespace and all its group names and all its channels? Default is No. Enter Y for Yes, Else just hit ENTER key");
+                        string removeExistingNamespace = Console.ReadLine();
+                        if (removeExistingNamespace.ToLower() == "y")
+                        {
+                            pubnub.RemoveChannelGroupNameSpace<string>(removeChannelGroupNamespace, DisplayReturnMessage, DisplayErrorMessage);
+                            break;
+                        }
+
+                        Console.WriteLine("Enter channel group name");
+                        string removeChannelGroupName = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("channel group name = {0}", removeChannelGroupName));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Do you want to remove the channel group and all its channels? Default is No. Enter Y for Yes, Else just hit ENTER key");
+                        string removeExistingGroup = Console.ReadLine();
+                        if (removeExistingGroup.ToLower() == "y")
+                        {
+                            pubnub.RemoveChannelGroup<string>(removeChannelGroupNamespace, removeChannelGroupName, DisplayReturnMessage, DisplayErrorMessage);
+                            break;
+                        }
+                        
+                        Console.WriteLine("Enter CHANNEL name. Use comma to enter multiple channels.");
+                        channel = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}",channel));
+                        Console.ResetColor();
+                        Console.WriteLine();
+                        pubnub.RemoveChannelsFromChannelGroup<string>(channel.Split(','), removeChannelGroupNamespace, removeChannelGroupName, DisplayReturnMessage, DisplayErrorMessage);
+                        break;
+                    case "40":
+                        Console.WriteLine("Do you want to get all existing namespaces? Default is No. Enter Y for Yes, Else just hit ENTER key");
+                        string getExistingNamespace = Console.ReadLine();
+                        if (getExistingNamespace.ToLower() == "y")
+                        {
+                            pubnub.GetAllChannelGroupNamespaces<string>(DisplayReturnMessage, DisplayErrorMessage);
+                            break;
+                        }
+
+                        Console.WriteLine("Enter namespace");
+                        string channelGroupNamespace = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("namespace = {0}", channelGroupNamespace));
+                        Console.ResetColor();
+
+                        if (channelGroupNamespace.Trim().Length > 0)
+                        {
+                            Console.WriteLine("Do you want to get all existing channel group names for the provided namespace? Default is No. Enter Y for Yes, Else just hit ENTER key");
+                            string getExistingGroupNames = Console.ReadLine();
+                            if (getExistingGroupNames.ToLower() == "y")
+                            {
+                                pubnub.GetAllChannelGroups<string>(channelGroupNamespace, DisplayReturnMessage, DisplayErrorMessage);
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Do you want to get all existing channel group names? Default is No. Enter Y for Yes, Else just hit ENTER key");
+                            string getExistingGroupNames = Console.ReadLine();
+                            if (getExistingGroupNames.ToLower() == "y")
+                            {
+                                pubnub.GetAllChannelGroups<string>(DisplayReturnMessage, DisplayErrorMessage);
+                                break;
+                            }
+                        }
+                        
+                        Console.WriteLine("Enter channel group name");
+                        string channelGroupName = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("channel group name = {0}", channelGroupName));
+                        Console.ResetColor();
+
+                        pubnub.GetChannelsForChannelGroup<string>(channelGroupNamespace, channelGroupName, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     default:
                         Console.ForegroundColor = ConsoleColor.Red;

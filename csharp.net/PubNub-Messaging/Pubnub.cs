@@ -283,8 +283,120 @@ namespace PubNubMessaging.Core
         }
         #endregion
 
-		#region "PubNub API Other Methods"
-		public void TerminateCurrentSubscriberRequest()
+        #region "PubNub API Channel Group Methods"
+        public void AddChannelsToChannelGroup(string[] channels, string groupName, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.AddChannelsToChannelGroup<object>(channels, groupName, userCallback, errorCallback);
+        }
+
+        public void AddChannelsToChannelGroup<T>(string[] channels, string groupName, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.AddChannelsToChannelGroup<T>(channels, groupName, userCallback, errorCallback);
+        }
+
+        public void AddChannelsToChannelGroup(string[] channels, string nameSpace, string groupName, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.AddChannelsToChannelGroup<object>(channels, nameSpace, groupName, userCallback, errorCallback);
+        }
+
+        public void AddChannelsToChannelGroup<T>(string[] channels, string nameSpace, string groupName, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.AddChannelsToChannelGroup<T>(channels, nameSpace, groupName, userCallback, errorCallback);
+        }
+
+        public void RemoveChannelsFromChannelGroup(string[] channels, string nameSpace, string groupName, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.RemoveChannelsFromChannelGroup(channels, nameSpace, groupName, userCallback, errorCallback);
+        }
+
+        public void RemoveChannelsFromChannelGroup<T>(string[] channels, string nameSpace, string groupName, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.RemoveChannelsFromChannelGroup<T>(channels, nameSpace, groupName, userCallback, errorCallback);
+        }
+
+        public void RemoveChannelsFromChannelGroup<T>(string[] channels, string groupName, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.RemoveChannelsFromChannelGroup<T>(channels, groupName, userCallback, errorCallback);
+        }
+
+        public void RemoveChannelsFromChannelGroup(string[] channels, string groupName, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.RemoveChannelsFromChannelGroup(channels, groupName, userCallback, errorCallback);
+        }
+
+        public void RemoveChannelGroup(string nameSpace, string groupName, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.RemoveChannelGroup(nameSpace, groupName, userCallback, errorCallback);
+        }
+
+        public void RemoveChannelGroup<T>(string nameSpace, string groupName, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.RemoveChannelGroup<T>(nameSpace, groupName, userCallback, errorCallback);
+        }
+
+        public void RemoveChannelGroupNameSpace(string nameSpace, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.RemoveChannelGroupNameSpace(nameSpace, userCallback, errorCallback);
+        }
+
+        public void RemoveChannelGroupNameSpace<T>(string nameSpace, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.RemoveChannelGroupNameSpace<T>(nameSpace, userCallback, errorCallback);
+        }
+
+        public void GetChannelsForChannelGroup(string nameSpace, string groupName, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.GetChannelsForChannelGroup(nameSpace, groupName, userCallback, errorCallback);
+        }
+
+        public void GetChannelsForChannelGroup<T>(string nameSpace, string groupName, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.GetChannelsForChannelGroup<T>(nameSpace, groupName, userCallback, errorCallback);
+        }
+
+        public void GetChannelsForChannelGroup(string groupName, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.GetChannelsForChannelGroup(groupName, userCallback, errorCallback);
+        }
+        
+        public void GetChannelsForChannelGroup<T>(string groupName, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.GetChannelsForChannelGroup<T>(groupName, userCallback, errorCallback);
+        }
+        
+        public void GetAllChannelGroups(string nameSpace, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.GetAllChannelGroups(nameSpace, userCallback, errorCallback);
+        }
+        
+        public void GetAllChannelGroups<T>(string nameSpace, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.GetAllChannelGroups<T>(nameSpace, userCallback, errorCallback);
+        }
+
+        public void GetAllChannelGroups(Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.GetAllChannelGroups(userCallback, errorCallback);
+        }
+
+        public void GetAllChannelGroups<T>(Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.GetAllChannelGroups<T>(userCallback, errorCallback);
+        }
+        public void GetAllChannelGroupNamespaces<T>(Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.GetAllChannelGroupNamespaces<T>(userCallback, errorCallback);
+        }
+
+        public void GetAllChannelGroupNamespaces(Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.GetAllChannelGroupNamespaces(userCallback, errorCallback);
+        }
+
+        #endregion
+
+        #region "PubNub API Other Methods"
+        public void TerminateCurrentSubscriberRequest()
 		{
 			pubnub.TerminateCurrentSubscriberRequest();
 		}

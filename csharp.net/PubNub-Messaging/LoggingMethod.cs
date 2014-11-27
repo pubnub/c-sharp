@@ -529,6 +529,7 @@ namespace PubNubMessaging.Core
         PAMAccessOperationTimeout = 135,
         UserStateUnchanged = 136,
         PushNotificationTimeout = 137,
+        ChannelGroupTimeout = 138,
 
 		MessageTooLarge = 4000,
 		BadRequest = 4001,
@@ -608,6 +609,7 @@ namespace PubNubMessaging.Core
             dictionaryCodes.Add(135, "Timeout occured while running PAM operations. Please try again. If it continues, please contact PubNub support");
             dictionaryCodes.Add(136, "User State Unchanged");
             dictionaryCodes.Add(137, "Timeout occured while registering device for push notifications. Please try again. If it continues, please contact PubNub support");
+            dictionaryCodes.Add(138, "Timeout occured while performing operation related to channel group. Please try again. If it continues, please contact PubNub support");
 			dictionaryCodes.Add(0, "Undocumented error. Please contact PubNub support with full error object details for further investigation");
 		}
 

@@ -1,4 +1,4 @@
-﻿//Build Date: November 14, 2014
+﻿//Build Date: November 26, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -120,6 +120,8 @@ namespace PubNubMessaging.Core
         private string pushRemoveChannelParameters = "";
         private string pushGetChannelsParameters = "";
         private string pushUnregisterDeviceParameters = "";
+        private string channelGroupAddParameters = "";
+        private string channelGroupRemoveParameters = "";
         private string _pnsdkVersion = "PubNub-CSharp-.NET/3.6.0.2";
         private string _pushServiceName = "push.pubnub.com";
 
@@ -1541,6 +1543,505 @@ namespace PubNubMessaging.Core
         }
         #endregion
 
+        #region "Channel Group"
+
+        public void AddChannelsToChannelGroup(string[] channels, string groupName, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            AddChannelsToChannelGroup<object>(channels, groupName, userCallback, errorCallback);
+        }
+
+        public void AddChannelsToChannelGroup<T>(string[] channels, string groupName, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            AddChannelsToChannelGroup<T>(channels, "", groupName, userCallback, errorCallback);
+        }
+
+        public void AddChannelsToChannelGroup(string[] channels, string nameSpace, string groupName, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            AddChannelsToChannelGroup<object>(channels, nameSpace, groupName, userCallback, errorCallback);
+        }
+
+        public void AddChannelsToChannelGroup<T>(string[] channels, string nameSpace, string groupName, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            if (channels == null || channels.Length == 0)
+            {
+                throw new ArgumentException("Missing channel(s)");
+            }
+            
+            if (nameSpace == null)
+            {
+                throw new ArgumentException("Missing nameSpace");
+            }
+            
+            if (string.IsNullOrEmpty(groupName) || groupName.Trim().Length == 0)
+            {
+                throw new ArgumentException("Missing groupName");
+            }
+
+            if (userCallback == null)
+            {
+                throw new ArgumentException("Missing userCallback");
+            }
+            if (errorCallback == null)
+            {
+                throw new ArgumentException("Missing errorCallback");
+            }
+
+            Uri request = BuildAddChannelsToChannelGroupRequest(channels, nameSpace, groupName);
+
+            RequestState<T> requestState = new RequestState<T>();
+            requestState.Type = ResponseType.ChannelGroupAdd;
+            requestState.Channels = new string[] { string.Format("channel-group:{0}", groupName) }; //new string[] { groupName };
+            requestState.UserCallback = userCallback;
+            requestState.ErrorCallback = errorCallback;
+            requestState.Reconnect = false;
+
+            UrlProcessRequest<T>(request, requestState);
+        }
+
+        public void RemoveChannelsFromChannelGroup(string[] channels, string groupName, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            RemoveChannelsFromChannelGroup<object>(channels, groupName, userCallback, errorCallback);
+        }
+        
+        public void RemoveChannelsFromChannelGroup<T>(string[] channels, string groupName, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            RemoveChannelsFromChannelGroup<T>(channels, "", groupName, userCallback, errorCallback);
+        }
+
+        public void RemoveChannelsFromChannelGroup(string[] channels, string nameSpace, string groupName, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            RemoveChannelsFromChannelGroup<object>(channels, nameSpace, groupName, userCallback, errorCallback);
+        }
+
+        /// <summary>
+        /// Remove channel(s) from group
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="channels"></param>
+        /// <param name="nameSpace"></param>
+        /// <param name="groupName"></param>
+        /// <param name="userCallback"></param>
+        /// <param name="errorCallback"></param>
+        public void RemoveChannelsFromChannelGroup<T>(string[] channels, string nameSpace, string groupName, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            if (channels == null || channels.Length == 0)
+            {
+                throw new ArgumentException("Missing channel(s)");
+            }
+
+            if (nameSpace == null)
+            {
+                throw new ArgumentException("Missing nameSpace");
+            }
+
+            if (string.IsNullOrEmpty(groupName) || groupName.Trim().Length == 0)
+            {
+                throw new ArgumentException("Missing groupName");
+            }
+
+            if (userCallback == null)
+            {
+                throw new ArgumentException("Missing userCallback");
+            }
+            if (errorCallback == null)
+            {
+                throw new ArgumentException("Missing errorCallback");
+            }
+
+            Uri request = BuildRemoveChannelsFromChannelGroupRequest(channels, nameSpace, groupName);
+
+            RequestState<T> requestState = new RequestState<T>();
+            requestState.Type = ResponseType.ChannelGroupRemove;
+            requestState.Channels = new string[] { groupName };
+            requestState.UserCallback = userCallback;
+            requestState.ErrorCallback = errorCallback;
+            requestState.Reconnect = false;
+
+            UrlProcessRequest<T>(request, requestState);
+        }
+
+        public void RemoveChannelGroup(string nameSpace, string groupName, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            RemoveChannelGroup<object>(nameSpace, groupName, userCallback, errorCallback);
+        }
+
+        /// <summary>
+        /// Removes group and all its channels
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="nameSpace"></param>
+        /// <param name="groupName"></param>
+        /// <param name="userCallback"></param>
+        /// <param name="errorCallback"></param>
+        public void RemoveChannelGroup<T>(string nameSpace, string groupName, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            if (nameSpace == null)
+            {
+                throw new ArgumentException("Missing nameSpace");
+            }
+
+            if (string.IsNullOrEmpty(groupName) || groupName.Trim().Length == 0)
+            {
+                throw new ArgumentException("Missing groupName");
+            }
+
+            if (userCallback == null)
+            {
+                throw new ArgumentException("Missing userCallback");
+            }
+            if (errorCallback == null)
+            {
+                throw new ArgumentException("Missing errorCallback");
+            }
+
+            Uri request = BuildRemoveChannelsFromChannelGroupRequest(null, nameSpace, groupName);
+
+            RequestState<T> requestState = new RequestState<T>();
+            requestState.Type = ResponseType.ChannelGroupRemove;
+            requestState.Channels = new string[] { string.Format("channel-group:{0}", groupName) }; //new string[] { groupName };
+            requestState.UserCallback = userCallback;
+            requestState.ErrorCallback = errorCallback;
+            requestState.Reconnect = false;
+
+            UrlProcessRequest<T>(request, requestState);
+        }
+
+        public void RemoveChannelGroupNameSpace(string nameSpace, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            RemoveChannelGroupNameSpace<object>(nameSpace, userCallback, errorCallback);
+        }
+
+        /// <summary>
+        /// Removes namespace and all its group names and all channels
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="nameSpace"></param>
+        /// <param name="userCallback"></param>
+        /// <param name="errorCallback"></param>
+        public void RemoveChannelGroupNameSpace<T>(string nameSpace, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            if (nameSpace == null)
+            {
+                throw new ArgumentException("Missing nameSpace");
+            }
+
+            if (userCallback == null)
+            {
+                throw new ArgumentException("Missing userCallback");
+            }
+            if (errorCallback == null)
+            {
+                throw new ArgumentException("Missing errorCallback");
+            }
+
+            Uri request = BuildRemoveChannelsFromChannelGroupRequest(null, nameSpace, null);
+
+            RequestState<T> requestState = new RequestState<T>();
+            requestState.Type = ResponseType.ChannelGroupRemove;
+            requestState.Channels = new string[] { string.Format("namespace:{0}",nameSpace) };
+            requestState.UserCallback = userCallback;
+            requestState.ErrorCallback = errorCallback;
+            requestState.Reconnect = false;
+
+            UrlProcessRequest<T>(request, requestState);
+        }
+
+        public void GetChannelsForChannelGroup(string nameSpace, string groupName, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            GetChannelsForChannelGroup<object>(nameSpace, groupName, userCallback, errorCallback);
+        }
+
+        /// <summary>
+        /// Get all channels for a given channel group
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="nameSpace"></param>
+        /// <param name="groupName"></param>
+        /// <param name="userCallback"></param>
+        /// <param name="errorCallback"></param>
+        public void GetChannelsForChannelGroup<T>(string nameSpace, string groupName, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            if (nameSpace == null)
+            {
+                throw new ArgumentException("Missing nameSpace");
+            }
+
+            if (string.IsNullOrEmpty(groupName) || groupName.Trim().Length == 0)
+            {
+                throw new ArgumentException("Missing groupName");
+            }
+
+            if (userCallback == null)
+            {
+                throw new ArgumentException("Missing userCallback");
+            }
+            if (errorCallback == null)
+            {
+                throw new ArgumentException("Missing errorCallback");
+            }
+
+            Uri request = BuildGetChannelsForChannelGroupRequest(nameSpace, groupName, false);
+
+            RequestState<T> requestState = new RequestState<T>();
+            requestState.Type = ResponseType.ChannelGroupRemove;
+            requestState.Channels = new string[] { string.Format("channel-group:{0}", groupName) }; //new string[] { groupName };
+            requestState.UserCallback = userCallback;
+            requestState.ErrorCallback = errorCallback;
+            requestState.Reconnect = false;
+
+            UrlProcessRequest<T>(request, requestState);
+        }
+
+        public void GetChannelsForChannelGroup(string groupName, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            GetChannelsForChannelGroup<object>(groupName, userCallback, errorCallback);
+        }
+
+        public void GetChannelsForChannelGroup<T>(string groupName, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            if (string.IsNullOrEmpty(groupName) || groupName.Trim().Length == 0)
+            {
+                throw new ArgumentException("Missing groupName");
+            }
+
+            if (userCallback == null)
+            {
+                throw new ArgumentException("Missing userCallback");
+            }
+            if (errorCallback == null)
+            {
+                throw new ArgumentException("Missing errorCallback");
+            }
+
+            Uri request = BuildGetChannelsForChannelGroupRequest(null, groupName, false);
+
+            RequestState<T> requestState = new RequestState<T>();
+            requestState.Type = ResponseType.ChannelGroupRemove;
+            requestState.Channels = new string[] { string.Format("channel-group:{0}", groupName) }; //new string[] { groupName };
+            requestState.UserCallback = userCallback;
+            requestState.ErrorCallback = errorCallback;
+            requestState.Reconnect = false;
+
+            UrlProcessRequest<T>(request, requestState);
+        }
+        
+        public void GetAllChannelGroups(string nameSpace, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            GetAllChannelGroups<object>(nameSpace, userCallback, errorCallback);
+        }
+
+        /// <summary>
+        /// Get all channel group names
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="nameSpace"></param>
+        /// <param name="userCallback"></param>
+        /// <param name="errorCallback"></param>
+        public void GetAllChannelGroups<T>(string nameSpace, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            if (nameSpace == null)
+            {
+                throw new ArgumentException("Missing nameSpace");
+            }
+
+            if (userCallback == null)
+            {
+                throw new ArgumentException("Missing userCallback");
+            }
+            if (errorCallback == null)
+            {
+                throw new ArgumentException("Missing errorCallback");
+            }
+
+            Uri request = BuildGetChannelsForChannelGroupRequest(nameSpace, null, true);
+
+            RequestState<T> requestState = new RequestState<T>();
+            requestState.Type = ResponseType.ChannelGroupGet;
+            requestState.Channels = new string[] { string.Format("namespace:{0}", nameSpace) }; //new string[] { groupName };
+            requestState.UserCallback = userCallback;
+            requestState.ErrorCallback = errorCallback;
+            requestState.Reconnect = false;
+
+            UrlProcessRequest<T>(request, requestState);
+        }
+
+        public void GetAllChannelGroups(Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            GetAllChannelGroups<object>(userCallback, errorCallback);
+        }
+
+        public void GetAllChannelGroups<T>(Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            if (userCallback == null)
+            {
+                throw new ArgumentException("Missing userCallback");
+            }
+            if (errorCallback == null)
+            {
+                throw new ArgumentException("Missing errorCallback");
+            }
+
+            Uri request = BuildGetChannelsForChannelGroupRequest(null, null, true);
+
+            RequestState<T> requestState = new RequestState<T>();
+            requestState.Type = ResponseType.ChannelGroupGet;
+            //requestState.Channels = new string[] { string.Format("namespace:{0}", nameSpace) }; //new string[] { groupName };
+            requestState.UserCallback = userCallback;
+            requestState.ErrorCallback = errorCallback;
+            requestState.Reconnect = false;
+
+            UrlProcessRequest<T>(request, requestState);
+        }
+
+        public void GetAllChannelGroupNamespaces(Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            GetAllChannelGroupNamespaces<object>(userCallback, errorCallback);
+        }
+
+        /// <summary>
+        /// Get all namespaces
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="userCallback"></param>
+        /// <param name="errorCallback"></param>
+        public void GetAllChannelGroupNamespaces<T>(Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            if (userCallback == null)
+            {
+                throw new ArgumentException("Missing userCallback");
+            }
+            if (errorCallback == null)
+            {
+                throw new ArgumentException("Missing errorCallback");
+            }
+
+            Uri request = BuildGetChannelsForChannelGroupRequest(null, null, false);
+
+            RequestState<T> requestState = new RequestState<T>();
+            requestState.Type = ResponseType.ChannelGroupGet;
+            //requestState.Channels = new string[] { string.Format("namespace:{0}", nameSpace) }; //new string[] { groupName };
+            requestState.UserCallback = userCallback;
+            requestState.ErrorCallback = errorCallback;
+            requestState.Reconnect = false;
+
+            UrlProcessRequest<T>(request, requestState);
+        } 
+        private Uri BuildAddChannelsToChannelGroupRequest(string[] channels, string nameSpace, string groupName)
+        {
+            StringBuilder parameterBuilder = new StringBuilder();
+            channelGroupAddParameters = "";
+
+            parameterBuilder.AppendFormat("?add={0}", string.Join(",",channels));
+
+            channelGroupAddParameters = parameterBuilder.ToString();
+
+            // Build URL
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("channel-registration");
+            url.Add("sub-key");
+            url.Add(this.subscribeKey);
+            if (!string.IsNullOrEmpty(nameSpace) && nameSpace.Trim().Length > 0)
+            {
+                url.Add("namespace");
+                url.Add(nameSpace);
+            }
+            url.Add("channel-group");
+            url.Add(groupName);
+
+            return BuildRestApiRequest<Uri>(url, ResponseType.ChannelGroupAdd);
+        }
+
+        private Uri BuildRemoveChannelsFromChannelGroupRequest(string[] channels, string nameSpace, string groupName)
+        {
+            bool groupNameAvailable = false;
+            bool nameSpaceAvailable = false;
+            bool channelAvaiable = false;
+
+            StringBuilder parameterBuilder = new StringBuilder();
+            channelGroupRemoveParameters = "";
+
+            if (channels != null && channels.Length > 0)
+            {
+                channelAvaiable = true;
+                parameterBuilder.AppendFormat("?remove={0}", string.Join(",", channels));
+                channelGroupRemoveParameters = parameterBuilder.ToString();
+            }
+
+            // Build URL
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("channel-registration");
+            url.Add("sub-key");
+            url.Add(this.subscribeKey);
+            if (!string.IsNullOrEmpty(nameSpace) && nameSpace.Trim().Length > 0)
+            {
+                nameSpaceAvailable = true;
+                url.Add("namespace");
+                url.Add(nameSpace);
+            }
+            if (!string.IsNullOrEmpty(groupName) && groupName.Trim().Length > 0)
+            {
+                groupNameAvailable = true;
+                url.Add("channel-group");
+                url.Add(groupName);
+            }
+            if (nameSpaceAvailable && groupNameAvailable && !channelAvaiable)
+            {
+                url.Add("remove");
+            }
+            else if (nameSpaceAvailable && !groupNameAvailable && !channelAvaiable)
+            {
+                url.Add("remove");
+            }
+
+            return BuildRestApiRequest<Uri>(url, ResponseType.ChannelGroupRemove);
+        }
+
+        private Uri BuildGetChannelsForChannelGroupRequest(string nameSpace, string groupName, bool limitToChannelGroupScopeOnly)
+        {
+            bool groupNameAvailable = false;
+            bool nameSpaceAvailable = false;
+
+            // Build URL
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("channel-registration");
+            url.Add("sub-key");
+            url.Add(this.subscribeKey);
+            if (!string.IsNullOrEmpty(nameSpace) && nameSpace.Trim().Length > 0)
+            {
+                nameSpaceAvailable = true;
+                url.Add("namespace");
+                url.Add(nameSpace);
+            }
+            if (limitToChannelGroupScopeOnly)
+            {
+                url.Add("channel-group");
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(groupName) && groupName.Trim().Length > 0)
+                {
+                    groupNameAvailable = true;
+                    url.Add("channel-group");
+                    url.Add(groupName);
+                }
+
+                if (!nameSpaceAvailable && !groupNameAvailable)
+                {
+                    url.Add("namespace");
+                }
+                else if (nameSpaceAvailable && !groupNameAvailable)
+                {
+                    url.Add("channel-group");
+                }
+            }
+            return BuildRestApiRequest<Uri>(url, ResponseType.ChannelGroupGet);
+        }
+
+
+        #endregion
 
         #region "Publish"
 
@@ -2924,6 +3425,10 @@ namespace PubNubMessaging.Core
             {
                 PushNotificationExceptionHandler<T>(channels, requestTimeout, errorCallback);
             }
+            else if (type == ResponseType.ChannelGroupAdd || type == ResponseType.ChannelGroupRemove || type == ResponseType.ChannelGroupGet)
+            {
+                ChannelGroupExceptionHandler<T>(channels, requestTimeout, errorCallback);
+            }
 		}
 
 		protected void MultiplexExceptionHandler<T> (ResponseType type, string[] channels, Action<T> userCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback, bool reconnectMaxTried, bool resumeOnReconnect)
@@ -3130,6 +3635,25 @@ namespace PubNubMessaging.Core
                 CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
                     channel, errorCallback, message,
                     PubnubErrorCode.PushNotificationTimeout, null, null);
+            }
+        }
+
+        private void ChannelGroupExceptionHandler<T>(string[] channels, bool requestTimeout, Action<PubnubClientError> errorCallback)
+        {
+            string channel = "";
+            if (channels != null)
+            {
+                channel = string.Join(",", channels);
+            }
+            if (requestTimeout)
+            {
+                string message = (requestTimeout) ? "Operation Timeout" : "Network connnect error";
+
+                LoggingMethod.WriteToLog(string.Format("DateTime {0}, ChannelGroupExceptionHandler response={1}", DateTime.Now.ToString(), message), LoggingMethod.LevelInfo);
+
+                CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
+                    channel, errorCallback, message,
+                    PubnubErrorCode.ChannelGroupTimeout, null, null);
             }
         }
 		#endregion
@@ -3435,6 +3959,13 @@ namespace PubNubMessaging.Core
             case ResponseType.PushRemove:
             case ResponseType.PushGet:
             case ResponseType.PushUnregister:
+				if (result != null && result.Count > 0) {
+					GoToCallback<T> (result, userCallback);
+				}
+                break;
+            case ResponseType.ChannelGroupAdd:
+            case ResponseType.ChannelGroupRemove:
+            case ResponseType.ChannelGroupGet:
 				if (result != null && result.Count > 0) {
 					GoToCallback<T> (result, userCallback);
 				}
@@ -4044,6 +4575,14 @@ namespace PubNubMessaging.Core
                         case ResponseType.PushUnregister:
 							result.Add (multiChannel);
                             break;
+                        case ResponseType.ChannelGroupAdd:
+                        case ResponseType.ChannelGroupRemove:
+                        case ResponseType.ChannelGroupGet:
+							Dictionary<string, object> channelGroupDictionary = _jsonPluggableLibrary.DeserializeToDictionaryOfObject (jsonString);
+							result = new List<object> ();
+                            result.Add(channelGroupDictionary);
+							result.Add (multiChannel);
+                            break;
 						default:
 							break;
 						}
@@ -4206,8 +4745,7 @@ namespace PubNubMessaging.Core
 				}
                 url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
 			}
-
-			if (type == ResponseType.PresenceHeartbeat) 
+			else if (type == ResponseType.PresenceHeartbeat) 
             {
 				queryParamExist = true;
 				url.AppendFormat("?uuid={0}", uuid);
@@ -4222,7 +4760,7 @@ namespace PubNubMessaging.Core
 				}
                 url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
 			}
-			if (type == ResponseType.SetUserState) 
+			else if (type == ResponseType.SetUserState) 
             {
 				queryParamExist = true;
 				url.Append(setUserStateparameters);
@@ -4233,7 +4771,7 @@ namespace PubNubMessaging.Core
 				}
                 url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
 			}
-			if (type == ResponseType.GetUserState) 
+			else if (type == ResponseType.GetUserState) 
             {
                 queryParamExist = true;
                 url.AppendFormat("?uuid={0}", uuid);
@@ -4244,8 +4782,7 @@ namespace PubNubMessaging.Core
                 url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
 
 			}
-
-			if (type == ResponseType.Here_Now) 
+            else if (type == ResponseType.Here_Now) 
             {
                 queryParamExist = true;
                 url.Append(hereNowParameters);
@@ -4256,7 +4793,7 @@ namespace PubNubMessaging.Core
 				}
                 url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
 			}
-			if (type == ResponseType.GlobalHere_Now) 
+			else if (type == ResponseType.GlobalHere_Now) 
             {
                 queryParamExist = true;
                 url.Append(globalHereNowParameters);
@@ -4267,7 +4804,7 @@ namespace PubNubMessaging.Core
 				}
                 url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
 			}
-			if (type == ResponseType.Where_Now) 
+			else if (type == ResponseType.Where_Now) 
             {
                 queryParamExist = true;
                 url.AppendFormat("?uuid={0}", uuid);
@@ -4277,8 +4814,7 @@ namespace PubNubMessaging.Core
                 }
                 url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
             }
-
-			if (type == ResponseType.Publish) 
+            else if (type == ResponseType.Publish) 
             {
 				queryParamExist = true;
                 url.AppendFormat("?uuid={0}", uuid);
@@ -4292,8 +4828,7 @@ namespace PubNubMessaging.Core
                 }
                 url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
             }
-
-            if (type == ResponseType.PushRegister || type == ResponseType.PushRemove || type == ResponseType.PushGet || type == ResponseType.PushUnregister)
+            else if (type == ResponseType.PushRegister || type == ResponseType.PushRemove || type == ResponseType.PushGet || type == ResponseType.PushUnregister)
             {
                 queryParamExist = true;
                 switch (type)
@@ -4318,11 +4853,28 @@ namespace PubNubMessaging.Core
                 }
                 url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
             }
-
-			if (type == ResponseType.DetailedHistory || type == ResponseType.GrantAccess || type == ResponseType.AuditAccess || type == ResponseType.RevokeAccess) {
-				url.Append(parameters);
-				queryParamExist = true;
-			}
+            else if (type == ResponseType.ChannelGroupAdd || type == ResponseType.ChannelGroupRemove || type == ResponseType.ChannelGroupGet)
+            {
+                queryParamExist = true;
+                switch (type)
+                {
+                    case ResponseType.ChannelGroupAdd:
+                        url.Append(channelGroupAddParameters);
+                        break;
+                    case ResponseType.ChannelGroupRemove:
+                        url.Append(channelGroupRemoveParameters);
+                        break;
+                    case ResponseType.ChannelGroupGet:
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else if (type == ResponseType.DetailedHistory || type == ResponseType.GrantAccess || type == ResponseType.AuditAccess || type == ResponseType.RevokeAccess)
+            {
+                url.Append(parameters);
+                queryParamExist = true;
+            }
 
             if (!queryParamExist)
             {
@@ -5075,7 +5627,10 @@ namespace PubNubMessaging.Core
         PushRegister,
         PushRemove,
         PushGet,
-        PushUnregister
+        PushUnregister,
+        ChannelGroupAdd,
+        ChannelGroupRemove,
+        ChannelGroupGet
 	}
 
 	internal class InternetState<T>
@@ -5150,5 +5705,6 @@ namespace PubNubMessaging.Core
     }
 
     #endregion
+
 
 }
