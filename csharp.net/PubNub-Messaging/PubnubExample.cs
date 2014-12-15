@@ -355,6 +355,7 @@ namespace PubNubMessaging.Core
 
             bool exitFlag = false;
             string channel="";
+            string channelGroup = "";
             int currentUserChoice = 0;
             string userinput = "";
             Console.WriteLine("");
@@ -362,9 +363,9 @@ namespace PubNubMessaging.Core
             {
                 if (currentUserChoice < 1 || (currentUserChoice > 40 && currentUserChoice != 99))
                 {
-                    Console.WriteLine("ENTER 1 FOR Subscribe");
+                    Console.WriteLine("ENTER 1 FOR Subscribe channel/channelgroup");
                     Console.WriteLine("ENTER 2 FOR Publish");
-                    Console.WriteLine("ENTER 3 FOR Presence");
+                    Console.WriteLine("ENTER 3 FOR Presence channel/channelgroup");
                     Console.WriteLine("ENTER 4 FOR Detailed History");
                     Console.WriteLine("ENTER 5 FOR Here_Now");
                     Console.WriteLine("ENTER 6 FOR Unsubscribe");
@@ -373,12 +374,12 @@ namespace PubNubMessaging.Core
                     Console.WriteLine("ENTER 9 FOR Disconnect/Reconnect existing Subscriber(s) (when internet is available)");
                     Console.WriteLine("ENTER 10 TO Disable Network Connection (no internet)");
                     Console.WriteLine("ENTER 11 TO Enable Network Connection (yes internet)");
-                    Console.WriteLine("ENTER 12 FOR Grant Access");
-                    Console.WriteLine("ENTER 13 FOR Audit Access");
-                    Console.WriteLine("ENTER 14 FOR Revoke Access");
-                    Console.WriteLine("ENTER 15 FOR Grant Access for Presence Channel");
-                    Console.WriteLine("ENTER 16 FOR Audit Access for Presence Channel");
-                    Console.WriteLine("ENTER 17 FOR Revoke Access for Presence Channel");
+                    Console.WriteLine("ENTER 12 FOR Grant Access to channel/ChannelGroup");
+                    Console.WriteLine("ENTER 13 FOR Audit Access to channel/ChannelGroup");
+                    Console.WriteLine("ENTER 14 FOR Revoke Access to channel/ChannelGroup");
+                    Console.WriteLine("ENTER 15 FOR Grant Access to Presence Channel/ChannelGroup");
+                    Console.WriteLine("ENTER 16 FOR Audit Access to Presence Channel/ChannelGroup");
+                    Console.WriteLine("ENTER 17 FOR Revoke Access to Presence Channel/ChannelGroup");
                     Console.WriteLine("ENTER 18 FOR Change/Update Auth Key (Current value = {0})", pubnub.AuthenticationKey);
                     Console.WriteLine("ENTER 19 TO Simulate Machine Sleep Mode");
                     Console.WriteLine("ENTER 20 TO Simulate Machine Awake Mode");
@@ -414,6 +415,7 @@ namespace PubNubMessaging.Core
                         break;
                     case "1":
                         Console.WriteLine("Enter CHANNEL name for subscribe. Use comma to enter multiple channels.");
+                        Console.WriteLine("NOTE: If you want to consider only Channel Group(s), just hit ENTER");
                         channel = Console.ReadLine();
 
                         Console.ForegroundColor = ConsoleColor.Blue;
@@ -421,8 +423,36 @@ namespace PubNubMessaging.Core
                         Console.ResetColor();
                         Console.WriteLine();
 
-                        Console.WriteLine("Running subscribe()");
-                        pubnub.Subscribe<string>(channel, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
+                        Console.WriteLine("Enter CHANNEL GROUP name for subscribe. Use comma to enter multiple channel groups.");
+                        Console.WriteLine("To denote a namespaced CHANNEL GROUP, use the colon (:) character with the format namespace:channelgroup.");
+                        Console.WriteLine("NOTE: If you want to consider only Channel(s), assuming you already entered , just hit ENTER");
+                        channelGroup = Console.ReadLine();
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel Group= {0}", channelGroup));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
+                        if (channel.Length > 0 || channelGroup.Length > 0)
+                        {
+                            Console.WriteLine("Running subscribe()");
+                            if (channel.Length > 0 && channelGroup.Length > 0)
+                            {
+                                pubnub.Subscribe<string>(channel, channelGroup, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
+                            }
+                            else if (channel.Length <= 0)
+                            {
+                                pubnub.SubscribeChannelGroup<string>(channelGroup, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
+                            }
+                            else
+                            {
+                                pubnub.Subscribe<string>(channel, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("To run subscribe(), provide either channel name or channel group name");
+                        }
 
                         break;
                     case "2":
@@ -433,6 +463,11 @@ namespace PubNubMessaging.Core
                         Console.WriteLine(string.Format("Channel = {0}",channel));
                         Console.ResetColor();
 
+                        if (channel == "")
+                        {
+                            Console.WriteLine("Invalid CHANNEL name");
+                            break;
+                        }
                         Console.WriteLine("Store In History? Enter Y for Yes or N for No. To accept default(Y), just press ENTER");
                         string storeInHistory = Console.ReadLine();
                         bool store = true;
@@ -525,6 +560,7 @@ namespace PubNubMessaging.Core
                         break;
                     case "3":
                         Console.WriteLine("Enter CHANNEL name for presence. Use comma to enter multiple channels.");
+                        Console.WriteLine("NOTE: If you want to consider only Presence Channel Group(s), just hit ENTER");
                         channel = Console.ReadLine();
 
                         Console.ForegroundColor = ConsoleColor.Blue;
@@ -532,8 +568,36 @@ namespace PubNubMessaging.Core
                         Console.ResetColor();
                         Console.WriteLine();
 
-                        Console.WriteLine("Running presence()");
-                        pubnub.Presence<string>(channel, DisplayPresenceReturnMessage, DisplayPresenceConnectStatusMessage, DisplayErrorMessage);
+                        Console.WriteLine("Enter CHANNEL GROUP name for presence. Use comma to enter multiple channel groups.");
+                        Console.WriteLine("To denote a namespaced CHANNEL GROUP, use the colon (:) character with the format namespace:channelgroup.");
+                        Console.WriteLine("NOTE: If you want to consider only Presence Channel(s), assuming you already entered, just hit ENTER");
+                        channelGroup = Console.ReadLine();
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Presence Channel Group= {0}", channelGroup));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
+                        if (channel.Length > 0 || channelGroup.Length > 0)
+                        {
+                            Console.WriteLine("Running presence()");
+                            if (channel.Length > 0 && channelGroup.Length > 0)
+                            {
+                                pubnub.Presence<string>(channel, channelGroup, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
+                            }
+                            else if (channel.Length <= 0)
+                            {
+                                pubnub.PresenceChannelGroup<string>(channelGroup, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
+                            }
+                            else
+                            {
+                                pubnub.Presence<string>(channel, DisplayPresenceReturnMessage, DisplayPresenceConnectStatusMessage, DisplayErrorMessage);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("To run presence(), provide either presence channel name or channel group name");
+                        }
 
                         break;
                     case "4":
@@ -587,6 +651,7 @@ namespace PubNubMessaging.Core
                         break;
                     case "6":
                         Console.WriteLine("Enter CHANNEL name for Unsubscribe. Use comma to enter multiple channels.");
+                        Console.WriteLine("NOTE: If you want to consider only Channel Group, just hit ENTER");
                         channel = Console.ReadLine();
 
                         Console.ForegroundColor = ConsoleColor.Blue;
@@ -594,8 +659,15 @@ namespace PubNubMessaging.Core
                         Console.ResetColor();
                         Console.WriteLine();
 
+                        Console.WriteLine("Enter channel group name");
+                        Console.WriteLine("NOTE: If you want to consider only Channel, just hit ENTER");
+                        channelGroup = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("ChannelGroup = {0}", channelGroup));
+                        Console.ResetColor();
+
                         Console.WriteLine("Running unsubscribe()");
-                        pubnub.Unsubscribe<string>(channel, DisplayReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeDisconnectStatusMessage, DisplayErrorMessage);
+                        pubnub.Unsubscribe<string>(channel, channelGroup, DisplayReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeDisconnectStatusMessage, DisplayErrorMessage);
                         break;
                     case "7":
                         Console.WriteLine("Enter CHANNEL name for Presence Unsubscribe. Use comma to enter multiple channels.");
@@ -606,8 +678,15 @@ namespace PubNubMessaging.Core
                         Console.ResetColor();
                         Console.WriteLine();
 
+                        Console.WriteLine("Enter channel group name for Presence Unsubscribe");
+                        Console.WriteLine("NOTE: If you want to consider only Channel, just hit ENTER");
+                        channelGroup = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("ChannelGroup = {0}", channelGroup));
+                        Console.ResetColor();
+
                         Console.WriteLine("Running presence-unsubscribe()");
-                        pubnub.PresenceUnsubscribe<string>(channel, DisplayReturnMessage, DisplayPresenceConnectStatusMessage, DisplayPresenceDisconnectStatusMessage, DisplayErrorMessage);
+                        pubnub.PresenceUnsubscribe<string>(channel, channelGroup, DisplayReturnMessage, DisplayPresenceConnectStatusMessage, DisplayPresenceDisconnectStatusMessage, DisplayErrorMessage);
                         break;
                     case "8":
                         Console.WriteLine("Running time()");
@@ -636,8 +715,20 @@ namespace PubNubMessaging.Core
                         break;
                     case "12":
                         Console.WriteLine("Enter CHANNEL name for PAM Grant. For Presence, Select Option 15.");
+                        Console.WriteLine("To enter CHANNEL GROUP name, just hit ENTER");
                         channel = Console.ReadLine();
 
+                        if (channel.Trim().Length <= 0)
+                        {
+                            channel = "";
+                            Console.WriteLine("Enter CHANNEL GROUP name for PAM Grant.");
+                            channelGroup = Console.ReadLine();
+                        }
+                        if (channel.Trim().Length <= 0 && channelGroup.Trim().Length <= 0)
+                        {
+                            Console.WriteLine("Channel or ChannelGroup not provided. Please try again.");
+                            break;
+                        }
                         Console.WriteLine("Enter the auth_key for PAM Grant (optional)");
                         Console.WriteLine("Press Enter Key if there is no auth_key at this time.");
                         string authGrant = Console.ReadLine();
@@ -645,9 +736,22 @@ namespace PubNubMessaging.Core
                         Console.WriteLine("Read Access? Enter Y for Yes (default), N for No.");
                         string readAccess = Console.ReadLine();
                         bool read = (readAccess.ToLower() == "n") ? false : true;
-                        Console.WriteLine("Write Access? Enter Y for Yes (default), N for No.");
-                        string writeAccess = Console.ReadLine();
-                        bool write = (writeAccess.ToLower() == "n") ? false : true;
+
+                        bool write = false;
+                        if (channel.Trim().Length > 0)
+                        {
+                            Console.WriteLine("Write Access? Enter Y for Yes (default), N for No.");
+                            string writeAccess = Console.ReadLine();
+                            write = (writeAccess.ToLower() == "n") ? false : true;
+                        }
+
+                        bool manage=false;
+                        if (channel.Trim().Length <= 0)
+                        {
+                            Console.WriteLine("Manage Access? Enter Y for Yes (default), N for No.");
+                            string manageAccess = Console.ReadLine();
+                            manage = (manageAccess.ToLower() == "n") ? false : true;
+                        }
                         Console.WriteLine("How many minutes do you want to allow Grant Access? Enter the number of minutes.");
                         Console.WriteLine("Default = 1440 minutes (24 hours). Press ENTER now to accept default value.");
                         int grantTimeLimitInMinutes;
@@ -664,22 +768,53 @@ namespace PubNubMessaging.Core
 
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}",channel));
+                        Console.WriteLine(string.Format("ChannelGroup = {0}", channelGroup));
                         Console.WriteLine(string.Format("auth_key = {0}", authGrant));
                         Console.WriteLine(string.Format("Read Access = {0}", read.ToString()));
-                        Console.WriteLine(string.Format("Write Access = {0}", write.ToString()));
+                        if (channel.Trim().Length > 0)
+                        {
+                            Console.WriteLine(string.Format("Write Access = {0}", write.ToString()));
+                        }
+                        if (channel.Trim().Length <= 0)
+                        {
+                            Console.WriteLine(string.Format("Manage Access = {0}", manage.ToString()));
+                        }
                         Console.WriteLine(string.Format("Grant Access Time Limit = {0}", grantTimeLimitInMinutes.ToString()));
                         Console.ResetColor();
                         Console.WriteLine();
 
                         Console.WriteLine("Running PamGrant()");
-                        pubnub.GrantAccess<string>(channel, authGrant, read, write, grantTimeLimitInMinutes, DisplayReturnMessage, DisplayErrorMessage);
+                        if (channel.Trim().Length > 0)
+                        {
+                            pubnub.GrantAccess<string>(channel, authGrant, read, write, grantTimeLimitInMinutes, DisplayReturnMessage, DisplayErrorMessage);
+                        }
+                        else
+                        {
+                            pubnub.ChannelGroupGrantAccess<string>(channelGroup, authGrant, read, manage, grantTimeLimitInMinutes, DisplayReturnMessage, DisplayErrorMessage);
+                        }
                         break;
                     case "13":
                         Console.WriteLine("Enter CHANNEL name for PAM Audit");
+                        Console.WriteLine("To enter CHANNEL GROUP name, just hit ENTER");
                         channel = Console.ReadLine();
+
+                        if (channel.Trim().Length <= 0)
+                        {
+                            Console.WriteLine("Enter CHANNEL GROUP name for PAM Audit.");
+                            channelGroup = Console.ReadLine();
+                        }
+                        if (channel.Trim().Length <= 0 && channelGroup.Trim().Length <= 0)
+                        {
+                            Console.WriteLine("Channel or ChannelGroup not provided. Please try again.");
+                            break;
+                        }
 
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", channel));
+                        Console.ResetColor();
+                        Console.WriteLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("ChannelGroup = {0}", channelGroup));
                         Console.ResetColor();
                         Console.WriteLine();
 
@@ -693,14 +828,38 @@ namespace PubNubMessaging.Core
                         Console.WriteLine();
 
                         Console.WriteLine("Running PamAudit()");
-                        pubnub.AuditAccess<string>(channel, authAudit, DisplayReturnMessage, DisplayErrorMessage);
+                        if (channel.Trim().Length > 0)
+                        {
+                            pubnub.AuditAccess<string>(channel, authAudit, DisplayReturnMessage, DisplayErrorMessage);
+                        }
+                        else
+                        {
+                            pubnub.ChannelGroupAuditAccess<string>(channelGroup, authAudit, DisplayReturnMessage, DisplayErrorMessage);
+                        }
                         break;
                     case "14":
                         Console.WriteLine("Enter CHANNEL name for PAM Revoke");
+                        Console.WriteLine("To enter CHANNEL GROUP name, just hit ENTER");
                         channel = Console.ReadLine();
                         
+                        if (channel.Trim().Length <= 0)
+                        {
+                            Console.WriteLine("Enter CHANNEL GROUP name for PAM Revoke.");
+                            channelGroup = Console.ReadLine();
+                        }
+                        if (channel.Trim().Length <= 0 && channelGroup.Trim().Length <= 0)
+                        {
+                            channel = "";
+                            Console.WriteLine("Channel or ChannelGroup not provided. Please try again.");
+                            break;
+                        }
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", channel));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("ChannelGroup = {0}", channelGroup));
                         Console.ResetColor();
                         Console.WriteLine();
 
@@ -714,7 +873,14 @@ namespace PubNubMessaging.Core
                         Console.WriteLine();
 
                         Console.WriteLine("Running PamRevoke()");
-                        pubnub.GrantAccess<string>(channel, authRevoke, false,false, DisplayReturnMessage, DisplayErrorMessage);
+                        if (channel.Trim().Length > 0)
+                        {
+                            pubnub.GrantAccess<string>(channel, authRevoke, false, false, DisplayReturnMessage, DisplayErrorMessage);
+                        }
+                        else
+                        {
+                            pubnub.ChannelGroupGrantAccess<string>(channelGroup, authRevoke, false, false, DisplayReturnMessage, DisplayErrorMessage);
+                        }
                         break;
                     case "15":
                         Console.WriteLine("Enter CHANNEL name for PAM Grant Presence.");
@@ -843,9 +1009,17 @@ namespace PubNubMessaging.Core
                         break;
                     case "23":
                         Console.WriteLine("Enter channel name");
+                        Console.WriteLine("NOTE: If you want to consider only Channel Group, just hit ENTER");
                         string userStateChannel = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", userStateChannel));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter channel group name");
+                        Console.WriteLine("NOTE: If you want to consider only Channel, just hit ENTER");
+                        string userStateChannelGroup = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("ChannelGroup = {0}", userStateChannelGroup));
                         Console.ResetColor();
 
                         Console.WriteLine("User State will be accepted as dictionary key:value pair");
@@ -865,35 +1039,51 @@ namespace PubNubMessaging.Core
                         //string currentUserState = "";
                         if (Int32.TryParse(valueUserState, out valueInt))
                         {
-                            pubnub.SetUserState<string>(userStateChannel, new KeyValuePair<string, object>(keyUserState, valueInt), DisplayReturnMessage, DisplayErrorMessage);
+                            pubnub.SetUserState<string>(userStateChannel, userStateChannelGroup, new KeyValuePair<string, object>(keyUserState, valueInt), DisplayReturnMessage, DisplayErrorMessage);
                         }
                         else if (Double.TryParse(valueUserState, out valueDouble))
                         {
-                            pubnub.SetUserState<string>(userStateChannel, new KeyValuePair<string, object>(keyUserState, valueDouble), DisplayReturnMessage, DisplayErrorMessage);
+                            pubnub.SetUserState<string>(userStateChannel, userStateChannelGroup, new KeyValuePair<string, object>(keyUserState, valueDouble), DisplayReturnMessage, DisplayErrorMessage);
                         }
                         else
                         {
-                            pubnub.SetUserState<string>(userStateChannel, new KeyValuePair<string, object>(keyUserState, valueUserState), DisplayReturnMessage, DisplayErrorMessage);
+                            pubnub.SetUserState<string>(userStateChannel, userStateChannelGroup, new KeyValuePair<string, object>(keyUserState, valueUserState), DisplayReturnMessage, DisplayErrorMessage);
                         }
 
                         break;
                     case "24":
                         Console.WriteLine("Enter channel name");
-                        string deleteUserStateChannel = Console.ReadLine();
+                        Console.WriteLine("NOTE: If you want to consider only Channel Group, just hit ENTER");
+                        string deleteChannelUserState = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", deleteUserStateChannel));
+                        Console.WriteLine(string.Format("Channel = {0}", deleteChannelUserState));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter channel group name");
+                        Console.WriteLine("NOTE: If you want to consider only Channel, just hit ENTER");
+                        string deleteChannelGroupUserState = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("ChannelGroup = {0}", deleteChannelGroupUserState));
                         Console.ResetColor();
 
                         Console.WriteLine("Enter key of the User State Key-Value pair to be deleted");
                         string deleteKeyUserState = Console.ReadLine();
-                        pubnub.SetUserState<string>(deleteUserStateChannel, new KeyValuePair<string, object>(deleteKeyUserState, null), DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.SetUserState<string>(deleteChannelUserState, deleteChannelGroupUserState, new KeyValuePair<string, object>(deleteKeyUserState, null), DisplayReturnMessage, DisplayErrorMessage);
 
                         break;
                     case "25":
                         Console.WriteLine("Enter channel name");
+                        Console.WriteLine("NOTE: If you want to consider only Channel Group, just hit ENTER");
                         string setUserStateChannel = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", setUserStateChannel));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter channel group name");
+                        Console.WriteLine("NOTE: If you want to consider only Channel, just hit ENTER");
+                        string setUserStateChannelGroup = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("ChannelGroup = {0}", setUserStateChannelGroup));
                         Console.ResetColor();
 
                         Console.WriteLine("Enter user state in json format (Eg. {\"key1\":\"value1\",\"key2\":\"value2\"}");
@@ -908,29 +1098,37 @@ namespace PubNubMessaging.Core
                         string uuid = Console.ReadLine();
                         if (string.IsNullOrEmpty(uuid))
                         {
-                            pubnub.SetUserState<string>(setUserStateChannel, jsonUserState, DisplayReturnMessage, DisplayErrorMessage);
+                            pubnub.SetUserState<string>(setUserStateChannel, setUserStateChannelGroup, jsonUserState, DisplayReturnMessage, DisplayErrorMessage);
                         }
                         else
                         {
-                            pubnub.SetUserState<string>(setUserStateChannel, uuid, jsonUserState, DisplayReturnMessage, DisplayErrorMessage);
+                            pubnub.SetUserState<string>(setUserStateChannel, setUserStateChannelGroup, uuid, jsonUserState, DisplayReturnMessage, DisplayErrorMessage);
                         }
                         break;
                     case "26":
                         Console.WriteLine("Enter channel name");
+                        Console.WriteLine("NOTE: If you want to consider only Channel Group, just hit ENTER");
                         string getUserStateChannel2 = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", getUserStateChannel2));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter channel group name");
+                        Console.WriteLine("NOTE: If you want to consider only Channel, just hit ENTER");
+                        string setUserStateChannelGroup2 = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("ChannelGroup = {0}", setUserStateChannelGroup2));
                         Console.ResetColor();
 
                         Console.WriteLine("Enter UUID. (Optional. Press ENTER to skip it)");
                         string uuid2 = Console.ReadLine();
                         if (string.IsNullOrEmpty(uuid2))
                         {
-                            pubnub.GetUserState<string>(getUserStateChannel2, DisplayReturnMessage, DisplayErrorMessage);
+                            pubnub.GetUserState<string>(getUserStateChannel2, setUserStateChannelGroup2, DisplayReturnMessage, DisplayErrorMessage);
                         }
                         else
                         {
-                            pubnub.GetUserState<string>(getUserStateChannel2, uuid2, DisplayReturnMessage, DisplayErrorMessage);
+                            pubnub.GetUserState<string>(getUserStateChannel2, setUserStateChannelGroup2, uuid2, DisplayReturnMessage, DisplayErrorMessage);
                         }
                         break;
                     case "27":
@@ -1236,13 +1434,15 @@ namespace PubNubMessaging.Core
                         Console.WriteLine(string.Format("namespace = {0}", removeChannelGroupNamespace));
                         Console.ResetColor();
 
-                        
-                        Console.WriteLine("Do you want to remove the namespace and all its group names and all its channels? Default is No. Enter Y for Yes, Else just hit ENTER key");
-                        string removeExistingNamespace = Console.ReadLine();
-                        if (removeExistingNamespace.ToLower() == "y")
+                        if (removeChannelGroupNamespace.Trim().Length > 0)
                         {
-                            pubnub.RemoveChannelGroupNameSpace<string>(removeChannelGroupNamespace, DisplayReturnMessage, DisplayErrorMessage);
-                            break;
+                            Console.WriteLine("Do you want to remove the namespace and all its group names and all its channels? Default is No. Enter Y for Yes, Else just hit ENTER key");
+                            string removeExistingNamespace = Console.ReadLine();
+                            if (removeExistingNamespace.ToLower() == "y")
+                            {
+                                pubnub.RemoveChannelGroupNameSpace<string>(removeChannelGroupNamespace, DisplayReturnMessage, DisplayErrorMessage);
+                                break;
+                            }
                         }
 
                         Console.WriteLine("Enter channel group name");
@@ -1251,6 +1451,11 @@ namespace PubNubMessaging.Core
                         Console.WriteLine(string.Format("channel group name = {0}", removeChannelGroupName));
                         Console.ResetColor();
 
+                        if (removeChannelGroupName.Trim().Length <= 0)
+                        {
+                            Console.WriteLine("Channel group not provided. Try again");
+                            break;
+                        }
                         Console.WriteLine("Do you want to remove the channel group and all its channels? Default is No. Enter Y for Yes, Else just hit ENTER key");
                         string removeExistingGroup = Console.ReadLine();
                         if (removeExistingGroup.ToLower() == "y")
