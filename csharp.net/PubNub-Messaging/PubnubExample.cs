@@ -884,7 +884,20 @@ namespace PubNubMessaging.Core
                         break;
                     case "15":
                         Console.WriteLine("Enter CHANNEL name for PAM Grant Presence.");
+                        Console.WriteLine("To enter CHANNEL GROUP name, just hit ENTER");
                         channel = Console.ReadLine();
+
+                        if (channel.Trim().Length <= 0)
+                        {
+                            channel = "";
+                            Console.WriteLine("Enter CHANNEL GROUP name for PAM Grant Presence.");
+                            channelGroup = Console.ReadLine();
+                        }
+                        if (channel.Trim().Length <= 0 && channelGroup.Trim().Length <= 0)
+                        {
+                            Console.WriteLine("Channel or ChannelGroup not provided. Please try again.");
+                            break;
+                        }
                         
                         Console.WriteLine("Enter the auth_key for PAM Grant Presence (optional)");
                         Console.WriteLine("Press Enter Key if there is no auth_key at this time.");
@@ -893,9 +906,23 @@ namespace PubNubMessaging.Core
                         Console.WriteLine("Read Access? Enter Y for Yes (default), N for No.");
                         string readPresenceAccess = Console.ReadLine();
                         bool readPresence = (readPresenceAccess.ToLower() == "n") ? false : true;
-                        Console.WriteLine("Write Access? Enter Y for Yes (default), N for No.");
-                        string writePresenceAccess = Console.ReadLine();
-                        bool writePresence = (writePresenceAccess.ToLower() == "n") ? false : true;
+
+                        bool writePresence = false;
+                        if (channel.Trim().Length > 0)
+                        {
+                            Console.WriteLine("Write Access? Enter Y for Yes (default), N for No.");
+                            string writePresenceAccess = Console.ReadLine();
+                            writePresence = (writePresenceAccess.ToLower() == "n") ? false : true;
+                        }
+
+                        bool managePresence=false;
+                        if (channel.Trim().Length <= 0)
+                        {
+                            Console.WriteLine("Manage Access? Enter Y for Yes (default), N for No.");
+                            string manageAccess = Console.ReadLine();
+                            managePresence = (manageAccess.ToLower() == "n") ? false : true;
+                        }
+
                         Console.WriteLine("How many minutes do you want to allow Grant Presence Access? Enter the number of minutes.");
                         Console.WriteLine("Default = 1440 minutes (24 hours). Press ENTER now to accept default value.");
                         int grantPresenceTimeLimitInMinutes;
@@ -912,27 +939,61 @@ namespace PubNubMessaging.Core
 
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", channel));
+                        Console.WriteLine(string.Format("ChannelGroup = {0}", channelGroup));
                         Console.WriteLine(string.Format("auth_key = {0}", authGrantPresence));
                         Console.WriteLine(string.Format("Read Access = {0}", readPresence.ToString()));
-                        Console.WriteLine(string.Format("Write Access = {0}", writePresence.ToString()));
+                        if (channel.Trim().Length > 0)
+                        {
+                            Console.WriteLine(string.Format("Write Access = {0}", writePresence.ToString()));
+                        }
+                        if (channel.Trim().Length <= 0)
+                        {
+                            Console.WriteLine(string.Format("Manage Access = {0}", managePresence.ToString()));
+                        }
                         Console.WriteLine(string.Format("Grant Access Time Limit = {0}", grantPresenceTimeLimitInMinutes.ToString()));
                         Console.ResetColor();
                         Console.WriteLine();
 
                         Console.WriteLine("Running PAM GrantPresenceAccess()");
-                        pubnub.GrantPresenceAccess<string>(channel, authGrantPresence, readPresence, writePresence, grantPresenceTimeLimitInMinutes, DisplayReturnMessage, DisplayErrorMessage);
+                        if (channel.Trim().Length > 0)
+                        {
+                            pubnub.GrantPresenceAccess<string>(channel, authGrantPresence, readPresence, writePresence, grantPresenceTimeLimitInMinutes, DisplayReturnMessage, DisplayErrorMessage);
+                        }
+                        else
+                        {
+                            pubnub.ChannelGroupGrantPresenceAccess<string>(channelGroup, authGrantPresence, readPresence, managePresence, grantPresenceTimeLimitInMinutes, DisplayReturnMessage, DisplayErrorMessage);
+                        }
                         break;
                     case "16":
                         Console.WriteLine("Enter CHANNEL name for PAM Presence Audit");
+                        Console.WriteLine("To enter CHANNEL GROUP name, just hit ENTER");
                         channel = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", channel));
                         Console.ResetColor();
                         Console.WriteLine();
 
+                        if (channel.Trim().Length <= 0)
+                        {
+                            Console.WriteLine("Enter CHANNEL GROUP name for PAM Presence Audit.");
+                            channelGroup = Console.ReadLine();
+                            
+                            Console.ForegroundColor = ConsoleColor.Blue;
+                            Console.WriteLine(string.Format("ChannelGroup = {0}", channelGroup));
+                            Console.ResetColor();
+                            Console.WriteLine();
+
+                        }
+                        if (channel.Trim().Length <= 0 && channelGroup.Trim().Length <= 0)
+                        {
+                            Console.WriteLine("Channel or ChannelGroup not provided. Please try again.");
+                            break;
+                        }
+
                         Console.WriteLine("Enter the auth_key for PAM Presence Audit (optional)");
                         Console.WriteLine("Press Enter Key if there is no auth_key at this time.");
                         string authPresenceAudit = Console.ReadLine();
+                        
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("auth_key = {0}", authPresenceAudit));
                         Console.ResetColor();
@@ -940,27 +1001,59 @@ namespace PubNubMessaging.Core
 
 
                         Console.WriteLine("Running PAM Presence Audit()");
-                        pubnub.AuditPresenceAccess<string>(channel, authPresenceAudit, DisplayReturnMessage, DisplayErrorMessage);
+                        if (channel.Trim().Length > 0)
+                        {
+                            pubnub.AuditPresenceAccess<string>(channel, authPresenceAudit, DisplayReturnMessage, DisplayErrorMessage);
+                        }
+                        else
+                        {
+                            pubnub.ChannelGroupAuditPresenceAccess<string>(channelGroup, authPresenceAudit, DisplayReturnMessage, DisplayErrorMessage);
+                        }
                         break;
                     case "17":
                         Console.WriteLine("Enter CHANNEL name for PAM Presence Revoke");
+                        Console.WriteLine("To enter CHANNEL GROUP name, just hit ENTER");
                         channel = Console.ReadLine();
 
+                        if (channel.Trim().Length <= 0)
+                        {
+                            Console.WriteLine("Enter CHANNEL GROUP name for PAM Revoke.");
+                            channelGroup = Console.ReadLine();
+                        }
+                        if (channel.Trim().Length <= 0 && channelGroup.Trim().Length <= 0)
+                        {
+                            channel = "";
+                            Console.WriteLine("Channel or ChannelGroup not provided. Please try again.");
+                            break;
+                        }
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", channel));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("ChannelGroup = {0}", channelGroup));
                         Console.ResetColor();
                         Console.WriteLine();
 
                         Console.WriteLine("Enter the auth_key for PAM Presence Revoke (optional)");
                         Console.WriteLine("Press Enter Key if there is no auth_key at this time.");
                         string authPresenceRevoke = Console.ReadLine();
+                        
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("auth_key = {0}", authPresenceRevoke));
                         Console.ResetColor();
                         Console.WriteLine();
 
                         Console.WriteLine("Running PAM Presence Revoke()");
-                        pubnub.GrantPresenceAccess<string>(channel, authPresenceRevoke, false, false, DisplayReturnMessage, DisplayErrorMessage);
+                        if (channel.Trim().Length > 0)
+                        {
+                            pubnub.GrantPresenceAccess<string>(channel, authPresenceRevoke, false, false, DisplayReturnMessage, DisplayErrorMessage);
+                        }
+                        else
+                        {
+                            pubnub.ChannelGroupGrantPresenceAccess<string>(channelGroup, authPresenceRevoke, false, false, DisplayReturnMessage, DisplayErrorMessage);
+                        }
                         break;
                     case "18":
                         Console.WriteLine("Enter Auth Key (applies to all subscribed channels).");

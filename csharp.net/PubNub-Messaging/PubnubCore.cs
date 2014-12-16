@@ -1,4 +1,4 @@
-﻿//Build Date: December 15, 2014
+﻿//Build Date: December 16, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -3243,7 +3243,7 @@ namespace PubNubMessaging.Core
 						LoggingMethod.WriteToLog (string.Format ("DateTime {0}, JSON response={1}", DateTime.Now.ToString (), jsonString), LoggingMethod.LevelInfo);
 						GoToCallback<T> (result, disconnectCallback);
 
-						DeleteLocalUserState (channelToBeRemoved);
+						DeleteLocalChannelUserState (channelToBeRemoved);
 					} else {
 						string message = "Unsubscribe Error. Please retry the channel unsubscribe operation.";
 
@@ -3270,7 +3270,7 @@ namespace PubNubMessaging.Core
                         LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
                         GoToCallback<T>(result, disconnectCallback);
 
-                        DeleteLocalUserState(channelGroupToBeRemoved);
+                        DeleteLocalChannelGroupUserState(channelGroupToBeRemoved);
                     }
                     else
                     {
@@ -3804,17 +3804,30 @@ namespace PubNubMessaging.Core
             return retJsonUserState;
 		}
 
-		private bool DeleteLocalUserState (string channel)
+		private bool DeleteLocalChannelUserState (string channel)
 		{
 			bool userStateDeleted = false;
 
-			if (_channelLocalUserState.ContainsKey (channel)) {
+			if (_channelLocalUserState.ContainsKey(channel)) {
 				Dictionary<string, object> returnedUserState = null;
 				userStateDeleted = _channelLocalUserState.TryRemove (channel, out returnedUserState);
 			}
 
 			return userStateDeleted;
 		}
+
+        private bool DeleteLocalChannelGroupUserState(string channelGroup)
+        {
+            bool userStateDeleted = false;
+
+            if (_channelGroupLocalUserState.ContainsKey(channelGroup))
+            {
+                Dictionary<string, object> returnedUserState = null;
+                userStateDeleted = _channelGroupLocalUserState.TryRemove(channelGroup, out returnedUserState);
+            }
+
+            return userStateDeleted;
+        }
 
         private string BuildJsonUserState(string channel, string channelGroup, bool local)
 		{
