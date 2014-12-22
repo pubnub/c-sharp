@@ -535,7 +535,7 @@ namespace PubNubMessaging.Tests
                 {
                     revokeManualEvent = new ManualResetEvent(false);
                     Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant ok..Now trying Revoke");
-                    pubnub.GrantAccess<string>("", authKey, false, false, 5, RevokeToUserLevelCallback, DummyErrorCallback);
+                    pubnub.GrantAccess<string>(channel, authKey, false, false, 5, RevokeToUserLevelCallback, DummyErrorCallback);
                     Thread.Sleep(1000);
                     revokeManualEvent.WaitOne();
                     Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant success but revoke failed.");
@@ -948,7 +948,7 @@ namespace PubNubMessaging.Tests
                                                 var authKeyContainer = auths.Value<JContainer>(authKey);
                                                 if (authKeyContainer != null)
                                                 {
-                                                    receivedRevokeMessage = false;
+                                                    receivedRevokeMessage = true;
                                                     break;
                                                 }
 
@@ -958,7 +958,7 @@ namespace PubNubMessaging.Tests
                                 }
                                 else
                                 {
-                                    receivedRevokeMessage = true;
+                                    receivedRevokeMessage = false;
                                 }
                             }
                         }
