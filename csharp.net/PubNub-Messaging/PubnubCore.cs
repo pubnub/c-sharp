@@ -1,4 +1,4 @@
-﻿//Build Date: December 16, 2014
+﻿//Build Date: December 22, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -2918,8 +2918,8 @@ namespace PubNubMessaging.Core
 				return;
 			}
 
-            if (((channelInternetStatus.ContainsKey(multiChannel) && !channelInternetStatus[multiChannel]) 
-                || (channelGroupInternetStatus.ContainsKey(multiChannelGroup) && !channelGroupInternetStatus[multiChannelGroup]))
+            if (((channelInternetStatus.ContainsKey(multiChannel) && !channelInternetStatus[multiChannel])
+                || (multiChannelGroup != "" && channelGroupInternetStatus.ContainsKey(multiChannelGroup) && !channelGroupInternetStatus[multiChannelGroup]))
                 && pubnetSystemActive) 
             {
 				if (channelInternetRetry.ContainsKey (multiChannel) && (channelInternetRetry[multiChannel] >= _pubnubNetworkCheckRetries)) {
@@ -4570,9 +4570,9 @@ namespace PubNubMessaging.Core
                         callbackKey.ChannelGroup = activeChannelGroup;
                         callbackKey.Type = type;
 
-                        if (channelCallbacks.Count > 0 && channelGroupCallbacks.ContainsKey(callbackKey))
+                        if (channelGroupCallbacks.Count > 0 && channelGroupCallbacks.ContainsKey(callbackKey))
                         {
-                            PubnubChannelCallback<T> currentPubnubCallback = channelGroupCallbacks[callbackKey] as PubnubChannelCallback<T>;
+                            PubnubChannelGroupCallback<T> currentPubnubCallback = channelGroupCallbacks[callbackKey] as PubnubChannelGroupCallback<T>;
                             if (currentPubnubCallback != null && currentPubnubCallback.Callback != null)
                             {
                                 CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
@@ -4597,7 +4597,7 @@ namespace PubNubMessaging.Core
 
                         if (channelGroupCallbacks.Count > 0 && channelGroupCallbacks.ContainsKey(callbackKey))
                         {
-                            PubnubChannelCallback<T> currentPubnubCallback = channelGroupCallbacks[callbackKey] as PubnubChannelCallback<T>;
+                            PubnubChannelGroupCallback<T> currentPubnubCallback = channelGroupCallbacks[callbackKey] as PubnubChannelGroupCallback<T>;
                             if (currentPubnubCallback != null && currentPubnubCallback.Callback != null)
                             {
                                 CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
@@ -4893,7 +4893,7 @@ namespace PubNubMessaging.Core
                 {
                     channels = new string[] { };
                 }
-                if (message.Count == 4)
+                if (message.Count >= 4)
                 {
                     if (message[message.Count - 2] is string[])
                     {
@@ -5069,7 +5069,7 @@ namespace PubNubMessaging.Core
 					#endif
 					if (messageList != null && messageList.Length > 0) 
                     {
-                        if (messages.Length == 4)
+                        if ((messages.Length == 4) || (messages.Length == 6))
                         {
                             messageChannelGroups = messages[2].ToString().Split(',');
                             messageChannels = messages[3].ToString().Split(',');
@@ -5104,13 +5104,20 @@ namespace PubNubMessaging.Core
 							}
 							itemMessage.Add (messages [1].ToString ());
 
-							if (currentChannelGroup != "")
-                            {
-                                itemMessage.Add(currentChannelGroup.Replace("-pnpres", ""));
-                            }
-							if (currentChannel != "")
+                            if (currentChannel == currentChannelGroup)
                             {
                                 itemMessage.Add(currentChannel.Replace("-pnpres", ""));
+                            }
+                            else
+                            {
+                                if (currentChannelGroup != "")
+                                {
+                                    itemMessage.Add(currentChannelGroup.Replace("-pnpres", ""));
+                                }
+                                if (currentChannel != "")
+                                {
+                                    itemMessage.Add(currentChannel.Replace("-pnpres", ""));
+                                }
                             }
 
 							PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey ();
