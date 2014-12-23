@@ -433,27 +433,15 @@ namespace PubNubMessaging.Core
                         Console.ResetColor();
                         Console.WriteLine();
 
-                        if (channel.Length > 0 || channelGroup.Length > 0)
+                        if (channel.Length <= 0 && channelGroup.Length <= 0)
                         {
-                            Console.WriteLine("Running subscribe()");
-                            if (channel.Length > 0 && channelGroup.Length > 0)
-                            {
-                                pubnub.Subscribe<string>(channel, channelGroup, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
-                            }
-                            else if (channel.Length <= 0)
-                            {
-                                pubnub.SubscribeChannelGroup<string>(channelGroup, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
-                            }
-                            else
-                            {
-                                pubnub.Subscribe<string>(channel, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
-                            }
+                            Console.WriteLine("To run subscribe(), atleast provide either channel name or channel group name or both");
                         }
                         else
                         {
-                            Console.WriteLine("To run subscribe(), provide either channel name or channel group name");
+                            Console.WriteLine("Running subscribe()");
+                            pubnub.Subscribe<string>(channel, channelGroup, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
                         }
-
                         break;
                     case "2":
                         Console.WriteLine("Enter CHANNEL name for publish.");
@@ -578,27 +566,15 @@ namespace PubNubMessaging.Core
                         Console.ResetColor();
                         Console.WriteLine();
 
-                        if (channel.Length > 0 || channelGroup.Length > 0)
+                        if (channel.Length <= 0 && channelGroup.Length <= 0)
                         {
-                            Console.WriteLine("Running presence()");
-                            if (channel.Length > 0 && channelGroup.Length > 0)
-                            {
-                                pubnub.Presence<string>(channel, channelGroup, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
-                            }
-                            else if (channel.Length <= 0)
-                            {
-                                pubnub.PresenceChannelGroup<string>(channelGroup, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
-                            }
-                            else
-                            {
-                                pubnub.Presence<string>(channel, DisplayPresenceReturnMessage, DisplayPresenceConnectStatusMessage, DisplayErrorMessage);
-                            }
+                            Console.WriteLine("To run presence(), atleast provide either channel name or channel group name or both");
                         }
                         else
                         {
-                            Console.WriteLine("To run presence(), provide either presence channel name or channel group name");
+                            Console.WriteLine("Running presence()");
+                            pubnub.Presence<string>(channel, channelGroup, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
                         }
-
                         break;
                     case "4":
                         Console.WriteLine("Enter CHANNEL name for Detailed History");
@@ -666,8 +642,15 @@ namespace PubNubMessaging.Core
                         Console.WriteLine(string.Format("ChannelGroup = {0}", channelGroup));
                         Console.ResetColor();
 
-                        Console.WriteLine("Running unsubscribe()");
-                        pubnub.Unsubscribe<string>(channel, channelGroup, DisplayReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeDisconnectStatusMessage, DisplayErrorMessage);
+                        if (channel.Length <= 0 && channelGroup.Length <= 0)
+                        {
+                            Console.WriteLine("To run unsubscribe(), atleast provide either channel name or channel group name or both");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Running unsubscribe()");
+                            pubnub.Unsubscribe<string>(channel, channelGroup, DisplayReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeDisconnectStatusMessage, DisplayErrorMessage);
+                        }
                         break;
                     case "7":
                         Console.WriteLine("Enter CHANNEL name for Presence Unsubscribe. Use comma to enter multiple channels.");
@@ -685,8 +668,15 @@ namespace PubNubMessaging.Core
                         Console.WriteLine(string.Format("ChannelGroup = {0}", channelGroup));
                         Console.ResetColor();
 
-                        Console.WriteLine("Running presence-unsubscribe()");
-                        pubnub.PresenceUnsubscribe<string>(channel, channelGroup, DisplayReturnMessage, DisplayPresenceConnectStatusMessage, DisplayPresenceDisconnectStatusMessage, DisplayErrorMessage);
+                        if (channel.Length <= 0 && channelGroup.Length <= 0)
+                        {
+                            Console.WriteLine("To run presence-unsubscribe(), atleast provide either channel name or channel group name or both");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Running presence-unsubscribe()");
+                            pubnub.PresenceUnsubscribe<string>(channel, channelGroup, DisplayReturnMessage, DisplayPresenceConnectStatusMessage, DisplayPresenceDisconnectStatusMessage, DisplayErrorMessage);
+                        }
                         break;
                     case "8":
                         Console.WriteLine("Running time()");

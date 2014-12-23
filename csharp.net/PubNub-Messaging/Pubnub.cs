@@ -19,11 +19,6 @@ namespace PubNubMessaging.Core
             pubnub.Subscribe<T>(channel, channelGroup, userCallback, connectCallback, errorCallback);
         }
 
-        public void SubscribeChannelGroup<T>(string channelGroup, Action<T> userCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.SubscribeChannelGroup<T>(channelGroup, userCallback, connectCallback, errorCallback);
-        }
-
 		public void Subscribe(string channel, Action<object> userCallback, Action<object> connectCallback, Action<PubnubClientError> errorCallback)
 		{
 			pubnub.Subscribe(channel, userCallback, connectCallback, errorCallback);
@@ -32,11 +27,6 @@ namespace PubNubMessaging.Core
         public void Subscribe(string channel, string channelGroup, Action<object> userCallback, Action<object> connectCallback, Action<PubnubClientError> errorCallback)
         {
             pubnub.Subscribe(channel, channelGroup, userCallback, connectCallback, errorCallback);
-        }
-
-        public void SubscribeChannelGroup(string channelGroup, Action<object> userCallback, Action<object> connectCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.SubscribeChannelGroup(channelGroup, userCallback, connectCallback, errorCallback);
         }
 
 		public bool Publish(string channel, object message, Action<object> userCallback, Action<PubnubClientError> errorCallback)
@@ -69,11 +59,6 @@ namespace PubNubMessaging.Core
             pubnub.Presence<T>(channel, channelGroup, userCallback, connectCallback, errorCallback);
         }
 
-        public void PresenceChannelGroup<T>(string channelGroup, Action<T> userCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.PresenceChannelGroup<T>(channelGroup, userCallback, connectCallback, errorCallback);
-        }
-
 		public void Presence(string channel, Action<object> userCallback, Action<object> connectCallback, Action<PubnubClientError> errorCallback)
 		{
 			pubnub.Presence(channel, userCallback, connectCallback, errorCallback);
@@ -82,11 +67,6 @@ namespace PubNubMessaging.Core
         public void Presence(string channel, string channelGroup, Action<object> userCallback, Action<object> connectCallback, Action<PubnubClientError> errorCallback)
         {
             pubnub.Presence(channel, channelGroup, userCallback, connectCallback, errorCallback);
-        }
-
-        public void PresenceChannelGroup(string channelGroup, Action<object> userCallback, Action<object> connectCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.PresenceChannelGroup(channelGroup, userCallback, connectCallback, errorCallback);
         }
 
 		public bool DetailedHistory(string channel, long start, long end, int count, bool reverse, Action<object> userCallback, Action<PubnubClientError> errorCallback)

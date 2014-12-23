@@ -1,4 +1,4 @@
-﻿//Build Date: December 22, 2014
+﻿//Build Date: December 23, 2014
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -2549,13 +2549,9 @@ namespace PubNubMessaging.Core
 
         public void Subscribe<T>(string channel, string channelGroup, Action<T> userCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback)
         {
-            if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()))
+            if ((string.IsNullOrEmpty(channel) || channel.Trim().Length <= 0) && (string.IsNullOrEmpty(channelGroup) || channelGroup.Trim().Length <= 0))
             {
-                throw new ArgumentException("Missing Channel");
-            }
-            if (string.IsNullOrEmpty(channelGroup) || string.IsNullOrEmpty(channelGroup.Trim()))
-            {
-                throw new ArgumentException("Missing Channel Group");
+                throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
             }
             if (userCallback == null)
             {
@@ -2575,42 +2571,19 @@ namespace PubNubMessaging.Core
             }
 
             LoggingMethod.WriteToLog(string.Format("DateTime {0}, requested subscribe for channel={1} and channel group={2}", DateTime.Now.ToString(), channel, channelGroup), LoggingMethod.LevelInfo);
-            string[] arrayChannel = channel.Split(',');
-            string[] arrayChannelGroup = channelGroup.Split(',');
-            MultiChannelSubscribeInit<T>(ResponseType.Subscribe, arrayChannel, arrayChannelGroup, userCallback, connectCallback, errorCallback);
-        }
 
-        public void SubscribeChannelGroup(string channelGroup, Action<object> userCallback, Action<object> connectCallback, Action<PubnubClientError> errorCallback)
-        {
-            SubscribeChannelGroup<object>(channelGroup, userCallback, connectCallback, errorCallback);
-        }
-        
-        public void SubscribeChannelGroup<T>(string channelGroup, Action<T> userCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback)
-        {
-            if (string.IsNullOrEmpty(channelGroup) || string.IsNullOrEmpty(channelGroup.Trim()))
-            {
-                throw new ArgumentException("Missing Channel Group");
-            }
-            if (userCallback == null)
-            {
-                throw new ArgumentException("Missing userCallback");
-            }
-            if (connectCallback == null)
-            {
-                throw new ArgumentException("Missing connectCallback");
-            }
-            if (errorCallback == null)
-            {
-                throw new ArgumentException("Missing errorCallback");
-            }
-            if (_jsonPluggableLibrary == null)
-            {
-                throw new NullReferenceException("Missing Json Pluggable Library for Pubnub Instance");
-            }
-
-            LoggingMethod.WriteToLog(string.Format("DateTime {0}, requested subscribe for channel group={1}", DateTime.Now.ToString(), channelGroup), LoggingMethod.LevelInfo);
             string[] arrayChannel = new string[] { };
-            string[] arrayChannelGroup = channelGroup.Split(',');
+            string[] arrayChannelGroup = new string[] { };
+
+            if (!string.IsNullOrEmpty(channel) && channel.Trim().Length > 0)
+            {
+                arrayChannel = channel.Trim().Split(',');
+            }
+
+            if (!string.IsNullOrEmpty(channelGroup) && channelGroup.Trim().Length > 0)
+            {
+                arrayChannelGroup = channelGroup.Trim().Split(',');
+            }
             MultiChannelSubscribeInit<T>(ResponseType.Subscribe, arrayChannel, arrayChannelGroup, userCallback, connectCallback, errorCallback);
         }
 
@@ -2654,13 +2627,9 @@ namespace PubNubMessaging.Core
 
         public void Presence<T>(string channel, string channelGroup, Action<T> userCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback)
         {
-            if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()))
+            if ((string.IsNullOrEmpty(channel) || channel.Trim().Length <= 0) && (string.IsNullOrEmpty(channelGroup) || channelGroup.Trim().Length <= 0))
             {
-                throw new ArgumentException("Missing Channel");
-            }
-            if (string.IsNullOrEmpty(channelGroup) || string.IsNullOrEmpty(channelGroup.Trim()))
-            {
-                throw new ArgumentException("Missing Channel Group");
+                throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
             }
             if (userCallback == null)
             {
@@ -2676,38 +2645,18 @@ namespace PubNubMessaging.Core
             }
 
             LoggingMethod.WriteToLog(string.Format("DateTime {0}, requested presence for channel={1} and channel group={2}", DateTime.Now.ToString(), channel, channelGroup), LoggingMethod.LevelInfo);
-            string[] arrayChannel = channel.Split(',');
-            string[] arrayChannelGroup = channelGroup.Split(',');
-            MultiChannelSubscribeInit<T>(ResponseType.Presence, arrayChannel, arrayChannelGroup, userCallback, connectCallback, errorCallback);
-        }
-
-        public void PresenceChannelGroup(string channelGroup, Action<object> userCallback, Action<object> connectCallback, Action<PubnubClientError> errorCallback)
-        {
-            PresenceChannelGroup<object>(channelGroup, userCallback, connectCallback, errorCallback);
-        }
-        
-        public void PresenceChannelGroup<T>(string channelGroup, Action<T> userCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback)
-        {
-            if (string.IsNullOrEmpty(channelGroup) || string.IsNullOrEmpty(channelGroup.Trim()))
-            {
-                throw new ArgumentException("Missing Channel Group");
-            }
-            if (userCallback == null)
-            {
-                throw new ArgumentException("Missing userCallback");
-            }
-            if (errorCallback == null)
-            {
-                throw new ArgumentException("Missing errorCallback");
-            }
-            if (_jsonPluggableLibrary == null)
-            {
-                throw new NullReferenceException("Missing Json Pluggable Library for Pubnub Instance");
-            }
-
-            LoggingMethod.WriteToLog(string.Format("DateTime {0}, requested presence for channel group={1}", DateTime.Now.ToString(), channelGroup), LoggingMethod.LevelInfo);
             string[] arrayChannel = new string[] { };
-            string[] arrayChannelGroup = channelGroup.Split(',');
+            string[] arrayChannelGroup = new string[] { };
+
+            if (!string.IsNullOrEmpty(channel) && channel.Trim().Length > 0)
+            {
+                arrayChannel = channel.Trim().Split(',');
+            }
+
+            if (!string.IsNullOrEmpty(channelGroup) && channelGroup.Trim().Length > 0)
+            {
+                arrayChannelGroup = channelGroup.Trim().Split(',');
+            }
             MultiChannelSubscribeInit<T>(ResponseType.Presence, arrayChannel, arrayChannelGroup, userCallback, connectCallback, errorCallback);
         }
 
@@ -2725,7 +2674,7 @@ namespace PubNubMessaging.Core
                 channelGroupSubscribeOnly = true;
             }
 
-            string channel = string.Join(",", rawChannels);
+            string channel = (rawChannels != null) ? string.Join(",", rawChannels) : "";
             string channelGroup = (rawChannelGroups != null) ? string.Join(",", rawChannelGroups) : "";
 
 			List<string> validChannels = new List<string> ();
