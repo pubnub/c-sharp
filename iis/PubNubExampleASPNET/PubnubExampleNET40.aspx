@@ -278,7 +278,13 @@
                                                 <tr>
                                                     <td colspan="2">
                                                         Channel Name :
-                                                        <asp:TextBox ID="txtChannel" runat="server" Text="my_hello_word" AutoPostBack="false"></asp:TextBox>
+                                                        <asp:TextBox ID="txtChannel" runat="server" Text="my_hello_world" AutoPostBack="false"></asp:TextBox>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2">
+                                                        Channel Group :
+                                                        <asp:TextBox ID="txtChannelGroup" runat="server" Text="my_hello_group" AutoPostBack="false"></asp:TextBox>
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -339,17 +345,17 @@
                                                 </tr>
                                                 <tr>
                                                     <td>
-                                                        <asp:Button ID="btnGrant" runat="server" Text="Grant Access" Width="138px" CommandName="GrantAccess"
+                                                        <asp:Button ID="btnGrant" runat="server" Text="Grant Channel" Width="138px" CommandName="GrantAccess"
                                                             OnCommand="btnGrant_Command" />
                                                     </td>
                                                     <td>
-                                                        <asp:Button ID="btnRevoke" runat="server" Text="RevokeAccess" Width="138px" CommandName="RevokeAccess"
+                                                        <asp:Button ID="btnRevoke" runat="server" Text="Revoke Channel" Width="138px" CommandName="RevokeAccess"
                                                             OnCommand="btnRevoke_Command" />
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td>
-                                                        <asp:Button ID="btnAudit" runat="server" Text="Audit Access" Width="138px" CommandName="AuditAccess"
+                                                        <asp:Button ID="btnAudit" runat="server" Text="Audit Channnel" Width="138px" CommandName="AuditAccess"
                                                             OnCommand="btnAudit_Command" />
                                                     </td>
                                                     <td>
@@ -385,6 +391,15 @@
                                                     <td>
                                                         <asp:Button ID="btnGetUserState" runat="server" Text="Get User State" Width="138px"
                                                             CommandName="GetUserState" OnCommand="btnGetUserState_Command" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <asp:Button ID="btnChannelGroup" runat="server" Text="Channel Group" Width="138px" CommandName="ChannelGroup"
+                                                            OnCommand="btnChannelGroup_Command" />
+                                                    </td>
+                                                    <td>
+                                                        
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -535,7 +550,54 @@
                                                         </asp:Panel>
                                                     </td>
                                                 </tr>
+                                                <tr>
+                                                    <td colspan="2">
+                                                        <asp:ModalPopupExtender ID="channelGroupPopupExtender" runat="server" TargetControlID="btnChannelGroup"
+                                                            PopupDragHandleControlID="channelGroupPopup" Drag="true" PopupControlID="popupPanelChannelGroup"
+                                                            CancelControlID="btnCancelChannelGroup" BackgroundCssClass="ModalPopupBG">
+                                                        </asp:ModalPopupExtender>
+                                                        <asp:Panel ID="popupPanelChannelGroup" runat="server" Style="display: none">
+                                                            <div class="publishPopup">
+                                                                <div class="PopupHeader" id="channelGroupPopup">
+                                                                    ChannelGroup: Get/Add/Remove channels</div>
+                                                                <div class="PopupBody">
+                                                                    <p>
+                                                                        Channel Group Name:
+                                                                        <br />
+                                                                        <asp:TextBox ID="txtChannelGroupName" Text="my_hello_group" Width="300px" runat="server"></asp:TextBox>
+                                                                    </p>
+                                                                    <p>
+                                                                        <asp:RadioButton ID="radChannelGroupGet" GroupName="gChannelGroup" Text="Get Channel List" runat="server"/><br />
+                                                                    </p>
+                                                                    <p>
+                                                                        <asp:RadioButton ID="radChannelGroupGrant" GroupName="gChannelGroup" Text="PAM Grant" runat="server"/><br />
+                                                                    </p>
+                                                                    <p>
+                                                                        <asp:RadioButton ID="radChannelGroupAudit" GroupName="gChannelGroup" Text="PAM Audit" runat="server"/><br />
+                                                                    </p>
+                                                                    <p>
+                                                                        <asp:RadioButton ID="radChannelGroupRevoke" GroupName="gChannelGroup" Text="PAM Revoke" runat="server"/><br />
+                                                                    </p>
+                                                                    <p>
+                                                                        <asp:RadioButton ID="radChannelGroupAdd" GroupName="gChannelGroup" Text="Add Channel [for multiple channels use comma delimiter]" runat="server"/><br />
+                                                                        Channel(s):
+                                                                        <asp:TextBox ID="txtChannelGroupAddChannels" Text="" Width="300px" runat="server"></asp:TextBox><br />
+                                                                    </p>
+                                                                    <p>
+                                                                        <asp:RadioButton ID="radChannelGroupRemove" GroupName="gChannelGroup" Text="Remove Channel[for multiple channels use comma delimiter]" runat="server"/><br />
+                                                                        Channel(s):
+                                                                        <asp:TextBox ID="txtChannelGroupRemoveChannels" Text="" Width="300px" runat="server"></asp:TextBox><br />
+                                                                    </p>
+                                                                </div>
+                                                                <div class="PopupControls">
+                                                                    <asp:Button ID="btnOkayChannelGroup" Text="Submit" runat="server" OnClick="btnOkayChannelGroup_OnClick" />
+                                                                    <input id="btnCancelChannelGroup" type="button" value="Cancel" />
+                                                                </div>
 
+                                                            </div>
+                                                        </asp:Panel>
+                                                    </td>
+                                                </tr>
                                             </table>
                                         </td>
                                     </tr>
