@@ -1,4 +1,4 @@
-﻿//Build Date: December 23, 2014
+﻿//Build Date: January 13, 2015
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -950,7 +950,7 @@ namespace PubNubMessaging.Core
 						}
 					}
 				}
-                if (state.ChannelGroups != null && state.ChannelGroups.Length > 0)
+                if (state.ChannelGroups != null && state.ChannelGroups.Length > 0 && state.ChannelGroups[0] != null)
                 {
                     string activeChannelGroup = state.ChannelGroups[0].ToString(); //Assuming one channel exist, else will refactor later
                     PubnubChannelGroupCallbackKey callbackKey = new PubnubChannelGroupCallbackKey();
