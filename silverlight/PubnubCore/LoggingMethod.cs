@@ -109,6 +109,7 @@ namespace PubNubMessaging.Core
 		PubnubMessageSource _messageSource;
 		string _message = "";
 		string _channel = "";
+        string _channelGroup = "";
 		Exception _detailedDotNetException = null;
 		PubnubWebRequest _pubnubWebRequest = null;
 		PubnubWebResponse _pubnubWebResponse = null;
@@ -119,7 +120,7 @@ namespace PubNubMessaging.Core
 		{
 		}
 
-		public PubnubClientError(int statusCode, PubnubErrorSeverity errorSeverity, bool isDotNetException, string message, Exception detailedDotNetException, PubnubMessageSource source, PubnubWebRequest pubnubWebRequest, PubnubWebResponse pubnubWebResponse, string description, string channel)
+		public PubnubClientError(int statusCode, PubnubErrorSeverity errorSeverity, bool isDotNetException, string message, Exception detailedDotNetException, PubnubMessageSource source, PubnubWebRequest pubnubWebRequest, PubnubWebResponse pubnubWebResponse, string description, string channel, string channelGroup)
 		{
 			_dateTimeGMT = DateTime.Now.ToUniversalTime();
 			_statusCode = statusCode;
@@ -128,13 +129,14 @@ namespace PubNubMessaging.Core
 			_errorSeverity = errorSeverity;
 			_messageSource = source;
 			_channel = channel;
+            _channelGroup = channelGroup;
 			_detailedDotNetException = detailedDotNetException;
 			_pubnubWebRequest = pubnubWebRequest;
 			_pubnubWebResponse = pubnubWebResponse;
 			_description = description;
 		}
 
-		public PubnubClientError(int statusCode, PubnubErrorSeverity errorSeverity, string message, PubnubMessageSource source, PubnubWebRequest pubnubWebRequest, PubnubWebResponse pubnubWebResponse, string description, string channel)
+		public PubnubClientError(int statusCode, PubnubErrorSeverity errorSeverity, string message, PubnubMessageSource source, PubnubWebRequest pubnubWebRequest, PubnubWebResponse pubnubWebResponse, string description, string channel, string channelGroup)
 		{
 			_dateTimeGMT = DateTime.Now.ToUniversalTime();
 			_statusCode = statusCode;
@@ -143,6 +145,7 @@ namespace PubNubMessaging.Core
 			_errorSeverity = errorSeverity;
 			_messageSource = source;
 			_channel = channel;
+            _channel = channelGroup;
 			_detailedDotNetException = null;
 			_pubnubWebRequest = pubnubWebRequest;
 			_pubnubWebResponse = pubnubWebResponse;
@@ -221,6 +224,14 @@ namespace PubNubMessaging.Core
 			}
 		}
 
+        public string ChannelGroup
+        {
+            get
+            {
+                return _channelGroup;
+            }
+        }
+
 		public string Description
 		{
 			get
@@ -256,9 +267,11 @@ namespace PubNubMessaging.Core
 			errorBuilder.AppendLine();
 			errorBuilder.AppendFormat("PubnubWebResponse={0} ", (_pubnubWebResponse != null) ? _pubnubWebResponse.ToString() : "");
 			errorBuilder.AppendLine();
-			errorBuilder.AppendFormat("Channel={0} ", _channel);
+			errorBuilder.AppendFormat("Channel={0} ", (_channel != null) ? _channel : "");
 			errorBuilder.AppendLine();
-			errorBuilder.AppendFormat("Description={0} ", _description);
+            errorBuilder.AppendFormat("ChannelGroup={0} ", (_channelGroup != null) ? _channelGroup : "");
+            errorBuilder.AppendLine();
+            errorBuilder.AppendFormat("Description={0} ", _description);
 			errorBuilder.AppendLine();
 			errorBuilder.AppendFormat("ErrorDateTimeGMT={0} ", _dateTimeGMT);
 			errorBuilder.AppendLine();
@@ -334,6 +347,9 @@ namespace PubNubMessaging.Core
 				case WebExceptionStatus.ServerProtocolViolation:
 				ret = PubnubErrorCode.ServerProtocolViolation;
 				break;
+                case WebExceptionStatus.ReceiveFailure:
+                ret = PubnubErrorCode.ReceiveFailure;
+                break;
                 #endif
                 case WebExceptionStatus.RequestCanceled:
 				ret = PubnubErrorCode.WebRequestCanceled;
@@ -442,9 +458,13 @@ namespace PubNubMessaging.Core
                 {
                     ret = PubnubErrorCode.InvalidTypeArgument;
                 }
+                else if (httpErrorCodeMessage.ToUpper() == "CHANNEL GROUP OR GROUPS RESULT IN EMPTY SUBSCRIPTION SET")
+                {
+                    ret = PubnubErrorCode.EmptyGroupSubscription;
+                }
 				break;
 				case 401:
-				ret = PubnubErrorCode.InvalidSubscribeKey;
+				    ret = PubnubErrorCode.InvalidSubscribeKey;
 				break;
 				case 402:
 				if (httpErrorCodeMessage.ToUpper() == "NOT ENABLED")
@@ -529,6 +549,9 @@ namespace PubNubMessaging.Core
         PAMAccessOperationTimeout = 135,
         UserStateUnchanged = 136,
         PushNotificationTimeout = 137,
+        ChannelGroupTimeout = 138,
+        DuplicateChannelGroup = 139,
+        ReceiveFailure = 140,
 
 		MessageTooLarge = 4000,
 		BadRequest = 4001,
@@ -536,6 +559,7 @@ namespace PubNubMessaging.Core
         NoUuidSpecified = 4003,
         InvalidTimestamp = 4004,
         InvalidTypeArgument = 4005,
+        EmptyGroupSubscription = 4006,
 		InvalidSubscribeKey = 4010,
 		PamNotEnabled = 4020,
 		Forbidden = 4030,
@@ -561,6 +585,7 @@ namespace PubNubMessaging.Core
             dictionaryCodes.Add(4003, "No UUID specified. Please ensure that UUID is being passed to server for heartbeat");
             dictionaryCodes.Add(4004, "Invalid Timestamp. Please try again. If the issue continues, please contact PubNub support");
             dictionaryCodes.Add(4005, "Invalid Key. Please verify your pub and sub keys");
+            dictionaryCodes.Add(4006, "Channel group or groups result in empty subscription set. Please ensure that channels are added to the channel group before subscribe.");
 			dictionaryCodes.Add(4010, "Please provide a valid subscribe key");
 			dictionaryCodes.Add(4020, "PAM is not enabled for this keyset. Please contact PubNub support for instructions on enabling PAM.");
 			dictionaryCodes.Add(4030, "Not authorized. Please ensure that the channel has the correct PAM permission, your authentication key is set correctly, then try again via unsub and re-sub. For further assistance, contact PubNub support.");
@@ -608,6 +633,9 @@ namespace PubNubMessaging.Core
             dictionaryCodes.Add(135, "Timeout occured while running PAM operations. Please try again. If it continues, please contact PubNub support");
             dictionaryCodes.Add(136, "User State Unchanged");
             dictionaryCodes.Add(137, "Timeout occured while registering device for push notifications. Please try again. If it continues, please contact PubNub support");
+            dictionaryCodes.Add(138, "Timeout occured while performing operation related to channel group. Please try again. If it continues, please contact PubNub support");
+            dictionaryCodes.Add(139, "Duplicate channel group subscription is not allowed. Internally Pubnub API removes the duplicates before processing");
+            dictionaryCodes.Add(140, "WebExcepton. The underlying connection was closed: An unexpected error occurred on a receive. If it continues, please contact PubNub support");
 			dictionaryCodes.Add(0, "Undocumented error. Please contact PubNub support with full error object details for further investigation");
 		}
 

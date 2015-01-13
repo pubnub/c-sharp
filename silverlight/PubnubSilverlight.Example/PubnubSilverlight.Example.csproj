@@ -87,6 +87,9 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\ChannelGroupDialog.xaml.cs">
+      <DependentUpon>ChannelGroupDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\ChangeUUIDDialog.xaml.cs">
       <DependentUpon>ChangeUUIDDialog.xaml</DependentUpon>
     </Compile>
@@ -126,6 +129,10 @@
     <None Include="Properties\AppManifest.xml" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Dialogs\ChannelGroupDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\ChangeUUIDDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

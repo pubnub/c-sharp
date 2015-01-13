@@ -27,6 +27,7 @@ namespace PubnubSilverlight
         static public Pubnub pubnub = null;
 
         static public string channel = "";
+        static public string channelGroup = "";
         static bool ssl = false;
         static string subscribeKey = "";
         static string publishKey = "";
@@ -129,12 +130,21 @@ namespace PubnubSilverlight
         {
             CheckUserInputs();
             channel = txtChannel.Text;
+            channelGroup = txtChannelGroup.Text.Trim();
             if (authKey.Trim() != "")
             {
                 pubnub.AuthenticationKey = authKey;
             }
             Console.WriteLine("Running subscribe()");
-            pubnub.Subscribe<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayErrorMessage);
+            if (channelGroup == "")
+            {
+                pubnub.Subscribe<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayErrorMessage);
+            }
+            else
+            {
+                pubnub.Subscribe<string>(channel, channelGroup, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayErrorMessage);
+            }
+
         }
 
         private void Publish_Click(object sender, RoutedEventArgs e)
@@ -225,12 +235,21 @@ namespace PubnubSilverlight
         {
             CheckUserInputs();
             channel = txtChannel.Text;
+            channelGroup = txtChannelGroup.Text.Trim();
             if (authKey.Trim() != "")
             {
                 pubnub.AuthenticationKey = authKey;
             }
             Console.WriteLine("Running presence()");
-            pubnub.Presence<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayErrorMessage);
+            if (channelGroup == "")
+            {
+                pubnub.Presence<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayErrorMessage);
+            }
+            else
+            {
+                pubnub.Presence<string>(channel, channelGroup, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayErrorMessage);
+            }
+
         }
 
         private void History_Click(object sender, RoutedEventArgs e)
@@ -285,24 +304,40 @@ namespace PubnubSilverlight
         {
             CheckUserInputs();
             channel = txtChannel.Text;
+            channelGroup = txtChannelGroup.Text.Trim();
             if (authKey.Trim() != "")
             {
                 pubnub.AuthenticationKey = authKey;
             }
             Console.WriteLine("Running unsubscribe()");
-            pubnub.Unsubscribe<string>(channel, DisplayUserCallbackMessage, DisplayUserCallbackMessage, DisplayDisconnectCallbackMessage, DisplayErrorMessage);
+            if (channelGroup == "")
+            {
+                pubnub.Unsubscribe<string>(channel, DisplayUserCallbackMessage, DisplayUserCallbackMessage, DisplayDisconnectCallbackMessage, DisplayErrorMessage);
+            }
+            else
+            {
+                pubnub.Unsubscribe<string>(channel, channelGroup, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayDisconnectCallbackMessage, DisplayErrorMessage);
+            }
         }
 
         private void PresenceUnsubscrib_Click(object sender, RoutedEventArgs e)
         {
             CheckUserInputs();
             channel = txtChannel.Text;
+            channelGroup = txtChannelGroup.Text.Trim();
             if (authKey.Trim() != "")
             {
                 pubnub.AuthenticationKey = authKey;
             }
             Console.WriteLine("Running presence-unsubscribe()");
-            pubnub.PresenceUnsubscribe<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayDisconnectCallbackMessage, DisplayErrorMessage);
+            if (channelGroup == "")
+            {
+                pubnub.PresenceUnsubscribe<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayDisconnectCallbackMessage, DisplayErrorMessage);
+            }
+            else
+            {
+                pubnub.PresenceUnsubscribe<string>(channel, channelGroup, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayDisconnectCallbackMessage, DisplayErrorMessage);
+            }
         }
 
         private void Time_Click(object sender, RoutedEventArgs e)
@@ -429,6 +464,7 @@ namespace PubnubSilverlight
         {
             CheckUserInputs();
             channel = txtChannel.Text;
+            channelGroup = txtChannelGroup.Text.Trim();
 
             if (authKey.Trim() != "")
             {
@@ -505,6 +541,62 @@ namespace PubnubSilverlight
                     txtUUID.Text = uuid = newUUID;
                 }
             };
+        }
+
+        private void btnChannelGroup_Click(object sender, RoutedEventArgs e)
+        {
+            CheckUserInputs();
+            channelGroup = txtChannelGroup.Text.Trim();
+
+            if (authKey.Trim() != "")
+            {
+                pubnub.AuthenticationKey = authKey;
+            }
+
+            ChannelGroupDialog channelGroupPopup = new ChannelGroupDialog();
+            channelGroupPopup.txtChannelGroupName.Text = channelGroup;
+            channelGroupPopup.Show();
+
+            channelGroupPopup.Closed += (obj, args) =>
+            {
+                if (channelGroupPopup.DialogResult == true)
+                {
+                    string userChannelGroupName = channelGroupPopup.txtChannelGroupName.Text.Trim();
+                    if (channelGroupPopup.radChannelGroupGet.IsChecked.Value)
+                    {
+                        Console.WriteLine("Running GetChannelsForChannelGroup()");
+                        pubnub.GetChannelsForChannelGroup<string>(userChannelGroupName, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    }
+                    else if (channelGroupPopup.radChannelGroupAdd.IsChecked.Value)
+                    {
+                        Console.WriteLine("Running AddChannelsToChannelGroup()");
+                        string userChannelGroupAddChannel = channelGroupPopup.txtChannelGroupAddChannels.Text;
+                        pubnub.AddChannelsToChannelGroup<string>(new string[] { userChannelGroupAddChannel }, userChannelGroupName, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    }
+                    else if (channelGroupPopup.radChannelGroupRemove.IsChecked.Value)
+                    {
+                        Console.WriteLine("Running RemoveChannelsFromChannelGroup()");
+                        string userChannelGroupRemoveChannel = channelGroupPopup.txtChannelGroupRemoveChannels.Text;
+                        pubnub.RemoveChannelsFromChannelGroup<string>(new string[] { userChannelGroupRemoveChannel }, userChannelGroupName, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    }
+                    else if (channelGroupPopup.radChannelGroupGrant.IsChecked.Value)
+                    {
+                        Console.WriteLine("Running ChannelGroupGrantAccess()");
+                        pubnub.ChannelGroupGrantAccess<string>(userChannelGroupName, true, true, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    }
+                    else if (channelGroupPopup.radChannelGroupAudit.IsChecked.Value)
+                    {
+                        Console.WriteLine("Running ChannelGroupAuditAccess()");
+                        pubnub.ChannelGroupAuditAccess<string>(userChannelGroupName, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    }
+                    else if (channelGroupPopup.radChannelGroupRevoke.IsChecked.Value)
+                    {
+                        Console.WriteLine("Running ChannelGroupRevokeAccess()");
+                        pubnub.ChannelGroupGrantAccess<string>(userChannelGroupName, false, false, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    }
+                }
+            };
+
         }
 
         static void DisplayUserCallbackMessage(string result)
