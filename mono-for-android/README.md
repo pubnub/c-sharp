@@ -117,7 +117,7 @@ pubnub.SetUserState<string>(channel="mychannel", uuid="myuuid", jsonUserState='{
 // NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
 
-### Get the state of the user on this channel (SetUserState)
+### Get the state of the user on this channel (GetUserState)
 
 ```c#
 pubnub.GetUserState<string>(channel="mychannel", DisplayReturnMessage, DisplayErrorMessage);
@@ -235,7 +235,7 @@ private static void DisplayReturnMessage(string publishResult)
 
       if (statusCode == 1 && statusMessage.ToLower() == "sent")
       {
-        Display("Cool. Messaage Published");
+        Display("Cool. Message Published");
       }
       else
       {
