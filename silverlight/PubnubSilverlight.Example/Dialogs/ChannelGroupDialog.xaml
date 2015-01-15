@@ -17,9 +17,12 @@
             </StackPanel>
             <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5,5,10,5" Name="spnlSingleChoice">
                 <RadioButton x:Name="radChannelGroupGet" FontSize="14" GroupName="gChannelGroup" IsChecked="True" >Get Channel List</RadioButton>
-                <RadioButton x:Name="radChannelGroupGrant" FontSize="14" GroupName="gChannelGroup" >PAM Grant</RadioButton>
-                <RadioButton x:Name="radChannelGroupAudit" FontSize="14" GroupName="gChannelGroup" >PAM Audit</RadioButton>
-                <RadioButton x:Name="radChannelGroupRevoke" FontSize="14" GroupName="gChannelGroup" >PAM Revoke</RadioButton>
+                <RadioButton x:Name="radChannelGroupGrant" FontSize="14" GroupName="gChannelGroup" >PAM  ChannelGroup Grant</RadioButton>
+                <RadioButton x:Name="radChannelGroupAudit" FontSize="14" GroupName="gChannelGroup" >PAM  ChannelGroup Audit</RadioButton>
+                <RadioButton x:Name="radChannelGroupRevoke" FontSize="14" GroupName="gChannelGroup" >PAM  ChannelGroup Revoke</RadioButton>
+                <RadioButton x:Name="radPresenceChannelGroupGrant" FontSize="14" GroupName="gChannelGroup" >PAM ChannelGroup Presence Grant</RadioButton>
+                <RadioButton x:Name="radPresenceChannelGroupAudit" FontSize="14" GroupName="gChannelGroup" >PAM ChannelGroup Presence Audit</RadioButton>
+                <RadioButton x:Name="radPresenceChannelGroupRevoke" FontSize="14" GroupName="gChannelGroup" >PAM ChannelGroup Presence Revoke</RadioButton>
             </StackPanel>
             <StackPanel Orientation="Vertical" Margin="5,5,10,5" Name="spnlCgAdd" HorizontalAlignment="Stretch" VerticalAlignment="Top">
                 <RadioButton x:Name="radChannelGroupAdd" FontSize="14" GroupName="gChannelGroup" >Add Channel [for multiple channels use comma delimiter]</RadioButton>

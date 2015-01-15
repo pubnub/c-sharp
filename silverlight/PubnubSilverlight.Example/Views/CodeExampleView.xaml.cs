@@ -594,6 +594,23 @@ namespace PubnubSilverlight
                         Console.WriteLine("Running ChannelGroupRevokeAccess()");
                         pubnub.ChannelGroupGrantAccess<string>(userChannelGroupName, false, false, DisplayUserCallbackMessage, DisplayErrorMessage);
                     }
+
+                    else if (channelGroupPopup.radPresenceChannelGroupGrant.IsChecked.Value)
+                    {
+                        Console.WriteLine("Running ChannelGroupGrantPresenceAccess()");
+                        pubnub.ChannelGroupGrantPresenceAccess<string>(userChannelGroupName, true, true, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    }
+                    else if (channelGroupPopup.radPresenceChannelGroupAudit.IsChecked.Value)
+                    {
+                        Console.WriteLine("Running ChannelGroupAuditPresenceAccess()");
+                        pubnub.ChannelGroupAuditPresenceAccess<string>(userChannelGroupName, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    }
+                    else if (channelGroupPopup.radPresenceChannelGroupRevoke.IsChecked.Value)
+                    {
+                        Console.WriteLine("Running ChannelGroup Revoke PresenceAccess()");
+                        pubnub.ChannelGroupGrantPresenceAccess<string>(userChannelGroupName, false, false, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    }
+                
                 }
             };
 
