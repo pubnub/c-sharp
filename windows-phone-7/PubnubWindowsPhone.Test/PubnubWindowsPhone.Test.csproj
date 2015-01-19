@@ -90,6 +90,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="UnitTest\WhenAuditIsRequested.cs" />
+    <Compile Include="UnitTest\WhenChannelGroupIsRequested.cs" />
     <Compile Include="UnitTest\WhenDetailedHistoryIsRequested.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -98,6 +99,8 @@
     <Compile Include="UnitTest\WhenSubscribedToAChannel.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="UnitTest\WhenSubscribedToAChannelGroup.cs" />
+    <Compile Include="UnitTest\WhenUnsubscribedToAChannelGroup.cs" />
     <Compile Include="WhenPushIsRequested.cs" />
   </ItemGroup>
   <ItemGroup>

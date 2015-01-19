@@ -68,6 +68,7 @@
     <Compile Include="ChangeUUIDUserControl.xaml.cs">
       <DependentUpon>ChangeUUIDUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ChannelGroupUserControl.xaml.cs" />
     <Compile Include="ClientNetworkStatus.cs" />
     <Compile Include="HereNowOptionsUserControl.xaml.cs">
       <DependentUpon>HereNowOptionsUserControl.xaml</DependentUpon>
@@ -78,6 +79,8 @@
     <Compile Include="PAMAuthKeyUserControl.xaml.cs">
       <DependentUpon>PAMAuthKeyUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PAMChannelGroupUserControl.xaml.cs" />
+    <Compile Include="PAMChannelUserControl.xaml.cs" />
     <Compile Include="Pubnub.cs" />
     <Compile Include="PubnubCore.cs" />
     <Compile Include="PubnubDemoStart.xaml.cs">
@@ -114,11 +117,23 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="ChannelGroupUserControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="HereNowOptionsUserControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="PAMAuthKeyUserControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PAMChannelGroupUserControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PAMChannelUserControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
