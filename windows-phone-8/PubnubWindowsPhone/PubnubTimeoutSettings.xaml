@@ -53,11 +53,11 @@
             </StackPanel>
             <StackPanel Height="65" HorizontalAlignment="Stretch" Margin="20,430,19,0" Name="spnlInput7" Orientation="Horizontal" VerticalAlignment="Top">
                 <TextBlock Name="lblPresenceHeartbeat" Text="Presence Heartbeat (in sec)" VerticalAlignment="Center" TextWrapping="NoWrap" Width="330" />
-                <TextBox Name="txtPresenceHeartbeat" Text="59" Width="91" />
+                <TextBox Name="txtPresenceHeartbeat" Text="" Width="91" />
             </StackPanel>
             <StackPanel Height="65" HorizontalAlignment="Stretch" Margin="20,480,19,0" Name="spnlInput8" Orientation="Horizontal" VerticalAlignment="Top">
                 <TextBlock Name="lblPresenceHeartbeatInterval" Text="Presence Heartbeat Interval (in sec)" VerticalAlignment="Center" TextWrapping="NoWrap" Width="330" />
-                <TextBox Name="txtPresenceHeartbeatInterval" Text="50" Width="91" />
+                <TextBox Name="txtPresenceHeartbeatInterval" Text="" Width="91" />
             </StackPanel>
             <StackPanel Height="65" HorizontalAlignment="Stretch" Margin="20,500,19,0" Name="spnlInput9" Orientation="Horizontal" VerticalAlignment="Top">
                 
