@@ -70,7 +70,7 @@ namespace PubnubWindowsStore.Test
         {
 
         }
-
+    
         [Test]
         public void ThenPresenceShouldReturnReceivedMessage()
         {
@@ -82,12 +82,12 @@ namespace PubnubWindowsStore.Test
             unitTest.TestClassName = "WhenAClientIsPresented";
             unitTest.TestCaseName = "ThenPresenceShouldReturnReceivedMessage";
             pubnub.PubnubUnitTest = unitTest;
-
+            
             string channel = "hello_my_channel";
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             pubnub.Presence<string>(channel, ThenPresenceShouldReturnMessage, PresenceDummyMethodForConnectCallback, DummyErrorCallback);
             Task.Delay(1000);
-
+            
             //since presence expects from stimulus from sub/unsub...
             pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
             Task.Delay(1000);
@@ -99,10 +99,11 @@ namespace PubnubWindowsStore.Test
                 Task.Delay(1000);
                 unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
             }
+
             presenceManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests();
-
+            
             Assert.IsTrue(receivedPresenceMessage, "Presence message not received");
         }
 
@@ -122,7 +123,7 @@ namespace PubnubWindowsStore.Test
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             pubnub.Presence<string>(channel, ThenPresenceWithCustomUUIDShouldReturnMessage, PresenceUUIDDummyMethodForConnectCallback, DummyErrorCallback);
             Task.Delay(1000);
-
+            
             //since presence expects from stimulus from sub/unsub...
             pubnub.SessionUUID = customUUID;
             pubnub.Subscribe<string>(channel, DummyMethodForSubscribeUUID, SubscribeUUIDDummyMethodForConnectCallback, DummyErrorCallback);
@@ -135,6 +136,7 @@ namespace PubnubWindowsStore.Test
                 Task.Delay(1000);
                 unsubscribeUUIDManualEvent.WaitOne(manualResetEventsWaitTimeout);
             }
+
             presenceUUIDManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests();
@@ -210,7 +212,7 @@ namespace PubnubWindowsStore.Test
                 grantManualEvent.Set();
             }
         }
-
+        
         void ThenPresenceShouldReturnMessage(string receivedMessage)
         {
             try
@@ -237,6 +239,7 @@ namespace PubnubWindowsStore.Test
         {
             try
             {
+                //Console.WriteLine("ThenPresenceWithCustomUUIDShouldReturnMessage -> result = " + receivedMessage);
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
                     object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
@@ -338,12 +341,12 @@ namespace PubnubWindowsStore.Test
                     JContainer dictionary = serializedMessage[0] as JContainer;
                     if (dictionary != null)
                     {
-                        var uuid = dictionary["uuid"].ToString();
-                        if (uuid != null)
-                        {
-                            receivedPresenceMessage = true;
-                        }
+                    var uuid = dictionary["uuid"].ToString();
+                    if (uuid != null)
+                    {
+                        receivedPresenceMessage = true;
                     }
+                        }
                 }
             }
             catch { }
