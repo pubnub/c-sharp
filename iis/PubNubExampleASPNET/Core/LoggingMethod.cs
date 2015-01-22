@@ -462,6 +462,10 @@ namespace PubNubMessaging.Core
                 {
                     ret = PubnubErrorCode.EmptyGroupSubscription;
                 }
+                else if (httpErrorCodeMessage.ToUpper() == "COULD NOT PARSE REQUEST")
+                {
+                    ret = PubnubErrorCode.CouldNotParseRequest;
+                }
 				break;
 				case 401:
 				    ret = PubnubErrorCode.InvalidSubscribeKey;
@@ -560,6 +564,7 @@ namespace PubNubMessaging.Core
         InvalidTimestamp = 4004,
         InvalidTypeArgument = 4005,
         EmptyGroupSubscription = 4006,
+        CouldNotParseRequest = 4007,
 		InvalidSubscribeKey = 4010,
 		PamNotEnabled = 4020,
 		Forbidden = 4030,
@@ -586,6 +591,7 @@ namespace PubNubMessaging.Core
             dictionaryCodes.Add(4004, "Invalid Timestamp. Please try again. If the issue continues, please contact PubNub support");
             dictionaryCodes.Add(4005, "Invalid Key. Please verify your pub and sub keys");
             dictionaryCodes.Add(4006, "Channel group or groups result in empty subscription set. Please ensure that channels are added to the channel group before subscribe.");
+            dictionaryCodes.Add(4007, "Invalid Key. Please verify your pub/sub/secret/cipher keys");
 			dictionaryCodes.Add(4010, "Please provide a valid subscribe key");
 			dictionaryCodes.Add(4020, "PAM is not enabled for this keyset. Please contact PubNub support for instructions on enabling PAM.");
 			dictionaryCodes.Add(4030, "Not authorized. Please ensure that the channel has the correct PAM permission, your authentication key is set correctly, then try again via unsub and re-sub. For further assistance, contact PubNub support.");
