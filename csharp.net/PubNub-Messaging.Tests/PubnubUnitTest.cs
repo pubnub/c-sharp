@@ -228,6 +228,13 @@ namespace PubNubMessaging.Tests
             return data;
         }
 
+        private Dictionary<string, string> LoadWhenDetailedHistoryIsRequestedDetailHistoryWithNullKeysReturnsError()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/v2/history/sub-key//channel/hello_my_channel", "{\"status\":400,\"message\":\"Could Not Parse Request\",\"service\":\"Access Manager\",\"error\":true}");
+            return data;
+        }
+
         private Dictionary<string, string> LoadWhenGetRequestServerTimeThenItShouldReturnTimeStamp()
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
@@ -718,6 +725,9 @@ namespace PubNubMessaging.Tests
                             break;
                         case "DetailedHistoryStartWithReverseTrue":
                             responseDictionary = LoadWhenDetailedHistoryIsRequestedDetailedHistoryStartWithReverseTrue();
+                            break;
+                        case "DetailHistoryWithNullKeysReturnsError":
+                            responseDictionary = LoadWhenDetailedHistoryIsRequestedDetailHistoryWithNullKeysReturnsError();
                             break;
                         default:
                             break;
