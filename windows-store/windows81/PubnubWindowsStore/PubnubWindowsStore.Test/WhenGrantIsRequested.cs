@@ -30,7 +30,6 @@ namespace PubnubWindowsStore.Test
             currentUnitTestCase = "ThenSubKeyLevelWithReadWriteShouldReturnSuccess";
 
             receivedGrantMessage = false;
-            grantManualEvent = new ManualResetEvent(false);
 
             Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
@@ -40,6 +39,7 @@ namespace PubnubWindowsStore.Test
             pubnub.PubnubUnitTest = unitTest;
             if (PubnubCommon.PAMEnabled)
             {
+                grantManualEvent = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>("", true, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
                 Task.Delay(1000);
 
@@ -59,7 +59,6 @@ namespace PubnubWindowsStore.Test
             currentUnitTestCase = "ThenSubKeyLevelWithReadShouldReturnSuccess";
 
             receivedGrantMessage = false;
-            grantManualEvent = new ManualResetEvent(false);
 
             Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
@@ -69,6 +68,7 @@ namespace PubnubWindowsStore.Test
             pubnub.PubnubUnitTest = unitTest;
             if (PubnubCommon.PAMEnabled)
             {
+                grantManualEvent = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>("", true, false, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
                 Task.Delay(1000);
 
@@ -88,7 +88,6 @@ namespace PubnubWindowsStore.Test
             currentUnitTestCase = "ThenSubKeyLevelWithWriteShouldReturnSuccess";
 
             receivedGrantMessage = false;
-            grantManualEvent = new ManualResetEvent(false);
 
             Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
@@ -98,6 +97,7 @@ namespace PubnubWindowsStore.Test
             pubnub.PubnubUnitTest = unitTest;
             if (PubnubCommon.PAMEnabled)
             {
+                grantManualEvent = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>("", false, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
                 Task.Delay(1000);
 
@@ -117,7 +117,6 @@ namespace PubnubWindowsStore.Test
             currentUnitTestCase = "ThenChannelLevelWithReadWriteShouldReturnSuccess";
 
             receivedGrantMessage = false;
-            grantManualEvent = new ManualResetEvent(false);
 
             Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
@@ -129,6 +128,7 @@ namespace PubnubWindowsStore.Test
             string channel = "hello_my_channel";
             if (PubnubCommon.PAMEnabled)
             {
+                grantManualEvent = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>(channel, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
                 Task.Delay(1000);
 
@@ -148,7 +148,6 @@ namespace PubnubWindowsStore.Test
             currentUnitTestCase = "ThenChannelLevelWithReadShouldReturnSuccess";
 
             receivedGrantMessage = false;
-            grantManualEvent = new ManualResetEvent(false);
 
             Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
@@ -160,6 +159,7 @@ namespace PubnubWindowsStore.Test
             string channel = "hello_my_channel";
             if (PubnubCommon.PAMEnabled)
             {
+                grantManualEvent = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>(channel, true, false, 5, AccessToChannelLevelCallback, DummyErrorCallback);
                 Task.Delay(1000);
 
@@ -179,7 +179,6 @@ namespace PubnubWindowsStore.Test
             currentUnitTestCase = "ThenChannelLevelWithWriteShouldReturnSuccess";
 
             receivedGrantMessage = false;
-            grantManualEvent = new ManualResetEvent(false);
 
             Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
@@ -191,6 +190,7 @@ namespace PubnubWindowsStore.Test
             string channel = "hello_my_channel";
             if (PubnubCommon.PAMEnabled)
             {
+                grantManualEvent = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>(channel, false, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
                 Task.Delay(1000);
 
@@ -210,7 +210,6 @@ namespace PubnubWindowsStore.Test
             currentUnitTestCase = "ThenUserLevelWithReadWriteShouldReturnSuccess";
 
             receivedGrantMessage = false;
-            grantManualEvent = new ManualResetEvent(false);
 
             Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
@@ -223,6 +222,7 @@ namespace PubnubWindowsStore.Test
             string authKey = "hello_my_authkey";
             if (PubnubCommon.PAMEnabled)
             {
+                grantManualEvent = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>(channel, authKey, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
                 Task.Delay(1000);
 
@@ -242,7 +242,6 @@ namespace PubnubWindowsStore.Test
             currentUnitTestCase = "ThenUserLevelWithReadShouldReturnSuccess";
 
             receivedGrantMessage = false;
-            grantManualEvent = new ManualResetEvent(false);
 
             Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
@@ -255,6 +254,7 @@ namespace PubnubWindowsStore.Test
             string authKey = "hello_my_authkey";
             if (PubnubCommon.PAMEnabled)
             {
+                grantManualEvent = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>(channel, authKey, true, false, 5, AccessToUserLevelCallback, DummyErrorCallback);
                 Task.Delay(1000);
 
@@ -274,7 +274,6 @@ namespace PubnubWindowsStore.Test
             currentUnitTestCase = "ThenUserLevelWithWriteShouldReturnSuccess";
 
             receivedGrantMessage = false;
-            grantManualEvent = new ManualResetEvent(false);
 
             Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
@@ -287,6 +286,7 @@ namespace PubnubWindowsStore.Test
             string authKey = "hello_my_authkey";
             if (PubnubCommon.PAMEnabled)
             {
+                grantManualEvent = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>(channel, authKey, false, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
                 Task.Delay(1000);
 
@@ -306,7 +306,6 @@ namespace PubnubWindowsStore.Test
             currentUnitTestCase = "ThenMultipleChannelGrantShouldReturnSuccess";
 
             receivedGrantMessage = false;
-            grantManualEvent = new ManualResetEvent(false);
 
             Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
@@ -339,6 +338,7 @@ namespace PubnubWindowsStore.Test
             }
             if (PubnubCommon.PAMEnabled)
             {
+                grantManualEvent = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>(channel, true, true, 5, AccessToMultiChannelGrantCallback, DummyErrorCallback);
                 Task.Delay(1000);
 
@@ -358,7 +358,6 @@ namespace PubnubWindowsStore.Test
             currentUnitTestCase = "ThenMultipleAuthGrantShouldReturnSuccess";
 
             receivedGrantMessage = false;
-            grantManualEvent = new ManualResetEvent(false);
 
             Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
@@ -392,6 +391,7 @@ namespace PubnubWindowsStore.Test
             }
             if (PubnubCommon.PAMEnabled)
             {
+                grantManualEvent = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>(channel, auth, true, true, 5, AccessToMultiAuthGrantCallback, DummyErrorCallback);
                 Task.Delay(1000);
 
@@ -412,8 +412,6 @@ namespace PubnubWindowsStore.Test
 
             receivedGrantMessage = false;
             receivedRevokeMessage = false;
-            grantManualEvent = new ManualResetEvent(false);
-            revokeManualEvent = new ManualResetEvent(false);
 
             Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
@@ -425,6 +423,7 @@ namespace PubnubWindowsStore.Test
             {
                 if (!unitTest.EnableStubTest)
                 {
+                    grantManualEvent = new ManualResetEvent(false);
                     pubnub.GrantAccess<string>("", true, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
                     Task.Delay(1000);
                     grantManualEvent.WaitOne();
@@ -435,6 +434,7 @@ namespace PubnubWindowsStore.Test
                 }
                 if (receivedGrantMessage)
                 {
+                    revokeManualEvent = new ManualResetEvent(false);
                     //Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess -> Grant ok..Now trying Revoke");
                     pubnub.GrantAccess<string>("", false, false, 5, RevokeToSubKeyLevelCallback, DummyErrorCallback);
                     Task.Delay(1000);
@@ -459,8 +459,6 @@ namespace PubnubWindowsStore.Test
 
             receivedGrantMessage = false;
             receivedRevokeMessage = false;
-            grantManualEvent = new ManualResetEvent(false);
-            revokeManualEvent = new ManualResetEvent(false);
 
             Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
@@ -474,6 +472,7 @@ namespace PubnubWindowsStore.Test
             {
                 if (!unitTest.EnableStubTest)
                 {
+                    grantManualEvent = new ManualResetEvent(false);
                     pubnub.GrantAccess<string>(channel, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
                     Task.Delay(1000);
                     grantManualEvent.WaitOne();
@@ -484,6 +483,7 @@ namespace PubnubWindowsStore.Test
                 }
                 if (receivedGrantMessage)
                 {
+                    revokeManualEvent = new ManualResetEvent(false);
                     //Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess -> Grant ok..Now trying Revoke");
                     pubnub.GrantAccess<string>("", false, false, 5, RevokeToChannelLevelCallback, DummyErrorCallback);
                     Task.Delay(1000);
@@ -508,8 +508,6 @@ namespace PubnubWindowsStore.Test
 
             receivedGrantMessage = false;
             receivedRevokeMessage = false;
-            grantManualEvent = new ManualResetEvent(false);
-            revokeManualEvent = new ManualResetEvent(false);
 
             Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
@@ -524,6 +522,7 @@ namespace PubnubWindowsStore.Test
             {
                 if (!unitTest.EnableStubTest)
                 {
+                    grantManualEvent = new ManualResetEvent(false);
                     pubnub.GrantAccess<string>(channel, authKey, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
                     Task.Delay(1000);
                     grantManualEvent.WaitOne();
@@ -534,8 +533,9 @@ namespace PubnubWindowsStore.Test
                 }
                 if (receivedGrantMessage)
                 {
+                    revokeManualEvent = new ManualResetEvent(false);
                     //Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant ok..Now trying Revoke");
-                    pubnub.GrantAccess<string>("", authKey, false, false, 5, RevokeToUserLevelCallback, DummyErrorCallback);
+                    pubnub.GrantAccess<string>(channel, authKey, false, false, 5, RevokeToUserLevelCallback, DummyErrorCallback);
                     Task.Delay(1000);
                     revokeManualEvent.WaitOne();
                     Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant success but revoke failed.");
@@ -550,6 +550,69 @@ namespace PubnubWindowsStore.Test
                 Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess.");
             }
         }
+
+        [Test]
+        public void ThenChannelGroupLevelWithReadManageShouldReturnSuccess()
+        {
+            currentUnitTestCase = "ThenChannelGroupLevelWithReadManageShouldReturnSuccess";
+
+            receivedGrantMessage = false;
+
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenGrantIsRequested";
+            unitTest.TestCaseName = "ThenChannelGroupLevelWithReadManageShouldReturnSuccess";
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channelgroup = "hello_my_group";
+            if (PubnubCommon.PAMEnabled)
+            {
+                grantManualEvent = new ManualResetEvent(false);
+                pubnub.ChannelGroupGrantAccess<string>(channelgroup, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                Task.Delay(1000);
+
+                grantManualEvent.WaitOne();
+
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelGroupLevelWithReadManageShouldReturnSuccess failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelGroupLevelWithReadManageShouldReturnSuccess.");
+            }
+        }
+
+        [Test]
+        public void ThenChannelGroupLevelWithReadShouldReturnSuccess()
+        {
+            currentUnitTestCase = "ThenChannelGroupLevelWithReadShouldReturnSuccess";
+
+            receivedGrantMessage = false;
+
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenGrantIsRequested";
+            unitTest.TestCaseName = "ThenChannelGroupLevelWithReadShouldReturnSuccess";
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channelgroup = "hello_my_group";
+            if (PubnubCommon.PAMEnabled)
+            {
+                grantManualEvent = new ManualResetEvent(false);
+                pubnub.ChannelGroupGrantAccess<string>(channelgroup, true, false, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                Task.Delay(1000);
+
+                grantManualEvent.WaitOne();
+
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelGroupLevelWithReadShouldReturnSuccess failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelGroupLevelWithReadShouldReturnSuccess.");
+            }
+        }
+
 
         void AccessToSubKeyLevelCallback(string receivedMessage)
         {
@@ -620,16 +683,16 @@ namespace PubnubWindowsStore.Test
                             if (payload != null)
                             {
                                 string level = payload.Value<string>("level");
-                                var channels = payload.Value<JContainer>("channels");
-                                if (channels != null)
+                                if (level == "channel")
                                 {
-                                    var channelContainer = channels.Value<JContainer>(currentChannel);
-                                    if (channelContainer != null)
+                                    var channels = payload.Value<JContainer>("channels");
+                                    if (channels != null)
                                     {
-                                        bool read = channelContainer.Value<bool>("r");
-                                        bool write = channelContainer.Value<bool>("w");
-                                        if (level == "channel")
+                                        var channelContainer = channels.Value<JContainer>(currentChannel);
+                                        if (channelContainer != null)
                                         {
+                                            bool read = channelContainer.Value<bool>("r");
+                                            bool write = channelContainer.Value<bool>("w");
                                             switch (currentUnitTestCase)
                                             {
                                                 case "ThenChannelLevelWithReadWriteShouldReturnSuccess":
@@ -641,6 +704,30 @@ namespace PubnubWindowsStore.Test
                                                     break;
                                                 case "ThenChannelLevelWithWriteShouldReturnSuccess":
                                                     if (!read && write) receivedGrantMessage = true;
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                }
+                                else if (level == "channel-group")
+                                {
+                                    var channelgroups = payload.Value<JContainer>("channel-groups");
+                                    if (channelgroups != null)
+                                    {
+                                        var channelgroupContainer = channelgroups.Value<JContainer>(currentChannel);
+                                        if (channelgroupContainer != null)
+                                        {
+                                            bool read = channelgroupContainer.Value<bool>("r");
+                                            bool manage = channelgroupContainer.Value<bool>("m");
+                                            switch (currentUnitTestCase)
+                                            {
+                                                case "ThenChannelGroupLevelWithReadManageShouldReturnSuccess":
+                                                    if (read && manage) receivedGrantMessage = true;
+                                                    break;
+                                                case "ThenChannelGroupLevelWithReadShouldReturnSuccess":
+                                                    if (read && !manage) receivedGrantMessage = true;
                                                     break;
                                                 default:
                                                     break;
@@ -683,7 +770,7 @@ namespace PubnubWindowsStore.Test
                                 var auths = payload.Value<JContainer>("auths");
                                 if (auths != null && auths.Count > 0)
                                 {
-                                    foreach (JToken auth in auths.Children())
+                                    foreach(JToken auth in auths.Children())
                                     {
                                         if (auth is JProperty)
                                         {
@@ -934,7 +1021,7 @@ namespace PubnubWindowsStore.Test
                                 string level = payload.Value<string>("level");
                                 string channel = payload.Value<string>("channel");
                                 var auths = payload.Value<JContainer>("auths");
-                                if (auths != null && auths.Count > 0)
+                                if (auths != null && auths.Count >= 0)
                                 {
                                     receivedRevokeMessage = true;
                                     foreach (JToken auth in auths.Children())
@@ -948,7 +1035,7 @@ namespace PubnubWindowsStore.Test
                                                 var authKeyContainer = auths.Value<JContainer>(authKey);
                                                 if (authKeyContainer != null)
                                                 {
-                                                    receivedRevokeMessage = false;
+                                                    receivedRevokeMessage = true;
                                                     break;
                                                 }
 
@@ -958,7 +1045,7 @@ namespace PubnubWindowsStore.Test
                                 }
                                 else
                                 {
-                                    receivedRevokeMessage = true;
+                                    receivedRevokeMessage = false;
                                 }
                             }
                         }

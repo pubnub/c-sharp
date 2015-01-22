@@ -111,12 +111,15 @@
     <Compile Include="WhenAClientIsPresented.cs" />
     <Compile Include="WhenAMessageIsPublished.cs" />
     <Compile Include="WhenAuditIsRequested.cs" />
+    <Compile Include="WhenChannelGroupIsRequested.cs" />
     <Compile Include="WhenDetailedHistoryIsRequested.cs" />
     <Compile Include="WhenGetRequestServerTime.cs" />
     <Compile Include="WhenGrantIsRequested.cs" />
     <Compile Include="WhenPushIsRequested.cs" />
     <Compile Include="WhenSubscribedToAChannel.cs" />
+    <Compile Include="WhenSubscribedToAChannelGroup.cs" />
     <Compile Include="WhenUnsubscribedToAChannel.cs" />
+    <Compile Include="WhenUnsubscribedToAChannelGroup.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
