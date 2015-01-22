@@ -17,7 +17,7 @@ namespace PubnubSilverlight.UnitTest
     [TestClass]
     public class WhenDetailedHistoryIsRequested : SilverlightTest
     {
-        bool message10Received = false;
+        bool messageReceived = false;
         bool message10ReverseTrueReceived = false;
         bool messageStartReverseTrue = false;
 
@@ -30,6 +30,8 @@ namespace PubnubSilverlight.UnitTest
 
         bool receivedGrantMessage = false;
         bool grantInitCallbackInvoked = false;
+
+        string currentTestCase = "";
 
         [ClassInitialize, Asynchronous]
         public void Init()
@@ -92,7 +94,7 @@ namespace PubnubSilverlight.UnitTest
         [TestMethod, Asynchronous]
         public void DetailHistoryCount10ReturnsRecords()
         {
-            message10Received = false;
+            messageReceived = false;
             mreDetailedHistory = new ManualResetEvent(false);
 
             ThreadPool.QueueUserWorkItem((s) =>
@@ -108,7 +110,7 @@ namespace PubnubSilverlight.UnitTest
                     EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, 10, DetailedHistoryCount10Callback, DummyErrorCallback));
                     mreDetailedHistory.WaitOne(310 * 1000);
                     
-                    EnqueueCallback(() => Assert.IsTrue(message10Received, "Detailed History Failed"));
+                    EnqueueCallback(() => Assert.IsTrue(messageReceived, "Detailed History Failed"));
                     EnqueueTestComplete();
                 });
             
@@ -127,7 +129,7 @@ namespace PubnubSilverlight.UnitTest
                     {
                         if (message.Count >= 0)
                         {
-                            message10Received = true;
+                            messageReceived = true;
                         }
                     }
                 }
@@ -269,12 +271,54 @@ namespace PubnubSilverlight.UnitTest
             mrePublish.Set();
         }
 
+        [TestMethod, Asynchronous]
+        public void DetailHistoryWithNullKeysReturnsError()
+        {
+            currentTestCase = "DetailHistoryWithNullKeysReturnsError";
+
+            messageReceived = false;
+
+            ThreadPool.QueueUserWorkItem((s) =>
+            {
+                Pubnub pubnub = new Pubnub(null, null, null, null, false);
+
+                PubnubUnitTest unitTest = new PubnubUnitTest();
+                unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
+                unitTest.TestCaseName = "DetailHistoryWithNullKeysReturnsError";
+
+                pubnub.PubnubUnitTest = unitTest;
+
+                string channel = "hello_my_channel";
+
+                mreDetailedHistory = new ManualResetEvent(false);
+                EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, -1, 10, true, DetailHistoryWithNullKeyseDummyCallback, DummyErrorCallback));
+                mreDetailedHistory.WaitOne(310 * 1000);
+
+                EnqueueCallback(() => Assert.IsTrue(messageReceived, "Detailed History With Null Keys Failed"));
+                EnqueueTestComplete();
+            });
+        }
+
+        [Asynchronous]
+        void DetailHistoryWithNullKeyseDummyCallback(string result)
+        {
+            mreDetailedHistory.Set();
+        }
+
         [Asynchronous]
         private void DummyErrorCallback(PubnubClientError result)
         {
-            if (result != null)
+            if (currentTestCase == "DetailHistoryWithNullKeysReturnsError")
             {
-                Console.WriteLine(result.Description);
+                messageReceived = true;
+                mreDetailedHistory.Set();
+            }
+            else
+            {
+                if (result != null)
+                {
+                    Console.WriteLine(result.Description);
+                }
             }
         }
 
