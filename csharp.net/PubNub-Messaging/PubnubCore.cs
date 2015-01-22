@@ -1,4 +1,4 @@
-﻿//Build Date: January 13, 2015
+﻿//Build Date: January 22, 2015
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -1318,7 +1318,12 @@ namespace PubNubMessaging.Core
          */
 		public PubnubCore (string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
 		{
-			this.Init (publishKey, subscribeKey, secretKey, cipherKey, sslOn);
+            if (IsNullOrWhiteSpace(publishKey)) { publishKey = ""; }
+            if (IsNullOrWhiteSpace(subscribeKey)) { subscribeKey = ""; }
+            if (IsNullOrWhiteSpace(secretKey)) { secretKey = ""; }
+            if (IsNullOrWhiteSpace(cipherKey)) { cipherKey = ""; }
+            
+            this.Init(publishKey, subscribeKey, secretKey, cipherKey, sslOn);
 		}
 
 		/**
@@ -1331,7 +1336,10 @@ namespace PubNubMessaging.Core
          */
 		public PubnubCore (string publishKey, string subscribeKey)
 		{
-			this.Init (publishKey, subscribeKey, "", "", false);
+            if (IsNullOrWhiteSpace(publishKey)) { publishKey = ""; }
+            if (IsNullOrWhiteSpace(subscribeKey)) { subscribeKey = ""; }
+            
+            this.Init(publishKey, subscribeKey, "", "", false);
 		}
 
 		/// <summary>
@@ -1343,9 +1351,22 @@ namespace PubNubMessaging.Core
 		/// <param name="secretKey"></param>
 		public PubnubCore (string publishKey, string subscribeKey, string secretKey)
 		{
-			this.Init (publishKey, subscribeKey, secretKey, "", false);
+            if (IsNullOrWhiteSpace(publishKey)) { publishKey = ""; }
+            if (IsNullOrWhiteSpace(subscribeKey)) { subscribeKey = ""; }
+            if (IsNullOrWhiteSpace(secretKey)) { secretKey = ""; }
+            
+            this.Init(publishKey, subscribeKey, secretKey, "", false);
 		}
 
+        public static bool IsNullOrWhiteSpace(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return true;
+            }
+
+            return string.IsNullOrEmpty(value.Trim());
+        }
 		#endregion
 
 		#region History (obsolete)
