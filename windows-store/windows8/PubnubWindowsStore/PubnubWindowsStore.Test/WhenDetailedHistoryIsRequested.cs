@@ -15,19 +15,20 @@ namespace PubnubWindowsStore.Test
     [TestFixture]
     public class WhenDetailedHistoryIsRequested
     {
-        ManualResetEvent mreMessageCount10 = new ManualResetEvent(false);
+        ManualResetEvent mreDetailedHistory = new ManualResetEvent(false);
         ManualResetEvent mreMessageCount10ReverseTrue = new ManualResetEvent(false);
         ManualResetEvent mreMessageStartReverseTrue = new ManualResetEvent(false);
         ManualResetEvent mrePublishStartReverseTrue = new ManualResetEvent(false);
         ManualResetEvent grantManualEvent = new ManualResetEvent(false);
 
-        bool message10Received = false;
+        bool messageReceived = false;
         bool message10ReverseTrueReceived = false;
         bool messageStartReverseTrue = false;
         bool receivedGrantMessage = false;
 
         int expectedCountAtStartTimeWithReverseTrue = 0;
         long startTimeWithReverseTrue = 0;
+        string currentTestCase = "";
 
         [TestFixtureSetUp]
         public void Init()
@@ -56,7 +57,7 @@ namespace PubnubWindowsStore.Test
         [Test]
         public void DetailHistoryCount10ReturnsRecords()
         {
-            message10Received = false;
+            messageReceived = false;
 
             Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
@@ -69,8 +70,8 @@ namespace PubnubWindowsStore.Test
             string channel = "hello_my_channel";
 
             pubnub.DetailedHistory<string>(channel, 10, DetailedHistoryCount10Callback, DummyErrorCallback);
-            mreMessageCount10.WaitOne(310 * 1000);
-            Assert.IsTrue(message10Received, "Detailed History Failed");
+            mreDetailedHistory.WaitOne(310 * 1000);
+            Assert.IsTrue(messageReceived, "Detailed History Failed");
         }
 
         void ThenDetailedHistoryInitializeShouldReturnGrantMessage(string receivedMessage)
@@ -107,13 +108,13 @@ namespace PubnubWindowsStore.Test
                     {
                         if (message.Count >= 0)
                         {
-                            message10Received = true;
+                            messageReceived = true;
                         }
                     }
                 }
             }
 
-            mreMessageCount10.Set();
+            mreDetailedHistory.Set();
         }
 
         [Test]
@@ -238,9 +239,40 @@ namespace PubnubWindowsStore.Test
             mrePublishStartReverseTrue.Set();
         }
 
+        [Test]
+        public void DetailHistoryWithNullKeysReturnsError()
+        {
+            currentTestCase = "DetailHistoryWithNullKeysReturnsError";
+
+            messageReceived = false;
+
+            Pubnub pubnub = new Pubnub(null, null, null, null, false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
+            unitTest.TestCaseName = "DetailHistoryWithNullKeysReturnsError";
+
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channel = "hello_my_channel";
+            mreDetailedHistory = new ManualResetEvent(false);
+            pubnub.DetailedHistory<string>(channel, -1, -1, 10, true, DetailHistoryWithNullKeyseDummyCallback, DummyErrorCallback);
+            mreDetailedHistory.WaitOne(310 * 1000);
+            Assert.IsTrue(messageReceived, "Detailed History With Null Keys Failed");
+        }
+
+        void DetailHistoryWithNullKeyseDummyCallback(string result)
+        {
+            mreDetailedHistory.Set();
+        }
+
         private void DummyErrorCallback(PubnubClientError result)
         {
-
+            if (currentTestCase == "DetailHistoryWithNullKeysReturnsError")
+            {
+                messageReceived = true;
+                mreDetailedHistory.Set();
+            }
         }
 
     }

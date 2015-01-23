@@ -1,4 +1,4 @@
-﻿//Build Date: December 15, 2014
+﻿//Build Date: January 22, 2015
 using System;
 using System.Text;
 using System.IO;
@@ -583,6 +583,26 @@ namespace PubNubMessaging.Core
                             }
                             else if (jsonString != "[]")
                             {
+                                if (base.JsonPluggableLibrary.IsDictionaryCompatible(jsonString))
+                                {
+                                    Dictionary<string, object> deserializeStatus = base.JsonPluggableLibrary.DeserializeToDictionaryOfObject(jsonString);
+                                    int statusCode = 0; //default. assuming all is ok 
+                                    if (deserializeStatus.ContainsKey("status") && deserializeStatus.ContainsKey("message"))
+                                    {
+                                        Int32.TryParse(deserializeStatus["status"].ToString(), out statusCode);
+                                        string statusMessage = deserializeStatus["message"].ToString();
+
+                                        if (statusCode != 200)
+                                        {
+                                            PubnubErrorCode pubnubErrorType = PubnubErrorCodeHelper.GetErrorType(statusCode, statusMessage);
+                                            int pubnubStatusCode = (int)pubnubErrorType;
+                                            string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(pubnubErrorType);
+
+                                            PubnubClientError error = new PubnubClientError(pubnubStatusCode, PubnubErrorSeverity.Critical, statusMessage, PubnubMessageSource.Server, asynchRequestState.Request, asynchRequestState.Response, errorDescription, channel, channelGroup);
+                                            GoToCallback(error, asynchRequestState.ErrorCallback);
+                                        }
+                                    }
+                                }
                                 result = WrapResultBasedOnResponseType<T>(asynchRequestState.Type, jsonString, asynchRequestState.Channels, asynchRequestState.ChannelGroups, asynchRequestState.Reconnect, asynchRequestState.Timetoken, asynchRequestState.ErrorCallback);
                             }
                         }
