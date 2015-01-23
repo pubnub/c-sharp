@@ -227,6 +227,13 @@ namespace PubnubWindowsPhone.Test.UnitTest
             return data;
         }
 
+        private Dictionary<string, string> LoadWhenDetailedHistoryIsRequestedDetailHistoryWithNullKeysReturnsError()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/v2/history/sub-key//channel/hello_my_channel", "{\"status\":400,\"message\":\"Could Not Parse Request\",\"service\":\"Access Manager\",\"error\":true}");
+            return data;
+        }
+
         private Dictionary<string, string> LoadWhenGetRequestServerTimeThenItShouldReturnTimeStamp()
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
@@ -305,7 +312,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             data.Add("/v1/channel-registration/sub-key/demo-36/channel-group/hello_my_group1?add=hello_my_channel1", "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}");
             data.Add("/v1/channel-registration/sub-key/demo-36/channel-group/hello_my_group2?add=hello_my_channel2", "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}");
             //data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22Test%20for%20WhenSubscribedToAChannelGroup%20ThenItShouldReturnReceivedMessage%22", "[1,\"Sent\",\"13559014566792817\"]");
-
+            
             data.Add("/subscribe/demo-36/,/0/0?uuid=myuuid&channel-group=hello_my_group1,hello_my_group2&pnsdk=PubNub-CSharp-.NET%2F3.6.0.2", "[[],\"13559006802662768\"]");
             data.Add("/subscribe/demo-36/,/0/13559006802662768?uuid=myuuid&channel-group=hello_my_group1,hello_my_group2&pnsdk=PubNub-CSharp-.NET%2F3.6.0.2", "[[\"Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage\"],\"13559014566792816\"]");
             data.Add("/subscribe/demo-36/,/0/13559014566792816?uuid=myuuid&channel-group=hello_my_group1,hello_my_group2&pnsdk=PubNub-CSharp-.NET%2F3.6.0.2", "[[],\"13559014566792816\"]");
@@ -718,6 +725,9 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         case "DetailedHistoryStartWithReverseTrue":
                             responseDictionary = LoadWhenDetailedHistoryIsRequestedDetailedHistoryStartWithReverseTrue();
                             break;
+                        case "DetailHistoryWithNullKeysReturnsError":
+                            responseDictionary = LoadWhenDetailedHistoryIsRequestedDetailHistoryWithNullKeysReturnsError();
+                            break;
                         default:
                             break;
                     }
@@ -932,7 +942,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             else if (responseDictionary != null)
             {
 #if (SILVERLIGHT || WINDOWS_PHONE || NETFX_CORE)
-                stubResponse = responseDictionary[string.Format("{0}{1}", requestUri.AbsolutePath, requestUri.Query)];
+                stubResponse = responseDictionary[string.Format("{0}{1}",requestUri.AbsolutePath,requestUri.Query)];
 #else
                 stubResponse = responseDictionary[requestUri.PathAndQuery];
 #endif
