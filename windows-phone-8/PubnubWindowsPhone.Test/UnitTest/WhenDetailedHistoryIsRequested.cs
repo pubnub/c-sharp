@@ -27,13 +27,14 @@ namespace PubnubWindowsPhone.Test.UnitTest
         ManualResetEvent mrePublish = new ManualResetEvent(false);
         ManualResetEvent mreGrant = new ManualResetEvent(false);
 
-        bool message10Received = false;
+        bool messageReceived = false;
         bool message10ReverseTrueReceived = false;
         bool messageStartReverseTrue = false;
         bool receivedGrantMessage = false;
 
         int expectedCountAtStartTimeWithReverseTrue=0;
         long startTimeWithReverseTrue = 0;
+        string currentTestCase = "";
 
         [ClassInitialize, Asynchronous]
         public void Init()
@@ -93,7 +94,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
         [TestMethod,Asynchronous]
         public void DetailHistoryCount10ReturnsRecords()
         {
-            message10Received = false;
+            messageReceived = false;
             ThreadPool.QueueUserWorkItem((s) =>
                 {
                     Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
@@ -109,7 +110,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     mreDetailedHistory.WaitOne(60 * 1000);
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
-                            Assert.IsTrue(message10Received, "Detailed History Failed");
+                            Assert.IsTrue(messageReceived, "Detailed History Failed");
                             TestComplete();
                         });
                 });
@@ -128,7 +129,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     {
                         if (message.Count >= 0)
                         {
-                            message10Received = true;
+                            messageReceived = true;
                         }
                     }
                 }
@@ -278,9 +279,49 @@ namespace PubnubWindowsPhone.Test.UnitTest
             mrePublish.Set();
         }
 
+        [TestMethod, Asynchronous]
+        public void DetailHistoryWithNullKeysReturnsError()
+        {
+            currentTestCase = "DetailHistoryWithNullKeysReturnsError";
+
+            messageReceived = false;
+
+            ThreadPool.QueueUserWorkItem((s) =>
+                {
+                    Pubnub pubnub = new Pubnub(null, null, null, null, false);
+
+                    PubnubUnitTest unitTest = new PubnubUnitTest();
+                    unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
+                    unitTest.TestCaseName = "DetailHistoryWithNullKeysReturnsError";
+
+                    pubnub.PubnubUnitTest = unitTest;
+
+                    string channel = "hello_my_channel";
+                    mreDetailedHistory = new ManualResetEvent(false);
+                    pubnub.DetailedHistory<string>(channel, -1, -1, 10, true, DetailHistoryWithNullKeyseDummyCallback, DummyErrorCallback);
+                    mreDetailedHistory.WaitOne(310 * 1000);
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                        {
+                            Assert.IsTrue(messageReceived, "Detailed History With Null Keys Failed");
+                            TestComplete();
+                        });
+                });
+        }
+
+        [Asynchronous]
+        void DetailHistoryWithNullKeyseDummyCallback(string result)
+        {
+            mreDetailedHistory.Set();
+        }
+
         [Asynchronous]
         private void DummyErrorCallback(PubnubClientError result)
         {
+            if (currentTestCase == "DetailHistoryWithNullKeysReturnsError")
+            {
+                messageReceived = true;
+                mreDetailedHistory.Set();
+            }
         }
 
     }
