@@ -16,6 +16,7 @@ namespace PubNubMessaging
         protected static Pubnub pubnub;
 
         static string channel = "";
+        static string channelGroup = "";
         static bool ssl = false;
         static string origin = "";
         static string publishKey = "";
@@ -68,6 +69,16 @@ namespace PubNubMessaging
 
         private void CheckUserInputs()
         {
+            if (ssl != chkSSL.Checked
+                || origin != txtOrigin.Text
+                || publishKey != txtPubKey.Text
+                || subscriberKey != txtSubKey.Text
+                || secretKey != txtSecret.Text
+                || cipherKey != txtCipher.Text)
+            {
+                //pubnub.EndPendingRequests();
+                pubnub = null;
+            }
             ssl = chkSSL.Checked;
             origin = txtOrigin.Text;
             publishKey = txtPubKey.Text;
@@ -387,10 +398,17 @@ namespace PubNubMessaging
             ProcessPubnubRequest(e.CommandName);
         }
 
+        protected void btnChannelGroup_Command(object sender, CommandEventArgs e)
+        {
+            ProcessPubnubRequest(e.CommandName);
+        }
+
         void ProcessPubnubRequest(string requestType)
         {
             CheckUserInputs();
             channel = txtChannel.Text;
+            channelGroup = txtChannelGroup.Text.Trim();
+
             bool storeInHistory = chkStoreInHistory.Checked;
             string pamAuthKey = txtPAMAuthKey.Text.Trim();
             UpdateTimer.Enabled = true;
@@ -398,10 +416,24 @@ namespace PubNubMessaging
             switch (requestType.ToLower())
             {
                 case "presence":
-                    pubnub.Presence<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayErrorMessage);
+                    if (channelGroup == "")
+                    {
+                        pubnub.Presence<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayErrorMessage);
+                    }
+                    else
+                    {
+                        pubnub.Presence<string>(channel, channelGroup, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayErrorMessage);
+                    }
                     break;
                 case "subscribe":
-                    pubnub.Subscribe<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayErrorMessage);
+                    if (channelGroup == "")
+                    {
+                        pubnub.Subscribe<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayErrorMessage);
+                    }
+                    else
+                    {
+                        pubnub.Subscribe<string>(channel, channelGroup, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayErrorMessage);
+                    }
                     break;
                 case "detailedhistory":
                     pubnub.DetailedHistory<string>(channel, 10, DisplayUserCallbackMessage, DisplayErrorMessage);
@@ -470,10 +502,24 @@ namespace PubNubMessaging
                     lblErrorMessage.Text = "";
                     break;
                 case "unsubscribe":
-                    pubnub.Unsubscribe<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayDisconnectCallbackMessage, DisplayErrorMessage);
+                    if (channelGroup == "")
+                    {
+                        pubnub.Unsubscribe<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayDisconnectCallbackMessage, DisplayErrorMessage);
+                    }
+                    else
+                    {
+                        pubnub.Unsubscribe<string>(channel, channelGroup, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayDisconnectCallbackMessage, DisplayErrorMessage);
+                    }
                     break;
                 case "presenceunsubscribe":
-                    pubnub.PresenceUnsubscribe<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayDisconnectCallbackMessage, DisplayErrorMessage);
+                    if (channelGroup == "")
+                    {
+                        pubnub.PresenceUnsubscribe<string>(channel, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayDisconnectCallbackMessage, DisplayErrorMessage);
+                    }
+                    else
+                    {
+                        pubnub.PresenceUnsubscribe<string>(channel, channelGroup, DisplayUserCallbackMessage, DisplayConnectCallbackMessage, DisplayDisconnectCallbackMessage, DisplayErrorMessage);
+                    }
                     break;
                 case "herenow":
                     bool showUUID2 = chbShowUUIDList2.Checked;
@@ -537,6 +583,35 @@ namespace PubNubMessaging
                         pubnub.SetUserState<string>(channel, new KeyValuePair<string, object>(key1, value1), DisplayUserCallbackMessage, DisplayErrorMessage);
                     }
 
+                    break;
+                case "channelgroup":
+                    string userChannelGroupName = txtChannelGroupName.Text;
+                    if (radChannelGroupGet.Checked)
+                    {
+                        pubnub.GetChannelsForChannelGroup<string>(userChannelGroupName, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    }
+                    else if (radChannelGroupAdd.Checked)
+                    {
+                        string userChannelGroupAddChannel = txtChannelGroupAddChannels.Text;
+                        pubnub.AddChannelsToChannelGroup<string>(new string[] { userChannelGroupAddChannel }, userChannelGroupName, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    }
+                    else if (radChannelGroupRemove.Checked)
+                    {
+                        string userChannelGroupRemoveChannel = txtChannelGroupRemoveChannels.Text;
+                        pubnub.RemoveChannelsFromChannelGroup<string>(new string[] { userChannelGroupRemoveChannel }, userChannelGroupName, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    }
+                    else if (radChannelGroupGrant.Checked)
+                    {
+                        pubnub.ChannelGroupGrantAccess<string>(userChannelGroupName, true, true, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    }
+                    else if (radChannelGroupAudit.Checked)
+                    {
+                        pubnub.ChannelGroupAuditAccess<string>(userChannelGroupName, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    }
+                    else if (radChannelGroupRevoke.Checked)
+                    {
+                        pubnub.ChannelGroupGrantAccess<string>(userChannelGroupName, false, false, DisplayUserCallbackMessage, DisplayErrorMessage);
+                    }
                     break;
                 default:
                     break;
@@ -672,6 +747,19 @@ namespace PubNubMessaging
             getUserStatePopupExtender.Hide();
 
             ProcessPubnubRequest("getuserstate");
+
+            UpdatePanelLeft.Update();
+        }
+
+        protected void btnOkayChannelGroup_OnClick(object sender, EventArgs e)
+        {
+            btnReset.Enabled = true;
+
+            lblErrorMessage.Text = "";
+
+            channelGroupPopupExtender.Hide();
+
+            ProcessPubnubRequest("channelgroup");
 
             UpdatePanelLeft.Update();
         }

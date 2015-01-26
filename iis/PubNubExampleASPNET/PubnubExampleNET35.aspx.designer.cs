@@ -193,6 +193,15 @@ namespace PubNubMessaging {
         protected global::System.Web.UI.WebControls.TextBox txtChannel;
         
         /// <summary>
+        /// txtChannelGroup control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtChannelGroup;
+        
+        /// <summary>
         /// txtAuthKey control.
         /// </summary>
         /// <remarks>
@@ -371,6 +380,15 @@ namespace PubNubMessaging {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnGetUserState;
+        
+        /// <summary>
+        /// btnChannelGroup control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnChannelGroup;
         
         /// <summary>
         /// publishModalPopupExtender control.
@@ -659,6 +677,114 @@ namespace PubNubMessaging {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnOkayGetUserState;
+        
+        /// <summary>
+        /// channelGroupPopupExtender control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::AjaxControlToolkit.ModalPopupExtender channelGroupPopupExtender;
+        
+        /// <summary>
+        /// popupPanelChannelGroup control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel popupPanelChannelGroup;
+        
+        /// <summary>
+        /// txtChannelGroupName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtChannelGroupName;
+        
+        /// <summary>
+        /// radChannelGroupGet control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButton radChannelGroupGet;
+        
+        /// <summary>
+        /// radChannelGroupGrant control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButton radChannelGroupGrant;
+        
+        /// <summary>
+        /// radChannelGroupAudit control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButton radChannelGroupAudit;
+        
+        /// <summary>
+        /// radChannelGroupRevoke control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButton radChannelGroupRevoke;
+        
+        /// <summary>
+        /// radChannelGroupAdd control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButton radChannelGroupAdd;
+        
+        /// <summary>
+        /// txtChannelGroupAddChannels control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtChannelGroupAddChannels;
+        
+        /// <summary>
+        /// radChannelGroupRemove control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButton radChannelGroupRemove;
+        
+        /// <summary>
+        /// txtChannelGroupRemoveChannels control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtChannelGroupRemoveChannels;
+        
+        /// <summary>
+        /// btnOkayChannelGroup control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnOkayChannelGroup;
         
         /// <summary>
         /// UpdatePanelRight control.

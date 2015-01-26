@@ -5,6 +5,7 @@ namespace PubNubMessaging.Core
 	public class ReconnectState<T>
 	{
 		public string[] Channels;
+        public string[] ChannelGroups;
 		public ResponseType Type;
 		public Action<T> Callback;
 		public Action<PubnubClientError> ErrorCallback;
@@ -15,6 +16,7 @@ namespace PubNubMessaging.Core
 		public ReconnectState()
 		{
 			Channels = null;
+            ChannelGroups = null;
 			Callback = null;
 			ConnectCallback = null;
 			Timetoken = null;

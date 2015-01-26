@@ -23,6 +23,7 @@ namespace PubnubWindowsPhone
     {
         Pubnub pubnub;
         string channel = "";
+        string channelGroup = "";
         bool ssl = false;
         string origin = "";
         string publishKey = "";
@@ -187,7 +188,6 @@ namespace PubnubWindowsPhone
                     );
             }
         }
-
 
         private void btnPublish_Click(object sender, RoutedEventArgs e)
         {
@@ -490,6 +490,7 @@ namespace PubnubWindowsPhone
         private void btnUserState_Click(object sender, RoutedEventArgs e)
         {
             channel = txtChannel.Text;
+            channelGroup = txtChannelGroup.Text;
             this.IsEnabled = false;
             Border border = new Border();
             border.BorderBrush = new SolidColorBrush(Colors.Black);
@@ -525,15 +526,15 @@ namespace PubnubWindowsPhone
                     double valueDouble;
                     if (Int32.TryParse(userStateValue1, out valueInt))
                     {
-                        pubnub.SetUserState<string>(channel, new KeyValuePair<string, object>(userStateKey1, valueInt), PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        pubnub.SetUserState<string>(channel, channelGroup, new KeyValuePair<string, object>(userStateKey1, valueInt), PubnubCallbackResult, PubnubDisplayErrorMessage);
                     }
                     else if (Double.TryParse(userStateValue1, out valueDouble))
                     {
-                        pubnub.SetUserState<string>(channel, new KeyValuePair<string, object>(userStateKey1, valueDouble), PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        pubnub.SetUserState<string>(channel, channelGroup, new KeyValuePair<string, object>(userStateKey1, valueDouble), PubnubCallbackResult, PubnubDisplayErrorMessage);
                     }
                     else
                     {
-                        pubnub.SetUserState<string>(channel, new KeyValuePair<string, object>(userStateKey1, userStateValue1), PubnubCallbackResult, PubnubDisplayErrorMessage);
+                        pubnub.SetUserState<string>(channel, channelGroup, new KeyValuePair<string, object>(userStateKey1, userStateValue1), PubnubCallbackResult, PubnubDisplayErrorMessage);
                     }
 
                     msg = "Running Set User State";
@@ -541,7 +542,7 @@ namespace PubnubWindowsPhone
                 else
                 {
                     string userStateUUID = control.txtGetUserStateUUID.Text;
-                    pubnub.GetUserState<string>(channel, userStateUUID, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                    pubnub.GetUserState<string>(channel, channelGroup, userStateUUID, PubnubCallbackResult, PubnubDisplayErrorMessage);
                     msg = "Running Get User State";
                 }
 
@@ -564,7 +565,15 @@ namespace PubnubWindowsPhone
         private void btnPresence_Click(object sender, RoutedEventArgs e)
         {
             channel = txtChannel.Text;
-            pubnub.Presence<string>(channel, PubnubCallbackResult, PubnubConnectCallbackResult, PubnubDisplayErrorMessage);
+            channelGroup = txtChannelGroup.Text;
+            if (channelGroup != "")
+            {
+                pubnub.Presence<string>(channel, channelGroup, PubnubCallbackResult, PubnubConnectCallbackResult, PubnubDisplayErrorMessage);
+            }
+            else
+            {
+                pubnub.Presence<string>(channel, PubnubCallbackResult, PubnubConnectCallbackResult, PubnubDisplayErrorMessage);
+            }
         }
 
         private void btnDetailedHistory_Click(object sender, RoutedEventArgs e)
@@ -585,19 +594,43 @@ namespace PubnubWindowsPhone
         private void btnUnsubscribe_Click(object sender, RoutedEventArgs e)
         {
             channel = txtChannel.Text;
-            pubnub.Unsubscribe<string>(channel, PubnubCallbackResult, PubnubConnectCallbackResult, PubnubDisconnectCallbackResult, PubnubDisplayErrorMessage);
+            channelGroup = txtChannelGroup.Text;
+            if (channelGroup != "")
+            {
+                pubnub.Unsubscribe<string>(channel, channelGroup, PubnubCallbackResult, PubnubConnectCallbackResult, PubnubDisconnectCallbackResult, PubnubDisplayErrorMessage);
+            }
+            else
+            {
+                pubnub.Unsubscribe<string>(channel, PubnubCallbackResult, PubnubConnectCallbackResult, PubnubDisconnectCallbackResult, PubnubDisplayErrorMessage);
+            }
         }
 
         private void btnPresenceUnsub_Click(object sender, RoutedEventArgs e)
         {
             channel = txtChannel.Text;
-            pubnub.PresenceUnsubscribe<string>(channel, PubnubCallbackResult, PubnubConnectCallbackResult, PubnubDisconnectCallbackResult, PubnubDisplayErrorMessage);
+            channelGroup = txtChannelGroup.Text;
+            if (channelGroup != "")
+            {
+                pubnub.PresenceUnsubscribe<string>(channel, channelGroup, PubnubCallbackResult, PubnubConnectCallbackResult, PubnubDisconnectCallbackResult, PubnubDisplayErrorMessage);
+            }
+            else
+            {
+                pubnub.PresenceUnsubscribe<string>(channel, PubnubCallbackResult, PubnubConnectCallbackResult, PubnubDisconnectCallbackResult, PubnubDisplayErrorMessage);
+            }
         }
 
         private void btnSubscribe_Click(object sender, RoutedEventArgs e)
         {
             channel = txtChannel.Text;
-            pubnub.Subscribe<string>(channel, PubnubCallbackResult, PubnubConnectCallbackResult, PubnubDisplayErrorMessage);
+            channelGroup = txtChannelGroup.Text;
+            if (channelGroup != "")
+            {
+                pubnub.Subscribe<string>(channel, channelGroup, PubnubCallbackResult, PubnubConnectCallbackResult, PubnubDisplayErrorMessage);
+            }
+            else
+            {
+                pubnub.Subscribe<string>(channel, PubnubCallbackResult, PubnubConnectCallbackResult, PubnubDisplayErrorMessage);
+            }
         }
 
         private void btnDisableNetwork_Click(object sender, RoutedEventArgs e)
@@ -615,252 +648,511 @@ namespace PubnubWindowsPhone
             pubnub.TerminateCurrentSubscriberRequest();
         }
 
-        private void btnGrant_Click(object sender, RoutedEventArgs e)
+        private void btnChannelGroup_Click(object sender, RoutedEventArgs e)
         {
+            channelGroup = txtChannelGroup.Text;
+
             this.IsEnabled = false;
             Border border = new Border();
             border.BorderBrush = new SolidColorBrush(Colors.Black);
             border.BorderThickness = new Thickness(5.0);
 
-            StackPanel pamAuthKeyStackPanel = new StackPanel();
-            pamAuthKeyStackPanel.Background = new SolidColorBrush(Colors.Blue);
-            pamAuthKeyStackPanel.Width = 400;
-            pamAuthKeyStackPanel.Height = 300;
+            StackPanel channelGroupStackPanel = new StackPanel();
+            channelGroupStackPanel.Background = new SolidColorBrush(Colors.Blue);
+            channelGroupStackPanel.Width = 400;
+            channelGroupStackPanel.Height = 440;
 
-            Popup pamAuthKeyPopup = new Popup();
-            pamAuthKeyPopup.Height = 300;
-            pamAuthKeyPopup.Width = 300;
-            pamAuthKeyPopup.VerticalOffset = 10;
-            pamAuthKeyPopup.HorizontalOffset = 10;
-            PAMAuthKeyUserControl control = new PAMAuthKeyUserControl();
-            control.txtPAMAuthKey.Text = "";
-            pamAuthKeyStackPanel.Children.Add(control);
-            border.Child = pamAuthKeyStackPanel;
+            Popup channelGroupPopup = new Popup();
+            channelGroupPopup.Height = 420;
+            channelGroupPopup.Width = 300;
 
-            pamAuthKeyPopup.Child = border;
-            pamAuthKeyPopup.IsOpen = true;
+            channelGroupPopup.HorizontalOffset = 10;
+            channelGroupPopup.VerticalOffset = 100;
+
+            ChannelGroupUserControl control = new ChannelGroupUserControl();
+
+            control.txtChannelGroup.Text = channelGroup;
+            control.txtChannelName.Text = "ch1";
+
+            channelGroupStackPanel.Children.Add(control);
+            border.Child = channelGroupStackPanel;
+
+            channelGroupPopup.Child = border;
+            channelGroupPopup.IsOpen = true;
 
             control.btnOK.Click += (s, args) =>
             {
-                pamAuthKeyPopup.IsOpen = false;
-                string pamAuthKey = control.txtPAMAuthKey.Text.Trim();
-                channel = txtChannel.Text;
-                pubnub.GrantAccess<string>(channel, pamAuthKey, true, true, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                channelGroupPopup.IsOpen = false;
+                string msg = "";
+                string userChannelGroup = control.txtChannelGroup.Text; ;
+                string userChannelName = control.txtChannelName.Text;
+
+                if (control.radGetChannelsOfChannelGroup.IsChecked.Value)
+                {
+                     msg = "Running GetChannelsForChannelGroup";
+                    pubnub.GetChannelsForChannelGroup<string>(userChannelGroup, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+
+                if (control.radAddChannelToChannelGroup.IsChecked.Value)
+                {
+                     msg = "Running AddChannelsToChannelGroup";
+                    pubnub.AddChannelsToChannelGroup<string>(new string[] { userChannelName }, userChannelGroup, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+
+                if (control.radRemoveChannelFromChannelGroup.IsChecked.Value)
+                {
+                     msg = "Running RemoveChannelsFromChannelGroup";
+                    pubnub.RemoveChannelsFromChannelGroup<string>(new string[] { userChannelName }, userChannelGroup, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
 
                 TextBlock textBlock = new TextBlock();
-                textBlock.Text = string.Format("Grant request ...\n");
+                textBlock.Text = msg;
                 messageStackPanel.Children.Add(textBlock);
                 scrollViewerResult.UpdateLayout();
                 scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
-
-                pamAuthKeyPopup = null;
+                channelGroupPopup = null;
                 this.IsEnabled = true;
             };
             control.btnCancel.Click += (s, args) =>
             {
-                pamAuthKeyPopup.IsOpen = false;
-                pamAuthKeyPopup = null;
+                channelGroupPopup.IsOpen = false;
+                channelGroupPopup = null;
                 this.IsEnabled = true;
             };
 
         }
 
-        private void btnRevoke_Click(object sender, RoutedEventArgs e)
+        private void btnPAMChannel_Click(object sender, RoutedEventArgs e)
         {
+            channel = txtChannel.Text;
+
             this.IsEnabled = false;
             Border border = new Border();
             border.BorderBrush = new SolidColorBrush(Colors.Black);
             border.BorderThickness = new Thickness(5.0);
 
-            StackPanel pamAuthKeyStackPanel = new StackPanel();
-            pamAuthKeyStackPanel.Background = new SolidColorBrush(Colors.Blue);
-            pamAuthKeyStackPanel.Width = 400;
-            pamAuthKeyStackPanel.Height = 300;
+            StackPanel pamChannelStackPanel = new StackPanel();
+            pamChannelStackPanel.Background = new SolidColorBrush(Colors.Blue);
+            pamChannelStackPanel.Width = 400;
+            pamChannelStackPanel.Height = 650;
 
-            Popup pamAuthKeyPopup = new Popup();
-            pamAuthKeyPopup.Height = 300;
-            pamAuthKeyPopup.Width = 300;
-            pamAuthKeyPopup.VerticalOffset = 10;
-            pamAuthKeyPopup.HorizontalOffset = 10;
-            PAMAuthKeyUserControl control = new PAMAuthKeyUserControl();
-            control.txtPAMAuthKey.Text = "";
-            pamAuthKeyStackPanel.Children.Add(control);
-            border.Child = pamAuthKeyStackPanel;
+            Popup pamChannelPopup = new Popup();
+            pamChannelPopup.Height = 650;
+            pamChannelPopup.Width = 400;
 
-            pamAuthKeyPopup.Child = border;
-            pamAuthKeyPopup.IsOpen = true;
+            pamChannelPopup.HorizontalOffset = 10;
+            pamChannelPopup.VerticalOffset = 10;
+
+            PAMChannelUserControl control = new PAMChannelUserControl();
+
+            control.txtChannelName.Text = channel;
+
+            pamChannelStackPanel.Children.Add(control);
+            border.Child = pamChannelStackPanel;
+
+            pamChannelPopup.Child = border;
+            pamChannelPopup.IsOpen = true;
 
             control.btnOK.Click += (s, args) =>
             {
-                pamAuthKeyPopup.IsOpen = false;
-                string pamAuthKey = control.txtPAMAuthKey.Text.Trim();
-                channel = txtChannel.Text;
-                pubnub.GrantAccess<string>(channel, pamAuthKey, false, false, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                pamChannelPopup.IsOpen = false;
+                string msg = "";
+                string pamUserChannelName = control.txtChannelName.Text;
+                string pamAuthKey = control.txtAuthKey.Text;
 
+                if (control.radGrantChannel.IsChecked.Value)
+                {
+                    msg = "Running GrantAccess";
+                    int ttlInMinutes = 1440;
+                    pubnub.GrantAccess<string>(pamUserChannelName, pamAuthKey, true, true, ttlInMinutes, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+
+                if (control.radAuditChannel.IsChecked.Value)
+                {
+                    msg = "Running AuditAccess";
+                    pubnub.AuditAccess<string>(pamUserChannelName, pamAuthKey, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+
+                if (control.radRevokeChannel.IsChecked.Value)
+                {
+                    msg = "Running Revoke Access";
+                    pubnub.GrantAccess<string>(pamUserChannelName, pamAuthKey, false, false, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+
+                if (control.radGrantPresenceChannel.IsChecked.Value)
+                {
+                    msg = "Running GrantPresenceAccess";
+                    int ttlInMinutes = 1440;
+                    pubnub.GrantPresenceAccess<string>(pamUserChannelName, pamAuthKey, true, true, ttlInMinutes, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+
+                if (control.radAuditPresenceChannel.IsChecked.Value)
+                {
+                    msg = "Running AuditPresenceAccess";
+                    pubnub.AuditPresenceAccess<string>(pamUserChannelName, pamAuthKey, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+
+                if (control.radRevokePresenceChannel.IsChecked.Value)
+                {
+                    msg = "Running Presence Revoke Access";
+                    pubnub.GrantPresenceAccess<string>(pamUserChannelName, pamAuthKey, false, false, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+                
                 TextBlock textBlock = new TextBlock();
-                textBlock.Text = string.Format("Revoke Grant request ....\n");
+                textBlock.Text = msg;
                 messageStackPanel.Children.Add(textBlock);
                 scrollViewerResult.UpdateLayout();
                 scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
-
-                pamAuthKeyPopup = null;
+                pamChannelPopup = null;
                 this.IsEnabled = true;
             };
             control.btnCancel.Click += (s, args) =>
             {
-                pamAuthKeyPopup.IsOpen = false;
-                pamAuthKeyPopup = null;
+                pamChannelPopup.IsOpen = false;
+                pamChannelPopup = null;
                 this.IsEnabled = true;
             };
+
+        }
+
+        private void btnPAMChannelGroup_Click(object sender, RoutedEventArgs e)
+        {
+            channelGroup = txtChannelGroup.Text;
+
+            this.IsEnabled = false;
+            Border border = new Border();
+            border.BorderBrush = new SolidColorBrush(Colors.Black);
+            border.BorderThickness = new Thickness(5.0);
+
+            StackPanel pamChannelGroupStackPanel = new StackPanel();
+            pamChannelGroupStackPanel.Background = new SolidColorBrush(Colors.Blue);
+            pamChannelGroupStackPanel.Width = 400;
+            pamChannelGroupStackPanel.Height = 650;
+
+            Popup pamChannelGroupPopup = new Popup();
+            pamChannelGroupPopup.Height = 650;
+            pamChannelGroupPopup.Width = 300;
+
+            pamChannelGroupPopup.HorizontalOffset = 10;
+            pamChannelGroupPopup.VerticalOffset = 10;
+
+            PAMChannelGroupUserControl control = new PAMChannelGroupUserControl();
+
+            control.txtChannelGroup.Text = channelGroup;
+
+            pamChannelGroupStackPanel.Children.Add(control);
+            border.Child = pamChannelGroupStackPanel;
+
+            pamChannelGroupPopup.Child = border;
+            pamChannelGroupPopup.IsOpen = true;
+
+            control.btnOK.Click += (s, args) =>
+            {
+                pamChannelGroupPopup.IsOpen = false;
+                string msg = "";
+                string pamUserChannelGroup = control.txtChannelGroup.Text;
+                string pamAuthKey = control.txtAuthKey.Text;
+                int ttlInMinutes = 1440;
+
+                if (control.radGrantPresenceChannelGroup.IsChecked.Value)
+                {
+                    msg = "Running ChannelGroupGrantAccess";
+                    pubnub.ChannelGroupGrantAccess<string>(pamUserChannelGroup, pamAuthKey, true, true, ttlInMinutes, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+
+                if (control.radAuditChannelGroup.IsChecked.Value)
+                {
+                    msg = "Running ChannelGroupAuditAccess";
+                    pubnub.ChannelGroupAuditAccess<string>(pamUserChannelGroup, pamAuthKey, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+
+                if (control.radRevokeChannelGroup.IsChecked.Value)
+                {
+                    msg = "Running ChannelGroup Revoke Access";
+                    pubnub.ChannelGroupGrantAccess<string>(pamUserChannelGroup, pamAuthKey, false, false, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+
+                if (control.radGrantPresenceChannelGroup.IsChecked.Value)
+                {
+                    msg = "Running ChannelGroupGrantPresenceAccess";
+                    pubnub.ChannelGroupGrantPresenceAccess<string>(pamUserChannelGroup, pamAuthKey, true, true, ttlInMinutes, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+
+                if (control.radAuditPresenceChannelGroup.IsChecked.Value)
+                {
+                    msg = "Running ChannelGroupAuditAccess";
+                    pubnub.ChannelGroupAuditPresenceAccess<string>(pamUserChannelGroup, pamAuthKey, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+
+                if (control.radRevokePresenceChannelGroup.IsChecked.Value)
+                {
+                    msg = "Running ChannelGroup Revoke Access";
+                    pubnub.ChannelGroupGrantPresenceAccess<string>(pamUserChannelGroup, pamAuthKey, false, false, PubnubCallbackResult, PubnubDisplayErrorMessage);
+                }
+                
+                TextBlock textBlock = new TextBlock();
+                textBlock.Text = msg;
+                messageStackPanel.Children.Add(textBlock);
+                scrollViewerResult.UpdateLayout();
+                scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
+                pamChannelGroupPopup = null;
+                this.IsEnabled = true;
+            };
+            control.btnCancel.Click += (s, args) =>
+            {
+                pamChannelGroupPopup.IsOpen = false;
+                pamChannelGroupPopup = null;
+                this.IsEnabled = true;
+            };
+
+        }
+
+        //private void btnGrant_Click(object sender, RoutedEventArgs e)
+        //{
+        //    this.IsEnabled = false;
+        //    Border border = new Border();
+        //    border.BorderBrush = new SolidColorBrush(Colors.Black);
+        //    border.BorderThickness = new Thickness(5.0);
+
+        //    StackPanel pamAuthKeyStackPanel = new StackPanel();
+        //    pamAuthKeyStackPanel.Background = new SolidColorBrush(Colors.Blue);
+        //    pamAuthKeyStackPanel.Width = 400;
+        //    pamAuthKeyStackPanel.Height = 300;
+
+        //    Popup pamAuthKeyPopup = new Popup();
+        //    pamAuthKeyPopup.Height = 300;
+        //    pamAuthKeyPopup.Width = 300;
+        //    pamAuthKeyPopup.VerticalOffset = 10;
+        //    pamAuthKeyPopup.HorizontalOffset = 10;
+        //    PAMAuthKeyUserControl control = new PAMAuthKeyUserControl();
+        //    control.txtPAMAuthKey.Text = "";
+        //    pamAuthKeyStackPanel.Children.Add(control);
+        //    border.Child = pamAuthKeyStackPanel;
+
+        //    pamAuthKeyPopup.Child = border;
+        //    pamAuthKeyPopup.IsOpen = true;
+
+        //    control.btnOK.Click += (s, args) =>
+        //    {
+        //        pamAuthKeyPopup.IsOpen = false;
+        //        string pamAuthKey = control.txtPAMAuthKey.Text.Trim();
+        //        channel = txtChannel.Text;
+        //        pubnub.GrantAccess<string>(channel, pamAuthKey, true, true, PubnubCallbackResult, PubnubDisplayErrorMessage);
+
+        //        TextBlock textBlock = new TextBlock();
+        //        textBlock.Text = string.Format("Grant request ...\n");
+        //        messageStackPanel.Children.Add(textBlock);
+        //        scrollViewerResult.UpdateLayout();
+        //        scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
+
+        //        pamAuthKeyPopup = null;
+        //        this.IsEnabled = true;
+        //    };
+        //    control.btnCancel.Click += (s, args) =>
+        //    {
+        //        pamAuthKeyPopup.IsOpen = false;
+        //        pamAuthKeyPopup = null;
+        //        this.IsEnabled = true;
+        //    };
+
+        //}
+
+        //private void btnRevoke_Click(object sender, RoutedEventArgs e)
+        //{
+        //    this.IsEnabled = false;
+        //    Border border = new Border();
+        //    border.BorderBrush = new SolidColorBrush(Colors.Black);
+        //    border.BorderThickness = new Thickness(5.0);
+
+        //    StackPanel pamAuthKeyStackPanel = new StackPanel();
+        //    pamAuthKeyStackPanel.Background = new SolidColorBrush(Colors.Blue);
+        //    pamAuthKeyStackPanel.Width = 400;
+        //    pamAuthKeyStackPanel.Height = 300;
+
+        //    Popup pamAuthKeyPopup = new Popup();
+        //    pamAuthKeyPopup.Height = 300;
+        //    pamAuthKeyPopup.Width = 300;
+        //    pamAuthKeyPopup.VerticalOffset = 10;
+        //    pamAuthKeyPopup.HorizontalOffset = 10;
+        //    PAMAuthKeyUserControl control = new PAMAuthKeyUserControl();
+        //    control.txtPAMAuthKey.Text = "";
+        //    pamAuthKeyStackPanel.Children.Add(control);
+        //    border.Child = pamAuthKeyStackPanel;
+
+        //    pamAuthKeyPopup.Child = border;
+        //    pamAuthKeyPopup.IsOpen = true;
+
+        //    control.btnOK.Click += (s, args) =>
+        //    {
+        //        pamAuthKeyPopup.IsOpen = false;
+        //        string pamAuthKey = control.txtPAMAuthKey.Text.Trim();
+        //        channel = txtChannel.Text;
+        //        pubnub.GrantAccess<string>(channel, pamAuthKey, false, false, PubnubCallbackResult, PubnubDisplayErrorMessage);
+
+        //        TextBlock textBlock = new TextBlock();
+        //        textBlock.Text = string.Format("Revoke Grant request ....\n");
+        //        messageStackPanel.Children.Add(textBlock);
+        //        scrollViewerResult.UpdateLayout();
+        //        scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
+
+        //        pamAuthKeyPopup = null;
+        //        this.IsEnabled = true;
+        //    };
+        //    control.btnCancel.Click += (s, args) =>
+        //    {
+        //        pamAuthKeyPopup.IsOpen = false;
+        //        pamAuthKeyPopup = null;
+        //        this.IsEnabled = true;
+        //    };
             
-        }
+        //}
 
-        private void btnAudit_Click(object sender, RoutedEventArgs e)
-        {
-            this.IsEnabled = false;
-            Border border = new Border();
-            border.BorderBrush = new SolidColorBrush(Colors.Black);
-            border.BorderThickness = new Thickness(5.0);
+        //private void btnAudit_Click(object sender, RoutedEventArgs e)
+        //{
+        //    this.IsEnabled = false;
+        //    Border border = new Border();
+        //    border.BorderBrush = new SolidColorBrush(Colors.Black);
+        //    border.BorderThickness = new Thickness(5.0);
 
-            StackPanel pamAuthKeyStackPanel = new StackPanel();
-            pamAuthKeyStackPanel.Background = new SolidColorBrush(Colors.Blue);
-            pamAuthKeyStackPanel.Width = 400;
-            pamAuthKeyStackPanel.Height = 300;
+        //    StackPanel pamAuthKeyStackPanel = new StackPanel();
+        //    pamAuthKeyStackPanel.Background = new SolidColorBrush(Colors.Blue);
+        //    pamAuthKeyStackPanel.Width = 400;
+        //    pamAuthKeyStackPanel.Height = 300;
 
-            Popup pamAuthKeyPopup = new Popup();
-            pamAuthKeyPopup.Height = 300;
-            pamAuthKeyPopup.Width = 300;
-            pamAuthKeyPopup.VerticalOffset = 10;
-            pamAuthKeyPopup.HorizontalOffset = 10;
-            PAMAuthKeyUserControl control = new PAMAuthKeyUserControl();
-            control.txtPAMAuthKey.Text = "";
-            pamAuthKeyStackPanel.Children.Add(control);
-            border.Child = pamAuthKeyStackPanel;
+        //    Popup pamAuthKeyPopup = new Popup();
+        //    pamAuthKeyPopup.Height = 300;
+        //    pamAuthKeyPopup.Width = 300;
+        //    pamAuthKeyPopup.VerticalOffset = 10;
+        //    pamAuthKeyPopup.HorizontalOffset = 10;
+        //    PAMAuthKeyUserControl control = new PAMAuthKeyUserControl();
+        //    control.txtPAMAuthKey.Text = "";
+        //    pamAuthKeyStackPanel.Children.Add(control);
+        //    border.Child = pamAuthKeyStackPanel;
 
-            pamAuthKeyPopup.Child = border;
-            pamAuthKeyPopup.IsOpen = true;
+        //    pamAuthKeyPopup.Child = border;
+        //    pamAuthKeyPopup.IsOpen = true;
 
-            control.btnOK.Click += (s, args) =>
-            {
-                pamAuthKeyPopup.IsOpen = false;
-                string pamAuthKey = control.txtPAMAuthKey.Text.Trim();
-                channel = txtChannel.Text;
-                pubnub.AuditAccess<string>(channel, pamAuthKey, PubnubCallbackResult, PubnubDisplayErrorMessage);
+        //    control.btnOK.Click += (s, args) =>
+        //    {
+        //        pamAuthKeyPopup.IsOpen = false;
+        //        string pamAuthKey = control.txtPAMAuthKey.Text.Trim();
+        //        channel = txtChannel.Text;
+        //        pubnub.AuditAccess<string>(channel, pamAuthKey, PubnubCallbackResult, PubnubDisplayErrorMessage);
 
-                TextBlock textBlock = new TextBlock();
-                textBlock.Text = string.Format("Audit request ...\n");
-                messageStackPanel.Children.Add(textBlock);
-                scrollViewerResult.UpdateLayout();
-                scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
+        //        TextBlock textBlock = new TextBlock();
+        //        textBlock.Text = string.Format("Audit request ...\n");
+        //        messageStackPanel.Children.Add(textBlock);
+        //        scrollViewerResult.UpdateLayout();
+        //        scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
 
-                pamAuthKeyPopup = null;
-                this.IsEnabled = true;
-            };
-            control.btnCancel.Click += (s, args) =>
-            {
-                pamAuthKeyPopup.IsOpen = false;
-                pamAuthKeyPopup = null;
-                this.IsEnabled = true;
-            };
-        }
+        //        pamAuthKeyPopup = null;
+        //        this.IsEnabled = true;
+        //    };
+        //    control.btnCancel.Click += (s, args) =>
+        //    {
+        //        pamAuthKeyPopup.IsOpen = false;
+        //        pamAuthKeyPopup = null;
+        //        this.IsEnabled = true;
+        //    };
+        //}
 
-        private void btnGrantPresence_Click(object sender, RoutedEventArgs e)
-        {
-            this.IsEnabled = false;
-            Border border = new Border();
-            border.BorderBrush = new SolidColorBrush(Colors.Black);
-            border.BorderThickness = new Thickness(5.0);
+        //private void btnGrantPresence_Click(object sender, RoutedEventArgs e)
+        //{
+        //    this.IsEnabled = false;
+        //    Border border = new Border();
+        //    border.BorderBrush = new SolidColorBrush(Colors.Black);
+        //    border.BorderThickness = new Thickness(5.0);
 
-            StackPanel pamAuthKeyStackPanel = new StackPanel();
-            pamAuthKeyStackPanel.Background = new SolidColorBrush(Colors.Blue);
-            pamAuthKeyStackPanel.Width = 400;
-            pamAuthKeyStackPanel.Height = 300;
+        //    StackPanel pamAuthKeyStackPanel = new StackPanel();
+        //    pamAuthKeyStackPanel.Background = new SolidColorBrush(Colors.Blue);
+        //    pamAuthKeyStackPanel.Width = 400;
+        //    pamAuthKeyStackPanel.Height = 300;
 
-            Popup pamAuthKeyPopup = new Popup();
-            pamAuthKeyPopup.Height = 300;
-            pamAuthKeyPopup.Width = 300;
-            pamAuthKeyPopup.VerticalOffset = 10;
-            pamAuthKeyPopup.HorizontalOffset = 10;
-            PAMAuthKeyUserControl control = new PAMAuthKeyUserControl();
-            control.txtPAMAuthKey.Text = "";
-            pamAuthKeyStackPanel.Children.Add(control);
-            border.Child = pamAuthKeyStackPanel;
+        //    Popup pamAuthKeyPopup = new Popup();
+        //    pamAuthKeyPopup.Height = 300;
+        //    pamAuthKeyPopup.Width = 300;
+        //    pamAuthKeyPopup.VerticalOffset = 10;
+        //    pamAuthKeyPopup.HorizontalOffset = 10;
+        //    PAMAuthKeyUserControl control = new PAMAuthKeyUserControl();
+        //    control.txtPAMAuthKey.Text = "";
+        //    pamAuthKeyStackPanel.Children.Add(control);
+        //    border.Child = pamAuthKeyStackPanel;
 
-            pamAuthKeyPopup.Child = border;
-            pamAuthKeyPopup.IsOpen = true;
+        //    pamAuthKeyPopup.Child = border;
+        //    pamAuthKeyPopup.IsOpen = true;
 
-            control.btnOK.Click += (s, args) =>
-            {
-                pamAuthKeyPopup.IsOpen = false;
-                string pamAuthKey = control.txtPAMAuthKey.Text.Trim();
-                channel = txtChannel.Text;
-                pubnub.GrantPresenceAccess<string>(channel, pamAuthKey, true, true, PubnubCallbackResult, PubnubDisplayErrorMessage);
+        //    control.btnOK.Click += (s, args) =>
+        //    {
+        //        pamAuthKeyPopup.IsOpen = false;
+        //        string pamAuthKey = control.txtPAMAuthKey.Text.Trim();
+        //        channel = txtChannel.Text;
+        //        pubnub.GrantPresenceAccess<string>(channel, pamAuthKey, true, true, PubnubCallbackResult, PubnubDisplayErrorMessage);
 
-                TextBlock textBlock = new TextBlock();
-                textBlock.Text = string.Format("Grant request ...\n");
-                messageStackPanel.Children.Add(textBlock);
-                scrollViewerResult.UpdateLayout();
-                scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
+        //        TextBlock textBlock = new TextBlock();
+        //        textBlock.Text = string.Format("Grant request ...\n");
+        //        messageStackPanel.Children.Add(textBlock);
+        //        scrollViewerResult.UpdateLayout();
+        //        scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
 
-                pamAuthKeyPopup = null;
-                this.IsEnabled = true;
-            };
-            control.btnCancel.Click += (s, args) =>
-            {
-                pamAuthKeyPopup.IsOpen = false;
-                pamAuthKeyPopup = null;
-                this.IsEnabled = true;
-            };
-        }
+        //        pamAuthKeyPopup = null;
+        //        this.IsEnabled = true;
+        //    };
+        //    control.btnCancel.Click += (s, args) =>
+        //    {
+        //        pamAuthKeyPopup.IsOpen = false;
+        //        pamAuthKeyPopup = null;
+        //        this.IsEnabled = true;
+        //    };
+        //}
 
-        private void btnAuditPresence_Click(object sender, RoutedEventArgs e)
-        {
-            this.IsEnabled = false;
-            Border border = new Border();
-            border.BorderBrush = new SolidColorBrush(Colors.Black);
-            border.BorderThickness = new Thickness(5.0);
+        //private void btnAuditPresence_Click(object sender, RoutedEventArgs e)
+        //{
+        //    this.IsEnabled = false;
+        //    Border border = new Border();
+        //    border.BorderBrush = new SolidColorBrush(Colors.Black);
+        //    border.BorderThickness = new Thickness(5.0);
 
-            StackPanel pamAuthKeyStackPanel = new StackPanel();
-            pamAuthKeyStackPanel.Background = new SolidColorBrush(Colors.Blue);
-            pamAuthKeyStackPanel.Width = 400;
-            pamAuthKeyStackPanel.Height = 300;
+        //    StackPanel pamAuthKeyStackPanel = new StackPanel();
+        //    pamAuthKeyStackPanel.Background = new SolidColorBrush(Colors.Blue);
+        //    pamAuthKeyStackPanel.Width = 400;
+        //    pamAuthKeyStackPanel.Height = 300;
 
-            Popup pamAuthKeyPopup = new Popup();
-            pamAuthKeyPopup.Height = 300;
-            pamAuthKeyPopup.Width = 300;
-            pamAuthKeyPopup.VerticalOffset = 10;
-            pamAuthKeyPopup.HorizontalOffset = 10;
-            PAMAuthKeyUserControl control = new PAMAuthKeyUserControl();
-            control.txtPAMAuthKey.Text = "";
-            pamAuthKeyStackPanel.Children.Add(control);
-            border.Child = pamAuthKeyStackPanel;
+        //    Popup pamAuthKeyPopup = new Popup();
+        //    pamAuthKeyPopup.Height = 300;
+        //    pamAuthKeyPopup.Width = 300;
+        //    pamAuthKeyPopup.VerticalOffset = 10;
+        //    pamAuthKeyPopup.HorizontalOffset = 10;
+        //    PAMAuthKeyUserControl control = new PAMAuthKeyUserControl();
+        //    control.txtPAMAuthKey.Text = "";
+        //    pamAuthKeyStackPanel.Children.Add(control);
+        //    border.Child = pamAuthKeyStackPanel;
 
-            pamAuthKeyPopup.Child = border;
-            pamAuthKeyPopup.IsOpen = true;
+        //    pamAuthKeyPopup.Child = border;
+        //    pamAuthKeyPopup.IsOpen = true;
 
-            control.btnOK.Click += (s, args) =>
-            {
-                pamAuthKeyPopup.IsOpen = false;
-                string pamAuthKey = control.txtPAMAuthKey.Text.Trim();
-                channel = txtChannel.Text;
-                pubnub.AuditPresenceAccess<string>(channel, pamAuthKey, PubnubCallbackResult, PubnubDisplayErrorMessage);
+        //    control.btnOK.Click += (s, args) =>
+        //    {
+        //        pamAuthKeyPopup.IsOpen = false;
+        //        string pamAuthKey = control.txtPAMAuthKey.Text.Trim();
+        //        channel = txtChannel.Text;
+        //        pubnub.AuditPresenceAccess<string>(channel, pamAuthKey, PubnubCallbackResult, PubnubDisplayErrorMessage);
 
-                TextBlock textBlock = new TextBlock();
-                textBlock.Text = string.Format("Audit request...\n");
-                messageStackPanel.Children.Add(textBlock);
-                scrollViewerResult.UpdateLayout();
-                scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
+        //        TextBlock textBlock = new TextBlock();
+        //        textBlock.Text = string.Format("Audit request...\n");
+        //        messageStackPanel.Children.Add(textBlock);
+        //        scrollViewerResult.UpdateLayout();
+        //        scrollViewerResult.ScrollToVerticalOffset(scrollViewerResult.ExtentHeight);
 
-                pamAuthKeyPopup = null;
-                this.IsEnabled = true;
-            };
-            control.btnCancel.Click += (s, args) =>
-            {
-                pamAuthKeyPopup.IsOpen = false;
-                pamAuthKeyPopup = null;
-                this.IsEnabled = true;
-            };
-        }
+        //        pamAuthKeyPopup = null;
+        //        this.IsEnabled = true;
+        //    };
+        //    control.btnCancel.Click += (s, args) =>
+        //    {
+        //        pamAuthKeyPopup.IsOpen = false;
+        //        pamAuthKeyPopup = null;
+        //        this.IsEnabled = true;
+        //    };
+        //}
 
         private void btnPush_Click(object sender, RoutedEventArgs e)
         {

@@ -15,7 +15,7 @@ namespace PubnubWindowsStore.Test
     [TestFixture]
     public class WhenPushIsRequested
     {
-        //string currentUnitTestCase = "";
+        string currentUnitTestCase = "";
         bool receivedSuccessMessage = false;
         static bool receivedGrantMessage = false;
 
@@ -26,10 +26,12 @@ namespace PubnubWindowsStore.Test
         [TestFixtureSetUp]
         public void Init()
         {
-            if (!PubnubCommon.PAMEnabled) return;
+            if (!PubnubCommon.PAMEnabled)
+            {
+                return;
+            }
 
             receivedGrantMessage = false;
-
             Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -39,12 +41,11 @@ namespace PubnubWindowsStore.Test
 
             string channel = "hello_my_channel";
 
-            pubnub.GrantAccess<string>(channel, true, true, 20, ThenPublishInitializeShouldReturnGrantMessage, DummyErrorCallback);
-            Task.Delay(1000);
+            mreGrant = new ManualResetEvent(false);
+            pubnub.GrantAccess<string>(channel, true, true, 20, ThenPushInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            mreGrant.WaitOne(60 * 1000);
 
-            mreGrant.WaitOne();
-
-            Assert.IsTrue(receivedGrantMessage, "WhenAMessageIsPublished Grant access failed.");
+            Assert.IsTrue(receivedGrantMessage, "WhenPushIsRequested Grant access failed.");
         }
 
         [Test]
@@ -180,7 +181,13 @@ namespace PubnubWindowsStore.Test
             mrePublish.Set();
         }
 
-        void ThenPublishInitializeShouldReturnGrantMessage(string receivedMessage)
+
+        private void DummyErrorCallback(PubnubClientError result)
+        {
+
+        }
+
+        void ThenPushInitializeShouldReturnGrantMessage(string receivedMessage)
         {
             try
             {
@@ -202,13 +209,6 @@ namespace PubnubWindowsStore.Test
             }
         }
 
-        private void DummyErrorCallback(PubnubClientError result)
-        {
-            if (result != null)
-            {
-                System.Diagnostics.Debug.WriteLine(result.Message);
-            }
-        }
-
     }
+
 }

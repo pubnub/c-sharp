@@ -551,6 +551,68 @@ namespace PubnubWindowsStore.Test
             }
         }
 
+        [Test]
+        public void ThenChannelGroupLevelWithReadManageShouldReturnSuccess()
+        {
+            currentUnitTestCase = "ThenChannelGroupLevelWithReadManageShouldReturnSuccess";
+
+            receivedGrantMessage = false;
+
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenGrantIsRequested";
+            unitTest.TestCaseName = "ThenChannelGroupLevelWithReadManageShouldReturnSuccess";
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channelgroup = "hello_my_group";
+            if (PubnubCommon.PAMEnabled)
+            {
+                grantManualEvent = new ManualResetEvent(false);
+                pubnub.ChannelGroupGrantAccess<string>(channelgroup, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                Task.Delay(1000);
+
+                grantManualEvent.WaitOne();
+
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelGroupLevelWithReadManageShouldReturnSuccess failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelGroupLevelWithReadManageShouldReturnSuccess.");
+            }
+        }
+
+        [Test]
+        public void ThenChannelGroupLevelWithReadShouldReturnSuccess()
+        {
+            currentUnitTestCase = "ThenChannelGroupLevelWithReadShouldReturnSuccess";
+
+            receivedGrantMessage = false;
+
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenGrantIsRequested";
+            unitTest.TestCaseName = "ThenChannelGroupLevelWithReadShouldReturnSuccess";
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channelgroup = "hello_my_group";
+            if (PubnubCommon.PAMEnabled)
+            {
+                grantManualEvent = new ManualResetEvent(false);
+                pubnub.ChannelGroupGrantAccess<string>(channelgroup, true, false, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                Task.Delay(1000);
+
+                grantManualEvent.WaitOne();
+
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelGroupLevelWithReadShouldReturnSuccess failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelGroupLevelWithReadShouldReturnSuccess.");
+            }
+        }
+
         void AccessToSubKeyLevelCallback(string receivedMessage)
         {
             try
@@ -620,16 +682,16 @@ namespace PubnubWindowsStore.Test
                             if (payload != null)
                             {
                                 string level = payload.Value<string>("level");
-                                var channels = payload.Value<JContainer>("channels");
-                                if (channels != null)
+                                if (level == "channel")
                                 {
-                                    var channelContainer = channels.Value<JContainer>(currentChannel);
-                                    if (channelContainer != null)
+                                    var channels = payload.Value<JContainer>("channels");
+                                    if (channels != null)
                                     {
-                                        bool read = channelContainer.Value<bool>("r");
-                                        bool write = channelContainer.Value<bool>("w");
-                                        if (level == "channel")
+                                        var channelContainer = channels.Value<JContainer>(currentChannel);
+                                        if (channelContainer != null)
                                         {
+                                            bool read = channelContainer.Value<bool>("r");
+                                            bool write = channelContainer.Value<bool>("w");
                                             switch (currentUnitTestCase)
                                             {
                                                 case "ThenChannelLevelWithReadWriteShouldReturnSuccess":
@@ -641,6 +703,30 @@ namespace PubnubWindowsStore.Test
                                                     break;
                                                 case "ThenChannelLevelWithWriteShouldReturnSuccess":
                                                     if (!read && write) receivedGrantMessage = true;
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                }
+                                else if (level == "channel-group")
+                                {
+                                    var channelgroups = payload.Value<JContainer>("channel-groups");
+                                    if (channelgroups != null)
+                                    {
+                                        var channelgroupContainer = channelgroups.Value<JContainer>(currentChannel);
+                                        if (channelgroupContainer != null)
+                                        {
+                                            bool read = channelgroupContainer.Value<bool>("r");
+                                            bool manage = channelgroupContainer.Value<bool>("m");
+                                            switch (currentUnitTestCase)
+                                            {
+                                                case "ThenChannelGroupLevelWithReadManageShouldReturnSuccess":
+                                                    if (read && manage) receivedGrantMessage = true;
+                                                    break;
+                                                case "ThenChannelGroupLevelWithReadShouldReturnSuccess":
+                                                    if (read && !manage) receivedGrantMessage = true;
                                                     break;
                                                 default:
                                                     break;
@@ -934,7 +1020,7 @@ namespace PubnubWindowsStore.Test
                                 string level = payload.Value<string>("level");
                                 string channel = payload.Value<string>("channel");
                                 var auths = payload.Value<JContainer>("auths");
-                                if (auths != null && auths.Count > 0)
+                                if (auths != null && auths.Count >= 0)
                                 {
                                     receivedRevokeMessage = true;
                                     foreach (JToken auth in auths.Children())

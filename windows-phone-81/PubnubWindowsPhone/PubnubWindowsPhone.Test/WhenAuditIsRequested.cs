@@ -81,6 +81,39 @@ namespace PubnubWindowsStore.Test
             }
         }
 
+        [Test]
+        public void ThenChannelGroupLevelShouldReturnSuccess()
+        {
+            currentUnitTestCase = "ThenChannelGroupLevelShouldReturnSuccess";
+
+            receivedAuditMessage = false;
+
+            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAuditIsRequested";
+            unitTest.TestCaseName = "ThenChannelGroupLevelShouldReturnSuccess";
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channelgroup = "hello_my_group";
+
+            if (PubnubCommon.PAMEnabled)
+            {
+                auditManualEvent = new ManualResetEvent(false);
+                pubnub.ChannelGroupAuditAccess<string>(channelgroup, AccessToChannelLevelCallback, DummyErrorCallback);
+                Task.Delay(1000);
+
+                auditManualEvent.WaitOne();
+
+                Assert.IsTrue(receivedAuditMessage, "WhenAuditIsRequested -> ThenChannelGroupLevelShouldReturnSuccess failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenAuditIsRequested -> ThenChannelGroupLevelShouldReturnSuccess");
+            }
+        }
+
+
         void AccessToSubKeyLevelCallback(string receivedMessage)
         {
             try
@@ -142,14 +175,29 @@ namespace PubnubWindowsStore.Test
                             if (payload != null)
                             {
                                 string level = payload.Value<string>("level");
-                                var channels = payload.Value<JContainer>("channels");
-                                if (channels != null)
+                                if (currentUnitTestCase == "ThenChannelLevelShouldReturnSuccess")
                                 {
-                                    //Console.WriteLine("{0} - AccessToChannelLevelCallback - Audit Channel Count = {1}", currentUnitTestCase, channels.Count);
+                                    var channels = payload.Value<JContainer>("channels");
+                                    if (channels != null)
+                                    {
+                                        //Console.WriteLine("{0} - AccessToChannelLevelCallback - Audit Channel Count = {1}", currentUnitTestCase, channels.Count);
+                                    }
+                                    if (level == "channel")
+                                    {
+                                        receivedAuditMessage = true;
+                                    }
                                 }
-                                if (level == "channel")
+                                else if (currentUnitTestCase == "ThenChannelGroupLevelShouldReturnSuccess")
                                 {
-                                    receivedAuditMessage = true;
+                                    var channelgroups = payload.Value<JContainer>("channel-groups");
+                                    if (channelgroups != null)
+                                    {
+                                        //Console.WriteLine("{0} - AccessToChannelLevelCallback - Audit ChannelGroup Count = {1}", currentUnitTestCase, channelgroups.Count);
+                                    }
+                                    if (level == "channel-group")
+                                    {
+                                        receivedAuditMessage = true;
+                                    }
                                 }
                             }
                         }

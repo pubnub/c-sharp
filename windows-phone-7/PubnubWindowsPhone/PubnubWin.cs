@@ -1,4 +1,4 @@
-﻿//Build Date: September 24, 2014
+﻿//Build Date: January 22, 2015
 using System;
 using System.Text;
 using System.IO;
@@ -222,10 +222,10 @@ namespace PubNubMessaging.Core
 
 		}
 
-		protected override bool InternetConnectionStatus<T> (string channel, Action<PubnubClientError> errorCallback, string[] rawChannels)
+		protected override bool InternetConnectionStatus<T> (string channel, string channelGroup, Action<PubnubClientError> errorCallback, string[] rawChannels, string[] rawChannelGroups)
 		{
             bool networkConnection;
-            networkConnection = ClientNetworkStatus.CheckInternetStatus<T>(pubnetSystemActive, errorCallback, rawChannels);
+            networkConnection = ClientNetworkStatus.CheckInternetStatus<T>(pubnetSystemActive, errorCallback, rawChannels, rawChannelGroups);
             return networkConnection;
         }
 
@@ -289,6 +289,7 @@ namespace PubNubMessaging.Core
             {
                 ReconnectState<T> netState = new ReconnectState<T>();
                 netState.Channels = pubnubRequestState.Channels;
+                netState.ChannelGroups = pubnubRequestState.ChannelGroups;
                 netState.Type = pubnubRequestState.Type;
                 netState.Callback = pubnubRequestState.UserCallback;
                 netState.ErrorCallback = pubnubRequestState.ErrorCallback;
@@ -307,10 +308,12 @@ namespace PubNubMessaging.Core
                     presenceHeartbeatTimer.Dispose();
                     presenceHeartbeatTimer = null;
                 }
-                if (pubnubRequestState.Channels != null && pubnubRequestState.Channels.Length > 0 && pubnubRequestState.Channels.Where(s => s.Contains("-pnpres") == false).ToArray().Length > 0)
+                if ((pubnubRequestState.Channels != null && pubnubRequestState.Channels.Length > 0 && pubnubRequestState.Channels.Where(s => s.Contains("-pnpres") == false).ToArray().Length > 0)
+                    || (pubnubRequestState.ChannelGroups != null && pubnubRequestState.ChannelGroups.Length > 0 && pubnubRequestState.ChannelGroups.Where(s => s.Contains("-pnpres") == false).ToArray().Length > 0))
                 {
                     RequestState<T> presenceHeartbeatState = new RequestState<T>();
                     presenceHeartbeatState.Channels = pubnubRequestState.Channels;
+                    presenceHeartbeatState.ChannelGroups = pubnubRequestState.ChannelGroups;
                     presenceHeartbeatState.Type = ResponseType.PresenceHeartbeat;
                     presenceHeartbeatState.ErrorCallback = pubnubRequestState.ErrorCallback;
                     presenceHeartbeatState.Request = null;
@@ -343,10 +346,10 @@ namespace PubNubMessaging.Core
 #endif
 
             LoggingMethod.WriteToLog(string.Format("DateTime {0} Exception= {1} for URL: {2}", DateTime.Now.ToString(), ex.ToString(), asynchRequestState.Request.RequestUri.ToString()), LoggingMethod.LevelError);
-            UrlRequestCommonExceptionHandler<T>(asynchRequestState.Type, asynchRequestState.Channels, asynchRequestState.Timeout, asynchRequestState.UserCallback, asynchRequestState.ConnectCallback, asynchRequestState.ErrorCallback, false);
+            UrlRequestCommonExceptionHandler<T>(asynchRequestState.Type, asynchRequestState.Channels, asynchRequestState.ChannelGroups, asynchRequestState.Timeout, asynchRequestState.UserCallback, asynchRequestState.ConnectCallback, asynchRequestState.ErrorCallback, false);
         }
 
-        protected override bool HandleWebException<T>(WebException webEx, RequestState<T> asynchRequestState, string channel)
+        protected override bool HandleWebException<T>(WebException webEx, RequestState<T> asynchRequestState, string channel, string channelGroup)
         {
             bool reconnect = false;
 #if SILVERLIGHT || NETFX_CORE
@@ -361,23 +364,47 @@ namespace PubNubMessaging.Core
             {
                 //internet connection problem.
                 LoggingMethod.WriteToLog(string.Format("DateTime {0}, _urlRequest - Internet connection problem", DateTime.Now.ToString()), LoggingMethod.LevelError);
-                if (channelInternetStatus.ContainsKey(channel) && (asynchRequestState.Type == ResponseType.Subscribe || asynchRequestState.Type == ResponseType.Presence))
+                if ((asynchRequestState.Type == ResponseType.Subscribe || asynchRequestState.Type == ResponseType.Presence))
                 {
-                    reconnect = true;
-                    if (channelInternetStatus[channel])
+                    if (channelInternetStatus.ContainsKey(channel))
                     {
-                        //Reset Retry if previous state is true
-                        channelInternetRetry.AddOrUpdate(channel, 0, (key, oldValue) => 0);
+                        reconnect = true;
+                        if (channelInternetStatus[channel])
+                        {
+                            //Reset Retry if previous state is true
+                            channelInternetRetry.AddOrUpdate(channel, 0, (key, oldValue) => 0);
+                        }
+                        else
+                        {
+                            channelInternetRetry.AddOrUpdate(channel, 1, (key, oldValue) => oldValue + 1);
+                            string multiChannel = (asynchRequestState.Channels != null) ? string.Join(",", asynchRequestState.Channels) : "";
+                            string multiChannelGroup = (asynchRequestState.ChannelGroups != null) ? string.Join(",", asynchRequestState.ChannelGroups) : "";
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} {1} channel = {2} _urlRequest - Internet connection retry {3} of {4}", DateTime.Now.ToString(), asynchRequestState.Type, multiChannel, channelInternetRetry[channel], base.NetworkCheckMaxRetries), LoggingMethod.LevelInfo);
+                            string message = string.Format("Detected internet connection problem. Retrying connection attempt {0} of {1}", channelInternetRetry[channel], base.NetworkCheckMaxRetries);
+                            CallErrorCallback(PubnubErrorSeverity.Warn, PubnubMessageSource.Client, multiChannel, multiChannelGroup, asynchRequestState.ErrorCallback, message, PubnubErrorCode.NoInternetRetryConnect, null, null);
+                        }
+                        channelInternetStatus[channel] = false;
                     }
-                    else
+
+                    if (channelGroupInternetStatus.ContainsKey(channelGroup))
                     {
-                        channelInternetRetry.AddOrUpdate(channel, 1, (key, oldValue) => oldValue + 1);
-                        string multiChannel = (asynchRequestState.Channels != null) ? string.Join(",", asynchRequestState.Channels) : "";
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0} {1} channel = {2} _urlRequest - Internet connection retry {3} of {4}", DateTime.Now.ToString(), asynchRequestState.Type, multiChannel, channelInternetRetry[channel], base.NetworkCheckMaxRetries), LoggingMethod.LevelInfo);
-                        string message = string.Format("Detected internet connection problem. Retrying connection attempt {0} of {1}", channelInternetRetry[channel], base.NetworkCheckMaxRetries);
-                        CallErrorCallback(PubnubErrorSeverity.Warn, PubnubMessageSource.Client, multiChannel, asynchRequestState.ErrorCallback, message, PubnubErrorCode.NoInternetRetryConnect, null, null);
+                        reconnect = true;
+                        if (channelGroupInternetStatus[channelGroup])
+                        {
+                            //Reset Retry if previous state is true
+                            channelGroupInternetRetry.AddOrUpdate(channelGroup, 0, (key, oldValue) => 0);
+                        }
+                        else
+                        {
+                            channelGroupInternetRetry.AddOrUpdate(channelGroup, 1, (key, oldValue) => oldValue + 1);
+                            string multiChannel = (asynchRequestState.Channels != null) ? string.Join(",", asynchRequestState.Channels) : "";
+                            string multiChannelGroup = (asynchRequestState.ChannelGroups != null) ? string.Join(",", asynchRequestState.ChannelGroups) : "";
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} {1} channelgroup = {2} _urlRequest - Internet connection retry {3} of {4}", DateTime.Now.ToString(), asynchRequestState.Type, multiChannelGroup, channelGroupInternetRetry[channelGroup], base.NetworkCheckMaxRetries), LoggingMethod.LevelInfo);
+                            string message = string.Format("Detected internet connection problem. Retrying connection attempt {0} of {1}", channelGroupInternetRetry[channelGroup], base.NetworkCheckMaxRetries);
+                            CallErrorCallback(PubnubErrorSeverity.Warn, PubnubMessageSource.Client, multiChannel, multiChannelGroup, asynchRequestState.ErrorCallback, message, PubnubErrorCode.NoInternetRetryConnect, null, null);
+                        }
+                        channelGroupInternetStatus[channelGroup] = false;
                     }
-                    channelInternetStatus[channel] = false;
                 }
                 #if NETFX_CORE
                 Task.Delay(base.NetworkCheckRetryInterval * 1000);
@@ -388,7 +415,7 @@ namespace PubNubMessaging.Core
             return reconnect;
         }
 
-        protected override void ProcessResponseCallbackWebExceptionHandler<T>(WebException webEx, RequestState<T> asynchRequestState, string channel)
+        protected override void ProcessResponseCallbackWebExceptionHandler<T>(WebException webEx, RequestState<T> asynchRequestState, string channel, string channelGroup)
         {
             bool reconnect = false;
             LoggingMethod.WriteToLog(string.Format("DateTime {0}, WebException: {1}", DateTime.Now.ToString(), webEx.ToString()), LoggingMethod.LevelError);
@@ -402,9 +429,9 @@ namespace PubNubMessaging.Core
                     TerminatePendingWebRequest(asynchRequestState);
             }
             //#elif (!SILVERLIGHT)
-            reconnect = HandleWebException(webEx, asynchRequestState, channel);
+            reconnect = HandleWebException(webEx, asynchRequestState, channel, channelGroup);
 
-            UrlRequestCommonExceptionHandler<T>(asynchRequestState.Type, asynchRequestState.Channels, asynchRequestState.Timeout,
+            UrlRequestCommonExceptionHandler<T>(asynchRequestState.Type, asynchRequestState.Channels, asynchRequestState.ChannelGroups, asynchRequestState.Timeout,
                 asynchRequestState.UserCallback, asynchRequestState.ConnectCallback, asynchRequestState.ErrorCallback, reconnect);
         }
 
@@ -415,10 +442,19 @@ namespace PubNubMessaging.Core
             RequestState<T> asynchRequestState = asynchronousResult.AsyncState as RequestState<T>;
 
             string channel = "";
-            if (asynchRequestState != null && asynchRequestState.Channels != null)
+            string channelGroup = "";
+            if (asynchRequestState != null)
             {
-                channel = string.Join(",", asynchRequestState.Channels);
+                if (asynchRequestState.Channels != null)
+                {
+                    channel = (asynchRequestState.Channels.Length > 0) ? string.Join(",", asynchRequestState.Channels) : ",";
+                }
+                if (asynchRequestState.ChannelGroups != null)
+                {
+                    channelGroup = string.Join(",", asynchRequestState.ChannelGroups);
+                }
             }
+            //if (asynchRequestState != null && asynchRequestState.c
 
             PubnubWebRequest asyncWebRequest = asynchRequestState.Request as PubnubWebRequest;
             try
@@ -433,13 +469,17 @@ namespace PubNubMessaging.Core
                         {
                             if (asynchRequestState.Type == ResponseType.Subscribe || asynchRequestState.Type == ResponseType.Presence)
                             {
-                                if (!overrideTcpKeepAlive && channelInternetStatus.ContainsKey(channel) && !channelInternetStatus[channel])
+                                if (!overrideTcpKeepAlive && (
+                                            (channelInternetStatus.ContainsKey(channel) && !channelInternetStatus[channel]) 
+                                                || (channelGroupInternetStatus.ContainsKey(channelGroup) && !channelGroupInternetStatus[channelGroup])
+                                                ))
                                 {
-                                    if (asynchRequestState.Channels != null)
+                                    if (asynchRequestState.Channels != null && asynchRequestState.Channels.Length > 0)
                                     {
                                         for (int index = 0; index < asynchRequestState.Channels.Length; index++)
                                         {
                                             string activeChannel = asynchRequestState.Channels[index].ToString();
+                                            string activeChannelGroup = "";
 
                                             string status = "Internet connection available";
 
@@ -460,7 +500,40 @@ namespace PubNubMessaging.Core
                                                 if (currentPubnubCallback != null && currentPubnubCallback.ConnectCallback != null)
                                                 {
                                                     CallErrorCallback(PubnubErrorSeverity.Info, PubnubMessageSource.Client,
-                                                        activeChannel, asynchRequestState.ErrorCallback,
+                                                        activeChannel, activeChannelGroup, asynchRequestState.ErrorCallback,
+                                                        status, PubnubErrorCode.YesInternet, null, null);
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if (asynchRequestState.ChannelGroups != null && asynchRequestState.ChannelGroups.Length > 0)
+                                    {
+                                        for (int index = 0; index < asynchRequestState.ChannelGroups.Length; index++)
+                                        {
+                                            string activeChannel = "";
+                                            string activeChannelGroup = asynchRequestState.ChannelGroups[index].ToString();
+
+                                            string status = "Internet connection available";
+
+                                            PubnubChannelGroupCallbackKey callbackKey = new PubnubChannelGroupCallbackKey();
+                                            callbackKey.ChannelGroup = activeChannel;
+                                            callbackKey.Type = asynchRequestState.Type;
+
+                                            if (channelGroupCallbacks.Count > 0 && channelGroupCallbacks.ContainsKey(callbackKey))
+                                            {
+                                                object callbackObject;
+                                                bool channelAvailable = channelGroupCallbacks.TryGetValue(callbackKey, out callbackObject);
+                                                PubnubChannelGroupCallback<T> currentPubnubCallback = null;
+                                                if (channelAvailable)
+                                                {
+                                                    currentPubnubCallback = callbackObject as PubnubChannelGroupCallback<T>;
+                                                }
+
+                                                if (currentPubnubCallback != null && currentPubnubCallback.ConnectCallback != null)
+                                                {
+                                                    CallErrorCallback(PubnubErrorSeverity.Info, PubnubMessageSource.Client,
+                                                        activeChannel, activeChannelGroup, asynchRequestState.ErrorCallback,
                                                         status, PubnubErrorCode.YesInternet, null, null);
                                                 }
                                             }
@@ -469,6 +542,7 @@ namespace PubNubMessaging.Core
                                 }
 
                                 channelInternetStatus.AddOrUpdate(channel, true, (key, oldValue) => true);
+                                channelGroupInternetStatus.AddOrUpdate(channelGroup, true, (key, oldValue) => true);
                             }
 
                             //Deserialize the result
@@ -501,7 +575,7 @@ namespace PubNubMessaging.Core
                                             int pubnubStatusCode = (int)pubnubErrorType;
                                             string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(pubnubErrorType);
 
-                                            PubnubClientError error = new PubnubClientError(pubnubStatusCode, PubnubErrorSeverity.Critical, statusMessage, PubnubMessageSource.Server, asynchRequestState.Request, asynchRequestState.Response, errorDescription, channel);
+                                            PubnubClientError error = new PubnubClientError(pubnubStatusCode, PubnubErrorSeverity.Critical, statusMessage, PubnubMessageSource.Server, asynchRequestState.Request, asynchRequestState.Response, errorDescription, channel, channelGroup);
                                             GoToCallback(error, asynchRequestState.ErrorCallback);
                                         }
                                     }
@@ -509,7 +583,27 @@ namespace PubNubMessaging.Core
                             }
                             else if (jsonString != "[]")
                             {
-                                result = WrapResultBasedOnResponseType<T>(asynchRequestState.Type, jsonString, asynchRequestState.Channels, asynchRequestState.Reconnect, asynchRequestState.Timetoken, asynchRequestState.ErrorCallback);
+                                if (base.JsonPluggableLibrary.IsDictionaryCompatible(jsonString))
+                                {
+                                    Dictionary<string, object> deserializeStatus = base.JsonPluggableLibrary.DeserializeToDictionaryOfObject(jsonString);
+                                    int statusCode = 0; //default. assuming all is ok 
+                                    if (deserializeStatus.ContainsKey("status") && deserializeStatus.ContainsKey("message"))
+                                    {
+                                        Int32.TryParse(deserializeStatus["status"].ToString(), out statusCode);
+                                        string statusMessage = deserializeStatus["message"].ToString();
+
+                                        if (statusCode != 200)
+                                        {
+                                            PubnubErrorCode pubnubErrorType = PubnubErrorCodeHelper.GetErrorType(statusCode, statusMessage);
+                                            int pubnubStatusCode = (int)pubnubErrorType;
+                                            string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(pubnubErrorType);
+
+                                            PubnubClientError error = new PubnubClientError(pubnubStatusCode, PubnubErrorSeverity.Critical, statusMessage, PubnubMessageSource.Server, asynchRequestState.Request, asynchRequestState.Response, errorDescription, channel, channelGroup);
+                                            GoToCallback(error, asynchRequestState.ErrorCallback);
+                                        }
+                                    }
+                                }
+                                result = WrapResultBasedOnResponseType<T>(asynchRequestState.Type, jsonString, asynchRequestState.Channels, asynchRequestState.ChannelGroups, asynchRequestState.Reconnect, asynchRequestState.Timetoken, asynchRequestState.ErrorCallback);
                             }
                         }
 #if !NETFX_CORE
@@ -519,16 +613,26 @@ namespace PubNubMessaging.Core
                 }
                 else
                 {
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0}, Request aborted for channel={1}", DateTime.Now.ToString(), channel), LoggingMethod.LevelInfo);
+                    LoggingMethod.WriteToLog(string.Format("DateTime {0}, Request aborted for channel={1}, channel group={2}", DateTime.Now.ToString(), channel, channelGroup), LoggingMethod.LevelInfo);
                 }
 
                 ProcessResponseCallbacks<T>(result, asynchRequestState);
 
-                if ((asynchRequestState.Type == ResponseType.Subscribe || asynchRequestState.Type == ResponseType.Presence) && (asynchRequestState.Channels != null) && (result != null) && (result.Count > 0))
+                if ((asynchRequestState.Type == ResponseType.Subscribe || asynchRequestState.Type == ResponseType.Presence) && (result != null) && (result.Count > 0))
                 {
-                    foreach (string currentChannel in asynchRequestState.Channels)
+                    if (asynchRequestState.Channels != null)
                     {
-                        multiChannelSubscribe.AddOrUpdate(currentChannel, Convert.ToInt64(result[1].ToString()), (key, oldValue) => Convert.ToInt64(result[1].ToString()));
+                        foreach (string currentChannel in asynchRequestState.Channels)
+                        {
+                            multiChannelSubscribe.AddOrUpdate(currentChannel, Convert.ToInt64(result[1].ToString()), (key, oldValue) => Convert.ToInt64(result[1].ToString()));
+                        }
+                    }
+                    if (asynchRequestState.ChannelGroups != null && asynchRequestState.ChannelGroups.Length > 0)
+                    {
+                        foreach (string currentChannelGroup in asynchRequestState.ChannelGroups)
+                        {
+                            multiChannelGroupSubscribe.AddOrUpdate(currentChannelGroup, Convert.ToInt64(result[1].ToString()), (key, oldValue) => Convert.ToInt64(result[1].ToString()));
+                        }
                     }
                 }
 
@@ -614,13 +718,13 @@ namespace PubNubMessaging.Core
                                     errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(pubnubErrorType);
                                 }
 
-                                PubnubClientError error = new PubnubClientError(pubnubStatusCode, PubnubErrorSeverity.Critical, jsonString, PubnubMessageSource.Server, asynchRequestState.Request, asynchRequestState.Response, errorDescription, channel);
+                                PubnubClientError error = new PubnubClientError(pubnubStatusCode, PubnubErrorSeverity.Critical, jsonString, PubnubMessageSource.Server, asynchRequestState.Request, asynchRequestState.Response, errorDescription, channel, channelGroup);
                                 GoToCallback(error, asynchRequestState.ErrorCallback);
 
                             }
                             else if (jsonString != "[]")
                             {
-                                result = WrapResultBasedOnResponseType<T>(asynchRequestState.Type, jsonString, asynchRequestState.Channels, asynchRequestState.Reconnect, asynchRequestState.Timetoken, asynchRequestState.ErrorCallback);
+                                result = WrapResultBasedOnResponseType<T>(asynchRequestState.Type, jsonString, asynchRequestState.Channels, asynchRequestState.ChannelGroups, asynchRequestState.Reconnect, asynchRequestState.Timetoken, asynchRequestState.ErrorCallback);
                             }
                             else
                             {
@@ -646,7 +750,7 @@ namespace PubNubMessaging.Core
                 }
                 else
                 {
-                    if (asynchRequestState.Channels != null || asynchRequestState.Type == ResponseType.Time)
+                    if (asynchRequestState.Channels != null || asynchRequestState.ChannelGroups != null || asynchRequestState.Type == ResponseType.Time)
                     {
                         if (asynchRequestState.Type == ResponseType.Subscribe
                                   || asynchRequestState.Type == ResponseType.Presence)
@@ -657,7 +761,11 @@ namespace PubNubMessaging.Core
                             {
                                 for (int index = 0; index < asynchRequestState.Channels.Length; index++)
                                 {
-                                    string activeChannel = asynchRequestState.Channels[index].ToString();
+                                    string activeChannel = (asynchRequestState.Channels != null && asynchRequestState.Channels.Length > 0) 
+                                        ? asynchRequestState.Channels[index].ToString() : "";
+                                    string activeChannelGroup = (asynchRequestState.ChannelGroups != null && asynchRequestState.ChannelGroups.Length > 0) 
+                                        ? asynchRequestState.ChannelGroups[index].ToString() : "";
+
                                     PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
                                     callbackKey.Channel = activeChannel;
                                     callbackKey.Type = asynchRequestState.Type;
@@ -674,38 +782,71 @@ namespace PubNubMessaging.Core
                                         if (currentPubnubCallback != null && currentPubnubCallback.ErrorCallback != null)
                                         {
                                             PubnubClientError error = CallErrorCallback(PubnubErrorSeverity.Warn, PubnubMessageSource.Client,
-                                                                                     activeChannel, currentPubnubCallback.ErrorCallback,
+                                                                                     activeChannel, activeChannelGroup, currentPubnubCallback.ErrorCallback,
                                                                                      webEx, asynchRequestState.Request, asynchRequestState.Response);
                                             LoggingMethod.WriteToLog(string.Format("DateTime {0}, PubnubClientError = {1}", DateTime.Now.ToString(), error.ToString()), LoggingMethod.LevelInfo);
                                         }
                                     }
+                                }
 
+                                if (asynchRequestState.ChannelGroups != null)
+                                {
+                                    for (int index = 0; index < asynchRequestState.ChannelGroups.Length; index++)
+                                    {
+                                        string activeChannel = (asynchRequestState.Channels != null && asynchRequestState.Channels.Length > 0)
+                                            ? asynchRequestState.Channels[index].ToString() : "";
+                                        string activeChannelGroup = (asynchRequestState.ChannelGroups != null && asynchRequestState.ChannelGroups.Length > 0)
+                                            ? asynchRequestState.ChannelGroups[index].ToString() : "";
+
+                                        PubnubChannelGroupCallbackKey callbackKey = new PubnubChannelGroupCallbackKey();
+                                        callbackKey.ChannelGroup = activeChannelGroup;
+                                        callbackKey.Type = asynchRequestState.Type;
+
+                                        if (channelGroupCallbacks.Count > 0 && channelGroupCallbacks.ContainsKey(callbackKey))
+                                        {
+                                            object callbackObject;
+                                            bool channelGroupAvailable = channelGroupCallbacks.TryGetValue(callbackKey, out callbackObject);
+                                            PubnubChannelGroupCallback<T> currentPubnubCallback = null;
+                                            if (channelGroupAvailable)
+                                            {
+                                                currentPubnubCallback = callbackObject as PubnubChannelGroupCallback<T>;
+                                            }
+                                            if (currentPubnubCallback != null && currentPubnubCallback.ErrorCallback != null)
+                                            {
+                                                PubnubClientError error = CallErrorCallback(PubnubErrorSeverity.Warn, PubnubMessageSource.Client,
+                                                                                         activeChannel, activeChannelGroup, currentPubnubCallback.ErrorCallback,
+                                                                                         webEx, asynchRequestState.Request, asynchRequestState.Response);
+                                                LoggingMethod.WriteToLog(string.Format("DateTime {0}, PubnubClientError = {1}", DateTime.Now.ToString(), error.ToString()), LoggingMethod.LevelInfo);
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
                         else
                         {
                             PubnubClientError error = CallErrorCallback(PubnubErrorSeverity.Warn, PubnubMessageSource.Client,
-                                                                 channel, asynchRequestState.ErrorCallback,
+                                                                 channel, channelGroup, asynchRequestState.ErrorCallback,
                                                                  webEx, asynchRequestState.Request, asynchRequestState.Response);
                             LoggingMethod.WriteToLog(string.Format("DateTime {0}, PubnubClientError = {1}", DateTime.Now.ToString(), error.ToString()), LoggingMethod.LevelInfo);
                         }
                     }
-                    ProcessResponseCallbackWebExceptionHandler<T>(webEx, asynchRequestState, channel);
+                    ProcessResponseCallbackWebExceptionHandler<T>(webEx, asynchRequestState, channel, channelGroup);
                 }
             }
             catch (Exception ex)
             {
                 if (!pubnetSystemActive && ex.Message.IndexOf("The IAsyncResult object was not returned from the corresponding asynchronous method on this class.") == -1)
                 {
-                    if (asynchRequestState.Channels != null)
+                    if (asynchRequestState.Type == ResponseType.Subscribe || asynchRequestState.Type == ResponseType.Presence)
                     {
-                        if (asynchRequestState.Type == ResponseType.Subscribe
-                                  || asynchRequestState.Type == ResponseType.Presence)
+                        if (asynchRequestState.Channels != null && asynchRequestState.Channels.Length > 0)
                         {
                             for (int index = 0; index < asynchRequestState.Channels.Length; index++)
                             {
                                 string activeChannel = asynchRequestState.Channels[index].ToString();
+                                string activeChannelGroup = (asynchRequestState.ChannelGroups != null && asynchRequestState.ChannelGroups.Length > 0)
+                                    ? asynchRequestState.ChannelGroups[index].ToString() : "";
 
                                 PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
                                 callbackKey.Channel = activeChannel;
@@ -723,19 +864,51 @@ namespace PubNubMessaging.Core
                                     if (currentPubnubCallback != null && currentPubnubCallback.ErrorCallback != null)
                                     {
                                         CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
-                                            activeChannel, currentPubnubCallback.ErrorCallback, ex, asynchRequestState.Request, asynchRequestState.Response);
+                                            activeChannel, activeChannelGroup, currentPubnubCallback.ErrorCallback, ex, asynchRequestState.Request, asynchRequestState.Response);
 
                                     }
                                 }
                             }
                         }
-                        else
-                        {
-                            CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
-                                channel, asynchRequestState.ErrorCallback, ex, asynchRequestState.Request, asynchRequestState.Response);
-                        }
 
+                        if (asynchRequestState.ChannelGroups != null && asynchRequestState.ChannelGroups.Length > 0)
+                        {
+                            for (int index = 0; index < asynchRequestState.ChannelGroups.Length; index++)
+                            {
+                                string activeChannel = (asynchRequestState.Channels != null && asynchRequestState.Channels.Length > 0)
+                                    ? asynchRequestState.Channels[index].ToString() : "";
+                                string activeChannelGroup = asynchRequestState.ChannelGroups[index].ToString();
+
+                                PubnubChannelGroupCallbackKey callbackKey = new PubnubChannelGroupCallbackKey();
+                                callbackKey.ChannelGroup = activeChannelGroup;
+                                callbackKey.Type = asynchRequestState.Type;
+
+                                if (channelGroupCallbacks.Count > 0 && channelGroupCallbacks.ContainsKey(callbackKey))
+                                {
+                                    object callbackObject;
+                                    bool channelAvailable = channelGroupCallbacks.TryGetValue(callbackKey, out callbackObject);
+                                    PubnubChannelGroupCallback<T> currentPubnubCallback = null;
+                                    if (channelAvailable)
+                                    {
+                                        currentPubnubCallback = callbackObject as PubnubChannelGroupCallback<T>;
+                                    }
+                                    if (currentPubnubCallback != null && currentPubnubCallback.ErrorCallback != null)
+                                    {
+                                        CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
+                                            activeChannel, activeChannelGroup, currentPubnubCallback.ErrorCallback, ex, asynchRequestState.Request, asynchRequestState.Response);
+
+                                    }
+                                }
+                            }
+                        }
+                        
                     }
+                    else
+                    {
+                        CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
+                            channel, channelGroup, asynchRequestState.ErrorCallback, ex, asynchRequestState.Request, asynchRequestState.Response);
+                    }
+
                 }
                 ProcessResponseCallbackExceptionHandler<T>(ex, asynchRequestState);
             }

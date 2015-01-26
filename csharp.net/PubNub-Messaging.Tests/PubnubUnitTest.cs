@@ -228,6 +228,13 @@ namespace PubNubMessaging.Tests
             return data;
         }
 
+        private Dictionary<string, string> LoadWhenDetailedHistoryIsRequestedDetailHistoryWithNullKeysReturnsError()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/v2/history/sub-key//channel/hello_my_channel", "{\"status\":400,\"message\":\"Could Not Parse Request\",\"service\":\"Access Manager\",\"error\":true}");
+            return data;
+        }
+
         private Dictionary<string, string> LoadWhenGetRequestServerTimeThenItShouldReturnTimeStamp()
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
@@ -253,6 +260,18 @@ namespace PubNubMessaging.Tests
             return data;
         }
 
+        private Dictionary<string, string> LoadWhenSubscribedToAChannelGroupThenSubscribeShouldReturnReceivedMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/v1/channel-registration/sub-key/demo-36/channel-group/hello_my_group?add=hello_my_channel", "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}");
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22Test%20for%20WhenSubscribedToAChannelGroup%20ThenItShouldReturnReceivedMessage%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/subscribe/demo-36/,/0/0?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.6.0.2", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/,/0/13559006802662768?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.6.0.2", "[[\"Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/,/0/13559014566792816?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.6.0.2", "[[],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/,/leave?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.6.0.2", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
+            return data;
+        }
+
         private Dictionary<string, string> LoadWhenSubscribedToAChannelThenSubscribeShouldReturnConnectStatus()
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
@@ -261,6 +280,18 @@ namespace PubNubMessaging.Tests
             data.Add("/subscribe/demo-36/hello_my_channel/0/13559006802662768", "[[\"Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage\"],\"13559014566792816\"]");
             data.Add("/subscribe/demo-36/hello_my_channel/0/13559014566792816", "[[],\"13559014566792816\"]");
             data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/leave", "{\"action\": \"leave\"}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenSubscribedToAChannelGroupThenSubscribeShouldReturnConnectStatus()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/v1/channel-registration/sub-key/demo-36/channel-group/hello_my_group?add=hello_my_channel", "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}");
+            //data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22Test%20for%20WhenSubscribedToAChannelGroup%20ThenItShouldReturnReceivedMessage%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/subscribe/demo-36/,/0/0?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.6.0.2", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/,/0/13559006802662768?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.6.0.2", "[[\"Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/,/0/13559014566792816?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.6.0.2", "[[],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/,/leave?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.6.0.2", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
             return data;
         }
 
@@ -273,6 +304,25 @@ namespace PubNubMessaging.Tests
             data.Add("/subscribe/demo-36/hello_my_channel1,hello_my_channel2/0/13559006802662768", "[[],\"13559006802662768\"]");
             data.Add("/subscribe/demo-36/hello_my_channel2,hello_my_channel1/0/0", "[[],\"13559006802662768\"]");
             data.Add("/subscribe/demo-36/hello_my_channel2,hello_my_channel1/0/13559006802662768", "[[],\"13559006802662768\"]");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenSubscribedToAChannelGroupThenMultiSubscribeShouldReturnConnectStatus()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/v1/channel-registration/sub-key/demo-36/channel-group/hello_my_group1?add=hello_my_channel1", "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}");
+            data.Add("/v1/channel-registration/sub-key/demo-36/channel-group/hello_my_group2?add=hello_my_channel2", "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}");
+            //data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22Test%20for%20WhenSubscribedToAChannelGroup%20ThenItShouldReturnReceivedMessage%22", "[1,\"Sent\",\"13559014566792817\"]");
+            
+            data.Add("/subscribe/demo-36/,/0/0?uuid=myuuid&channel-group=hello_my_group1,hello_my_group2&pnsdk=PubNub-CSharp-.NET%2F3.6.0.2", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/,/0/13559006802662768?uuid=myuuid&channel-group=hello_my_group1,hello_my_group2&pnsdk=PubNub-CSharp-.NET%2F3.6.0.2", "[[\"Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/,/0/13559014566792816?uuid=myuuid&channel-group=hello_my_group1,hello_my_group2&pnsdk=PubNub-CSharp-.NET%2F3.6.0.2", "[[],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/,/leave?uuid=myuuid&channel-group=hello_my_group1,hello_my_group2&pnsdk=PubNub-CSharp-.NET%2F3.6.0.2", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
+
+            data.Add("/subscribe/demo-36/,/0/0?uuid=myuuid&channel-group=hello_my_group2,hello_my_group1&pnsdk=PubNub-CSharp-.NET%2F3.6.0.2", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/,/0/13559006802662768?uuid=myuuid&channel-group=hello_my_group2,hello_my_group1&pnsdk=PubNub-CSharp-.NET%2F3.6.0.2", "[[\"Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/,/0/13559014566792816?uuid=myuuid&channel-group=hello_my_group2,hello_my_group1&pnsdk=PubNub-CSharp-.NET%2F3.6.0.2", "[[],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/,/leave?uuid=myuuid&channel-group=hello_my_group2,hello_my_group1&pnsdk=PubNub-CSharp-.NET%2F3.6.0.2", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
             return data;
         }
 
@@ -303,6 +353,18 @@ namespace PubNubMessaging.Tests
             return data;
         }
 
+        private Dictionary<string, string> LoadWhenUnsubscribedToAChannelGroupThenShouldReturnUnsubscribedMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/v1/channel-registration/sub-key/demo-36/channel-group/hello_my_group?add=hello_my_channel", "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}");
+            //data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22Test%20for%20WhenSubscribedToAChannelGroup%20ThenItShouldReturnReceivedMessage%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/subscribe/demo-36/,/0/0?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.6.0.2", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/,/0/13559006802662768?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.6.0.2", "[[\"Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/,/0/13559014566792816?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.6.0.2", "[[],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/,/leave?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.6.0.2", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
+            return data;
+        }
+
         private Dictionary<string, string> LoadWhenAuditIsRequestedThenSubKeyLevelShouldReturnSuccess()
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
@@ -316,6 +378,14 @@ namespace PubNubMessaging.Tests
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add("/v1/auth/audit/sub-key/sub-c-a478dd2a-c33d-11e2-883f-02ee2ddab7fe", "{\"status\":200,\"message\":\"Success\",\"payload\":{\"channels\":{},\"subscribe_key\":\"sub-c-a478dd2a-c33d-11e2-883f-02ee2ddab7fe\",\"level\":\"channel\"},\"service\":\"Access Manager\"}");
             data.Add("/v1/auth/audit/sub-key/demo-36", "{\"status\":200,\"message\":\"Success\",\"payload\":{\"channels\":{},\"subscribe_key\":\"demo-36\",\"level\":\"channel\"},\"service\":\"Access Manager\"}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenAuditIsRequestedThenChannelGroupLevelShouldReturnSuccess()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/v1/auth/audit/sub-key/sub-c-a478dd2a-c33d-11e2-883f-02ee2ddab7fe", "{\"status\":200,\"service\":\"Access Manager\",\"message\":\"Success\",\"payload\":{\"channel-groups\":{},\"subscribe_key\":\"sub-c-a478dd2a-c33d-11e2-883f-02ee2ddab7fe\",\"level\":\"channel-group\"}}");
+            data.Add("/v1/auth/audit/sub-key/demo-36", "{\"status\":200,\"service\":\"Access Manager\",\"message\":\"Success\",\"payload\":{\"channel-groups\":{},\"subscribe_key\":\"demo-36\",\"level\":\"channel-group\"}}");
             return data;
         }
 
@@ -431,6 +501,22 @@ namespace PubNubMessaging.Tests
             return data;
         }
 
+        private Dictionary<string, string> LoadWhenGrantIsRequestedThenChannelGroupLevelWithReadManageShouldReturnSuccess()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/v1/auth/grant/sub-key/sub-c-a478dd2a-c33d-11e2-883f-02ee2ddab7fe", "{\"status\":200,\"service\":\"Access Manager\",\"message\":\"Success\",\"payload\":{\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"m\":1,\"w\":0}},\"subscribe_key\":\"sub-c-a478dd2a-c33d-11e2-883f-02ee2ddab7fe\",\"ttl\":5,\"level\":\"channel-group\"}}");
+            data.Add("/v1/auth/grant/sub-key/demo-36", "{\"status\":200,\"service\":\"Access Manager\",\"message\":\"Success\",\"payload\":{\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"m\":1,\"w\":0}},\"subscribe_key\":\"demo-36\",\"ttl\":5,\"level\":\"channel-group\"}}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenGrantIsRequestedThenChannelGroupLevelWithReadShouldReturnSuccess()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/v1/auth/grant/sub-key/sub-c-a478dd2a-c33d-11e2-883f-02ee2ddab7fe", "{\"status\":200,\"service\":\"Access Manager\",\"message\":\"Success\",\"payload\":{\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"m\":0,\"w\":0}},\"subscribe_key\":\"sub-c-a478dd2a-c33d-11e2-883f-02ee2ddab7fe\",\"ttl\":5,\"level\":\"channel-group\"}}");
+            data.Add("/v1/auth/grant/sub-key/demo-36", "{\"status\":200,\"service\":\"Access Manager\",\"message\":\"Success\",\"payload\":{\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"m\":0,\"w\":0}},\"subscribe_key\":\"demo-36\",\"ttl\":5,\"level\":\"channel-group\"}}");
+            return data;
+        }
+
         private Dictionary<string, string> LoadGrantRequestUnitTestInit()
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
@@ -444,6 +530,14 @@ namespace PubNubMessaging.Tests
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add("/v1/auth/grant/sub-key/sub-c-a478dd2a-c33d-11e2-883f-02ee2ddab7fe", "{\"status\":200,\"message\":\"Success\",\"payload\":{\"channels\":{\"hello_my_channel\":{\"r\":1,\"w\":1},\"hello_my_channel-pnpres\":{\"r\":1,\"w\":1}},\"subscribe_key\":\"sub-c-a478dd2a-c33d-11e2-883f-02ee2ddab7fe\",\"level\":\"channel\"},\"service\":\"Access Manager\"}");
             data.Add("/v1/auth/grant/sub-key/demo-36", "{\"status\":200,\"message\":\"Success\",\"payload\":{\"channels\":{\"hello_my_channel\":{\"r\":1,\"w\":1},\"hello_my_channel-pnpres\":{\"r\":1,\"w\":1}},\"subscribe_key\":\"demo-36\",\"level\":\"channel\"},\"service\":\"Access Manager\"}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadGrantRequestUnitTestInit3()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/v1/auth/grant/sub-key/sub-c-a478dd2a-c33d-11e2-883f-02ee2ddab7fe", "{\"status\":200,\"service\":\"Access Manager\",\"message\":\"Success\",\"payload\":{\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"m\":1,\"w\":0}},\"subscribe_key\":\"sub-c-a478dd2a-c33d-11e2-883f-02ee2ddab7fe\",\"ttl\":20,\"level\":\"channel-group\"}}");
+            data.Add("/v1/auth/grant/sub-key/demo-36", "{\"status\":200,\"service\":\"Access Manager\",\"message\":\"Success\",\"payload\":{\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"m\":1,\"w\":0}},\"subscribe_key\":\"demo-36\",\"ttl\":20,\"level\":\"channel-group\"}}");
             return data;
         }
 
@@ -515,6 +609,27 @@ namespace PubNubMessaging.Tests
             return data;
         }
 
+        private Dictionary<string, string> LoadWhenChannelGroupIsRequestedThenAddChannelShouldReturnSuccess()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/v1/channel-registration/sub-key/demo-36/channel-group/hello_my_group?add=hello_my_channel", "{\"status\":200,\"message\":\"OK\",\"service\":\"channel-registry\",\"error\":false}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenChannelGroupIsRequestedThenRemoveChannelShouldReturnSuccess()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/v1/channel-registration/sub-key/demo-36/channel-group/hello_my_group?remove=hello_my_channel", "{\"status\":200,\"message\":\"OK\",\"service\":\"channel-registry\",\"error\":false}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenChannelGroupIsRequestedThenGetChannelListShouldReturnSuccess()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/v1/channel-registration/sub-key/demo-36/channel-group/hello_my_group", "{\"status\": 200, \"payload\": {\"channels\": [\"hello_my_channel\"], \"group\": \"hello_my_group\"}, \"service\": \"channel-registry\", \"error\": false}");
+            return data;
+        }
+
         public string GetStubResponse(HttpWebRequest request)
         {
             Uri requestUri = request.RequestUri;
@@ -532,6 +647,9 @@ namespace PubNubMessaging.Tests
                             break;
                         case "Init2":
                             responseDictionary = LoadGrantRequestUnitTestInit2();
+                            break;
+                        case "Init3":
+                            responseDictionary = LoadGrantRequestUnitTestInit3();
                             break;
                         default:
                             break;
@@ -608,6 +726,9 @@ namespace PubNubMessaging.Tests
                         case "DetailedHistoryStartWithReverseTrue":
                             responseDictionary = LoadWhenDetailedHistoryIsRequestedDetailedHistoryStartWithReverseTrue();
                             break;
+                        case "DetailHistoryWithNullKeysReturnsError":
+                            responseDictionary = LoadWhenDetailedHistoryIsRequestedDetailHistoryWithNullKeysReturnsError();
+                            break;
                         default:
                             break;
                     }
@@ -647,11 +768,37 @@ namespace PubNubMessaging.Tests
                             break;
                     }
                     break;
+                case "WhenSubscribedToAChannelGroup":
+                    switch (_testCaseName)
+                    {
+                        case "ThenSubscribeShouldReturnReceivedMessage":
+                            responseDictionary = LoadWhenSubscribedToAChannelGroupThenSubscribeShouldReturnReceivedMessage();
+                            break;
+                        case "ThenSubscribeShouldReturnConnectStatus":
+                            responseDictionary = LoadWhenSubscribedToAChannelGroupThenSubscribeShouldReturnConnectStatus();
+                            break;
+                        case "ThenMultiSubscribeShouldReturnConnectStatus":
+                            responseDictionary = LoadWhenSubscribedToAChannelGroupThenMultiSubscribeShouldReturnConnectStatus();
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
                 case "WhenUnsubscribedToAChannel":
                     switch (_testCaseName)
                     {
                         case "ThenShouldReturnUnsubscribedMessage":
                             responseDictionary = LoadWhenUnsubscribedToAChannelThenShouldReturnUnsubscribedMessage();
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case "WhenUnsubscribedToAChannelGroup":
+                    switch (_testCaseName)
+                    {
+                        case "ThenShouldReturnUnsubscribedMessage":
+                            responseDictionary = LoadWhenUnsubscribedToAChannelGroupThenShouldReturnUnsubscribedMessage();
                             break;
                         default:
                             break;
@@ -665,6 +812,9 @@ namespace PubNubMessaging.Tests
                             break;
                         case "ThenChannelLevelShouldReturnSuccess":
                             responseDictionary = LoadWhenAuditIsRequestedThenChannelLevelShouldReturnSuccess();
+                            break;
+                        case "ThenChannelGroupLevelShouldReturnSuccess":
+                            responseDictionary = LoadWhenAuditIsRequestedThenChannelGroupLevelShouldReturnSuccess();
                             break;
                         default:
                             break;
@@ -715,6 +865,12 @@ namespace PubNubMessaging.Tests
                         case "ThenRevokeAtUserLevelReturnSuccess":
                             responseDictionary = LoadWhenGrantIsRequestedThenRevokeAtUserLevelReturnSuccess();
                             break;
+                        case "ThenChannelGroupLevelWithReadManageShouldReturnSuccess":
+                            responseDictionary = LoadWhenGrantIsRequestedThenChannelGroupLevelWithReadManageShouldReturnSuccess();
+                            break;
+                        case "ThenChannelGroupLevelWithReadShouldReturnSuccess":
+                            responseDictionary = LoadWhenGrantIsRequestedThenChannelGroupLevelWithReadShouldReturnSuccess();
+                            break;
                         default:
                             break;
                     }
@@ -750,6 +906,22 @@ namespace PubNubMessaging.Tests
                             break;
                     }
                     break;
+                case "WhenChannelGroupIsRequested":
+                    switch (_testCaseName)
+                    {
+                        case "ThenAddChannelShouldReturnSuccess":
+                            responseDictionary = LoadWhenChannelGroupIsRequestedThenAddChannelShouldReturnSuccess();
+                            break;
+                        case "ThenRemoveChannelShouldReturnSuccess":
+                            responseDictionary = LoadWhenChannelGroupIsRequestedThenRemoveChannelShouldReturnSuccess();
+                            break;
+                        case "ThenGetChannelListShouldReturnSuccess":
+                            responseDictionary = LoadWhenChannelGroupIsRequestedThenGetChannelListShouldReturnSuccess();
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
                 default:
                     break;
             }
@@ -767,6 +939,14 @@ namespace PubNubMessaging.Tests
 #endif
                     throw largeMessageException;
                 }
+            }
+            else if (responseDictionary != null)
+            {
+#if (SILVERLIGHT || WINDOWS_PHONE || NETFX_CORE)
+                stubResponse = responseDictionary[string.Format("{0}{1}",requestUri.AbsolutePath,requestUri.Query)];
+#else
+                stubResponse = responseDictionary[requestUri.PathAndQuery];
+#endif
             }
             else
             {
