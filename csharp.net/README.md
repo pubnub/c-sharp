@@ -14,6 +14,13 @@ For best performance after completion of all intended operations, please call th
 of the Pubnub instance, and assign it to null. This will help ensure speedy resources cleanup when you are done
 with the object.
 
+### Important Changes in PubNub 3.7
+1. Added channelgroup feature for subscribe, presence, unsubscribe, presence unsubscribe, user state and PAM grant/audit/revoke.
+2. Push notification feature supporting MPNS for windows phone 8 client.
+3. Added pnsdk param to URL request
+4. Store in history option for publish
+
+
 ### Important Changes in PubNub 3.6 
 1. Renamed property name HeartbeatInterval to LocalClientHeartbeatInterval.
 2. New properties PresenceHeartbeat, PresenceHeartbeatInterval were added.
@@ -55,10 +62,38 @@ pubnub.Subscribe<string>(channel="mychannel", DisplaySubscribeReturnMessage, Dis
 // NOTE: DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage and DisplayErrorMessage are callback methods
 ```
 
+### Subscribe to channel group only
+
+```c#
+pubnub.Subscribe<string>(channel="", channelGroup="myGroup", DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
+// NOTE: DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage and DisplayErrorMessage are callback methods
+```
+
+### Subscribe to both channel and channel group
+
+```c#
+pubnub.Subscribe<string>(channel="mychannel", channelGroup="myGroup", DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
+// NOTE: DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage and DisplayErrorMessage are callback methods
+```
+
 ### Subscribe to presence channel
 
 ```c#
 pubnub.Presence<string>(channel="mychannel", DisplayPresenceReturnMessage, DisplayPresenceConnectStatusMessage, DisplayErrorMessage);
+// NOTE: DisplayPresenceReturnMessage, DisplayPresenceConnectStatusMessage and DisplayErrorMessage are callback methods
+```
+
+### Subscribe to presence channel group only
+
+```c#
+pubnub.Presence<string>(channel="", channelGroup="myGroup", DisplayPresenceReturnMessage, DisplayPresenceConnectStatusMessage, DisplayErrorMessage);
+// NOTE: DisplayPresenceReturnMessage, DisplayPresenceConnectStatusMessage and DisplayErrorMessage are callback methods
+```
+
+### Subscribe to both presence channel and presence channel group
+
+```c#
+pubnub.Presence<string>(channel="mychannel", channelGroup="myGroup", DisplayPresenceReturnMessage, DisplayPresenceConnectStatusMessage, DisplayErrorMessage);
 // NOTE: DisplayPresenceReturnMessage, DisplayPresenceConnectStatusMessage and DisplayErrorMessage are callback methods
 ```
 
@@ -94,9 +129,29 @@ pubnub.HereNow<string>(channel="mychannel", showUUID=true, includeUserState=true
 ### Set the state of the user on this channel (SetUserState)
 
 ```c#
-pubnub.SetUserState<string>(channel="mychannel", jsonUserState="{mychannel:{"key1":"value1"}}", DisplayReturnMessage, DisplayErrorMessage);
+pubnub.SetUserState<string>(channel="mychannel", jsonUserState='{"key1":"value1"}', DisplayReturnMessage, DisplayErrorMessage);
 
-pubnub.SetUserState<string>(channel="mychannel", uuid="myuuid", jsonUserState='{mychannel:{"key1":"value1"}}', DisplayReturnMessage, DisplayErrorMessage);
+pubnub.SetUserState<string>(channel="mychannel", uuid="myuuid", jsonUserState='{"key1":"value1"}', DisplayReturnMessage, DisplayErrorMessage);
+
+// NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
+```
+
+### Set the state of the user on this channel and channel group (SetUserState)
+
+```c#
+pubnub.SetUserState<string>(channel="mychannel", channelGroup="myGroup", jsonUserState='{"key1":"value1"}', DisplayReturnMessage, DisplayErrorMessage);
+
+pubnub.SetUserState<string>(channel="mychannel", channelGroup="myGroup", uuid="myuuid", jsonUserState='{"key1":"value1"}', DisplayReturnMessage, DisplayErrorMessage);
+
+// NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
+```
+
+### Set the state of the user on this channel group only (SetUserState)
+
+```c#
+pubnub.SetUserState<string>(channel="", channelGroup="myGroup", jsonUserState='{"key1":"value1"}', DisplayReturnMessage, DisplayErrorMessage);
+
+pubnub.SetUserState<string>(channel="", channelGroup="myGroup", uuid="myuuid", jsonUserState='{"key1":"value1"}', DisplayReturnMessage, DisplayErrorMessage);
 
 // NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
@@ -107,6 +162,26 @@ pubnub.SetUserState<string>(channel="mychannel", uuid="myuuid", jsonUserState='{
 pubnub.GetUserState<string>(channel="mychannel", DisplayReturnMessage, DisplayErrorMessage);
 
 pubnub.GetUserState<string>(channel="mychannel", uuid="myAlternateUUID", DisplayReturnMessage, DisplayErrorMessage);
+
+// NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
+```
+
+### Get the state of the user on this channel and channel group (GetUserState)
+
+```c#
+pubnub.GetUserState<string>(channel="mychannel", channelGroup="myGroup", DisplayReturnMessage, DisplayErrorMessage);
+
+pubnub.GetUserState<string>(channel="mychannel", channelGroup="myGroup", uuid="myAlternateUUID", DisplayReturnMessage, DisplayErrorMessage);
+
+// NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
+```
+
+### Get the state of the user on this channel group only (GetUserState)
+
+```c#
+pubnub.GetUserState<string>(channel="", channelGroup="myGroup", DisplayReturnMessage, DisplayErrorMessage);
+
+pubnub.GetUserState<string>(channel="", channelGroup="myGroup", uuid="myAlternateUUID", DisplayReturnMessage, DisplayErrorMessage);
 
 // NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
@@ -134,10 +209,24 @@ pubnub.Unsubscribe<string>(channel="mychannel", DisplayReturnMessage, DisplaySub
 // NOTE: DisplayReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeDisconnectStatusMessage and DisplayErrorMessage are callback methods
 ```
 
+### Unsubscribe from a channel and channel group
+
+```c#
+pubnub.Unsubscribe<string>(channel="mychannel", channelGroup="myGroup", DisplayReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeDisconnectStatusMessage, DisplayErrorMessage);
+// NOTE: DisplayReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeDisconnectStatusMessage and DisplayErrorMessage are callback methods
+```
+
 ### Unsubscribe from a Presence channel
 
 ```c#
 pubnub.PresenceUnsubscribe<string>(channel="mychannel", DisplayReturnMessage, DisplayPresenceConnectStatusMessage, DisplayPresenceDisconnectStatusMessage, DisplayErrorMessage);
+// NOTE: DisplayReturnMessage, DisplayPresenceConnectStatusMessage, DisplayPresenceDisconnectStatusMessage and DisplayErrorMessage are callback methods
+```
+
+### Unsubscribe from a Presence channel and Presence channel group
+
+```c#
+pubnub.PresenceUnsubscribe<string>(channel="mychannel", channelGroup="myGroup", DisplayReturnMessage, DisplayPresenceConnectStatusMessage, DisplayPresenceDisconnectStatusMessage, DisplayErrorMessage);
 // NOTE: DisplayReturnMessage, DisplayPresenceConnectStatusMessage, DisplayPresenceDisconnectStatusMessage and DisplayErrorMessage are callback methods
 ```
 
@@ -270,15 +359,20 @@ pubnub.GrantAccess<string>(channel="mychannel", read=false, write=false, grantTi
 
 
 // At the user level. User is ID'ed via the auth key parameter.
-pubnub.AuthenticationKey = authKey;
 // Grant
-pubnub.GrantAccess<string>(channel="mychannel", read=true, write=true, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
+pubnub.GrantAccess<string>(channel="mychannel", authenticationKey="authKey", read=true, write=true, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
 // Revoke
-pubnub.GrantAccess<string>(channel="mychannel", read=false, write=false, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
+pubnub.GrantAccess<string>(channel="mychannel", authenticationKey="authKey", read=false, write=false, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
+
+
+// At the channel group level
+// Grant
+pubnub.ChannelGroupGrantAccess<string>(channelGroup="myGroup", authenticationKey="authKey", read=true, manage=true, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
+// Revoke
+pubnub.ChannelGroupGrantAccess<string>(channelGroup="myGroup", authenticationKey="authKey", read=false, manage=false, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
 
 // NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
-
 
 ### PAM: Grant and revoke access for Presence
 
@@ -296,16 +390,21 @@ pubnub.GrantPresenceAccess<string>(channel="mychannel", read=true, write=true, g
 pubnub.GrantPresenceAccess<string>(channel="mychannel", read=false, write=false, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
 
 // At the user level. User is ID'ed via the auth key parameter.
-pubnub.AuthenticationKey = authKey;
 // Grant
-pubnub.GrantPresenceAccess<string>(channel="mychannel", read=true, write=true, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
+pubnub.GrantPresenceAccess<string>(channel="mychannel", authenticationKey="authKey", read=true, write=true, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
 // Revoke
-pubnub.GrantPresenceAccess<string>(channel="mychannel", read=true, write=true, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
+pubnub.GrantPresenceAccess<string>(channel="mychannel", authenticationKey="authKey", read=false, write=false, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
+
+// At the channel group level
+// Grant
+pubnub.ChannelGroupGrantPresenceAccess<string>(channelGroup="myGroup", authenticationKey="authKey", read=true, manage=true, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
+// Revoke
+pubnub.ChannelGroupGrantPresenceAccess<string>(channelGroup="myGroup", authenticationKey="authKey", read=false, manage=false, grantTimeLimitInSeconds=60, DisplayReturnMessage, DisplayErrorMessage);
 
 // NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
 
-### Code snippet to audit PAM access for subscribe and presence channels
+### Code snippet to audit PAM access for subscribe and presence channels/channelgroups
 
 ```
 // Audit access at the sub-key level (no channel is given)
@@ -317,9 +416,16 @@ pubnub.AuditAccess<string>(channel="mychannel",DisplayReturnMessage, DisplayErro
 pubnub.AuditPresenceAccess<string>(channel="mychannel",DisplayReturnMessage, DisplayErrorMessage);
 
 //Audit Access at the user level. User is ID'ed via the auth key parameter.
-pubnub.AuthenticationKey = authKey;
-pubnub.AuditAccess<string>(channel="mychannel",DisplayReturnMessage, DisplayErrorMessage);
-pubnub.AuditPresenceAccess<string>(channel="mychannel",DisplayReturnMessage, DisplayErrorMessage);
+pubnub.AuditAccess<string>(channel="mychannel", authenticationKey="authKey", DisplayReturnMessage, DisplayErrorMessage);
+pubnub.AuditPresenceAccess<string>(channel="mychannel", authenticationKey="authKey", DisplayReturnMessage, DisplayErrorMessage);
+
+//Audit Access at channelgroup level
+pubnub.ChannelGroupAuditAccess<string>(channelGroup="myGroup", DisplayReturnMessage, DisplayErrorMessage);
+pubnub.ChannelGroupAuditPresenceAccess<string>(channelGroup="myGroup", DisplayReturnMessage, DisplayErrorMessage);
+
+//Audit Access for channelgroup at user level. 
+pubnub.ChannelGroupAuditAccess<string>(channelGroup="myGroup", authenticationKey="authKey", DisplayReturnMessage, DisplayErrorMessage);
+pubnub.ChannelGroupAuditPresenceAccess<string>(channelGroup="myGroup", authenticationKey="authKey", DisplayReturnMessage, DisplayErrorMessage);
 
 NOTE: DisplayReturnMessage and DisplayErrorMessage are callback methods
 ```
