@@ -1,4 +1,4 @@
-﻿//Build Date: January 22, 2015
+﻿//Build Date: January 28, 2015
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -130,7 +130,7 @@ namespace PubNubMessaging.Core
         private string pushUnregisterDeviceParameters = "";
         private string channelGroupAddParameters = "";
         private string channelGroupRemoveParameters = "";
-        private string _pnsdkVersion = "PubNub-CSharp-.NET/3.6.0.2";
+        private string _pnsdkVersion = "PubNub-CSharp-.NET/3.7";
         private string _pushServiceName = "push.pubnub.com";
 
 		#endregion
