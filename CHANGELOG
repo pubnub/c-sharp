@@ -1,3 +1,12 @@
+01-28-2015 - 3.7.0 - 08d9fd
+. Added pnsdk and UUID params
+. Provided option to store published message or not in history
+. Implemented Push notification feature supporting MPNS for windows phone 8 client.
+. Implemented Channel Groups
+. Fixed issue where null keys were not handled properly
+. Improved unit tests for Mono clients on friendly messages
+. Fixed corner case issue where Xamarin.iOS UI could hang on complex object publish
+
 08-15-2014 - 3.6 - d45ee9
 . Full support for new Presence features! Heartbeat, State, Where Now, Global Here Now
 . Windows Phone 8.1, Windows 8, and 8.1 Store Client Support (Surface)
