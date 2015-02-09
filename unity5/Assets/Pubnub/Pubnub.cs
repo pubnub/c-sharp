@@ -39,11 +39,13 @@ namespace PubNubMessaging.Core
 
         #region "Class variables"
 
-        private GameObject gobj;
-        private CoroutineClass subCoroutine;
+        private static GameObject gobj;
+
+        private CoroutineClass coroutine;
+        /*private CoroutineClass subCoroutine;
         private CoroutineClass nonSubCoroutine;
         private CoroutineClass heartbeatCoroutine;
-        private CoroutineClass presenceHeartbeatCoroutine;
+        private CoroutineClass presenceHeartbeatCoroutine;*/
 
         private string _origin = "pubsub.pubnub.com";
         private string publishKey = "";
@@ -103,6 +105,20 @@ namespace PubNubMessaging.Core
         #endregion
 
         #region "Properties"
+
+        /// <summary>
+        /// Gets or sets the set game object.
+        /// This method should be called before ini
+        /// </summary>
+        /// <value>The set game object.</value>
+        public static GameObject SetGameObject{
+            get{
+                return gobj;
+            }
+            set{
+                gobj = value;
+            }
+        }
 
         private static bool _failClientNetworkForTesting = false;
         private static bool _machineSuspendMode = false;
@@ -366,6 +382,9 @@ namespace PubNubMessaging.Core
 
         private void Init (string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
         {
+            LoggingMethod.LogLevel = _pubnubLogLevel;
+            PubnubErrorFilter.ErrorLevel = _errorLevel;
+
             #if (USE_MiniJSON)
             LoggingMethod.WriteToLog("USE_MiniJSON", LoggingMethod.LevelInfo);
             this.JsonPluggableLibrary = new MiniJSONObjectSerializer();
@@ -387,15 +406,20 @@ namespace PubNubMessaging.Core
             #else
             this.Version = "PubNub-CSharp-Unity5/3.6.2";
             #endif
+            LoggingMethod.WriteToLog (this.Version, LoggingMethod.LevelInfo);
 
-            gobj = new GameObject ();            
-            subCoroutine = gobj.AddComponent<CoroutineClass> ();
+            if (gobj == null) {
+                LoggingMethod.WriteToLog ("Initilizing new GameObject", LoggingMethod.LevelInfo);
+                gobj = new GameObject ();  
+            } else {
+                LoggingMethod.WriteToLog ("Resuing already initialized GameObject", LoggingMethod.LevelInfo);
+            }
+            /*subCoroutine = gobj.AddComponent<CoroutineClass> ();
             nonSubCoroutine = gobj.AddComponent<CoroutineClass> ();
             heartbeatCoroutine = gobj.AddComponent<CoroutineClass> ();
-            presenceHeartbeatCoroutine = gobj.AddComponent<CoroutineClass> ();
+            presenceHeartbeatCoroutine = gobj.AddComponent<CoroutineClass> ();*/
 
-            LoggingMethod.LogLevel = _pubnubLogLevel;
-            PubnubErrorFilter.ErrorLevel = _errorLevel;
+            coroutine = gobj.AddComponent<CoroutineClass> ();
 
             this.publishKey = publishKey;
             this.subscribeKey = subscribeKey;
@@ -407,8 +431,34 @@ namespace PubNubMessaging.Core
             internetStatus = true;
 
             VerifyOrSetSessionUUID ();
+            #if(UNITY_ANDROID || UNITY_STANDALONE)
+            ServicePointManager.ServerCertificateValidationCallback = ValidatorUnity;
+            #endif
+
         }
 
+        #endregion
+
+        #region "ValidatorUnity"
+        #if(UNITY_ANDROID || MONOTOUCH || __IOS__||UNITY_STANDALONE)
+        /// <summary>
+        /// Workaround for the bug described here 
+        /// https://bugzilla.xamarin.com/show_bug.cgi?id=6501
+        /// </summary>
+        /// <param name="sender">Sender.</param>
+        /// <param name="certificate">Certificate.</param>
+        /// <param name="chain">Chain.</param>
+        /// <param name="sslPolicyErrors">Ssl policy errors.</param>
+        static bool ValidatorUnity (object sender,
+            System.Security.Cryptography.X509Certificates.X509Certificate
+            certificate,
+            System.Security.Cryptography.X509Certificates.X509Chain chain,
+            System.Net.Security.SslPolicyErrors sslPolicyErrors)
+        {
+            //TODO:
+            return true;
+        }
+        #endif
         #endregion
 
         #region "PubNub API Channel Methods"
@@ -1343,7 +1393,8 @@ namespace PubNubMessaging.Core
         public void TerminateCurrentSubscriberRequest ()
         {
             //pubnub.TerminateCurrentSubscriberRequest ();
-            subCoroutine.BounceRequest ();
+            //subCoroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
+            coroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
         }
 
         /*public void EnableSimulateNetworkFailForTestingOnly ()
@@ -1371,24 +1422,36 @@ namespace PubNubMessaging.Core
             //pubnub.EndPendingRequests ();
             RemoveChannelCallback ();
             RemoveUserState ();
-            subCoroutine.BounceRequest ();
+            //subCoroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
+            //nonSubCoroutine.BounceRequest (CoroutineClass.CurrentRequestType.NonSubscribe);
+            coroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
+            coroutine.BounceRequest (CoroutineClass.CurrentRequestType.NonSubscribe);
+
             LoggingMethod.WriteToLog (string.Format ("DateTime {0} Request bounced.", DateTime.Now.ToString ()), LoggingMethod.LevelInfo);
             StopHeartbeat ();
             LoggingMethod.WriteToLog (string.Format ("DateTime {0} StopHeartbeat.", DateTime.Now.ToString ()), LoggingMethod.LevelInfo);
             StopPresenceHeartbeat ();
             LoggingMethod.WriteToLog (string.Format ("DateTime {0} StopPresenceHeartbeat.", DateTime.Now.ToString ()), LoggingMethod.LevelInfo);
-            UnityEngine.Object.Destroy (subCoroutine);
+
+            /*UnityEngine.Object.Destroy (subCoroutine);
             UnityEngine.Object.Destroy (nonSubCoroutine);
             UnityEngine.Object.Destroy (heartbeatCoroutine);
-            UnityEngine.Object.Destroy (presenceHeartbeatCoroutine);
+            UnityEngine.Object.Destroy (presenceHeartbeatCoroutine);*/
+            UnityEngine.Object.Destroy (coroutine);
+
             UnityEngine.Object.Destroy (gobj);
             LoggingMethod.WriteToLog (string.Format ("DateTime {0} Clean up complete.", DateTime.Now.ToString ()), LoggingMethod.LevelInfo);
         }
 
         private void RemoveChannelCallback ()
         {
-            ICollection<PubnubChannelCallbackKey> channelCollection = channelCallbacks.Keys;
-            foreach (PubnubChannelCallbackKey keyChannel in channelCollection) {
+            LoggingMethod.WriteToLog (string.Format ("DateTime {0} RemoveChannelCallback from dictionary", DateTime.Now.ToString ()), LoggingMethod.LevelInfo);
+            channelCallbacks.Clear ();
+            //ICollection<PubnubChannelCallbackKey> channelCollection = channelCallbacks.Keys;
+            //SafeDictionary<PubnubChannelCallbackKey, object>
+            /*for (int i = 0; i < channelCallbacks.Count; i++) {
+                PubnubChannelCallbackKey keyChannel = channelCallbacks.Keys;
+                //channelCallbacks.ContainsKey (keyChannel);
                 if (channelCallbacks.ContainsKey (keyChannel)) {
                     object tempChannelCallback;
                     bool removeKey = channelCallbacks.TryRemove (keyChannel, out tempChannelCallback);
@@ -1398,12 +1461,28 @@ namespace PubNubMessaging.Core
                         LoggingMethod.WriteToLog (string.Format ("DateTime {0} Unable to RemoveChannelCallback from dictionary in RemoveChannelCallback for channel= {1}", DateTime.Now.ToString (), removeKey), LoggingMethod.LevelError);
                     }
                 }
+                    
             }
+            /*foreach (PubnubChannelCallbackKey keyChannel in channelCollection) {
+                if (channelCallbacks.ContainsKey (keyChannel)) {
+                    object tempChannelCallback;
+                    bool removeKey = channelCallbacks.TryRemove (keyChannel, out tempChannelCallback);
+                    if (removeKey) {
+                        LoggingMethod.WriteToLog (string.Format ("DateTime {0} RemoveChannelCallback from dictionary in RemoveChannelCallback for channel= {1}", DateTime.Now.ToString (), removeKey), LoggingMethod.LevelInfo);
+                    } else {
+                        LoggingMethod.WriteToLog (string.Format ("DateTime {0} Unable to RemoveChannelCallback from dictionary in RemoveChannelCallback for channel= {1}", DateTime.Now.ToString (), removeKey), LoggingMethod.LevelError);
+                    }
+                }
+            }*/
         }
 
         private void RemoveUserState ()
         {
-            ICollection<string> channelLocalUserStateCollection = _channelLocalUserState.Keys;
+            LoggingMethod.WriteToLog (string.Format ("DateTime {0} RemoveUserState from user state dictionary", DateTime.Now.ToString ()), LoggingMethod.LevelInfo);
+            _channelLocalUserState.Clear ();
+            _channelUserState.Clear ();
+
+            /*ICollection<string> channelLocalUserStateCollection = _channelLocalUserState.Keys;
             ICollection<string> channelUserStateCollection = _channelUserState.Keys;
 
             foreach (string key in channelLocalUserStateCollection) {
@@ -1428,17 +1507,12 @@ namespace PubNubMessaging.Core
                         LoggingMethod.WriteToLog (string.Format ("DateTime {0} Unable to RemoveUserState from user state dictionary for channel= {1}", DateTime.Now.ToString (), removeKey), LoggingMethod.LevelError);
                     }
                 }
-            }
+            }*/
         }
 
         public Guid GenerateGuid ()
         {
             return Guid.NewGuid ();
-        }
-
-        public void ChangeUUID (string newUUID)
-        {
-            //pubnub.ChangeUUID (newUUID);
         }
 
         public static long TranslateDateTimeToPubnubUnixNanoSeconds (DateTime dotNetUTCDateTime)
@@ -1449,6 +1523,42 @@ namespace PubNubMessaging.Core
         public static DateTime TranslatePubnubUnixNanoSecondsToDateTime (long unixNanoSecondTime)
         {
             return TranslatePubnubUnixNanoSecondsToDateTime (unixNanoSecondTime);
+        }
+
+        #endregion
+
+        #region "Change UUID"
+
+        public void ChangeUUID (string newUUID)
+        {
+            if (string.IsNullOrEmpty (newUUID) || sessionUUID == newUUID) {
+                return;
+            }
+
+            _uuidChanged = true;
+
+            string oldUUID = sessionUUID;
+
+            sessionUUID = newUUID;
+
+            string[] channels = GetCurrentSubscriberChannels ();
+
+            if (channels != null && channels.Length > 0) {
+                Uri request = BuildMultiChannelLeaveRequest (channels, oldUUID);
+
+                RequestState<string> requestState = new RequestState<string> ();
+                requestState.Channels = channels;
+                requestState.Type = ResponseType.Leave;
+                requestState.UserCallback = null;
+                requestState.ErrorCallback = null;
+                requestState.ConnectCallback = null;
+                requestState.Reconnect = false;
+
+                UrlProcessRequest<string> (request, requestState); // connectCallback = null
+            }
+
+            TerminateCurrentSubscriberRequest ();
+
         }
 
         #endregion
@@ -1486,26 +1596,33 @@ namespace PubNubMessaging.Core
             keepPresenceHearbeatRunning = true;
             LoggingMethod.WriteToLog (string.Format ("DateTime {0}, In RunPresenceHeartbeat ", DateTime.Now.ToString ()), LoggingMethod.LevelError);
             if (!isPresenceHearbeatRunning) {
-                string[] subscriberChannels = pubnubRequestState.Channels.Where (s => s.Contains ("-pnpres") == false).ToArray ();
+                try{
+                    string[] subscriberChannels = pubnubRequestState.Channels.Where (s => s.Contains ("-pnpres") == false).ToArray ();
 
-                if (subscriberChannels != null && subscriberChannels.Length > 0) {
+                    if (subscriberChannels != null && subscriberChannels.Length > 0) {
 
-                    isPresenceHearbeatRunning = true;
+                        isPresenceHearbeatRunning = true;
 
-                    LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Running RunPresenceHeartbeat ", DateTime.Now.ToString ()), LoggingMethod.LevelError);
+                        LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Running RunPresenceHeartbeat ", DateTime.Now.ToString ()), LoggingMethod.LevelError);
 
-                    Uri requestUrl = BuildPresenceHeartbeatRequest (subscriberChannels);
+                        Uri requestUrl = BuildPresenceHeartbeatRequest (subscriberChannels);
 
-                    presenceHeartbeatCoroutine.CoroutineComplete += CoroutineCompleteHandler<T>;
-                    RequestState<T> requestState = new RequestState<T> ();
-                    requestState.Channels = pubnubRequestState.Channels;
-                    requestState.Type = ResponseType.PresenceHeartbeat;
-                    requestState.UserCallback = null;
-                    requestState.ErrorCallback = pubnubRequestState.ErrorCallback;
-                    //for heartbeat and presence heartbeat treat reconnect as pause
-                    requestState.Reconnect = pause;
+                        //presenceHeartbeatCoroutine.CoroutineComplete += CoroutineCompleteHandler<T>;
+                        coroutine.PresenceHeartbeatCoroutineComplete += CoroutineCompleteHandler<T>;
 
-                    presenceHeartbeatCoroutine.Run<T> (requestUrl.OriginalString, requestState, HeartbeatTimeout, pauseTime);
+                        RequestState<T> requestState = new RequestState<T> ();
+                        requestState.Channels = pubnubRequestState.Channels;
+                        requestState.Type = ResponseType.PresenceHeartbeat;
+                        requestState.UserCallback = null;
+                        requestState.ErrorCallback = pubnubRequestState.ErrorCallback;
+                        //for heartbeat and presence heartbeat treat reconnect as pause
+                        requestState.Reconnect = pause;
+
+                        //presenceHeartbeatCoroutine.Run<T> (requestUrl.OriginalString, requestState, HeartbeatTimeout, pauseTime);
+                        coroutine.Run<T> (requestUrl.OriginalString, requestState, HeartbeatTimeout, pauseTime);
+                    }
+                } catch (Exception ex){
+                    LoggingMethod.WriteToLog (string.Format ("DateTime {0}, PresenceHeartbeat exception {1}", DateTime.Now.ToString (), ex.ToString()), LoggingMethod.LevelError);
                 }
             } else {
                 LoggingMethod.WriteToLog (string.Format ("DateTime {0}, PresenceHeartbeat Running ", DateTime.Now.ToString ()), LoggingMethod.LevelError);
@@ -1517,20 +1634,26 @@ namespace PubNubMessaging.Core
             keepHearbeatRunning = true;
             LoggingMethod.WriteToLog (string.Format ("DateTime {0}, In Runheartbeat ", DateTime.Now.ToString ()), LoggingMethod.LevelError);
             if (!isHearbeatRunning) {
-                isHearbeatRunning = true;
-                LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Running Runheartbeat ", DateTime.Now.ToString ()), LoggingMethod.LevelError);
-                Uri requestUrl = BuildTimeRequest ();
+                try{
+                    isHearbeatRunning = true;
+                    LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Running Runheartbeat ", DateTime.Now.ToString ()), LoggingMethod.LevelError);
+                    Uri requestUrl = BuildTimeRequest ();
 
-                heartbeatCoroutine.CoroutineComplete += CoroutineCompleteHandler<T>;
-                RequestState<T> requestState = new RequestState<T> ();
-                requestState.Channels = null;
-                requestState.Type = ResponseType.Heartbeat;
-                requestState.UserCallback = null;
-                requestState.ErrorCallback = null;
-                //for heartbeat and presence heartbeat treat reconnect as pause
-                requestState.Reconnect = pause;
+                    //heartbeatCoroutine.CoroutineComplete += CoroutineCompleteHandler<T>;
+                    coroutine.HeartbeatCoroutineComplete += CoroutineCompleteHandler<T>;
+                    RequestState<T> requestState = new RequestState<T> ();
+                    requestState.Channels = null;
+                    requestState.Type = ResponseType.Heartbeat;
+                    requestState.UserCallback = null;
+                    requestState.ErrorCallback = null;
+                    //for heartbeat and presence heartbeat treat reconnect as pause
+                    requestState.Reconnect = pause;
 
-                heartbeatCoroutine.Run<T> (requestUrl.OriginalString, requestState, HeartbeatTimeout, pauseTime);
+                    //heartbeatCoroutine.Run<T> (requestUrl.OriginalString, requestState, HeartbeatTimeout, pauseTime);
+                    coroutine.Run<T> (requestUrl.OriginalString, requestState, HeartbeatTimeout, pauseTime);
+                } catch (Exception ex){
+                    LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Heartbeat exception {1}", DateTime.Now.ToString (), ex.ToString()), LoggingMethod.LevelError);
+                }
             } else {
                 LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Heartbeat Running ", DateTime.Now.ToString ()), LoggingMethod.LevelError);
             }
@@ -1544,7 +1667,7 @@ namespace PubNubMessaging.Core
             CustomEventArgs<T> cea = ea as CustomEventArgs<T>;
             try {
                 if(cea.pubnubRequestState.Type == ResponseType.Heartbeat){
-                    isHearbeatRunning = false;
+
                     if (cea.isTimeout || cea.isError) {
                         RetryLoop();
                         LoggingMethod.WriteToLog (string.Format ("DateTime {0} Heartbeat timeout={1}", DateTime.Now.ToString (), cea.message.ToString ()), LoggingMethod.LevelError);
@@ -1556,8 +1679,10 @@ namespace PubNubMessaging.Core
                         internetStatus = true;
                         retriesExceeded = false;
                     }
+                    isHearbeatRunning = false;
                     if(keepHearbeatRunning){
                         LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Restarting Heartbeat ", DateTime.Now.ToString ()), LoggingMethod.LevelError);
+
                         if(internetStatus){
                             RunHeartbeat<T>(true, LocalClientHeartbeatInterval);
                         } else {
@@ -1598,8 +1723,18 @@ namespace PubNubMessaging.Core
             } catch (Exception ex) {
                 LoggingMethod.WriteToLog (string.Format ("DateTime {0} Exception={1}", DateTime.Now.ToString (), ex.ToString ()), LoggingMethod.LevelError);
             }
-            CoroutineClass coroutine = sender as CoroutineClass;
-            coroutine.CoroutineComplete -= CoroutineCompleteHandler<T>;
+            //CoroutineClass coroutine = sender as CoroutineClass;
+            if (cea.crt == CoroutineClass.CurrentRequestType.Heartbeat) {
+                coroutine.HeartbeatCoroutineComplete -= CoroutineCompleteHandler<T>;
+            } else if (cea.crt == CoroutineClass.CurrentRequestType.PresenceHeartbeat) {
+                coroutine.PresenceHeartbeatCoroutineComplete -= CoroutineCompleteHandler<T>;
+            } else if (cea.crt == CoroutineClass.CurrentRequestType.NonSubscribe) {
+                coroutine.NonSubCoroutineComplete -= CoroutineCompleteHandler<T>;
+            } else if (cea.crt == CoroutineClass.CurrentRequestType.Subscribe) {
+                coroutine.SubCoroutineComplete -= CoroutineCompleteHandler<T>;
+            }
+
+            //coroutine.CoroutineComplete -= CoroutineCompleteHandler<T>;
         }
 
         private void ProcessResponseCallbackExceptionHandler<T> (Exception ex, RequestState<T> asynchRequestState)
@@ -1664,7 +1799,8 @@ namespace PubNubMessaging.Core
                         if (overrideTcpKeepAlive) {
                             LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Aborting previous subscribe/presence requests having channel(s) UrlProcessResponseCallbackNonAsync", DateTime.Now.ToString ()), LoggingMethod.LevelInfo);
                             //TerminateLocalClientHeartbeatTimer (requestState.Request.RequestUri);
-                            subCoroutine.BounceRequest();
+                            //subCoroutine.BounceRequest(CoroutineClass.CurrentRequestType.Subscribe);
+                            coroutine.BounceRequest(CoroutineClass.CurrentRequestType.Subscribe);
                         }
 
                         if (jsonString != "[]") {
@@ -2275,7 +2411,11 @@ namespace PubNubMessaging.Core
                         LoggingMethod.WriteToLog (string.Format ("DateTime: {0}, OnPubnubWebRequestTimeout: client request timeout reached.Request abort for channel = {1}", DateTime.Now.ToString (), currentMultiChannel), LoggingMethod.LevelInfo);
                         currentState.Timeout = true;
                         //TerminatePendingWebRequest (currentState);
-                        subCoroutine.BounceRequest ();
+                        if ((currentState.Type == ResponseType.Subscribe) || (currentState.Type == ResponseType.Presence)) {
+                            coroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
+                        } else {
+                            coroutine.BounceRequest (CoroutineClass.CurrentRequestType.NonSubscribe);
+                        }
                     }
                 } else {
                     LoggingMethod.WriteToLog (string.Format ("DateTime: {0}, OnPubnubWebRequestTimeout: client request timeout reached. However state is unknown", DateTime.Now.ToString ()), LoggingMethod.LevelError);
@@ -2289,7 +2429,11 @@ namespace PubNubMessaging.Core
             if (currentState != null && currentState.Response == null && currentState.Request != null) {
                 currentState.Timeout = true;
                 //TerminatePendingWebRequest (currentState);
-                subCoroutine.BounceRequest ();
+                if ((currentState.Type == ResponseType.Subscribe) || (currentState.Type == ResponseType.Presence)) {
+                    coroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
+                } else {
+                    coroutine.BounceRequest (CoroutineClass.CurrentRequestType.NonSubscribe);
+                }
                 LoggingMethod.WriteToLog (string.Format ("DateTime: {0}, **WP7 OnPubnubWebRequestTimeout**", DateTime.Now.ToString ()), LoggingMethod.LevelError);
             }
         }
@@ -2327,11 +2471,16 @@ namespace PubNubMessaging.Core
                             RunPresenceHeartbeat<T>(false, PresenceHeartbeatInterval, pubnubRequestState);
                         }
                     }
-                    subCoroutine.CoroutineComplete += CoroutineCompleteHandler<T>;
-                    subCoroutine.Run<T> (requestUri.OriginalString, pubnubRequestState, SubscribeTimeout, 0);
+                    //subCoroutine.CoroutineComplete += CoroutineCompleteHandler<T>;
+                    //subCoroutine.Run<T> (requestUri.OriginalString, pubnubRequestState, SubscribeTimeout, 0);
+                    coroutine.SubCoroutineComplete += CoroutineCompleteHandler<T>;
+                    coroutine.Run<T> (requestUri.OriginalString, pubnubRequestState, SubscribeTimeout, 0);
+
                 } else {
-                    nonSubCoroutine.CoroutineComplete += CoroutineCompleteHandler<T>;
-                    nonSubCoroutine.Run<T> (requestUri.OriginalString, pubnubRequestState, NonSubscribeTimeout, 0);
+                    //nonSubCoroutine.CoroutineComplete += CoroutineCompleteHandler<T>;
+                    //nonSubCoroutine.Run<T> (requestUri.OriginalString, pubnubRequestState, NonSubscribeTimeout, 0);
+                    coroutine.NonSubCoroutineComplete += CoroutineCompleteHandler<T>;
+                    coroutine.Run<T> (requestUri.OriginalString, pubnubRequestState, NonSubscribeTimeout, 0);
                 }
 
                 /*if (overrideTcpKeepAlive) {
@@ -2418,7 +2567,8 @@ namespace PubNubMessaging.Core
                         }
                         /*if (webRequest != null)
                             TerminatePendingWebRequest (webRequest, errorCallback);*/
-                        subCoroutine.BounceRequest ();
+                        //subCoroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
+                        coroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
 
                     } else {
                         LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Unable to capture channel(s)={1} from _channelRequest to abort request.", DateTime.Now.ToString (), multiChannelName), LoggingMethod.LevelInfo);
@@ -2571,7 +2721,8 @@ namespace PubNubMessaging.Core
                         //if (webRequest != null)
                             //TerminatePendingWebRequest (webRequest, errorCallback);
 
-                        subCoroutine.BounceRequest ();
+                        //subCoroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
+                        coroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
 
                     } else {
                         LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Unable to capture channel(s)={1} from _channelRequest to abort request.", DateTime.Now.ToString (), multiChannelName), LoggingMethod.LevelInfo);
@@ -2706,7 +2857,8 @@ namespace PubNubMessaging.Core
                 //stop heartbeat.
                 keepHearbeatRunning = false;
                 //Unsubscribe channels here.
-                subCoroutine.BounceRequest ();
+                //subCoroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
+                coroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
 
                 //TODO: Fire callbacks
 
@@ -2721,6 +2873,16 @@ namespace PubNubMessaging.Core
             } else {
                 return false;
             }
+        }
+
+        private string[] GetCurrentSubscriberChannels ()
+        {
+            string[] channels = null;
+            if (multiChannelSubscribe != null && multiChannelSubscribe.Keys.Count > 0) {
+                channels = multiChannelSubscribe.Keys.ToArray<string> ();
+            }
+
+            return channels;
         }
 
         private void VerifyOrSetSessionUUID ()
@@ -2920,10 +3082,15 @@ namespace PubNubMessaging.Core
                             } else {
                                 //decrypt the subscriber message if cipherkey is available
                                 if (this.cipherKey.Length > 0) {
-                                    PubnubCrypto aes = new PubnubCrypto (this.cipherKey);
-                                    string decryptMessage = aes.Decrypt (messageList [messageIndex].ToString ());
-                                    object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : _jsonPluggableLibrary.DeserializeToObject (decryptMessage);
-
+                                    object decodeMessage;
+                                    try{
+                                        PubnubCrypto aes = new PubnubCrypto (this.cipherKey);
+                                        string decryptMessage = aes.Decrypt (messageList [messageIndex].ToString ());
+                                        decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : _jsonPluggableLibrary.DeserializeToObject (decryptMessage);
+                                    } catch (Exception decryptEx){
+                                        decodeMessage = messageList [messageIndex].ToString ();
+                                        LoggingMethod.WriteToLog (string.Format ("DateTime {0}, decodeMessage Exception: {1}", DateTime.Now.ToString (), decryptEx.ToString()), LoggingMethod.LevelError);
+                                    }
                                     itemMessage.Add (decodeMessage);
                                 } else {
                                     itemMessage.Add (messageList [messageIndex]);
@@ -3483,27 +3650,6 @@ namespace PubNubMessaging.Core
         #endregion
 
     }
-
-    #region EventExt and Args
-    static class EventExtensions
-    {
-        public static void Raise<T> (this EventHandler<T> handler, object sender, T args)
-            where T : EventArgs
-        {
-            if (handler != null) {
-                handler (sender, args);
-            }
-        }
-    }
-
-    internal class CustomEventArgs<T> : EventArgs
-    {
-        internal string message;
-        internal RequestState<T> pubnubRequestState;
-        internal bool isError;
-        internal bool isTimeout;
-    }
-    #endregion
 
     #region "Unit test interface"
     public interface IPubnubUnitTest

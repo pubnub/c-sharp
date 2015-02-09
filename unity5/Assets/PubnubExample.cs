@@ -1069,7 +1069,7 @@ public class PubnubExample : MonoBehaviour
         if (pubnub == null) {
             //GameObject gobj = new GameObject ();
             //pubnub = gobj.AddComponent<Pubnub> ();
-
+            Pubnub.SetGameObject = new GameObject ();
             pubnub = new Pubnub (publishKey, subscribeKey, secretKey, cipherKey, ssl);
             pubnub.SessionUUID = uuid;
             pubnub.SubscribeTimeout = int.Parse (subscribeTimeoutInSeconds);

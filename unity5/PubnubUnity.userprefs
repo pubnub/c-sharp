@@ -1,14 +1,16 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/PubnubExample.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Pubnub/CoroutineClass.cs">
     <Files>
-      <File FileName="Assets/PubnubExample.cs" Line="1" Column="1" />
-      <File FileName="Assets/Pubnub/Pubnub.cs" Line="142" Column="142" />
-      <File FileName="Assets/Pubnub/LoggingMethod.cs" Line="6" Column="6" />
-      <File FileName="Assets/Pubnub/CoroutineClass.cs" Line="25" Column="25" />
+      <File FileName="Assets/PubnubExample.cs" Line="36" Column="36" />
+      <File FileName="Assets/Pubnub/Pubnub.cs" Line="67" Column="67" />
+      <File FileName="Assets/Pubnub/LoggingMethod.cs" Line="1" Column="1" />
+      <File FileName="Assets/Pubnub/CoroutineClass.cs" Line="23" Column="23" />
       <File FileName="Assets/Pubnub/ReconnectState.cs" Line="1" Column="1" />
-      <File FileName="../../backups/Unity/unused unity files/PubnubCore.cs" Line="1" Column="1" />
-      <File FileName="../../backups/Unity/unused unity files/PubnubUnity.cs" Line="95" Column="95" />
+      <File FileName="../../backups/Unity/unused unity files/PubnubCore.cs" Line="86" Column="86" />
+      <File FileName="../../backups/Unity/unused unity files/PubnubUnity.cs" Line="26" Column="26" />
+      <File FileName="Assets/Pubnub/SafeDictionary.cs" Line="9" Column="9" />
+      <File FileName="Assets/Pubnub/MD5.cs" Line="28" Column="28" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
