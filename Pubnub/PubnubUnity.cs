@@ -1060,8 +1060,9 @@ namespace PubNubMessaging.Core
                     requestMessage.Append (requestUri.Segments [i]);
                 }
             }
+
             foreach (char ch in requestMessage.ToString().ToCharArray()) {
-                if (" ~`!@#$^&*()+=[]\\{}|;':\"./<>?".IndexOf (ch) >= 0) {
+                if (" ~`!@#$^&*()+=[]\\{}|;':\"/?".IndexOf (ch) >= 0) {
                     isUnsafe = true;
                     break;
                 }

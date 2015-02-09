@@ -1,9 +1,9 @@
 //Build Date: September 29, 2014
 //#define USE_JSONFX
 #region "Header"
-#if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
-#define USE_JSONFX_UNITY_IOS
-#endif
+// #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
+// #define USE_JSONFX_UNITY_IOS
+// #endif
 #if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
 #define TRACE
 #endif
