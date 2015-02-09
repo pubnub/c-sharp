@@ -543,7 +543,8 @@ namespace PubNubMessaging.Core
             LoggingMethod.WriteToLog (string.Format ("DateTime {0}, requestUriO: {1}", DateTime.Now.ToString (), requestUri.OriginalString), LoggingMethod.LevelInfo);
 
             if ((pubnubRequestState.Type == ResponseType.Publish) && (RequestIsUnsafe (requestUri))) {
-                SendRequestUsingUnityWww<T> (requestUri, pubnubRequestState);
+				throw new Exception("Unsafe request: " + requestUri);
+                // SendRequestUsingUnityWww<T> (requestUri, pubnubRequestState);
             } else {
             #if (UNITY_ANDROID || UNITY_STANDALONE)
                 if (pubnubRequestState.Type == ResponseType.Subscribe || pubnubRequestState.Type == ResponseType.Presence) {
@@ -594,7 +595,8 @@ namespace PubNubMessaging.Core
             }
             #elif(__MonoCS__)
             if ((pubnubRequestState.Type == ResponseType.Publish) && (RequestIsUnsafe (requestUri))) {
-                SendRequestUsingTcpClient<T> (requestUri, pubnubRequestState);
+                // SendRequestUsingTcpClient<T> (requestUri, pubnubRequestState);
+				throw new Exception("Unsafe request: " + requestUri);
             } else {
                 IAsyncResult asyncResult = request.BeginGetResponse (new AsyncCallback (UrlProcessResponseCallback<T>), pubnubRequestState);
                 if (!asyncResult.AsyncWaitHandle.WaitOne (GetTimeoutInSecondsForResponseType (pubnubRequestState.Type) * 1000)) {
