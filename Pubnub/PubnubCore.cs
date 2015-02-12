@@ -4329,10 +4329,10 @@ namespace PubNubMessaging.Core
 	public class MiniJSONObjectSerializer : IJsonPluggableLibrary
     {
         public bool IsArrayCompatible(string jsonString){
-            return false;
+            return jsonString.Trim().StartsWith("[");
         }
         public bool IsDictionaryCompatible(string jsonString){
-            return true;
+            return jsonString.Trim().StartsWith("{");
         }
 
         public string SerializeToJsonString(object objectToSerialize)
