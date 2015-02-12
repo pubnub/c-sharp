@@ -59,6 +59,13 @@ namespace PubNubMessaging.Core
         }
     }
 
+    public static class StoredRequestState<T>{
+        public static RequestState<T> CurrentState {
+            get;
+            set;
+        }
+    }
+
     public class RequestState<T>
     {
         public Action<T> UserCallback;
@@ -70,7 +77,8 @@ namespace PubNubMessaging.Core
         public string[] Channels;
         public bool Timeout;
         public bool Reconnect;
-        public long Timetoken;
+        public long Timetoken; 
+        public Type TypeParameterType;
 
         public RequestState ()
         {
@@ -81,6 +89,7 @@ namespace PubNubMessaging.Core
             Channels = null;
         }
     }
+
     #endregion
 }
 

@@ -99,7 +99,6 @@ namespace PubNubMessaging.Core
         private bool internetStatus = true;
         private bool retriesExceeded = false;
 
-
         private int retryCount = 0;
 
         #endregion
@@ -270,9 +269,9 @@ namespace PubNubMessaging.Core
             }
 
             set {
-                _jsonPluggableLibrary = value;
-                if (_jsonPluggableLibrary is IJsonPluggableLibrary) {
-                    this._jsonPluggableLibrary = _jsonPluggableLibrary;
+                //_jsonPluggableLibrary = value;
+                if (value is IJsonPluggableLibrary) {
+                    this._jsonPluggableLibrary = value;
                 } else {
                     _jsonPluggableLibrary = null;
                     throw new ArgumentException ("Missing or Incorrect JsonPluggableLibrary value");
@@ -1390,11 +1389,14 @@ namespace PubNubMessaging.Core
 
         #region "PubNub API Other Methods"
 
-        public void TerminateCurrentSubscriberRequest ()
+        public void TerminateCurrentSubscriberRequest (){
+            TerminateCurrentSubscriberRequest<object> ();
+        }
+        public void TerminateCurrentSubscriberRequest<T> ()
         {
             //pubnub.TerminateCurrentSubscriberRequest ();
             //subCoroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
-            coroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
+            coroutine.BounceRequest<T> (CoroutineClass.CurrentRequestType.Subscribe, StoredRequestState<T>.CurrentState, true);
         }
 
         /*public void EnableSimulateNetworkFailForTestingOnly ()
@@ -1424,8 +1426,8 @@ namespace PubNubMessaging.Core
             RemoveUserState ();
             //subCoroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
             //nonSubCoroutine.BounceRequest (CoroutineClass.CurrentRequestType.NonSubscribe);
-            coroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
-            coroutine.BounceRequest (CoroutineClass.CurrentRequestType.NonSubscribe);
+            coroutine.BounceRequest<object> (CoroutineClass.CurrentRequestType.Subscribe, null, false);
+            coroutine.BounceRequest<object> (CoroutineClass.CurrentRequestType.NonSubscribe, null, false);
 
             LoggingMethod.WriteToLog (string.Format ("DateTime {0} Request bounced.", DateTime.Now.ToString ()), LoggingMethod.LevelInfo);
             StopHeartbeat ();
@@ -1557,7 +1559,7 @@ namespace PubNubMessaging.Core
                 UrlProcessRequest<string> (request, requestState); // connectCallback = null
             }
 
-            TerminateCurrentSubscriberRequest ();
+            TerminateCurrentSubscriberRequest<string> ();
 
         }
 
@@ -1594,7 +1596,7 @@ namespace PubNubMessaging.Core
         void RunPresenceHeartbeat<T> (bool pause, int pauseTime, RequestState<T> pubnubRequestState)
         {
             keepPresenceHearbeatRunning = true;
-            LoggingMethod.WriteToLog (string.Format ("DateTime {0}, In RunPresenceHeartbeat ", DateTime.Now.ToString ()), LoggingMethod.LevelError);
+            //LoggingMethod.WriteToLog (string.Format ("DateTime {0}, In RunPresenceHeartbeat ", DateTime.Now.ToString ()), LoggingMethod.LevelError);
             if (!isPresenceHearbeatRunning) {
                 try{
                     string[] subscriberChannels = pubnubRequestState.Channels.Where (s => s.Contains ("-pnpres") == false).ToArray ();
@@ -1629,10 +1631,10 @@ namespace PubNubMessaging.Core
             }
         }
 
-        void RunHeartbeat<T> (bool pause, int pauseTime)
+        void RunHeartbeat<T> (bool pause, int pauseTime, RequestState<T> pubnubRequestState)
         {
             keepHearbeatRunning = true;
-            LoggingMethod.WriteToLog (string.Format ("DateTime {0}, In Runheartbeat ", DateTime.Now.ToString ()), LoggingMethod.LevelError);
+            LoggingMethod.WriteToLog (string.Format ("DateTime {0}, In Runheartbeat {1}", DateTime.Now.ToString (), isHearbeatRunning.ToString()), LoggingMethod.LevelError);
             if (!isHearbeatRunning) {
                 try{
                     isHearbeatRunning = true;
@@ -1642,14 +1644,16 @@ namespace PubNubMessaging.Core
                     //heartbeatCoroutine.CoroutineComplete += CoroutineCompleteHandler<T>;
                     coroutine.HeartbeatCoroutineComplete += CoroutineCompleteHandler<T>;
                     RequestState<T> requestState = new RequestState<T> ();
-                    requestState.Channels = null;
+                    requestState.Channels = pubnubRequestState.Channels;
                     requestState.Type = ResponseType.Heartbeat;
-                    requestState.UserCallback = null;
-                    requestState.ErrorCallback = null;
+                    requestState.UserCallback = pubnubRequestState.UserCallback;
+                    requestState.ErrorCallback = pubnubRequestState.ErrorCallback;
+                    requestState.ConnectCallback = pubnubRequestState.ConnectCallback;
                     //for heartbeat and presence heartbeat treat reconnect as pause
                     requestState.Reconnect = pause;
 
                     //heartbeatCoroutine.Run<T> (requestUrl.OriginalString, requestState, HeartbeatTimeout, pauseTime);
+
                     coroutine.Run<T> (requestUrl.OriginalString, requestState, HeartbeatTimeout, pauseTime);
                 } catch (Exception ex){
                     LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Heartbeat exception {1}", DateTime.Now.ToString (), ex.ToString()), LoggingMethod.LevelError);
@@ -1664,16 +1668,43 @@ namespace PubNubMessaging.Core
 
         void CoroutineCompleteHandler<T> (object sender, EventArgs ea)
         {
-            CustomEventArgs<T> cea = ea as CustomEventArgs<T>;
-            try {
-                if(cea.pubnubRequestState.Type == ResponseType.Heartbeat){
+            Debug.Log ("In handler of event");
 
-                    if (cea.isTimeout || cea.isError) {
-                        RetryLoop();
-                        LoggingMethod.WriteToLog (string.Format ("DateTime {0} Heartbeat timeout={1}", DateTime.Now.ToString (), cea.message.ToString ()), LoggingMethod.LevelError);
+            CustomEventArgs<T> cea = ea as CustomEventArgs<T>;
+
+            /*Type genericType = typeof(RequestState<>);
+            Type specificListType = genericType.MakeGenericType(cea.PubnubRequestState.TypeParameterType);
+            var pnRequestState = Activator.CreateInstance(specificListType);
+            //var pnRequestState = (genericType)Activator.CreateInstance(cea.PubnubRequestState.TypeParameterType, cea.PubnubRequestState);
+            //var pnRequestState1;
+            //var pnRequestState = cea.PubnubRequestState as cea.PubnubRequestState.TypeParameterType;
+            if (cea.PubnubRequestState.TypeParameterType == typeof(RequestState<object>)) {
+                Debug.Log ("In handler of event cea isobject ");     
+                var pnRequestState1 = cea.PubnubRequestState as RequestState<object>;
+                Debug.Log ("In handler of event cea isobject " + pnRequestState1.Timeout);     
+            }else if (cea.PubnubRequestState.TypeParameterType == typeof(RequestState<string>)) {
+                Debug.Log ("In handler of event cea isstring ");        
+                var pnRequestState1 = cea.PubnubRequestState as RequestState<string>;
+                Debug.Log ("In handler of event cea isobject " + pnRequestState1.Timeout);
+            }
+            //Debug.Log ("pnRequestState1 " + pnRequestState1.);        
+            //pnRequestState
+            //var a = (specificListType)pnRequestState.Type;*/
+
+            Debug.Log ("In handler of event cea " + cea.CurrRequestType.ToString());
+            Debug.Log ("In handler of event cea " + cea.PubnubRequestState.Type.ToString());
+            try {
+                LoggingMethod.WriteToLog (string.Format ("DateTime {0}, RequestType CoroutineCompleteHandler {1}", DateTime.Now.ToString (), typeof(T)), LoggingMethod.LevelError);
+                if(cea.PubnubRequestState.Type == ResponseType.Heartbeat){
+
+                    if (cea.IsTimeout || cea.IsError) {
+                        RetryLoop<T> (cea.PubnubRequestState);
+                        LoggingMethod.WriteToLog (string.Format ("DateTime {0} Heartbeat timeout={1}", DateTime.Now.ToString (), cea.Message.ToString ()), LoggingMethod.LevelError);
+                        //MultiplexExceptionHandler<T> (ResponseType.Subscribe, cea.pubnubRequestState.Channels, cea.pubnubRequestState.UserCallback, cea.pubnubRequestState.ConnectCallback, cea.pubnubRequestState.ErrorCallback, false, EnableResumeOnReconnect);
                     } else {
                         if(retryCount > 0){
                             LoggingMethod.WriteToLog (string.Format ("DateTime {0} Internet Connection Available.", DateTime.Now.ToString ()), LoggingMethod.LevelInfo);
+                            MultiplexExceptionHandler<T> (ResponseType.Subscribe, cea.PubnubRequestState.Channels, cea.PubnubRequestState.UserCallback, cea.PubnubRequestState.ConnectCallback, cea.PubnubRequestState.ErrorCallback, false, EnableResumeOnReconnect);
                         }
                         retryCount = 0;
                         internetStatus = true;
@@ -1684,55 +1715,67 @@ namespace PubNubMessaging.Core
                         LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Restarting Heartbeat ", DateTime.Now.ToString ()), LoggingMethod.LevelError);
 
                         if(internetStatus){
-                            RunHeartbeat<T>(true, LocalClientHeartbeatInterval);
+                            RunHeartbeat<T>(true, LocalClientHeartbeatInterval, cea.PubnubRequestState);
                         } else {
-                            RunHeartbeat<T>(true, NetworkCheckRetryInterval);
+                            RunHeartbeat<T>(true, NetworkCheckRetryInterval, cea.PubnubRequestState);
                         }
                     }
-                } if(cea.pubnubRequestState.Type == ResponseType.PresenceHeartbeat){
+                    //coroutine.HeartbeatCoroutineComplete -= CoroutineCompleteHandler<T>;
+                    //LoggingMethod.WriteToLog (string.Format ("DateTime {0} Remove HeartbeatCoroutineComplete", DateTime.Now.ToString ()), LoggingMethod.LevelError);
+
+                } if(cea.PubnubRequestState.Type == ResponseType.PresenceHeartbeat){
                     isPresenceHearbeatRunning = false;
-                    if (cea.isTimeout || cea.isError) {
-                        LoggingMethod.WriteToLog (string.Format ("DateTime {0} Presence Heartbeat timeout={1}", DateTime.Now.ToString (), cea.message.ToString ()), LoggingMethod.LevelError);
+                    if (cea.IsTimeout || cea.IsError) {
+                        LoggingMethod.WriteToLog (string.Format ("DateTime {0} Presence Heartbeat timeout={1}", DateTime.Now.ToString (), cea.Message.ToString ()), LoggingMethod.LevelError);
                     } else {
-                        LoggingMethod.WriteToLog (string.Format ("DateTime {0} Presence Heartbeat response: {1}", DateTime.Now.ToString (), cea.message.ToString ()), LoggingMethod.LevelInfo);
+                        LoggingMethod.WriteToLog (string.Format ("DateTime {0} Presence Heartbeat response: {1}", DateTime.Now.ToString (), cea.Message.ToString ()), LoggingMethod.LevelInfo);
                     }
                     if(keepPresenceHearbeatRunning){
                         LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Restarting PresenceHeartbeat ", DateTime.Now.ToString ()), LoggingMethod.LevelError);
-                        RunPresenceHeartbeat<T>(true, PresenceHeartbeatInterval, cea.pubnubRequestState);
+                        RunPresenceHeartbeat<T>(true, PresenceHeartbeatInterval, cea.PubnubRequestState);
                     }
-                } else if (cea.pubnubRequestState.Type == ResponseType.Subscribe || cea.pubnubRequestState.Type == ResponseType.Presence) {
-                    if (cea.isTimeout) {
-                        OnPubnubWebRequestTimeout<T> (cea.pubnubRequestState, true);
-                        UrlRequestCommonExceptionHandler<T> (cea.pubnubRequestState.Type, cea.pubnubRequestState.Channels, true, cea.pubnubRequestState.UserCallback, cea.pubnubRequestState.ConnectCallback, cea.pubnubRequestState.ErrorCallback, false);
-                    } else if (cea.isError) {
-                        UrlRequestCommonExceptionHandler<T> (cea.pubnubRequestState.Type, cea.pubnubRequestState.Channels, false, cea.pubnubRequestState.UserCallback, cea.pubnubRequestState.ConnectCallback, cea.pubnubRequestState.ErrorCallback, false);
+                    //coroutine.PresenceHeartbeatCoroutineComplete -= CoroutineCompleteHandler<T>;
+                    //LoggingMethod.WriteToLog (string.Format ("DateTime {0} Remove PresenceHeartbeatCoroutineComplete", DateTime.Now.ToString ()), LoggingMethod.LevelError);
+
+                } else if (cea.PubnubRequestState.Type == ResponseType.Subscribe || cea.PubnubRequestState.Type == ResponseType.Presence) {
+                    if (cea.IsTimeout) {
+                        LoggingMethod.WriteToLog (string.Format ("DateTime {0} Sub timeout={1}", DateTime.Now.ToString (), cea.Message.ToString ()), LoggingMethod.LevelError);
+                        //OnPubnubWebRequestTimeout<T> (cea.pubnubRequestState, true);
+                        UrlRequestCommonExceptionHandler<T> (cea.PubnubRequestState.Type, cea.PubnubRequestState.Channels, true, cea.PubnubRequestState.UserCallback, cea.PubnubRequestState.ConnectCallback, cea.PubnubRequestState.ErrorCallback, false);
+                    } else if (cea.IsError) {
+                        LoggingMethod.WriteToLog (string.Format ("DateTime {0} Sub Error={1}", DateTime.Now.ToString (), cea.Message.ToString ()), LoggingMethod.LevelError);
+                        UrlRequestCommonExceptionHandler<T> (cea.PubnubRequestState.Type, cea.PubnubRequestState.Channels, false, cea.PubnubRequestState.UserCallback, cea.PubnubRequestState.ConnectCallback, cea.PubnubRequestState.ErrorCallback, false);
                     } else {
                         UrlProcessResponseCallbackNonAsync<T>(cea);
                     }
+                    //coroutine.SubCoroutineComplete -= CoroutineCompleteHandler<T>;
+                    //LoggingMethod.WriteToLog (string.Format ("DateTime {0} Remove SubCoroutineComplete", DateTime.Now.ToString ()), LoggingMethod.LevelError);
+
                 } else {
-                    if (cea.isTimeout) {
-                        OnPubnubWebRequestTimeout<T> (cea.pubnubRequestState, true);
-                        UrlRequestCommonExceptionHandler<T> (cea.pubnubRequestState.Type, cea.pubnubRequestState.Channels, true, cea.pubnubRequestState.UserCallback, cea.pubnubRequestState.ConnectCallback, cea.pubnubRequestState.ErrorCallback, false);
-                    } else if (cea.isError) {
-                        UrlRequestCommonExceptionHandler<T> (cea.pubnubRequestState.Type, cea.pubnubRequestState.Channels, false, cea.pubnubRequestState.UserCallback, cea.pubnubRequestState.ConnectCallback, cea.pubnubRequestState.ErrorCallback, false);
+                    if (cea.IsTimeout) {
+                        LoggingMethod.WriteToLog (string.Format ("DateTime {0} NonSub timeout={1}", DateTime.Now.ToString (), cea.Message.ToString ()), LoggingMethod.LevelError);
+                        //OnPubnubWebRequestTimeout<T> (cea.pubnubRequestState, true);
+                        UrlRequestCommonExceptionHandler<T> (cea.PubnubRequestState.Type, cea.PubnubRequestState.Channels, true, cea.PubnubRequestState.UserCallback, cea.PubnubRequestState.ConnectCallback, cea.PubnubRequestState.ErrorCallback, false);
+                    } else if (cea.IsError) {
+                        LoggingMethod.WriteToLog (string.Format ("DateTime {0} NonSub Error={1}", DateTime.Now.ToString (), cea.Message.ToString ()), LoggingMethod.LevelError);
+                        UrlRequestCommonExceptionHandler<T> (cea.PubnubRequestState.Type, cea.PubnubRequestState.Channels, false, cea.PubnubRequestState.UserCallback, cea.PubnubRequestState.ConnectCallback, cea.PubnubRequestState.ErrorCallback, false);
                     } else {
-                        var result = WrapResultBasedOnResponseType<T> (cea.pubnubRequestState.Type, cea.message, cea.pubnubRequestState.Channels, cea.pubnubRequestState.Reconnect, cea.pubnubRequestState.Timetoken, cea.pubnubRequestState.ErrorCallback);
-                        ProcessResponseCallbacks<T> (result, cea.pubnubRequestState);            
+                        var result = WrapResultBasedOnResponseType<T> (cea.PubnubRequestState.Type, cea.Message, cea.PubnubRequestState.Channels, cea.PubnubRequestState.Reconnect, cea.PubnubRequestState.Timetoken, cea.PubnubRequestState.ErrorCallback);
+                        ProcessResponseCallbacks<T> (result, cea.PubnubRequestState);            
                     }
+                    //coroutine.NonSubCoroutineComplete -= CoroutineCompleteHandler<T>;
+                    //LoggingMethod.WriteToLog (string.Format ("DateTime {0} Remove NonSubCoroutineComplete", DateTime.Now.ToString ()), LoggingMethod.LevelError);
+
                 }
             } catch (Exception ex) {
                 LoggingMethod.WriteToLog (string.Format ("DateTime {0} Exception={1}", DateTime.Now.ToString (), ex.ToString ()), LoggingMethod.LevelError);
             }
             //CoroutineClass coroutine = sender as CoroutineClass;
-            if (cea.crt == CoroutineClass.CurrentRequestType.Heartbeat) {
-                coroutine.HeartbeatCoroutineComplete -= CoroutineCompleteHandler<T>;
+            /*if (cea.crt == CoroutineClass.CurrentRequestType.Heartbeat) {
             } else if (cea.crt == CoroutineClass.CurrentRequestType.PresenceHeartbeat) {
-                coroutine.PresenceHeartbeatCoroutineComplete -= CoroutineCompleteHandler<T>;
             } else if (cea.crt == CoroutineClass.CurrentRequestType.NonSubscribe) {
-                coroutine.NonSubCoroutineComplete -= CoroutineCompleteHandler<T>;
             } else if (cea.crt == CoroutineClass.CurrentRequestType.Subscribe) {
-                coroutine.SubCoroutineComplete -= CoroutineCompleteHandler<T>;
-            }
+            }*/
 
             //coroutine.CoroutineComplete -= CoroutineCompleteHandler<T>;
         }
@@ -1771,7 +1814,7 @@ namespace PubNubMessaging.Core
         {
             List<object> result = new List<object> ();
 
-            RequestState<T> requestState = cea.pubnubRequestState;
+            RequestState<T> requestState = cea.PubnubRequestState;
 
             string channel = "";
             if (requestState != null && requestState.Channels != null) {
@@ -1779,28 +1822,28 @@ namespace PubNubMessaging.Core
             }
             try {
                 //if (requestState.Request != null) {
-                    if (cea.isError) {
-                        LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Message: {1}", DateTime.Now.ToString (), cea.message), LoggingMethod.LevelError);
+                    if (cea.IsError) {
+                        LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Message: {1}", DateTime.Now.ToString (), cea.Message), LoggingMethod.LevelError);
                         WebException webEx;
-                        if ((cea.message.Contains ("NameResolutionFailure")
-                            || cea.message.Contains ("ConnectFailure")
-                            || cea.message.Contains ("ServerProtocolViolation")
-                            || cea.message.Contains ("ProtocolError")
+                        if ((cea.Message.Contains ("NameResolutionFailure")
+                            || cea.Message.Contains ("ConnectFailure")
+                            || cea.Message.Contains ("ServerProtocolViolation")
+                            || cea.Message.Contains ("ProtocolError")
                         )) {
                             webEx = new WebException ("Network connnect error", WebExceptionStatus.ConnectFailure);
                         } else {
-                            webEx = new WebException (cea.message);
+                            webEx = new WebException (cea.Message);
                         }
                         ProcessResponseCallbackWebExceptionHandler<T> (webEx, requestState, channel);
                     } else {
                         //base.channelInternetStatus.AddOrUpdate (channel, true, (key, oldValue) => true);
 
-                        string jsonString = cea.message;
+                        string jsonString = cea.Message;
                         if (overrideTcpKeepAlive) {
                             LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Aborting previous subscribe/presence requests having channel(s) UrlProcessResponseCallbackNonAsync", DateTime.Now.ToString ()), LoggingMethod.LevelInfo);
                             //TerminateLocalClientHeartbeatTimer (requestState.Request.RequestUri);
                             //subCoroutine.BounceRequest(CoroutineClass.CurrentRequestType.Subscribe);
-                            coroutine.BounceRequest(CoroutineClass.CurrentRequestType.Subscribe);
+                            coroutine.BounceRequest(CoroutineClass.CurrentRequestType.Subscribe, requestState, false);
                         }
 
                         if (jsonString != "[]") {
@@ -2112,6 +2155,7 @@ namespace PubNubMessaging.Core
 
         protected void MultiplexExceptionHandler<T> (ResponseType type, string[] channels, Action<T> userCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback, bool reconnectMaxTried, bool resumeOnReconnect)
         {
+            LoggingMethod.WriteToLog (string.Format ("DateTime {0}, in MultiplexExceptionHandler responsetype={1}", DateTime.Now.ToString (), type.ToString()), LoggingMethod.LevelInfo);
             string channel = "";
             if (channels != null) {
                 channel = string.Join (",", channels);
@@ -2171,6 +2215,11 @@ namespace PubNubMessaging.Core
                 }
 
             } else {
+                if (!internetStatus) {
+                    LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Subscribe channel={1} - No internet connection. ", DateTime.Now.ToString (), channel), LoggingMethod.LevelInfo);
+                    return;
+                }
+
                 List<object> result = new List<object> ();
                 result.Add ("0");
                 if (resumeOnReconnect) {
@@ -2358,7 +2407,7 @@ namespace PubNubMessaging.Core
             UrlProcessRequest<T> (request, requestState);
 
             //bounce the long-polling subscribe requests to update user state
-            TerminateCurrentSubscriberRequest ();
+            TerminateCurrentSubscriberRequest<T> ();
         }
             
         private Uri BuildSetUserStateRequest (string channel, string uuid, string jsonUserState)
@@ -2412,9 +2461,9 @@ namespace PubNubMessaging.Core
                         currentState.Timeout = true;
                         //TerminatePendingWebRequest (currentState);
                         if ((currentState.Type == ResponseType.Subscribe) || (currentState.Type == ResponseType.Presence)) {
-                            coroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
+                            coroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe, currentState, false);
                         } else {
-                            coroutine.BounceRequest (CoroutineClass.CurrentRequestType.NonSubscribe);
+                            coroutine.BounceRequest (CoroutineClass.CurrentRequestType.NonSubscribe, currentState, false);
                         }
                     }
                 } else {
@@ -2423,20 +2472,20 @@ namespace PubNubMessaging.Core
             }
         }
 
-        protected void OnPubnubWebRequestTimeout<T> (System.Object requestState)
+        /*protected void OnPubnubWebRequestTimeout<T> (System.Object requestState)
         {
             RequestState<T> currentState = requestState as RequestState<T>;
             if (currentState != null && currentState.Response == null && currentState.Request != null) {
                 currentState.Timeout = true;
                 //TerminatePendingWebRequest (currentState);
                 if ((currentState.Type == ResponseType.Subscribe) || (currentState.Type == ResponseType.Presence)) {
-                    coroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
+                    coroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe, currentState, false);
                 } else {
-                    coroutine.BounceRequest (CoroutineClass.CurrentRequestType.NonSubscribe);
+                    coroutine.BounceRequest (CoroutineClass.CurrentRequestType.NonSubscribe, currentState, false);
                 }
                 LoggingMethod.WriteToLog (string.Format ("DateTime: {0}, **WP7 OnPubnubWebRequestTimeout**", DateTime.Now.ToString ()), LoggingMethod.LevelError);
             }
-        }
+        }*/
 
         private bool UrlProcessRequest<T> (Uri requestUri, RequestState<T> pubnubRequestState)
         {
@@ -2449,8 +2498,8 @@ namespace PubNubMessaging.Core
                 if (!_channelRequest.ContainsKey (channel) && (pubnubRequestState.Type == ResponseType.Subscribe || pubnubRequestState.Type == ResponseType.Presence)) {
                     return false;
                 }
-                LoggingMethod.WriteToLog (string.Format ("DateTime {0}, requestUriA: {1}", DateTime.Now.ToString (), requestUri.AbsoluteUri), LoggingMethod.LevelError);
-                LoggingMethod.WriteToLog (string.Format ("DateTime {0}, requestUriO: {1}", DateTime.Now.ToString (), requestUri.OriginalString), LoggingMethod.LevelInfo);
+                //LoggingMethod.WriteToLog (string.Format ("DateTime {0}, requestUriA: {1}", DateTime.Now.ToString (), requestUri.AbsoluteUri), LoggingMethod.LevelError);
+                //LoggingMethod.WriteToLog (string.Format ("DateTime {0}, requestUriO: {1}", DateTime.Now.ToString (), requestUri.OriginalString), LoggingMethod.LevelInfo);
 
                 // Create Request
                 /*PubnubWebRequestCreator requestCreator = new PubnubWebRequestCreator (_pubnubUnitTest);
@@ -2464,7 +2513,8 @@ namespace PubNubMessaging.Core
                 if (pubnubRequestState.Type == ResponseType.Subscribe || pubnubRequestState.Type == ResponseType.Presence) {
                     _channelRequest.AddOrUpdate (channel, pubnubRequestState.Request, (key, oldState) => pubnubRequestState.Request);
 
-                    RunHeartbeat<T>(false, LocalClientHeartbeatInterval);
+                    RunHeartbeat<T>(false, LocalClientHeartbeatInterval, pubnubRequestState);
+                    LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Heartbeat started", DateTime.Now.ToString ()), LoggingMethod.LevelInfo);
 
                     if (pubnubRequestState.Channels != null && pubnubRequestState.Channels.Length > 0 && pubnubRequestState.Channels.Where (s => s.Contains ("-pnpres") == false).ToArray ().Length > 0) {
                         if (PresenceHeartbeatInterval > 0) {
@@ -2489,7 +2539,7 @@ namespace PubNubMessaging.Core
                     request = SetServicePointSetTcpKeepAlive (request);
                 }*/
 
-                LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Request={1}", DateTime.Now.ToString (), requestUri.ToString ()), LoggingMethod.LevelInfo);
+                //LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Request={1}", DateTime.Now.ToString (), requestUri.ToString ()), LoggingMethod.LevelInfo);
 
                 //SendRequestAndGetResult (requestUri, pubnubRequestState, request);
 
@@ -2556,7 +2606,7 @@ namespace PubNubMessaging.Core
                         /*if (webRequest != null) {
                             TerminateLocalClientHeartbeatTimer (webRequest.RequestUri);
                         }*/
-                        StopHeartbeat ();
+                        //StopHeartbeat ();
 
                         PubnubWebRequest removedRequest;
                         bool removedChannel = _channelRequest.TryRemove (multiChannelName, out removedRequest);
@@ -2568,7 +2618,7 @@ namespace PubNubMessaging.Core
                         /*if (webRequest != null)
                             TerminatePendingWebRequest (webRequest, errorCallback);*/
                         //subCoroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
-                        coroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
+                        coroutine.BounceRequest<T> (CoroutineClass.CurrentRequestType.Subscribe, StoredRequestState<T>.CurrentState, false);
 
                     } else {
                         LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Unable to capture channel(s)={1} from _channelRequest to abort request.", DateTime.Now.ToString (), multiChannelName), LoggingMethod.LevelInfo);
@@ -2706,7 +2756,7 @@ namespace PubNubMessaging.Core
                         PubnubWebRequest webRequest = _channelRequest [multiChannelName];
                         _channelRequest [multiChannelName] = null;
 
-                        StopHeartbeat ();
+                        //StopHeartbeat ();
                         //if (webRequest != null)
                             //TerminateLocalClientHeartbeatTimer (webRequest.RequestUri);
 
@@ -2722,7 +2772,7 @@ namespace PubNubMessaging.Core
                             //TerminatePendingWebRequest (webRequest, errorCallback);
 
                         //subCoroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
-                        coroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
+                        coroutine.BounceRequest<T> (CoroutineClass.CurrentRequestType.Subscribe, StoredRequestState<T>.CurrentState, false);
 
                     } else {
                         LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Unable to capture channel(s)={1} from _channelRequest to abort request.", DateTime.Now.ToString (), multiChannelName), LoggingMethod.LevelInfo);
@@ -2773,12 +2823,14 @@ namespace PubNubMessaging.Core
         {
             //Exit if the channel is unsubscribed
             if (multiChannelSubscribe != null && multiChannelSubscribe.Count <= 0) {
+                StopHeartbeat ();
                 LoggingMethod.WriteToLog (string.Format ("DateTime {0}, All channels are Unsubscribed. Further subscription was stopped", DateTime.Now.ToString ()), LoggingMethod.LevelInfo);
                 return;
             }
 
             string multiChannel = string.Join (",", channels);
             if (!_channelRequest.ContainsKey (multiChannel)) {
+                LoggingMethod.WriteToLog (string.Format ("DateTime {0}, MultiChannelSubscribeRequest _channelRequest doesnt contain {1}", DateTime.Now.ToString (), multiChannel), LoggingMethod.LevelInfo);    
                 return;
             }
 
@@ -2804,6 +2856,7 @@ namespace PubNubMessaging.Core
             }*/
 
             // Begin recursive subscribe
+            LoggingMethod.WriteToLog (string.Format ("DateTime {0}, MultiChannelSubscribeRequest ", DateTime.Now.ToString ()), LoggingMethod.LevelInfo);    
             try {
                 long lastTimetoken = 0;
                 long minimumTimetoken = multiChannelSubscribe.Min (token => token.Value);
@@ -2826,12 +2879,14 @@ namespace PubNubMessaging.Core
                 RequestState<T> pubnubRequestState = new RequestState<T> ();
                 pubnubRequestState.Channels = channels;
                 pubnubRequestState.Type = type;
-                pubnubRequestState.ConnectCallback = connectCallback;
-                pubnubRequestState.UserCallback = userCallback;
+                pubnubRequestState.ConnectCallback = connectCallback as Action<T>;
+                pubnubRequestState.UserCallback = userCallback as Action<T>;
                 pubnubRequestState.ErrorCallback = errorCallback;
                 pubnubRequestState.Reconnect = reconnect;
+                pubnubRequestState.TypeParameterType = typeof(T);
                 pubnubRequestState.Timetoken = Convert.ToInt64 (timetoken.ToString ());
 
+                StoredRequestState<T>.CurrentState = pubnubRequestState;
                 // Wait for message
                 UrlProcessRequest<T> (requestUrl, pubnubRequestState);
             } catch (Exception ex) {
@@ -2844,7 +2899,7 @@ namespace PubNubMessaging.Core
             }
         }
 
-        private void RetryLoop ()
+        private void RetryLoop<T> (RequestState<T> pubnubRequestState)
         {
             internetStatus = false;
             retryCount++;
@@ -2858,8 +2913,8 @@ namespace PubNubMessaging.Core
                 keepHearbeatRunning = false;
                 //Unsubscribe channels here.
                 //subCoroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
-                coroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
-
+                coroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe, pubnubRequestState, false);
+                MultiplexExceptionHandler<T> (ResponseType.Subscribe, pubnubRequestState.Channels, pubnubRequestState.UserCallback, pubnubRequestState.ConnectCallback, pubnubRequestState.ErrorCallback, true, false);
                 //TODO: Fire callbacks
 
                 //TODO: reinit subscribe
@@ -3315,8 +3370,9 @@ namespace PubNubMessaging.Core
                 LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Lost Channel Name for resubscribe", DateTime.Now.ToString ()), LoggingMethod.LevelError);
                 return;
             }
-
+            LoggingMethod.WriteToLog (string.Format ("DateTime {0}, MultiplexInternalCallback", DateTime.Now.ToString ()), LoggingMethod.LevelError);
             if (message != null && message.Count >= 3) {
+                LoggingMethod.WriteToLog (string.Format ("DateTime {0}, MultiChannelSubscribeRequest", DateTime.Now.ToString ()), LoggingMethod.LevelError);    
                 MultiChannelSubscribeRequest<T> (type, channels, (object)message [1], userCallback, connectCallback, errorCallback, false);
             }
         }

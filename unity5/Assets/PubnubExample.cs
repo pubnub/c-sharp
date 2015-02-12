@@ -9,6 +9,7 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 //using System.Threading;
 using System.Text;
+using System.Linq;
 using System.Collections.Generic;
 
 public class PubnubExample : MonoBehaviour
@@ -985,6 +986,7 @@ public class PubnubExample : MonoBehaviour
             } else if ((PubnubState)pubnubState == PubnubState.Subscribe) {
                 AddToPubnubResultContainer ("Running Subscribe");
                 allowUserSettingsChange = false;
+                //pubnub.Subscribe<string> (channel, DisplayReturnMessageObj, DisplayConnectStatusMessageObj, DisplayErrorMessage);
                 pubnub.Subscribe<string> (channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
             } else if ((PubnubState)pubnubState == PubnubState.DetailedHistory) {
                 AddToPubnubResultContainer ("Running Detailed History");
@@ -1169,7 +1171,7 @@ public class PubnubExample : MonoBehaviour
 					do
 				    {
 						currentRecord = recordQueue.Dequeue();
-                        Debug.Log( "currentRecord: " + currentRecord );
+                        //Debug.Log( "currentRecord: " + currentRecord );
 						sbResult.AppendLine (currentRecord);
 					} while (recordQueue.Count != 0);
 				}
@@ -1219,11 +1221,39 @@ public class PubnubExample : MonoBehaviour
         AddToPubnubResultContainer (string.Format ("REGULAR CALLBACK: {0}", result));
     }
 
+    void DisplayReturnMessageObj (object result)
+    {
+        //print(result);
+        var myList = result as List<object>;
+        var stringList = myList.OfType<string>();
+        //var stringList = (from o in result 
+          //      select o.ToString()).ToList();
+        //string result2 = string.Join(",", stringList.ToArray());
+        string result2 = string.Join(",", stringList.ToArray());//myList.OfType<string>();
+        UnityEngine.Debug.Log (string.Format ("REGULAR CALLBACK LOG: {0}", result2));
+        AddToPubnubResultContainer (string.Format ("REGULAR CALLBACK: {0}", result2));
+    }
+
     void DisplayConnectStatusMessage (string result)
     {
         //print(result);
         UnityEngine.Debug.Log (string.Format ("CONNECT CALLBACK LOG: {0}", result));
         AddToPubnubResultContainer (string.Format ("CONNECT CALLBACK: {0}", result));
+    }
+
+    void DisplayConnectStatusMessageObj (object result)
+    {
+        //print(result);
+        var myList = result as List<object>;
+        var stringList = myList.OfType<string>();
+        //var stringList = (from o in result 
+        //      select o.ToString()).ToList();
+        //string result2 = string.Join(",", stringList.ToArray());
+        string result2 = string.Join(",", stringList.ToArray());//myList.OfType<string>();
+
+        //string result2 = string.Join(",", result.ToArray());
+        UnityEngine.Debug.Log (string.Format ("CONNECT CALLBACK LOG: {0}", result2));
+        AddToPubnubResultContainer (string.Format ("CONNECT CALLBACK: {0}", result2));
     }
 
     void DisplayDisconnectStatusMessage (string result)
@@ -1400,10 +1430,10 @@ public class PubnubExample : MonoBehaviour
 
     void AddToPubnubResultContainer (string result)
     {
-        UnityEngine.Debug.Log ("result:" + result);
+        //UnityEngine.Debug.Log ("result:" + result);
         //recordQueue.Enqueue (result);
 		lock (recordQueue) {
-			UnityEngine.Debug.Log (string.Format ("Enqueuing {0}", result)); 
+			//UnityEngine.Debug.Log (string.Format ("Enqueuing {0}", result)); 
 			recordQueue.Enqueue (result);
 		}
     }
