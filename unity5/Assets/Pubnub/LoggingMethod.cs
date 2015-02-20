@@ -66,7 +66,7 @@ namespace PubNubMessaging.Core
             if (writeToLog) {
                 #if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || __IOS__ || MONODROID || __ANDROID__)
                 System.Diagnostics.Debug.WriteLine(logText);
-                #elif (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
+                #elif (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID || UNITY_5)
                 //print (logText);
                 UnityEngine.Debug.Log (logText);
                 #else

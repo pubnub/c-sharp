@@ -418,7 +418,7 @@ namespace PubNubMessaging.Core
             heartbeatCoroutine = gobj.AddComponent<CoroutineClass> ();
             presenceHeartbeatCoroutine = gobj.AddComponent<CoroutineClass> ();*/
 
-            coroutine = gobj.AddComponent<CoroutineClass> ();
+            coroutine = gobj.AddComponent<CoroutineClass> ();             
 
             this.publishKey = publishKey;
             this.subscribeKey = subscribeKey;
@@ -1396,7 +1396,9 @@ namespace PubNubMessaging.Core
         {
             //pubnub.TerminateCurrentSubscriberRequest ();
             //subCoroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
-            coroutine.BounceRequest<T> (CoroutineClass.CurrentRequestType.Subscribe, StoredRequestState<T>.CurrentState, true);
+            //RequestState<T> reqState = StoredRequestState.Instance.GetStoredRequestState<T> (CurrentRequestType.Subscribe) as RequestState<T>;
+            RequestState<T> reqState = StoredRequestState.Instance.GetStoredRequestState (CurrentRequestType.Subscribe) as RequestState<T>;
+            coroutine.BounceRequest<T> (CurrentRequestType.Subscribe, reqState, true);
         }
 
         /*public void EnableSimulateNetworkFailForTestingOnly ()
@@ -1426,8 +1428,8 @@ namespace PubNubMessaging.Core
             RemoveUserState ();
             //subCoroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
             //nonSubCoroutine.BounceRequest (CoroutineClass.CurrentRequestType.NonSubscribe);
-            coroutine.BounceRequest<object> (CoroutineClass.CurrentRequestType.Subscribe, null, false);
-            coroutine.BounceRequest<object> (CoroutineClass.CurrentRequestType.NonSubscribe, null, false);
+            coroutine.BounceRequest<object> (CurrentRequestType.Subscribe, null, false);
+            coroutine.BounceRequest<object> (CurrentRequestType.NonSubscribe, null, false);
 
             LoggingMethod.WriteToLog (string.Format ("DateTime {0} Request bounced.", DateTime.Now.ToString ()), LoggingMethod.LevelInfo);
             StopHeartbeat ();
@@ -1620,6 +1622,8 @@ namespace PubNubMessaging.Core
                         //for heartbeat and presence heartbeat treat reconnect as pause
                         requestState.Reconnect = pause;
 
+                        StoredRequestState.Instance.SetRequestState(CurrentRequestType.PresenceHeartbeat, requestState); 
+
                         //presenceHeartbeatCoroutine.Run<T> (requestUrl.OriginalString, requestState, HeartbeatTimeout, pauseTime);
                         coroutine.Run<T> (requestUrl.OriginalString, requestState, HeartbeatTimeout, pauseTime);
                     }
@@ -1651,6 +1655,8 @@ namespace PubNubMessaging.Core
                     requestState.ConnectCallback = pubnubRequestState.ConnectCallback;
                     //for heartbeat and presence heartbeat treat reconnect as pause
                     requestState.Reconnect = pause;
+
+                    StoredRequestState.Instance.SetRequestState(CurrentRequestType.Heartbeat, requestState);
 
                     //heartbeatCoroutine.Run<T> (requestUrl.OriginalString, requestState, HeartbeatTimeout, pauseTime);
 
@@ -1691,7 +1697,7 @@ namespace PubNubMessaging.Core
             //pnRequestState
             //var a = (specificListType)pnRequestState.Type;*/
 
-            Debug.Log ("In handler of event cea " + cea.CurrRequestType.ToString());
+            //Debug.Log ("In handler of event cea " + cea.CurrRequestType.ToString());
             Debug.Log ("In handler of event cea " + cea.PubnubRequestState.Type.ToString());
             try {
                 LoggingMethod.WriteToLog (string.Format ("DateTime {0}, RequestType CoroutineCompleteHandler {1}", DateTime.Now.ToString (), typeof(T)), LoggingMethod.LevelError);
@@ -1843,7 +1849,7 @@ namespace PubNubMessaging.Core
                             LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Aborting previous subscribe/presence requests having channel(s) UrlProcessResponseCallbackNonAsync", DateTime.Now.ToString ()), LoggingMethod.LevelInfo);
                             //TerminateLocalClientHeartbeatTimer (requestState.Request.RequestUri);
                             //subCoroutine.BounceRequest(CoroutineClass.CurrentRequestType.Subscribe);
-                            coroutine.BounceRequest(CoroutineClass.CurrentRequestType.Subscribe, requestState, false);
+                            coroutine.BounceRequest(CurrentRequestType.Subscribe, requestState, false);
                         }
 
                         if (jsonString != "[]") {
@@ -2461,9 +2467,9 @@ namespace PubNubMessaging.Core
                         currentState.Timeout = true;
                         //TerminatePendingWebRequest (currentState);
                         if ((currentState.Type == ResponseType.Subscribe) || (currentState.Type == ResponseType.Presence)) {
-                            coroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe, currentState, false);
+                            coroutine.BounceRequest (CurrentRequestType.Subscribe, currentState, false);
                         } else {
-                            coroutine.BounceRequest (CoroutineClass.CurrentRequestType.NonSubscribe, currentState, false);
+                            coroutine.BounceRequest (CurrentRequestType.NonSubscribe, currentState, false);
                         }
                     }
                 } else {
@@ -2523,12 +2529,14 @@ namespace PubNubMessaging.Core
                     }
                     //subCoroutine.CoroutineComplete += CoroutineCompleteHandler<T>;
                     //subCoroutine.Run<T> (requestUri.OriginalString, pubnubRequestState, SubscribeTimeout, 0);
+                    StoredRequestState.Instance.SetRequestState(CurrentRequestType.Subscribe, pubnubRequestState);
                     coroutine.SubCoroutineComplete += CoroutineCompleteHandler<T>;
                     coroutine.Run<T> (requestUri.OriginalString, pubnubRequestState, SubscribeTimeout, 0);
 
                 } else {
                     //nonSubCoroutine.CoroutineComplete += CoroutineCompleteHandler<T>;
                     //nonSubCoroutine.Run<T> (requestUri.OriginalString, pubnubRequestState, NonSubscribeTimeout, 0);
+                    StoredRequestState.Instance.SetRequestState(CurrentRequestType.NonSubscribe, pubnubRequestState);
                     coroutine.NonSubCoroutineComplete += CoroutineCompleteHandler<T>;
                     coroutine.Run<T> (requestUri.OriginalString, pubnubRequestState, NonSubscribeTimeout, 0);
                 }
@@ -2618,7 +2626,9 @@ namespace PubNubMessaging.Core
                         /*if (webRequest != null)
                             TerminatePendingWebRequest (webRequest, errorCallback);*/
                         //subCoroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
-                        coroutine.BounceRequest<T> (CoroutineClass.CurrentRequestType.Subscribe, StoredRequestState<T>.CurrentState, false);
+                        //RequestState<T> reqState = StoredRequestState.Instance.GetStoredRequestState<T> (CurrentRequestType.Subscribe) as RequestState<T>;
+                        RequestState<T> reqState = StoredRequestState.Instance.GetStoredRequestState (CurrentRequestType.Subscribe) as RequestState<T>;
+                        coroutine.BounceRequest<T> (CurrentRequestType.Subscribe, reqState, false);
 
                     } else {
                         LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Unable to capture channel(s)={1} from _channelRequest to abort request.", DateTime.Now.ToString (), multiChannelName), LoggingMethod.LevelInfo);
@@ -2772,7 +2782,9 @@ namespace PubNubMessaging.Core
                             //TerminatePendingWebRequest (webRequest, errorCallback);
 
                         //subCoroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
-                        coroutine.BounceRequest<T> (CoroutineClass.CurrentRequestType.Subscribe, StoredRequestState<T>.CurrentState, false);
+                        //RequestState<T> reqState = StoredRequestState.Instance.GetStoredRequestState<T> (CurrentRequestType.Subscribe) as RequestState<T>;
+                        RequestState<T> reqState = StoredRequestState.Instance.GetStoredRequestState (CurrentRequestType.Subscribe) as RequestState<T>;
+                        coroutine.BounceRequest<T> (CurrentRequestType.Subscribe, reqState, false);
 
                     } else {
                         LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Unable to capture channel(s)={1} from _channelRequest to abort request.", DateTime.Now.ToString (), multiChannelName), LoggingMethod.LevelInfo);
@@ -2886,7 +2898,6 @@ namespace PubNubMessaging.Core
                 pubnubRequestState.TypeParameterType = typeof(T);
                 pubnubRequestState.Timetoken = Convert.ToInt64 (timetoken.ToString ());
 
-                StoredRequestState<T>.CurrentState = pubnubRequestState;
                 // Wait for message
                 UrlProcessRequest<T> (requestUrl, pubnubRequestState);
             } catch (Exception ex) {
@@ -2913,7 +2924,7 @@ namespace PubNubMessaging.Core
                 keepHearbeatRunning = false;
                 //Unsubscribe channels here.
                 //subCoroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe);
-                coroutine.BounceRequest (CoroutineClass.CurrentRequestType.Subscribe, pubnubRequestState, false);
+                coroutine.BounceRequest (CurrentRequestType.Subscribe, pubnubRequestState, false);
                 MultiplexExceptionHandler<T> (ResponseType.Subscribe, pubnubRequestState.Channels, pubnubRequestState.UserCallback, pubnubRequestState.ConnectCallback, pubnubRequestState.ErrorCallback, true, false);
                 //TODO: Fire callbacks
 
