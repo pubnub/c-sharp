@@ -499,7 +499,7 @@ namespace PubNubMessaging.Core
             dictionaryCodes.Add (119, "Channel not subscribed for presence yet");
             dictionaryCodes.Add (120, "Incomplete unsubscribe. Try again for unsubscribe.");
             dictionaryCodes.Add (121, "Incomplete presence-unsubscribe. Try again for presence-unsubscribe.");
-            dictionaryCodes.Add (122, "Network/Internet connection not available. C# client retrying again to verify connection. No action is needed from your side.");
+            dictionaryCodes.Add (122, "Network/Internet connection not available. Unity client is trying to verify connection. No action is needed from your side.");
             dictionaryCodes.Add (123, "During non-availability of network/internet, max retries for connection were attempted. So unsubscribed the channel.");
             dictionaryCodes.Add (124, "During non-availability of network/internet, max retries for connection were attempted. So presence-unsubscribed the channel.");
             dictionaryCodes.Add (125, "Publish operation timeout occured.");

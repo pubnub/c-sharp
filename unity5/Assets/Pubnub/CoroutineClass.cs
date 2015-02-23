@@ -325,9 +325,16 @@ namespace PubNubMessaging.Core
                         message = www.error;
                         isError = true;
                     } 
-                    var requestState = StoredRequestState.Instance.GetStoredRequestState(cp.crt) as RequestState<string>;
-
-                    FireEvent (message, isError, false, requestState, cp.crt);
+                    ;
+                    if (cp.typeParameterType == typeof(string)){
+                        var requestState = StoredRequestState.Instance.GetStoredRequestState(cp.crt) as RequestState<string>;
+                        FireEvent (message, isError, false, requestState, cp.crt);
+                    }else if (cp.typeParameterType == typeof(object)){
+                        var requestState = StoredRequestState.Instance.GetStoredRequestState(cp.crt) as RequestState<object>;
+                        FireEvent (message, isError, false, requestState, cp.crt);
+                    } else {
+                        throw new Exception("'string' and 'object' are the only types supported in generic method calls.");
+                    }
                 } 
             } catch (Exception ex) {
                 LoggingMethod.WriteToLog (string.Format ("DateTime {0}, RunCoroutineSub {1}, Exception: {2}", DateTime.Now.ToString (), cp.crt.ToString (), ex.ToString ()), LoggingMethod.LevelError);
@@ -625,10 +632,17 @@ namespace PubNubMessaging.Core
         public void ProcessTimeout(CoroutineParams cp){
             try {
                 if (!CheckComplete (cp.crt)) {
-                    var requestState = StoredRequestState.Instance.GetStoredRequestState(cp.crt) as RequestState<string>;
-                    FireEvent ("Timed out", true, true, requestState, cp.crt);
-                    LoggingMethod.WriteToLog (string.Format ("DateTime {0}, WWW Error: {1} sec timeout", DateTime.Now.ToString (), cp.timeout.ToString ()), LoggingMethod.LevelError);
-
+                    if (cp.typeParameterType == typeof(string)){
+                        var requestState = StoredRequestState.Instance.GetStoredRequestState(cp.crt) as RequestState<string>;
+                        FireEvent ("Timed out", true, true, requestState, cp.crt);
+                        LoggingMethod.WriteToLog (string.Format ("DateTime {0}, WWW Error: {1} sec timeout", DateTime.Now.ToString (), cp.timeout.ToString ()), LoggingMethod.LevelError);
+                    } else if (cp.typeParameterType == typeof(object)){ 
+                        var requestState = StoredRequestState.Instance.GetStoredRequestState(cp.crt) as RequestState<object>;
+                        FireEvent ("Timed out", true, true, requestState, cp.crt);
+                        LoggingMethod.WriteToLog (string.Format ("DateTime {0}, WWW Error: {1} sec timeout", DateTime.Now.ToString (), cp.timeout.ToString ()), LoggingMethod.LevelError);
+                    } else {
+                        throw new Exception("'string' and 'object' are the only types supported in generic method calls");
+                    }
                     //FireForceStopCoroutineSub (true, cp.crt);
                 }
                 LoggingMethod.WriteToLog (string.Format ("DateTime {0}, CheckTimeout exit {1}", DateTime.Now.ToString (), cp.crt.ToString ()), LoggingMethod.LevelError);

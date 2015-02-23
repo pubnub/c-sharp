@@ -3,12 +3,13 @@
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Pubnub/Pubnub.cs">
     <Files>
       <File FileName="Assets/Pubnub/LoggingMethod.cs" Line="1" Column="1" />
-      <File FileName="Assets/PubnubExample.cs" Line="38" Column="38" />
-      <File FileName="Assets/Pubnub/CoroutineClass.cs" Line="50" Column="50" />
-      <File FileName="Assets/Pubnub/Pubnub.cs" Line="25" Column="25" />
-      <File FileName="Assets/Pubnub/ReconnectState.cs" Line="27" Column="27" />
+      <File FileName="Assets/PubnubExample.cs" Line="1" Column="1" />
+      <File FileName="Assets/Pubnub/CoroutineClass.cs" Line="1" Column="1" />
+      <File FileName="Assets/Pubnub/Pubnub.cs" Line="43" Column="43" />
+      <File FileName="Assets/Pubnub/ReconnectState.cs" Line="1" Column="1" />
       <File FileName="Assets/Pubnub/SafeDictionary.cs" Line="1" Column="1" />
       <File FileName="Assets/Pubnub/MD5.cs" Line="1" Column="1" />
+      <File FileName="../mono-for-mac/PubNub-Console/Pubnub/PubnubCore.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
