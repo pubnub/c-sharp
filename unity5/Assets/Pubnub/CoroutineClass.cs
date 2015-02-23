@@ -307,7 +307,8 @@ namespace PubNubMessaging.Core
             StartCoroutine (crRequest);*/
         }
 
-        public void ProcessResponse(WWW www, CoroutineParams cp){
+        public void ProcessResponse (WWW www, CoroutineParams cp)
+        {
             try {
                 if (www != null) {
 
@@ -326,14 +327,14 @@ namespace PubNubMessaging.Core
                         isError = true;
                     } 
                     ;
-                    if (cp.typeParameterType == typeof(string)){
-                        var requestState = StoredRequestState.Instance.GetStoredRequestState(cp.crt) as RequestState<string>;
+                    if (cp.typeParameterType == typeof(string)) {
+                        var requestState = StoredRequestState.Instance.GetStoredRequestState (cp.crt) as RequestState<string>;
                         FireEvent (message, isError, false, requestState, cp.crt);
-                    }else if (cp.typeParameterType == typeof(object)){
-                        var requestState = StoredRequestState.Instance.GetStoredRequestState(cp.crt) as RequestState<object>;
+                    } else if (cp.typeParameterType == typeof(object)) {
+                        var requestState = StoredRequestState.Instance.GetStoredRequestState (cp.crt) as RequestState<object>;
                         FireEvent (message, isError, false, requestState, cp.crt);
                     } else {
-                        throw new Exception("'string' and 'object' are the only types supported in generic method calls.");
+                        throw new Exception ("'string' and 'object' are the only types supported in generic method calls.");
                     }
                 } 
             } catch (Exception ex) {
@@ -381,8 +382,8 @@ namespace PubNubMessaging.Core
                         isError = true;
                     }*/ 
                     
-                    #region "working code"
-                        /*Type generic = typeof(StoredRequestState);
+            #region "working code"
+            /*Type generic = typeof(StoredRequestState);
                         Type constructed = generic.MakeGenericType (typeArgs);
                         var repository = Activator.CreateInstance (generic);
                         LoggingMethod.WriteToLog (string.Format ("DateTime {0}, repository Activator.CreateInstance", DateTime.Now.ToString ()), LoggingMethod.LevelError);
@@ -397,10 +398,10 @@ namespace PubNubMessaging.Core
                         }
                         LoggingMethod.WriteToLog (string.Format ("DateTime {0}, repository After invoke", DateTime.Now.ToString ()), LoggingMethod.LevelError);
                     */
-                    #endregion
+            #endregion
 
-                    #region "working code2"
-                    /*LoggingMethod.WriteToLog (string.Format ("DateTime {0}, repository Invoking method", DateTime.Now.ToString ()), LoggingMethod.LevelError);
+            #region "working code2"
+            /*LoggingMethod.WriteToLog (string.Format ("DateTime {0}, repository Invoking method", DateTime.Now.ToString ()), LoggingMethod.LevelError);
                     MethodInfo repositorymethod = StoredRequestState.Instance.GetType().GetMethod("GetStoredRequestState").MakeGenericMethod(typeArgs);
 
                     var a = repositorymethod.Invoke (StoredRequestState.Instance, new object[] { cp.crt });
@@ -414,9 +415,9 @@ namespace PubNubMessaging.Core
                     } else {
                         LoggingMethod.WriteToLog (string.Format ("DateTime {0}, a not null", DateTime.Now.ToString ()), LoggingMethod.LevelError);
                     }*/
-                    #endregion
+            #endregion
 
-                    /*Type[] typeArgs = { cp.typeParameterType };
+            /*Type[] typeArgs = { cp.typeParameterType };
                     Type generic = typeof(RequestState<>);
                     Type constructed = generic.MakeGenericType (typeArgs);
 
@@ -437,14 +438,14 @@ namespace PubNubMessaging.Core
                         LoggingMethod.WriteToLog (string.Format ("DateTime {0}, a not null", DateTime.Now.ToString ()), LoggingMethod.LevelError);
                     }*/
                     
-                    #region "Uncomment when the webgl generic bug is resolved"
-                    /*LoggingMethod.WriteToLog (string.Format ("DateTime {0}, CallFireEvent MakeGenericMethod", DateTime.Now.ToString ()), LoggingMethod.LevelError);
+            #region "Uncomment when the webgl generic bug is resolved"
+            /*LoggingMethod.WriteToLog (string.Format ("DateTime {0}, CallFireEvent MakeGenericMethod", DateTime.Now.ToString ()), LoggingMethod.LevelError);
                         MethodInfo method = GetType ().GetMethod ("CallFireEvent").MakeGenericMethod(typeArgs);
                         method.Invoke (this, new object[] { message, isError, false, requestState, cp });
                     LoggingMethod.WriteToLog (string.Format ("DateTime {0}, CallFireEvent After invoke", DateTime.Now.ToString ()), LoggingMethod.LevelError);*/
-                    #endregion
+            #endregion
 
-                    /*FireEvent(message, isError, false, requestState, cp.crt);
+            /*FireEvent(message, isError, false, requestState, cp.crt);
 
                 } 
             } catch (Exception ex) {
@@ -524,16 +525,16 @@ namespace PubNubMessaging.Core
             try {
                 if (crt == CurrentRequestType.Heartbeat) {
                     isHearbeatComplete = true;
-                    StopCoroutine("CheckTimeoutHeartbeat");  
+                    StopCoroutine ("CheckTimeoutHeartbeat");  
                 } else if (crt == CurrentRequestType.PresenceHeartbeat) {
                     isPresenceHeartbeatComplete = true;
-                    StopCoroutine("CheckTimeoutPresenceHeartbeat");
+                    StopCoroutine ("CheckTimeoutPresenceHeartbeat");
                 } else if (crt == CurrentRequestType.Subscribe) {
                     isSubscribeComplete = true;
-                    StopCoroutine("CheckTimeoutSub");
+                    StopCoroutine ("CheckTimeoutSub");
                 } else {
                     isNonSubscribeComplete = true;
-                    StopCoroutine("CheckTimeoutNonSub");
+                    StopCoroutine ("CheckTimeoutNonSub");
                 } 
                 //StopCoroutine("CheckTimeout");
 
@@ -629,19 +630,20 @@ namespace PubNubMessaging.Core
             LoggingMethod.WriteToLog (string.Format ("DateTime {0}, BounceRequest {1}", DateTime.Now.ToString (), crt.ToString ()), LoggingMethod.LevelError);
         }
 
-        public void ProcessTimeout(CoroutineParams cp){
+        public void ProcessTimeout (CoroutineParams cp)
+        {
             try {
                 if (!CheckComplete (cp.crt)) {
-                    if (cp.typeParameterType == typeof(string)){
-                        var requestState = StoredRequestState.Instance.GetStoredRequestState(cp.crt) as RequestState<string>;
+                    if (cp.typeParameterType == typeof(string)) {
+                        var requestState = StoredRequestState.Instance.GetStoredRequestState (cp.crt) as RequestState<string>;
                         FireEvent ("Timed out", true, true, requestState, cp.crt);
                         LoggingMethod.WriteToLog (string.Format ("DateTime {0}, WWW Error: {1} sec timeout", DateTime.Now.ToString (), cp.timeout.ToString ()), LoggingMethod.LevelError);
-                    } else if (cp.typeParameterType == typeof(object)){ 
-                        var requestState = StoredRequestState.Instance.GetStoredRequestState(cp.crt) as RequestState<object>;
+                    } else if (cp.typeParameterType == typeof(object)) { 
+                        var requestState = StoredRequestState.Instance.GetStoredRequestState (cp.crt) as RequestState<object>;
                         FireEvent ("Timed out", true, true, requestState, cp.crt);
                         LoggingMethod.WriteToLog (string.Format ("DateTime {0}, WWW Error: {1} sec timeout", DateTime.Now.ToString (), cp.timeout.ToString ()), LoggingMethod.LevelError);
                     } else {
-                        throw new Exception("'string' and 'object' are the only types supported in generic method calls");
+                        throw new Exception ("'string' and 'object' are the only types supported in generic method calls");
                     }
                     //FireForceStopCoroutineSub (true, cp.crt);
                 }
@@ -678,7 +680,7 @@ namespace PubNubMessaging.Core
             yield return new WaitForSeconds (cp.timeout); 
             ProcessTimeout (cp);
         }
-        
+
         public void FireEvent<T> (string message, bool isError, bool isTimeout, RequestState<T> pubnubRequestState, CurrentRequestType crt)
         {
             CustomEventArgs<T> cea = new CustomEventArgs<T> ();

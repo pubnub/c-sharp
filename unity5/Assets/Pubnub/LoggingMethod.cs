@@ -355,7 +355,7 @@ namespace PubNubMessaging.Core
                     ret = PubnubErrorCode.BadRequest;
                 } else if (httpErrorCodeMessage.ToUpper () == "NO UUID SPECIFIED") {
                     ret = PubnubErrorCode.NoUuidSpecified;
-                } else if (httpErrorCodeMessage.ToUpper() == "INVALID TIMESTAMP") {
+                } else if (httpErrorCodeMessage.ToUpper () == "INVALID TIMESTAMP") {
                     ret = PubnubErrorCode.InvalidTimestamp;
                 }
                 break;

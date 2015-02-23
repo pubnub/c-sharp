@@ -60,21 +60,21 @@ namespace PubNubMessaging.Core
         }
     }
 
-    public class StoredRequestState{
+    public class StoredRequestState
+    {
 
         private static volatile StoredRequestState instance;
-        private static readonly object syncRoot = new Object();
+        private static readonly object syncRoot = new Object ();
 
-        private StoredRequestState() {}
-
-        public static StoredRequestState Instance
+        private StoredRequestState ()
         {
+        }
+
+        public static StoredRequestState Instance {
             get {
-                if (instance == null) 
-                {
-                    lock (syncRoot) 
-                    {
-                        if (instance == null) 
+                if (instance == null) {
+                    lock (syncRoot) {
+                        if (instance == null)
                             instance = new StoredRequestState ();
                     }
                 }
@@ -83,17 +83,18 @@ namespace PubNubMessaging.Core
             }
         }
 
-        SafeDictionary<CurrentRequestType, object> requestStates = new SafeDictionary<CurrentRequestType, object>();
+        SafeDictionary<CurrentRequestType, object> requestStates = new SafeDictionary<CurrentRequestType, object> ();
 
         //public void SetRequestState<U>(CurrentRequestType key, RequestState<U> requestState) {
-        public void SetRequestState(CurrentRequestType key, object requestState) {
+        public void SetRequestState (CurrentRequestType key, object requestState)
+        {
             //LoggingMethod.WriteToLog (string.Format ("DateTime {0}, requestState {1}", DateTime.Now.ToString (), requestState.Channels.ToString()), LoggingMethod.LevelError);
             object reqState = requestState as object;
             //LoggingMethod.WriteToLog (string.Format ("DateTime {0}, reqState {1}", DateTime.Now.ToString (), reqState.Channels.ToString()), LoggingMethod.LevelError);
             //if (requestStates.ContainsKey(key)) {
-                requestStates.AddOrUpdate(key, reqState, (oldData, newData) => reqState);
+            requestStates.AddOrUpdate (key, reqState, (oldData, newData) => reqState);
             LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Adding", DateTime.Now.ToString ()), LoggingMethod.LevelError);
-                //LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Adding {1}", DateTime.Now.ToString (), requestStates[key].Channels), LoggingMethod.LevelError);
+            //LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Adding {1}", DateTime.Now.ToString (), requestStates[key].Channels), LoggingMethod.LevelError);
             /*} else {
                 requestStates[key] = reqState;
                 LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Adding {1}", DateTime.Now.ToString (), requestStates[key].Channels), LoggingMethod.LevelError);
@@ -101,9 +102,10 @@ namespace PubNubMessaging.Core
         }
 
         //public object GetStoredRequestState<U>(CurrentRequestType aKey) {
-        public object GetStoredRequestState(CurrentRequestType aKey) {
-            LoggingMethod.WriteToLog (string.Format ("DateTime {0}, akey", DateTime.Now.ToString (), aKey.ToString()), LoggingMethod.LevelError);
-            if(requestStates.ContainsKey(aKey)){
+        public object GetStoredRequestState (CurrentRequestType aKey)
+        {
+            LoggingMethod.WriteToLog (string.Format ("DateTime {0}, akey", DateTime.Now.ToString (), aKey.ToString ()), LoggingMethod.LevelError);
+            if (requestStates.ContainsKey (aKey)) {
                 /*RequestState<object> reqState;
                 if (requestStates.TryGetValue (aKey, out reqState)) {
                     LoggingMethod.WriteToLog (string.Format ("DateTime {0}, returning reqState {1}", DateTime.Now.ToString (), reqState.Channels), LoggingMethod.LevelError);
@@ -113,7 +115,7 @@ namespace PubNubMessaging.Core
                     //LoggingMethod.WriteToLog (string.Format ("DateTime {0}, returning reqState {1}", DateTime.Now.ToString (), requestStates[aKey].Channels), LoggingMethod.LevelError);
                     LoggingMethod.WriteToLog (string.Format ("DateTime {0}, returning", DateTime.Now.ToString ()), LoggingMethod.LevelError);
                     //return requestStates[aKey] as RequestState<U>;
-                    return requestStates[aKey];
+                    return requestStates [aKey];
                 }
                 LoggingMethod.WriteToLog (string.Format ("DateTime {0}, returning false", DateTime.Now.ToString ()), LoggingMethod.LevelError);
                 //return reqState;
@@ -123,7 +125,7 @@ namespace PubNubMessaging.Core
         }
 
     }
-        
+
     public class RequestState<T>
     {
         public Action<T> UserCallback;
@@ -135,7 +137,7 @@ namespace PubNubMessaging.Core
         public string[] Channels;
         public bool Timeout;
         public bool Reconnect;
-        public long Timetoken; 
+        public long Timetoken;
         public Type TypeParameterType;
 
         public RequestState ()
@@ -150,7 +152,7 @@ namespace PubNubMessaging.Core
         public RequestState (RequestState<T> requestState)
         {
             Channels = requestState.Channels;
-            LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Channels {1}", DateTime.Now.ToString (), Channels.ToString()), LoggingMethod.LevelError);
+            LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Channels {1}", DateTime.Now.ToString (), Channels.ToString ()), LoggingMethod.LevelError);
             ConnectCallback = requestState.ConnectCallback as Action<T>;
             ErrorCallback = requestState.ErrorCallback;
             Reconnect = requestState.Reconnect;
@@ -163,17 +165,17 @@ namespace PubNubMessaging.Core
         }
 
         public void SetRequestState<U> (
-                string[] channels, 
-                Action<T> connectCallback, 
-                Action<PubnubClientError> errorCallback,
-                bool reconnect,
-                PubnubWebRequest request,
-                PubnubWebResponse response,
-                bool timeout,
-                long timetoken,
-                Type typeParameterType,
-                Action<T> userCallback
-            )
+            string[] channels, 
+            Action<T> connectCallback, 
+            Action<PubnubClientError> errorCallback,
+            bool reconnect,
+            PubnubWebRequest request,
+            PubnubWebResponse response,
+            bool timeout,
+            long timetoken,
+            Type typeParameterType,
+            Action<T> userCallback
+        )
         {
             Channels = channels;
             ConnectCallback = connectCallback as Action<T>;
