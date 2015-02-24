@@ -3329,11 +3329,16 @@ namespace PubNubMessaging.Core
             string callbackJson = "";
 
             if (typeof(T) == typeof(string)) {
+		try{
+		LoggingMethod.WriteToLog (string.Format ("DateTime {0}, before _jsonPluggableLibrary.SerializeToJsonString", DateTime.Now.ToString ()), LoggingMethod.LevelInfo);
                 callbackJson = _jsonPluggableLibrary.SerializeToJsonString (result);
-
+		LoggingMethod.WriteToLog (string.Format ("DateTime {0}, after _jsonPluggableLibrary.SerializeToJsonString", DateTime.Now.ToString ()), LoggingMethod.LevelInfo);
                 Action<string> castCallback = callback as Action<string>;
                 castCallback (callbackJson);
-            }
+		} catch (Exception ex) {
+		LoggingMethod.WriteToLog (string.Format ("DateTime {0}, JsonResponseToCallback = {1} ", DateTime.Now.ToString (), ex.ToString()), LoggingMethod.LevelInfo);		
+        }
+        }
         }
 
         private void GoToCallback<T> (object result, Action<T> Callback)
@@ -3479,13 +3484,14 @@ namespace PubNubMessaging.Core
                 string multiChannel = (channels != null) ? string.Join (",", channels) : "";
                 if (!string.IsNullOrEmpty (jsonString)) {
                     if (!string.IsNullOrEmpty (jsonString)) {
+LoggingMethod.WriteToLog (string.Format ("DateTime {0}, jsonString = {1}", DateTime.Now.ToString (), jsonString), LoggingMethod.LevelInfo);
                         object deSerializedResult = _jsonPluggableLibrary.DeserializeToObject (jsonString);
                         List<object> result1 = ((IEnumerable)deSerializedResult).Cast<object> ().ToList ();
 
                         if (result1 != null && result1.Count > 0) {
                             result = result1;
                         }
-
+LoggingMethod.WriteToLog (string.Format ("DateTime {0}, after result", DateTime.Now.ToString ()), LoggingMethod.LevelInfo);
                         switch (type) {
                         case ResponseType.Publish:
                             result.Add (multiChannel);
@@ -3524,6 +3530,16 @@ namespace PubNubMessaging.Core
                             result.Add (multiChannel);
                             break;
                         case ResponseType.Time:
+                            LoggingMethod.WriteToLog (string.Format ("DateTime {0}, in time ", DateTime.Now.ToString ()), LoggingMethod.LevelInfo);
+                            long lTt;
+                            result = new List<object> ();
+                            var res = _jsonPluggableLibrary.DeserializeToObject (jsonString);
+                            LoggingMethod.WriteToLog (string.Format ("DateTime {0},  try parse on {1}", DateTime.Now.ToString (), res.ToString()), LoggingMethod.LevelInfo);
+                            if(long.TryParse(res.ToString(), out lTt)){
+                                result.Add (lTt);
+                                LoggingMethod.WriteToLog (string.Format ("DateTime {0}, in try parse ", DateTime.Now.ToString ()), LoggingMethod.LevelInfo);
+                            }
+
                             break;
                         case ResponseType.Subscribe:
                         case ResponseType.Presence:

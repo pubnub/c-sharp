@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using UnityEngine;
 using System.Collections;
@@ -158,6 +158,26 @@ namespace PubNubMessaging.Core
     //StopCoroutine only works when the coroutine is started with string overload.
     class CoroutineClass : MonoBehaviour
     {
+    #region "IL2CPP workarounds"
+	//Got an exception when using JSON serialisation for [], 
+	//IL2CPP needs to know about the array type at compile time.
+	//So please define private static filed like this:
+        private static System.String[][] _unused;
+	private static System.Int32[][] _unused2;
+	private static System.Int64[][] _unused3;
+    private static System.Int16[][] _unused4;
+    private static System.UInt16[][] _unused5;
+    private static System.UInt64[][] _unused6;
+    private static System.UInt32[][] _unused7;
+    private static System.Decimal[][] _unused8;
+    private static System.Double[][] _unused9;
+    private static long[][] _unused10;
+    private static int[][] _unused11;
+    private static float[][] _unused12;
+    private static decimal[][] _unused13;
+    private static uint[][] _unused14;
+    private static ulong[][] _unused15;
+    #endregion
         private bool isHearbeatComplete = false;
         private bool isPresenceHeartbeatComplete = false;
         private bool isSubscribeComplete = false;
