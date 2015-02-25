@@ -559,7 +559,7 @@ namespace PubNubMessaging.Core
                 } else {
                     if (asyncResultNonSubscribe != null && !asyncResultNonSubscribe.IsCompleted) {
 						throw new System.Exception("Another request is in progress!");
-                        CloseOpenRequest<T> (asyncResultNonSubscribe);
+                        // CloseOpenRequest<T> (asyncResultNonSubscribe);
                     }
                     asyncResultNonSubscribe = request.BeginGetResponse (new AsyncCallback (UrlProcessResponseCallback<T>), pubnubRequestState);
                     if (!asyncResultNonSubscribe.AsyncWaitHandle.WaitOne (GetTimeoutInSecondsForResponseType (pubnubRequestState.Type) * 1000)) {
