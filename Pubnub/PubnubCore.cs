@@ -4522,11 +4522,7 @@ namespace PubNubMessaging.Core
         }
     }
 
-    public class RequestState<T>
-    {
-        public Action<T> UserCallback;
-        public Action<PubnubClientError> ErrorCallback;
-        public Action<T> ConnectCallback;
+	public abstract class RequestStateBase {
         public PubnubWebRequest Request;
         public PubnubWebResponse Response;
         public ResponseType Type;
@@ -4535,13 +4531,24 @@ namespace PubNubMessaging.Core
         public bool Reconnect;
         public long Timetoken;
 
-        public RequestState ()
+        protected RequestStateBase ()
         {
-            UserCallback = null;
-            ConnectCallback = null;
             Request = null;
             Response = null;
             Channels = null;
+        }
+	}
+
+    public class RequestState<T> : RequestStateBase
+    {
+        public Action<T> UserCallback;
+        public Action<PubnubClientError> ErrorCallback;
+        public Action<T> ConnectCallback;
+
+        public RequestState () : base()
+        {
+            UserCallback = null;
+            ConnectCallback = null;
         }
     }
     #endregion

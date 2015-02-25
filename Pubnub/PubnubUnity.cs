@@ -36,7 +36,9 @@ namespace PubNubMessaging.Core
         #endif
         #if(UNITY_ANDROID || UNITY_STANDALONE)
         IAsyncResult asyncResultSubscribe;
+		RequestStateBase requestSubscribe;
         IAsyncResult asyncResultNonSubscribe;
+		RequestStateBase requestNonSubscribe;
         #endif
         #endregion
 
@@ -548,20 +550,20 @@ namespace PubNubMessaging.Core
             } else {
             #if (UNITY_ANDROID || UNITY_STANDALONE)
                 if (pubnubRequestState.Type == ResponseType.Subscribe || pubnubRequestState.Type == ResponseType.Presence) {
-                    if (asyncResultSubscribe != null && !asyncResultSubscribe.IsCompleted) {
-						throw new System.Exception("Another subscribe/presence request is in progress!");
-                        // CloseOpenRequest<T> (asyncResultSubscribe);
+                    if (asyncResultSubscribe != null) {
+                        CloseOpenRequest<T> (requestSubscribe, asyncResultSubscribe);
                     }
                     asyncResultSubscribe = request.BeginGetResponse (new AsyncCallback (UrlProcessResponseCallback<T>), pubnubRequestState);
+					requestSubscribe = pubnubRequestState;
                     if (!asyncResultSubscribe.AsyncWaitHandle.WaitOne (GetTimeoutInSecondsForResponseType (pubnubRequestState.Type) * 1000)) {
                         OnPubnubWebRequestTimeout<T> (pubnubRequestState, true);
                     }
                 } else {
-                    if (asyncResultNonSubscribe != null && !asyncResultNonSubscribe.IsCompleted) {
-						throw new System.Exception("Another request is in progress!");
-                        // CloseOpenRequest<T> (asyncResultNonSubscribe);
+                    if (asyncResultNonSubscribe != null) {
+                        CloseOpenRequest<T> (requestNonSubscribe, asyncResultNonSubscribe);
                     }
                     asyncResultNonSubscribe = request.BeginGetResponse (new AsyncCallback (UrlProcessResponseCallback<T>), pubnubRequestState);
+					requestNonSubscribe = pubnubRequestState;
                     if (!asyncResultNonSubscribe.AsyncWaitHandle.WaitOne (GetTimeoutInSecondsForResponseType (pubnubRequestState.Type) * 1000)) {
                         OnPubnubWebRequestTimeout<T> (pubnubRequestState, true);
                     }
@@ -682,15 +684,21 @@ namespace PubNubMessaging.Core
         #region "Other methods"
 
         #if (UNITY_ANDROID || UNITY_STANDALONE)
-        void CloseOpenRequest<T> (IAsyncResult asyncResult)
+        void CloseOpenRequest<T> (RequestStateBase state, IAsyncResult asyncResult)
         {
-			if (!asyncResult.IsCompleted) {
-				RequestState<T> asynchRequestState = asyncResult.AsyncState as RequestState<T>;
-
-				PubnubWebRequest asyncWebRequest = asynchRequestState.Request as PubnubWebRequest;
-				asyncWebRequest.Abort (null, errorLevel);
-				asyncResult.AsyncWaitHandle.Close ();
+			if (asyncResult.IsCompleted) {
+				return;
 			}
+
+			if (state.Type != ResponseType.PresenceHeartbeat) {
+				throw new Exception("Unable to close active user request of type: " + state.Type);throw new Exception("Unable to close active user request of type: " + state.Type);
+			}
+						
+			RequestState<T> asynchRequestState = asyncResult.AsyncState as RequestState<T>;
+
+			PubnubWebRequest asyncWebRequest = asynchRequestState.Request as PubnubWebRequest;
+			asyncWebRequest.Abort (null, errorLevel);
+			asyncResult.AsyncWaitHandle.Close ();
         }
         #endif
         #if (UNITY_IOS)
