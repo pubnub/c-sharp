@@ -37,6 +37,8 @@ namespace PubNubMessaging.Core
         #if(UNITY_ANDROID || UNITY_STANDALONE)
         IAsyncResult asyncResultSubscribe;
 		RequestStateBase requestSubscribe;
+        IAsyncResult asyncResultHeartbeat;
+		RequestStateBase requestHeartbeat;
         IAsyncResult asyncResultNonSubscribe;
 		RequestStateBase requestNonSubscribe;
         #endif
@@ -558,7 +560,16 @@ namespace PubNubMessaging.Core
                     if (!asyncResultSubscribe.AsyncWaitHandle.WaitOne (GetTimeoutInSecondsForResponseType (pubnubRequestState.Type) * 1000)) {
                         OnPubnubWebRequestTimeout<T> (pubnubRequestState, true);
                     }
-                } else {
+                } else if (pubnubRequestState.Type == ResponseType.PresenceHeartbeat) {
+                    if (asyncResultHeartbeat != null) {
+                        CloseOpenRequest<T> (requestHeartbeat, asyncResultHeartbeat);
+                    }
+                    asyncResultHeartbeat = request.BeginGetResponse (new AsyncCallback (UrlProcessResponseCallback<T>), pubnubRequestState);
+					requestHeartbeat = pubnubRequestState;
+                    if (!asyncResultHeartbeat.AsyncWaitHandle.WaitOne (GetTimeoutInSecondsForResponseType (pubnubRequestState.Type) * 1000)) {
+                        OnPubnubWebRequestTimeout<T> (pubnubRequestState, true);
+                    }
+				} else {
                     if (asyncResultNonSubscribe != null) {
                         CloseOpenRequest<T> (requestNonSubscribe, asyncResultNonSubscribe);
                     }
@@ -691,7 +702,7 @@ namespace PubNubMessaging.Core
 			}
 
 			if (state.Type != ResponseType.PresenceHeartbeat) {
-				throw new Exception("Unable to close active user request of type: " + state.Type);throw new Exception("Unable to close active user request of type: " + state.Type);
+				throw new Exception("Unable to close active user request of type: " + state.Type);
 			}
 						
 			RequestState<T> asynchRequestState = asyncResult.AsyncState as RequestState<T>;
