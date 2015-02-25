@@ -548,15 +548,17 @@ namespace PubNubMessaging.Core
             } else {
             #if (UNITY_ANDROID || UNITY_STANDALONE)
                 if (pubnubRequestState.Type == ResponseType.Subscribe || pubnubRequestState.Type == ResponseType.Presence) {
-                    if (asyncResultSubscribe != null) {
-                        CloseOpenRequest<T> (asyncResultSubscribe);
+                    if (asyncResultSubscribe != null && !asyncResultSubscribe.IsCompleted) {
+						throw new System.Exception("Another subscribe/presence request is in progress!");
+                        // CloseOpenRequest<T> (asyncResultSubscribe);
                     }
                     asyncResultSubscribe = request.BeginGetResponse (new AsyncCallback (UrlProcessResponseCallback<T>), pubnubRequestState);
                     if (!asyncResultSubscribe.AsyncWaitHandle.WaitOne (GetTimeoutInSecondsForResponseType (pubnubRequestState.Type) * 1000)) {
                         OnPubnubWebRequestTimeout<T> (pubnubRequestState, true);
                     }
                 } else {
-                    if (asyncResultNonSubscribe != null) {
+                    if (asyncResultNonSubscribe != null && !asyncResultNonSubscribe.IsCompleted) {
+						throw new System.Exception("Another request is in progress!");
                         CloseOpenRequest<T> (asyncResultNonSubscribe);
                     }
                     asyncResultNonSubscribe = request.BeginGetResponse (new AsyncCallback (UrlProcessResponseCallback<T>), pubnubRequestState);
@@ -682,30 +684,22 @@ namespace PubNubMessaging.Core
         #if (UNITY_ANDROID || UNITY_STANDALONE)
         void CloseOpenRequest<T> (IAsyncResult asyncResult)
         {
-            try {
-                if (!asyncResult.IsCompleted) {
-                    RequestState<T> asynchRequestState = asyncResult.AsyncState as RequestState<T>;
+			if (!asyncResult.IsCompleted) {
+				RequestState<T> asynchRequestState = asyncResult.AsyncState as RequestState<T>;
 
-                    PubnubWebRequest asyncWebRequest = asynchRequestState.Request as PubnubWebRequest;
-                    asyncWebRequest.Abort (null, errorLevel);
-                    asyncResult.AsyncWaitHandle.Close ();
-                }
-            } catch (Exception ex) {
-                LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Response:{1}", DateTime.Now.ToString (), ex.ToString ()), LoggingMethod.LevelError);
-            }
+				PubnubWebRequest asyncWebRequest = asynchRequestState.Request as PubnubWebRequest;
+				asyncWebRequest.Abort (null, errorLevel);
+				asyncResult.AsyncWaitHandle.Close ();
+			}
         }
         #endif
         #if (UNITY_IOS)
         void AbortOpenRequest (PubnubWebRequest webRequest)
         {
-            try {
-                if (webRequest != null) {
-                    webRequest.Abort (null, errorLevel);
-                    webRequest = null;
-                }
-            } catch (Exception ex) {
-                LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Response:{1}", DateTime.Now.ToString (), ex.ToString ()), LoggingMethod.LevelError);
-            }
+			if (webRequest != null) {
+				webRequest.Abort (null, errorLevel);
+				webRequest = null;
+			}
         }
 
         void TimoutDelegate<T> (RequestState<T> pubnubRequestState)

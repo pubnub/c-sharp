@@ -659,19 +659,14 @@ namespace PubNubMessaging.Core
                     callbackKey.Type = state.Type;
 
                     if (channelCallbacks.Count > 0 && channelCallbacks.ContainsKey (callbackKey)) {
-                        object callbackObject;
                         bool channelAvailable = channelCallbacks.TryGetValue (callbackKey, out callbackObject);
                         PubnubChannelCallback<T> currentPubnubCallback = null;
                         if (channelAvailable) {
-                            currentPubnubCallback = callbackObject as PubnubChannelCallback<T>;
                         }
                         if (currentPubnubCallback != null && currentPubnubCallback.ErrorCallback != null) {
-                            state.Request.Abort (currentPubnubCallback.ErrorCallback, _errorLevel);
                         }
-                    }
                 }
             } else {
-                ICollection<string> keyCollection = _channelRequest.Keys;
                 foreach (string key in keyCollection) {
                     PubnubWebRequest currentRequest = _channelRequest [key];
                     if (currentRequest != null) {
@@ -4019,6 +4014,10 @@ namespace PubNubMessaging.Core
                 return terminated;
             }
         }
+
+		public override string ToString() {
+			return RequestUri.ToString();
+		}
     }
 
     public abstract class PubnubWebResponseBase : WebResponse
