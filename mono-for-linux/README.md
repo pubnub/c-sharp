@@ -16,6 +16,8 @@ For a video walkthrough, check out https://vimeo.com/54805917 !
  - UserState data in the response format of presence events.
 
 ### Instructions
+This should be complied with XamarinStudio/MonoDevelop targeting mono framework. If using Visual Studio please ensure that you target Mono framework or add `__MonoCS__` to `Project settings -> Build ->  Conditional compilation symbols`.
+
 Open PubNub-Console/PubNub-Messaging.csproj, the example Pubnub_Example.cs should demonstrate all functionality, asyncronously using delegates. The main functionality lies in the pubnub.cs file.
 
 PubNubTest contains the Unit test cases.
