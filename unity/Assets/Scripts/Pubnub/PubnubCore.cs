@@ -1,9 +1,9 @@
 //Build Date: September 29, 2014
 //#define USE_JSONFX
 #region "Header"
-#if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
-#define USE_JSONFX_UNITY_IOS
-#endif
+// #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
+// #define USE_JSONFX_UNITY_IOS
+// #endif
 #if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
 #define TRACE
 #endif
@@ -4019,6 +4019,10 @@ namespace PubNubMessaging.Core
                 return terminated;
             }
         }
+
+		public override string ToString() {
+			return RequestUri.ToString();
+		}
     }
 
     public abstract class PubnubWebResponseBase : WebResponse
@@ -4329,10 +4333,10 @@ namespace PubNubMessaging.Core
 	public class MiniJSONObjectSerializer : IJsonPluggableLibrary
     {
         public bool IsArrayCompatible(string jsonString){
-            return false;
+            return jsonString.Trim().StartsWith("[");
         }
         public bool IsDictionaryCompatible(string jsonString){
-            return true;
+            return jsonString.Trim().StartsWith("{");
         }
 
         public string SerializeToJsonString(object objectToSerialize)
@@ -4518,11 +4522,7 @@ namespace PubNubMessaging.Core
         }
     }
 
-    public class RequestState<T>
-    {
-        public Action<T> UserCallback;
-        public Action<PubnubClientError> ErrorCallback;
-        public Action<T> ConnectCallback;
+	public abstract class RequestStateBase {
         public PubnubWebRequest Request;
         public PubnubWebResponse Response;
         public ResponseType Type;
@@ -4531,13 +4531,24 @@ namespace PubNubMessaging.Core
         public bool Reconnect;
         public long Timetoken;
 
-        public RequestState ()
+        protected RequestStateBase ()
         {
-            UserCallback = null;
-            ConnectCallback = null;
             Request = null;
             Response = null;
             Channels = null;
+        }
+	}
+
+    public class RequestState<T> : RequestStateBase
+    {
+        public Action<T> UserCallback;
+        public Action<PubnubClientError> ErrorCallback;
+        public Action<T> ConnectCallback;
+
+        public RequestState () : base()
+        {
+            UserCallback = null;
+            ConnectCallback = null;
         }
     }
     #endregion
