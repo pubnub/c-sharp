@@ -1252,7 +1252,7 @@ namespace PubNubMessaging.Core
             string message = _jsonPluggableLibrary.SerializeToJsonString (originalMessage);
 
 
-            if (this.cipherKey.Length > 0) {
+            if (!string.IsNullOrWhiteSpace(this.cipherKey) && this.cipherKey.Length > 0) {
                 PubnubCrypto aes = new PubnubCrypto (this.cipherKey);
                 string encryptMessage = aes.Encrypt (message);
                 message = _jsonPluggableLibrary.SerializeToJsonString (encryptMessage);
@@ -1264,7 +1264,7 @@ namespace PubNubMessaging.Core
         private List<object> DecodeDecryptLoop (List<object> message, string[] channels, Action<PubnubClientError> errorCallback)
         {
             List<object> returnMessage = new List<object> ();
-            if (this.cipherKey.Length > 0) {
+            if (!string.IsNullOrWhiteSpace(this.cipherKey) && this.cipherKey.Length > 0) {
                 PubnubCrypto aes = new PubnubCrypto (this.cipherKey);
                 var myObjectArray = (from item in message
                                      select item as object).ToArray ();
@@ -2844,7 +2844,7 @@ namespace PubNubMessaging.Core
                                 itemMessage.Add (messageList [messageIndex]);
                             } else {
                                 //decrypt the subscriber message if cipherkey is available
-                                if (this.cipherKey.Length > 0) {
+                                if (!string.IsNullOrWhiteSpace(this.cipherKey) && this.cipherKey.Length > 0) {
                                     PubnubCrypto aes = new PubnubCrypto (this.cipherKey);
                                     string decryptMessage = aes.Decrypt (messageList [messageIndex].ToString ());
                                     object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : _jsonPluggableLibrary.DeserializeToObject (decryptMessage);
@@ -3435,7 +3435,7 @@ namespace PubNubMessaging.Core
                             result.Add (multiChannel);
                             break;
                         case ResponseType.History:
-                            if (this.cipherKey.Length > 0) {
+                            if (!string.IsNullOrWhiteSpace(this.cipherKey) && this.cipherKey.Length > 0) {
                                 List<object> historyDecrypted = new List<object> ();
                                 PubnubCrypto aes = new PubnubCrypto (this.cipherKey);
                                 foreach (object message in result) {
