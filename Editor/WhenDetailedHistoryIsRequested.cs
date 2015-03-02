@@ -143,7 +143,7 @@ namespace PubNubMessaging.Tests
                         Assert.AreEqual (message, response);
                     } else {
                         Console.WriteLine ("Response:" + response);
-                        Assert.IsNotEmpty (response);
+                        Assert.IsFalse(string.IsNullOrEmpty(response));
                     }
                 }
             } else {
