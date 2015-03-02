@@ -90,7 +90,7 @@ namespace PubNubMessaging.Core
         protected ConcurrentDictionary<PubnubChannelCallbackKey, object> channelCallbacks = new ConcurrentDictionary<PubnubChannelCallbackKey, object> ();
         ConcurrentDictionary<string, Dictionary<string, object>> _channelLocalUserState = new ConcurrentDictionary<string, Dictionary<string, object>> ();
         ConcurrentDictionary<string, Dictionary<string, object>> _channelUserState = new ConcurrentDictionary<string, Dictionary<string, object>> ();
-        ConcurrentDictionary<string, List<string>> _channelSubscribedAuthKeys = new ConcurrentDictionary<string, List<string>> ();
+        // ConcurrentDictionary<string, List<string>> _channelSubscribedAuthKeys = new ConcurrentDictionary<string, List<string>> ();
         protected System.Threading.Timer localClientHeartBeatTimer;
         protected System.Threading.Timer presenceHeartbeatTimer = null;
         protected static bool pubnetSystemActive = true;
@@ -541,7 +541,7 @@ namespace PubNubMessaging.Core
 
         protected virtual void ReconnectFromSuspendModeCallback<T> (System.Object reconnectState)
         {
-            string channel = "";
+            // string channel = "";
             if (PubnubWebRequest.MachineSuspendMode && ClientNetworkStatus.MachineSuspendMode) {
                 return;
             }
@@ -551,7 +551,7 @@ namespace PubNubMessaging.Core
             ReconnectState<T> netState = reconnectState as ReconnectState<T>;
             try {
                 if (netState != null && netState.Channels != null) {
-                    channel = string.Join (",", netState.Channels);
+                    // channel = string.Join (",", netState.Channels);
 
                     switch (netState.Type) {
                     case ResponseType.Subscribe:
@@ -2656,7 +2656,7 @@ namespace PubNubMessaging.Core
             //Make presence heartbeat call
             RequestState<T> currentState = presenceHeartbeatState as RequestState<T>;
             if (currentState != null && currentState.Channels != null) {
-                string channel = (currentState.Channels != null) ? string.Join (",", currentState.Channels) : "";
+                // string channel = (currentState.Channels != null) ? string.Join (",", currentState.Channels) : "";
 
                 bool networkConnection;
                 if (_pubnubUnitTest is IPubnubUnitTest && _pubnubUnitTest.EnableStubTest) {

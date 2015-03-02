@@ -245,7 +245,7 @@ namespace PubNubMessaging.Tests
 
             SendMultipleIntMessages (totalMessages / 2, totalMessages, channel, pubnub);
 
-            long endtime = common.Timestamp (pubnub);
+            // long endtime = common.Timestamp (pubnub);
 
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestEncryptedSecretDetailedHistoryParams1");
 
@@ -315,7 +315,7 @@ namespace PubNubMessaging.Tests
 
             SendMultipleIntMessages (totalMessages / 2, totalMessages, channel, pubnub);
 
-            long endtime = common.Timestamp (pubnub);
+            // long endtime = common.Timestamp (pubnub);
 
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestUnencryptedSecretDetailedHistoryParams1");
 
@@ -385,7 +385,7 @@ namespace PubNubMessaging.Tests
       
             SendMultipleIntMessages (totalMessages / 2, totalMessages, channel, pubnub);
       
-            long endtime = common.Timestamp (pubnub);
+            // long endtime = common.Timestamp (pubnub);
       
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestUnencryptedDetailedHistoryParams1");
       
@@ -455,7 +455,7 @@ namespace PubNubMessaging.Tests
 
             SendMultipleIntMessages (totalMessages / 2, totalMessages, channel, pubnub);
 
-            long endtime = common.Timestamp (pubnub);
+            // long endtime = common.Timestamp (pubnub);
 
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestEncryptedDetailedHistoryParams1");
       
@@ -516,15 +516,15 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
 
-            long starttime = common.Timestamp (pubnub);
+            // long starttime = common.Timestamp (pubnub);
 
             SendMultipleIntMessages (0, totalMessages / 2, channel, pubnub);
 
-            long midtime = common.Timestamp (pubnub);
+            // long midtime = common.Timestamp (pubnub);
 
             SendMultipleIntMessages (totalMessages / 2, totalMessages, channel, pubnub);
 
-            long endtime = common.Timestamp (pubnub);
+            // long endtime = common.Timestamp (pubnub);
             common.WaitForResponse ();
       
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestUnencryptedDetailedHistory");
@@ -558,15 +558,15 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
 
-            long starttime = common.Timestamp (pubnub);
+            // long starttime = common.Timestamp (pubnub);
 
             SendMultipleIntMessages (0, totalMessages, channel, pubnub);
 
-            long midtime = common.Timestamp (pubnub);
+            // long midtime = common.Timestamp (pubnub);
 
             SendMultipleIntMessages (totalMessages, totalMessages / 2, channel, pubnub);
 
-            long endtime = common.Timestamp (pubnub);
+            // long endtime = common.Timestamp (pubnub);
             common.WaitForResponse ();
       
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestEncryptedDetailedHistory");
@@ -609,7 +609,7 @@ namespace PubNubMessaging.Tests
 
             SendMultipleIntMessages (totalMessages / 2, totalMessages, channel, pubnub);
 
-            long endtime = common.Timestamp (pubnub);
+            // long endtime = common.Timestamp (pubnub);
 
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestEncryptedSecretDetailedHistoryParams1");
 
@@ -679,7 +679,7 @@ namespace PubNubMessaging.Tests
 
             SendMultipleIntMessages (totalMessages / 2, totalMessages, channel, pubnub);
 
-            long endtime = common.Timestamp (pubnub);
+            // long endtime = common.Timestamp (pubnub);
 
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestUnencryptedSecretDetailedHistoryParams1");
 
@@ -749,7 +749,7 @@ namespace PubNubMessaging.Tests
 
             SendMultipleIntMessages (totalMessages / 2, totalMessages, channel, pubnub);
 
-            long endtime = common.Timestamp (pubnub);
+            // long endtime = common.Timestamp (pubnub);
 
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestUnencryptedDetailedHistoryParams1");
 
@@ -819,7 +819,7 @@ namespace PubNubMessaging.Tests
 
             SendMultipleIntMessages (totalMessages / 2, totalMessages, channel, pubnub);
 
-            long endtime = common.Timestamp (pubnub);
+            // long endtime = common.Timestamp (pubnub);
 
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestEncryptedDetailedHistoryParams1");
 
@@ -881,15 +881,15 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
 
-            long starttime = common.Timestamp (pubnub);
+            // long starttime = common.Timestamp (pubnub);
 
             SendMultipleIntMessages (0, totalMessages / 2, channel, pubnub);
 
-            long midtime = common.Timestamp (pubnub);
+            // long midtime = common.Timestamp (pubnub);
 
             SendMultipleIntMessages (totalMessages / 2, totalMessages, channel, pubnub);
 
-            long endtime = common.Timestamp (pubnub);
+            // long endtime = common.Timestamp (pubnub);
             common.WaitForResponse ();
 
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestUnencryptedDetailedHistory");
@@ -923,15 +923,15 @@ namespace PubNubMessaging.Tests
             common.DeliveryStatus = false;
             common.Response = null;
 
-            long starttime = common.Timestamp (pubnub);
+            // long starttime = common.Timestamp (pubnub);
 
             SendMultipleIntMessages (0, totalMessages, channel, pubnub);
 
-            long midtime = common.Timestamp (pubnub);
+            // long midtime = common.Timestamp (pubnub);
 
             SendMultipleIntMessages (totalMessages, totalMessages / 2, channel, pubnub);
 
-            long endtime = common.Timestamp (pubnub);
+            // long endtime = common.Timestamp (pubnub);
             common.WaitForResponse ();
 
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenDetailedHistoryIsRequested", "TestEncryptedDetailedHistory");

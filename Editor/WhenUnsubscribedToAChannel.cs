@@ -204,7 +204,7 @@ namespace PubNubMessaging.Tests
 
             common.WaitForResponse ();
 
-            string response = "";
+            // string response = "";
             if (common.Response == null) {
                 Assert.Fail ("No response: " + common.ErrorResponse);
             } else {

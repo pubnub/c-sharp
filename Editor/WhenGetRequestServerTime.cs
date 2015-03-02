@@ -14,9 +14,9 @@ namespace PubNubMessaging.Tests
     public class WhenGetRequestServerTime
     {
         ManualResetEvent mreTime = new ManualResetEvent (false);
-        ManualResetEvent mreProxy = new ManualResetEvent (false);
-        bool timeReceived = false;
-        bool timeReceivedWhenProxy = false;
+        // ManualResetEvent mreProxy = new ManualResetEvent (false);
+        // bool timeReceived = false;
+        // bool timeReceivedWhenProxy = false;
 
         [Test]
         public void ThenItShouldReturnTimeStamp ()
@@ -89,7 +89,7 @@ namespace PubNubMessaging.Tests
                     string time = deserializedMessage [0].ToString ();
                     Int64 nanoTime;
                     if (time.Length > 2 && Int64.TryParse (time, out nanoTime)) {
-                        timeReceived = true;
+                        // timeReceived = true;
                     }
                 }
             }
