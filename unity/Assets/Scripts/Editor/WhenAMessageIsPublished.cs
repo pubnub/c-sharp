@@ -60,7 +60,7 @@ namespace PubNubMessaging.Tests
             //pubnub.NonSubscribeTimeout = int.Parse (operationTimeoutInSeconds);
             object message = new PubnubDemoObject ();
             Common common = new Common ();
-            DeliveryStatus = false;
+            // DeliveryStatus = false;
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenAMessageIsPublished", "ThenItShouldReturnSuccessCodeAndInfoForEncryptedComplexMessage2");
             pubnub.Publish<string> (channel, message, DisplayReturnMessageECM2, DisplayErrorMessageECM2);
 
@@ -74,8 +74,8 @@ namespace PubNubMessaging.Tests
                        );
             object message2 = new PubnubDemoObject ();
 
-            string json = Common.Serialize (message2);
-            DeliveryStatus = false;
+            // string json = Common.Serialize (message2);
+            // DeliveryStatus = false;
             pubnub2.PubnubUnitTest = common.CreateUnitTestInstance ("WhenAMessageIsPublished", "ThenItShouldReturnSuccessCodeAndInfoForComplexMessage2WithSsl");
 
 
@@ -92,22 +92,22 @@ namespace PubNubMessaging.Tests
             object message3 = new PubnubDemoObject ();
             //object message = new CustomClass2();
 
-            string json3 = Common.Serialize (message3);
+            // string json3 = Common.Serialize (message3);
 
             pubnub3.PubnubUnitTest = common.CreateUnitTestInstance ("WhenAMessageIsPublished", "ThenItShouldReturnSuccessCodeAndInfoForComplexMessage2");
             pubnub3.Publish<string> (channel, message3, DisplayReturnMessage, DisplayErrorMessage);
         }
 
-        object ResponseECM2;
+        // object ResponseECM2;
 
-        object ResponseECM2Ssl;
+        // object ResponseECM2Ssl;
 
         public void DisplayReturnMessageECM2 (string result)
         {
             UnityEngine.Debug.Log ("DisplayReturnMessageS:" + result.ToString ());
             UnityEngine.Debug.Log ("DisplayReturnMessageS:" + DateTime.UtcNow.ToLongTimeString ());
-            ResponseECM2 = (object)result.ToString ();
-            DeliveryStatus = true;
+            // ResponseECM2 = (object)result.ToString ();
+            // DeliveryStatus = true;
             UnityEngine.Debug.Log ("DisplayReturnMessageS2:" + DateTime.UtcNow.ToLongTimeString ());
         }
 
@@ -115,8 +115,8 @@ namespace PubNubMessaging.Tests
         {
             UnityEngine.Debug.Log ("DisplayReturnMessageS1:" + result.ToString ());
             UnityEngine.Debug.Log ("DisplayReturnMessageS1:" + DateTime.UtcNow.ToLongTimeString ());
-            ResponseECM2 = result;
-            DeliveryStatus = true;
+            // ResponseECM2 = result;
+            // DeliveryStatus = true;
             UnityEngine.Debug.Log ("DisplayReturnMessageS12:" + DateTime.UtcNow.ToLongTimeString ());
         }
 
@@ -129,8 +129,8 @@ namespace PubNubMessaging.Tests
         {
             UnityEngine.Debug.Log ("DisplayReturnMessageS1:" + result.ToString ());
             UnityEngine.Debug.Log ("DisplayReturnMessageS1:" + DateTime.UtcNow.ToLongTimeString ());
-            ResponseECM2Ssl = result;
-            DeliveryStatus = true;
+            // ResponseECM2Ssl = result;
+            // DeliveryStatus = true;
             UnityEngine.Debug.Log ("DisplayReturnMessageS12:" + DateTime.UtcNow.ToLongTimeString ());
         }
 
@@ -201,7 +201,7 @@ namespace PubNubMessaging.Tests
             object message = new PubnubDemoObject ();
             //object message = new CustomClass2();
           
-            string json = Common.Serialize (message);
+            // string json = Common.Serialize (message);
             Common common = new Common ();
           
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenAMessageIsPublished", "ThenItShouldReturnSuccessCodeAndInfoForComplexMessage2WithSsl");
@@ -232,15 +232,15 @@ namespace PubNubMessaging.Tests
 						}*/
         }
 
-        object Response;
-        bool DeliveryStatus;
+        // object Response;
+        // bool DeliveryStatus;
 
         public void DisplayReturnMessage (string result)
         {
             UnityEngine.Debug.Log ("DisplayReturnMessageS1:" + result.ToString ());
             UnityEngine.Debug.Log ("DisplayReturnMessageS1:" + DateTime.UtcNow.ToLongTimeString ());
-            Response = (object)result.ToString ();
-            DeliveryStatus = true;
+            // Response = (object)result.ToString ();
+            // DeliveryStatus = true;
             UnityEngine.Debug.Log ("DisplayReturnMessageS12:" + DateTime.UtcNow.ToLongTimeString ());
         }
 
@@ -263,11 +263,11 @@ namespace PubNubMessaging.Tests
             object message = new PubnubDemoObject ();
             //object message = new CustomClass2();
 
-            string json = Common.Serialize (message);
+            // string json = Common.Serialize (message);
             Common common = new Common ();
 
             pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenAMessageIsPublished", "ThenItShouldReturnSuccessCodeAndInfoForComplexMessage2");
-            DeliveryStatus = false;
+            // DeliveryStatus = false;
             pubnub.Publish<string> (channel, message, DisplayReturnMessage, DisplayErrorMessage);
             //wait till the response is received from the server
             common.WaitForResponse ();

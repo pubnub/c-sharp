@@ -152,7 +152,7 @@ namespace PubNubMessaging.Tests
 
             common.WaitForResponse (30);
 
-            string response = "";
+            // string response = "";
 
             if (common.Response == null) {
                 Assert.Fail ("Null response"); 
@@ -211,7 +211,7 @@ namespace PubNubMessaging.Tests
 
             common.WaitForResponse (30);
 
-            string response = "";
+            // string response = "";
             if (common.Response == null) {
                 Assert.Fail ("Null response");
             } else {
