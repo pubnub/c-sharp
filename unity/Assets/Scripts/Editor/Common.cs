@@ -1,4 +1,4 @@
-#define USE_JSONFX_UNITY_IOS
+// #define USE_JSONFX_UNITY_IOS
 //#define USE_MiniJSON
 using System;
 using PubNubMessaging.Core;
