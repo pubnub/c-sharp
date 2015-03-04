@@ -690,6 +690,7 @@ public class PubnubExample : MonoBehaviour
             toggle1 = false;
             toggle2 = false;
         }
+
         GUI.DragWindow (new Rect (0, 0, 800, 400));
     }
 
@@ -812,6 +813,13 @@ public class PubnubExample : MonoBehaviour
             state = PubnubState.PresenceInterval;
             showAuthWindow = true;
             showActionsPopupWindow = false;
+        }
+        fTop = fTopInit + 13 * fRowHeight + 10;
+        if (GUI.Button (new Rect (fLeft, fTop, fButtonWidth, fButtonHeight), "Publish Tests")) {
+            InstantiatePubnub ();
+            pubnub.Publish<string> (channel, 1, storeInHistory, DisplayReturnMessage, DisplayErrorMessage);
+            pubnub.Publish<string> (channel, 1.2f, storeInHistory, DisplayReturnMessage, DisplayErrorMessage);
+            pubnub.Publish<string> (channel, 14248827499560120, storeInHistory, DisplayReturnMessage, DisplayErrorMessage);
         }
     }
 
@@ -1107,7 +1115,7 @@ public class PubnubExample : MonoBehaviour
 
     void Start ()
     {
-        System.Net.ServicePointManager.ServerCertificateValidationCallback = ValidateServerCertificate;
+        //System.Net.ServicePointManager.ServerCertificateValidationCallback = ValidateServerCertificate;
     }
 
     private static bool ValidateServerCertificate (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
