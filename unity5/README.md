@@ -1,26 +1,27 @@
 # Please direct all Support Questions and Concerns to Support@PubNub.com
 
-## PubNub 3.6 Web Data Push Cloud-Hosted API for Unity 4
-### Supports PC, Mac, Linux, iOS and Android
+## PubNub 3.6.2b Web Data Push Cloud-Hosted API for Unity 4 and Unity 5
+### Supports PC, Mac, Linux, iOS, Android, WebPlayer and WebGL
 
 ### View this First!
 We've made a [screencast](https://vimeo.com/69591819) that will walk you through the general setup. 
 After checking out the general setup video, [For iOS targets](https://vimeo.com/71549964) be sure to view this walkthrough next. Check it out!
 
 ### Important changes from previous version
-- UserState method parameters have been modified.
-- PAM auth method parameters have been modified.
-- Implements the features of Pubnub 3.6
- - Renamed property name HeartbeatInterval to LocalClientHeartbeatInterval.
- - New properties PresenceHeartbeat, PresenceHeartbeatInterval were added.
- - Additional optional parameters showUUIDList, includeUserState for HereNow method.
- - New methods GlobalHereNow, WhereNow, SetUserState, GetUserState, SetLocalUserState, GetLocalUserState and ChangeUUID
- - UserState data in the response format of presence events.
-- We have removed the separate versions for Unity, and made this as a common version which  works on all unity distros. The update is an optimized version of the code which was used for Unity iOS. This version uses the JsonFx 1.4 library (mod by TowerOBricks, https://bitbucket.org/TowerOfBricks/jsonfx-for-unity3d/overview).  
-- Now the SDK uses only one pre-processor directive for all Unity distros
-i.e.`USE_JSONFX_UNITY_IOS`
+- Removed dependency on System.Threading.
+- This code uses Unity's www class and coroutines all around for network communication. This means all the calls to the PubNub SDK should be made from the main thread.
+- Updated the JsonFx version with the latest one from here (mod by TowerOBricks, https://bitbucket.org/TowerOfBricks/jsonfx-for-unity3d-git).  
+- Detailed History call now supports time token retrieval.
+
+### There are some known issues and limitations (mostly due to WebGL support)
+- Generic calls to the SDKs methods support only `<string>` and `<object>`. This is because `MakeGenericMethod` throws an exception on WebGL.
+- Time response is treated as string instead of long. If treated as long we get an exception from il2cpp on WebGL.
+- Resume on reconnect looks broken, working on it.
 
 #### Changes in the earlier versions
+- We have removed the separate versions for Unity, and made this as a common version which  works on all unity distros. The update is an optimized version of the code which was used for Unity iOS. This version uses the JsonFx 1.4 library (mod by TowerOBricks, https://bitbucket.org/TowerOfBricks/jsonfx-for-unity3d-git).  
+- Now the SDK uses only one pre-processor directive for all Unity distros
+i.e.`USE_JSONFX_UNITY_IOS`
 - UserState method parameters have been modified.
 - PAM auth method parameters have been modified.
 - Implements the features of Pubnub 3.6
@@ -50,12 +51,14 @@ NOTE: The callback methods DisplayReturnMessage, DisplayConnectStatusMessage and
 ```
 
 #### Prerequisites
-+ Install a free Full version of Unity 4 Pro from http://unity3d.com/unity/download/ (Unity 4 is recommended, but current/later versions should be ok). MonoDevelop IDE tool will be installed as part of Unity to write C# scripts.
++ Install Unity 5 from http://unity3d.com/unity/download/ . MonoDevelop IDE tool will be installed as part of Unity to write C# scripts.
 + For Unity, JSONFX (1.4 mod by TowerOBricks) is needed for the serialization library. To use JSONFX we use the pre-processor directive `USE_JSONFX_UNITY_IOS` which works on all unity distros.
 
 Please note the other serialization libraries used in the pubnubCore.cs and pubnubUnity.cs classes are the default from the builtin .NET class (activated when the pre-compiler directive USE_DOTNET_SERIALIZATION is used), the Newtonsoft.Json (activated when neither USE_JSONFX nor USE_DOTNET_SERIALIZATION is defined) and the latest version JSONFX (activated when the directive USE_JSONFX is defined) are not supported on unity. 
 
-The directive `USE_JSONFX_UNITY` (uses JSONFx 1.4 dll) works only for UNITY_STANDALONE or UNITY_WEBPLAYER or UNITY_ANDROID and NOT for UNITY_IOS. This directive is not recommended to use in this version.
+The directive `USE_JSONFX_UNITY` (uses JSONFx 1.4 dll) works only for UNITY_STANDALONE or UNITY_WEBPLAYER or UNITY_ANDROID and NOT for UNITY_IOS. This directive is not recommended to be used in this version.
+
+To enable MiniJSON, you need to replace `#define USE_JSONFX_UNITY_IOS` here `https://github.com/pubnub/c-sharp/blob/pt87102862/unity5/Assets/Pubnub/Pubnub.cs#L4` with `#define USE_MiniJSON` 
 
 #### To run the unit tests, in addition to the above, you need to 
 1. Import UnityTestTools package (this is already present in the Pubnub client code under the path Assets/UnityTestTools) into your Assets. (https://www.assetstore.unity3d.com/#/content/13802)
@@ -143,7 +146,7 @@ For best performance after completion of all intended operations, please call th
 of the Pubnub instance, and assign it to null. This will help ensure speedy resources cleanup when you are done
 with the object.
 
-### For the calls listed below (apart from the instantiation of Pubnub instance) it is recommended that you call them on a background thread to avoid some UI freezes on slow connections. e.g.:
+### All the calls listed below should be called from the main thread due to the use of coroutines.
 
 ```c#
 #if(UNITY_IOS || UNITY_ANDROID)
