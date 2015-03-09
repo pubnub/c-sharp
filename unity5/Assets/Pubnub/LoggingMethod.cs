@@ -30,34 +30,34 @@ namespace PubNubMessaging.Core
 
         public enum Level
         {
-            Off,
-            Error,
-            Info,
-            Verbose,
-            Warning
-        }
+		Verbose,
+		Info,
+		Warning,
+		Error,
+		Off,
+	}
 
         public static bool LevelError {
             get {
-                return (int)LogLevel >= 1;
+                return LogLevel <= Level.Error;
             }
         }
 
         public static bool LevelInfo {
             get {
-                return (int)LogLevel >= 2;
+                return LogLevel <= Level.Info;
             }
         }
 
         public static bool LevelVerbose {
             get {
-                return (int)LogLevel >= 3;
+                return LogLevel <= Level.Verbose;
             }
         }
 
         public static bool LevelWarning {
             get {
-                return (int)LogLevel >= 4;
+                return LogLevel <= Level.Warning;
             }
         }
 
