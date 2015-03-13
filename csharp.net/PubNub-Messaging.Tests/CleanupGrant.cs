@@ -6,8 +6,8 @@ using NUnit.Framework;
 using System.ComponentModel;
 using System.Threading;
 using System.Collections;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+//using Newtonsoft.Json;
+//using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
@@ -20,18 +20,28 @@ namespace PubNubMessaging.Tests
         bool receivedAuditMessage = false;
         bool receivedRevokeMessage = false;
 
+        Pubnub pubnub = null;
+
         [Test]
         public void AtUserLevel()
         {
+            if (!PubnubCommon.PAMEnabled)
+            {
+                Assert.Ignore("PAM not enabled; CleanupGrant -> AtUserLevel.");
+                return;
+            }
+
             if (!PubnubCommon.EnableStubTest)
             {
                 receivedAuditMessage = false;
                 auditManualEvent = new ManualResetEvent(false);
 
-                Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+                pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
                 pubnub.AuditAccess<string>(UserCallbackForCleanUpAccessAtUserLevel, ErrorCallbackForCleanUpAccessAtUserLevel);
                 auditManualEvent.WaitOne();
 
+                pubnub.EndPendingRequests();
+                pubnub = null;
                 Assert.IsTrue(receivedAuditMessage, "CleanupGrant -> AtUserLevel failed.");
             }
             else
@@ -43,15 +53,23 @@ namespace PubNubMessaging.Tests
         [Test]
         public void AtChannelLevel()
         {
+            if (!PubnubCommon.PAMEnabled)
+            {
+                Assert.Ignore("PAM not enabled; CleanupGrant -> AtChannelLevel.");
+                return;
+            }
+
             if (!PubnubCommon.EnableStubTest)
             {
                 receivedAuditMessage = false;
                 auditManualEvent = new ManualResetEvent(false);
 
-                Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+                pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
                 pubnub.AuditAccess<string>(UserCallbackForCleanUpAccessAtChannelLevel, ErrorCallbackForCleanUpAccessAtChannelLevel);
                 auditManualEvent.WaitOne();
 
+                pubnub.EndPendingRequests();
+                pubnub = null;
                 Assert.IsTrue(receivedAuditMessage, "CleanupGrant -> AtChannelLevel failed.");
             }
             else
@@ -67,70 +85,55 @@ namespace PubNubMessaging.Tests
                 Console.WriteLine(receivedMessage);
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
-                    if (dictionary != null)
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
                     {
-                        int statusCode = dictionary.Value<int>("status");
-                        string statusMessage = dictionary.Value<string>("message");
-                        if (statusCode == 200 && statusMessage.ToLower() == "success")
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null && dictionary.Count > 0)
                         {
-                            var payload = dictionary.Value<JContainer>("payload");
-                            if (payload != null)
+                            int statusCode = Convert.ToInt32(dictionary["status"]);
+                            string statusMessage = dictionary["message"].ToString();
+                            if (statusCode == 200 && statusMessage.ToLower() == "success")
                             {
-                                bool read = payload.Value<bool>("r");
-                                bool write = payload.Value<bool>("w");
-                                var channels = payload.Value<JContainer>("channels");
-                                if (channels != null && channels.Count > 0)
+                                Dictionary<string, object> payload = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(dictionary["payload"]);
+                                if (payload != null && payload.Count > 0)
                                 {
-                                    Console.WriteLine("CleanupGrant / AtUserLevel / UserCallbackForCleanUpAccess - Channel Count = {0}", channels.Count);
-                                    foreach (JToken channel in channels.Children())
+                                    Dictionary<string, object> channels = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(payload["channels"]);
+                                    if (channels != null && channels.Count > 0)
                                     {
-                                        if (channel is JProperty)
+                                        Console.WriteLine("CleanupGrant / AtUserLevel / UserCallbackForCleanUpAccess - Channel Count = {0}", channels.Count);
+                                        foreach (string channelName in channels.Keys)
                                         {
-                                            var channelProperty = channel as JProperty;
-                                            if (channelProperty != null)
+                                            Dictionary<string, object> channelContainer = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(channels[channelName]);
+                                            if (channelContainer != null && channelContainer.Count > 0 && channelContainer.ContainsKey("auths"))
                                             {
-                                                string channelName = channelProperty.Name;
-                                                Console.WriteLine(channelName);
-                                                var channelContainer = channels.Value<JContainer>(channelName);
-                                                if (channelContainer != null && channelContainer.Count > 0)
+                                                Dictionary<string, object> auths = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(channelContainer["auths"]);
+                                                if (auths != null && auths.Count > 0)
                                                 {
-                                                    var auths = channelContainer.Value<JContainer>("auths");
-                                                    if (auths != null && auths.Count > 0)
+                                                    foreach (string authKey in auths.Keys)
                                                     {
-                                                        foreach (JToken auth in auths.Children())
-                                                        {
-                                                            if (auth is JProperty)
-                                                            {
-                                                                var authProperty = auth as JProperty;
-                                                                if (authProperty != null)
-                                                                {
-                                                                    receivedRevokeMessage = false;
-                                                                    string authKey = authProperty.Name;
-                                                                    Console.WriteLine("Auth Key = " + authKey);
-                                                                    Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
-                                                                    pubnub.AuthenticationKey = authKey;
-                                                                    pubnub.GrantAccess<string>(channelName, false, false, UserCallbackForRevokeAccess, ErrorCallbackForRevokeAccess);
-                                                                    revokeManualEvent.WaitOne();
-                                                                }
-                                                            }
-                                                        }
+                                                        receivedRevokeMessage = false;
+                                                        Console.WriteLine("Auth Key = " + authKey);
+                                                        pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+                                                        pubnub.GrantAccess<string>(channelName, authKey, false, false, UserCallbackForRevokeAccess, ErrorCallbackForRevokeAccess);
+                                                        revokeManualEvent.WaitOne();
+
                                                     }
                                                 }
                                             }
                                         }
                                     }
-                                }
-                                string level = payload.Value<string>("level");
-                                if (level == "subkey")
-                                {
-                                    receivedAuditMessage = true;
+                                    string level = payload["level"].ToString();
+                                    if (level == "subkey")
+                                    {
+                                        receivedAuditMessage = true;
+                                    }
                                 }
                             }
                         }
-
                     }
+
+                    
                 }
             }
             catch { }
@@ -175,48 +178,60 @@ namespace PubNubMessaging.Tests
                 Console.WriteLine(receivedMessage);
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
-                    if (dictionary != null)
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
                     {
-                        int statusCode = dictionary.Value<int>("status");
-                        string statusMessage = dictionary.Value<string>("message");
-                        if (statusCode == 200 && statusMessage.ToLower() == "success")
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null && dictionary.Count > 0)
                         {
-                            var payload = dictionary.Value<JContainer>("payload");
-                            if (payload != null)
+                            int statusCode = Convert.ToInt32(dictionary["status"]);
+                            string statusMessage = dictionary["message"].ToString();
+                            if (statusCode == 200 && statusMessage.ToLower() == "success")
                             {
-                                bool read = payload.Value<bool>("r");
-                                bool write = payload.Value<bool>("w");
-                                var channels = payload.Value<JContainer>("channels");
-                                if (channels != null && channels.Count > 0)
+                                Dictionary<string, object> payload = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(dictionary["payload"]);
+                                if (payload != null && payload.Count > 0)
                                 {
-                                    Console.WriteLine("CleanupGrant / AtUserLevel / UserCallbackForCleanUpAccess - Channel Count = {0}", channels.Count);
-                                    foreach (JToken channel in channels.Children())
+                                    Dictionary<string, object> channels = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(payload["channels"]);
+                                    if (channels != null && channels.Count > 0)
                                     {
-                                        if (channel is JProperty)
+                                        Console.WriteLine("CleanupGrant / AtUserLevel / UserCallbackForCleanUpAccess - Channel Count = {0}", channels.Count);
+                                        foreach (string channelName in channels.Keys)
                                         {
-                                            var channelProperty = channel as JProperty;
-                                            if (channelProperty != null)
-                                            {
-                                                string channelName = channelProperty.Name;
-                                                Console.WriteLine(channelName);
-                                                Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
-                                                pubnub.GrantAccess<string>(channelName, false, false, UserCallbackForRevokeAccess, ErrorCallbackForRevokeAccess);
-                                                revokeManualEvent.WaitOne();
-                                            }
+                                            //Dictionary<string, object> channelContainer = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(channels[channelName]);
+                                            Console.WriteLine(channelName);
+                                            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+                                            pubnub.GrantAccess<string>(channelName, false, false, UserCallbackForRevokeAccess, ErrorCallbackForRevokeAccess);
+                                            revokeManualEvent.WaitOne();
+
                                         }
+                                        //foreach (JToken channel in channels.Children())
+                                        //{
+                                        //    if (channel is JProperty)
+                                        //    {
+                                        //        var channelProperty = channel as JProperty;
+                                        //        if (channelProperty != null)
+                                        //        {
+                                        //            string channelName = channelProperty.Name;
+                                        //            Console.WriteLine(channelName);
+                                        //            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+                                        //            pubnub.GrantAccess<string>(channelName, false, false, UserCallbackForRevokeAccess, ErrorCallbackForRevokeAccess);
+                                        //            revokeManualEvent.WaitOne();
+                                        //        }
+                                        //    }
+                                        //}
+                                    }
+                                    string level = payload["level"].ToString();
+                                    if (level == "subkey")
+                                    {
+                                        receivedAuditMessage = true;
                                     }
                                 }
-                                string level = payload.Value<string>("level");
-                                if (level == "subkey")
-                                {
-                                    receivedAuditMessage = true;
-                                }
                             }
-                        }
 
+                        }
                     }
+                    
+                    
                 }
             }
             catch { }

@@ -6,8 +6,8 @@ using NUnit.Framework;
 using System.ComponentModel;
 using System.Threading;
 using System.Collections;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+//using Newtonsoft.Json;
+//using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
@@ -31,6 +31,8 @@ namespace PubNubMessaging.Tests
 
         string currentTestCase = "";
 
+        Pubnub pubnub = null;
+
         [TestFixtureSetUp]
         public void Init()
         {
@@ -38,7 +40,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "GrantRequestUnitTest";
@@ -52,6 +54,8 @@ namespace PubNubMessaging.Tests
 
             grantManualEvent.WaitOne();
 
+            pubnub.EndPendingRequests();
+            pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "WhenDetailedHistoryIsRequested Grant access failed.");
         }
 
@@ -60,7 +64,7 @@ namespace PubNubMessaging.Tests
         {
             messageReceived = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
@@ -72,6 +76,9 @@ namespace PubNubMessaging.Tests
 
             pubnub.DetailedHistory<string>(channel, 10, DetailedHistoryCount10Callback, DummyErrorCallback);
             mreDetailedHistory.WaitOne(310 * 1000);
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
             Assert.IsTrue(messageReceived, "Detailed History Failed");
         }
 
@@ -81,13 +88,21 @@ namespace PubNubMessaging.Tests
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
-                    var status = dictionary["status"].ToString();
-                    if (status == "200")
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
                     {
-                        receivedGrantMessage = true;
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null)
+                        {
+                            var status = dictionary["status"].ToString();
+                            if (status == "200")
+                            {
+                                receivedGrantMessage = true;
+                            }
+                        }
+
                     }
+                   
                 }
             }
             catch { }
@@ -101,13 +116,13 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
-                    JArray message = deserializedMessage[0] as JArray;
+                    object[] message = pubnub.JsonPluggableLibrary.ConvertToObjectArray(deserializedMessage[0]);
                     if (message != null)
                     {
-                        if (message.Count >= 0)
+                        if (message.Length >= 0)
                         {
                             messageReceived = true;
                         }
@@ -123,7 +138,7 @@ namespace PubNubMessaging.Tests
         {
             message10ReverseTrueReceived = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
@@ -135,6 +150,9 @@ namespace PubNubMessaging.Tests
 
             pubnub.DetailedHistory<string>(channel, -1, -1, 10, true, DetailedHistoryCount10ReverseTrueCallback, DummyErrorCallback);
             mreMessageCount10ReverseTrue.WaitOne(310 * 1000);
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
             Assert.IsTrue(message10ReverseTrueReceived, "Detailed History Failed");
         }
 
@@ -142,13 +160,13 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
-                    JArray message = deserializedMessage[0] as JArray;
+                    object[] message = pubnub.JsonPluggableLibrary.ConvertToObjectArray(deserializedMessage[0]);
                     if (message != null)
                     {
-                        if (message.Count >= 0)
+                        if (message.Length >= 0)
                         {
                             message10ReverseTrueReceived = true;
                         }
@@ -164,7 +182,7 @@ namespace PubNubMessaging.Tests
         {
             expectedCountAtStartTimeWithReverseTrue = 0;
             messageStartReverseTrue = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
@@ -188,6 +206,9 @@ namespace PubNubMessaging.Tests
             pubnub.DetailedHistory<string>(channel, startTimeWithReverseTrue, DetailedHistoryStartWithReverseTrueCallback, DummyErrorCallback, true);
             Thread.Sleep(2000);
             mreMessageStartReverseTrue.WaitOne(310 * 1000);
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
             Assert.IsTrue(messageStartReverseTrue, "Detailed History with Start and Reverse True Failed");
         }
 
@@ -196,13 +217,13 @@ namespace PubNubMessaging.Tests
             int actualCountAtStartTimeWithReverseFalse = 0;
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
-                    JArray message = deserializedMessage[0] as JArray;
+                    object[] message = pubnub.JsonPluggableLibrary.ConvertToObjectArray(deserializedMessage[0]);
                     if (message != null)
                     {
-                        if (message.Count >= expectedCountAtStartTimeWithReverseTrue)
+                        if (message.Length >= expectedCountAtStartTimeWithReverseTrue)
                         {
                             foreach (object item in message)
                             {
@@ -226,8 +247,8 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
                     int statusCode = Int32.Parse(deserializedMessage[0].ToString());
                     string statusMessage = (string)deserializedMessage[1];
@@ -247,7 +268,7 @@ namespace PubNubMessaging.Tests
 
             messageReceived = false;
 
-            Pubnub pubnub = new Pubnub(null, null, null, null, false);
+            pubnub = new Pubnub(null, null, null, null, false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
@@ -259,6 +280,9 @@ namespace PubNubMessaging.Tests
             mreDetailedHistory = new ManualResetEvent(false);
             pubnub.DetailedHistory<string>(channel, -1, -1, 10, true, DetailHistoryWithNullKeyseDummyCallback, DummyErrorCallback);
             mreDetailedHistory.WaitOne(310 * 1000);
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
             Assert.IsTrue(messageReceived, "Detailed History With Null Keys Failed");
         }
 

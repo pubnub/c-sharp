@@ -6,8 +6,8 @@ using NUnit.Framework;
 using System.ComponentModel;
 using System.Threading;
 using System.Collections;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+//using Newtonsoft.Json;
+//using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
@@ -37,6 +37,8 @@ namespace PubNubMessaging.Tests
         int numberOfReceivedMessages = 0;
         int manualResetEventsWaitTimeout = 310 * 1000;
 
+        Pubnub pubnub = null;
+
         [TestFixtureSetUp]
         public void Init()
         {
@@ -44,7 +46,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "GrantRequestUnitTest";
@@ -58,6 +60,8 @@ namespace PubNubMessaging.Tests
 
             grantManualEvent.WaitOne();
 
+            pubnub.EndPendingRequests();
+            pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "WhenSubscribedToAChannel Grant access failed.");
         }
 
@@ -65,7 +69,7 @@ namespace PubNubMessaging.Tests
         public void ThenSubscribeShouldReturnReceivedMessage()
         {
             receivedMessage = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannel";
@@ -85,8 +89,9 @@ namespace PubNubMessaging.Tests
             pubnub.Unsubscribe<string>(channel, dummyUnsubscribeCallback, SubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
 
             meUnsubscribe.WaitOne(manualResetEventsWaitTimeout);
-            
+
             pubnub.EndPendingRequests();
+            pubnub = null;
 
             Assert.IsTrue(receivedMessage,"WhenSubscribedToAChannel --> ThenItShouldReturnReceivedMessage Failed");
         }
@@ -95,7 +100,7 @@ namespace PubNubMessaging.Tests
         public void ThenSubscribeShouldReturnConnectStatus()
         {
             receivedConnectMessage = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannel";
@@ -111,6 +116,7 @@ namespace PubNubMessaging.Tests
             meSubscribeYesConnect.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests();
+            pubnub = null;
 
             Assert.IsTrue(receivedConnectMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnConnectStatus Failed");
         }
@@ -120,7 +126,7 @@ namespace PubNubMessaging.Tests
         {
             receivedChannel1ConnectMessage = false;
             receivedChannel2ConnectMessage = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannel";
@@ -138,6 +144,7 @@ namespace PubNubMessaging.Tests
             meChannel2SubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests();
+            pubnub = null;
 
             Assert.IsTrue(receivedChannel1ConnectMessage && receivedChannel2ConnectMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnConnectStatus Failed");
         }
@@ -146,7 +153,7 @@ namespace PubNubMessaging.Tests
         public void ThenDuplicateChannelShouldReturnAlreadySubscribed()
         {
             receivedAlreadySubscribedMessage = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannel";
@@ -164,6 +171,7 @@ namespace PubNubMessaging.Tests
             meAlreadySubscribed.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests();
+            pubnub = null;
 
             Assert.IsTrue(receivedAlreadySubscribedMessage, "WhenSubscribedToAChannel --> ThenDuplicateChannelShouldReturnAlreadySubscribed Failed");
         }
@@ -172,7 +180,7 @@ namespace PubNubMessaging.Tests
         public void ThenSubscriberShouldBeAbleToReceiveManyMessages()
         {
             receivedManyMessages = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannel";
@@ -200,6 +208,7 @@ namespace PubNubMessaging.Tests
             }
             meSubscriberManyMessages.WaitOne(manualResetEventsWaitTimeout);
             pubnub.EndPendingRequests();
+            pubnub = null;
 
 
             Assert.IsTrue(receivedManyMessages, "WhenSubscribedToAChannel --> ThenSubscriberShouldBeAbleToReceiveManyMessages Failed");
@@ -211,12 +220,19 @@ namespace PubNubMessaging.Tests
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
-                    var status = dictionary["status"].ToString();
-                    if (status == "200")
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
                     {
-                        receivedGrantMessage = true;
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null)
+                        {
+                            var status = dictionary["status"].ToString();
+                            if (status == "200")
+                            {
+                                receivedGrantMessage = true;
+                            }
+                        }
+
                     }
                 }
             }
@@ -253,8 +269,8 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
                     string statusMessage = (string)deserializedMessage[1];
@@ -271,8 +287,8 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
                     string statusMessage = (string)deserializedMessage[1];
@@ -301,8 +317,8 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
                     object subscribedObject = (object)deserializedMessage[0];
                     if (subscribedObject != null)
@@ -323,8 +339,8 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
                     string statusMessage = (string)deserializedMessage[1];

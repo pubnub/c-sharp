@@ -6,8 +6,8 @@ using NUnit.Framework;
 using System.ComponentModel;
 using System.Threading;
 using System.Collections;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+//using Newtonsoft.Json;
+//using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
 
 
@@ -24,6 +24,8 @@ namespace PubNubMessaging.Tests
         ManualResetEvent mreGrant = new ManualResetEvent(false);
         ManualResetEvent mrePublish = new ManualResetEvent(false);
 
+        Pubnub pubnub = null;
+
         [TestFixtureSetUp]
         public void Init()
         {
@@ -31,7 +33,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "GrantRequestUnitTest";
@@ -45,6 +47,8 @@ namespace PubNubMessaging.Tests
 
             mreGrant.WaitOne();
 
+            pubnub.EndPendingRequests();
+            pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "WhenAMessageIsPublished Grant access failed.");
         }
 
@@ -52,7 +56,7 @@ namespace PubNubMessaging.Tests
         public void ThenPublishMpnsToastShouldReturnSuccess()
         {
             receivedSuccessMessage = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
             string channel = "hello_my_channel";
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -71,6 +75,8 @@ namespace PubNubMessaging.Tests
             pubnub.Publish<string>(channel, dicToast, PublishCallbackResult, DummyErrorCallback);
             mrePublish.WaitOne(60 * 1000);
 
+            pubnub.EndPendingRequests();
+            pubnub = null;
             Assert.IsTrue(receivedSuccessMessage, "Toast Publish Failed");
         }
 
@@ -78,7 +84,7 @@ namespace PubNubMessaging.Tests
         public void ThenPublishMpnsFlipTileShouldReturnSuccess()
         {
             receivedSuccessMessage = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
             string channel = "hello_my_channel";
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -102,6 +108,8 @@ namespace PubNubMessaging.Tests
             pubnub.Publish<string>(channel, dicTile, PublishCallbackResult, DummyErrorCallback);
             mrePublish.WaitOne(60 * 1000);
 
+            pubnub.EndPendingRequests();
+            pubnub = null;
             Assert.IsTrue(receivedSuccessMessage, "Flip Tile Publish Failed");
         }
 
@@ -109,7 +117,7 @@ namespace PubNubMessaging.Tests
         public void ThenPublishMpnsCycleTileShouldReturnSuccess()
         {
             receivedSuccessMessage = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
             string channel = "hello_my_channel";
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -131,6 +139,8 @@ namespace PubNubMessaging.Tests
             pubnub.Publish<string>(channel, dicTile, PublishCallbackResult, DummyErrorCallback);
             mrePublish.WaitOne(60 * 1000);
 
+            pubnub.EndPendingRequests();
+            pubnub = null;
             Assert.IsTrue(receivedSuccessMessage, "Cycle Tile Publish Failed");
         }
 
@@ -138,7 +148,7 @@ namespace PubNubMessaging.Tests
         public void ThenPublishMpnsIconicTileShouldReturnSuccess()
         {
             receivedSuccessMessage = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
             string channel = "hello_my_channel";
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -160,6 +170,8 @@ namespace PubNubMessaging.Tests
             pubnub.Publish<string>(channel, dicTile, PublishCallbackResult, DummyErrorCallback);
             mrePublish.WaitOne(60 * 1000);
 
+            pubnub.EndPendingRequests();
+            pubnub = null;
             Assert.IsTrue(receivedSuccessMessage, "Iconic Tile Publish Failed");
         }
 
@@ -167,8 +179,8 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
                     string statusMessage = (string)deserializedMessage[1];
@@ -187,12 +199,18 @@ namespace PubNubMessaging.Tests
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
-                    var status = dictionary["status"].ToString();
-                    if (status == "200")
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
                     {
-                        receivedGrantMessage = true;
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null && dictionary.Count > 0)
+                        {
+                            var status = dictionary["status"].ToString();
+                            if (status == "200")
+                            {
+                                receivedGrantMessage = true;
+                            }
+                        }
                     }
                 }
             }

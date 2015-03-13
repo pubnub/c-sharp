@@ -6,8 +6,8 @@ using NUnit.Framework;
 using System.ComponentModel;
 using System.Threading;
 using System.Collections;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+//using Newtonsoft.Json;
+//using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
@@ -41,6 +41,8 @@ namespace PubNubMessaging.Tests
         string customUUID = "mylocalmachine.mydomain.com";
         int manualResetEventsWaitTimeout = 310 * 1000;
 
+        Pubnub pubnub = null;
+
         [TestFixtureSetUp]
         public void Init()
         {
@@ -48,7 +50,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "GrantRequestUnitTest";
@@ -62,6 +64,8 @@ namespace PubNubMessaging.Tests
 
             grantManualEvent.WaitOne();
 
+            pubnub.EndPendingRequests();
+            pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed.");
         }
 
@@ -76,7 +80,7 @@ namespace PubNubMessaging.Tests
         {
             receivedPresenceMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAClientIsPresented";
@@ -100,7 +104,9 @@ namespace PubNubMessaging.Tests
             presenceManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests();
-            
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
             Assert.IsTrue(receivedPresenceMessage, "Presence message not received");
         }
 
@@ -109,7 +115,7 @@ namespace PubNubMessaging.Tests
         {
             receivedCustomUUID = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAClientIsPresented";
@@ -135,6 +141,8 @@ namespace PubNubMessaging.Tests
 
             pubnub.EndPendingRequests();
 
+            pubnub.EndPendingRequests();
+            pubnub = null;
             Assert.IsTrue(receivedCustomUUID, "Custom UUID not received");
         }
 
@@ -143,7 +151,7 @@ namespace PubNubMessaging.Tests
         {
             receivedHereNowMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAClientIsPresented";
             unitTest.TestCaseName = "IfHereNowIsCalledThenItShouldReturnInfo";
@@ -151,6 +159,9 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback);
             hereNowManualEvent.WaitOne();
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
             Assert.IsTrue(receivedHereNowMessage, "here_now message not received");
         }
 
@@ -159,13 +170,16 @@ namespace PubNubMessaging.Tests
         {
             receivedGlobalHereNowMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAClientIsPresented";
             unitTest.TestCaseName = "IfGlobalHereNowIsCalledThenItShouldReturnInfo";
             pubnub.PubnubUnitTest = unitTest;
             pubnub.GlobalHereNow<string>(true, true, ThenGlobalHereNowShouldReturnMessage, DummyErrorCallback);
             globalHereNowManualEvent.WaitOne();
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
             Assert.IsTrue(receivedGlobalHereNowMessage, "global_here_now message not received");
         }
 
@@ -174,7 +188,7 @@ namespace PubNubMessaging.Tests
         {
             receivedWhereNowMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAClientIsPresented";
             unitTest.TestCaseName = "IfWhereNowIsCalledThenItShouldReturnInfo";
@@ -182,6 +196,9 @@ namespace PubNubMessaging.Tests
             string uuid = "hello_my_uuid";
             pubnub.WhereNow<string>(uuid, ThenWhereNowShouldReturnMessage, DummyErrorCallback);
             whereNowManualEvent.WaitOne();
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
             Assert.IsTrue(receivedWhereNowMessage, "where_now message not received");
         }
 
@@ -191,12 +208,18 @@ namespace PubNubMessaging.Tests
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
-                    var status = dictionary["status"].ToString();
-                    if (status == "200")
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
                     {
-                        receivedGrantMessage = true;
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null && dictionary.Count > 0)
+                        {
+                            var status = dictionary["status"].ToString();
+                            if (status == "200")
+                            {
+                                receivedGrantMessage = true;
+                            }
+                        }
                     }
                 }
             }
@@ -213,12 +236,18 @@ namespace PubNubMessaging.Tests
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
-                    var uuid = dictionary["uuid"].ToString();
-                    if (uuid != null)
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
                     {
-                        receivedPresenceMessage = true;
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null && dictionary.Count > 0)
+                        {
+                            var uuid = dictionary["uuid"].ToString();
+                            if (uuid != null)
+                            {
+                                receivedPresenceMessage = true;
+                            }
+                        }
                     }
                 }
             }
@@ -236,12 +265,18 @@ namespace PubNubMessaging.Tests
                 Console.WriteLine("ThenPresenceWithCustomUUIDShouldReturnMessage -> result = " + receivedMessage);
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
-                    var uuid = dictionary["uuid"].ToString();
-                    if (uuid != null && uuid.Contains(customUUID))
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
                     {
-                        receivedCustomUUID = true;
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null && dictionary.Count > 0)
+                        {
+                            var uuid = dictionary["uuid"].ToString();
+                            if (uuid != null && uuid.Contains(customUUID))
+                            {
+                                receivedCustomUUID = true;
+                            }
+                        }
                     }
                 }
             }
@@ -258,11 +293,18 @@ namespace PubNubMessaging.Tests
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    var dictionary = ((JContainer)serializedMessage[0])["uuids"];
-                    if (dictionary != null)
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
                     {
-                        receivedHereNowMessage = true;
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null && dictionary.Count > 0)
+                        {
+                            var uuids = dictionary["uuids"];
+                            if (uuids != null)
+                            {
+                                receivedHereNowMessage = true;
+                            }
+                        }
                     }
                 }
             }
@@ -279,17 +321,24 @@ namespace PubNubMessaging.Tests
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
-                    var payload = dictionary.Value<JContainer>("payload");
-                    if (payload != null)
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
                     {
-                        var channels = payload.Value<JContainer>("channels");
-                        if (channels != null && channels.Count >= 0)
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null && dictionary.Count > 0)
                         {
-                            receivedGlobalHereNowMessage = true;
+                            Dictionary<string, object> payload = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(dictionary["payload"]);
+                            if (payload != null && payload.Count > 0)
+                            {
+                                Dictionary<string, object> channels = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(payload["channels"]);
+                                if (channels != null && channels.Count >= 0)
+                                {
+                                    receivedGlobalHereNowMessage = true;
+                                }
+                            }
                         }
                     }
+                    
                 }
             }
             catch { }
@@ -305,15 +354,21 @@ namespace PubNubMessaging.Tests
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
-                    var payload = dictionary.Value<JContainer>("payload");
-                    if (payload != null)
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
                     {
-                        var channels = payload.Value<JContainer>("channels");
-                        if (channels != null && channels.Count >= 0)
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null && dictionary.Count > 0)
                         {
-                            receivedWhereNowMessage = true;
+                            Dictionary<string, object> payload = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(dictionary["payload"]);
+                            if (payload != null && payload.Count > 0)
+                            {
+                                object[] channels = pubnub.JsonPluggableLibrary.ConvertToObjectArray(payload["channels"]);
+                                if (channels != null && channels.Length >= 0)
+                                {
+                                    receivedWhereNowMessage = true;
+                                }
+                            }
                         }
                     }
                 }
@@ -331,16 +386,19 @@ namespace PubNubMessaging.Tests
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
-                    if (dictionary != null)
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
                     {
-                    var uuid = dictionary["uuid"].ToString();
-                    if (uuid != null)
-                    {
-                        receivedPresenceMessage = true;
-                    }
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null && dictionary.Count > 0)
+                        {
+                            var uuid = dictionary["uuid"].ToString();
+                            if (uuid != null)
+                            {
+                                receivedPresenceMessage = true;
+                            }
                         }
+                    }
                 }
             }
             catch { }
@@ -357,14 +415,17 @@ namespace PubNubMessaging.Tests
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
-                    if (dictionary != null)
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
                     {
-                        var uuid = dictionary["uuid"].ToString();
-                        if (uuid != null)
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null && dictionary.Count > 0)
                         {
-                            receivedCustomUUID = true;
+                            var uuid = dictionary["uuid"].ToString();
+                            if (uuid != null)
+                            {
+                                receivedCustomUUID = true;
+                            }
                         }
                     }
                 }

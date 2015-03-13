@@ -6,8 +6,8 @@ using NUnit.Framework;
 using System.ComponentModel;
 using System.Threading;
 using System.Collections;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+//using Newtonsoft.Json;
+//using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
@@ -20,10 +20,12 @@ namespace PubNubMessaging.Tests
         bool timeReceived = false;
         bool timeReceivedWhenProxy = false;
 
+        Pubnub pubnub = null;
+
         [Test]
         public void ThenItShouldReturnTimeStamp()
         {
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGetRequestServerTime";
@@ -33,6 +35,8 @@ namespace PubNubMessaging.Tests
 
             pubnub.Time<string>(ReturnTimeStampCallback, DummyErrorCallback);
             mreTime.WaitOne(310 * 1000);
+            pubnub.EndPendingRequests();
+            pubnub = null;
             Assert.IsTrue(timeReceived, "time() Failed");
         }
 
@@ -47,7 +51,7 @@ namespace PubNubMessaging.Tests
             proxy.ProxyUserName = "tuvpnfreeproxy";
             proxy.ProxyPassword = "Rx8zW78k";
 
-            Pubnub pubnub = new Pubnub("demo", "demo", "", "", false);
+            pubnub = new Pubnub("demo", "demo", "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGetRequestServerTime";
@@ -59,6 +63,8 @@ namespace PubNubMessaging.Tests
                 pubnub.Proxy = proxy;
                 pubnub.Time<string>(ReturnProxyPresenceTimeStampCallback, DummyErrorCallback);
                 mreProxy.WaitOne(310 * 1000);
+                pubnub.EndPendingRequests();
+                pubnub = null;
                 Assert.IsTrue(timeReceivedWhenProxy, "time() Failed");
             }
             else
@@ -72,8 +78,8 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
                     string time = deserializedMessage[0].ToString();
                     Int64 nanoTime;
@@ -90,8 +96,8 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
                     string time = deserializedMessage[0].ToString();
                     Int64 nanoTime;

@@ -6,8 +6,8 @@ using NUnit.Framework;
 using System.ComponentModel;
 using System.Threading;
 using System.Collections;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+//using Newtonsoft.Json;
+//using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
@@ -75,6 +75,8 @@ namespace PubNubMessaging.Tests
 
         int manualResetEventsWaitTimeout = 310 * 1000;
 
+        Pubnub pubnub = null;
+
         [TestFixtureSetUp]
         public void Init()
         {
@@ -82,7 +84,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "GrantRequestUnitTest";
@@ -96,6 +98,8 @@ namespace PubNubMessaging.Tests
 
             grantManualEvent.WaitOne();
 
+            pubnub.EndPendingRequests();
+            pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "WhenAMessageIsPublished Grant access failed.");
         }
 
@@ -103,7 +107,7 @@ namespace PubNubMessaging.Tests
         public void ThenUnencryptPublishShouldReturnSuccessCodeAndInfo()
         {
             isUnencryptPublished = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
             unitTest.TestCaseName = "ThenUnencryptPublishShouldReturnSuccessCodeAndInfo";
@@ -124,22 +128,26 @@ namespace PubNubMessaging.Tests
                 Thread.Sleep(1000);
                 pubnub.DetailedHistory<string>(channel, -1, unEncryptPublishTimetoken, -1, false, CaptureUnencryptDetailedHistoryCallback, DummyErrorCallback);
                 mreUnencryptDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
+
                 Assert.IsTrue(isUnencryptDetailedHistory, "Unable to match the successful unencrypt Publish");
             }
+            pubnub.EndPendingRequests();
+            pubnub = null;
         }
 
         [Test]
         public void ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo()
         {
             isUnencryptObjectPublished = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
             unitTest.TestCaseName = "ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo";
             pubnub.PubnubUnitTest = unitTest;
             string channel = "hello_my_channel";
             object message = new CustomClass();
-            messageObjectForUnencryptPublish = JsonConvert.SerializeObject(message);
+            //messageObjectForUnencryptPublish = JsonConvert.SerializeObject(message);
+            messageObjectForUnencryptPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
 
             pubnub.Publish<string>(channel, message, ReturnSuccessUnencryptObjectPublishCodeCallback, DummyErrorCallback);
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
@@ -154,15 +162,18 @@ namespace PubNubMessaging.Tests
                 Thread.Sleep(1000);
                 pubnub.DetailedHistory<string>(channel, -1, unEncryptObjectPublishTimetoken, -1, false, CaptureUnencryptObjectDetailedHistoryCallback, DummyErrorCallback);
                 mreUnencryptObjectDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
+
                 Assert.IsTrue(isUnencryptObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
             }
+            pubnub.EndPendingRequests();
+            pubnub = null;
         }
 
         [Test]
         public void ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo()
         {
             isEncryptObjectPublished = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "enigma", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "enigma", false);
             
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -172,7 +183,8 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
             object message = new SecretCustomClass();
-            messageObjectForEncryptPublish = JsonConvert.SerializeObject(message);
+            //messageObjectForEncryptPublish = JsonConvert.SerializeObject(message);
+            messageObjectForEncryptPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
 
             pubnub.Publish<string>(channel, message, ReturnSuccessEncryptObjectPublishCodeCallback, DummyErrorCallback);
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
@@ -187,15 +199,18 @@ namespace PubNubMessaging.Tests
                 Thread.Sleep(1000);
                 pubnub.DetailedHistory<string>(channel, -1, encryptObjectPublishTimetoken, -1, false, CaptureEncryptObjectDetailedHistoryCallback, DummyErrorCallback);
                 mreEncryptObjectDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
+
                 Assert.IsTrue(isEncryptObjectDetailedHistory, "Unable to match the successful encrypt object Publish");
             }
+            pubnub.EndPendingRequests();
+            pubnub = null;
         }
 
         [Test]
         public void ThenEncryptPublishShouldReturnSuccessCodeAndInfo()
         {
             isEncryptPublished = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "enigma", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "enigma", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -219,15 +234,18 @@ namespace PubNubMessaging.Tests
                 Thread.Sleep(1000);
                 pubnub.DetailedHistory<string>(channel, -1, encryptPublishTimetoken, -1, false, CaptureEncryptDetailedHistoryCallback, DummyErrorCallback);
                 mreEncryptDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
+
                 Assert.IsTrue(isEncryptDetailedHistory, "Unable to decrypt the successful Publish");
             }
+            pubnub.EndPendingRequests();
+            pubnub = null;
         }
 
         [Test]
         public void ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo()
         {
             isSecretEncryptPublished = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "key", "enigma", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "key", "enigma", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -251,15 +269,18 @@ namespace PubNubMessaging.Tests
                 Thread.Sleep(1000);
                 pubnub.DetailedHistory<string>(channel, -1, secretEncryptPublishTimetoken, -1, false, CaptureSecretEncryptDetailedHistoryCallback, DummyErrorCallback);
                 mreSecretEncryptDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
+
                 Assert.IsTrue(isSecretEncryptDetailedHistory, "Unable to decrypt the successful Secret key Publish");
             }
+            pubnub.EndPendingRequests();
+            pubnub = null;
         }
 
         [Test]
         public void ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo()
         {
             isComplexObjectPublished = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -271,7 +292,7 @@ namespace PubNubMessaging.Tests
             messageComplexObjectForPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
 
             pubnub.Publish<string>(channel, message, ReturnSuccessComplexObjectPublishCodeCallback, DummyErrorCallback);
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 310 * 1000 : 310 * 1000;
             mreComplexObjectPublish.WaitOne(manualResetEventsWaitTimeout);
 
             if (!isComplexObjectPublished)
@@ -283,15 +304,18 @@ namespace PubNubMessaging.Tests
                 Console.WriteLine("WhenAMessageIsPublished-ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo - Publish OK. Now checking detailed history");
                 pubnub.DetailedHistory<string>(channel, -1, complexObjectPublishTimetoken, -1, false, CaptureComplexObjectDetailedHistoryCallback, DummyErrorCallback);
                 mreComplexObjectDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
+
                 Assert.IsTrue(isComplexObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
             }
+            pubnub.EndPendingRequests();
+            pubnub = null;
         }
 
         [Test]
         public void ThenDisableJsonEncodeShouldSendSerializedObjectMessage()
         {
             isSerializedObjectMessagePublished = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
             pubnub.EnableJsonEncodingForPublish = false;
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -317,13 +341,15 @@ namespace PubNubMessaging.Tests
                 mreSerializedMessagePublishDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
                 Assert.IsTrue(isSerializedObjectMessageDetailedHistory, "Unable to match the successful serialized object message Publish");
             }
+            pubnub.EndPendingRequests();
+            pubnub = null;
         }
 
         [Test]
         public void ThenLargeMessageShoudFailWithMessageTooLargeInfo()
         {
             isLargeMessagePublished = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -337,6 +363,8 @@ namespace PubNubMessaging.Tests
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             mreLaregMessagePublish.WaitOne(manualResetEventsWaitTimeout);
 
+            pubnub.EndPendingRequests();
+            pubnub = null;
             Assert.IsTrue(isLargeMessagePublished, "Message Too Large is not failing as expected.");
         }
 
@@ -346,12 +374,18 @@ namespace PubNubMessaging.Tests
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
-                    var status = dictionary["status"].ToString();
-                    if (status == "200")
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
                     {
-                        receivedGrantMessage = true;
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null && dictionary.Count > 0)
+                        {
+                            var status = dictionary["status"].ToString();
+                            if (status == "200")
+                            {
+                                receivedGrantMessage = true;
+                            }
+                        }
                     }
                 }
             }
@@ -366,8 +400,8 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
                     string statusMessage = (string)deserializedMessage[1];
@@ -385,8 +419,8 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
                     string statusMessage = (string)deserializedMessage[1];
@@ -404,8 +438,8 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
                     string statusMessage = (string)deserializedMessage[1];
@@ -423,8 +457,8 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
                     string statusMessage = (string)deserializedMessage[1];
@@ -442,8 +476,8 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
                     string statusMessage = (string)deserializedMessage[1];
@@ -461,11 +495,11 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
-                    JArray message = deserializedMessage[0] as JArray;
-                    if (message != null && message.Count > 0 && message[0].ToString() == messageForUnencryptPublish)
+                    object[] message = pubnub.JsonPluggableLibrary.ConvertToObjectArray(deserializedMessage[0]);
+                    if (message != null && message.Length > 0 && message[0].ToString() == messageForUnencryptPublish)
                     {
                         isUnencryptDetailedHistory = true;
                     }
@@ -479,13 +513,17 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
-                    JArray message = deserializedMessage[0] as JArray;
-                    if (message != null && message.Count > 0 && message[0].ToString(Formatting.None) == messageObjectForUnencryptPublish)
+                    object[] message = pubnub.JsonPluggableLibrary.ConvertToObjectArray(deserializedMessage[0]);
+                    if (message != null && message.Length > 0)
                     {
-                        isUnencryptObjectDetailedHistory = true;
+                        string publishedMesaage = pubnub.JsonPluggableLibrary.SerializeToJsonString(message[0]);
+                        if (publishedMesaage == messageObjectForUnencryptPublish)
+                        {
+                            isUnencryptObjectDetailedHistory = true;
+                        }
                     }
                 }
             }
@@ -497,14 +535,19 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
-                    JArray message = deserializedMessage[0] as JArray;
-                    if (message != null && message.Count > 0 && message[0].ToString(Formatting.None) == messageObjectForEncryptPublish)
+                    object[] message = pubnub.JsonPluggableLibrary.ConvertToObjectArray(deserializedMessage[0]);
+                    if (message != null && message.Length > 0)
                     {
-                        isEncryptObjectDetailedHistory = true;
+                        string publishedMesaage = pubnub.JsonPluggableLibrary.SerializeToJsonString(message[0]);
+                        if (publishedMesaage == messageObjectForEncryptPublish)
+                        {
+                            isEncryptObjectDetailedHistory = true;
+                        }
                     }
+
                 }
             }
 
@@ -515,13 +558,17 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
-                    JArray message = deserializedMessage[0] as JArray;
-                    if (message != null && message.Count > 0 && message[0].ToString() == messageForEncryptPublish)
+                    object[] message = pubnub.JsonPluggableLibrary.ConvertToObjectArray(deserializedMessage[0]);
+                    if (message != null && message.Length > 0)
                     {
-                        isEncryptDetailedHistory = true;
+                        string publishedMesaage = message[0].ToString();
+                        if (publishedMesaage == messageForEncryptPublish)
+                        {
+                            isEncryptDetailedHistory = true;
+                        }
                     }
                 }
             }
@@ -533,14 +580,19 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedResult = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedResult is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
-                    JArray message = deserializedResult[0] as JArray;
-                    if (message != null && message.Count > 0 && message[0].ToString() == messageForSecretEncryptPublish)
+                    object[] message = pubnub.JsonPluggableLibrary.ConvertToObjectArray(deserializedMessage[0]);
+                    if (message != null && message.Length > 0)
                     {
-                        isSecretEncryptDetailedHistory = true;
+                        string publishedMesaage = message[0].ToString();
+                        if (publishedMesaage == messageForSecretEncryptPublish)
+                        {
+                            isSecretEncryptDetailedHistory = true;
+                        }
                     }
+
                 }
             }
 
@@ -551,8 +603,8 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
                     long statusCode = Int64.Parse(deserializedMessage[0].ToString());
                     string statusMessage = (string)deserializedMessage[1];
@@ -573,13 +625,17 @@ namespace PubNubMessaging.Tests
             Console.WriteLine("CaptureComplexObjectDetailedHistoryCallback = \n" + result);
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
-                    JArray message = deserializedMessage[0] as JArray;
-                    if (message != null && message.Count > 0 && message[0].ToString(Formatting.None) == messageComplexObjectForPublish)
+                    object[] message = pubnub.JsonPluggableLibrary.ConvertToObjectArray(deserializedMessage[0]);
+                    if (message != null && message.Length > 0)
                     {
-                        isComplexObjectDetailedHistory = true;
+                        string publishedMesaage = pubnub.JsonPluggableLibrary.SerializeToJsonString(message[0]);
+                        if (publishedMesaage == messageComplexObjectForPublish)
+                        {
+                            isComplexObjectDetailedHistory = true;
+                        }
                     }
                 }
             }
@@ -597,19 +653,7 @@ namespace PubNubMessaging.Tests
                     isLargeMessagePublished = true;
                 }
             }
-            //if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
-            //{
-            //    object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-            //    if (deserializedMessage is object[])
-            //    {
-            //        long statusCode = Int64.Parse(deserializedMessage[0].ToString().Trim());
-            //        string statusMessage = (string)deserializedMessage[1];
-            //        if (statusCode == 0 && statusMessage.ToLower() == "message too large")
-            //        {
-            //            isLargeMessagePublished = true;
-            //        }
-            //    }
-            //}
+
             mreLaregMessagePublish.Set();
         }
 
@@ -621,16 +665,17 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenPubnubShouldGenerateUniqueIdentifier()
         {
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             Assert.IsNotNull(pubnub.GenerateGuid());
+            pubnub = null;
         }
 
         [Test]
         [ExpectedException(typeof(MissingMemberException))]
         public void ThenPublishKeyShouldNotBeEmpty()
         {
-            Pubnub pubnub = new Pubnub("", PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub("", PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -643,6 +688,8 @@ namespace PubNubMessaging.Tests
             string message = "Pubnub API Usage Example";
 
             pubnub.Publish<string>(channel, message, null, DummyErrorCallback);
+            pubnub = null;
+
         }
 
 
@@ -650,7 +697,7 @@ namespace PubNubMessaging.Tests
         public void ThenOptionalSecretKeyShouldBeProvidedInConstructor()
         {
             isPublished2 = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "key");
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "key");
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -665,6 +712,8 @@ namespace PubNubMessaging.Tests
             pubnub.Publish<string>(channel, message, ReturnSecretKeyPublishCallback, DummyErrorCallback);
             mreOptionalSecretKeyPublish.WaitOne(310 * 1000);
 
+            pubnub.EndPendingRequests();
+            pubnub = null;
             Assert.IsTrue(isPublished2, "Publish Failed with secret key");
         }
 
@@ -672,11 +721,11 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedResult = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedResult is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
-                    long statusCode = Int64.Parse(deserializedResult[0].ToString());
-                    string statusMessage = (string)deserializedResult[1];
+                    long statusCode = Int64.Parse(deserializedMessage[0].ToString());
+                    string statusMessage = (string)deserializedMessage[1];
                     if (statusCode == 1 && statusMessage.ToLower() == "sent")
                     {
                         isPublished2 = true;
@@ -690,7 +739,7 @@ namespace PubNubMessaging.Tests
         public void IfSSLNotProvidedThenDefaultShouldBeFalse()
         {
             isPublished3 = false;
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "");
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "");
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -703,6 +752,9 @@ namespace PubNubMessaging.Tests
 
             pubnub.Publish<string>(channel, message, ReturnNoSSLDefaultFalseCallback, DummyErrorCallback);
             mreNoSslPublish.WaitOne(310 * 1000);
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
             Assert.IsTrue(isPublished3, "Publish Failed with no SSL");
         }
 
@@ -710,11 +762,11 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedResult = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedResult is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
-                    long statusCode = Int64.Parse(deserializedResult[0].ToString());
-                    string statusMessage = (string)deserializedResult[1];
+                    long statusCode = Int64.Parse(deserializedMessage[0].ToString());
+                    string statusMessage = (string)deserializedMessage[1];
                     if (statusCode == 1 && statusMessage.ToLower() == "sent")
                     {
                         isPublished3 = true;
@@ -728,15 +780,15 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedResult = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedResult is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
-                    long statusCode = Int64.Parse(deserializedResult[0].ToString());
-                    string statusMessage = (string)deserializedResult[1];
+                    long statusCode = Int64.Parse(deserializedMessage[0].ToString());
+                    string statusMessage = (string)deserializedMessage[1];
                     if (statusCode == 1 && statusMessage.ToLower() == "sent")
                     {
                         isSerializedObjectMessagePublished = true;
-                        serializedMessagePublishTimetoken = Convert.ToInt64(deserializedResult[2].ToString());
+                        serializedMessagePublishTimetoken = Convert.ToInt64(deserializedMessage[2].ToString());
                     }
                 }
             }
@@ -747,14 +799,19 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
-                object[] deserializedMessage = JsonConvert.DeserializeObject<object[]>(result);
-                if (deserializedMessage is object[])
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
-                    JArray message = deserializedMessage[0] as JArray;
-                    if (message != null && message.Count > 0 && message[0].ToString(Formatting.None) == serializedObjectMessageForPublish)
+                   object[] message = pubnub.JsonPluggableLibrary.ConvertToObjectArray(deserializedMessage[0]);
+                    if (message != null && message.Length > 0)
                     {
-                        isSerializedObjectMessageDetailedHistory = true;
+                        string publishedMesaage = pubnub.JsonPluggableLibrary.SerializeToJsonString(message[0]);
+                        if (publishedMesaage == serializedObjectMessageForPublish)
+                        {
+                            isSerializedObjectMessageDetailedHistory = true;
+                        }
                     }
+
                 }
             }
 

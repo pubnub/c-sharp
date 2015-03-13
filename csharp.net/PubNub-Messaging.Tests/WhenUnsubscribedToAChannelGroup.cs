@@ -6,8 +6,8 @@ using NUnit.Framework;
 using System.ComponentModel;
 using System.Threading;
 using System.Collections;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+//using Newtonsoft.Json;
+//using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
 namespace PubNubMessaging.Tests
 {
@@ -27,6 +27,8 @@ namespace PubNubMessaging.Tests
 
         int manualResetEventsWaitTimeout = 310 * 1000;
 
+        Pubnub pubnub = null;
+
         [TestFixtureSetUp]
         public void Init()
         {
@@ -34,7 +36,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "GrantRequestUnitTest";
@@ -46,6 +48,8 @@ namespace PubNubMessaging.Tests
 
             grantManualEvent.WaitOne();
 
+            pubnub.EndPendingRequests();
+            pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "WhenUnsubscribedToAChannelGroup Grant access failed.");
         }
 
@@ -57,7 +61,7 @@ namespace PubNubMessaging.Tests
             receivedChannelGroupMessage = false;
             receivedChannelGroupConnectedMessage = false;
 
-            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
             pubnub.SessionUUID = "myuuid";
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -87,6 +91,7 @@ namespace PubNubMessaging.Tests
                 }
 
                 pubnub.EndPendingRequests();
+                pubnub = null;
 
                 Assert.IsTrue(receivedMessage, "WhenUnsubscribedToAChannelGroup --> ThenShouldReturnUnsubscribedMessage Failed");
             }
@@ -132,20 +137,23 @@ namespace PubNubMessaging.Tests
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
-                    if (dictionary != null)
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
                     {
-                        int statusCode = dictionary.Value<int>("status");
-                        string serviceType = dictionary.Value<string>("service");
-                        bool errorStatus = dictionary.Value<bool>("error");
-                        string currentChannelGroup = serializedMessage[1].ToString().Substring(1); //assuming no namespace for channel group
-                        string statusMessage = dictionary.Value<string>("message");
-                        if (statusCode == 200 && statusMessage.ToLower() == "ok" && serviceType == "channel-registry" && !errorStatus)
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null)
                         {
-                            if (currentChannelGroup == channelGroupName)
+                            int statusCode = Convert.ToInt32(dictionary["status"]);
+                            string serviceType = dictionary["service"].ToString();
+                            bool errorStatus = (bool)dictionary["error"];
+                            string currentChannelGroup = serializedMessage[1].ToString().Substring(1); //assuming no namespace for channel group
+                            string statusMessage = dictionary["message"].ToString();
+                            if (statusCode == 200 && statusMessage.ToLower() == "ok" && serviceType == "channel-registry" && !errorStatus)
                             {
-                                receivedChannelGroupMessage = true;
+                                if (currentChannelGroup == channelGroupName)
+                                {
+                                    receivedChannelGroupMessage = true;
+                                }
                             }
                         }
                     }
@@ -165,12 +173,19 @@ namespace PubNubMessaging.Tests
             {
                 if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
                 {
-                    object[] serializedMessage = JsonConvert.DeserializeObject<object[]>(receivedMessage);
-                    JContainer dictionary = serializedMessage[0] as JContainer;
-                    var status = dictionary["status"].ToString();
-                    if (status == "200")
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
                     {
-                        receivedGrantMessage = true;
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null)
+                        {
+                            var status = dictionary["status"].ToString();
+                            if (status == "200")
+                            {
+                                receivedGrantMessage = true;
+                            }
+                        }
+
                     }
                 }
             }
