@@ -583,6 +583,7 @@ namespace PubNubMessaging.Core
                             }
                             else if (jsonString != "[]")
                             {
+                                bool errorCallbackRaised = false;
                                 if (base.JsonPluggableLibrary.IsDictionaryCompatible(jsonString))
                                 {
                                     Dictionary<string, object> deserializeStatus = base.JsonPluggableLibrary.DeserializeToDictionaryOfObject(jsonString);
@@ -599,11 +600,15 @@ namespace PubNubMessaging.Core
                                             string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(pubnubErrorType);
 
                                             PubnubClientError error = new PubnubClientError(pubnubStatusCode, PubnubErrorSeverity.Critical, statusMessage, PubnubMessageSource.Server, asynchRequestState.Request, asynchRequestState.Response, errorDescription, channel, channelGroup);
+                                            errorCallbackRaised = true;
                                             GoToCallback(error, asynchRequestState.ErrorCallback);
                                         }
                                     }
                                 }
-                                result = WrapResultBasedOnResponseType<T>(asynchRequestState.Type, jsonString, asynchRequestState.Channels, asynchRequestState.ChannelGroups, asynchRequestState.Reconnect, asynchRequestState.Timetoken, asynchRequestState.ErrorCallback);
+                                if (!errorCallbackRaised)
+                                {
+                                    result = WrapResultBasedOnResponseType<T>(asynchRequestState.Type, jsonString, asynchRequestState.Channels, asynchRequestState.ChannelGroups, asynchRequestState.Reconnect, asynchRequestState.Timetoken, asynchRequestState.ErrorCallback);
+                                }
                             }
                         }
 #if !NETFX_CORE

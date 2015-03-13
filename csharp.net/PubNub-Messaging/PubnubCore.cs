@@ -6919,6 +6919,12 @@ namespace PubNubMessaging.Core
 		object DeserializeToObject (string jsonString);
 		//T DeserializeToObject<T>(string jsonString);
 		Dictionary<string, object> DeserializeToDictionaryOfObject (string jsonString);
+
+        Dictionary<string, object> ConvertToDictionaryObject(object localContainer);
+
+        Dictionary<string, object>[] ConvertToDictionaryObjectArray(object localContainer);
+
+        object[] ConvertToObjectArray(object localContainer);
 	}
 	#if (USE_JSONFX)|| (USE_JSONFX_UNITY)
 	public class JsonFXDotNet : IJsonPluggableLibrary
@@ -6930,7 +6936,20 @@ namespace PubNubMessaging.Core
 
 		public bool IsDictionaryCompatible (string jsonString)
 		{
-			return true;
+            bool ret = false;
+
+			jsonString = PubnubCryptoBase.ConvertHexToUnicodeChars (jsonString);
+			var reader = new JsonFx.Json.JsonReader ();
+			var output = reader.Read<object> (jsonString);
+			Type valueType = null;
+			valueType = output.GetType ();
+			var expectedType = typeof(System.Dynamic.ExpandoObject);
+            if (expectedType.IsAssignableFrom(valueType))
+            {
+                ret = true;
+            }
+
+            return ret;
 		}
 
 		public string SerializeToJsonString (object objectToSerialize)
@@ -6940,11 +6959,24 @@ namespace PubNubMessaging.Core
 			string json = writer.Write (objectToSerialize);
 			return PubnubCryptoBase.ConvertHexToUnicodeChars (json);
 			#else
+            
 			string json = "";
-			var resolver = new JsonFx.Serialization.Resolvers.CombinedResolverStrategy(new JsonFx.Serialization.Resolvers.DataContractResolverStrategy());
-			JsonFx.Serialization.DataWriterSettings dataWriterSettings = new JsonFx.Serialization.DataWriterSettings(resolver);
-			var writer = new JsonFx.Json.JsonWriter(dataWriterSettings, new string[] { "PubnubClientError" });
-			json = writer.Write(objectToSerialize);
+			var resolver = new JsonFx.Serialization.Resolvers.CombinedResolverStrategy(
+                new JsonFx.Json.Resolvers.JsonResolverStrategy(),
+                new JsonFx.Serialization.Resolvers.DataContractResolverStrategy()
+                );
+
+            //JsonFx.Serialization.DataWriterSettings dataWriterSettings = new JsonFx.Serialization.DataWriterSettings(resolver);
+            //var writer = new JsonFx.Json.JsonWriter(dataWriterSettings, new string[] { "PubnubClientError" });
+            var writer = new JsonFx.Json.JsonWriter();
+            try
+            {
+                json = writer.Write(objectToSerialize);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.ToString());
+            }
 
 			return json;
 			#endif
@@ -7007,6 +7039,53 @@ namespace PubNubMessaging.Core
 			}
 			#endif
 		}
+
+        public Dictionary<string, object> ConvertToDictionaryObject(object localContainer)
+        {
+            Dictionary<string, object> ret = null;
+
+            if (localContainer != null && localContainer.GetType().ToString() == "System.Dynamic.ExpandoObject")
+            {
+                IDictionary<string, object> iDictionary = localContainer as IDictionary<string, object>;
+                ret = iDictionary.ToDictionary(item => item.Key, item => item.Value);
+            }
+
+            return ret;
+        }
+
+        public Dictionary<string, object>[] ConvertToDictionaryObjectArray(object localContainer)
+        {
+            Dictionary<string, object>[] ret = null;
+
+            if (localContainer != null && localContainer.GetType().ToString() == "System.Dynamic.ExpandoObject[]")
+            {
+                IDictionary<string, object>[] iDictionary = localContainer as IDictionary<string, object>[];
+                if (iDictionary != null && iDictionary.Length > 0)
+                {
+                    ret = new Dictionary<string, object>[iDictionary.Length];
+
+                    for(int index=0; index < iDictionary.Length; index++)
+                    {
+                        IDictionary<string, object> iItem = iDictionary[index];
+                        ret[index] = iItem.ToDictionary(item => item.Key, item => item.Value);
+                    }
+                }
+            }
+
+            return ret;
+        }
+
+        public object[] ConvertToObjectArray(object localContainer)
+        {
+            object[] ret = null;
+
+            if (localContainer != null)
+            {
+                ret = localContainer as object[];
+            }
+
+            return ret;
+        }
 	}
 	#elif (USE_DOTNET_SERIALIZATION)
 	public class JscriptSerializer : IJsonPluggableLibrary
@@ -7191,13 +7270,143 @@ namespace PubNubMessaging.Core
 		{
 			return JsonConvert.DeserializeObject<Dictionary<string, object>> (jsonString);
 		}
-	#endregion
+
+        public Dictionary<string, object> ConvertToDictionaryObject(object localContainer)
+        {
+            Dictionary<string, object> ret = null;
+
+            if (localContainer != null)
+            {
+                if (localContainer.GetType().ToString() == "Newtonsoft.Json.Linq.JObject")
+                {
+                    ret = new Dictionary<string, object>();
+
+                    IDictionary<string, JToken> jDictionary = localContainer as JObject;
+                    if (jDictionary != null)
+                    {
+                        foreach (KeyValuePair<string, JToken> pair in jDictionary)
+                        {
+                            JToken token = pair.Value;
+                            ret.Add(pair.Key, ConvertJTokenToDictionary(token));
+                        }
+                    }
+                }
+                else if (localContainer.GetType().ToString() == "System.Collections.Generic.Dictionary`2[System.String,System.Object]")
+                {
+                    ret = new Dictionary<string, object>();
+                    Dictionary<string, object> dictionary = localContainer as Dictionary<string, object>;
+                    foreach(string key in dictionary.Keys)
+                    {
+                        ret.Add(key, dictionary[key]);
+                    }
+                }
+            }
+
+            return ret;
+
+        }
+
+        public Dictionary<string, object>[] ConvertToDictionaryObjectArray(object localContainer)
+        {
+            Dictionary<string, object>[] ret = null;
+
+            if (localContainer != null && localContainer.GetType().ToString() == "Newtonsoft.Json.Linq.JObject[]")
+            {
+                IDictionary<string, JToken>[] iDictionary = localContainer as IDictionary<string, JToken>[];
+                if (iDictionary != null && iDictionary.Length > 0)
+                {
+                    ret = new Dictionary<string, object>[iDictionary.Length];
+
+                    for (int index = 0; index < iDictionary.Length; index++)
+                    {
+                        IDictionary<string, JToken> iItem = iDictionary[index];
+                        foreach (KeyValuePair<string, JToken> pair in iItem)
+                        {
+                            JToken token = pair.Value;
+                            ret[index].Add(pair.Key, ConvertJTokenToDictionary(token));
+                        }
+                    }
+                }
+            }
+
+            return ret;
+        }
+
+        public object[] ConvertToObjectArray(object localContainer)
+        {
+            object[] ret = null;
+
+            if (localContainer.GetType().ToString() == "Newtonsoft.Json.Linq.JArray")
+            {
+                JArray jarrayResult = localContainer as JArray;
+                List<object> objectContainer = jarrayResult.ToObject<List<object>>();
+                if (objectContainer != null && objectContainer.Count > 0)
+                {
+                    for (int index = 0; index < objectContainer.Count; index++)
+                    {
+                        if (objectContainer[index].GetType().ToString() == "Newtonsoft.Json.Linq.JArray")
+                        {
+                            JArray internalItem = objectContainer[index] as JArray;
+                            objectContainer[index] = internalItem.Select(item => (object)item).ToArray();
+                        }
+                    }
+                    ret = objectContainer.ToArray<object>();
+                }
+            }
+            else if (localContainer.GetType().ToString() == "System.Collections.Generic.List`1[System.Object]")
+            {
+                List<object> listResult = localContainer as List<object>;
+                ret = listResult.ToArray<object>();
+            }
+
+            return ret;
+        }
+
+        private static object ConvertJTokenToDictionary(JToken token)
+        {
+            if (token == null)
+            {
+                return null;
+            }
+
+            var jValue = token as JValue;
+            if (jValue != null)
+            {
+                return jValue.Value;
+            }
+
+            var jContainer = token as JArray;
+            if (jContainer != null)
+            {
+                List<object> jsonList = new List<object>();
+                foreach (JToken arrayItem in jContainer)
+                {
+                    jsonList.Add(ConvertJTokenToDictionary(arrayItem));
+                }
+                return jsonList;
+            }
+
+            IDictionary<string, JToken> jsonObject = token as JObject;
+            if (jsonObject != null)
+            {
+                var jsonDict = new Dictionary<string, object>();
+                (from childToken in token 
+                    where childToken is JProperty select childToken as JProperty)
+                    .ToList()
+                    .ForEach(property => jsonDict.Add(property.Name, ConvertJTokenToDictionary(property.Value)));
+                return jsonDict;
+            }
+
+            return null;
+        }
+
+    #endregion
 	
 	}
-	#endif
-	#endregion
-	#region "States and ResposeTypes"
-	public enum ResponseType
+#endif
+    #endregion
+    #region "States and ResposeTypes"
+    public enum ResponseType
 	{
 		Publish,
 		History,
