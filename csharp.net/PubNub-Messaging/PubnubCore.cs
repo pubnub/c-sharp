@@ -1159,8 +1159,9 @@ namespace PubNubMessaging.Core
 		{
 			if (requestUri != null) {
 				if (channelLocalClientHeartbeatTimer.ContainsKey (requestUri)) {
-					Timer requestHeatbeatTimer = channelLocalClientHeartbeatTimer [requestUri];
-					if (requestHeatbeatTimer != null) {
+					Timer requestHeatbeatTimer = null;
+                    if (channelLocalClientHeartbeatTimer.TryGetValue(requestUri, out requestHeatbeatTimer) && requestHeatbeatTimer != null)
+                    {
 						try {
 							requestHeatbeatTimer.Change (
 								(-1 == _pubnubNetworkTcpCheckIntervalInSeconds) ? -1 : _pubnubNetworkTcpCheckIntervalInSeconds * 1000,
@@ -1185,13 +1186,17 @@ namespace PubNubMessaging.Core
 				ICollection<Uri> keyCollection = timerCollection.Keys;
 				foreach (Uri key in keyCollection) {
 					if (channelLocalClientHeartbeatTimer.ContainsKey (key)) {
-						Timer currentTimer = channelLocalClientHeartbeatTimer [key];
-						currentTimer.Dispose ();
-						Timer removedTimer = null;
-						bool removed = channelLocalClientHeartbeatTimer.TryRemove (key, out removedTimer);
-						if (!removed) {
-							LoggingMethod.WriteToLog (string.Format ("DateTime {0} TerminateLocalClientHeartbeatTimer(null) - Unable to remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString (), key.ToString ()), LoggingMethod.LevelInfo);
-						}
+						Timer currentTimer = null;
+                        if (channelLocalClientHeartbeatTimer.TryGetValue(key, out currentTimer) && currentTimer != null)
+                        {
+                            currentTimer.Dispose();
+                            Timer removedTimer = null;
+                            bool removed = channelLocalClientHeartbeatTimer.TryRemove(key, out removedTimer);
+                            if (!removed)
+                            {
+                                LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateLocalClientHeartbeatTimer(null) - Unable to remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString(), key.ToString()), LoggingMethod.LevelInfo);
+                            }
+                        }
 					}
 				}
 			}
