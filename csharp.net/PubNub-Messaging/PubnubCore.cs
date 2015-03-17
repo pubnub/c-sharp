@@ -1,4 +1,4 @@
-﻿//Build Date: January 28, 2015
+﻿//Build Date: March 17, 2015
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -2448,7 +2448,7 @@ namespace PubNubMessaging.Core
 							decryptMessage = "**DECRYPT ERROR**";
 
 							string multiChannel = string.Join (",", channels);
-                            string multiChannelGroup = string.Join(",", channelGroups);
+                            string multiChannelGroup = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups) : "";
 
 							CallErrorCallback (PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
                                 multiChannel, multiChannelGroup, errorCallback, ex, null, null);
