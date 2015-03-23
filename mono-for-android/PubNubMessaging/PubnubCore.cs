@@ -397,6 +397,13 @@ namespace PubNubMessaging.Core
 
                     if (channelInternetStatus.ContainsKey (channel)
                     && (netState.Type == ResponseType.Subscribe || netState.Type == ResponseType.Presence)) {
+
+                        // Check if Internet connection is back if it was lost earlier.
+                        if(!channelInternetStatus [channel])
+						{
+							channelInternetStatus [channel] = CheckInternetConnectionStatus<T> (pubnetSystemActive, netState.ErrorCallback, netState.Channels);
+						}
+
                         if (channelInternetStatus [channel]) {
                             //Reset Retry if previous state is true
                             channelInternetRetry.AddOrUpdate (channel, 0, (key, oldValue) => 0);
