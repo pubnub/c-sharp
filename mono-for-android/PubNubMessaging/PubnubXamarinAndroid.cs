@@ -497,7 +497,9 @@ namespace PubNubMessaging.Core
 
             base.VerifyOrSetSessionUUID ();
 
+            #if(__MonoCS__)
             PubnubWebRequest.ServicePointConnectionLimit = 300;
+            #endif
         }
 
         protected override bool InternetConnectionStatus<T> (string channel, Action<PubnubClientError> errorCallback, string[] rawChannels)
@@ -526,9 +528,12 @@ namespace PubNubMessaging.Core
 
         protected override sealed void SendRequestAndGetResult<T> (Uri requestUri, RequestState<T> pubnubRequestState, PubnubWebRequest request)
         {
+            #if (__MonoCS__)
             if ((pubnubRequestState.Type == ResponseType.Publish) && (RequestIsUnsafe (requestUri))) {
                 SendRequestUsingTcpClient<T> (requestUri, pubnubRequestState);
-            } else {
+            } else 
+            #endif
+            {
                 IAsyncResult asyncResult = request.BeginGetResponse (new AsyncCallback (UrlProcessResponseCallback<T>), pubnubRequestState);
                 if (!asyncResult.AsyncWaitHandle.WaitOne (GetTimeoutInSecondsForResponseType (pubnubRequestState.Type) * 1000)) {
                     OnPubnubWebRequestTimeout<T> (pubnubRequestState, true);
@@ -1144,7 +1149,9 @@ namespace PubNubMessaging.Core
         #endif
         public PubnubWebRequest (HttpWebRequest request) : base (request)
         {
+            #if(__MonoCS__)
             base.request.ServicePoint.ConnectionLimit = ServicePointConnectionLimit;
+            #endif
             #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE)
                 this.ServicePoint = this.request.ServicePoint;
             #endif
@@ -1159,7 +1166,10 @@ namespace PubNubMessaging.Core
         public PubnubWebRequest (HttpWebRequest request, IPubnubUnitTest pubnubUnitTest)
             : base (request, pubnubUnitTest)
         {
+            #if(__MonoCS__)
             this.request.ServicePoint.ConnectionLimit = ServicePointConnectionLimit;
+            #endif
+
             #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE)
                 this.ServicePoint = this.request.ServicePoint;
             #endif

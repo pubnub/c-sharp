@@ -264,7 +264,7 @@ namespace PubNubMessaging.Example
                 this.m_DrawerList.Adapter = new ArrayAdapter<string> (this, Resource.Layout.ItemMenu, Sections);
                 this.m_DrawerList.ItemClick += (sender, args) => ListItemClicked (args.Position);
 
-                this.m_Drawer.SetDrawerShadow (Resource.Drawable.drawer_shadow_dark, (int)GravityFlags.Start);
+                this.m_Drawer.SetDrawerShadow (Resource.Drawable.drawer_shadow_dark, GravityFlags.Start);
                 //DrawerToggle is the animation that happens with the indicator next to the actionbar
                 this.m_DrawerToggle = new MyActionBarDrawerToggle (this, this.m_Drawer,
                     Resource.Drawable.ic_drawer_light,

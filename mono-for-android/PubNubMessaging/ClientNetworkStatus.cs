@@ -50,7 +50,7 @@ namespace PubNubMessaging.Core
         /*#if(__MonoCS__ && !UNITY_IOS && !UNITY_ANDROID)
         static UdpClient udp;
         #endif*/
-        #if(UNITY_IOS || UNITY_ANDROID || __MonoCS__)
+        #if(UNITY_IOS || UNITY_ANDROID || MONODROID || __MonoCS__)
         static HttpWebRequest request;
         static WebResponse response;
 
