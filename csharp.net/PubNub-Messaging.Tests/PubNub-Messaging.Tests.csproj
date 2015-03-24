@@ -102,6 +102,8 @@
     <Compile Include="WhenGrantIsRequested.cs" />
     <Compile Include="WhenPushIsRequested.cs" />
     <Compile Include="WhenSubscribedToAChannel.cs" />
+    <Compile Include="WhenSubscribedToAChannel2.cs" />
+    <Compile Include="WhenSubscribedToAChannel3.cs" />
     <Compile Include="WhenSubscribedToAChannelGroup.cs" />
     <Compile Include="WhenUnsubscribedToAChannel.cs" />
     <Compile Include="WhenUnsubscribedToAChannelGroup.cs" />

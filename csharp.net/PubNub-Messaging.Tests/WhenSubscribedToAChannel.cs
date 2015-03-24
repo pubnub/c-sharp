@@ -6,8 +6,6 @@ using NUnit.Framework;
 using System.ComponentModel;
 using System.Threading;
 using System.Collections;
-//using Newtonsoft.Json;
-//using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
@@ -15,16 +13,15 @@ namespace PubNubMessaging.Tests
     [TestFixture]
     public class WhenSubscribedToAChannel
     {
-        ManualResetEvent meSubscribeNoConnect = new ManualResetEvent(false);
-        ManualResetEvent meSubscribeYesConnect = new ManualResetEvent(false);
-        ManualResetEvent mePublish = new ManualResetEvent(false);
-        ManualResetEvent meUnsubscribe = new ManualResetEvent(false);
-        ManualResetEvent meAlreadySubscribed = new ManualResetEvent(false);
-        ManualResetEvent meChannel1SubscribeConnect = new ManualResetEvent(false);
-        ManualResetEvent meChannel2SubscribeConnect = new ManualResetEvent(false);
-        ManualResetEvent meSubscriberManyMessages = new ManualResetEvent(false);
-        ManualResetEvent grantManualEvent = new ManualResetEvent(false);
-        ManualResetEvent subscribeEvent = new ManualResetEvent(false);
+        ManualResetEvent mreSubscribeConnect = new ManualResetEvent(false);
+        ManualResetEvent mrePublish = new ManualResetEvent(false);
+        ManualResetEvent mreUnsubscribe = new ManualResetEvent(false);
+        ManualResetEvent mreAlreadySubscribed = new ManualResetEvent(false);
+        ManualResetEvent mreChannel1SubscribeConnect = new ManualResetEvent(false);
+        ManualResetEvent mreChannel2SubscribeConnect = new ManualResetEvent(false);
+        ManualResetEvent mreSubscriberManyMessages = new ManualResetEvent(false);
+        ManualResetEvent mreGrant = new ManualResetEvent(false);
+        ManualResetEvent mreSubscribe = new ManualResetEvent(false);
 
         bool receivedMessage = false;
         bool receivedConnectMessage = false;
@@ -36,6 +33,8 @@ namespace PubNubMessaging.Tests
 
         int numberOfReceivedMessages = 0;
         int manualResetEventsWaitTimeout = 310 * 1000;
+        object publishedMessage = null;
+        bool isPublished = false;
 
         Pubnub pubnub = null;
 
@@ -58,7 +57,7 @@ namespace PubNubMessaging.Tests
             pubnub.GrantAccess<string>(channel, true, true, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
             Thread.Sleep(1000);
 
-            grantManualEvent.WaitOne();
+            mreGrant.WaitOne();
 
             pubnub.EndPendingRequests();
             pubnub = null;
@@ -66,36 +65,107 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnReceivedMessage()
+        public void ThenComplexMessageSubscribeShouldReturnReceivedMessage()
         {
             receivedMessage = false;
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams("", "", false);
+            Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageSubscribeShouldReturnReceivedMessage Failed");
+        }
+
+        private void CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
+        {
+            receivedMessage = false;
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, secretKey, cipherKey, ssl);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannel";
-            unitTest.TestCaseName = "ThenSubscribeShouldReturnReceivedMessage";
+            unitTest.TestCaseName = (string.IsNullOrEmpty(cipherKey)) ? "ThenSubscribeShouldReturnReceivedComplexMessage" : "ThenSubscribeShouldReturnReceivedCipherComplexMessage";
 
             pubnub.PubnubUnitTest = unitTest;
 
             string channel = "hello_my_channel";
 
+            mreSubscribe = new ManualResetEvent(false);
+
+            mreSubscribeConnect = new ManualResetEvent(false);
             pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
-            pubnub.Publish<string>(channel, "Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage", dummyPublishCallback, DummyErrorCallback);
+            mreSubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
+
+            mrePublish = new ManualResetEvent(false);
+            publishedMessage = new CustomClass();
+            pubnub.Publish<string>(channel, publishedMessage, dummyPublishCallback, DummyErrorCallback);
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
-            mePublish.WaitOne(manualResetEventsWaitTimeout);
+            mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
-            meSubscribeNoConnect.WaitOne(manualResetEventsWaitTimeout);
-            pubnub.Unsubscribe<string>(channel, dummyUnsubscribeCallback, SubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+            if (isPublished)
+            {
+                mreSubscribe.WaitOne(manualResetEventsWaitTimeout);
 
-            meUnsubscribe.WaitOne(manualResetEventsWaitTimeout);
-
+                mreUnsubscribe = new ManualResetEvent(false);
+                pubnub.Unsubscribe<string>(channel, dummyUnsubscribeCallback, SubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+                mreUnsubscribe.WaitOne(manualResetEventsWaitTimeout);
+            }
             pubnub.EndPendingRequests();
             pubnub = null;
 
-            Assert.IsTrue(receivedMessage,"WhenSubscribedToAChannel --> ThenItShouldReturnReceivedMessage Failed");
         }
 
+        [Test]
+        public void ThenComplexMessageSSLSubscribeShouldReturnReceivedMessage()
+        {
+            receivedMessage = false;
+            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams("", "", true);
+            Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageSSLSubscribeShouldReturnReceivedMessage Failed");
+        }
+
+        [Test]
+        public void ThenComplexMessageSecretSubscribeShouldReturnReceivedMessage()
+        {
+            receivedMessage = false;
+            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(PubnubCommon.SecretKey, "", false);
+            Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageSecretSubscribeShouldReturnReceivedMessage Failed");
+        }
+
+        [Test]
+        public void ThenComplexMessageSecretSSLSubscribeShouldReturnReceivedMessage()
+        {
+            receivedMessage = false;
+            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(PubnubCommon.SecretKey, "", true);
+            Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageSecretSSLSubscribeShouldReturnReceivedMessage Failed");
+        }
+
+        [Test]
+        public void ThenComplexMessageCipherSubscribeShouldReturnReceivedMessage()
+        {
+            receivedMessage = false;
+            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams("", "enigma", false);
+            Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageCipherSubscribeShouldReturnReceivedMessage Failed");
+        }
+
+        [Test]
+        public void ThenComplexMessageCipherSSLSubscribeShouldReturnReceivedMessage()
+        {
+            receivedMessage = false;
+            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams("", "enigma", true);
+            Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageCipherSSLSubscribeShouldReturnReceivedMessage Failed");
+        }
+
+        [Test]
+        public void ThenComplexMessageCipherSecretSubscribeShouldReturnReceivedMessage()
+        {
+            receivedMessage = false;
+            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", false);
+            Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageCipherSecretSubscribeShouldReturnReceivedMessage Failed");
+        }
+
+        [Test]
+        public void ThenComplexMessageCipherSecretSSLSubscribeShouldReturnReceivedMessage()
+        {
+            receivedMessage = false;
+            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", true);
+            Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageCipherSecretSSLSubscribeShouldReturnReceivedMessage Failed");
+        }
+        
         [Test]
         public void ThenSubscribeShouldReturnConnectStatus()
         {
@@ -111,9 +181,10 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
 
+            mreSubscribeConnect = new ManualResetEvent(false);
             pubnub.Subscribe<string>(channel, ReceivedMessageCallbackYesConnect, ConnectStatusCallback, DummyErrorCallback);
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
-            meSubscribeYesConnect.WaitOne(manualResetEventsWaitTimeout);
+            mreSubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests();
             pubnub = null;
@@ -136,17 +207,49 @@ namespace PubNubMessaging.Tests
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
 
             string channel1 = "hello_my_channel1";
+            mreChannel1SubscribeConnect = new ManualResetEvent(false);
             pubnub.Subscribe<string>(channel1, ReceivedChannelUserCallback, ReceivedChannel1ConnectCallback, DummyErrorCallback);
-            meChannel1SubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
+            mreChannel1SubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
             string channel2 = "hello_my_channel2";
+            mreChannel2SubscribeConnect = new ManualResetEvent(false);
             pubnub.Subscribe<string>(channel2, ReceivedChannelUserCallback, ReceivedChannel2ConnectCallback, DummyErrorCallback);
-            meChannel2SubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
+            mreChannel2SubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests();
             pubnub = null;
 
             Assert.IsTrue(receivedChannel1ConnectMessage && receivedChannel2ConnectMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnConnectStatus Failed");
+        }
+
+        [Test]
+        public void ThenMultiSubscribeShouldReturnConnectStatusSSL()
+        {
+            receivedChannel1ConnectMessage = false;
+            receivedChannel2ConnectMessage = false;
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", true);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenSubscribedToAChannel";
+            unitTest.TestCaseName = "ThenMultiSubscribeShouldReturnConnectStatus";
+
+            pubnub.PubnubUnitTest = unitTest;
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+
+            string channel1 = "hello_my_channel1";
+            mreChannel1SubscribeConnect = new ManualResetEvent(false);
+            pubnub.Subscribe<string>(channel1, ReceivedChannelUserCallback, ReceivedChannel1ConnectCallback, DummyErrorCallback);
+            mreChannel1SubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
+
+            string channel2 = "hello_my_channel2";
+            mreChannel2SubscribeConnect = new ManualResetEvent(false);
+            pubnub.Subscribe<string>(channel2, ReceivedChannelUserCallback, ReceivedChannel2ConnectCallback, DummyErrorCallback);
+            mreChannel2SubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
+
+            Assert.IsTrue(receivedChannel1ConnectMessage && receivedChannel2ConnectMessage, "WhenSubscribedToAChannel --> ThenMultiSubscribeShouldReturnConnectStatusSSL Failed");
         }
 
         [Test]
@@ -168,7 +271,7 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(100);
 
             pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback2, DummyMethodDuplicateChannelConnectCallback, DuplicateChannelErrorCallback);
-            meAlreadySubscribed.WaitOne(manualResetEventsWaitTimeout);
+            mreAlreadySubscribed.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests();
             pubnub = null;
@@ -190,23 +293,24 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
-            Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Iniatiating Subscribe");
+            //Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Iniatiating Subscribe");
+            mreSubscribe = new ManualResetEvent(false);
             pubnub.Subscribe<string>(channel, SubscriberDummyMethodForManyMessagesUserCallback, SubscribeDummyMethodForManyMessagesConnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
             
-            subscribeEvent.WaitOne(manualResetEventsWaitTimeout);
+            mreSubscribe.WaitOne(manualResetEventsWaitTimeout);
 
             if (!unitTest.EnableStubTest)
             {
                 for (int index = 0; index < 10; index++)
                 {
-                    Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Publishing " + index.ToString());
+                    //Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Publishing " + index.ToString());
                     pubnub.Publish<string>(channel, index.ToString(), dummyPublishCallback, DummyErrorCallback);
-                    Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Publishing..waiting for confirmation " + index.ToString());
+                    //Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Publishing..waiting for confirmation " + index.ToString());
                     //mePublish.WaitOne(10*1000);
                 }
             }
-            meSubscriberManyMessages.WaitOne(manualResetEventsWaitTimeout);
+            mreSubscriberManyMessages.WaitOne(manualResetEventsWaitTimeout);
             pubnub.EndPendingRequests();
             pubnub = null;
 
@@ -239,26 +343,26 @@ namespace PubNubMessaging.Tests
             catch { }
             finally
             {
-                grantManualEvent.Set();
+                mreGrant.Set();
             }
         }
 
         private void SubscriberDummyMethodForManyMessagesUserCallback(string result)
         {
-            Console.WriteLine("WhenSubscribedToChannel -> \n ThenSubscriberShouldBeAbleToReceiveManyMessages -> \n SubscriberDummyMethodForManyMessagesUserCallback -> result = " + result);
+            //Console.WriteLine("WhenSubscribedToChannel -> \n ThenSubscriberShouldBeAbleToReceiveManyMessages -> \n SubscriberDummyMethodForManyMessagesUserCallback -> result = " + result);
             numberOfReceivedMessages = numberOfReceivedMessages + 1;
             if (numberOfReceivedMessages >= 10)
             {
                 receivedManyMessages = true;
-                meSubscriberManyMessages.Set();
+                mreSubscriberManyMessages.Set();
             }
             
         }
 
         private void SubscribeDummyMethodForManyMessagesConnectCallback(string result)
         {
-            Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Subscribe Connected");
-            subscribeEvent.Set();
+            //Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Subscribe Connected");
+            mreSubscribe.Set();
         }
 
         private void ReceivedChannelUserCallback(string result)
@@ -280,7 +384,7 @@ namespace PubNubMessaging.Tests
                     }
                 }
             }
-            meChannel1SubscribeConnect.Set();
+            mreChannel1SubscribeConnect.Set();
         }
 
         private void ReceivedChannel2ConnectCallback(string result)
@@ -298,7 +402,7 @@ namespace PubNubMessaging.Tests
                     }
                 }
             }
-            meChannel2SubscribeConnect.Set();
+            mreChannel2SubscribeConnect.Set();
         }
 
         private void DummyMethodDuplicateChannelUserCallback1(string result)
@@ -317,17 +421,24 @@ namespace PubNubMessaging.Tests
         {
             if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
             {
+                //Console.WriteLine("ReceivedMessageCallbackWhenSubscribed -> result = " + result);
                 List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
                 if (deserializedMessage != null && deserializedMessage.Count > 0)
                 {
                     object subscribedObject = (object)deserializedMessage[0];
                     if (subscribedObject != null)
                     {
-                        receivedMessage = true;
+                        string serializedResultMessage = pubnub.JsonPluggableLibrary.SerializeToJsonString(subscribedObject);
+                        string serializedPublishMesage = pubnub.JsonPluggableLibrary.SerializeToJsonString(publishedMessage);
+                        if (serializedResultMessage == serializedPublishMesage)
+                        {
+                            receivedMessage = true;
+                        }
+                        
                     }
                 }
             }
-            meSubscribeNoConnect.Set();
+            mreSubscribe.Set();
         }
 
         private void ReceivedMessageCallbackYesConnect(string result)
@@ -350,13 +461,27 @@ namespace PubNubMessaging.Tests
                     }
                 }
             }
-            meSubscribeYesConnect.Set();
+            mreSubscribeConnect.Set();
         }
 
         private void dummyPublishCallback(string result)
         {
-            Console.WriteLine("dummyPublishCallback -> result = " + result);
-            mePublish.Set();
+            //Console.WriteLine("dummyPublishCallback -> result = " + result);
+            if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
+            {
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
+                {
+                    long statusCode = Int64.Parse(deserializedMessage[0].ToString());
+                    string statusMessage = (string)deserializedMessage[1];
+                    if (statusCode == 1 && statusMessage.ToLower() == "sent")
+                    {
+                        isPublished = true;
+                    }
+                }
+            }
+
+            mrePublish.Set();
         }
 
         private void DummyErrorCallback(PubnubClientError result)
@@ -373,7 +498,7 @@ namespace PubNubMessaging.Tests
             {
                 receivedAlreadySubscribedMessage = true;
             }
-            meAlreadySubscribed.Set();
+            mreAlreadySubscribed.Set();
         }
 
         private void dummyUnsubscribeCallback(string result)
@@ -383,11 +508,12 @@ namespace PubNubMessaging.Tests
 
         void SubscribeDummyMethodForConnectCallback(string receivedMessage)
         {
+            mreSubscribeConnect.Set();
         }
 
         void UnsubscribeDummyMethodForDisconnectCallback(string receivedMessage)
         {
-            meUnsubscribe.Set();
+            mreUnsubscribe.Set();
         }
 
     }

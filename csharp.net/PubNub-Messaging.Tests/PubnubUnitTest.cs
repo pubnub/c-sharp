@@ -37,11 +37,15 @@ namespace PubNubMessaging.Tests
             data.Add("/subscribe/demo-36/hello_my_channel,hello_my_channel-pnpres/0/0", "[[],\"13596603179264912\"]");
             data.Add("/subscribe/demo-36/hello_my_channel,hello_my_channel-pnpres/0/13596603179264912", "[[{\"action\": \"join\", \"timestamp\": 1355929955, \"uuid\": \"eb4c1645-1319-4425-865f-008563009d67\", \"occupancy\": 1}],\"13559006802662768\"]");
             data.Add("/subscribe/demo-36/hello_my_channel,hello_my_channel-pnpres/0/13559006802662768", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel-pnpres/0/13559006802662768", "[[],\"13559006802662768\"]");
+
 
             data.Add("/subscribe/demo-36/hello_my_channel-pnpres,hello_my_channel/0/0", "[[],\"13596603179264912\"]");
             data.Add("/subscribe/demo-36/hello_my_channel-pnpres,hello_my_channel/0/13596603179264912", "[[{\"action\": \"join\", \"timestamp\": 1355929955, \"uuid\": \"eb4c1645-1319-4425-865f-008563009d67\", \"occupancy\": 1}],\"13559006802662768\"]");
             data.Add("/subscribe/demo-36/hello_my_channel-pnpres,hello_my_channel/0/13559006802662768", "[[],\"13559006802662768\"]");
-
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/heartbeat", "{\"status\": 200, \"message\": \"OK\", \"service\": \"Presence\"}");
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/leave", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
+            
             return data;
         }
 
@@ -53,17 +57,37 @@ namespace PubNubMessaging.Tests
             data.Add("/subscribe/demo-36/hello_my_channel,hello_my_channel-pnpres/0/0", "[[],\"13596603179264912\"]");
             data.Add("/subscribe/demo-36/hello_my_channel,hello_my_channel-pnpres/0/13596603179264912", "[[{\"action\": \"join\", \"timestamp\": 1355929955, \"uuid\": \"mylocalmachine.mydomain.com\", \"occupancy\": 1}],\"13559006802662768\"]");
             data.Add("/subscribe/demo-36/hello_my_channel,hello_my_channel-pnpres/0/13559006802662768", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel-pnpres/0/13559006802662768", "[[],\"13559006802662768\"]");
 
             data.Add("/subscribe/demo-36/hello_my_channel-pnpres,hello_my_channel/0/0", "[[],\"13596603179264912\"]");
             data.Add("/subscribe/demo-36/hello_my_channel-pnpres,hello_my_channel/0/13596603179264912", "[[{\"action\": \"join\", \"timestamp\": 1355929955, \"uuid\": \"mylocalmachine.mydomain.com\", \"occupancy\": 1}],\"13559006802662768\"]");
             data.Add("/subscribe/demo-36/hello_my_channel-pnpres,hello_my_channel/0/13559006802662768", "[[],\"13559006802662768\"]");
+
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/leave", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
+
             return data;
         }
 
         private Dictionary<string, string> LoadWhenAClientIsPresentedIfHereNowIsCalledThenItShouldReturnInfo()
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
-            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel", "{\"uuids\":[\"eb4c1645-1319-4425-865f-008563009d67\"],\"occupancy\":1}");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/0", "[[],\"13596603179264912\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13596603179264912", "[[{\"action\": \"join\", \"timestamp\": 1355929955, \"uuid\": \"eb4c1645-1319-4425-865f-008563009d67\", \"occupancy\": 1}],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559006802662768", "[[],\"13559006802662768\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel", "{\"status\": 200, \"message\": \"OK\", \"service\": \"Presence\", \"uuids\": [\"eb4c1645-1319-4425-865f-008563009d67\"], \"occupancy\": 1}");
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/leave", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenAClientIsPresentedIfHereNowIsCalledThenItShouldReturnInfoWithUserState()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/subscribe/demo-36/hello_my_channel/0/0", "[[],\"13596603179264912\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13596603179264912", "[[{\"action\": \"join\", \"timestamp\": 1355929955, \"uuid\": \"mylocalmachine.mydomain.com\", \"occupancy\": 1}],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559006802662768", "[[],\"13559006802662768\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/uuid/mylocalmachine.mydomain.com/data", "{\"status\": 200, \"message\": \"OK\", \"payload\": {\"testkey\": \"testval\"}, \"service\": \"Presence\"}");
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel", "{\"status\": 200, \"message\": \"OK\", \"service\": \"Presence\", \"uuids\": [{\"state\": {\"testkey\": \"testval\"}, \"uuid\": \"mylocalmachine.mydomain.com\"}], \"occupancy\": 1}");
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/leave", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
             return data;
         }
 
@@ -74,10 +98,41 @@ namespace PubNubMessaging.Tests
             return data;
         }
 
+        private Dictionary<string, string> LoadWhenAClientIsPresentedIfGlobalHereNowIsCalledThenItShouldReturnInfoWithUserState()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/subscribe/demo-36/hello_my_channel/0/0", "[[],\"13596603179264912\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13596603179264912", "[[{\"action\": \"join\", \"timestamp\": 1355929955, \"uuid\": \"mylocalmachine.mydomain.com\", \"occupancy\": 1}],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559006802662768", "[[],\"13559006802662768\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/uuid/mylocalmachine.mydomain.com/data", "{\"status\": 200, \"message\": \"OK\", \"payload\": {\"testkey\": \"testval\"}, \"service\": \"Presence\"}");
+            data.Add("/v2/presence/sub_key/demo-36", "{\"status\":200,\"message\":\"OK\",\"payload\":{\"channels\":{\"hello_my_channel\":{\"uuids\":[{\"uuid\":\"mylocalmachine.mydomain.com\"}],\"occupancy\":1}},\"total_channels\":1,\"total_occupancy\":1},\"service\":\"Presence\"}");
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/leave", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
+            return data;
+        }
+
         private Dictionary<string, string> LoadWhenAClientIsPresentedIfWhereNowIsCalledThenItShouldReturnInfo()
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
-            data.Add("/v2/presence/sub_key/demo-36/uuid/hello_my_uuid", "{\"status\":200,\"message\":\"OK\",\"payload\":{\"channels\":[\"hello_my_channel\"]},\"service\":\"Presence\"}");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/0", "[[],\"13596603179264912\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13596603179264912", "[[{\"action\": \"join\", \"timestamp\": 1355929955, \"uuid\": \"mylocalmachine.mydomain.com\", \"occupancy\": 1}],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559006802662768", "[[],\"13559006802662768\"]");
+            data.Add("/v2/presence/sub_key/demo-36/uuid/mylocalmachine.mydomain.com", "{\"status\":200,\"message\":\"OK\",\"payload\":{\"channels\":[\"hello_my_channel\"]},\"service\":\"Presence\"}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenAClientIsPresentedIfSetAndGetUserStateThenItShouldReturnInfo()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/uuid/mylocalmachine.mydomain.com/data", "{\"status\": 200, \"message\": \"OK\", \"payload\": {\"testkey\": \"testval\"}, \"service\": \"Presence\"}");
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/uuid/mylocalmachine.mydomain.com", "{\"status\": 200, \"uuid\": \"mylocalmachine.mydomain.com\", \"service\": \"Presence\", \"message\": \"OK\", \"payload\": {\"testkey\": \"testval\"}, \"channel\": \"hello_my_channel\"}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenAClientIsPresentedIfSetAndDeleteUserStateThenItShouldReturnInfo()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/uuid/mylocalmachine.mydomain.com/data", "{\"status\": 200, \"message\": \"OK\", \"payload\": {\"k2\":\"v2\",\"k\":\"v\"}, \"service\": \"Presence\"}");
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/uuid/mylocalmachine.mydomain.com", "{\"status\": 200, \"uuid\": \"mylocalmachine.mydomain.com\", \"service\": \"Presence\", \"message\": \"OK\", \"payload\": {\"k\": \"v\"}, \"channel\": \"hello_my_channel\"}");
             return data;
         }
 
@@ -235,6 +290,114 @@ namespace PubNubMessaging.Tests
             return data;
         }
 
+        private Dictionary<string, string> LoadWhenDetailedHistoryIsRequestedDetailHistoryNoStoreShouldNotGetMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22Pubnub%20Messaging%20With%20No%20Storage%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/pam/pam/0/hello_my_channel/0/%22Pubnub%20Messaging%20With%20No%20Storage%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel", "[[],0,0]");
+            data.Add("/v2/history/sub-key/pam/channel/hello_my_channel", "[[],0,0]");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenDetailedHistoryIsRequestedDetailHistoryShouldReturnDecryptMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22f42pIQcWZ9zbTbH8cyLwByD%2FGsviOE0vcREIEVPARR0%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel", "[[\"f42pIQcWZ9zbTbH8cyLwByD/GsviOE0vcREIEVPARR0=\"],14271207051615569,14271207051615569]");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenDetailedHistoryIsRequestedDetailHistoryShouldReturnServerTime1()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/time/0", "[14271224264234400]");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenDetailedHistoryIsRequestedDetailHistoryShouldReturnServerTime2()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/time/0", "[14271224327449617]");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenDetailedHistoryIsRequestedDetailHistoryShouldReturnServerTime3()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/time/0", "[14271224393563309]");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenDetailedHistoryIsRequestedDetailedHistoryShouldReturnEncryptedMessageBasedOnParams()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+                       
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22kvIeHmojsLyV1KMBo82DYQ%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22Ld0rZfbe4yN0Qj4V7o2BuQ%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22zNlnhYco9o6a646%2BOx6ksg%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22mR8EEMx154BBHU3OOa%2BYjQ%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22v%2BviLoq0Gj2docUMAYyoYg%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22F2ZPfJnzuU34VKe24ds81A%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%222K%2FTO5WADvJRhvX7Zk0IpQ%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22oWOYyGxkWFJ1gpJxhcyzjA%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22LwEzvPCHdM8Yagg6oKknvg%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22%2FjjH%2FPT4NrK5HHjDT2KAlQ%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/publish/demo-36/demo-36/155b7bd8269bacde295010fd1a10899f/hello_my_channel/0/%22kvIeHmojsLyV1KMBo82DYQ%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/d717121f8d51b777e0a2dbe5dc8f818f/hello_my_channel/0/%22Ld0rZfbe4yN0Qj4V7o2BuQ%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/4b79cac17fc4c52cde119c8b09d6a70c/hello_my_channel/0/%22zNlnhYco9o6a646%2BOx6ksg%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/57c79052b0ccc0f63d6bd5de5e7ffe05/hello_my_channel/0/%22mR8EEMx154BBHU3OOa%2BYjQ%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/d90d19ce93013ffa3ae76dd40b9bbad5/hello_my_channel/0/%22v%2BviLoq0Gj2docUMAYyoYg%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/publish/demo-36/demo-36/292b383b26ba55fc38671eb9749ca27d/hello_my_channel/0/%22F2ZPfJnzuU34VKe24ds81A%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/ee1c53de3bd8ce7c63703881fb30dad0/hello_my_channel/0/%222K%2FTO5WADvJRhvX7Zk0IpQ%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/da9219cd36be50e44af1f13c30e3a0fc/hello_my_channel/0/%22oWOYyGxkWFJ1gpJxhcyzjA%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/06d3a3c66138d3e1e98c16cb4b28b447/hello_my_channel/0/%22LwEzvPCHdM8Yagg6oKknvg%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/ba5ec8b3290acff6505e156e91838906/hello_my_channel/0/%22%2FjjH%2FPT4NrK5HHjDT2KAlQ%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel?count=5&reverse=true&start=14271224264234400&end=14271224327449617&uuid=myuuid&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[\"kvIeHmojsLyV1KMBo82DYQ==\",\"Ld0rZfbe4yN0Qj4V7o2BuQ==\",\"zNlnhYco9o6a646+Ox6ksg==\",\"mR8EEMx154BBHU3OOa+YjQ==\",\"v+viLoq0Gj2docUMAYyoYg==\"],14271224271199908,14271224324230142]");
+            data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel?count=5&reverse=true&start=14271224327449616&uuid=myuuid&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[\"F2ZPfJnzuU34VKe24ds81A==\",\"2K/TO5WADvJRhvX7Zk0IpQ==\",\"oWOYyGxkWFJ1gpJxhcyzjA==\",\"LwEzvPCHdM8Yagg6oKknvg==\",\"/jjH/PT4NrK5HHjDT2KAlQ==\"],14271224337423013,14271224390377690]");
+            data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel?count=5&start=14271224327449616&uuid=myuuid&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[\"kvIeHmojsLyV1KMBo82DYQ==\",\"Ld0rZfbe4yN0Qj4V7o2BuQ==\",\"zNlnhYco9o6a646+Ox6ksg==\",\"mR8EEMx154BBHU3OOa+YjQ==\",\"v+viLoq0Gj2docUMAYyoYg==\"],14271224271199908,14271224324230142]");
+
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenDetailedHistoryIsRequestedDetailedHistoryShouldReturnUnencryptedMessageBasedOnParams()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/0", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/1", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/2", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/3", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/4", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/5.1", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/6.1", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/7.1", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/8.1", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/9.1", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/publish/demo-36/demo-36/6c45a5d05e409fbac6b50d10027b276f/hello_my_channel/0/0", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/bf08bd19cea9915a5e557529c4a29028/hello_my_channel/0/1", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/cc125f5ded91bf364369346d39b09adb/hello_my_channel/0/2", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/dc69f4352ddbe3252e5a0f1d389bf186/hello_my_channel/0/3", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/ab26456775f28be0232efe7a92545ffa/hello_my_channel/0/4", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/publish/demo-36/demo-36/638c03dfeb41e9b61e8b774001559e1d/hello_my_channel/0/5.1", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/7dc6b36e781f7c426c97efbdb30d87a9/hello_my_channel/0/6.1", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/56ec2f91fb9d78c3c0f5a04e9b138576/hello_my_channel/0/7.1", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/9034b22230cb5e1eab4f8d549422771e/hello_my_channel/0/8.1", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/1118a02dc5d490ee212f175775452329/hello_my_channel/0/9.1", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel?count=5&reverse=true&start=14271224264234400&end=14271224327449617&uuid=myuuid&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[0,1,2,3,4],14271224271199908,14271224324230142]");
+            data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel?count=5&reverse=true&start=14271224327449616&uuid=myuuid&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[5.1,6.1,7.1,8.1],14271224337423013,14271224390377690]");
+            data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel?count=5&start=14271224327449616&uuid=myuuid&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[0,1,2,3,4],14271224271199908,14271224324230142]");
+
+            return data;
+        }
+
         private Dictionary<string, string> LoadWhenGetRequestServerTimeThenItShouldReturnTimeStamp()
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
@@ -253,9 +416,152 @@ namespace PubNubMessaging.Tests
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22Test%20for%20WhenSubscribedToAChannel%20ThenItShouldReturnReceivedMessage%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22Zbr7pEF%2FGFGKj1rOstp0tWzA4nwJXEfj%2BezLtAr8qqE%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/d4a031148880d7c3d96251f02586726c/hello_my_channel/0/%22Zbr7pEF%2FGFGKj1rOstp0tWzA4nwJXEfj%2BezLtAr8qqE%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/47770aa0273635b0694b07336afeb435/hello_my_channel/0/%22Test%20for%20WhenSubscribedToAChannel%20ThenItShouldReturnReceivedMessage%22", "[1,\"Sent\",\"13559014566792817\"]");
+
             data.Add("/subscribe/demo-36/hello_my_channel/0/0", "[[],\"13559006802662768\"]");
             data.Add("/subscribe/demo-36/hello_my_channel/0/13559006802662768", "[[\"Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage\"],\"13559014566792816\"]");
             data.Add("/subscribe/demo-36/hello_my_channel/0/13559014566792816", "[[],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/leave", "{\"action\": \"leave\"}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenSubscribedToAChannelThenSubscribeShouldReturnReceivedCipherMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22QoHwTga0QtOCtJRQ6sqtyateB%2FVotNt%2F50y23yXW7rpCbZdJLUAVKKbf01SpN6zghA6MqQaaHRXoYqAf84RF56C7Ky6Oi6jLqN2I5%2FlXSCw%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/d4a031148880d7c3d96251f02586726c/hello_my_channel/0/%22Zbr7pEF%2FGFGKj1rOstp0tWzA4nwJXEfj%2BezLtAr8qqE%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/cc7da4d07401634f5cad21ce254d7787/hello_my_channel/0/%22QoHwTga0QtOCtJRQ6sqtyateB%2FVotNt%2F50y23yXW7rpCbZdJLUAVKKbf01SpN6zghA6MqQaaHRXoYqAf84RF56C7Ky6Oi6jLqN2I5%2FlXSCw%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/subscribe/demo-36/hello_my_channel/0/0", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559006802662768", "[[\"QoHwTga0QtOCtJRQ6sqtyateB/VotNt/50y23yXW7rpCbZdJLUAVKKbf01SpN6zghA6MqQaaHRXoYqAf84RF56C7Ky6Oi6jLqN2I5/lXSCw=\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559014566792816", "[[],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/leave", "{\"action\": \"leave\"}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenSubscribedToAChannelThenSubscribeShouldReturnReceivedComplexMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%7B%22foo%22%3A%22hi%21%22%2C%22bar%22%3A%5B1%2C2%2C3%2C4%2C5%5D%7D", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/a50a618029da59507f80118062de229a/hello_my_channel/0/%7B%22foo%22%3A%22hi%21%22%2C%22bar%22%3A%5B1%2C2%2C3%2C4%2C5%5D%7D", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/d4a031148880d7c3d96251f02586726c/hello_my_channel/0/%22Zbr7pEF%2FGFGKj1rOstp0tWzA4nwJXEfj%2BezLtAr8qqE%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22Zbr7pEF%2FGFGKj1rOstp0tWzA4nwJXEfj%2BezLtAr8qqE%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/subscribe/demo-36/hello_my_channel/0/0", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559006802662768", "[[{\"foo\":\"hi!\",\"bar\":[1,2,3,4,5]}],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559014566792816", "[[],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/leave", "{\"action\": \"leave\"}");
+            return data;
+        }
+        private Dictionary<string, string> LoadWhenSubscribedToAChannelThenSubscribeShouldReturnReceivedCipherComplexMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%7B%22foo%22%3A%22hi%21%22%2C%22bar%22%3A%5B1%2C2%2C3%2C4%2C5%5D%7D", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/a50a618029da59507f80118062de229a/hello_my_channel/0/%7B%22foo%22%3A%22hi%21%22%2C%22bar%22%3A%5B1%2C2%2C3%2C4%2C5%5D%7D", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/d4a031148880d7c3d96251f02586726c/hello_my_channel/0/%22Zbr7pEF%2FGFGKj1rOstp0tWzA4nwJXEfj%2BezLtAr8qqE%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22Zbr7pEF%2FGFGKj1rOstp0tWzA4nwJXEfj%2BezLtAr8qqE%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/subscribe/demo-36/hello_my_channel/0/0", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559006802662768", "[[\"Zbr7pEF/GFGKj1rOstp0tWzA4nwJXEfj+ezLtAr8qqE=\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559014566792816", "[[],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/leave", "{\"action\": \"leave\"}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenSubscribedToAChannelThenSubscribeShouldReturnReceivedEmojiMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22Text%20with%20%5Cud83d%5Cude1c%20emoji%20%5Cud83c%5Cudf89.%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/8003ac87ee0d9c9ba205c9697972891c/hello_my_channel/0/%22Text%20with%20%5Cud83d%5Cude1c%20emoji%20%5Cud83c%5Cudf89.%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/subscribe/demo-36/hello_my_channel/0/0", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559006802662768", "[[\"Text with \ud83d\ude1c emoji \ud83c\udf89.\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559014566792816", "[[\"Text with \ud83d\ude1c emoji \ud83c\udf89.\"],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/leave", "{\"action\": \"leave\"}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenSubscribedToAChannelThenSubscribeShouldReturnReceivedCipherEmojiMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/fc80436ca486018b9f97dd7fc93cd9ef/hello_my_channel/0/%22vaD98V5XDtEvByw6RrxT9Ya76GKQLhyrEZw9Otrsu1KBVDIqGgWkrAD8X6TM%2FXC6%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22Zbr7pEF%2FGFGKj1rOstp0tWzA4nwJXEfj%2BezLtAr8qqE%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/subscribe/demo-36/hello_my_channel/0/0", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559006802662768", "[[\"vaD98V5XDtEvByw6RrxT9Ya76GKQLhyrEZw9Otrsu1KBVDIqGgWkrAD8X6TM/XC6\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559014566792816", "[[\"vaD98V5XDtEvByw6RrxT9Ya76GKQLhyrEZw9Otrsu1KBVDIqGgWkrAD8X6TM/XC6\"],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/leave", "{\"action\": \"leave\"}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenSubscribedToAChannelThenSubscribeShouldReturnUnicodeMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22Text%20with%20%5Cu00DC%5Cu00D6%5Cu6F22%5Cu8A9E%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/subscribe/demo-36/hello_my_channel/0/0", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559006802662768", "[[\"Text with \u00DC\u00D6\u6F22\u8A9E\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559014566792816", "[[\"Text with \u00DC\u00D6\u6F22\u8A9E\"],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/leave", "{\"action\": \"leave\"}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenSubscribedToAChannelThenSubscribeShouldReturnUnicodeCipherMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenSubscribedToAChannelThenSubscribeShouldReturnReceivedForwardSlashMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22Text%20with%20%2F%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/20eb1f490fd3682a417640ec5fdd0d1b/hello_my_channel/0/%22Text%20with%20%2F%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/subscribe/demo-36/hello_my_channel/0/0", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559006802662768", "[[\"Text with \\/\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559014566792816", "[[],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/leave", "{\"action\": \"leave\"}");
+            return data;
+        }
+        
+        private Dictionary<string, string> LoadWhenSubscribedToAChannelThenSubscribeShouldReturnReceivedForwardSlashCipherMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22s98XlGoA68ypX1Z7A7mOwQ%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/487a1708fcddc1ff3ed45b2a43ee256b/hello_my_channel/0/%22s98XlGoA68ypX1Z7A7mOwQ%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/subscribe/demo-36/hello_my_channel/0/0", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559006802662768", "[[\"s98XlGoA68ypX1Z7A7mOwQ==\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559014566792816", "[[\"s98XlGoA68ypX1Z7A7mOwQ==\"],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/leave", "{\"action\": \"leave\"}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenSubscribedToAChannelThenSubscribeShouldReturnSpecialCharMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22Text%20with%20%27%5C%22%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/45f266dc617d0e42619b8886f05015aa/hello_my_channel/0/%22Text%20with%20%27%5C%22%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/subscribe/demo-36/hello_my_channel/0/0", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559006802662768", "[[\"Text with '\\\"\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559014566792816", "[[\"Text with '\\\"\"],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/leave", "{\"action\": \"leave\"}");
+            return data;
+        }
+        
+        private Dictionary<string, string> LoadWhenSubscribedToAChannelThenSubscribeShouldReturnSpecialCharCipherMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22kl7vmPUMMz6UdliN7t6XYw%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/d99eb7e70213acb4f839ea7a9653c29d/hello_my_channel/0/%22kl7vmPUMMz6UdliN7t6XYw%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/subscribe/demo-36/hello_my_channel/0/0", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559006802662768", "[[\"kl7vmPUMMz6UdliN7t6XYw==\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel/0/13559014566792816", "[[\"kl7vmPUMMz6UdliN7t6XYw==\"],\"13559014566792816\"]");
             data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/leave", "{\"action\": \"leave\"}");
             return data;
         }
@@ -350,6 +656,7 @@ namespace PubNubMessaging.Tests
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add("/subscribe/demo-36/hello_my_channel/0/0", "[[],\"13559006802662768\"]");
             data.Add("/subscribe/demo-36/hello_my_channel/0/13559006802662768", "[[],\"13559006802662768\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel/leave", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
             return data;
         }
 
@@ -673,6 +980,18 @@ namespace PubNubMessaging.Tests
                         case "IfWhereNowIsCalledThenItShouldReturnInfo":
                             responseDictionary = LoadWhenAClientIsPresentedIfWhereNowIsCalledThenItShouldReturnInfo();
                             break;
+                        case "IfHereNowIsCalledThenItShouldReturnInfoWithUserState":
+                            responseDictionary = LoadWhenAClientIsPresentedIfHereNowIsCalledThenItShouldReturnInfoWithUserState();
+                            break;
+                        case "IfGlobalHereNowIsCalledThenItShouldReturnInfoWithUserState":
+                            responseDictionary = LoadWhenAClientIsPresentedIfGlobalHereNowIsCalledThenItShouldReturnInfoWithUserState();
+                            break;
+                        case "IfSetAndGetUserStateThenItShouldReturnInfo":
+                            responseDictionary = LoadWhenAClientIsPresentedIfSetAndGetUserStateThenItShouldReturnInfo();
+                            break;
+                        case "IfSetAndDeleteUserStateThenItShouldReturnInfo":
+                            responseDictionary = LoadWhenAClientIsPresentedIfSetAndDeleteUserStateThenItShouldReturnInfo();
+                            break;
                         default:
                             break;
                     }
@@ -729,6 +1048,27 @@ namespace PubNubMessaging.Tests
                         case "DetailHistoryWithNullKeysReturnsError":
                             responseDictionary = LoadWhenDetailedHistoryIsRequestedDetailHistoryWithNullKeysReturnsError();
                             break;
+                        case "DetailHistoryNoStoreShouldNotGetMessage":
+                            responseDictionary = LoadWhenDetailedHistoryIsRequestedDetailHistoryNoStoreShouldNotGetMessage();
+                            break;
+                        case "DetailHistoryShouldReturnDecryptMessage":
+                            responseDictionary = LoadWhenDetailedHistoryIsRequestedDetailHistoryShouldReturnDecryptMessage();
+                            break;
+                        case "DetailHistoryShouldReturnServerTime1":
+                            responseDictionary = LoadWhenDetailedHistoryIsRequestedDetailHistoryShouldReturnServerTime1();
+                            break;
+                        case "DetailHistoryShouldReturnServerTime2":
+                            responseDictionary = LoadWhenDetailedHistoryIsRequestedDetailHistoryShouldReturnServerTime2();
+                            break;
+                        case "DetailHistoryShouldReturnServerTime3":
+                            responseDictionary = LoadWhenDetailedHistoryIsRequestedDetailHistoryShouldReturnServerTime3();
+                            break;
+                        case "DetailedHistoryShouldReturnEncryptedMessageBasedOnParams":
+                            responseDictionary = LoadWhenDetailedHistoryIsRequestedDetailedHistoryShouldReturnEncryptedMessageBasedOnParams();
+                            break;
+                        case "DetailedHistoryShouldReturnUnencryptedMessageBasedOnParams":
+                            responseDictionary = LoadWhenDetailedHistoryIsRequestedDetailedHistoryShouldReturnUnencryptedMessageBasedOnParams();
+                            break;
                         default:
                             break;
                     }
@@ -752,6 +1092,9 @@ namespace PubNubMessaging.Tests
                         case "ThenSubscribeShouldReturnReceivedMessage":
                             responseDictionary = LoadWhenSubscribedToAChannelThenSubscribeShouldReturnReceivedMessage();
                             break;
+                        case "ThenSubscribeShouldReturnReceivedCipherMessage":
+                            responseDictionary = LoadWhenSubscribedToAChannelThenSubscribeShouldReturnReceivedCipherMessage();
+                            break;
                         case "ThenSubscribeShouldReturnConnectStatus":
                             responseDictionary = LoadWhenSubscribedToAChannelThenSubscribeShouldReturnConnectStatus();
                             break;
@@ -763,6 +1106,36 @@ namespace PubNubMessaging.Tests
                             break;
                         case "ThenSubscriberShouldBeAbleToReceiveManyMessages":
                             responseDictionary = LoadWhenSubscribedToAChannelThenSubscriberShouldBeAbleToReceiveManyMessages();
+                            break;
+                        case "ThenSubscribeShouldReturnReceivedComplexMessage":
+                            responseDictionary = LoadWhenSubscribedToAChannelThenSubscribeShouldReturnReceivedComplexMessage();
+                            break;
+                        case "ThenSubscribeShouldReturnReceivedCipherComplexMessage":
+                            responseDictionary = LoadWhenSubscribedToAChannelThenSubscribeShouldReturnReceivedCipherComplexMessage();
+                            break;
+                        case "ThenSubscribeShouldReturnReceivedEmojiMessage":
+                            responseDictionary = LoadWhenSubscribedToAChannelThenSubscribeShouldReturnReceivedEmojiMessage();
+                            break;
+                        case "ThenSubscribeShouldReturnReceivedCipherEmojiMessage":
+                            responseDictionary = LoadWhenSubscribedToAChannelThenSubscribeShouldReturnReceivedCipherEmojiMessage();
+                            break;
+                        case "ThenSubscribeShouldReturnUnicodeMessage":
+                            responseDictionary = LoadWhenSubscribedToAChannelThenSubscribeShouldReturnUnicodeMessage();
+                            break;
+                        case "ThenSubscribeShouldReturnUnicodeCipherMessage":
+                            responseDictionary = LoadWhenSubscribedToAChannelThenSubscribeShouldReturnUnicodeCipherMessage();
+                            break;
+                        case "ThenSubscribeShouldReturnReceivedForwardSlashMessage":
+                            responseDictionary = LoadWhenSubscribedToAChannelThenSubscribeShouldReturnReceivedForwardSlashMessage();
+                            break;
+                        case "ThenSubscribeShouldReturnReceivedForwardSlashCipherMessage":
+                            responseDictionary = LoadWhenSubscribedToAChannelThenSubscribeShouldReturnReceivedForwardSlashCipherMessage();
+                            break;
+                        case "ThenSubscribeShouldReturnSpecialCharMessage":
+                            responseDictionary = LoadWhenSubscribedToAChannelThenSubscribeShouldReturnSpecialCharMessage();
+                            break;
+                        case "ThenSubscribeShouldReturnSpecialCharCipherMessage":
+                            responseDictionary = LoadWhenSubscribedToAChannelThenSubscribeShouldReturnSpecialCharCipherMessage();
                             break;
                         default:
                             break;
@@ -945,18 +1318,20 @@ namespace PubNubMessaging.Tests
 #if (SILVERLIGHT || WINDOWS_PHONE || NETFX_CORE)
                 stubResponse = responseDictionary[string.Format("{0}{1}",requestUri.AbsolutePath,requestUri.Query)];
 #else
-                stubResponse = responseDictionary[requestUri.PathAndQuery];
+                stubResponse = (responseDictionary.ContainsKey(requestUri.PathAndQuery)) ? responseDictionary[requestUri.PathAndQuery] : "[]";
 #endif
             }
             else
             {
                 stubResponse = "[]";
             }
-            //if (stubResponse == "!! Stub Response Not Assigned !!")
-            //{
-            //    System.Diagnostics.Debug.WriteLine("requestUri.AbsolutePath = " + requestUri.AbsolutePath);
-            //    System.Diagnostics.Debug.WriteLine("stubResponse = " + stubResponse);
-            //}
+            if (stubResponse == "!! Stub Response Not Assigned !!" || stubResponse == "[]")
+            {
+                Console.WriteLine("requestUri.AbsolutePath = " + requestUri.AbsolutePath);
+                Console.WriteLine("stubResponse = " + stubResponse);
+                System.Diagnostics.Debug.WriteLine("requestUri.AbsolutePath = " + requestUri.AbsolutePath);
+                System.Diagnostics.Debug.WriteLine("stubResponse = " + stubResponse);
+            }
             return stubResponse;
         }
 

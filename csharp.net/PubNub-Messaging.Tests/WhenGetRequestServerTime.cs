@@ -41,6 +41,25 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public void ThenItShouldReturnTimeStampWithSSL()
+        {
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", true);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenGetRequestServerTime";
+            unitTest.TestCaseName = "ThenItShouldReturnTimeStamp";
+
+            pubnub.PubnubUnitTest = unitTest;
+
+            pubnub.Time<string>(ReturnTimeStampCallback, DummyErrorCallback);
+            mreTime.WaitOne(310 * 1000);
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.IsTrue(timeReceived, "time() with SSL Failed");
+        }
+
+
+        [Test]
         public void ThenWithProxyItShouldReturnTimeStamp()
         {
             bool proxyConfigured = false;
@@ -51,7 +70,7 @@ namespace PubNubMessaging.Tests
             proxy.ProxyUserName = "tuvpnfreeproxy";
             proxy.ProxyPassword = "Rx8zW78k";
 
-            pubnub = new Pubnub("demo", "demo", "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGetRequestServerTime";
@@ -73,6 +92,41 @@ namespace PubNubMessaging.Tests
             }
 
         }
+
+        [Test]
+        public void ThenWithProxyItShouldReturnTimeStampWithSSL()
+        {
+            bool proxyConfigured = false;
+
+            PubnubProxy proxy = new PubnubProxy();
+            proxy.ProxyServer = "test.pandu.com";
+            proxy.ProxyPort = 808;
+            proxy.ProxyUserName = "tuvpnfreeproxy";
+            proxy.ProxyPassword = "Rx8zW78k";
+
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", true);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenGetRequestServerTime";
+            unitTest.TestCaseName = "ThenWithProxyItShouldReturnTimeStamp";
+            pubnub.PubnubUnitTest = unitTest;
+
+            if (proxyConfigured)
+            {
+                pubnub.Proxy = proxy;
+                pubnub.Time<string>(ReturnProxyPresenceTimeStampCallback, DummyErrorCallback);
+                mreProxy.WaitOne(310 * 1000);
+                pubnub.EndPendingRequests();
+                pubnub = null;
+                Assert.IsTrue(timeReceivedWhenProxy, "time() with SSL through proxy Failed");
+            }
+            else
+            {
+                Assert.Ignore("Proxy setup for SSL not configured. After setup Set proxyConfigured to true");
+            }
+
+        }
+
 
         private void ReturnTimeStampCallback(string result)
         {

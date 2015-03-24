@@ -104,6 +104,21 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ThenNullMessageShouldReturnException()
+        {
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+
+            string channel = "hello_my_channel";
+            object message = null;
+
+            pubnub.Publish<string>(channel, message, null, DummyErrorCallback);
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
+        }
+
+        [Test]
         public void ThenUnencryptPublishShouldReturnSuccessCodeAndInfo()
         {
             isUnencryptPublished = false;
@@ -173,6 +188,8 @@ namespace PubNubMessaging.Tests
         public void ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo()
         {
             isEncryptObjectPublished = false;
+            isEncryptObjectDetailedHistory = false;
+
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "enigma", false);
             
             PubnubUnitTest unitTest = new PubnubUnitTest();
@@ -186,6 +203,7 @@ namespace PubNubMessaging.Tests
             //messageObjectForEncryptPublish = JsonConvert.SerializeObject(message);
             messageObjectForEncryptPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
 
+            mreEncryptObjectPublish = new ManualResetEvent(false);
             pubnub.Publish<string>(channel, message, ReturnSuccessEncryptObjectPublishCodeCallback, DummyErrorCallback);
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             mreEncryptObjectPublish.WaitOne(manualResetEventsWaitTimeout);
@@ -197,10 +215,52 @@ namespace PubNubMessaging.Tests
             else
             {
                 Thread.Sleep(1000);
+                mreEncryptObjectDetailedHistory = new ManualResetEvent(false);
                 pubnub.DetailedHistory<string>(channel, -1, encryptObjectPublishTimetoken, -1, false, CaptureEncryptObjectDetailedHistoryCallback, DummyErrorCallback);
                 mreEncryptObjectDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
 
                 Assert.IsTrue(isEncryptObjectDetailedHistory, "Unable to match the successful encrypt object Publish");
+            }
+            pubnub.EndPendingRequests();
+            pubnub = null;
+        }
+
+        [Test]
+        public void ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfoWithSSL()
+        {
+            isEncryptObjectPublished = false;
+            isEncryptObjectDetailedHistory = false;
+
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "enigma", true);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAMessageIsPublished";
+            unitTest.TestCaseName = "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo";
+
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channel = "hello_my_channel";
+            object message = new SecretCustomClass();
+            //messageObjectForEncryptPublish = JsonConvert.SerializeObject(message);
+            messageObjectForEncryptPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
+
+            mreEncryptObjectPublish = new ManualResetEvent(false);
+            pubnub.Publish<string>(channel, message, ReturnSuccessEncryptObjectPublishCodeCallback, DummyErrorCallback);
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            mreEncryptObjectPublish.WaitOne(manualResetEventsWaitTimeout);
+
+            if (!isEncryptObjectPublished)
+            {
+                Assert.IsTrue(isEncryptObjectPublished, "Encrypt Object Publish with SSL Failed");
+            }
+            else
+            {
+                Thread.Sleep(1000);
+                mreEncryptObjectDetailedHistory = new ManualResetEvent(false);
+                pubnub.DetailedHistory<string>(channel, -1, encryptObjectPublishTimetoken, -1, false, CaptureEncryptObjectDetailedHistoryCallback, DummyErrorCallback);
+                mreEncryptObjectDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
+
+                Assert.IsTrue(isEncryptObjectDetailedHistory, "Unable to match the successful encrypt object Publish with SSL");
             }
             pubnub.EndPendingRequests();
             pubnub = null;
@@ -360,7 +420,7 @@ namespace PubNubMessaging.Tests
             string message = messageLarge32K;
 
             pubnub.Publish<string>(channel, message, DummyPublishMessageTooLargeInfoCallback, ReturnPublishMessageTooLargeErrorCallback);
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 310 * 1000 : 310 * 1000;
             mreLaregMessagePublish.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests();
