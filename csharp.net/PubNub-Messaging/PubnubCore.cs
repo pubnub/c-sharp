@@ -1,4 +1,4 @@
-﻿//Build Date: March 17, 2015
+﻿//Build Date: March 24, 2015
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -6039,8 +6039,8 @@ namespace PubNubMessaging.Core
                             }
                             result.Add(multiChannelGroup);
                             result.Add (multiChannel);
-							
-                            long receivedTimetoken = (result.Count > 1) ? Convert.ToInt64 (result [1].ToString ()) : 0;
+
+                            long receivedTimetoken = (result.Count > 1 && result[1].ToString() != "") ? Convert.ToInt64(result[1].ToString()) : 0;
 							
                             long minimumTimetoken1 = (multiChannelSubscribe.Count > 0) ? multiChannelSubscribe.Min (token => token.Value) : 0;
                             long minimumTimetoken2 = (multiChannelGroupSubscribe.Count > 0) ? multiChannelGroupSubscribe.Min(token => token.Value) : 0;
@@ -7087,6 +7087,42 @@ namespace PubNubMessaging.Core
             if (localContainer != null)
             {
                 ret = localContainer as object[];
+                if (ret == null)
+                {
+                    if (localContainer.GetType().IsArray)
+                    {
+                        switch (localContainer.GetType().GetElementType().FullName)
+                        {
+                            case "System.Int32":
+                                int[] intArray = localContainer as int[];
+                                ret = new object[intArray.Length];
+                                Array.Copy(intArray, ret, intArray.Length);
+                                break;
+                            case "System.Int64":
+                                Int64[] int64Array = localContainer as Int64[];
+                                ret = new object[int64Array.Length];
+                                Array.Copy(int64Array, ret, int64Array.Length);
+                                break;
+                            case "System.Double":
+                                double[] doubleArray = localContainer as double[];
+                                ret = new object[doubleArray.Length];
+                                Array.Copy(doubleArray, ret, doubleArray.Length);
+                                break;
+                            case "System.Decimal":
+                                decimal[] decimalArray = localContainer as decimal[];
+                                ret = new object[decimalArray.Length];
+                                Array.Copy(decimalArray, ret, decimalArray.Length);
+                                break;
+                            case "System.Single":
+                                float[] floatArray = localContainer as float[];
+                                ret = new object[floatArray.Length];
+                                Array.Copy(floatArray, ret, floatArray.Length);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
             }
 
             return ret;
