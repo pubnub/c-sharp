@@ -55,6 +55,11 @@
 /demos/ePoll/ePoll.Types/Debug/bin/*.pdb
 /demos/ePoll/ePoll.Types/obj/*
 /demos/ePoll/ePoll.Types/Debug/*.pdb
+/mono-for-linux/PubNub-Messaging/PubNub-Console/bin/Debug/*
+/mono-for-linux/PubNub-Messaging/PubNubTest/bin/Debug/*
+/mono-for-linux/PubNub-Messaging/PubNub-Messaging.userprefs
+/mono-for-linux/PubNub-Messaging/test-results/*
+/mono-for-linux/PubNub-Messaging/PubNubTest/test-results/*
 .DS_Store
 *.cache
 *.suo

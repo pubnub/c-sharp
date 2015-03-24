@@ -26,6 +26,6 @@ Global
 		{9A973E1B-A9F2-400F-A5DE-C95C085A50EC}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = PubNub-Console\PubNub-Messaging.csproj
+		StartupItem = PubNubTest\PubNub-Messaging.Tests.csproj
 	EndGlobalSection
 EndGlobal
