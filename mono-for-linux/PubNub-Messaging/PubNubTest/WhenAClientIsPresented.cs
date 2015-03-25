@@ -1,34 +1,92 @@
-//#define USE_JSONFX
-using System;
-using PubNubMessaging.Core;
+﻿using System;
+using System.Text;
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using System.ComponentModel;
-using System.Collections.Generic;
 using System.Threading;
+using System.Collections;
+using PubNubMessaging.Core;
 
-#if (USE_JSONFX)
-using JsonFx.Json;
-#elif (USE_DOTNET_SERIALIZATION)
-using System.Runtime.Serialization.Json;
-using System.Web.Script.Serialization;
-#else
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-#endif
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
     public class WhenAClientIsPresented
     {
+        ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+        ManualResetEvent presenceManualEvent = new ManualResetEvent(false);
+        ManualResetEvent unsubscribeManualEvent = new ManualResetEvent(false);
+
+        ManualResetEvent subscribeUUIDManualEvent = new ManualResetEvent(false);
+        ManualResetEvent presenceUUIDManualEvent = new ManualResetEvent(false);
+        ManualResetEvent unsubscribeUUIDManualEvent = new ManualResetEvent(false);
+
+        ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
+        ManualResetEvent globalHereNowManualEvent = new ManualResetEvent(false);
+        ManualResetEvent whereNowManualEvent = new ManualResetEvent(false);
+        ManualResetEvent presenceUnsubscribeEvent = new ManualResetEvent(false);
+        ManualResetEvent presenceUnsubscribeUUIDEvent = new ManualResetEvent(false);
+
+        ManualResetEvent grantManualEvent = new ManualResetEvent(false);
+        ManualResetEvent userStateManualEvent = new ManualResetEvent(false);
+
+        static bool receivedPresenceMessage = false;
+        static bool receivedHereNowMessage = false;
+        static bool receivedGlobalHereNowMessage = false;
+        static bool receivedWhereNowMessage = false;
+        static bool receivedCustomUUID = false;
+        static bool receivedGrantMessage = false;
+        static bool receivedUserStateMessage = false;
+
+        string customUUID = "mylocalmachine.mydomain.com";
+        string jsonUserState = "";
+        string currentTestCase = "";
+        string whereNowChannel = "";
+        int manualResetEventsWaitTimeout = 310 * 1000;
+
+        Pubnub pubnub = null;
+
+        [TestFixtureSetUp]
+        public void Init()
+        {
+            if (!PubnubCommon.PAMEnabled) return;
+
+            receivedGrantMessage = false;
+
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "GrantRequestUnitTest";
+            unitTest.TestCaseName = "Init";
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channel = "hello_my_channel,hello_my_channel-pnpres";
+
+            pubnub.GrantAccess<string>(channel, true, true, 20, ThenPresenceInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            Thread.Sleep(1000);
+
+            grantManualEvent.WaitOne();
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed.");
+        }
+
+        [TestFixtureTearDown]
+        public void Cleanup()
+        {
+
+        }
+
         #if (USE_JSONFX)
         [Test]
         #else
         [Ignore]
         #endif
-        public void UsingJsonFx ()
+        public void UsingJsonFx()
         {
-            Console.Write ("UsingJsonFx");
-            Assert.True (true, "UsingJsonFx");
+            Console.Write("UsingJsonFx");
+            Assert.True(true, "UsingJsonFx");
         }
 
         #if (USE_JSONFX)
@@ -36,755 +94,1105 @@ namespace PubNubMessaging.Tests
         #else
         [Test]
         #endif
-        public void UsingNewtonSoft ()
+        public void UsingNewtonSoft()
         {
-            Console.Write ("UsingNewtonSoft");
-            Assert.True (true, "UsingNewtonSoft");
+            Console.Write("UsingNewtonSoft");
+            Assert.True(true, "UsingNewtonSoft");
+        }
+    
+        [Test]
+        public void ThenPresenceShouldReturnReceivedMessage()
+        {
+            receivedPresenceMessage = false;
+            currentTestCase = "ThenPresenceShouldReturnReceivedMessage";
+
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "ThenPresenceShouldReturnReceivedMessage";
+            pubnub.PubnubUnitTest = unitTest;
+
+            presenceManualEvent = new ManualResetEvent(false);
+            subscribeManualEvent = new ManualResetEvent(false);
+            unsubscribeManualEvent = new ManualResetEvent(false);
+
+            string channel = "hello_my_channel";
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            pubnub.Presence<string>(channel, ThenPresenceShouldReturnMessage, PresenceDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            
+            //since presence expects from stimulus from sub/unsub...
+            pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            presenceManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.IsTrue(receivedPresenceMessage, "Presence message not received");
         }
 
         [Test]
-        public void ThenItShouldReturnReceivedMessage ()
+        public void ThenPresenceShouldReturnReceivedMessageSSL()
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "",
-                                false
-                            );
-            string channel = "hello_world2";
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-          
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenAClientIsPresented", "ThenPresenceShouldReturnReceivedMessage");
+            receivedPresenceMessage = false;
+            currentTestCase = "ThenPresenceShouldReturnReceivedMessageSSL";
 
-            pubnub.Presence<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessage, common.DisplayErrorMessage);
-            Thread.Sleep (500);
-            Common commonSubscribe = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-          
-            pubnub.Subscribe<string> (channel, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayErrorMessage);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", true);
 
-            commonSubscribe.DeliveryStatus = false;
-            commonSubscribe.Response = null;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "ThenPresenceShouldReturnReceivedMessage";
+            pubnub.PubnubUnitTest = unitTest;
 
+            presenceManualEvent = new ManualResetEvent(false);
+            subscribeManualEvent = new ManualResetEvent(false);
+            unsubscribeManualEvent = new ManualResetEvent(false);
 
-            common.WaitForResponse (30);
-          
-            string response = "";
-            if (common.Response == null) {
-                Assert.Fail ("Null response");
-            } else {
-                //IList<object> responseFields = common.Response as IList<object>;
-                object[] responseFields = Common.Deserialize<object[]> (common.Response.ToString ());
-                foreach (object item in responseFields) {
-                    response = item.ToString ();
-                    Console.WriteLine ("Response:" + response);
-                }
-                Assert.AreEqual (channel, responseFields [2]);
+            string channel = "hello_my_channel";
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            pubnub.Presence<string>(channel, ThenPresenceShouldReturnMessage, PresenceDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+
+            //since presence expects from stimulus from sub/unsub...
+            pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            presenceManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.IsTrue(receivedPresenceMessage, "Presence message not received");
+        }
+
+        [Test]
+        public void ThenPresenceShouldReturnCustomUUID()
+        {
+            receivedCustomUUID = false;
+            currentTestCase = "ThenPresenceShouldReturnCustomUUID";
+
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "ThenPresenceShouldReturnCustomUUID";
+            pubnub.PubnubUnitTest = unitTest;
+
+            presenceUUIDManualEvent = new ManualResetEvent(false);
+            subscribeUUIDManualEvent = new ManualResetEvent(false);
+            unsubscribeUUIDManualEvent = new ManualResetEvent(false);
+
+            string channel = "hello_my_channel";
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            pubnub.Presence<string>(channel, ThenPresenceWithCustomUUIDShouldReturnMessage, PresenceUUIDDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            
+            //since presence expects from stimulus from sub/unsub...
+            pubnub.SessionUUID = customUUID;
+            pubnub.Subscribe<string>(channel, DummyMethodForSubscribeUUID, SubscribeUUIDDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            subscribeUUIDManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribeUUID, UnsubscribeUUIDDummyMethodForConnectCallback, UnsubscribeUUIDDummyMethodForDisconnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            unsubscribeUUIDManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            presenceUUIDManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.IsTrue(receivedCustomUUID, "Custom UUID not received");
+        }
+
+        [Test]
+        public void IfHereNowIsCalledThenItShouldReturnInfo()
+        {
+            receivedHereNowMessage = false;
+
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "IfHereNowIsCalledThenItShouldReturnInfo";
+            pubnub.PubnubUnitTest = unitTest;
+            string channel = "hello_my_channel";
+
+            subscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            hereNowManualEvent = new ManualResetEvent(false);
+            pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback);
+            hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            unsubscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.IsTrue(receivedHereNowMessage, "here_now message not received");
+        }
+
+        [Test]
+        public void IfHereNowIsCalledThenItShouldReturnInfoCipher()
+        {
+            receivedHereNowMessage = false;
+
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "enigma", false);
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "IfHereNowIsCalledThenItShouldReturnInfo";
+            pubnub.PubnubUnitTest = unitTest;
+            
+            string channel = "hello_my_channel";
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+
+            subscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            hereNowManualEvent = new ManualResetEvent(false);
+            pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback);
+            hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            unsubscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.IsTrue(receivedHereNowMessage, "here_now message not received with cipher");
+        }
+
+        [Test]
+        public void IfHereNowIsCalledThenItShouldReturnInfoCipherSecret()
+        {
+            receivedHereNowMessage = false;
+
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "enigma", false);
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "IfHereNowIsCalledThenItShouldReturnInfo";
+            pubnub.PubnubUnitTest = unitTest;
+            
+            string channel = "hello_my_channel";
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+
+            subscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            hereNowManualEvent = new ManualResetEvent(false);
+            pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback);
+            hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            unsubscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.IsTrue(receivedHereNowMessage, "here_now message not received with cipher and secret");
+        }
+
+        [Test]
+        public void IfHereNowIsCalledThenItShouldReturnInfoCipherSecretSSL()
+        {
+            receivedHereNowMessage = false;
+
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "enigma", true);
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "IfHereNowIsCalledThenItShouldReturnInfo";
+            pubnub.PubnubUnitTest = unitTest;
+            
+            string channel = "hello_my_channel";
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+
+            subscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            hereNowManualEvent = new ManualResetEvent(false);
+            pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback);
+            hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            unsubscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.IsTrue(receivedHereNowMessage, "here_now message not received with cipher, secret, ssl");
+        }
+
+        [Test]
+        public void IfHereNowIsCalledThenItShouldReturnInfoCipherSSL()
+        {
+            receivedHereNowMessage = false;
+
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "enigma", true);
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "IfHereNowIsCalledThenItShouldReturnInfo";
+            pubnub.PubnubUnitTest = unitTest;
+            
+            string channel = "hello_my_channel";
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+
+            subscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            hereNowManualEvent = new ManualResetEvent(false);
+            pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback);
+            hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            unsubscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.IsTrue(receivedHereNowMessage, "here_now message not received with cipher, ssl");
+        }
+
+        [Test]
+        public void IfHereNowIsCalledThenItShouldReturnInfoSecret()
+        {
+            receivedHereNowMessage = false;
+
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "IfHereNowIsCalledThenItShouldReturnInfo";
+            pubnub.PubnubUnitTest = unitTest;
+            
+            string channel = "hello_my_channel";
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+
+            subscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            hereNowManualEvent = new ManualResetEvent(false);
+            pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback);
+            hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            unsubscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.IsTrue(receivedHereNowMessage, "here_now message not received with secret key");
+        }
+
+        [Test]
+        public void IfHereNowIsCalledThenItShouldReturnInfoSecretSSL()
+        {
+            receivedHereNowMessage = false;
+
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", true);
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "IfHereNowIsCalledThenItShouldReturnInfo";
+            pubnub.PubnubUnitTest = unitTest;
+            
+            string channel = "hello_my_channel";
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+
+            subscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            hereNowManualEvent = new ManualResetEvent(false);
+            pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback);
+            hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            unsubscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.IsTrue(receivedHereNowMessage, "here_now message not received ,with secret key, ssl");
+        }
+
+        [Test]
+        public void IfHereNowIsCalledThenItShouldReturnInfoSSL()
+        {
+            receivedHereNowMessage = false;
+
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", true);
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "IfHereNowIsCalledThenItShouldReturnInfo";
+            pubnub.PubnubUnitTest = unitTest;
+            
+            string channel = "hello_my_channel";
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+
+            subscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            hereNowManualEvent = new ManualResetEvent(false);
+            pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback);
+            hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            unsubscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.IsTrue(receivedHereNowMessage, "here_now message not received with ssl");
+        }
+
+        [Test]
+        public void IfHereNowIsCalledThenItShouldReturnInfoWithUserState()
+        {
+            receivedHereNowMessage = false;
+            currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoWithUserState";
+
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub.SessionUUID = customUUID;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "IfHereNowIsCalledThenItShouldReturnInfoWithUserState";
+            pubnub.PubnubUnitTest = unitTest;
+            
+            string channel = "hello_my_channel";
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+
+            subscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            userStateManualEvent = new ManualResetEvent(false);
+            jsonUserState = "{\"testkey\":\"testval\"}";
+            pubnub.SetUserState<string>(channel, jsonUserState, SetUserStateDummyMethodCallback, DummyErrorCallback);
+            userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            hereNowManualEvent = new ManualResetEvent(false);
+            pubnub.HereNow<string>(channel, true, true, ThenHereNowShouldReturnMessage, DummyErrorCallback);
+            hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            unsubscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.IsTrue(receivedHereNowMessage, "here_now message not received with user state");
+        }
+
+        [Test]
+        public void IfGlobalHereNowIsCalledThenItShouldReturnInfo()
+        {
+            receivedGlobalHereNowMessage = false;
+
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "IfGlobalHereNowIsCalledThenItShouldReturnInfo";
+            pubnub.PubnubUnitTest = unitTest;
+            
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+
+            globalHereNowManualEvent = new ManualResetEvent(false);
+            pubnub.GlobalHereNow<string>(true, true, ThenGlobalHereNowShouldReturnMessage, DummyErrorCallback);
+            globalHereNowManualEvent.WaitOne();
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.IsTrue(receivedGlobalHereNowMessage, "global_here_now message not received");
+        }
+
+        [Test]
+        public void IfGlobalHereNowIsCalledThenItShouldReturnInfoWithUserState()
+        {
+            receivedGlobalHereNowMessage = false;
+            currentTestCase = "IfGlobalHereNowIsCalledThenItShouldReturnInfoWithUserState";
+
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub.SessionUUID = customUUID;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "IfGlobalHereNowIsCalledThenItShouldReturnInfoWithUserState";
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channel = "hello_my_channel";
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+
+            subscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            userStateManualEvent = new ManualResetEvent(false);
+            jsonUserState = "{\"testkey\":\"testval\"}";
+            pubnub.SetUserState<string>(channel, jsonUserState, SetUserStateDummyMethodCallback, DummyErrorCallback);
+            userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            globalHereNowManualEvent = new ManualResetEvent(false);
+            pubnub.GlobalHereNow<string>(true, true, ThenGlobalHereNowShouldReturnMessage, DummyErrorCallback);
+            globalHereNowManualEvent.WaitOne();
+
+            unsubscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.IsTrue(receivedGlobalHereNowMessage, "global_here_now message not received for user state");
+        }
+
+        [Test]
+        public void IfWhereNowIsCalledThenItShouldReturnInfo()
+        {
+            receivedWhereNowMessage = false;
+
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub.SessionUUID = customUUID;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "IfWhereNowIsCalledThenItShouldReturnInfo";
+            pubnub.PubnubUnitTest = unitTest;
+
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            whereNowChannel = "hello_my_channel";
+
+            subscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Subscribe<string>(whereNowChannel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            whereNowManualEvent = new ManualResetEvent(false);
+            pubnub.WhereNow<string>(customUUID, ThenWhereNowShouldReturnMessage, DummyErrorCallback);
+            whereNowManualEvent.WaitOne();
+
+            if (!pubnub.PubnubUnitTest.EnableStubTest)
+            {
+                unsubscribeManualEvent = new ManualResetEvent(false);
+                pubnub.Unsubscribe<string>(whereNowChannel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+                Thread.Sleep(1000);
+                unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
             }
-            pubnub.EndPendingRequests ();
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.IsTrue(receivedWhereNowMessage, "where_now message not received");
         }
 
         [Test]
-        public void ThenItShouldReturnReceivedMessageSSL ()
+        public void IfSetAndGetUserStateThenItShouldReturnInfo()
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "",
-                                true
-                            );
-            string channel = "hello_world3";
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
+            receivedUserStateMessage = false;
+            currentTestCase = "IfSetAndGetUserStateThenItShouldReturnInfo";
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenAClientIsPresented", "ThenPresenceShouldReturnReceivedMessage");
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub.SessionUUID = customUUID;
 
-            pubnub.Presence<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessage, common.DisplayErrorMessage);
-            Thread.Sleep (500);
-            Common commonSubscribe = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "IfSetAndGetUserStateThenItShouldReturnInfo";
+            pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.Subscribe<string> (channel, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayErrorMessage);
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            string channel = "hello_my_channel";
 
-            commonSubscribe.DeliveryStatus = false;
-            commonSubscribe.Response = null;
+            jsonUserState = "{\"testkey\":\"testval\"}";
+            userStateManualEvent = new ManualResetEvent(false);
+            pubnub.SetUserState<string>(channel, jsonUserState, SetUserStateDummyMethodCallback, DummyErrorCallback);
+            userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
-
-            common.WaitForResponse (30);
-
-            string response = "";
-            if (common.Response == null) {
-                Assert.Fail ("Null response");
-            } else {
-                //IList<object> responseFields = common.Response as IList<object>;
-                object[] responseFields = Common.Deserialize<object[]> (common.Response.ToString ());
-                foreach (object item in responseFields) {
-                    response = item.ToString ();
-                    Console.WriteLine ("Response:" + response);
-                }
-                Assert.AreEqual (channel, responseFields [2]);
+            if (receivedUserStateMessage)
+            {
+                Thread.Sleep(2000);
+                receivedUserStateMessage = false;
+                userStateManualEvent = new ManualResetEvent(false);
+                pubnub.GetUserState<string>(channel, "", GetUserStateRegularCallback, DummyErrorCallback);
+                userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
             }
-            pubnub.EndPendingRequests ();
-        }
-
-        /// <summary>
-        /// Callback method captures the response in JSON string format for Subscribe
-        /// </summary>
-        /// <param name="result"></param>
-        static void DisplaySubscribeReturnMessage (string result)
-        {
-            Console.WriteLine ("SUBSCRIBE REGULAR CALLBACK:");
-            Console.WriteLine (result);
-            Console.WriteLine ();
-        }
-
-        /// <summary>
-        /// Callback method captures the response in JSON string format for Presence
-        /// </summary>
-        /// <param name="result"></param>
-        static void DisplayPresenceReturnMessage (string result)
-        {
-            Console.WriteLine ("PRESENCE REGULAR CALLBACK:");
-            Console.WriteLine (result);
-            Console.WriteLine ();
-        }
-
-        /// <summary>
-        /// Callback method to provide the connect status of Subscribe call
-        /// </summary>
-        /// <param name="result"></param>
-        static void DisplaySubscribeConnectStatusMessage (string result)
-        {
-            Console.WriteLine ("SUBSCRIBE CONNECT CALLBACK:");
-            Console.WriteLine (result);
-            Console.WriteLine ();
-        }
-
-        /// <summary>
-        /// Callback method to provide the connect status of Presence call
-        /// </summary>
-        /// <param name="result"></param>
-        static void DisplayPresenceConnectStatusMessage (string result)
-        {
-            Console.WriteLine ("PRESENCE CONNECT CALLBACK:");
-            Console.WriteLine (result);
-            Console.WriteLine ();
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.IsTrue(receivedUserStateMessage, "IfSetAndGetUserStateThenItShouldReturnInfo failed");
         }
 
         [Test]
-        public void IfHereNowIsCalledThenItShouldReturnInfo ()
+        public void IfSetAndDeleteUserStateThenItShouldReturnInfo()
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "",
-                                false
-                            );
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-          
-            HereNow (pubnub, "IfHereNowIsCalledThenItShouldReturnInfo", common.DisplayReturnMessage);
-            common.WaitForResponse ();
+            receivedUserStateMessage = false;
+            currentTestCase = "IfSetAndDeleteUserStateThenItShouldReturnInfo";
 
-            ParseResponse (common.Response, pubnub);
-            pubnub.EndPendingRequests ();
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub.SessionUUID = customUUID;
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "IfSetAndDeleteUserStateThenItShouldReturnInfo";
+            pubnub.PubnubUnitTest = unitTest;
+
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            string channel = "hello_my_channel";
+
+            jsonUserState = "{\"k\":\"v\"}";
+            KeyValuePair<string, object> kvp = new KeyValuePair<string, object>("k", "v");
+            userStateManualEvent = new ManualResetEvent(false);
+            pubnub.SetUserState<string>(channel, kvp, SetUserStateDummyMethodCallback, DummyErrorCallback);
+            userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            Thread.Sleep(2000);
+            receivedUserStateMessage = false;
+            KeyValuePair<string, object> kvp2 = new KeyValuePair<string, object>("k2", "v2");
+            userStateManualEvent = new ManualResetEvent(false);
+            pubnub.SetUserState<string>(channel, kvp2, SetUserStateDummyMethodCallback, DummyErrorCallback);
+            userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            Thread.Sleep(2000);
+            receivedUserStateMessage = false;
+            userStateManualEvent = new ManualResetEvent(false);
+            pubnub.GetUserState<string>(channel, "", GetUserStateRegularCallback, DummyErrorCallback);
+            userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            Thread.Sleep(2000);
+            receivedUserStateMessage = false;
+            KeyValuePair<string, object> kvp22 = new KeyValuePair<string, object>("k2", null);
+            userStateManualEvent = new ManualResetEvent(false);
+            pubnub.SetUserState<string>(channel, kvp22, SetUserStateDummyMethodCallback, DummyErrorCallback);
+            userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            Thread.Sleep(2000);
+            receivedUserStateMessage = false;
+            userStateManualEvent = new ManualResetEvent(false);
+            pubnub.GetUserState<string>(channel, "", GetUserStateRegularCallback, DummyErrorCallback);
+            userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
+            
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.IsTrue(receivedUserStateMessage, "IfSetAndDeleteUserStateThenItShouldReturnInfo message not received");
         }
 
         [Test]
-        public void IfHereNowIsCalledThenItShouldReturnInfoCipher ()
+        public void ThenPresenceHeartbeatShouldReturnMessage()
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "enigma",
-                                false
-                            );
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
+            receivedPresenceMessage = false;
+            currentTestCase = "ThenPresenceHeartbeatShouldReturnMessage";
 
-            HereNow (pubnub, "IfHereNowIsCalledThenItShouldReturnInfo", common.DisplayReturnMessage);
-            common.WaitForResponse ();
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub.PresenceHeartbeat = 5;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenAClientIsPresented";
+            unitTest.TestCaseName = "ThenPresenceShouldReturnReceivedMessage";
+            pubnub.PubnubUnitTest = unitTest;
 
-            ParseResponse (common.Response, pubnub);
-            pubnub.EndPendingRequests ();
+            presenceManualEvent = new ManualResetEvent(false);
+            subscribeManualEvent = new ManualResetEvent(false);
+            unsubscribeManualEvent = new ManualResetEvent(false);
+
+            string channel = "hello_my_channel";
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            pubnub.Presence<string>(channel, ThenPresenceShouldReturnMessage, PresenceDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+
+            //since presence expects from stimulus from sub/unsub...
+            pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            Thread.Sleep(pubnub.PresenceHeartbeat+3 * 1000);
+
+            pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+            unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            presenceManualEvent.WaitOne(manualResetEventsWaitTimeout);
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.IsTrue(receivedPresenceMessage, "ThenPresenceHeartbeatShouldReturnMessage not received");
         }
 
-        [Test]
-        public void IfHereNowIsCalledThenItShouldReturnInfoCipherSecret ()
+        void ThenPresenceInitializeShouldReturnGrantMessage(string receivedMessage)
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "secret",
-                                "enigma",
-                                false
-                            );
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            HereNow (pubnub, "IfHereNowIsCalledThenItShouldReturnInfo", common.DisplayReturnMessage);
-            common.WaitForResponse ();
-
-            ParseResponse (common.Response, pubnub);
-            pubnub.EndPendingRequests ();
-        }
-
-        [Test]
-        public void IfHereNowIsCalledThenItShouldReturnInfoCipherSecretSSL ()
-        {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "secret",
-                                "enigma",
-                                false
-                            );
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            HereNow (pubnub, "IfHereNowIsCalledThenItShouldReturnInfo", common.DisplayReturnMessage);
-            common.WaitForResponse ();
-
-            ParseResponse (common.Response, pubnub);
-            pubnub.EndPendingRequests ();
-        }
-
-        [Test]
-        public void IfHereNowIsCalledThenItShouldReturnInfoCipherSSL ()
-        {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "enigma",
-                                true
-                            );
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            HereNow (pubnub, "IfHereNowIsCalledThenItShouldReturnInfo", common.DisplayReturnMessage);
-            common.WaitForResponse ();
-
-            ParseResponse (common.Response, pubnub);
-            pubnub.EndPendingRequests ();
-        }
-
-        [Test]
-        public void IfHereNowIsCalledThenItShouldReturnInfoSecret ()
-        {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "secret",
-                                "",
-                                false
-                            );
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            HereNow (pubnub, "IfHereNowIsCalledThenItShouldReturnInfo", common.DisplayReturnMessage);
-            common.WaitForResponse ();
-
-            ParseResponse (common.Response, pubnub);
-            pubnub.EndPendingRequests ();
-        }
-
-        [Test]
-        public void IfHereNowIsCalledThenItShouldReturnInfoSecretSSL ()
-        {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "secret",
-                                "",
-                                true
-                            );
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            HereNow (pubnub, "IfHereNowIsCalledThenItShouldReturnInfo", common.DisplayReturnMessage);
-            common.WaitForResponse ();
-
-            ParseResponse (common.Response, pubnub);
-            pubnub.EndPendingRequests ();
-        }
-
-        [Test]
-        public void IfHereNowIsCalledThenItShouldReturnInfoSSL ()
-        {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "",
-                                true
-                            );
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            HereNow (pubnub, "IfHereNowIsCalledThenItShouldReturnInfo", common.DisplayReturnMessage);
-            common.WaitForResponse ();
-
-            ParseResponse (common.Response, pubnub);
-            pubnub.EndPendingRequests ();
-        }
-
-        void HereNow (Pubnub pubnub, string unitTestCaseName, 
-                     Action<object> userCallback)
-        {
-            Random r = new Random ();
-            string channel = "hello_world_hn" + r.Next (100);
-
-            Common commonSubscribe = new Common ();
-            pubnub.Subscribe<string> (channel, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayErrorMessage);
-
-            commonSubscribe.DeliveryStatus = false;
-            commonSubscribe.Response = null;
-
-            commonSubscribe.WaitForResponse (45);
-            Thread.Sleep (500);
-            pubnub.HereNow (channel, userCallback, userCallback);
-
-            //pubnub.Unsubscribe<string>(channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy);
-        }
-
-        public void ParseResponse (object commonResponse, Pubnub pubnub)
-        {
-            if (commonResponse.Equals (null)) {
-                Assert.Fail ("Null response");
-            } else {
-                bool found = false;
-                IList<object> responseFields = commonResponse as IList<object>;
-                Console.WriteLine ("response:" + commonResponse.ToString ()); 
-                foreach (object item in responseFields) {
-                    if (item is Dictionary<string, object>) {
-                        Dictionary<string, object> message = (Dictionary<string, object>)item;
-                        if (message.ContainsKey ("uuids")) {
-                            object[] objUuid = null;
-                            Console.WriteLine ("uuids:" + message ["uuids"]);
-                            Type valueType = message ["uuids"].GetType ();
-                            var expectedType = typeof(string[]);
-                            var expectedType2 = typeof(object[]);
-
-                            if (expectedType.IsAssignableFrom (valueType)) {
-                                objUuid = message ["uuids"] as string[];
-                            } else if (expectedType2.IsAssignableFrom (valueType)) {
-                                objUuid = message ["uuids"] as object[];
-                            } else {
-                                objUuid = Common.Deserialize<object[]> (message ["uuids"].ToString ());
+            try
+            {
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                {
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    {
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null && dictionary.Count > 0)
+                        {
+                            var status = dictionary["status"].ToString();
+                            if (status == "200")
+                            {
+                                receivedGrantMessage = true;
                             }
-                            foreach (object obj in objUuid) {
-                                Console.WriteLine (obj.ToString ()); 
-                                if (obj.Equals (pubnub.SessionUUID)) {
-                                    found = true;
+                        }
+                    }
+                }
+            }
+            catch { }
+            finally
+            {
+                grantManualEvent.Set();
+            }
+        }
+        
+        void ThenPresenceShouldReturnMessage(string receivedMessage)
+        {
+            try
+            {
+                Console.WriteLine("ThenPresenceShouldReturnMessage -> result = " + receivedMessage);
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                {
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    {
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null && dictionary.Count > 0 && dictionary.ContainsKey("uuid"))
+                        {
+                            string action = dictionary.ContainsKey("action") ? dictionary["action"].ToString() : "";
+                            if (currentTestCase == "ThenPresenceHeartbeatShouldReturnMessage")
+                            {
+                                if (action == "timeout")
+                                {
+                                    receivedPresenceMessage = false;
+                                }
+                                else
+                                {
+                                    receivedPresenceMessage = true;
+                                }
+                            }
+                            else
+                            {
+                                receivedPresenceMessage = true;
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+            finally
+            {
+                presenceManualEvent.Set();
+            }
+        }
+
+        void ThenPresenceWithCustomUUIDShouldReturnMessage(string receivedMessage)
+        {
+            try
+            {
+                Console.WriteLine("ThenPresenceWithCustomUUIDShouldReturnMessage -> result = " + receivedMessage);
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                {
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    {
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null && dictionary.Count > 0)
+                        {
+                            var uuid = dictionary["uuid"].ToString();
+                            if (uuid != null && uuid.Contains(customUUID))
+                            {
+                                receivedCustomUUID = true;
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+            finally
+            {
+                presenceUUIDManualEvent.Set();
+            }
+        }
+
+        void ThenHereNowShouldReturnMessage(string receivedMessage)
+        {
+            try
+            {
+                Console.WriteLine("ThenHereNowShouldReturnMessage -> result = " + receivedMessage);
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                {
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    {
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null && dictionary.Count > 0)
+                        {
+                            var uuids = dictionary["uuids"];
+                            if (uuids != null)
+                            {
+                                object[] uuidList = null;
+                                if (uuids.GetType().Equals(typeof(string[])))
+                                {
+                                    uuidList = uuids as string[];
+                                }
+                                else if (uuids.GetType().Equals(typeof(object[])))
+                                {
+                                    uuidList = uuids as object[];
+                                }
+                                else
+                                {
+                                    uuidList = pubnub.JsonPluggableLibrary.ConvertToObjectArray(uuids);
+                                }
+                                if (uuidList != null)
+                                {
+                                    if (currentTestCase == "IfHereNowIsCalledThenItShouldReturnInfoWithUserState")
+                                    {
+                                        foreach (object obj in uuidList)
+                                        {
+                                            Dictionary<string, object> uuidDic = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(obj);
+                                            if (uuidDic != null)
+                                            {
+                                                if (uuidDic.ContainsKey("uuid") && uuidDic.ContainsKey("state"))
+                                                {
+                                                    string receivedState = pubnub.JsonPluggableLibrary.SerializeToJsonString(uuidDic["state"]);
+                                                    string receivedUUID = uuidDic["uuid"].ToString();
+                                                    if (receivedUUID == pubnub.SessionUUID && receivedState == jsonUserState)
+                                                    {
+                                                        receivedHereNowMessage = true;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        foreach (object obj in uuidList)
+                                        {
+                                            if (pubnub.PubnubUnitTest != null && pubnub.PubnubUnitTest.EnableStubTest)
+                                            {
+                                                receivedHereNowMessage = true;
+                                                break;
+                                            }
+                                            if (obj.Equals(pubnub.SessionUUID))
+                                            {
+                                                receivedHereNowMessage = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+            finally
+            {
+                hereNowManualEvent.Set();
+            }
+        }
+
+        void ThenGlobalHereNowShouldReturnMessage(string receivedMessage)
+        {
+            try
+            {
+                Console.WriteLine(string.Format("ThenGlobalHereNowShouldReturnMessage result = {0}", receivedMessage));
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                {
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    {
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null && dictionary.Count > 0)
+                        {
+                            Dictionary<string, object> payload = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(dictionary["payload"]);
+                            if (payload != null && payload.Count > 0)
+                            {
+                                Dictionary<string, object> channels = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(payload["channels"]);
+                                if (channels != null && channels.Count >= 0)
+                                {
+                                    foreach (KeyValuePair<string,object> channelUUID in channels)
+                                    {
+                                        var channelName = channelUUID.Key;
+                                        Dictionary<string, object> channelUuidListDictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(channelUUID.Value);
+                                        if (channelUuidListDictionary != null)
+                                        {
+                                            foreach (KeyValuePair<string, object> keyPair in channelUuidListDictionary)
+                                            {
+                                                if (pubnub.PubnubUnitTest != null && pubnub.PubnubUnitTest.EnableStubTest)
+                                                {
+                                                    receivedGlobalHereNowMessage = true;
+                                                    break;
+                                                }
+                                                if (keyPair.Key == "uuids")
+                                                {
+                                                    object[] uuidList = pubnub.JsonPluggableLibrary.ConvertToObjectArray(keyPair.Value);
+                                                    if (currentTestCase == "IfGlobalHereNowIsCalledThenItShouldReturnInfoWithUserState")
+                                                    {
+                                                        foreach (object uuid in uuidList)
+                                                        {
+                                                            Dictionary<string, object> uuidDic = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(uuid);
+                                                            if (uuidDic.ContainsKey("uuid") && uuidDic.ContainsKey("state"))
+                                                            {
+                                                                string receivedState = pubnub.JsonPluggableLibrary.SerializeToJsonString(uuidDic["state"]);
+                                                                string receivedUUID = uuidDic["uuid"].ToString();
+                                                                if (receivedUUID == pubnub.SessionUUID && receivedState == jsonUserState)
+                                                                {
+                                                                    receivedGlobalHereNowMessage = true;
+                                                                    break;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        receivedGlobalHereNowMessage = true;
+                                                        break;
+                                                    }
+
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                }
+                            }
+                        }
+                    }
+                    
+                }
+            }
+            catch { }
+            finally
+            {
+                globalHereNowManualEvent.Set();
+            }
+        }
+
+        void ThenWhereNowShouldReturnMessage(string receivedMessage)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                {
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    {
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null && dictionary.Count > 0)
+                        {
+                            Dictionary<string, object> payload = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(dictionary["payload"]);
+                            if (payload != null && payload.Count > 0)
+                            {
+                                object[] channels = pubnub.JsonPluggableLibrary.ConvertToObjectArray(payload["channels"]);
+                                if (channels != null && channels.Length >= 0)
+                                {
+                                    foreach (object channel in channels)
+                                    {
+                                        if (channel.Equals(whereNowChannel))
+                                        {
+                                            receivedWhereNowMessage = true;
+                                            break;
+                                        }
+                                    }
+                                    
                                 }
                             }
                         }
                     }
                 }
-                if (found) {
-                    Assert.True (found, "Test passed");
-                } else {
-                    Console.WriteLine ("response:" + commonResponse.ToString ()); 
-                    Assert.Fail ("Test failed:" + commonResponse.ToString ());
-                }
-                /*Dictionary<string, object> message = (Dictionary<string, object>)responseFields [3];
+            }
+            catch { }
+            finally
+            {
+                whereNowManualEvent.Set();
+            }
+        }
 
-                    foreach (KeyValuePair<String, object> entry in message)
+        void DummyMethodForSubscribe(string receivedMessage)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                {
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    {
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null && dictionary.Count > 0)
                         {
-                            Console.WriteLine("value:" + entry.Value + "  " + "key:" + entry.Key);
+                            var uuid = dictionary["uuid"].ToString();
+                            if (uuid != null)
+                            {
+                                receivedPresenceMessage = true;
+                            }
                         }
-                    if (message.Count <= 0)
+                    }
+                }
+            }
+            catch { }
+            finally
+            {
+                presenceManualEvent.Set();
+            }
+            //Dummary callback method for subscribe and unsubscribe to test presence
+        }
+
+        void DummyMethodForSubscribeUUID(string receivedMessage)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                {
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    {
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null && dictionary.Count > 0)
                         {
-                            Assert.Fail("No UUID");
+                            var uuid = dictionary["uuid"].ToString();
+                            if (uuid != null)
+                            {
+                                receivedCustomUUID = true;
+                            }
                         }
-                    /**/
-                //Assert.AreNotEqual(0, message["occupancy"]);
-            }
-
-        }
-
-        [Test]
-        public void IfHereNowIsCalledWithState ()
-        {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "",
-                                false
-                            );
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            string channel = "testChannelhn1";
-            string testname = "IfHereNowIsCalledWithState";
-
-            HereNowWithState<string> (pubnub, channel, testname, common.DisplayReturnMessage, common.DisplayErrorMessage);
-            common.WaitForResponse ();
-
-            //string json = pubnub.GetLocalUserState(channel);
-
-            ParseResponseWithState (common.Response, "{\"testkey\":\"testval\"}", testname);
-            pubnub.Unsubscribe<string> (channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
-            pubnub.EndPendingRequests ();
-        }
-
-        public void ParseResponseWithState (object commonResponse, string userState, string testname)
-        {
-            if (commonResponse.Equals (null)) {
-                Assert.Fail ("Null response");
-            } else {
-                Console.WriteLine ("response:" + commonResponse.ToString ()); 
-                if (commonResponse.ToString ().Contains (userState)) {
-                    Assert.True (true, "Test passed:" + testname);
-                } else {
-                    Assert.Fail ("Test failed:" + userState + testname + commonResponse.ToString ());
+                    }
                 }
             }
-        }
-
-        void HereNowWithState<T> (Pubnub pubnub, string channel, string unitTestCaseName, 
-                                 Action<T> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            Common commonSubscribe = new Common ();
-            pubnub.Subscribe<string> (channel, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayErrorMessage);
-            commonSubscribe.WaitForResponse ();
-
-            commonSubscribe.DeliveryStatus = false;
-            commonSubscribe.Response = null;
-
-            //pubnub.SetLocalUserState(channel, "testkey", "testval");
-            //string json = pubnub.GetLocalUserState(channel);
-            pubnub.SetUserState<string> (channel, "{\"testkey\": \"testval\"}", commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayErrorMessage);
-            commonSubscribe.WaitForResponse (30);
-            Thread.Sleep (500);
-            pubnub.HereNow<T> (channel, true, true, userCallback, errorCallback);
-        }
-
-        [Test]
-        public void TestGlobalHerewNow ()
-        {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "",
-                                false
-                            );
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            string channel = "testChannel5";
-            string testname = "IfHereNowIsCalledWithState";
-
-            Common commonSubscribe = new Common ();
-            pubnub.Subscribe<string> (channel, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayErrorMessage);
-            commonSubscribe.WaitForResponse ();
-            Thread.Sleep (5000);
-            pubnub.GlobalHereNow<string> (true, true, common.DisplayReturnMessage, common.DisplayErrorMessage);
-            common.WaitForResponse ();   
-
-            if (common.Response.Equals (null)) {
-                Assert.Fail ("Null response");
-            } else {
-                if (common.Response.ToString ().Contains (pubnub.SessionUUID)
-                        && common.Response.ToString ().Contains (channel)) {
-                    Assert.True (true, "Test passed:" + testname);
-                } else {
-                    Console.WriteLine ("response:" + common.Response.ToString ()); 
-                    Assert.Fail ("Test failed:" + testname);
-                }
+            catch { }
+            finally
+            {
+                presenceUUIDManualEvent.Set();
             }
-            pubnub.Unsubscribe<string> (channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy);
-            pubnub.EndPendingRequests ();
+            //Dummary callback method for subscribe and unsubscribe to test presence
         }
 
-        [Test]
-        public void TestWhereNow ()
+        void DummyMethodForUnSubscribe(string receivedMessage)
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "",
-                                false
-                            );
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            string channel = "testChannel7";
-            string testname = "IfHereNowIsCalledWithState";
-
-            Common commonSubscribe = new Common ();
-            pubnub.Subscribe<string> (channel, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayErrorMessage);
-            commonSubscribe.WaitForResponse ();
-
-            Thread.Sleep (5000);
-
-            pubnub.WhereNow<string> ("", common.DisplayReturnMessage, common.DisplayErrorMessage);
-            common.WaitForResponse ();   
-
-            if (common.Response.Equals (null)) {
-                Assert.Fail ("Null response");
-            } else {
-                if (common.Response.ToString ().Contains (pubnub.SessionUUID)
-                        && common.Response.ToString ().Contains (channel)) {
-                    Assert.True (true, "Test passed:" + testname);
-                } else {
-                    Console.WriteLine ("response:" + common.Response.ToString ()); 
-                    Assert.Fail ("Test failed:" + testname);
-                }
-            }
-            pubnub.Unsubscribe<string> (channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy);
-            pubnub.EndPendingRequests ();
+            //Dummary callback method for unsubscribe to test presence
         }
 
-        /*[Test]
-        public void SetAndDeleteLocalState()
+        void DummyMethodForUnSubscribeUUID(string receivedMessage)
         {
-            Pubnub pubnub = new Pubnub(
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "",
-                                false
-                            );
-            string channel = "testChannel";
-            pubnub.SetLocalUserState(channel, "testkey", "testval");
-            pubnub.SetLocalUserState(channel, "testkey2", "testval2");
-            pubnub.SetLocalUserState(channel, "testkey2", null);
-            Assert.AreEqual("{\"testkey\":\"testval\"}", pubnub.GetLocalUserState(channel));
-            pubnub.EndPendingRequests();
+            //Dummary callback method for unsubscribe to test presence
         }
 
-        [Test]
-        public void SetAndGetLocalState()
+        void PresenceDummyMethodForConnectCallback(string receivedMessage)
         {
-            Pubnub pubnub = new Pubnub(
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "",
-                                false
-                            );
-            string channel = "testChannel2";
-            pubnub.SetLocalUserState(channel, "testkey", "testval");
-            Assert.AreEqual("{\"testkey\":\"testval\"}", pubnub.GetLocalUserState(channel));
-            pubnub.EndPendingRequests();
-        }*/
-
-        [Test]
-        public void SetAndGetGlobalState ()
-        {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "sec-c-NGVlNmRkYjAtY2Q1OS00OWM2LWE4NzktNzM5YzIxNGQxZjg3",
-                                "",
-                                false
-                            );
-            string channel = "testChannel3";
-            //pubnub.SetLocalUserState(channel, "testkey", "testval");
-
-            Common common = new Common ();
-
-            pubnub.SetUserState<string> (channel, "{\"testkey\": \"testval\"}", common.DisplayReturnMessage, common.DisplayErrorMessage);
-            common.WaitForResponse (30);
-
-            pubnub.GetUserState<string> (channel, common.DisplayReturnMessage, common.DisplayErrorMessage);
-            common.WaitForResponse (30);
-
-            Assert.IsTrue (common.Response.ToString ().Contains ("{\"testkey\":\"testval\"}"));
         }
 
-        [Test]
-        public void SetAndDeleteGlobalState ()
+        void PresenceUUIDDummyMethodForConnectCallback(string receivedMessage)
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "",
-                                false
-                            );
-            string channel = "testChannel4";
-            Common common = new Common ();
-            KeyValuePair<string, object> kvp = new KeyValuePair<string, object> ("k", "v");
-            pubnub.SetUserState<string> (channel, kvp, common.DisplayReturnMessage, common.DisplayErrorMessage);
-            common.WaitForResponse (30);
-            Console.WriteLine ("Response UserStateAfterKvp:" + common.Response.ToString ());
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-
-            KeyValuePair<string, object> kvp2 = new KeyValuePair<string, object> ("k2", "v2");
-            pubnub.SetUserState<string> (channel, kvp2, common.DisplayReturnMessage, common.DisplayErrorMessage);
-            common.WaitForResponse (30);
-            Console.WriteLine ("Response UserStateAfterKvp2:" + common.Response.ToString ());
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            pubnub.GetUserState<string> (channel, common.DisplayReturnMessage, common.DisplayErrorMessage);
-            common.WaitForResponse (30);
-            Console.WriteLine ("Response GetUserStateBeforeDelete:" + common.Response.ToString ());
-            Thread.Sleep (5000);
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            pubnub.SetUserState<string> (channel, new KeyValuePair<string, object> ("k2", null), common.DisplayReturnMessage, common.DisplayErrorMessage);
-            common.WaitForResponse (30);
-
-            Console.WriteLine ("Response SetUserState:" + common.Response.ToString ());
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            Thread.Sleep (5000);
-            pubnub.GetUserState<string> (channel, common.DisplayReturnMessage, common.DisplayErrorMessage);
-            common.WaitForResponse (30);
-            Console.WriteLine ("Response GetUserStateAfterDelete:" + common.Response.ToString ());
-            Assert.IsTrue (common.Response.ToString ().Contains ("{\"k\":\"v\"}"));
         }
 
-        [Test]
-        public void TestPresenceHeartbeat ()
+        void SubscribeDummyMethodForConnectCallback(string receivedMessage)
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "",
-                                false
-                            );     
-            string channel = "testChannel6";
-
-            Common common = new Common ();
-            pubnub.Presence<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessage, common.DisplayErrorMessage);
-            common.WaitForResponse ();   
-
-            Common commonSubscribe = new Common ();
-            pubnub.Subscribe<string> (channel, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayErrorMessage);
-            commonSubscribe.WaitForResponse ();
-
-            common.DeliveryStatus = false;
-            common.Response = null;
-            common.WaitForResponse (); 
-
-            common.DeliveryStatus = false;
-            common.Response = null;
-            common.WaitForResponse (pubnub.PresenceHeartbeat + 3); 
-
-            if (common.Response == null) {
-                Assert.True (true, "Test passed");
-            } else {
-                if (common.Response.ToString ().Contains ("timeout")
-                        && common.Response.ToString ().Contains (channel)) {
-                    Assert.Fail ("Test failed: timed out");
-                } else {
-                    Console.WriteLine ("response:" + common.Response.ToString ()); 
-                    Assert.True (true, "Test passed");
-                }
-            }
-            pubnub.Unsubscribe<string> (channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy);
-            pubnub.EndPendingRequests ();
+            subscribeManualEvent.Set();
         }
 
-        [Test]
-        public void ThenPresenceShouldReturnCustomUUID ()
+        void SubscribeUUIDDummyMethodForConnectCallback(string receivedMessage)
         {
-            Pubnub pubnub = new Pubnub (Common.PublishKey,
-                                Common.SubscribeKey,
-                                "", "", false);
-        
-            Common commonHereNow = new Common ();
-            commonHereNow.DeliveryStatus = false;
-            commonHereNow.Response = null;
+            subscribeUUIDManualEvent.Set();
+        }
 
-            Common commonSubscribe = new Common ();
-            commonSubscribe.DeliveryStatus = false;
-            commonSubscribe.Response = null;
 
-            pubnub.PubnubUnitTest = commonHereNow.CreateUnitTestInstance ("WhenAClientIsPresented", "ThenPresenceShouldReturnCustomUUID");
-            ;
-            pubnub.SessionUUID = "CustomSessionUUIDTest";
-        
-            string channel = "hello_world3";
-            pubnub.Unsubscribe<string> (channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessage);
-            commonSubscribe.WaitForResponse (30);
+        void UnsubscribeDummyMethodForConnectCallback(string receivedMessage)
+        {
+        }
 
-            pubnub.Subscribe<string> (channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessage);
-          
-            //while (!commonSubscribe.DeliveryStatus);
-            commonSubscribe.WaitForResponse (30);
-            Thread.Sleep (5000);
+        void UnsubscribeUUIDDummyMethodForConnectCallback(string receivedMessage)
+        {
+        }
 
-            pubnub.HereNow<string> (channel, commonHereNow.DisplayReturnMessage, commonHereNow.DisplayReturnMessage);
+        void UnsubscribeDummyMethodForDisconnectCallback(string receivedMessage)
+        {
+            unsubscribeManualEvent.Set();
+        }
 
-            //while (!commonHereNow.DeliveryStatus);
-            commonHereNow.WaitForResponse (30);
-            pubnub.Unsubscribe<string> (channel, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessageDummy, commonSubscribe.DisplayReturnMessage);
-            if (commonHereNow.Response != null) {
-                Console.WriteLine (commonHereNow.Response.ToString ());
-                object[] fields = Common.Deserialize<object[]> (commonHereNow.Response.ToString ());
-#if (USE_JSONFX)
-                    if (fields [0] != null)
+        void UnsubscribeUUIDDummyMethodForDisconnectCallback(string receivedMessage)
+        {
+            unsubscribeUUIDManualEvent.Set();
+        }
+
+        void SetUserStateDummyMethodCallback(string receivedMessage)
+        {
+            Console.WriteLine(string.Format("SetUserStateDummyMethodCallback result = {0}", receivedMessage));
+            receivedUserStateMessage = true;
+            userStateManualEvent.Set();
+        }
+
+        void GetUserStateRegularCallback(string receivedMessage)
+        {
+            try
+            {
+                Console.WriteLine(string.Format("GetUserStateRegularCallback result = {0}", receivedMessage));
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                {
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    {
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null && dictionary.Count > 0)
                         {
-                            dynamic x = fields [0];
-                            string[] strarr = x.uuids;
-                            bool found = false;
-                            foreach (string s in strarr)
-                                {
-                                    if (s.Contains(pubnub.SessionUUID))
-                                        {
-                                            found = true;
-                                            break;
-                                        }
-                                }
-                            if (found)
-                                {
-                                    Assert.True(found, "Customuuid pass");
-                                } else
-                                {
-                                    Assert.Fail("Customuuid fail");
-                                }
-                        } else
-                        {
-                            Assert.Fail("Null response");
+                            string uuid = (dictionary.ContainsKey("uuid")) ? dictionary["uuid"].ToString() : "";
+                            string channel = (dictionary.ContainsKey("channel")) ? dictionary["channel"].ToString() : "";
+                            string receivedUserState = "";
+                            if (dictionary.ContainsKey("payload"))
+                            {
+                                receivedUserState = pubnub.JsonPluggableLibrary.SerializeToJsonString(dictionary["payload"]);
+                            }
+                            if (uuid == pubnub.SessionUUID && jsonUserState == receivedUserState)
+                            {
+                                receivedUserStateMessage = true;
+                            }
                         }
-#else
-                JContainer dictionary = fields [0] as JContainer;
-                var uuid = dictionary ["uuids"].ToString ();
-                if (uuid != null) {
-                    Assert.True (uuid.Contains (pubnub.SessionUUID));
-                } else {
-                    Assert.Fail ("Custom uuid not found.");
+                    }
                 }
-#endif
-            } else {
-                Assert.Fail ("Null response");
             }
-            pubnub.EndPendingRequests ();
+            catch { }
+            finally
+            {
+                userStateManualEvent.Set();
+            }
         }
+
+        void DummyErrorCallback(PubnubClientError result)
+        {
+            if (currentTestCase == "IfSetAndGetUserStateThenItShouldReturnInfo")
+            {
+                userStateManualEvent.Set();
+            }
+        }
+
     }
 }
-    

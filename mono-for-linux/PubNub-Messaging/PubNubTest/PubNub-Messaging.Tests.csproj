@@ -52,7 +52,6 @@
     <Compile Include="WhenGetRequestServerTime.cs" />
     <Compile Include="WhenSubscribedToAChannel.cs" />
     <Compile Include="WhenAClientIsPresented.cs" />
-    <Compile Include="Common.cs" />
     <Compile Include="PubnubUnitTest.cs" />
     <Compile Include="WhenUnsubscribedToAChannel.cs" />
     <Compile Include="CleanupGrant.cs" />
@@ -83,5 +82,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Common.cs" />
   </ItemGroup>
 </Project>
