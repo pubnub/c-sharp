@@ -719,6 +719,19 @@ namespace PubNubMessaging.Tests
 
         private void DummyPublishMessageTooLargeInfoCallback(string result)
         {
+            if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
+            {
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
+                {
+                    long statusCode = Int64.Parse(deserializedMessage[0].ToString());
+                    string statusMessage = (string)deserializedMessage[1];
+                    if (statusCode == 0 && statusMessage.ToLower().IndexOf("message too large") >= 0)
+                    {
+                        isLargeMessagePublished = true;
+                    }
+                }
+            }
             mreLaregMessagePublish.Set();
         }
 

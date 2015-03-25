@@ -357,9 +357,9 @@ namespace PubNubMessaging.Tests
             data.Add("/publish/demo-36/demo-36/06d3a3c66138d3e1e98c16cb4b28b447/hello_my_channel/0/%22LwEzvPCHdM8Yagg6oKknvg%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
             data.Add("/publish/demo-36/demo-36/ba5ec8b3290acff6505e156e91838906/hello_my_channel/0/%22%2FjjH%2FPT4NrK5HHjDT2KAlQ%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
 
-            data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel?count=5&reverse=true&start=14271224264234400&end=14271224327449617&uuid=myuuid&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[\"kvIeHmojsLyV1KMBo82DYQ==\",\"Ld0rZfbe4yN0Qj4V7o2BuQ==\",\"zNlnhYco9o6a646+Ox6ksg==\",\"mR8EEMx154BBHU3OOa+YjQ==\",\"v+viLoq0Gj2docUMAYyoYg==\"],14271224271199908,14271224324230142]");
-            data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel?count=5&reverse=true&start=14271224327449616&uuid=myuuid&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[\"F2ZPfJnzuU34VKe24ds81A==\",\"2K/TO5WADvJRhvX7Zk0IpQ==\",\"oWOYyGxkWFJ1gpJxhcyzjA==\",\"LwEzvPCHdM8Yagg6oKknvg==\",\"/jjH/PT4NrK5HHjDT2KAlQ==\"],14271224337423013,14271224390377690]");
-            data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel?count=5&start=14271224327449616&uuid=myuuid&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[\"kvIeHmojsLyV1KMBo82DYQ==\",\"Ld0rZfbe4yN0Qj4V7o2BuQ==\",\"zNlnhYco9o6a646+Ox6ksg==\",\"mR8EEMx154BBHU3OOa+YjQ==\",\"v+viLoq0Gj2docUMAYyoYg==\"],14271224271199908,14271224324230142]");
+            data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel?count=5&reverse=true&start=14271224264234400&end=14271224327449617&uuid=myuuid", "[[\"kvIeHmojsLyV1KMBo82DYQ==\",\"Ld0rZfbe4yN0Qj4V7o2BuQ==\",\"zNlnhYco9o6a646+Ox6ksg==\",\"mR8EEMx154BBHU3OOa+YjQ==\",\"v+viLoq0Gj2docUMAYyoYg==\"],14271224271199908,14271224324230142]");
+            data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel?count=5&reverse=true&start=14271224327449616&uuid=myuuid", "[[\"F2ZPfJnzuU34VKe24ds81A==\",\"2K/TO5WADvJRhvX7Zk0IpQ==\",\"oWOYyGxkWFJ1gpJxhcyzjA==\",\"LwEzvPCHdM8Yagg6oKknvg==\",\"/jjH/PT4NrK5HHjDT2KAlQ==\"],14271224337423013,14271224390377690]");
+            data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel?count=5&start=14271224327449616&uuid=myuuid", "[[\"kvIeHmojsLyV1KMBo82DYQ==\",\"Ld0rZfbe4yN0Qj4V7o2BuQ==\",\"zNlnhYco9o6a646+Ox6ksg==\",\"mR8EEMx154BBHU3OOa+YjQ==\",\"v+viLoq0Gj2docUMAYyoYg==\"],14271224271199908,14271224324230142]");
 
             return data;
         }
@@ -391,9 +391,9 @@ namespace PubNubMessaging.Tests
             data.Add("/publish/demo-36/demo-36/9034b22230cb5e1eab4f8d549422771e/hello_my_channel/0/8.1", "[1,\"Sent\",\"13559014566792817\"]");
             data.Add("/publish/demo-36/demo-36/1118a02dc5d490ee212f175775452329/hello_my_channel/0/9.1", "[1,\"Sent\",\"13559014566792817\"]");
 
-            data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel?count=5&reverse=true&start=14271224264234400&end=14271224327449617&uuid=myuuid&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[0,1,2,3,4],14271224271199908,14271224324230142]");
-            data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel?count=5&reverse=true&start=14271224327449616&uuid=myuuid&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[5.1,6.1,7.1,8.1],14271224337423013,14271224390377690]");
-            data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel?count=5&start=14271224327449616&uuid=myuuid&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[0,1,2,3,4],14271224271199908,14271224324230142]");
+            data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel?count=5&reverse=true&start=14271224264234400&end=14271224327449617&uuid=myuuid", "[[0,1,2,3,4],14271224271199908,14271224324230142]");
+            data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel?count=5&reverse=true&start=14271224327449616&uuid=myuuid", "[[5.1,6.1,7.1,8.1],14271224337423013,14271224390377690]");
+            data.Add("/v2/history/sub-key/demo-36/channel/hello_my_channel?count=5&start=14271224327449616&uuid=myuuid", "[[0,1,2,3,4],14271224271199908,14271224324230142]");
 
             return data;
         }
@@ -571,10 +571,10 @@ namespace PubNubMessaging.Tests
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add("/v1/channel-registration/sub-key/demo-36/channel-group/hello_my_group?add=hello_my_channel", "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}");
             data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22Test%20for%20WhenSubscribedToAChannelGroup%20ThenItShouldReturnReceivedMessage%22", "[1,\"Sent\",\"13559014566792817\"]");
-            data.Add("/subscribe/demo-36/,/0/0?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[],\"13559006802662768\"]");
-            data.Add("/subscribe/demo-36/,/0/13559006802662768?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[\"Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage\"],\"13559014566792816\"]");
-            data.Add("/subscribe/demo-36/,/0/13559014566792816?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[],\"13559014566792816\"]");
-            data.Add("/v2/presence/sub_key/demo-36/channel/,/leave?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.7", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
+            data.Add("/subscribe/demo-36/,/0/0?uuid=myuuid&channel-group=hello_my_group", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/,/0/13559006802662768?uuid=myuuid&channel-group=hello_my_group", "[[\"Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/,/0/13559014566792816?uuid=myuuid&channel-group=hello_my_group", "[[],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/,/leave?uuid=myuuid&channel-group=hello_my_group", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
             return data;
         }
 
@@ -594,10 +594,10 @@ namespace PubNubMessaging.Tests
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add("/v1/channel-registration/sub-key/demo-36/channel-group/hello_my_group?add=hello_my_channel", "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}");
             //data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22Test%20for%20WhenSubscribedToAChannelGroup%20ThenItShouldReturnReceivedMessage%22", "[1,\"Sent\",\"13559014566792817\"]");
-            data.Add("/subscribe/demo-36/,/0/0?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[],\"13559006802662768\"]");
-            data.Add("/subscribe/demo-36/,/0/13559006802662768?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[\"Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage\"],\"13559014566792816\"]");
-            data.Add("/subscribe/demo-36/,/0/13559014566792816?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[],\"13559014566792816\"]");
-            data.Add("/v2/presence/sub_key/demo-36/channel/,/leave?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.7", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
+            data.Add("/subscribe/demo-36/,/0/0?uuid=myuuid&channel-group=hello_my_group", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/,/0/13559006802662768?uuid=myuuid&channel-group=hello_my_group", "[[\"Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/,/0/13559014566792816?uuid=myuuid&channel-group=hello_my_group", "[[],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/,/leave?uuid=myuuid&channel-group=hello_my_group", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
             return data;
         }
 
@@ -620,15 +620,15 @@ namespace PubNubMessaging.Tests
             data.Add("/v1/channel-registration/sub-key/demo-36/channel-group/hello_my_group2?add=hello_my_channel2", "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}");
             //data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22Test%20for%20WhenSubscribedToAChannelGroup%20ThenItShouldReturnReceivedMessage%22", "[1,\"Sent\",\"13559014566792817\"]");
             
-            data.Add("/subscribe/demo-36/,/0/0?uuid=myuuid&channel-group=hello_my_group1,hello_my_group2&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[],\"13559006802662768\"]");
-            data.Add("/subscribe/demo-36/,/0/13559006802662768?uuid=myuuid&channel-group=hello_my_group1,hello_my_group2&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[\"Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage\"],\"13559014566792816\"]");
-            data.Add("/subscribe/demo-36/,/0/13559014566792816?uuid=myuuid&channel-group=hello_my_group1,hello_my_group2&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[],\"13559014566792816\"]");
-            data.Add("/v2/presence/sub_key/demo-36/channel/,/leave?uuid=myuuid&channel-group=hello_my_group1,hello_my_group2&pnsdk=PubNub-CSharp-.NET%2F3.7", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
+            data.Add("/subscribe/demo-36/,/0/0?uuid=myuuid&channel-group=hello_my_group1,hello_my_group2", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/,/0/13559006802662768?uuid=myuuid&channel-group=hello_my_group1,hello_my_group2", "[[\"Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/,/0/13559014566792816?uuid=myuuid&channel-group=hello_my_group1,hello_my_group2", "[[],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/,/leave?uuid=myuuid&channel-group=hello_my_group1,hello_my_group2", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
 
-            data.Add("/subscribe/demo-36/,/0/0?uuid=myuuid&channel-group=hello_my_group2,hello_my_group1&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[],\"13559006802662768\"]");
-            data.Add("/subscribe/demo-36/,/0/13559006802662768?uuid=myuuid&channel-group=hello_my_group2,hello_my_group1&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[\"Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage\"],\"13559014566792816\"]");
-            data.Add("/subscribe/demo-36/,/0/13559014566792816?uuid=myuuid&channel-group=hello_my_group2,hello_my_group1&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[],\"13559014566792816\"]");
-            data.Add("/v2/presence/sub_key/demo-36/channel/,/leave?uuid=myuuid&channel-group=hello_my_group2,hello_my_group1&pnsdk=PubNub-CSharp-.NET%2F3.7", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
+            data.Add("/subscribe/demo-36/,/0/0?uuid=myuuid&channel-group=hello_my_group2,hello_my_group1", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/,/0/13559006802662768?uuid=myuuid&channel-group=hello_my_group2,hello_my_group1", "[[\"Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/,/0/13559014566792816?uuid=myuuid&channel-group=hello_my_group2,hello_my_group1", "[[],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/,/leave?uuid=myuuid&channel-group=hello_my_group2,hello_my_group1", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
             return data;
         }
 
@@ -665,10 +665,10 @@ namespace PubNubMessaging.Tests
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add("/v1/channel-registration/sub-key/demo-36/channel-group/hello_my_group?add=hello_my_channel", "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}");
             //data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22Test%20for%20WhenSubscribedToAChannelGroup%20ThenItShouldReturnReceivedMessage%22", "[1,\"Sent\",\"13559014566792817\"]");
-            data.Add("/subscribe/demo-36/,/0/0?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[],\"13559006802662768\"]");
-            data.Add("/subscribe/demo-36/,/0/13559006802662768?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[\"Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage\"],\"13559014566792816\"]");
-            data.Add("/subscribe/demo-36/,/0/13559014566792816?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.7", "[[],\"13559014566792816\"]");
-            data.Add("/v2/presence/sub_key/demo-36/channel/,/leave?uuid=myuuid&channel-group=hello_my_group&pnsdk=PubNub-CSharp-.NET%2F3.7", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
+            data.Add("/subscribe/demo-36/,/0/0?uuid=myuuid&channel-group=hello_my_group", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/,/0/13559006802662768?uuid=myuuid&channel-group=hello_my_group", "[[\"Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/,/0/13559014566792816?uuid=myuuid&channel-group=hello_my_group", "[[],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/,/leave?uuid=myuuid&channel-group=hello_my_group", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
             return data;
         }
 
@@ -1316,9 +1316,43 @@ namespace PubNubMessaging.Tests
             else if (responseDictionary != null)
             {
 #if (SILVERLIGHT || WINDOWS_PHONE || NETFX_CORE)
-                stubResponse = responseDictionary[string.Format("{0}{1}",requestUri.AbsolutePath,requestUri.Query)];
+                string uriKey = string.Format("{0}{1}",requestUri.AbsolutePath, requestUri.Query);
+                if (responseDictionary.ContainsKey(uriKey))
+                {
+                    stubResponse = responseDictionary[uriKey];
+                }
+                else if (requestUri.Query.Contains("&pnsdk="))
+                {
+                    int indexOfPnsdk = requestUri.Query.IndexOf("&pnsdk=");
+                    string modifiedQuery = requestUri.Query.Substring(0, indexOfPnsdk);
+                    string uriModifiedKey = string.Format("{0}{1}",requestUri.AbsolutePath, modifiedQuery);
+                    if (responseDictionary.ContainsKey(uriModifiedKey))
+                    {
+                        stubResponse = responseDictionary[uriModifiedKey];
+                    }
+                    else
+                    {
+                         stubResponse = "[]";
+                    }
+                }
 #else
-                stubResponse = (responseDictionary.ContainsKey(requestUri.PathAndQuery)) ? responseDictionary[requestUri.PathAndQuery] : "[]";
+                if (responseDictionary.ContainsKey(requestUri.PathAndQuery))
+                {
+                    stubResponse = responseDictionary[requestUri.PathAndQuery];
+                }
+                else if (requestUri.PathAndQuery.Contains("&pnsdk="))
+                {
+                    int indexOfPnsdk = requestUri.PathAndQuery.IndexOf("&pnsdk=");
+                    string modifiedRequestUri = requestUri.PathAndQuery.Substring(0, indexOfPnsdk);
+                    if (responseDictionary.ContainsKey(modifiedRequestUri))
+                    {
+                        stubResponse = responseDictionary[modifiedRequestUri];
+                    }
+                    else
+                    {
+                        stubResponse = "[]";
+                    }
+                }
 #endif
             }
             else
