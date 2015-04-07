@@ -61,6 +61,9 @@
     <Compile Include="WhenGrantIsRequested.cs" />
     <Compile Include="WhenSubscribedToAChannel2.cs" />
     <Compile Include="WhenSubscribedToAChannel3.cs" />
+    <Compile Include="WhenSubscribedToAChannelGroup.cs" />
+    <Compile Include="WhenChannelGroupIsRequested.cs" />
+    <Compile Include="WhenUnsubscribedToAChannelGroup.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
