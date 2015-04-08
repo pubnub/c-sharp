@@ -60,6 +60,9 @@
 /mono-for-linux/PubNub-Messaging/PubNub-Messaging.userprefs
 /mono-for-linux/PubNub-Messaging/test-results/*
 /mono-for-linux/PubNub-Messaging/PubNubTest/test-results/*
+/mono-for-mac/PubNub-Console/bin/Debug/*
+/mono-for-mac/PubNub-Console/obj/*
+/mono-for-mac/PubNub-Messaging.userprefs
 .DS_Store
 *.cache
 *.suo

@@ -59,25 +59,25 @@ namespace PubNubMessaging.Core
             set;
         }
 
-        internal static bool CheckInternetStatusUnity<T> (bool systemActive, Action<PubnubClientError> errorCallback, string[] channels, int heartBeatInterval)
+        internal static bool CheckInternetStatusUnity<T> (bool systemActive, Action<PubnubClientError> errorCallback, string[] channels, string[] channelGroups, int heartBeatInterval)
         {
             HeartbeatInterval = heartBeatInterval;
             if (_failClientNetworkForTesting) {
                 //Only to simulate network fail
                 return false;
             } else {
-                CheckClientNetworkAvailability<T> (CallbackClientNetworkStatus, errorCallback, channels);
+                CheckClientNetworkAvailability<T> (CallbackClientNetworkStatus, errorCallback, channels, channelGroups);
                 return _status;
             }
         }
         #endif
-        internal static bool CheckInternetStatus<T> (bool systemActive, Action<PubnubClientError> errorCallback, string[] channels)
+        internal static bool CheckInternetStatus<T> (bool systemActive, Action<PubnubClientError> errorCallback, string[] channels, string[] channelGroups)
         {
             if (_failClientNetworkForTesting || _machineSuspendMode) {
                 //Only to simulate network fail
                 return false;
             } else {
-                CheckClientNetworkAvailability<T> (CallbackClientNetworkStatus, errorCallback, channels);
+                CheckClientNetworkAvailability<T> (CallbackClientNetworkStatus, errorCallback, channels, channelGroups);
                 return _status;
             }
         }
@@ -92,12 +92,13 @@ namespace PubNubMessaging.Core
             _status = status;
         }
 
-        private static void CheckClientNetworkAvailability<T> (Action<bool> callback, Action<PubnubClientError> errorCallback, string[] channels)
+        private static void CheckClientNetworkAvailability<T> (Action<bool> callback, Action<PubnubClientError> errorCallback, string[] channels, string[] channelGroups)
         {
             InternetState<T> state = new InternetState<T> ();
             state.Callback = callback;
             state.ErrorCallback = errorCallback;
             state.Channels = channels;
+            state.ChannelGroups = channelGroups;
             #if (UNITY_ANDROID || UNITY_IOS)
             CheckSocketConnect<T>(state);
             #elif(__MonoCS__)
@@ -119,6 +120,7 @@ namespace PubNubMessaging.Core
             Action<bool> callback = state.Callback;
             Action<PubnubClientError> errorCallback = state.ErrorCallback;
             string[] channels = state.Channels;
+            string[] channelGroups = state.ChannelGroups;
             try {
                 #if (SILVERLIGHT || WINDOWS_PHONE)
                 using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
@@ -199,7 +201,7 @@ namespace PubNubMessaging.Core
                     callback(true);
                 } else {
                     _status =false;
-                    ParseCheckSocketConnectException<T>(webEx, channels, errorCallback, callback);
+            ParseCheckSocketConnectException<T>(webEx, channels, channelGroups, errorCallback, callback);
                 }
             }
             #endif
@@ -207,7 +209,7 @@ namespace PubNubMessaging.Core
                 #if(__MonoCS__)
                 _status = false;
                 #endif
-                ParseCheckSocketConnectException<T> (ex, channels, errorCallback, callback);
+                ParseCheckSocketConnectException<T> (ex, channels, channelGroups, errorCallback, callback);
             } finally {
                 #if (UNITY_IOS || UNITY_ANDROID)
                 if(response!=null){
@@ -230,12 +232,14 @@ namespace PubNubMessaging.Core
             #endif
         }
 
-        static void ParseCheckSocketConnectException<T> (Exception ex, string[] channels, Action<PubnubClientError> errorCallback, Action<bool> callback)
+        static void ParseCheckSocketConnectException<T> (Exception ex, string[] channels, string[] channelGroups, Action<PubnubClientError> errorCallback, Action<bool> callback)
         {
             PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType (ex);
             int statusCode = (int)errorType;
             string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription (errorType);
-            PubnubClientError error = new PubnubClientError (statusCode, PubnubErrorSeverity.Warn, true, ex.ToString (), ex, PubnubMessageSource.Client, null, null, errorDescription, string.Join (",", channels));
+            string channel = (channels == null) ? "" : string.Join (",", channels);
+            string channelGroup = (channelGroups == null) ? "" : string.Join (",", channelGroups);
+            PubnubClientError error = new PubnubClientError(statusCode, PubnubErrorSeverity.Warn, true, ex.ToString (), ex, PubnubMessageSource.Client, null, null, errorDescription, channel, channelGroup);
             GoToCallback (error, errorCallback);
 
             LoggingMethod.WriteToLog (string.Format ("DateTime {0} checkInternetStatus Error. {1}", DateTime.Now.ToString (), ex.ToString ()), LoggingMethod.LevelError);
