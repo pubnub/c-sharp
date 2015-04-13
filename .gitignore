@@ -63,6 +63,8 @@
 /mono-for-mac/PubNub-Console/bin/Debug/*
 /mono-for-mac/PubNub-Console/obj/*
 /mono-for-mac/PubNub-Messaging.userprefs
+/mono-for-mac/PubNubTest/bin/Debug/*
+/mono-for-mac/PubNubTest/obj/*
 .DS_Store
 *.cache
 *.suo

@@ -47,7 +47,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Common.cs" />
     <Compile Include="PubnubUnitTest.cs" />
     <Compile Include="PubnubCommon.cs" />
     <Compile Include="WhenAClientIsPresented.cs" />
@@ -63,6 +62,9 @@
     <Compile Include="WhenSubscribedToAChannel2.cs" />
     <Compile Include="WhenSubscribedToAChannel.cs" />
     <Compile Include="WhenDetailedHistoryIsRequested.cs" />
+    <Compile Include="WhenChannelGroupIsRequested.cs" />
+    <Compile Include="WhenSubscribedToAChannelGroup.cs" />
+    <Compile Include="WhenUnsubscribedToAChannelGroup.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

@@ -1,234 +1,195 @@
-using System;
-using PubNubMessaging.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using NUnit.Framework;
 using System.ComponentModel;
-using System.Collections.Generic;
 using System.Threading;
+using System.Collections;
+//using Newtonsoft.Json;
+//using Newtonsoft.Json.Linq;
+using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
     public class WhenUnsubscribedToAChannel
     {
-        [Test]
-        public void ThenNonExistentChannelShouldReturnNotSubscribed ()
+        ManualResetEvent meNotSubscribed = new ManualResetEvent(false);
+        ManualResetEvent meChannelSubscribed = new ManualResetEvent(false);
+        ManualResetEvent meChannelUnsubscribed = new ManualResetEvent(false);
+        ManualResetEvent grantManualEvent = new ManualResetEvent(false);
+
+        bool receivedNotSubscribedMessage = false;
+        bool receivedUnsubscribedMessage = false;
+        bool receivedChannelConnectedMessage = false;
+        bool receivedGrantMessage = false;
+
+        Pubnub pubnub = null;
+
+        [TestFixtureSetUp]
+        public void Init()
         {
-            Pubnub pubnub = new Pubnub (Common.PublishKey,
-                                Common.SubscribeKey,
-                                "", "", false);
+            if (!PubnubCommon.PAMEnabled) return;
 
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-      
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenUnsubscribedToAChannel", "ThenNonExistentChannelShouldReturnNotSubscribed");
-      
-            string channel = "hello_world_unsub";
-      
-            pubnub.Unsubscribe<string> (channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessage);
-            common.WaitForResponse ();
+            receivedGrantMessage = false;
 
-            Console.WriteLine ("Response:" + common.Response);
-            if (common.Response.ToString ().ToLower ().Contains ("not subscribed")) {
-                Assert.Pass ();
-            } else {
-                Assert.Fail ();
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "GrantRequestUnitTest";
+            unitTest.TestCaseName = "Init";
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channel = "hello_my_channel";
+
+            pubnub.GrantAccess<string>(channel, true, true, 20, ThenUnsubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            Thread.Sleep(1000);
+
+            grantManualEvent.WaitOne();
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.IsTrue(receivedGrantMessage, "WhenUnsubscribedToAChannel Grant access failed.");
+        }
+
+        [Test]
+        public void ThenNoExistChannelShouldReturnNotSubscribed()
+        {
+            receivedNotSubscribedMessage = false;
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenUnsubscribedToAChannel";
+            unitTest.TestCaseName = "ThenNoExistChannelShouldReturnNotSubscribed";
+
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channel = "hello_my_channel";
+
+            pubnub.Unsubscribe<string>(channel, DummyMethodNoExistChannelUnsubscribeChannelUserCallback, DummyMethodNoExistChannelUnsubscribeChannelConnectCallback, DummyMethodNoExistChannelUnsubscribeChannelDisconnectCallback1, NoExistChannelErrorCallback);
+
+            meNotSubscribed.WaitOne();
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
+
+            Assert.IsTrue(receivedNotSubscribedMessage, "WhenUnsubscribedToAChannel --> ThenNoExistChannelShouldReturnNotSubscribed Failed");
+        }
+
+        [Test]
+        public void ThenShouldReturnUnsubscribedMessage()
+        {
+            receivedChannelConnectedMessage = false;
+            receivedUnsubscribedMessage = false;
+
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenUnsubscribedToAChannel";
+            unitTest.TestCaseName = "ThenShouldReturnUnsubscribedMessage";
+
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channel = "hello_my_channel";
+
+            pubnub.Subscribe<string>(channel, DummyMethodChannelSubscribeUserCallback, DummyMethodChannelSubscribeConnectCallback, DummyErrorCallback);
+            meChannelSubscribed.WaitOne();
+
+            if (receivedChannelConnectedMessage)
+            {
+                pubnub.Unsubscribe<string>(channel, DummyMethodUnsubscribeChannelUserCallback, DummyMethodUnsubscribeChannelConnectCallback, DummyMethodUnsubscribeChannelDisconnectCallback, DummyErrorCallback);
+                meChannelUnsubscribed.WaitOne();
             }
-            pubnub.EndPendingRequests ();
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
+
+            Assert.IsTrue(receivedUnsubscribedMessage, "WhenUnsubscribedToAChannel --> ThenShouldReturnUnsubscribedMessage Failed");
         }
 
-        [Test]
-        public void ThenShouldReturnUnsubscribedMessage ()
+        void ThenUnsubscribeInitializeShouldReturnGrantMessage(string receivedMessage)
         {
-            Pubnub pubnub = new Pubnub (Common.PublishKey,
-                                Common.SubscribeKey, "", "", false);
-      
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-      
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenUnsubscribedToAChannel", "ThenShouldReturnUnsubscribedMessage");
-      
-            string channel = "hello_world_unsub1";
+            try
+            {
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                {
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    {
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null)
+                        {
+                            var status = dictionary["status"].ToString();
+                            if (status == "200")
+                            {
+                                receivedGrantMessage = true;
+                            }
+                        }
 
-            pubnub.Subscribe<string> (channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
-
-            common.WaitForResponse ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            pubnub.Unsubscribe<string> (channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
-            common.WaitForResponse ();
-
-            if (common.Response.ToString ().Contains ("Unsubscribed from")) {
-                Console.WriteLine ("Response:" + common.Response);
-                Assert.Pass ();
-            } else {
-                Assert.Fail ();
-            }    
-            pubnub.EndPendingRequests ();
-
-        }
-
-        [Test]
-        public void ThenShouldReturnUnsubscribedMessageSSL ()
-        {
-            Pubnub pubnub = new Pubnub (Common.PublishKey,
-                                Common.SubscribeKey, "", "", true);
-
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenUnsubscribedToAChannel", "ThenShouldReturnUnsubscribedMessage");
-
-            string channel = "hello_world_unsub12";
-
-            pubnub.Subscribe<string> (channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
-
-            common.WaitForResponse ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            pubnub.Unsubscribe<string> (channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
-            common.WaitForResponse ();
-
-            if (common.Response.ToString ().Contains ("Unsubscribed from")) {
-                Console.WriteLine ("Response:" + common.Response);
-                Assert.Pass ();
-            } else {
-                Assert.Fail ();
-            }  
-            pubnub.EndPendingRequests ();
-
-        }
-
-        [Test]
-        public void TestUnsubscribePresence ()
-        {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "",
-                                false
-                            );
-            string channel = "hello_world_unsub2";
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenAClientIsPresented", "ThenPresenceShouldReturnReceivedMessage");
-
-            pubnub.Presence<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessage, common.DisplayErrorMessage);
-            Thread.Sleep (3000);
-            Common commonSubscribe = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            pubnub.Subscribe<string> (channel, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayErrorMessage);
-
-            commonSubscribe.DeliveryStatus = false;
-            commonSubscribe.Response = null;
-
-            common.WaitForResponse (30);
-            string response = "";
-            if (common.Response == null) {
-                Assert.Fail ("Null response");
-            } else {
-                //IList<object> responseFields = common.Response as IList<object>;
-
-                object[] responseFields = Common.Deserialize<object[]> (common.Response.ToString ());
-                Type valueType = responseFields [0].GetType ();
-                var expectedType = typeof(System.Dynamic.ExpandoObject);
-                if (expectedType.IsAssignableFrom (valueType)) {
-                    dynamic x = responseFields [0];
-                    Console.WriteLine (x.action);
-                } else {
-                    foreach (object item in responseFields) {
-                        response = item.ToString ();
-                        Console.WriteLine ("Response:" + response);
                     }
                 }
-                if (channel.Equals (responseFields [2])) {
-                    Unsub (common, pubnub, channel);
-                }
+            }
+            catch { }
+            finally
+            {
+                grantManualEvent.Set();
             }
         }
 
-        private void Unsub (Common common, Pubnub pubnub, string channel)
+        private void DummyMethodChannelSubscribeUserCallback(string result)
         {
-            Common commonUnsubscribe = new Common ();
-
-            common.DeliveryStatus = false;
-            common.Response = null;
-            pubnub.Unsubscribe<string> (channel, commonUnsubscribe.DisplayReturnMessageDummy, commonUnsubscribe.DisplayReturnMessageDummy, commonUnsubscribe.DisplayReturnMessage, common.DisplayReturnMessageDummy);
-
-            common.WaitForResponse (20);
-            string response = "";
-            if (common.Response == null) {
-                Assert.Fail ("Null response");
-            } else {
-                object[] responseFields2 = Common.Deserialize<object[]> (common.Response.ToString ());
-                Type valueType = responseFields2 [0].GetType ();
-                var expectedType = typeof(System.Dynamic.ExpandoObject);
-                if (expectedType.IsAssignableFrom (valueType)) {
-                    dynamic x = responseFields2 [0];
-                    Console.WriteLine (x.action);
-                    Assert.True (channel.Equals (responseFields2 [2]) && x.action.Contains ("leave"));
-                } else {
-                    foreach (object item in responseFields2) {
-                        response = item.ToString ();
-                        Console.WriteLine ("Response:" + response);
-                    }
-                    Assert.True (channel.Equals (responseFields2 [2]) && responseFields2 [0].ToString ().Contains ("leave"));
-                }
-            }
-            pubnub.EndPendingRequests ();
         }
 
-        [Test]
-        public void TestUnsubscribePresenceSSL ()
+        private void DummyMethodChannelSubscribeConnectCallback(string result)
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "",
-                                true
-                            );
-            string channel = "hello_world_unsub3";
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenAClientIsPresented", "ThenPresenceShouldReturnReceivedMessage");
-
-            pubnub.Presence<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessage, common.DisplayErrorMessage);
-            Thread.Sleep (5000);
-            Common commonSubscribe = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            pubnub.Subscribe<string> (channel, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayReturnMessage, commonSubscribe.DisplayErrorMessage);
-
-            commonSubscribe.DeliveryStatus = false;
-            commonSubscribe.Response = null;
-
-
-            common.WaitForResponse (30);
-
-            string response = "";
-            if (common.Response == null) {
-                Assert.Fail ("Null response");
-            } else {
-                //IList<object> responseFields = common.Response as IList<object>;
-                object[] responseFields = Common.Deserialize<object[]> (common.Response.ToString ());
-                if (channel.Equals (responseFields [2])) {
-                    Unsub (common, pubnub, channel);
-                }
+            if (result.Contains("Connected"))
+            {
+                receivedChannelConnectedMessage = true;
             }
+            meChannelSubscribed.Set();
+        }
+
+        private void DummyMethodUnsubscribeChannelUserCallback(string result)
+        {
+        }
+
+        private void DummyMethodUnsubscribeChannelConnectCallback(string result)
+        {
+        }
+
+        private void DummyMethodUnsubscribeChannelDisconnectCallback(string result)
+        {
+            if (result.Contains("Unsubscribed from"))
+            {
+                receivedUnsubscribedMessage = true;
+            }
+            meChannelUnsubscribed.Set();
+        }
+
+        private void DummyMethodNoExistChannelUnsubscribeChannelUserCallback(string result)
+        {
+        }
+
+        private void DummyMethodNoExistChannelUnsubscribeChannelConnectCallback(string result)
+        {
+        }
+
+        private void DummyMethodNoExistChannelUnsubscribeChannelDisconnectCallback1(string result)
+        {
+        }
+
+        private void DummyErrorCallback(PubnubClientError result)
+        {
+        }
+
+        private void NoExistChannelErrorCallback(PubnubClientError result)
+        {
+            if (result != null && result.Message.ToLower().Contains("not subscribed"))
+            {
+                receivedNotSubscribedMessage = true;
+            }
+            meNotSubscribed.Set();
         }
     }
 }
-
