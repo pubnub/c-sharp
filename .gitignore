@@ -65,6 +65,8 @@
 /mono-for-mac/PubNub-Messaging.userprefs
 /mono-for-mac/PubNubTest/bin/Debug/*
 /mono-for-mac/PubNubTest/obj/*
+/monotouch/PubnubMessaging/bin/Debug/*
+/monotouch/Newtonsoft.Json/bin/Debug/*
 .DS_Store
 *.cache
 *.suo
