@@ -44,7 +44,7 @@ namespace PubnubMessagingExample
                 BackgroundColor = UIColor.Clear,
                 TextAlignment = UITextAlignment.Center
             };
-            headerMultipleChannels.Text = "Enter multiple channel names separated by comma";
+            headerMultipleChannels.Text = "Enter multiple channel/channelgroup names separated by comma";
 
             EntryElement entrySubscribeKey = new EntryElement ("Subscribe Key", "Enter Subscribe Key", "demo");
             entrySubscribeKey.AutocapitalizationType = UITextAutocapitalizationType.None;
@@ -61,6 +61,10 @@ namespace PubnubMessagingExample
             EntryElement entryChannelName = new EntryElement ("Channel(s)", "Enter Channel Name", "");
             entryChannelName.AutocapitalizationType = UITextAutocapitalizationType.None;
             entryChannelName.AutocorrectionType = UITextAutocorrectionType.No;
+
+            EntryElement entryChannelGroupName = new EntryElement ("ChannelGroup(s)", "Enter ChannelGroup Name", "");
+            entryChannelGroupName.AutocapitalizationType = UITextAutocapitalizationType.None;
+            entryChannelGroupName.AutocorrectionType = UITextAutocorrectionType.No;
 
             EntryElement entryCipher = new EntryElement ("Cipher", "Enter Cipher", "");
             entryCipher.AutocapitalizationType = UITextAutocapitalizationType.None;
@@ -103,6 +107,9 @@ namespace PubnubMessagingExample
                     entryChannelName,
                     sslEnabled
                 },
+                new Section(){
+                    entryChannelGroupName
+                },
                 new Section ("Enter cipher key for encryption. Leave blank for unencrypted transfer.") {
                     entryCipher
                 },
@@ -125,14 +132,14 @@ namespace PubnubMessagingExample
                 new Section () {
                     new StyledStringElement ("Launch Example", () => {
                         bool errorFree = true;
-                        errorFree = ValidateAndInitPubnub (entryChannelName.Value, entryCipher.Value, sslEnabled.Value, 
+                        errorFree = ValidateAndInitPubnub (entryChannelName.Value, entryChannelGroupName.Value, entryCipher.Value, sslEnabled.Value, 
                             entryCustonUuid.Value, proxyEnabled.Value, entryProxyPort.Value,
                             entryProxyUser.Value, entryProxyServer.Value, entryProxyPassword.Value, 
                             entrySubscribeKey.Value, entryPublishKey.Value, entrySecretKey.Value
                         );
 
                         if (errorFree) {
-                            new Pubnub_MessagingSub (entryChannelName.Value, entryCipher.Value, sslEnabled.Value, pubnub);
+                            new Pubnub_MessagingSub (entryChannelName.Value, entryChannelGroupName.Value, entryCipher.Value, sslEnabled.Value, pubnub);
                         }
                     }) {
                         BackgroundColor = UIColor.Blue,
@@ -163,16 +170,16 @@ namespace PubnubMessagingExample
             };
         }
 
-        bool ValidateAndInitPubnub (string channelName, string cipher, bool ssl, 
+        bool ValidateAndInitPubnub (string channelName, string channelGroupName, string cipher, bool ssl, 
                                     string customUuid, bool proxyEnabled, string proxyPort,
                                     string proxyUser, string proxyServer, string proxyPass,
                                     string subscribeKey, string publishKey, string secretKey
         )
         {
             bool errorFree = true;
-            if (String.IsNullOrWhiteSpace (channelName)) {
+            if (String.IsNullOrWhiteSpace (channelName) && String.IsNullOrWhiteSpace (channelGroupName)) {
                 errorFree = false;
-                new UIAlertView ("Error!", "Please enter a channel name", null, "OK").Show (); 
+                new UIAlertView ("Error!", "Please enter either channel name or channelgroup name or both", null, "OK").Show (); 
             }
             
             if (errorFree) {

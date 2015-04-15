@@ -125,6 +125,18 @@ namespace PubnubMessagingExample
                     menu.Hide (true);
                     pubnub_MessagingSub.ChangeUuid ();
                 }),
+                new StyledStringElement ("Add Channel To ChannelGroup", () => {
+                    menu.Hide (true);
+                    pubnub_MessagingSub.AddChannelToChannelGroup();
+                }),
+                new StyledStringElement ("Remove Channel From ChannelGroup", () => {
+                    menu.Hide (true);
+                    pubnub_MessagingSub.RemoveChannelFromChannelGroup();
+                }),
+                new StyledStringElement ("Get ChannelList From ChannelGroup", () => {
+                    menu.Hide (true);
+                    pubnub_MessagingSub.GetChannelFromChannelGroup();
+                }),
             });
         }
     }
@@ -153,7 +165,10 @@ namespace PubnubMessagingExample
             AuditSubscribe,
             AuditPresence,
             RevokeSubscribe,
-            RevokePresence
+            RevokePresence,
+            AddChannelToChannelGroup,
+            RemoveChannelFromChannelGroup,
+            GetChannelsFromChannelGroup
         }
 
         public SlideoutNavigationController Menu { get; private set; }
@@ -163,6 +178,11 @@ namespace PubnubMessagingExample
             set;
             //get { return newChannels.Text; }
             //set { newChannels.Text = value; }
+        }
+
+        string ChannelGroup {
+            get;
+            set;
         }
 
         string Cipher {
@@ -183,11 +203,13 @@ namespace PubnubMessagingExample
         public bool showErrorMessageSegments = true;
         UITextField tfChannels;
         UITextField newChannels;
+        UITextField newChannelGroups;
 
-        public Pubnub_MessagingSub (string channelName, string cipher, bool enableSSL, Pubnub pubnub)
+        public Pubnub_MessagingSub (string channelName, string channelGroupName, string cipher, bool enableSSL, Pubnub pubnub)
             : base (UITableViewStyle.Grouped, null)
         {
             Channel = channelName;
+            ChannelGroup = channelGroupName;
             Ssl = enableSSL;
             Cipher = cipher;
             this.pubnub = pubnub;
@@ -242,6 +264,7 @@ namespace PubnubMessagingExample
             AppDelegate.navigation.PushViewController (Menu, true);
             Menu.ShowMenuLeft ();
             newChannels.Text = Channel;
+            newChannelGroups.Text = ChannelGroup;
 
         }
 
@@ -263,7 +286,7 @@ namespace PubnubMessagingExample
 
             UILabel lblInfo = new UILabel (new RectangleF (10, 2, 300, 25));
             lblInfo.Font = font12;
-            lblInfo.Text = "Enter new channel(s) and/or use the menu for actions";
+            lblInfo.Text = "Enter new channel(s)/channelgroup(s) and/or use the menu for actions";
             uiView.Add (lblInfo);
 
             UILabel lblNewChannel = new UILabel (new RectangleF (10, 32, 100, 25));
@@ -277,6 +300,17 @@ namespace PubnubMessagingExample
             newChannels.Font = font12;
             uiView.Add (newChannels);
 
+            UILabel lblNewChannelGroup = new UILabel (new RectangleF (10, 62, 140, 25));
+            lblNewChannelGroup.Font = font13;
+            lblNewChannelGroup.Text = "New ChannelGroup(s):";
+            uiView.Add (lblNewChannelGroup);
+
+            newChannelGroups = new UITextField (new RectangleF (160, 62, 145, 25));
+            newChannelGroups.AutocorrectionType = UITextAutocorrectionType.No;
+            newChannelGroups.BackgroundColor = UIColor.White;
+            newChannelGroups.Font = font12;
+            uiView.Add (newChannelGroups);
+
             return uiView;
         }
 
@@ -285,7 +319,7 @@ namespace PubnubMessagingExample
             Display ("Running Subscribe");
             Channel = newChannels.Text;
             InvokeInBackground(() => {
-                pubnub.Subscribe<string> (Channel, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
+                pubnub.Subscribe<string> (Channel, ChannelGroup, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
             });
         }
 
@@ -341,7 +375,7 @@ namespace PubnubMessagingExample
             Display ("Running Presence");
             Channel = newChannels.Text;
             InvokeInBackground (() => {
-                pubnub.Presence<string> (Channel, DisplayReturnMessage, null, DisplayErrorMessage);
+                pubnub.Presence<string> (Channel, ChannelGroup, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
             });
         }
 
@@ -367,7 +401,7 @@ namespace PubnubMessagingExample
             Display ("Running unsubscribe");
             Channel = newChannels.Text;
             InvokeInBackground (() => {
-                pubnub.Unsubscribe<string> (Channel, DisplayReturnMessage, 
+                pubnub.Unsubscribe<string> (Channel, ChannelGroup, DisplayReturnMessage, 
                     DisplayConnectStatusMessage, DisplayConnectStatusMessage, 
                     DisplayErrorMessage);
             });
@@ -378,7 +412,7 @@ namespace PubnubMessagingExample
             Display ("Running presence-unsubscribe");
             Channel = newChannels.Text;
             InvokeInBackground (() => {
-                pubnub.PresenceUnsubscribe<string> (Channel, DisplayReturnMessage, 
+                pubnub.PresenceUnsubscribe<string> (Channel, ChannelGroup, DisplayReturnMessage, 
                     DisplayConnectStatusMessage, DisplayConnectStatusMessage, 
                     DisplayErrorMessage);
             });
@@ -465,6 +499,106 @@ namespace PubnubMessagingExample
             ShowAlertType3 (CommonDialogStates.SetUserStateJson);
         }
 
+        public void AddChannelToChannelGroup()
+        {
+            EntryElement elementChannel = new EntryElement ("Channel(s)", "Enter Channel(s)", "");
+            elementChannel.AutocapitalizationType = UITextAutocapitalizationType.None;
+            elementChannel.AutocorrectionType = UITextAutocorrectionType.No;
+
+            EntryElement elementChannelGroup = new EntryElement ("ChannelGroup", "Enter ChannelGrop", "");
+            elementChannelGroup.AutocapitalizationType = UITextAutocapitalizationType.None;
+            elementChannelGroup.AutocorrectionType = UITextAutocorrectionType.No;
+
+            var newroot = new RootElement ("Add Channel To ChannelGroup", 0, 0) {
+                new Section () {
+                    elementChannelGroup,
+                    elementChannel,
+                },
+                new Section ("") {
+                    new StyledStringElement ("Add Channel", () => {
+                        string entryChannel = elementChannel.Value;
+                        string entryChannelGroup = elementChannelGroup.Value;
+
+                        Display ("Adding Channel To ChannelGroup");
+                        pubnub.AddChannelsToChannelGroup<string>(new string[]{entryChannel}, entryChannelGroup, DisplayReturnMessage, DisplayErrorMessage);
+
+                        AppDelegate.navigation.PopViewControllerAnimated (true);
+                    }) {
+                        BackgroundColor = UIColor.Blue,
+                        TextColor = UIColor.White,
+                        Alignment = UITextAlignment.Center
+                    },
+                },
+            };
+            dvc = new DialogViewController (newroot, true);
+            AppDelegate.navigation.PushViewController (dvc, true);
+            
+        }
+
+        public void RemoveChannelFromChannelGroup()
+        {
+            EntryElement elementChannel = new EntryElement ("Channel(s)", "Enter Channel(s)", "");
+            elementChannel.AutocapitalizationType = UITextAutocapitalizationType.None;
+            elementChannel.AutocorrectionType = UITextAutocorrectionType.No;
+
+            EntryElement elementChannelGroup = new EntryElement ("ChannelGroup", "Enter ChannelGrop", "");
+            elementChannelGroup.AutocapitalizationType = UITextAutocapitalizationType.None;
+            elementChannelGroup.AutocorrectionType = UITextAutocorrectionType.No;
+
+            var newroot = new RootElement ("Remove Channel From ChannelGroup", 0, 0) {
+                new Section () {
+                    elementChannelGroup,
+                    elementChannel,
+                },
+                new Section ("") {
+                    new StyledStringElement ("Remove Channel", () => {
+                        string entryChannel = elementChannel.Value;
+                        string entryChannelGroup = elementChannelGroup.Value;
+
+                        Display ("Removing Channel From ChannelGroup");
+                        pubnub.RemoveChannelsFromChannelGroup<string>(new string[]{entryChannel}, entryChannelGroup, DisplayReturnMessage, DisplayErrorMessage);
+
+                        AppDelegate.navigation.PopViewControllerAnimated (true);
+                    }) {
+                        BackgroundColor = UIColor.Blue,
+                        TextColor = UIColor.White,
+                        Alignment = UITextAlignment.Center
+                    },
+                },
+            };
+            dvc = new DialogViewController (newroot, true);
+            AppDelegate.navigation.PushViewController (dvc, true);
+        }
+
+        public void GetChannelFromChannelGroup()
+        {
+            EntryElement elementChannelGroup = new EntryElement ("ChannelGroup", "Enter ChannelGrop", "");
+            elementChannelGroup.AutocapitalizationType = UITextAutocapitalizationType.None;
+            elementChannelGroup.AutocorrectionType = UITextAutocorrectionType.No;
+
+            var newroot = new RootElement ("Get Channel List From ChannelGroup", 0, 0) {
+                new Section () {
+                    elementChannelGroup,
+                },
+                new Section ("") {
+                    new StyledStringElement ("Get ChannelList", () => {
+                        string entryChannelGroup = elementChannelGroup.Value;
+
+                        Display ("Getting ChannelList From ChannelGroup");
+                        pubnub.GetChannelsForChannelGroup<string>(entryChannelGroup, DisplayReturnMessage, DisplayErrorMessage);
+
+                        AppDelegate.navigation.PopViewControllerAnimated (true);
+                    }) {
+                        BackgroundColor = UIColor.Blue,
+                        TextColor = UIColor.White,
+                        Alignment = UITextAlignment.Center
+                    },
+                },
+            };
+            dvc = new DialogViewController (newroot, true);
+            AppDelegate.navigation.PushViewController (dvc, true);
+        }
+
         /*public void ViewUserState ()
         {
             string[] channels = Channel.Split (',');
@@ -500,37 +634,46 @@ namespace PubnubMessagingExample
 
             string strHead = "", elementText1 = "", elementText2 = "", elementText3 = "";
             string elementSubText1 = "", elementSubText2 = "", elementSubText3 = "", buttonTitle = "";
+            string elementTextChannelGroup = "", elementSubTextChannelGroup = "";
             if (cds == CommonDialogStates.SetUserStateKeyPair) {
                 strHead = "Add Local User State";
                 elementText1 = "Channel";
+                elementTextChannelGroup = "ChannelGroup";
                 elementText2 = "Key";
                 elementText3 = "Value";
                 elementSubText1 = "Enter Channel";
+                elementSubTextChannelGroup = "Enter ChannelGroup";
                 elementSubText2 = "Enter Key";
                 elementSubText3 = "Enter Value";
                 buttonTitle = "Add";
             } else if (cds == CommonDialogStates.DeleteUserState) {
                 strHead = "Delete Local User State";
                 elementText1 = "Channel";
+                elementTextChannelGroup = "ChannelGroup";
                 elementText2 = "Key";
                 elementSubText1 = "Enter Channel";
+                elementSubTextChannelGroup = "Enter ChannelGroup";
                 elementSubText2 = "Key to delete";
                 buttonTitle = "Delete";
                 showEntryText3 = false;
             } else if (cds == CommonDialogStates.SetUserStateJson) {
                 strHead = "Add User State";
                 elementText1 = "Channel";
+                elementTextChannelGroup = "ChannelGroup";
                 elementText2 = "State";
                 elementText3 = "UUID";
                 elementSubText1 = "Enter Channel";
+                elementSubTextChannelGroup = "Enter ChannelGroup";
                 elementSubText2 = "enter json format";
                 elementSubText3 = "Enter UUID";
                 buttonTitle = "Add";
             } else if (cds == CommonDialogStates.GetUserState) {
                 strHead = "Get User State";
                 elementText1 = "Channel";
+                elementTextChannelGroup = "ChannelGroup";
                 elementText2 = "UUID";
                 elementSubText1 = "Enter Channel";
+                elementSubTextChannelGroup = "Enter ChannelGroup";
                 elementSubText2 = "Enter UUID";
                 buttonTitle = "Get";
                 showEntryText3 = false;
@@ -552,9 +695,14 @@ namespace PubnubMessagingExample
             entryText2.AutocapitalizationType = UITextAutocapitalizationType.None;
             entryText2.AutocorrectionType = UITextAutocorrectionType.No;
 
+            EntryElement entryChannelGroup = new EntryElement (elementTextChannelGroup, elementSubTextChannelGroup, "");
+            entryChannelGroup.AutocapitalizationType = UITextAutocapitalizationType.None;
+            entryChannelGroup.AutocorrectionType = UITextAutocorrectionType.No;
+
             var newroot = new RootElement (strHead, 0, 0) {
                 new Section () {
                     entryText1,
+                    entryChannelGroup,
                     entryText2,
                     entryText3
                 },
@@ -562,6 +710,7 @@ namespace PubnubMessagingExample
                     new StyledStringElement (buttonTitle, () => {
                         string entryText1Val = entryText1.Value;
                         string entryText2Val = entryText2.Value;
+                        string entryChannelGroupValue = entryChannelGroup.Value;
 
                         if (cds == CommonDialogStates.SetUserStateKeyPair) {
                             string entryText3Val = entryText3.Value;
@@ -570,20 +719,20 @@ namespace PubnubMessagingExample
                             double valueDouble;
                             if (Int32.TryParse (entryText3Val, out valueInt)) {
                                 InvokeInBackground(() => {
-                                    pubnub.SetUserState<string> (entryText1Val, new KeyValuePair<string, object> (entryText2Val, valueInt), DisplayReturnMessage, DisplayErrorMessage);
+                                    pubnub.SetUserState<string> (entryText1Val, entryChannelGroupValue, new KeyValuePair<string, object> (entryText2Val, valueInt), DisplayReturnMessage, DisplayErrorMessage);
                                 });
                             } else if (Double.TryParse (entryText3Val, out valueDouble)) {
                                 InvokeInBackground(() => {
-                                    pubnub.SetUserState<string> (entryText1Val, new KeyValuePair<string, object> (entryText2Val, valueDouble), DisplayReturnMessage, DisplayErrorMessage);
+                                    pubnub.SetUserState<string> (entryText1Val, entryChannelGroupValue, new KeyValuePair<string, object> (entryText2Val, valueDouble), DisplayReturnMessage, DisplayErrorMessage);
                                 });
                             } else {
                                 InvokeInBackground(() => {
-                                    pubnub.SetUserState<string> (entryText1Val, new KeyValuePair<string, object> (entryText2Val, entryText3Val), DisplayReturnMessage, DisplayErrorMessage);
+                                    pubnub.SetUserState<string> (entryText1Val, entryChannelGroupValue, new KeyValuePair<string, object> (entryText2Val, entryText3Val), DisplayReturnMessage, DisplayErrorMessage);
                                 });
                             }
                         } else if (cds == CommonDialogStates.DeleteUserState) {
                             InvokeInBackground(() => {
-                                pubnub.SetUserState<string> (entryText1Val, new KeyValuePair<string, object> (entryText2Val, null), DisplayReturnMessage, DisplayErrorMessage);
+                                pubnub.SetUserState<string> (entryText1Val, entryChannelGroupValue, new KeyValuePair<string, object> (entryText2Val, null), DisplayReturnMessage, DisplayErrorMessage);
                             });
                         } else if (cds == CommonDialogStates.SetUserStateJson) {
                             Display ("Setting user state");
@@ -595,12 +744,12 @@ namespace PubnubMessagingExample
                                 jsonUserState = entryText2Val;
                             }
                             InvokeInBackground(() => {
-                                pubnub.SetUserState<string> (entryText1Val, entryText3Val, jsonUserState, DisplayReturnMessage, DisplayErrorMessage);
+                                pubnub.SetUserState<string> (entryText1Val, entryChannelGroupValue, entryText3Val, jsonUserState, DisplayReturnMessage, DisplayErrorMessage);
                             });
                         } else if (cds == CommonDialogStates.GetUserState) {
                             Display ("Running get user state");
                             InvokeInBackground(() => {
-                                pubnub.GetUserState<string> (entryText1Val, entryText2Val, DisplayReturnMessage, DisplayErrorMessage);
+                                pubnub.GetUserState<string> (entryText1Val, entryChannelGroupValue, entryText2Val, DisplayReturnMessage, DisplayErrorMessage);
                             });
                         }
 

@@ -67,6 +67,14 @@
 /mono-for-mac/PubNubTest/obj/*
 /monotouch/PubnubMessaging/bin/Debug/*
 /monotouch/Newtonsoft.Json/bin/Debug/*
+/monotouch/PubnubMessagingExample/bin/iPhoneSimulator/Debug/*
+/monotouch/PubnubMessagingExample/obj/iPhoneSimulator/Debug/*
+/monotouch/Launcher/bin/Debug/*
+/monotouch/Launcher/obj/iPhoneSimulator/Debug/*
+/monotouch/PubnubMessaging.Tests/bin/iPhoneSimulator/Debug/*
+/monotouch/PubnubMessaging.Tests/obj/iPhoneSimulator/Debug/*
+/monotouch/Touch.Server/bin/Debug/*
+/monotouch/Touch.Server/obj/iPhone/Debug/*
 .DS_Store
 *.cache
 *.suo
