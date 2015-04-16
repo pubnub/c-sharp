@@ -24,6 +24,7 @@
     <MtouchLink>None</MtouchLink>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     <MtouchDebug>true</MtouchDebug>
+    <CodesignKey>iPhone Developer</CodesignKey>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>full</DebugType>
@@ -102,7 +103,6 @@
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="UnitTestAppDelegate.cs" />
-    <Compile Include="Common.cs" />
     <Compile Include="PubnubCommon.cs" />
     <Compile Include="PubnubUnitTest.cs" />
     <Compile Include="EncryptionTests.cs" />
@@ -115,8 +115,12 @@
     <Compile Include="GenerateSampleGrant.cs" />
     <Compile Include="WhenSubscribedToAChannel2.cs" />
     <Compile Include="WhenSubscribedToAChannel3.cs" />
+    <Compile Include="WhenChannelGroupIsRequested.cs" />
+    <Compile Include="WhenSubscribedToAChannelGroup.cs" />
+    <Compile Include="WhenUnsubscribedToAChannelGroup.cs" />
+    <Compile Include="WhenAuditIsRequested.cs" />
+    <Compile Include="WhenGrantIsRequested.cs" />
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <ProjectReference Include="..\Newtonsoft.Json\Newtonsoft.Json.MonoTouch.csproj">
       <Project>{12448CD5-D860-4C1C-8B9F-139F3794B9BC}</Project>
@@ -127,4 +131,5 @@
       <Name>PubnubMessaging.Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.MonoTouch.CSharp.targets" />
 </Project>

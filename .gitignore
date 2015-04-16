@@ -75,6 +75,9 @@
 /monotouch/PubnubMessaging.Tests/obj/iPhoneSimulator/Debug/*
 /monotouch/Touch.Server/bin/Debug/*
 /monotouch/Touch.Server/obj/iPhone/Debug/*
+/monotouch/Touch.Unit/bin/iPhoneSimulator/Debug/
+/monotouch/Touch.Unit/bin/iPhoneSimulator/Debug/TouchUnit.app/
+/monotouch/Touch.Unit/obj/*
 .DS_Store
 *.cache
 *.suo
