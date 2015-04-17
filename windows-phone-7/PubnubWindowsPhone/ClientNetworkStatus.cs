@@ -268,7 +268,9 @@ namespace PubNubMessaging.Core
 			PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(ex);
 			int statusCode = (int)errorType;
 			string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(errorType);
-            PubnubClientError error = new PubnubClientError(statusCode, PubnubErrorSeverity.Warn, true, ex.Message, ex, PubnubMessageSource.Client, null, null, errorDescription, string.Join(",", channels), string.Join(",", channelGroups));
+            string channel = (channels == null) ? "" : string.Join(",", channels);
+            string channelGroup = (channelGroups == null) ? "" : string.Join(",", channelGroups);
+            PubnubClientError error = new PubnubClientError(statusCode, PubnubErrorSeverity.Warn, true, ex.ToString(), ex, PubnubMessageSource.Client, null, null, errorDescription, channel, channelGroup);
 			GoToCallback(error, errorCallback);
 
 			LoggingMethod.WriteToLog(string.Format("DateTime {0} checkInternetStatus Error. {1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelError);
