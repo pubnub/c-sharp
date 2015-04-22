@@ -2691,15 +2691,6 @@ namespace PubNubMessaging.Core
             bool channelGroupSubscribeOnly = false;
             bool channelSubscribeOnly = false;
 
-            if (rawChannels != null && rawChannels.Length > 0 && rawChannelGroups == null)
-            {
-                channelSubscribeOnly = true;
-            }
-            if (rawChannels != null && rawChannels.Length == 0 && rawChannelGroups != null && rawChannelGroups.Length > 0)
-            {
-                channelGroupSubscribeOnly = true;
-            }
-
             string channel = (rawChannels != null) ? string.Join(",", rawChannels) : "";
             string channelGroup = (rawChannelGroups != null) ? string.Join(",", rawChannelGroups) : "";
 
@@ -2852,7 +2843,16 @@ namespace PubNubMessaging.Core
 				string[] channels = multiChannelSubscribe.Keys.ToArray<string> ();
                 string[] channelGroups = multiChannelGroupSubscribe.Keys.ToArray<string>();
 
-				RequestState<T> state = new RequestState<T>();
+                if (channels != null && channels.Length > 0 && (channelGroups == null || channelGroups.Length == 0))
+                {
+                    channelSubscribeOnly = true;
+                }
+                if (channelGroups != null && channelGroups.Length > 0 && (channels == null || channels.Length == 0))
+                {
+                    channelGroupSubscribeOnly = true;
+                }
+
+                RequestState<T> state = new RequestState<T>();
                 if (channelGroupSubscribeOnly)
                 {
                     _channelRequest.AddOrUpdate(",", state.Request, (key, oldValue) => state.Request);
@@ -4918,7 +4918,9 @@ namespace PubNubMessaging.Core
                         {
 							PubnubChannelCallback<T> currentPubnubCallback = channelCallbacks [callbackKey] as PubnubChannelCallback<T>;
 							if (currentPubnubCallback != null && currentPubnubCallback.ConnectCallback != null) {
-								GoToCallback<T> (connectResult, currentPubnubCallback.ConnectCallback);
+                                Action<T> targetCallback = currentPubnubCallback.ConnectCallback;
+                                currentPubnubCallback.ConnectCallback = null;
+                                GoToCallback<T>(connectResult, targetCallback);
 							}
 						}
 						break;
@@ -4934,7 +4936,9 @@ namespace PubNubMessaging.Core
 						if (channelCallbacks.Count > 0 && channelCallbacks.ContainsKey (pCallbackKey)) {
 							PubnubChannelCallback<T> currentPubnubCallback = channelCallbacks [pCallbackKey] as PubnubChannelCallback<T>;
 							if (currentPubnubCallback != null && currentPubnubCallback.ConnectCallback != null) {
-								GoToCallback<T> (connectResult, currentPubnubCallback.ConnectCallback);
+                                Action<T> targetCallback = currentPubnubCallback.ConnectCallback;
+                                currentPubnubCallback.ConnectCallback = null;
+                                GoToCallback<T>(connectResult, targetCallback);
 							}
 						}
 						break;
