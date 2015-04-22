@@ -4918,8 +4918,10 @@ namespace PubNubMessaging.Core
                         {
 							PubnubChannelCallback<T> currentPubnubCallback = channelCallbacks [callbackKey] as PubnubChannelCallback<T>;
 							if (currentPubnubCallback != null && currentPubnubCallback.ConnectCallback != null) {
-								GoToCallback<T> (connectResult, currentPubnubCallback.ConnectCallback);
-							}
+                                Action<T> targetCallback = currentPubnubCallback.ConnectCallback;
+                                currentPubnubCallback.ConnectCallback = null;
+                                GoToCallback<T>(connectResult, targetCallback);
+                            }
 						}
 						break;
 					case ResponseType.Presence:
@@ -4934,8 +4936,10 @@ namespace PubNubMessaging.Core
 						if (channelCallbacks.Count > 0 && channelCallbacks.ContainsKey (pCallbackKey)) {
 							PubnubChannelCallback<T> currentPubnubCallback = channelCallbacks [pCallbackKey] as PubnubChannelCallback<T>;
 							if (currentPubnubCallback != null && currentPubnubCallback.ConnectCallback != null) {
-								GoToCallback<T> (connectResult, currentPubnubCallback.ConnectCallback);
-							}
+                                Action<T> targetCallback = currentPubnubCallback.ConnectCallback;
+                                currentPubnubCallback.ConnectCallback = null;
+                                GoToCallback<T>(connectResult, targetCallback);
+                            }
 						}
 						break;
 					default:
