@@ -2,26 +2,28 @@ using System;
 
 namespace PubNubMessaging.Core
 {
-    //#if(!UNITY_IOS && !UNITY_ANDROID)
+    #if(!UNITY_IOS && !UNITY_ANDROID)
     public class ReconnectState<T>
-    {
-        public string[] Channels;
-        public ResponseType Type;
-        public Action<T> Callback;
-        public Action<PubnubClientError> ErrorCallback;
-        public Action<T> ConnectCallback;
-        public object Timetoken;
+	{
+		public string[] Channels;
+        public string[] ChannelGroups;
+		public ResponseType Type;
+		public Action<T> Callback;
+		public Action<PubnubClientError> ErrorCallback;
+		public Action<T> ConnectCallback;
+		public object Timetoken;
         public bool Reconnect;
 
-        public ReconnectState ()
-        {
-            Channels = null;
-            Callback = null;
-            ConnectCallback = null;
-            Timetoken = null;
+		public ReconnectState()
+		{
+			Channels = null;
+            ChannelGroups = null;
+			Callback = null;
+			ConnectCallback = null;
+			Timetoken = null;
             Reconnect = false;
-        }
-    }
-    //#endif
+		}
+	}
+    #endif
 }
 
