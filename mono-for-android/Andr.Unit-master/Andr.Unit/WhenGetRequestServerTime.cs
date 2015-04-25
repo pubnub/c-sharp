@@ -1,127 +1,190 @@
-using System;
-using PubNubMessaging.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using NUnit.Framework;
 using System.ComponentModel;
-using System.Collections.Generic;
 using System.Threading;
+using System.Collections;
+//using Newtonsoft.Json;
+//using Newtonsoft.Json.Linq;
+using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
     public class WhenGetRequestServerTime
     {
-        ManualResetEvent mreTime = new ManualResetEvent (false);
-        ManualResetEvent mreProxy = new ManualResetEvent (false);
+        ManualResetEvent mreTime = new ManualResetEvent(false);
+        ManualResetEvent mreProxy = new ManualResetEvent(false);
         bool timeReceived = false;
         bool timeReceivedWhenProxy = false;
 
+        Pubnub pubnub = null;
+
         [Test]
-        public void ThenItShouldReturnTimeStamp ()
+        public void ThenItShouldReturnTimeStamp()
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "",
-                                false
-                            );
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenGetRequestServerTime";
+            unitTest.TestCaseName = "ThenItShouldReturnTimeStamp";
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenGetRequestServerTime", "ThenItShouldReturnTimeStamp");
-            ;
+            pubnub.PubnubUnitTest = unitTest;
+
+            pubnub.Time<string>(ReturnTimeStampCallback, DummyErrorCallback);
+            mreTime.WaitOne(310 * 1000);
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.True(timeReceived, "time() Failed");
+        }
+
+        [Test]
+        public void ThenItShouldReturnTimeStampWithSSL()
+        {
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", true);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenGetRequestServerTime";
+            unitTest.TestCaseName = "ThenItShouldReturnTimeStamp";
+
+            pubnub.PubnubUnitTest = unitTest;
+
+            pubnub.Time<string>(ReturnTimeStampCallback, DummyErrorCallback);
+            mreTime.WaitOne(310 * 1000);
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.True(timeReceived, "time() with SSL Failed");
+        }
+
+
+        [Test]
+        public void ThenWithProxyItShouldReturnTimeStamp()
+        {
+            bool proxyConfigured = false;
+
+            PubnubProxy proxy = new PubnubProxy();
+            proxy.ProxyServer = "test.pandu.com";
+            proxy.ProxyPort = 808;
+            proxy.ProxyUserName = "tuvpnfreeproxy";
+            proxy.ProxyPassword = "Rx8zW78k";
+
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenGetRequestServerTime";
+            unitTest.TestCaseName = "ThenWithProxyItShouldReturnTimeStamp";
+            pubnub.PubnubUnitTest = unitTest;
             
-            string response = "";
+            if (proxyConfigured)
+            {
+                pubnub.Proxy = proxy;
+                pubnub.Time<string>(ReturnProxyPresenceTimeStampCallback, DummyErrorCallback);
+                mreProxy.WaitOne(310 * 1000);
+                pubnub.EndPendingRequests();
+                pubnub = null;
+                Assert.True(timeReceivedWhenProxy, "time() Failed");
+            }
+            else
+            {
+                Assert.Ignore("Proxy setup not configured. After setup Set proxyConfigured to true");
+            }
 
-            pubnub.Time (common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
-           
-            common.WaitForResponse ();
-
-            IList<object> fields = common.Response as IList<object>;
-            response = fields [0].ToString ();
-            Console.WriteLine ("Response:" + response);
-            Assert.False (("0").Equals (response));
-            pubnub.EndPendingRequests ();
         }
 
         [Test]
-        public void ThenItShouldReturnTimeStampSSL ()
+        public void ThenWithProxyItShouldReturnTimeStampWithSSL()
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "",
-                                true
-                            );
+            bool proxyConfigured = false;
 
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
+            PubnubProxy proxy = new PubnubProxy();
+            proxy.ProxyServer = "test.pandu.com";
+            proxy.ProxyPort = 808;
+            proxy.ProxyUserName = "tuvpnfreeproxy";
+            proxy.ProxyPassword = "Rx8zW78k";
 
-            pubnub.PubnubUnitTest = common.CreateUnitTestInstance ("WhenGetRequestServerTime", "ThenItShouldReturnTimeStamp");
-            ;
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", true);
 
-            string response = "";
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenGetRequestServerTime";
+            unitTest.TestCaseName = "ThenWithProxyItShouldReturnTimeStamp";
+            pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.Time (common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
+            if (proxyConfigured)
+            {
+                pubnub.Proxy = proxy;
+                pubnub.Time<string>(ReturnProxyPresenceTimeStampCallback, DummyErrorCallback);
+                mreProxy.WaitOne(310 * 1000);
+                pubnub.EndPendingRequests();
+                pubnub = null;
+                Assert.True(timeReceivedWhenProxy, "time() with SSL through proxy Failed");
+            }
+            else
+            {
+                Assert.Ignore("Proxy setup for SSL not configured. After setup Set proxyConfigured to true");
+            }
 
-            common.WaitForResponse ();
-
-            IList<object> fields = common.Response as IList<object>;
-            response = fields [0].ToString ();
-            Console.WriteLine ("Response:" + response);
-            Assert.False (("0").Equals (response));
-            pubnub.EndPendingRequests ();
         }
 
-        private void ReturnTimeStampCallback (string result)
+
+        private void ReturnTimeStampCallback(string result)
         {
-            if (!string.IsNullOrEmpty (result) && !string.IsNullOrEmpty (result.Trim ())) {
-                Pubnub pubnub = new Pubnub ("demo", "demo", "", "", false);
-                object[] deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject (result).ToArray ();
-                if (deserializedMessage is object[]) {
-                    string time = deserializedMessage [0].ToString ();
+            if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
+            {
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
+                {
+                    string time = deserializedMessage[0].ToString();
                     Int64 nanoTime;
-                    if (time.Length > 2 && Int64.TryParse (time, out nanoTime)) {
+                    if (time.Length > 2 && Int64.TryParse(time, out nanoTime))
+                    {
                         timeReceived = true;
                     }
                 }
             }
-            mreTime.Set ();
+            mreTime.Set();
+        }
+
+        private void ReturnProxyPresenceTimeStampCallback(string result)
+        {
+            if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
+            {
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
+                {
+                    string time = deserializedMessage[0].ToString();
+                    Int64 nanoTime;
+                    if (time.Length > 2 && Int64.TryParse(time, out nanoTime))
+                    {
+                        timeReceivedWhenProxy = true;
+                    }
+                }
+            }
+            mreProxy.Set();
         }
 
         [Test]
-        public void TranslateDateTimeToUnixTime ()
+        public void TranslateDateTimeToUnixTime()
         {
-            //Debug.Log ("Running TranslateDateTimeToUnixTime()");
             //Test for 26th June 2012 GMT
-            DateTime dt = new DateTime (2012, 6, 26, 0, 0, 0, DateTimeKind.Utc);
-            long nanoSecondTime = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds (dt);
-            Assert.True ((13406688000000000).Equals (nanoSecondTime));
+            DateTime dt = new DateTime(2012,6,26,0,0,0,DateTimeKind.Utc);
+            long nanoSecondTime = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(dt);
+            Assert.Equals(13406688000000000, nanoSecondTime);
         }
 
         [Test]
-        public void TranslateUnixTimeToDateTime ()
+        public void TranslateUnixTimeToDateTime()
         {
-            //Debug.Log ("Running TranslateUnixTimeToDateTime()");
             //Test for 26th June 2012 GMT
-            DateTime expectedDate = new DateTime (2012, 6, 26, 0, 0, 0, DateTimeKind.Utc);
-            DateTime actualDate = Pubnub.TranslatePubnubUnixNanoSecondsToDateTime (13406688000000000);
-            Assert.True (expectedDate.ToString ().Equals (actualDate.ToString ()));
+            DateTime expectedDate = new DateTime(2012, 6, 26, 0, 0, 0, DateTimeKind.Utc);
+            DateTime actualDate = Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(13406688000000000);
+            Assert.Equals(expectedDate, actualDate);
         }
 
-        void DummyErrorCallback (string result)
+        void DummyErrorCallback(PubnubClientError result)
         {
-            //Debug.Log ("WhenGetRequestServerTime ErrorCallback = " + result);
         }
 
-        void DummyErrorCallback (PubnubClientError result)
-        {
-            //Debug.Log ("WhenUnsubscribedToAChannel ErrorCallback = " + result.ToString ());
-        }
     }
 }
-

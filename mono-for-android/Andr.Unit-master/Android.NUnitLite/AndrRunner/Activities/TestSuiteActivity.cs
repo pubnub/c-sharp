@@ -23,6 +23,7 @@ using Android.Widget;
 
 using MonoDroid.Dialog;
 using NUnitLite;
+using System.Collections.Generic;
 
 namespace Android.NUnitLite.UI {
 
@@ -66,13 +67,35 @@ namespace Android.NUnitLite.UI {
         
         public void Run ()
         {
+            Dictionary<string,string> testCases = new Dictionary<string, string>();
+            int successCount = 0;
+            int failureCount = 0;
+            int errorCount = 0;
+            int noRunCount = 0;
+
             AndroidRunner runner = AndroidRunner.Runner;
             if (!runner.OpenWriter ("Run " + test_suite, this))
                 return;
             
             try {
                 foreach (ITest test in suite.Tests) {
-                    test.Run (runner);
+                    TestResult result = test.Run (runner);
+                    testCases.Add(test.FullName, result.ResultState.ToString());
+                    switch(result.ResultState)
+                    {
+                    case ResultState.Success:
+                        successCount++;
+                        break;
+                    case ResultState.Failure:
+                        failureCount++;
+                        break;
+                    case ResultState.Error:
+                        errorCount++;
+                        break;
+                    case ResultState.NotRun:
+                        noRunCount++;
+                        break;
+                    }
                 }
             }
             finally {
@@ -82,6 +105,15 @@ namespace Android.NUnitLite.UI {
             foreach (TestElement te in main) {
                 te.Update ();
             }
+
+            foreach (string key in testCases.Keys) {
+                Console.WriteLine ("{0} : {1}", key, testCases [key]);
+            }
+            Console.WriteLine ("TestCaseCount = {0}", suite.TestCaseCount);
+            Console.WriteLine ("Success Count = {0}", successCount);
+            Console.WriteLine ("Fail Count = {0}", failureCount);
+            Console.WriteLine ("Error Count = {0}", errorCount);
+            Console.WriteLine ("Not Run count = {0}", noRunCount);
         }
     }
 }

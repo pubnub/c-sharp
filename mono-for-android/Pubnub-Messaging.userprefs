@@ -1,21 +1,30 @@
-﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Android.YT910F2NYE" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="PubNubMessaging.Example/LaunchScreen.cs">
+﻿<Properties StartupItem="Andr.Unit-master/Andr.Unit/Andr.Unit.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Android.MonoForAndroid_API_12" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Andr.Unit-master/Android.NUnitLite/AndrRunner/Activities/TestSuiteActivity.cs">
     <Files>
-      <File FileName="PubNubMessaging.Example/MainActivity.cs" Line="256" Column="13" />
-      <File FileName="PubNubMessaging.Example/GrantDialogFragment.cs" Line="1" Column="1" />
-      <File FileName="PubNubMessaging.Example/LaunchScreen.cs" Line="48" Column="13" />
-      <File FileName="PubNubMessaging.Example/Resources/values/Strings.xml" Line="1" Column="1" />
+      <File FileName="Andr.Unit-master/Andr.Unit/MainActivity.cs" Line="50" Column="1" />
+      <File FileName="Andr.Unit-master/Android.NUnitLite/AndrRunner/TcpTextWriter.cs" Line="26" Column="1" />
+      <File FileName="Andr.Unit-master/Andr.Unit/PubnubCommon.cs" Line="10" Column="45" />
+      <File FileName="Andr.Unit-master/Andr.Unit/GenerateSampleGrant.cs" Line="68" Column="17" />
+      <File FileName="Andr.Unit-master/Android.NUnitLite/AndrRunner/Activities/TestSuiteActivity.cs" Line="42" Column="53" />
     </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="Andr.Unit" expanded="True" />
+          <Node name="Android.NUnitLite" expanded="True">
+            <Node name="AndrRunner" expanded="True">
+              <Node name="Activities" expanded="True">
+                <Node name="TestSuiteActivity.cs" selected="True" />
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <MonoDevelop.Ide.ItemProperties.PubNubMessaging.Example MonoForAntroid.PreferredDevice="AndArm" />
-</Properties>roidDeviceId-Debug="YT910F2NYE" />
-</Properties>aging/Pubnub.cs" line="1526" offsetX="915" offsetY="22880" expression="cert" liveUpdate="False" />
-  </MonoDevelop.Ide.DebuggingService.PinnedWatches>
-  <MonoDevelop.Ide.ItemProperties.PubNubMessaging.Example MonoForAntroid.PreferredDevice="AndArm" AndroidDeviceId-Debug="YT910F2NYE" />
-  <MonoDevelop.Ide.ItemProperties.Andr.Unit AndroidDeviceId-Release="emulator-5554" AndroidDeviceId-Debug="YT910F2NYE" />
 </Properties>

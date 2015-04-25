@@ -118,12 +118,45 @@ namespace Android.NUnitLite.UI {
 
         void Run ()
         {
+            Dictionary<string,string> testCases = new Dictionary<string, string>();
+            int successCount = 0;
+            int failureCount = 0;
+            int errorCount = 0;
+            int noRunCount = 0;
+            int testCasesCount = 0;
+
             if (!Runner.OpenWriter ("Run Everything", this))
                 return;
             
             try {
                 foreach (TestSuite suite in AndroidRunner.AssemblyLevel) {
-                    suite.Run (Runner);
+                    //TestResult result = suite.Run (Runner);
+                    testCasesCount = suite.TestCaseCount;
+                    foreach (ITest test in suite.Tests) {
+                        TestSuite testCaseSuite = test as TestSuite;
+                        if (testCaseSuite != null & testCaseSuite.TestCaseCount > 0)
+                        {
+                            foreach (ITest testCase in testCaseSuite.Tests) {
+                                TestResult result = testCase.Run (Runner);
+                                testCases.Add(testCase.FullName, result.ResultState.ToString());
+                                switch(result.ResultState)
+                                {
+                                case ResultState.Success:
+                                    successCount++;
+                                    break;
+                                case ResultState.Failure:
+                                    failureCount++;
+                                    break;
+                                case ResultState.Error:
+                                    errorCount++;
+                                    break;
+                                case ResultState.NotRun:
+                                    noRunCount++;
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
             }
             finally {
@@ -133,6 +166,15 @@ namespace Android.NUnitLite.UI {
             foreach (TestElement te in main) {
                 te.Update ();
             }
+
+            foreach (string key in testCases.Keys) {
+                Console.WriteLine ("{0} : {1}", key, testCases [key]);
+            }
+            Console.WriteLine ("TestCaseCount = {0}", testCasesCount);
+            Console.WriteLine ("Success Count = {0}", successCount);
+            Console.WriteLine ("Fail Count = {0}", failureCount);
+            Console.WriteLine ("Error Count = {0}", errorCount);
+            Console.WriteLine ("Not Run count = {0}", noRunCount);
         }
     }
 }

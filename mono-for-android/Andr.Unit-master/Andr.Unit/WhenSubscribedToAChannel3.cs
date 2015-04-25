@@ -1,419 +1,410 @@
-using System;
-using PubNubMessaging.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using NUnit.Framework;
 using System.ComponentModel;
-using System.Collections.Generic;
-using System.Collections;
-using System.Linq;
 using System.Threading;
+using System.Collections;
+using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
     public class WhenSubscribedToAChannel3
     {
-        void SubscribePublishAndParse (string message, Pubnub pubnub, Common common, string channel)
+        ManualResetEvent mreSubscribeConnect = new ManualResetEvent(false);
+        ManualResetEvent mrePublish = new ManualResetEvent(false);
+        ManualResetEvent mreUnsubscribe = new ManualResetEvent(false);
+        ManualResetEvent mreGrant = new ManualResetEvent(false);
+        ManualResetEvent mreSubscribe = new ManualResetEvent(false);
+
+        bool receivedMessage = false;
+        bool receivedGrantMessage = false;
+
+        int manualResetEventsWaitTimeout = 310 * 1000;
+        object publishedMessage = null;
+        bool isPublished = false;
+
+        Pubnub pubnub = null;
+
+        [SetUp]
+        public void Init()
         {
-            Random r = new Random ();
-            channel = "hello_world_sub" + r.Next (1000);
-            pubnub.Subscribe<string> (channel, common.DisplayReturnMessage, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy); 
-            Thread.Sleep (2500);
+            if (!PubnubCommon.PAMEnabled) return;
 
-            pubnub.Publish (channel, message, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy);
+            receivedGrantMessage = false;
 
-            common.WaitForResponse (35);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            if (common.Response != null) {
-                object[] deserializedMessage = Common.Deserialize<object[]> (common.Response.ToString ());
-                if (deserializedMessage != null) {
-                    Assert.True (message.Equals (deserializedMessage [0].ToString ()));
-                } else {
-                    Assert.Fail ("Test not successful");
-                }
-            } else {
-                Assert.Fail ("No response");
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "GrantRequestUnitTest";
+            unitTest.TestCaseName = "Init";
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channel = "hello_my_channel,hello_my_channel1,hello_my_channel2";
+
+            pubnub.GrantAccess<string>(channel, true, true, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            Thread.Sleep(1000);
+
+            mreGrant.WaitOne();
+
+            pubnub.EndPendingRequests();
+            pubnub = null;
+            Assert.True(receivedGrantMessage, "WhenSubscribedToAChannel Grant access failed.");
+        }
+
+        [Test]
+        public void ThenSubscribeShouldReturnUnicodeMessage()
+        {
+            receivedMessage = false;
+            CommonSubscribeShouldReturnUnicodeMessageBasedOnParams("", "", false);
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnUnicodeMessage Failed");
+        }
+
+        private void CommonSubscribeShouldReturnUnicodeMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
+        {
+            receivedMessage = false;
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, secretKey, cipherKey, ssl);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenSubscribedToAChannel";
+            unitTest.TestCaseName = (string.IsNullOrEmpty(cipherKey)) ? "ThenSubscribeShouldReturnUnicodeMessage" : "ThenSubscribeShouldReturnUnicodeCipherMessage";
+
+            pubnub.PubnubUnitTest = unitTest;
+
+            string channel = "hello_my_channel";
+
+            mreSubscribe = new ManualResetEvent(false);
+
+            mreSubscribeConnect = new ManualResetEvent(false);
+            pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            mreSubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
+
+            mrePublish = new ManualResetEvent(false);
+            publishedMessage = "Text with ÜÖ漢語";
+            pubnub.Publish<string>(channel, publishedMessage, dummyPublishCallback, DummyErrorCallback);
+            mrePublish.WaitOne(manualResetEventsWaitTimeout);
+
+            if (isPublished)
+            {
+                mreSubscribe.WaitOne(manualResetEventsWaitTimeout);
+
+                mreUnsubscribe = new ManualResetEvent(false);
+                pubnub.Unsubscribe<string>(channel, dummyUnsubscribeCallback, SubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+                mreUnsubscribe.WaitOne(manualResetEventsWaitTimeout);
             }
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            pubnub.Unsubscribe<string> (channel, common.DisplayReturnMessageDummy, common.DisplayReturnMessageDummy, common.DisplayReturnMessage, common.DisplayReturnMessageDummy);
-
-            common.WaitForResponse (20);
-
-            pubnub.EndPendingRequests ();
+            pubnub.EndPendingRequests();
+            pubnub = null;
         }
 
         [Test]
-        public void TestForUnicodeSSL ()
+        public void ThenSubscribeShouldReturnUnicodeMessageSSL()
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "",
-                                true);
-            string channel = "hello_world";
-
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            string message = "Text with ÜÖ漢語";
-
-            SubscribePublishAndParse (message, pubnub, common, channel);
+            receivedMessage = false;
+            CommonSubscribeShouldReturnUnicodeMessageBasedOnParams("", "", true);
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnUnicodeMessageSSL Failed");
         }
 
         [Test]
-        public void TestForUnicode ()
+        public void ThenSubscribeShouldReturnForwardSlashMessage()
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "",
-                                false);
-            string channel = "hello_world";
-
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            string message = "Text with ÜÖ漢語";
-
-            SubscribePublishAndParse (message, pubnub, common, channel);
+            receivedMessage = false;
+            CommonSubscribeReturnForwardSlashMessageBasedOnParams("", "", false);
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessage Failed");
         }
 
-        [Test]
-        public void TestForForwardSlashSSL ()
+        private void CommonSubscribeReturnForwardSlashMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "",
-                                true);
-            string channel = "hello_world";
+            receivedMessage = false;
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, secretKey, cipherKey, ssl);
 
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenSubscribedToAChannel";
+            unitTest.TestCaseName = (string.IsNullOrEmpty(cipherKey)) ? "ThenSubscribeShouldReturnReceivedForwardSlashMessage" : "ThenSubscribeShouldReturnReceivedForwardSlashCipherMessage";
 
-            string message = "Text with /";
+            pubnub.PubnubUnitTest = unitTest;
 
-            SubscribePublishAndParse (message, pubnub, common, channel);
-        }
+            string channel = "hello_my_channel";
 
-        [Test]
-        public void TestForForwardSlashCipher ()
-        {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "enigma",
-                                false);
-            string channel = "hello_world";
+            mreSubscribe = new ManualResetEvent(false);
 
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
+            mreSubscribeConnect = new ManualResetEvent(false);
+            pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            mreSubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
-            string message = "Text with /";
+            mrePublish = new ManualResetEvent(false);
+            publishedMessage = "Text with /";
+            pubnub.Publish<string>(channel, publishedMessage, dummyPublishCallback, DummyErrorCallback);
+            mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
-            SubscribePublishAndParse (message, pubnub, common, channel);
-        }
+            if (isPublished)
+            {
+                mreSubscribe.WaitOne(manualResetEventsWaitTimeout);
 
-        [Test]
-        public void TestForForwardSlash ()
-        {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "",
-                                false);
-            string channel = "hello_world";
-
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            string message = "Text with /";
-
-            SubscribePublishAndParse (message, pubnub, common, channel);
+                mreUnsubscribe = new ManualResetEvent(false);
+                pubnub.Unsubscribe<string>(channel, dummyUnsubscribeCallback, SubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+                mreUnsubscribe.WaitOne(manualResetEventsWaitTimeout);
+            }
+            pubnub.EndPendingRequests();
+            pubnub = null;
 
         }
 
         [Test]
-        public void TestForForwardSlashCipherSSL ()
+        public void ThenSubscribeShouldReturnForwardSlashMessageSSL()
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "enigma",
-                                true);
-            string channel = "hello_world";
-
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            string message = "Text with /";
-
-            SubscribePublishAndParse (message, pubnub, common, channel);
-
+            receivedMessage = false;
+            CommonSubscribeReturnForwardSlashMessageBasedOnParams("", "", true);
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessageSSL Failed");
         }
 
         [Test]
-        public void TestForForwardSlashSecret ()
+        public void ThenSubscribeShouldReturnForwardSlashMessageCipher()
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                Common.SecretKey,
-                                "",
-                                false);
-            string channel = "hello_world";
-
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            string message = "Text with /";
-
-            SubscribePublishAndParse (message, pubnub, common, channel);
+            receivedMessage = false;
+            CommonSubscribeReturnForwardSlashMessageBasedOnParams("", "enigma", false);
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessageCipher Failed");
         }
 
         [Test]
-        public void TestForForwardSlashCipherSecret ()
+        public void ThenSubscribeShouldReturnForwardSlashMessageCipherSSL()
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                Common.SecretKey,
-                                "enigma",
-                                false);
-            string channel = "hello_world";
-
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            string message = "Text with /";
-
-            SubscribePublishAndParse (message, pubnub, common, channel);
-
+            receivedMessage = false;
+            CommonSubscribeReturnForwardSlashMessageBasedOnParams("", "enigma", true);
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessageCipherSSL Failed");
         }
 
         [Test]
-        public void TestForForwardSlashCipherSecretSSL ()
+        public void ThenSubscribeShouldReturnForwardSlashMessageSecret()
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                Common.SecretKey,
-                                "enigma",
-                                true);
-            string channel = "hello_world";
-
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            string message = "Text with /";
-
-            SubscribePublishAndParse (message, pubnub, common, channel);
-
+            receivedMessage = false;
+            CommonSubscribeReturnForwardSlashMessageBasedOnParams(PubnubCommon.SecretKey, "", false);
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessageSecret Failed");
         }
 
         [Test]
-        public void TestForForwardSlashSecretSSL ()
+        public void ThenSubscribeShouldReturnForwardSlashMessageCipherSecret()
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                Common.SecretKey,
-                                "",
-                                true);
-            string channel = "hello_world";
-
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            string message = "Text with /";
-
-            SubscribePublishAndParse (message, pubnub, common, channel);
+            receivedMessage = false;
+            CommonSubscribeReturnForwardSlashMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", false);
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessageCipherSecret Failed");
         }
 
         [Test]
-        public void TestForSpecialCharSSL ()
+        public void ThenSubscribeShouldReturnForwardSlashMessageCipherSecretSSL()
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "",
-                                true);
-            string channel = "hello_world";
-
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            string message = "Text with '\"";
-
-            SubscribePublishAndParse (message, pubnub, common, channel);
-
+            receivedMessage = false;
+            CommonSubscribeReturnForwardSlashMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", true);
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessageCipherSecretSSL Failed");
         }
 
         [Test]
-        public void TestForSpecialCharCipher ()
+        public void ThenSubscribeShouldReturnForwardSlashMessageSecretSSL()
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "enigma",
-                                false);
-            string channel = "hello_world";
-
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            string message = "Text with '\"";
-
-            SubscribePublishAndParse (message, pubnub, common, channel);
-
+            receivedMessage = false;
+            CommonSubscribeReturnForwardSlashMessageBasedOnParams(PubnubCommon.SecretKey, "", true);
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessageSecretSSL Failed");
         }
 
         [Test]
-        public void TestForSpecialChar ()
+        public void ThenSubscribeShouldReturnSpecialCharMessage()
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "",
-                                false);
-            string channel = "hello_world";
+            receivedMessage = false;
+            CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams("", "", false);
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessage Failed");
+        }
 
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
+        private void CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
+        {
+            receivedMessage = false;
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, secretKey, cipherKey, ssl);
 
-            string message = "Text with '\"";
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenSubscribedToAChannel";
+            unitTest.TestCaseName = (string.IsNullOrEmpty(cipherKey)) ? "ThenSubscribeShouldReturnSpecialCharMessage" : "ThenSubscribeShouldReturnSpecialCharCipherMessage";
 
-            SubscribePublishAndParse (message, pubnub, common, channel);
+            pubnub.PubnubUnitTest = unitTest;
 
+            string channel = "hello_my_channel";
+
+            mreSubscribe = new ManualResetEvent(false);
+
+            mreSubscribeConnect = new ManualResetEvent(false);
+            pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            mreSubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
+
+            mrePublish = new ManualResetEvent(false);
+            publishedMessage = "Text with '\"";
+            pubnub.Publish<string>(channel, publishedMessage, dummyPublishCallback, DummyErrorCallback);
+            mrePublish.WaitOne(manualResetEventsWaitTimeout);
+
+            if (isPublished)
+            {
+                mreSubscribe.WaitOne(manualResetEventsWaitTimeout);
+
+                mreUnsubscribe = new ManualResetEvent(false);
+                pubnub.Unsubscribe<string>(channel, dummyUnsubscribeCallback, SubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+                mreUnsubscribe.WaitOne(manualResetEventsWaitTimeout);
+            }
+            pubnub.EndPendingRequests();
+            pubnub = null;
         }
 
         [Test]
-        public void TestForSpecialCharCipherSSL ()
+        public void ThenSubscribeShouldReturnSpecialCharMessageSSL()
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                "",
-                                "enigma",
-                                true);
-            string channel = "hello_world";
-
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            string message = "Text with '\"";
-
-            SubscribePublishAndParse (message, pubnub, common, channel);
-
+            receivedMessage = false;
+            CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams("", "", true);
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessageSSL Failed");
         }
 
         [Test]
-        public void TestForSpecialCharSecret ()
+        public void ThenSubscribeShouldReturnSpecialCharMessageCipher()
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                Common.SecretKey,
-                                "",
-                                false);
-            string channel = "hello_world";
-
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            string message = "Text with '\"";
-
-            SubscribePublishAndParse (message, pubnub, common, channel);
-
+            receivedMessage = false;
+            CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams("", "enigma", false);
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessageCipher Failed");
         }
 
         [Test]
-        public void TestForSpecialCharCipherSecret ()
+        public void ThenSubscribeShouldReturnSpecialCharMessageCipherSSL()
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                Common.SecretKey,
-                                "enigma",
-                                false);
-            string channel = "hello_world";
-
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            string message = "Text with '\"";
-
-            SubscribePublishAndParse (message, pubnub, common, channel);
-
+            receivedMessage = false;
+            CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams("", "enigma", true);
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessageCipherSSL Failed");
         }
 
         [Test]
-        public void TestForSpecialCharCipherSecretSSL ()
+        public void ThenSubscribeShouldReturnSpecialCharMessageSecret()
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                Common.SecretKey,
-                                "enigma",
-                                true);
-            string channel = "hello_world";
-
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
-
-            string message = "Text with '\"";
-
-            SubscribePublishAndParse (message, pubnub, common, channel);
-
+            receivedMessage = false;
+            CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams(PubnubCommon.SecretKey, "", false);
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessageSecret Failed");
         }
 
         [Test]
-        public void TestForSpecialCharSecretSSL ()
+        public void ThenSubscribeShouldReturnSpecialCharMessageCipherSecret()
         {
-            Pubnub pubnub = new Pubnub (
-                                Common.PublishKey,
-                                Common.SubscribeKey,
-                                Common.SecretKey,
-                                "",
-                                true);
-            string channel = "hello_world";
+            receivedMessage = false;
+            CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", false);
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessageCipherSecret Failed");
+        }
 
-            Common common = new Common ();
-            common.DeliveryStatus = false;
-            common.Response = null;
+        [Test]
+        public void ThenSubscribeShouldReturnSpecialCharMessageCipherSecretSSL()
+        {
+            receivedMessage = false;
+            CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", true);
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessageCipherSecretSSL Failed");
+        }
 
-            string message = "Text with '\"";
+        [Test]
+        public void ThenSubscribeShouldReturnSpecialCharMessageSecretSSL()
+        {
+            receivedMessage = false;
+            CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams(PubnubCommon.SecretKey, "", true);
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessageSecretSSL Failed");
+        }
 
-            SubscribePublishAndParse (message, pubnub, common, channel);
+        void ThenSubscribeInitializeShouldReturnGrantMessage(string receivedMessage)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                {
+                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
+                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    {
+                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
+                        if (dictionary != null)
+                        {
+                            var status = dictionary["status"].ToString();
+                            if (status == "200")
+                            {
+                                receivedGrantMessage = true;
+                            }
+                        }
+
+                    }
+                }
+            }
+            catch { }
+            finally
+            {
+                mreGrant.Set();
+            }
+        }
+
+        private void ReceivedMessageCallbackWhenSubscribed(string result)
+        {
+            if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
+            {
+                //Console.WriteLine("ReceivedMessageCallbackWhenSubscribed -> result = " + result);
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
+                {
+                    object subscribedObject = (object)deserializedMessage[0];
+                    if (subscribedObject != null)
+                    {
+                        string serializedResultMessage = pubnub.JsonPluggableLibrary.SerializeToJsonString(subscribedObject);
+                        string serializedPublishMesage = pubnub.JsonPluggableLibrary.SerializeToJsonString(publishedMessage);
+                        if (serializedResultMessage == serializedPublishMesage)
+                        {
+                            receivedMessage = true;
+                        }
+
+                    }
+                }
+            }
+            mreSubscribe.Set();
+        }
+
+        private void dummyPublishCallback(string result)
+        {
+            //Console.WriteLine("dummyPublishCallback -> result = " + result);
+            if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
+            {
+                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
+                if (deserializedMessage != null && deserializedMessage.Count > 0)
+                {
+                    long statusCode = Int64.Parse(deserializedMessage[0].ToString());
+                    string statusMessage = (string)deserializedMessage[1];
+                    if (statusCode == 1 && statusMessage.ToLower() == "sent")
+                    {
+                        isPublished = true;
+                    }
+                }
+            }
+
+            mrePublish.Set();
+        }
+
+        private void DummyErrorCallback(PubnubClientError result)
+        {
+            if (result != null)
+            {
+                Console.WriteLine("DummyErrorCallback result = " + result.Message);
+            }
+        }
+
+        private void dummyUnsubscribeCallback(string result)
+        {
 
         }
+
+        void SubscribeDummyMethodForConnectCallback(string receivedMessage)
+        {
+            mreSubscribeConnect.Set();
+        }
+
+        void UnsubscribeDummyMethodForDisconnectCallback(string receivedMessage)
+        {
+            mreUnsubscribe.Set();
+        }
+
     }
 }
-

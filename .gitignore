@@ -78,6 +78,15 @@
 /monotouch/Touch.Unit/bin/iPhoneSimulator/Debug/
 /monotouch/Touch.Unit/bin/iPhoneSimulator/Debug/TouchUnit.app/
 /monotouch/Touch.Unit/obj/*
+/mono-for-android/MonoDroid.Dialog/bin/Debug/*
+/mono-for-android/MonoDroid.Dialog/obj/Debug/*
+/mono-for-android/Newtonsoft.Json/bin/Debug/*
+/mono-for-android/Newtonsoft.Json/obj/Debug/*
+/mono-for-android/PubNubMessaging.Example/bin/Debug/*
+/mono-for-android/PubNubMessaging.Example/obj/Debug/*
+/mono-for-android/PubNubMessaging/bin/Debug/*
+/mono-for-android/PubNubMessaging/obj/Debug/*
+/mono-for-android/PubNubMessaging.Example/Resources/*
 .DS_Store
 *.cache
 *.suo

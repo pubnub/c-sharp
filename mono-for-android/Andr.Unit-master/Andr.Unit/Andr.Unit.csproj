@@ -54,9 +54,7 @@
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MainActivity.cs" />
-    <Compile Include="Common.cs" />
     <Compile Include="PubnubUnitTest.cs" />
-    <Compile Include="PubnubCommon.cs" />
     <Compile Include="WhenAClientIsPresented.cs" />
     <Compile Include="EncryptionTests.cs" />
     <Compile Include="GenerateSampleGrant.cs" />
@@ -70,6 +68,10 @@
     <Compile Include="WhenSubscribedToAChannel3.cs" />
     <Compile Include="WhenSubscribedToAChannel2.cs" />
     <Compile Include="WhenDetailedHistoryIsRequested.cs" />
+    <Compile Include="WhenChannelGroupIsRequested.cs" />
+    <Compile Include="WhenSubscribedToAChannelGroup.cs" />
+    <Compile Include="WhenUnsubscribedToAChannelGroup.cs" />
+    <Compile Include="PubnubCommon.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -135,10 +137,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\Android.NUnitLite\Android.NUnitLite.csproj">
-      <Project>{6A005891-A3D6-4398-A729-F645397D573A}</Project>
-      <Name>Android.NUnitLite</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Newtonsoft.Json\Newtonsoft.Json.MonoDroid.csproj">
       <Project>{E6C3413C-919B-486D-8B6C-225CBD921B98}</Project>
       <Name>Newtonsoft.Json.MonoDroid</Name>
@@ -146,6 +144,10 @@
     <ProjectReference Include="..\..\PubNubMessaging\PubNubMessaging.csproj">
       <Project>{1EF57539-3213-4F01-AEEC-566EA1C4457C}</Project>
       <Name>PubNubMessaging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Android.NUnitLite\Android.NUnitLite.csproj">
+      <Project>{6A005891-A3D6-4398-A729-F645397D573A}</Project>
+      <Name>Android.NUnitLite</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
