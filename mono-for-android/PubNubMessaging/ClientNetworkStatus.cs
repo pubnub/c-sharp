@@ -194,14 +194,20 @@ namespace PubNubMessaging.Core
                 #endif
             }
             #if (UNITY_IOS || UNITY_ANDROID || MONODROID || __ANDROID__)
-            catch (WebException webEx){
-
-                if(webEx.Message.Contains("404")){
-                    _status =true;
-                    callback(true);
-                } else {
-                    _status =false;
-            ParseCheckSocketConnectException<T>(webEx, channels, channelGroups, errorCallback, callback);
+            catch (WebException webEx)
+            {
+                if (!webEx.Message.Contains("Aborted"))
+                {
+                    if(webEx.Message.Contains("404"))
+                    {
+                        _status =true;
+                        callback(true);
+                    } 
+                    else 
+                    {
+                        _status =false;
+                        ParseCheckSocketConnectException<T>(webEx, channels, channelGroups, errorCallback, callback);
+                    }
                 }
             }
             #endif
