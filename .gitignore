@@ -82,11 +82,17 @@
 /mono-for-android/MonoDroid.Dialog/obj/Debug/*
 /mono-for-android/Newtonsoft.Json/bin/Debug/*
 /mono-for-android/Newtonsoft.Json/obj/Debug/*
+/mono-for-android/Newtonsoft.Json/obj/Release/*
+/mono-for-android/Newtonsoft.Json/bin/Release/*
 /mono-for-android/PubNubMessaging.Example/bin/Debug/*
 /mono-for-android/PubNubMessaging.Example/obj/Debug/*
 /mono-for-android/PubNubMessaging/bin/Debug/*
 /mono-for-android/PubNubMessaging/obj/Debug/*
 /mono-for-android/PubNubMessaging.Example/Resources/*
+/mono-for-android/PubNubMessaging.Example/bin/Release/*
+/mono-for-android/PubNubMessaging.Example/obj/Release/*
+/mono-for-android/PubNubMessaging/obj/Release/*
+/mono-for-android/PubNubMessaging/bin/Release/*
 .DS_Store
 *.cache
 *.suo

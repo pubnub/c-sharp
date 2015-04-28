@@ -32,14 +32,16 @@
     <ConsolePause>False</ConsolePause>
     <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
     <AndroidLinkMode>None</AndroidLinkMode>
+    <AndroidSupportedAbis>armeabi;armeabi-v7a;x86</AndroidSupportedAbis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>none</DebugType>
+    <DebugType>full</DebugType>
     <Optimize>True</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
+    <AndroidSupportedAbis>armeabi;armeabi-v7a</AndroidSupportedAbis>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -55,6 +57,7 @@
     <Compile Include="MainActivity.cs" />
     <Compile Include="GrantDialogFragment.cs" />
     <Compile Include="CommonDialogFragment.cs" />
+    <Compile Include="AddRemoveFromChannelGroupDialogFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -86,6 +89,7 @@
     <AndroidResource Include="Resources\layout\GrantDialog.axml" />
     <AndroidResource Include="Resources\layout\AuthKey.axml" />
     <AndroidResource Include="Resources\drawable\border.xml" />
+    <AndroidResource Include="Resources\layout\AddRemoveFromChannelGroup.axml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>

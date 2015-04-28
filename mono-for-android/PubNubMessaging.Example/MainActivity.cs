@@ -29,6 +29,11 @@ namespace PubNubMessaging.Example
             set;
         }
 
+        string channelGroup {
+            get;
+            set;
+        }
+
         public bool showErrorMessageSegments = true;
         private MyActionBarDrawerToggle m_DrawerToggle;
         private string m_DrawerTitle;
@@ -36,16 +41,16 @@ namespace PubNubMessaging.Example
         private DrawerLayout m_Drawer;
         private ListView m_DrawerList;
         private static readonly string[] Sections = new[] {
-            "Subscribe", 
-            "Publish", 
-            "Presence", 
-            "Detailed History", 
-            "Here Now", 
-            "Unsubscribe",
+            "Subscribe", //0
+            "Publish",  //1
+            "Presence", //2
+            "Detailed History", //3
+            "Here Now", //4
+            "Unsubscribe", //5
             "Unsubscribe-Presence",
             "Time",
-            "Subscribe Grant",
-            "Subscribe Audit",
+            "Grant", //8
+            "Subscribe Audit", //9
             "Subscribe Revoke",
             "Presence Grant",
             "Presence Audit",
@@ -59,7 +64,17 @@ namespace PubNubMessaging.Example
             "Get User State",
             "Where Now",
             "Global Here Now",
-            "Change UUID"
+            "Change UUID", //23
+            "ChannelGroup Sub Grant",
+            "ChannelGroup Pre Grant",
+            "ChannelGroup Sub Audit",
+            "ChannelGroup Pre Audit",
+            "ChannelGroup Sub Revoke",
+            "ChannelGroup Pre Revoke", //29
+            "Add to ChannelGrp",
+            "Get from ChannelGrp",
+            "Remove from ChannelGrp",
+            ""
         };
         /*public override bool OnCreateOptionsMenu(IMenu menu)
         {
@@ -115,6 +130,8 @@ namespace PubNubMessaging.Example
         {
             TextView txtSubscribedChannel = FindViewById<TextView> (Resource.Id.newChannels);
             channel = txtSubscribedChannel.Text;
+            TextView txtSubscribedChannelGroup = FindViewById<TextView> (Resource.Id.newChannelGroups);
+            channelGroup = txtSubscribedChannelGroup.Text;
 
             switch (position) {
             case 0:
@@ -202,6 +219,33 @@ namespace PubNubMessaging.Example
                 //"Change UUID"
                 ChangeUuid ();
                 break;
+            case 24:
+                ChannelGroupSubscribeGrant ();
+                break;
+            case 25:
+                ChannelGroupPresenceGrant ();
+                break;
+            case 26:
+                ChannelGroupSubscribeAudit();
+                break;
+            case 27:
+                ChannelGroupPresenceAudit();
+                break;
+            case 28:
+                ChannelGroupSubscribeRevoke();
+                break;
+            case 29:
+                ChannelGroupPresenceRevoke();
+                break;
+            case 30:
+                AddChannelToChannelGroup ();
+                break;
+            case 31:
+                GetChannelListFromChannelGroup ();
+                break;
+            case 32:
+                RemoveChannelFromChannelGroup ();
+                break;
             }
             this.m_DrawerList.SetItemChecked (position, false);
             this.m_Drawer.CloseDrawer (this.m_DrawerList);
@@ -233,6 +277,7 @@ namespace PubNubMessaging.Example
             SetContentView (Resource.Layout.PageHomeView);
 
             string channelName = Intent.GetStringExtra ("Channel");
+            string channelGroupName = Intent.GetStringExtra ("ChannelGroup");
 
             bool enableSSL = Convert.ToBoolean ((Intent.GetStringExtra ("SslOn")));
             string cipher = (Intent.GetStringExtra ("Cipher"));
@@ -256,6 +301,10 @@ namespace PubNubMessaging.Example
             txtSubscribedChannel.Text = channelName;
             channel = txtSubscribedChannel.Text;
 
+            TextView txtSubscribedChannelGroup = FindViewById<TextView> (Resource.Id.newChannelGroups);
+            txtSubscribedChannelGroup.Text = channelGroupName;
+            channelGroup = txtSubscribedChannelGroup.Text;
+
             TextView txtViewLog = FindViewById<TextView> (Resource.Id.txtViewLog);
             txtViewLog.Text = "";
             try {
@@ -264,7 +313,7 @@ namespace PubNubMessaging.Example
                 this.m_DrawerList.Adapter = new ArrayAdapter<string> (this, Resource.Layout.ItemMenu, Sections);
                 this.m_DrawerList.ItemClick += (sender, args) => ListItemClicked (args.Position);
 
-                this.m_Drawer.SetDrawerShadow (Resource.Drawable.drawer_shadow_dark, (int)GravityFlags.Start);
+                this.m_Drawer.SetDrawerShadow (Resource.Drawable.drawer_shadow_dark, GravityFlags.Start);
                 //DrawerToggle is the animation that happens with the indicator next to the actionbar
                 this.m_DrawerToggle = new MyActionBarDrawerToggle (this, this.m_Drawer,
                     Resource.Drawable.ic_drawer_light,
@@ -302,7 +351,7 @@ namespace PubNubMessaging.Example
 
         void GlobalHereNow ()
         {
-            var dialog = new GrantDialogFragment (CommonDialogStates.GlobalHereNow);
+            var dialog = new GrantDialogFragment (CommonDialogStates.GlobalHereNow, this);
             dialog.GrantPerms += HandleGrantPerms;
             dialog.Show (SupportFragmentManager, "dialog");
         }
@@ -373,14 +422,14 @@ namespace PubNubMessaging.Example
         {
             Display ("Running Subscribe");
             ThreadPool.QueueUserWorkItem (o => 
-                pubnub.Subscribe<string> (channel, DisplayReturnMessage, 
+                pubnub.Subscribe<string> (channel, channelGroup, DisplayReturnMessage, 
                     DisplayConnectStatusMessage, DisplayErrorMessage)
             );
         }
 
         public void Publish ()
         {
-            var dialog = new GrantDialogFragment (CommonDialogStates.Publish);
+            var dialog = new GrantDialogFragment (CommonDialogStates.Publish, this);
             dialog.GrantPerms += HandleGrantPerms;
             dialog.Show (SupportFragmentManager, "dialog");
         }
@@ -417,7 +466,7 @@ namespace PubNubMessaging.Example
         {
             Display ("Running Presence");
             ThreadPool.QueueUserWorkItem (o => 
-                pubnub.Presence<string> (channel, DisplayReturnMessage, null, DisplayErrorMessage)
+                pubnub.Presence<string> (channel, channelGroup, DisplayReturnMessage, DisplayReturnMessage, DisplayErrorMessage)
             );
         }
 
@@ -434,12 +483,12 @@ namespace PubNubMessaging.Example
 
         public void HereNow ()
         {
-            Display ("Running Here Now");
+            //Display ("Running Here Now");
             /*string[] channels = channel.Split (',');
             foreach (string channelToCall in channels) {
                 pubnub.HereNow<string> (channelToCall.Trim (), DisplayReturnMessage, DisplayErrorMessage);
             }*/
-            var dialog = new GrantDialogFragment (CommonDialogStates.HereNow);
+            var dialog = new GrantDialogFragment (CommonDialogStates.HereNow, this);
             dialog.GrantPerms += HandleGrantPerms;
             dialog.Show (SupportFragmentManager, "dialog");
 
@@ -449,7 +498,7 @@ namespace PubNubMessaging.Example
         {
             Display ("Running unsubscribe");
             ThreadPool.QueueUserWorkItem (o => 
-                pubnub.Unsubscribe<string> (channel, DisplayReturnMessage, DisplayReturnMessage, 
+                pubnub.Unsubscribe<string> (channel, channelGroup, DisplayReturnMessage, DisplayReturnMessage, 
                     DisplayReturnMessage, DisplayErrorMessage)
             );
         }
@@ -458,7 +507,7 @@ namespace PubNubMessaging.Example
         {
             Display ("Running presence-unsubscribe");
             ThreadPool.QueueUserWorkItem (o => 
-                pubnub.PresenceUnsubscribe<string> (channel, DisplayReturnMessage, DisplayReturnMessage, 
+                pubnub.PresenceUnsubscribe<string> (channel, channelGroup, DisplayReturnMessage, DisplayReturnMessage, 
                     DisplayReturnMessage, DisplayErrorMessage)
             );
         }
@@ -509,6 +558,66 @@ namespace PubNubMessaging.Example
             dialog.Show (SupportFragmentManager, "dialog");
         }
 
+        public void ChannelGroupSubscribeAudit()
+        {
+            var dialog = new CommonDialogFragment (CommonDialogStates.AuditChannelGroupSubscribe, this);
+            dialog.SetValues += HandleSetValues;
+            dialog.Show (SupportFragmentManager, "dialog");
+        }
+
+        public void ChannelGroupPresenceAudit()
+        {
+            var dialog = new CommonDialogFragment (CommonDialogStates.AuditChannelGroupPresence, this);
+            dialog.SetValues += HandleSetValues;
+            dialog.Show (SupportFragmentManager, "dialog");
+        }
+
+        public void ChannelGroupSubscribeRevoke()
+        {
+            var dialog = new CommonDialogFragment (CommonDialogStates.RevokeChannelGroupSubscribe, this);
+            dialog.SetValues += HandleSetValues;
+            dialog.Show (SupportFragmentManager, "dialog");
+        }
+
+        public void ChannelGroupPresenceRevoke()
+        {
+            var dialog = new CommonDialogFragment (CommonDialogStates.RevokeChannelGroupPresence, this);
+            dialog.SetValues += HandleSetValues;
+            dialog.Show (SupportFragmentManager, "dialog");
+        }
+
+        public void ChannelGroupSubscribeGrant()
+        {
+            RunChannelGroupGrant (false);
+        }
+
+        public void ChannelGroupPresenceGrant()
+        {
+            RunChannelGroupGrant (true);
+        }
+
+        public void AddChannelToChannelGroup()
+        {
+            var dialog = new AddRemoveFromChannelGroupDialogFragment (CommonDialogStates.AddToChannelGroup, this);
+            dialog.AddRemoveFromCgPerms += HandleAddRemoveFromCgPerms;
+            dialog.Show (SupportFragmentManager, "dialog");
+
+        }
+
+        public void GetChannelListFromChannelGroup()
+        {
+            var dialog = new AddRemoveFromChannelGroupDialogFragment (CommonDialogStates.GetChannelGroup, this);
+            dialog.AddRemoveFromCgPerms += HandleAddRemoveFromCgPerms;
+            dialog.Show (SupportFragmentManager, "dialog");
+        }
+
+        public void RemoveChannelFromChannelGroup()
+        {
+            var dialog = new AddRemoveFromChannelGroupDialogFragment (CommonDialogStates.RemoveFromChannelGroup, this);
+            dialog.AddRemoveFromCgPerms += HandleAddRemoveFromCgPerms;
+            dialog.Show (SupportFragmentManager, "dialog");
+        }
+
         public void AuthKey ()
         {
             var dialog = new CommonDialogFragment (CommonDialogStates.Auth, this);
@@ -527,28 +636,52 @@ namespace PubNubMessaging.Example
                     Display ("Auth Key set");
                 } else if (cea.cds == CommonDialogStates.AuditSubscribe) {
 
-                    Display ("Running Subscribe Audit");
+                    Display ("Running Channel Subscribe Audit");
                     ThreadPool.QueueUserWorkItem (o => 
-                        pubnub.AuditAccess<string> (channel, cea.valueToSet, DisplayReturnMessage, DisplayErrorMessage)
+                        pubnub.AuditAccess<string> (cea.channel, cea.valueToSet, DisplayReturnMessage, DisplayErrorMessage)
                     );
                 } else if (cea.cds == CommonDialogStates.AuditPresence) {
 
                     Display ("Running Presence Audit");
                     ThreadPool.QueueUserWorkItem (o => 
-                        pubnub.AuditPresenceAccess<string> (channel, cea.valueToSet, DisplayReturnMessage, DisplayErrorMessage)
+                        pubnub.AuditPresenceAccess<string> (cea.channel, cea.valueToSet, DisplayReturnMessage, DisplayErrorMessage)
+                    );
+                } else if (cea.cds == CommonDialogStates.AuditChannelGroupSubscribe) {
+
+                    Display ("Running ChannelGroup Subscribe Audit");
+                    ThreadPool.QueueUserWorkItem (o => 
+                        pubnub.ChannelGroupAuditAccess<string> (cea.channelGroup, cea.valueToSet, DisplayReturnMessage, DisplayErrorMessage)
+                    );
+                } else if (cea.cds == CommonDialogStates.AuditChannelGroupPresence) {
+
+                    Display ("Running ChannelGroup Presence Audit");
+                    ThreadPool.QueueUserWorkItem (o => 
+                        pubnub.ChannelGroupAuditPresenceAccess<string> (cea.channelGroup, cea.valueToSet, DisplayReturnMessage, DisplayErrorMessage)
                     );
 
                 } else if (cea.cds == CommonDialogStates.RevokePresence) {
                     Display ("Running Presence Revoke");
                     ThreadPool.QueueUserWorkItem (o => 
-                        pubnub.GrantPresenceAccess<string> (channel, cea.valueToSet, false, false, DisplayReturnMessage, DisplayErrorMessage)
+                        pubnub.GrantPresenceAccess<string> (cea.channel, cea.valueToSet, false, false, DisplayReturnMessage, DisplayErrorMessage)
                     );
 
                 } else if (cea.cds == CommonDialogStates.RevokeSubscribe) {
 
                     Display ("Running Subscribe Revoke");
                     ThreadPool.QueueUserWorkItem (o => 
-                        pubnub.GrantAccess<string> (channel, cea.valueToSet, false, false, DisplayReturnMessage, DisplayErrorMessage)
+                        pubnub.GrantAccess<string> (cea.channel, cea.valueToSet, false, false, DisplayReturnMessage, DisplayErrorMessage)
+                    );
+                } else if (cea.cds == CommonDialogStates.RevokeChannelGroupPresence) {
+                    Display ("Running ChannelGroup Presence Revoke");
+                    ThreadPool.QueueUserWorkItem (o => 
+                        pubnub.ChannelGroupGrantPresenceAccess<string> (cea.channelGroup, cea.valueToSet, false, false, DisplayReturnMessage, DisplayErrorMessage)
+                    );
+
+                } else if (cea.cds == CommonDialogStates.RevokeChannelGroupSubscribe) {
+
+                    Display ("Running ChannelGroup Revoke");
+                    ThreadPool.QueueUserWorkItem (o => 
+                        pubnub.ChannelGroupGrantAccess<string> (cea.channelGroup, cea.valueToSet, false, false, DisplayReturnMessage, DisplayErrorMessage)
                     );
 
                 } else if (cea.cds == CommonDialogStates.ChangeUuid) {
@@ -563,12 +696,12 @@ namespace PubNubMessaging.Example
                 } else if (cea.cds == CommonDialogStates.GetUserState) {
                     Display ("Running get user state");
                     ThreadPool.QueueUserWorkItem (o => 
-                        pubnub.GetUserState<string> (cea.channel, cea.valueToSet, DisplayReturnMessage, DisplayErrorMessage)
+                        pubnub.GetUserState<string> (cea.channel, cea.channelGroup, cea.valueToSet, DisplayReturnMessage, DisplayErrorMessage)
                     );
                 } else if (cea.cds == CommonDialogStates.DeleteUserState) {
                     Display ("Running delete user state");
                     ThreadPool.QueueUserWorkItem (o => 
-                        pubnub.SetUserState<string> (cea.channel, new KeyValuePair<string, object> (cea.valueToSet, null), DisplayReturnMessage, DisplayErrorMessage)
+                        pubnub.SetUserState<string> (cea.channel, cea.channelGroup, new KeyValuePair<string, object> (cea.valueToSet, null), DisplayReturnMessage, DisplayErrorMessage)
                     );
                 } else if (cea.cds == CommonDialogStates.PresenceHeartbeat) {
                     Display ("Setting presence heartbeat");
@@ -587,15 +720,15 @@ namespace PubNubMessaging.Example
 
                     if (Int32.TryParse (cea.valueToSet2, out valueInt)) {
                         ThreadPool.QueueUserWorkItem (o => 
-                            pubnub.SetUserState<string> (cea.channel, new KeyValuePair<string, object> (cea.valueToSet, valueInt), DisplayReturnMessage, DisplayErrorMessage)
+                            pubnub.SetUserState<string> (cea.channel, cea.channelGroup, new KeyValuePair<string, object> (cea.valueToSet, valueInt), DisplayReturnMessage, DisplayErrorMessage)
                         );
                     } else if (Double.TryParse (cea.valueToSet2, out valueDouble)) {
                         ThreadPool.QueueUserWorkItem (o => 
-                            pubnub.SetUserState<string> (cea.channel, new KeyValuePair<string, object> (cea.valueToSet, valueDouble), DisplayReturnMessage, DisplayErrorMessage)
+                            pubnub.SetUserState<string> (cea.channel, cea.channelGroup, new KeyValuePair<string, object> (cea.valueToSet, valueDouble), DisplayReturnMessage, DisplayErrorMessage)
                         );
                     } else {
                         ThreadPool.QueueUserWorkItem (o => 
-                            pubnub.SetUserState<string> (cea.channel, new KeyValuePair<string, object> (cea.valueToSet, cea.valueToSet2), DisplayReturnMessage, DisplayErrorMessage)
+                            pubnub.SetUserState<string> (cea.channel, cea.channelGroup, new KeyValuePair<string, object> (cea.valueToSet, cea.valueToSet2), DisplayReturnMessage, DisplayErrorMessage)
                         );
                     }
                 } else if (cea.cds == CommonDialogStates.SetUserStateJson) {
@@ -606,7 +739,7 @@ namespace PubNubMessaging.Example
                         jsonUserState = cea.valueToSet2;
                     }
                     ThreadPool.QueueUserWorkItem (o => 
-                        pubnub.SetUserState<string> (cea.channel, cea.valueToSet, jsonUserState, DisplayReturnMessage, DisplayErrorMessage)
+                        pubnub.SetUserState<string> (cea.channel, cea.channelGroup, cea.valueToSet, jsonUserState, DisplayReturnMessage, DisplayErrorMessage)
                     );
                 }
             } catch (Exception ex) {
@@ -619,10 +752,48 @@ namespace PubNubMessaging.Example
 
         void RunGrant (bool isPresenceGrant)
         {
-            var dialog = new GrantDialogFragment (CommonDialogStates.Grant);
+            var dialog = new GrantDialogFragment (CommonDialogStates.Grant, this);
             dialog.IsPresenceGrant = isPresenceGrant;
             dialog.GrantPerms += HandleGrantPerms;
             dialog.Show (SupportFragmentManager, "dialog");
+        }
+
+        void RunChannelGroupGrant (bool isPresenceGrant)
+        {
+            var dialog = new GrantDialogFragment (CommonDialogStates.ChannelGroupGrant, this);
+            dialog.IsPresenceGrant = isPresenceGrant;
+            dialog.GrantPerms += HandleGrantPerms;
+            dialog.Show (SupportFragmentManager, "dialog");
+        }
+
+        void HandleAddRemoveFromCgPerms(object sender, EventArgs ea)
+        {
+            try {
+                AddRemoveFromCgEventArgs cea = ea as AddRemoveFromCgEventArgs;
+                if (cea.cds == CommonDialogStates.AddToChannelGroup) {
+                    Display ("Running AddChannelsToChannelGroup");
+                    ThreadPool.QueueUserWorkItem (o => 
+                        pubnub.AddChannelsToChannelGroup<string> (new string[] { cea.channel }, cea.channelGroup, DisplayReturnMessage, DisplayErrorMessage)
+                    );
+                } else if (cea.cds == CommonDialogStates.RemoveFromChannelGroup) {
+                    Display ("Running RemoveChannelsFromChannelGroup");
+                    ThreadPool.QueueUserWorkItem (o => 
+                        pubnub.RemoveChannelsFromChannelGroup<string> (new string[] { cea.channel }, cea.channelGroup, DisplayReturnMessage, DisplayErrorMessage)
+                    );
+                } else if (cea.cds == CommonDialogStates.GetChannelGroup) {
+                    Display ("Running GetChannelsForChannelGroup");
+                    ThreadPool.QueueUserWorkItem (o => 
+                        pubnub.GetChannelsForChannelGroup<string> (cea.channelGroup, DisplayReturnMessage, DisplayErrorMessage)
+                    );
+                } 
+            }
+            catch (Exception ex) {
+                Display (ex.Message);
+            } finally {
+                AddRemoveFromChannelGroupDialogFragment coroutine = sender as AddRemoveFromChannelGroupDialogFragment;
+                coroutine.AddRemoveFromCgPerms -= HandleAddRemoveFromCgPerms;
+            }
+
         }
 
         void HandleGrantPerms (object sender, EventArgs ea)
@@ -633,19 +804,34 @@ namespace PubNubMessaging.Example
                     if (cea.isPresence) {
                         Display ("Running Presence Grant");
                         ThreadPool.QueueUserWorkItem (o => 
-                            pubnub.GrantPresenceAccess<string> (channel, cea.channel, cea.valToSet2, cea.valToSet1, cea.ttl, DisplayReturnMessage, DisplayErrorMessage)
+                            pubnub.GrantPresenceAccess<string> (cea.channel, cea.authKey, cea.valToSet2, cea.valToSet1, cea.ttl, DisplayReturnMessage, DisplayErrorMessage)
                         );
                     } else {
                         Display ("Running Subscribe Grant");
                         ThreadPool.QueueUserWorkItem (o => 
-                            pubnub.GrantAccess<string> (channel, cea.channel, cea.valToSet2, cea.valToSet1, cea.ttl, DisplayReturnMessage, DisplayErrorMessage)
+                            pubnub.GrantAccess<string> (cea.channel, cea.authKey, cea.valToSet2, cea.valToSet1, cea.ttl, DisplayReturnMessage, DisplayErrorMessage)
+                        );
+                    }
+                } else if (cea.cds == CommonDialogStates.ChannelGroupGrant) {
+                    
+                    if (cea.isPresence) {
+                        Display ("Running ChannelGroup Presence Grant");
+                        ThreadPool.QueueUserWorkItem (o => 
+                            pubnub.ChannelGroupGrantPresenceAccess<string> (cea.channel, cea.authKey, cea.valToSet2, cea.valToSet1, cea.ttl, DisplayReturnMessage, DisplayErrorMessage)
+                        );
+                    } else {
+                        Display ("Running ChannelGroup Subscribe Grant");
+                        ThreadPool.QueueUserWorkItem (o => 
+                            pubnub.ChannelGroupGrantAccess<string> (cea.channel, cea.authKey, cea.valToSet2, cea.valToSet1, cea.ttl, DisplayReturnMessage, DisplayErrorMessage)
                         );
                     }
                 } else if (cea.cds == CommonDialogStates.HereNow) {
+                    Display ("Running HereNow");
                     ThreadPool.QueueUserWorkItem (o => 
                         pubnub.HereNow<string> (cea.channel, cea.valToSet2, cea.valToSet1, DisplayReturnMessage, DisplayErrorMessage)
                     );
                 } else if (cea.cds == CommonDialogStates.GlobalHereNow) {
+                    Display ("Running GlobalHereNow");
                     ThreadPool.QueueUserWorkItem (o => 
                         pubnub.GlobalHereNow<string> (cea.valToSet2, cea.valToSet1, DisplayReturnMessage, DisplayErrorMessage)
                     );

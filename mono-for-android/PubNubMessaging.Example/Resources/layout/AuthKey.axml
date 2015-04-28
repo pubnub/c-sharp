@@ -19,6 +19,7 @@
     </TableRow>
     <TableRow
         android:background="#000"
+        android:padding="2dp"
         android:layout_width="match_parent">
         <TextView
             android:layout_column="0"
@@ -32,6 +33,27 @@
             android:layout_column="1"
             android:id="@+id/txtChannel"
             android:background="#FFF"
+            android:textColor="@android:color/background_dark"
+            android:width="100dp"
+            android:layout_height="wrap_content" />
+    </TableRow>
+    <TableRow
+        android:background="#000"
+        android:padding="2dp"
+        android:layout_width="match_parent">
+        <TextView
+            android:layout_column="0"
+            android:text="@string/channelGroup"
+            android:id="@+id/lblCGinput"
+            android:width="100dp"
+            android:gravity="center_horizontal"
+            android:layout_height="wrap_content" />
+        <EditText
+            android:padding="2dp"
+            android:layout_column="1"
+            android:id="@+id/txtChannelGroup"
+            android:background="#FFF"
+            android:textColor="@android:color/background_dark"
             android:width="100dp"
             android:layout_height="wrap_content" />
     </TableRow>
@@ -56,6 +78,7 @@
             android:layout_column="1"
             android:id="@+id/txtauth"
             android:background="#FFF"
+            android:textColor="@android:color/background_dark"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </TableRow>
@@ -80,6 +103,7 @@
             android:layout_column="1"
             android:id="@+id/txtinput2"
             android:background="#FFF"
+            android:textColor="@android:color/background_dark"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </TableRow>

@@ -9,9 +9,10 @@
     <TableLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:padding="10dip"
+        android:padding="5dip"
         android:stretchColumns="*">
-        <TableRow>
+        <TableRow
+            android:padding="5dp">
             <TextView
                 android:layout_column="0"
                 android:layout_span="3"
@@ -20,7 +21,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
         </TableRow>
-        <TableRow>
+        <TableRow
+            android:padding="5dp">
             <TextView
                 android:layout_column="0"
                 android:text="@string/newchannel"
@@ -32,10 +34,29 @@
                 android:layout_span="2"
                 android:id="@+id/newChannels"
                 android:background="#FFF"
+                android:textColor="@android:color/background_dark"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </TableRow>
-        <TableRow>
+        <TableRow
+            android:padding="5dp">
+            <TextView
+                android:layout_column="0"
+                android:text="@string/newchannelGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+            <EditText
+                android:layout_column="1"
+                android:layout_span="2"
+                android:id="@+id/newChannelGroups"
+                android:background="#FFF"
+                android:textColor="@android:color/background_dark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </TableRow>
+        <TableRow
+            android:padding="5dp">
             <ScrollView
                 android:layout_column="0"
                 android:layout_span="3"

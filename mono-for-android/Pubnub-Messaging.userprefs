@@ -1,30 +1,29 @@
-﻿<Properties StartupItem="Andr.Unit-master/Andr.Unit/Andr.Unit.csproj">
+﻿<Properties StartupItem="PubNubMessaging.Example/PubNubMessaging.Example.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Android.MonoForAndroid_API_12" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Andr.Unit-master/Android.NUnitLite/AndrRunner/Activities/TestSuiteActivity.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="PubNubMessaging/PubnubXamarinAndroid.cs">
     <Files>
-      <File FileName="Andr.Unit-master/Andr.Unit/MainActivity.cs" Line="50" Column="1" />
-      <File FileName="Andr.Unit-master/Android.NUnitLite/AndrRunner/TcpTextWriter.cs" Line="26" Column="1" />
-      <File FileName="Andr.Unit-master/Andr.Unit/PubnubCommon.cs" Line="10" Column="45" />
-      <File FileName="Andr.Unit-master/Andr.Unit/GenerateSampleGrant.cs" Line="68" Column="17" />
-      <File FileName="Andr.Unit-master/Android.NUnitLite/AndrRunner/Activities/TestSuiteActivity.cs" Line="42" Column="53" />
+      <File FileName="PubNubMessaging.Example/MainActivity.cs" Line="478" Column="8" />
+      <File FileName="PubNubMessaging.Example/GrantDialogFragment.cs" Line="331" Column="9" />
+      <File FileName="PubNubMessaging/PubnubCore.cs" Line="2896" Column="1" />
+      <File FileName="PubNubMessaging/PubnubXamarinAndroid.cs" Line="284" Column="21" />
+      <File FileName="PubNubMessaging/ClientNetworkStatus.cs" Line="296" Column="10" />
     </Files>
-    <Pads>
-      <Pad Id="ProjectPad">
-        <State expanded="True">
-          <Node name="Andr.Unit" expanded="True" />
-          <Node name="Android.NUnitLite" expanded="True">
-            <Node name="AndrRunner" expanded="True">
-              <Node name="Activities" expanded="True">
-                <Node name="TestSuiteActivity.cs" selected="True" />
-              </Node>
-            </Node>
-          </Node>
-        </State>
-      </Pad>
-    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/Users/pandumasabathula/Pandu/GitHub/c-sharp/mono-for-android/Andr.Unit-master/Android.NUnitLite/AndrRunner/Activities/TestSuiteActivity.cs" line="119" column="2" />
+      <Breakpoint file="/Users/pandumasabathula/Pandu/GitHub/c-sharp/mono-for-android/Andr.Unit-master/Android.NUnitLite/AndrRunner/Activities/TestSuiteActivity.cs" line="112" column="1" />
+      <Breakpoint file="/Users/pandumasabathula/Pandu/GitHub/c-sharp/mono-for-android/Andr.Unit-master/Android.NUnitLite/AndrRunner/Activities/TestSuiteActivity.cs" line="83" column="1" />
+      <Breakpoint file="/Users/pandumasabathula/Pandu/GitHub/c-sharp/mono-for-android/PubNubMessaging/PubnubXamarinAndroid.cs" line="942" column="1" />
+      <Breakpoint file="/Users/pandumasabathula/Pandu/GitHub/c-sharp/mono-for-android/PubNubMessaging/PubnubXamarinAndroid.cs" line="992" column="1" />
+      <Breakpoint file="/Users/pandumasabathula/Pandu/GitHub/c-sharp/mono-for-android/PubNubMessaging/PubnubXamarinAndroid.cs" line="999" column="1" />
+      <Breakpoint file="/Users/pandumasabathula/Pandu/GitHub/c-sharp/mono-for-android/PubNubMessaging/PubnubXamarinAndroid.cs" line="146" column="1" />
+      <Breakpoint file="/Users/pandumasabathula/Pandu/GitHub/c-sharp/mono-for-android/PubNubMessaging/PubnubXamarinAndroid.cs" line="319" column="1" />
+      <Breakpoint file="/Users/pandumasabathula/Pandu/GitHub/c-sharp/mono-for-android/PubNubMessaging/PubnubXamarinAndroid.cs" line="502" column="1" />
+      <Breakpoint file="/Users/pandumasabathula/Pandu/GitHub/c-sharp/mono-for-android/PubNubMessaging/ClientNetworkStatus.cs" line="154" column="1" />
+      <Breakpoint file="/Users/pandumasabathula/Pandu/GitHub/c-sharp/mono-for-android/PubNubMessaging/ClientNetworkStatus.cs" line="218" column="1" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.ItemProperties.PubNubMessaging.Example AndroidDesignerPreferredDevice="Nexus 4" />
 </Properties>

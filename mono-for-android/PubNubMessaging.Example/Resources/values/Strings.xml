@@ -28,6 +28,7 @@
     <string name="unsubscribe">Unsubscribe</string>
     <string name="unsubscribePres">Unsubscribe-Presence</string>
     <string name="channel">Enter Channel (Multiple channels separated by comma)</string>
+    <string name="channelGroup">Enter ChannelGroup(s)</string>
     <string name="enablessl">Enable SSL</string>
     <string name="sslOn">On</string>
     <string name="sslOff">Off</string>
@@ -40,6 +41,7 @@
     <string name="subchannel">Channel(s)</string>
     <string name="channelinfo">Enter channel(s) and/or use the navigation drawer for actions</string>
     <string name="newchannel">New Channel(s)</string>
+    <string name="newchannelGroup">New ChannelGroup(s)</string>
     <string name="grant">Grant</string>
     <string name="grantread">Read</string>
     <string name="grantwrite">Write</string>
@@ -49,11 +51,19 @@
     <string name="authkey">Enter Auth Key</string>
     <string name="authkeyopt">Enter Auth Key (Optional)</string>
     <string name="btngrant">Grant</string>
+    <string name="audit">PAM Audit</string>
+    <string name="revoke">PAM Revoke</string>
+    <string name="auditpresence">PAM Presence Audit</string>
+    <string name="revokepresence">PAM Presence Revoke</string>
+
     <string name="btncancel">Cancel</string>
     <string name="auth">Set Auth Key</string>
     <string name="authopt">Set Auth Key (Optional)</string>
     <string name="btnset">Set</string>
     <string name="channel">Channel</string>
+    <string name="channelgroup">ChannelGroup</string>
+    <string name="grantchannel">Channel</string>
+    <string name="grantchannelgroup">ChannelGroup</string>
     <string name="btnWhereNow">Run Where Now</string>
     <string name="enterHeartbeatTime">Enter hearbeat time in secs</string>
     <string name="enterHeartbeatInterval">Enter hearbeat interval in secs</string>

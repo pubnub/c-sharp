@@ -22,6 +22,44 @@
         <TextView
             android:layout_column="0"
             android:gravity="center_horizontal"
+            android:text="@string/grantchannel"
+            android:id="@+id/lblGrantChannel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+        <EditText
+            android:padding="2dp"
+            android:layout_column="1"
+            android:id="@+id/txtChannel"
+            android:background="#FFF"
+            android:textColor="@android:color/background_dark"
+            android:layout_width="75dp"
+            android:layout_height="wrap_content" />
+    </TableRow>
+    <TableRow
+        android:background="#000">
+        <TextView
+            android:layout_column="0"
+            android:gravity="center_horizontal"
+            android:text="@string/grantchannelgroup"
+            android:id="@+id/lblGrantChannelGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+        <EditText
+            android:padding="2dp"
+            android:layout_column="1"
+            android:id="@+id/txtChannelGroup"
+            android:background="#FFF"
+            android:textColor="@android:color/background_dark"
+            android:layout_width="75dp"
+            android:layout_height="wrap_content" />
+    </TableRow>
+    <TableRow
+        android:background="#000">
+        <TextView
+            android:layout_column="0"
+            android:gravity="center_horizontal"
             android:text="@string/grantread"
             android:id="@+id/lblGrant1"
             android:layout_width="wrap_content"
@@ -69,6 +107,7 @@
             android:layout_column="1"
             android:id="@+id/txtauth"
             android:background="#FFF"
+            android:textColor="@android:color/background_dark"
             android:layout_width="75dp"
             android:layout_height="wrap_content" />
     </TableRow>
@@ -89,6 +128,7 @@
             android:id="@+id/txtttl"
             android:inputType="number"
             android:background="#FFF"
+            android:textColor="@android:color/background_dark"
             android:layout_width="75dp"
             android:layout_height="wrap_content" />
     </TableRow>

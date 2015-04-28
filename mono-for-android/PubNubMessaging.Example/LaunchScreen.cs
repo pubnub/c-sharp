@@ -210,8 +210,9 @@ namespace PubNubMessaging.Example
         void LaunchClick (object sender, EventArgs e)
         {
             EditText txtChannel = FindViewById<EditText> (Resource.Id.txtChannel);
-            if (String.IsNullOrWhiteSpace (txtChannel.Text.Trim ())) {
-                ShowAlert ("Please enter a channel name");
+            EditText txtChannelGroup = FindViewById<EditText> (Resource.Id.txtChannelGroup);
+            if (String.IsNullOrWhiteSpace (txtChannel.Text.Trim ()) && String.IsNullOrWhiteSpace (txtChannelGroup.Text.Trim ())) {
+                ShowAlert ("Please enter a channel name or channelgroup or both");
             } else {
 
                 ToggleButton tbSsl = FindViewById<ToggleButton> (Resource.Id.tbSsl);
@@ -221,6 +222,7 @@ namespace PubNubMessaging.Example
                 var mainActivity = new Intent (this, typeof(MainActivity));
 
                 mainActivity.PutExtra ("Channel", txtChannel.Text.Trim ());
+                mainActivity.PutExtra ("ChannelGroup", txtChannelGroup.Text.Trim ());
 
                 if (tbSsl.Checked) {
                     mainActivity.PutExtra ("SslOn", "true");
