@@ -12,6 +12,7 @@ using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
 {
+    [TestFixture]
     public class WhenSubscribedToAChannelGroup
     {
         ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
