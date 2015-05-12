@@ -361,7 +361,7 @@ namespace PubnubSilverlight.UnitTest
             ThreadPool.QueueUserWorkItem((s) =>
                 {
                     Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
-                    string uuid = "hello_my_uuid";
+                    string uuid = customUUID;
 
                     PubnubUnitTest unitTest = new PubnubUnitTest();
                     unitTest.TestClassName = "WhenAClientIsPresented";
