@@ -292,7 +292,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 unitTest.TestClassName = "WhenAClientIsPresented";
                 unitTest.TestCaseName = "IfWhereNowIsCalledThenItShouldReturnInfo";
                 pubnub.PubnubUnitTest = unitTest;
-                string uuid = "hello_my_uuid";
+                string uuid = customUUID;
 
                 mreWhereNow = new ManualResetEvent(false);
                 pubnub.WhereNow<string>(uuid, ThenWhereNowShouldReturnMessage, DummyErrorCallback);
