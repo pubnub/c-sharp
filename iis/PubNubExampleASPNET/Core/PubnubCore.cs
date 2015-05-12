@@ -1,4 +1,4 @@
-﻿//Build Date: January 28, 2015
+﻿//Build Date: May 11, 2015
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -1027,6 +1027,43 @@ namespace PubNubMessaging.Core
 			}
 		}
 
+        private void RemoveChannelCallback<T>(string channel, ResponseType type)
+        {
+            string[] arrChannels = channel.Split(',');
+            if (arrChannels != null && arrChannels.Length > 0)
+            {
+                foreach (string arrChannel in arrChannels)
+                {
+                    PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
+                    callbackKey.Channel = arrChannel;
+                    switch (type)
+                    {
+                        case ResponseType.Unsubscribe:
+                            callbackKey.Type = ResponseType.Subscribe;
+                            break;
+                        case ResponseType.PresenceUnsubscribe:
+                            callbackKey.Type = ResponseType.Presence;
+                            break;
+                        default:
+                            callbackKey.Type = ResponseType.Time; //overriding the default
+                            break;
+                    }
+
+                    if (channelCallbacks.Count > 0 && channelCallbacks.ContainsKey(callbackKey))
+                    {
+                        PubnubChannelCallback<T> currentPubnubCallback = channelCallbacks[callbackKey] as PubnubChannelCallback<T>;
+                        if (currentPubnubCallback != null)
+                        {
+                            currentPubnubCallback.Callback = null;
+                            currentPubnubCallback.ConnectCallback = null;
+                        }
+                    }
+
+                }
+            }
+
+        }
+
 		private void RemoveChannelCallback()
 		{
 			ICollection<PubnubChannelCallbackKey> channelCollection = channelCallbacks.Keys;
@@ -1042,6 +1079,43 @@ namespace PubNubMessaging.Core
 				}
 			}
 		}
+
+        private void RemoveChannelGroupCallback<T>(string channelGroup, ResponseType type)
+        {
+            string[] arrChannelGroups = channelGroup.Split(',');
+            if (arrChannelGroups != null && arrChannelGroups.Length > 0)
+            {
+                foreach (string arrChannelGroup in arrChannelGroups)
+                {
+                    PubnubChannelGroupCallbackKey callbackKey = new PubnubChannelGroupCallbackKey();
+                    callbackKey.ChannelGroup = arrChannelGroup;
+                    switch (type)
+                    {
+                        case ResponseType.Unsubscribe:
+                            callbackKey.Type = ResponseType.Subscribe;
+                            break;
+                        case ResponseType.PresenceUnsubscribe:
+                            callbackKey.Type = ResponseType.Presence;
+                            break;
+                        default:
+                            callbackKey.Type = ResponseType.Time; //overriding the default
+                            break;
+                    }
+
+                    if (channelGroupCallbacks.Count > 0 && channelGroupCallbacks.ContainsKey(callbackKey))
+                    {
+                        PubnubChannelGroupCallback<T> currentPubnubCallback = channelGroupCallbacks[callbackKey] as PubnubChannelGroupCallback<T>;
+                        if (currentPubnubCallback != null)
+                        {
+                            currentPubnubCallback.Callback = null;
+                            currentPubnubCallback.ConnectCallback = null;
+                        }
+                    }
+
+                }
+            }
+
+        }
 
         private void RemoveChannelGroupCallback()
         {
@@ -1159,8 +1233,9 @@ namespace PubNubMessaging.Core
 		{
 			if (requestUri != null) {
 				if (channelLocalClientHeartbeatTimer.ContainsKey (requestUri)) {
-					Timer requestHeatbeatTimer = channelLocalClientHeartbeatTimer [requestUri];
-					if (requestHeatbeatTimer != null) {
+					Timer requestHeatbeatTimer = null;
+                    if (channelLocalClientHeartbeatTimer.TryGetValue(requestUri, out requestHeatbeatTimer) && requestHeatbeatTimer != null)
+                    {
 						try {
 							requestHeatbeatTimer.Change (
 								(-1 == _pubnubNetworkTcpCheckIntervalInSeconds) ? -1 : _pubnubNetworkTcpCheckIntervalInSeconds * 1000,
@@ -1185,13 +1260,17 @@ namespace PubNubMessaging.Core
 				ICollection<Uri> keyCollection = timerCollection.Keys;
 				foreach (Uri key in keyCollection) {
 					if (channelLocalClientHeartbeatTimer.ContainsKey (key)) {
-						Timer currentTimer = channelLocalClientHeartbeatTimer [key];
-						currentTimer.Dispose ();
-						Timer removedTimer = null;
-						bool removed = channelLocalClientHeartbeatTimer.TryRemove (key, out removedTimer);
-						if (!removed) {
-							LoggingMethod.WriteToLog (string.Format ("DateTime {0} TerminateLocalClientHeartbeatTimer(null) - Unable to remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString (), key.ToString ()), LoggingMethod.LevelInfo);
-						}
+						Timer currentTimer = null;
+                        if (channelLocalClientHeartbeatTimer.TryGetValue(key, out currentTimer) && currentTimer != null)
+                        {
+                            currentTimer.Dispose();
+                            Timer removedTimer = null;
+                            bool removed = channelLocalClientHeartbeatTimer.TryRemove(key, out removedTimer);
+                            if (!removed)
+                            {
+                                LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateLocalClientHeartbeatTimer(null) - Unable to remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString(), key.ToString()), LoggingMethod.LevelInfo);
+                            }
+                        }
 					}
 				}
 			}
@@ -2443,7 +2522,7 @@ namespace PubNubMessaging.Core
 							decryptMessage = "**DECRYPT ERROR**";
 
 							string multiChannel = string.Join (",", channels);
-                            string multiChannelGroup = string.Join(",", channelGroups);
+                            string multiChannelGroup = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups) : "";
 
 							CallErrorCallback (PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
                                 multiChannel, multiChannelGroup, errorCallback, ex, null, null);
@@ -2686,15 +2765,6 @@ namespace PubNubMessaging.Core
             bool channelGroupSubscribeOnly = false;
             bool channelSubscribeOnly = false;
 
-            if (rawChannels != null && rawChannels.Length > 0 && rawChannelGroups == null)
-            {
-                channelSubscribeOnly = true;
-            }
-            if (rawChannels != null && rawChannels.Length == 0 && rawChannelGroups != null && rawChannelGroups.Length > 0)
-            {
-                channelGroupSubscribeOnly = true;
-            }
-
             string channel = (rawChannels != null) ? string.Join(",", rawChannels) : "";
             string channelGroup = (rawChannelGroups != null) ? string.Join(",", rawChannelGroups) : "";
 
@@ -2847,7 +2917,16 @@ namespace PubNubMessaging.Core
 				string[] channels = multiChannelSubscribe.Keys.ToArray<string> ();
                 string[] channelGroups = multiChannelGroupSubscribe.Keys.ToArray<string>();
 
-				RequestState<T> state = new RequestState<T>();
+                if (channels != null && channels.Length > 0 && (channelGroups == null || channelGroups.Length == 0))
+                {
+                    channelSubscribeOnly = true;
+                }
+                if (channelGroups != null && channelGroups.Length > 0 && (channels == null || channels.Length == 0))
+                {
+                    channelGroupSubscribeOnly = true;
+                }
+
+                RequestState<T> state = new RequestState<T>();
                 if (channelGroupSubscribeOnly)
                 {
                     _channelRequest.AddOrUpdate(",", state.Request, (key, oldValue) => state.Request);
@@ -3160,8 +3239,15 @@ namespace PubNubMessaging.Core
 
 					if (_channelRequest.ContainsKey(multiChannelName)) 
                     {
-						LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Aborting previous subscribe/presence requests having channel(s)={1}; channelgroup(s)={2}", DateTime.Now.ToString (), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
-						PubnubWebRequest webRequest = _channelRequest[multiChannelName];
+                        string[] arrValidChannels = validChannels.ToArray();
+                        RemoveChannelCallback<T>(string.Join(",", arrValidChannels), type);
+
+                        string[] arrValidChannelGroups = validChannels.ToArray();
+                        RemoveChannelGroupCallback<T>(string.Join(",", arrValidChannelGroups), type);
+                        
+                        LoggingMethod.WriteToLog(string.Format("DateTime {0}, Aborting previous subscribe/presence requests having channel(s)={1}; channelgroup(s)={2}", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
+						
+                        PubnubWebRequest webRequest = _channelRequest[multiChannelName];
 						_channelRequest[multiChannelName] = null;
 
 						if (webRequest != null) {
@@ -4913,8 +4999,10 @@ namespace PubNubMessaging.Core
                         {
 							PubnubChannelCallback<T> currentPubnubCallback = channelCallbacks [callbackKey] as PubnubChannelCallback<T>;
 							if (currentPubnubCallback != null && currentPubnubCallback.ConnectCallback != null) {
-								GoToCallback<T> (connectResult, currentPubnubCallback.ConnectCallback);
-							}
+                                Action<T> targetCallback = currentPubnubCallback.ConnectCallback;
+                                currentPubnubCallback.ConnectCallback = null;
+                                GoToCallback<T>(connectResult, targetCallback);
+                            }
 						}
 						break;
 					case ResponseType.Presence:
@@ -4929,8 +5017,10 @@ namespace PubNubMessaging.Core
 						if (channelCallbacks.Count > 0 && channelCallbacks.ContainsKey (pCallbackKey)) {
 							PubnubChannelCallback<T> currentPubnubCallback = channelCallbacks [pCallbackKey] as PubnubChannelCallback<T>;
 							if (currentPubnubCallback != null && currentPubnubCallback.ConnectCallback != null) {
-								GoToCallback<T> (connectResult, currentPubnubCallback.ConnectCallback);
-							}
+                                Action<T> targetCallback = currentPubnubCallback.ConnectCallback;
+                                currentPubnubCallback.ConnectCallback = null;
+                                GoToCallback<T>(connectResult, targetCallback);
+                            }
 						}
 						break;
 					default:
@@ -4964,7 +5054,9 @@ namespace PubNubMessaging.Core
                                 PubnubChannelGroupCallback<T> currentPubnubCallback = channelGroupCallbacks[callbackKey] as PubnubChannelGroupCallback<T>;
                                 if (currentPubnubCallback != null && currentPubnubCallback.ConnectCallback != null)
                                 {
-                                    GoToCallback<T>(connectResult, currentPubnubCallback.ConnectCallback);
+                                    Action<T> targetCallback = currentPubnubCallback.ConnectCallback;
+                                    currentPubnubCallback.ConnectCallback = null;
+                                    GoToCallback<T>(connectResult, targetCallback);
                                 }
                             }
                             break;
@@ -4982,7 +5074,9 @@ namespace PubNubMessaging.Core
                                 PubnubChannelGroupCallback<T> currentPubnubCallback = channelGroupCallbacks[pCallbackKey] as PubnubChannelGroupCallback<T>;
                                 if (currentPubnubCallback != null && currentPubnubCallback.ConnectCallback != null)
                                 {
-                                    GoToCallback<T>(connectResult, currentPubnubCallback.ConnectCallback);
+                                    Action<T> targetCallback = currentPubnubCallback.ConnectCallback;
+                                    currentPubnubCallback.ConnectCallback = null;
+                                    GoToCallback<T>(connectResult, targetCallback);
                                 }
                             }
                             break;
@@ -6034,8 +6128,8 @@ namespace PubNubMessaging.Core
                             }
                             result.Add(multiChannelGroup);
                             result.Add (multiChannel);
-							
-                            long receivedTimetoken = (result.Count > 1) ? Convert.ToInt64 (result [1].ToString ()) : 0;
+
+                            long receivedTimetoken = (result.Count > 1 && result[1].ToString() != "") ? Convert.ToInt64(result[1].ToString()) : 0;
 							
                             long minimumTimetoken1 = (multiChannelSubscribe.Count > 0) ? multiChannelSubscribe.Min (token => token.Value) : 0;
                             long minimumTimetoken2 = (multiChannelGroupSubscribe.Count > 0) ? multiChannelGroupSubscribe.Min(token => token.Value) : 0;
@@ -6919,6 +7013,12 @@ namespace PubNubMessaging.Core
 		object DeserializeToObject (string jsonString);
 		//T DeserializeToObject<T>(string jsonString);
 		Dictionary<string, object> DeserializeToDictionaryOfObject (string jsonString);
+
+        Dictionary<string, object> ConvertToDictionaryObject(object localContainer);
+
+        Dictionary<string, object>[] ConvertToDictionaryObjectArray(object localContainer);
+
+        object[] ConvertToObjectArray(object localContainer);
 	}
 	#if (USE_JSONFX)|| (USE_JSONFX_UNITY)
 	public class JsonFXDotNet : IJsonPluggableLibrary
@@ -6930,7 +7030,20 @@ namespace PubNubMessaging.Core
 
 		public bool IsDictionaryCompatible (string jsonString)
 		{
-			return true;
+            bool ret = false;
+
+			jsonString = PubnubCryptoBase.ConvertHexToUnicodeChars (jsonString);
+			var reader = new JsonFx.Json.JsonReader ();
+			var output = reader.Read<object> (jsonString);
+			Type valueType = null;
+			valueType = output.GetType ();
+			var expectedType = typeof(System.Dynamic.ExpandoObject);
+            if (expectedType.IsAssignableFrom(valueType))
+            {
+                ret = true;
+            }
+
+            return ret;
 		}
 
 		public string SerializeToJsonString (object objectToSerialize)
@@ -6940,11 +7053,24 @@ namespace PubNubMessaging.Core
 			string json = writer.Write (objectToSerialize);
 			return PubnubCryptoBase.ConvertHexToUnicodeChars (json);
 			#else
+            
 			string json = "";
-			var resolver = new JsonFx.Serialization.Resolvers.CombinedResolverStrategy(new JsonFx.Serialization.Resolvers.DataContractResolverStrategy());
-			JsonFx.Serialization.DataWriterSettings dataWriterSettings = new JsonFx.Serialization.DataWriterSettings(resolver);
-			var writer = new JsonFx.Json.JsonWriter(dataWriterSettings, new string[] { "PubnubClientError" });
-			json = writer.Write(objectToSerialize);
+			var resolver = new JsonFx.Serialization.Resolvers.CombinedResolverStrategy(
+                new JsonFx.Json.Resolvers.JsonResolverStrategy(),
+                new JsonFx.Serialization.Resolvers.DataContractResolverStrategy()
+                );
+
+            //JsonFx.Serialization.DataWriterSettings dataWriterSettings = new JsonFx.Serialization.DataWriterSettings(resolver);
+            //var writer = new JsonFx.Json.JsonWriter(dataWriterSettings, new string[] { "PubnubClientError" });
+            var writer = new JsonFx.Json.JsonWriter();
+            try
+            {
+                json = writer.Write(objectToSerialize);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.ToString());
+            }
 
 			return json;
 			#endif
@@ -7007,6 +7133,89 @@ namespace PubNubMessaging.Core
 			}
 			#endif
 		}
+
+        public Dictionary<string, object> ConvertToDictionaryObject(object localContainer)
+        {
+            Dictionary<string, object> ret = null;
+
+            if (localContainer != null && localContainer.GetType().ToString() == "System.Dynamic.ExpandoObject")
+            {
+                IDictionary<string, object> iDictionary = localContainer as IDictionary<string, object>;
+                ret = iDictionary.ToDictionary(item => item.Key, item => item.Value);
+            }
+
+            return ret;
+        }
+
+        public Dictionary<string, object>[] ConvertToDictionaryObjectArray(object localContainer)
+        {
+            Dictionary<string, object>[] ret = null;
+
+            if (localContainer != null && localContainer.GetType().ToString() == "System.Dynamic.ExpandoObject[]")
+            {
+                IDictionary<string, object>[] iDictionary = localContainer as IDictionary<string, object>[];
+                if (iDictionary != null && iDictionary.Length > 0)
+                {
+                    ret = new Dictionary<string, object>[iDictionary.Length];
+
+                    for(int index=0; index < iDictionary.Length; index++)
+                    {
+                        IDictionary<string, object> iItem = iDictionary[index];
+                        ret[index] = iItem.ToDictionary(item => item.Key, item => item.Value);
+                    }
+                }
+            }
+
+            return ret;
+        }
+
+        public object[] ConvertToObjectArray(object localContainer)
+        {
+            object[] ret = null;
+
+            if (localContainer != null)
+            {
+                ret = localContainer as object[];
+                if (ret == null)
+                {
+                    if (localContainer.GetType().IsArray)
+                    {
+                        switch (localContainer.GetType().GetElementType().FullName)
+                        {
+                            case "System.Int32":
+                                int[] intArray = localContainer as int[];
+                                ret = new object[intArray.Length];
+                                Array.Copy(intArray, ret, intArray.Length);
+                                break;
+                            case "System.Int64":
+                                Int64[] int64Array = localContainer as Int64[];
+                                ret = new object[int64Array.Length];
+                                Array.Copy(int64Array, ret, int64Array.Length);
+                                break;
+                            case "System.Double":
+                                double[] doubleArray = localContainer as double[];
+                                ret = new object[doubleArray.Length];
+                                Array.Copy(doubleArray, ret, doubleArray.Length);
+                                break;
+                            case "System.Decimal":
+                                decimal[] decimalArray = localContainer as decimal[];
+                                ret = new object[decimalArray.Length];
+                                Array.Copy(decimalArray, ret, decimalArray.Length);
+                                break;
+                            case "System.Single":
+                                float[] floatArray = localContainer as float[];
+                                ret = new object[floatArray.Length];
+                                Array.Copy(floatArray, ret, floatArray.Length);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+
+            return ret;
+        }
 	}
 	#elif (USE_DOTNET_SERIALIZATION)
 	public class JscriptSerializer : IJsonPluggableLibrary
@@ -7123,36 +7332,49 @@ namespace PubNubMessaging.Core
 	public class NewtonsoftJsonDotNet : IJsonPluggableLibrary
 	{
 	#region IJsonPlugableLibrary methods implementation
+        private bool IsValidJson(string jsonString)
+        {
+            bool ret = false;
+            try
+            {
+                JObject.Parse(jsonString);
+                ret = true;
+            }
+            catch { }
+            return ret;
+        }
 				
 		public bool IsArrayCompatible (string jsonString)
 		{
 			bool ret = false;
-			JsonTextReader reader = new JsonTextReader (new StringReader (jsonString));
-			while (reader.Read ()) {
-				if (reader.LineNumber == 1 && reader.LinePosition == 1 && reader.TokenType == JsonToken.StartArray) {
-					ret = true;
-					break;
-				} else {
-					break;
-				}
-			}
-
+            if (IsValidJson(jsonString)){
+                JsonTextReader reader = new JsonTextReader(new StringReader(jsonString));
+                while (reader.Read()){
+                    if (reader.LineNumber == 1 && reader.LinePosition == 1 && reader.TokenType == JsonToken.StartArray){
+                        ret = true;
+                        break;
+                    } else {
+                        break;
+                    }
+                }
+            }
 			return ret;
 		}
 
 		public bool IsDictionaryCompatible (string jsonString)
 		{
 			bool ret = false;
-			JsonTextReader reader = new JsonTextReader (new StringReader (jsonString));
-			while (reader.Read ()) {
-				if (reader.LineNumber == 1 && reader.LinePosition == 1 && reader.TokenType == JsonToken.StartObject) {
-					ret = true;
-					break;
-				} else {
-					break;
-				}
-			}
-
+            if (IsValidJson(jsonString)){
+                JsonTextReader reader = new JsonTextReader(new StringReader(jsonString));
+                while (reader.Read()){
+                    if (reader.LineNumber == 1 && reader.LinePosition == 1 && reader.TokenType == JsonToken.StartObject){
+                        ret = true;
+                        break;
+                    } else {
+                        break;
+                    }
+                }
+            }
 			return ret;
 		}
 
@@ -7191,13 +7413,151 @@ namespace PubNubMessaging.Core
 		{
 			return JsonConvert.DeserializeObject<Dictionary<string, object>> (jsonString);
 		}
-	#endregion
+
+        public Dictionary<string, object> ConvertToDictionaryObject(object localContainer)
+        {
+            Dictionary<string, object> ret = null;
+
+            if (localContainer != null)
+            {
+                if (localContainer.GetType().ToString() == "Newtonsoft.Json.Linq.JObject")
+                {
+                    ret = new Dictionary<string, object>();
+
+                    IDictionary<string, JToken> jDictionary = localContainer as JObject;
+                    if (jDictionary != null)
+                    {
+                        foreach (KeyValuePair<string, JToken> pair in jDictionary)
+                        {
+                            JToken token = pair.Value;
+                            ret.Add(pair.Key, ConvertJTokenToDictionary(token));
+                        }
+                    }
+                }
+                else if (localContainer.GetType().ToString() == "System.Collections.Generic.Dictionary`2[System.String,System.Object]")
+                {
+                    ret = new Dictionary<string, object>();
+                    Dictionary<string, object> dictionary = localContainer as Dictionary<string, object>;
+                    foreach(string key in dictionary.Keys)
+                    {
+                        ret.Add(key, dictionary[key]);
+                    }
+                }
+            }
+
+            return ret;
+
+        }
+
+        public Dictionary<string, object>[] ConvertToDictionaryObjectArray(object localContainer)
+        {
+            Dictionary<string, object>[] ret = null;
+
+            if (localContainer != null && localContainer.GetType().ToString() == "Newtonsoft.Json.Linq.JObject[]")
+            {
+                IDictionary<string, JToken>[] iDictionary = localContainer as IDictionary<string, JToken>[];
+                if (iDictionary != null && iDictionary.Length > 0)
+                {
+                    ret = new Dictionary<string, object>[iDictionary.Length];
+
+                    for (int index = 0; index < iDictionary.Length; index++)
+                    {
+                        IDictionary<string, JToken> iItem = iDictionary[index];
+                        foreach (KeyValuePair<string, JToken> pair in iItem)
+                        {
+                            JToken token = pair.Value;
+                            ret[index].Add(pair.Key, ConvertJTokenToDictionary(token));
+                        }
+                    }
+                }
+            }
+
+            return ret;
+        }
+
+        public object[] ConvertToObjectArray(object localContainer)
+        {
+            object[] ret = null;
+
+            if (localContainer.GetType().ToString() == "Newtonsoft.Json.Linq.JArray")
+            {
+                JArray jarrayResult = localContainer as JArray;
+                List<object> objectContainer = jarrayResult.ToObject<List<object>>();
+                if (objectContainer != null && objectContainer.Count > 0)
+                {
+                    for (int index = 0; index < objectContainer.Count; index++)
+                    {
+                        if (objectContainer[index].GetType().ToString() == "Newtonsoft.Json.Linq.JArray")
+                        {
+                            JArray internalItem = objectContainer[index] as JArray;
+                            objectContainer[index] = internalItem.Select(item => (object)item).ToArray();
+                        }
+                    }
+                    ret = objectContainer.ToArray<object>();
+                }
+            }
+            else if (localContainer.GetType().ToString() == "System.Collections.Generic.List`1[System.Object]")
+            {
+                List<object> listResult = localContainer as List<object>;
+                ret = listResult.ToArray<object>();
+            }
+
+            return ret;
+        }
+
+        private static object ConvertJTokenToDictionary(JToken token)
+        {
+            if (token == null)
+            {
+                return null;
+            }
+
+            var jValue = token as JValue;
+            if (jValue != null)
+            {
+                return jValue.Value;
+            }
+
+            var jContainer = token as JArray;
+            if (jContainer != null)
+            {
+                List<object> jsonList = new List<object>();
+                foreach (JToken arrayItem in jContainer)
+                {
+                    jsonList.Add(ConvertJTokenToDictionary(arrayItem));
+                }
+                return jsonList;
+            }
+
+            IDictionary<string, JToken> jsonObject = token as JObject;
+            if (jsonObject != null)
+            {
+                var jsonDict = new Dictionary<string, object>();
+                List<JProperty> propertyList = (from childToken in token
+                                                where childToken is JProperty
+                                                select childToken as JProperty).ToList();
+                foreach (JProperty property in propertyList)
+                {
+                    jsonDict.Add(property.Name, ConvertJTokenToDictionary(property.Value));
+                }
+
+                //(from childToken in token 
+                //    where childToken is JProperty select childToken as JProperty)
+                //    .ToList()
+                //    .ForEach(property => jsonDict.Add(property.Name, ConvertJTokenToDictionary(property.Value)));
+                return jsonDict;
+            }
+
+            return null;
+        }
+
+    #endregion
 	
 	}
-	#endif
-	#endregion
-	#region "States and ResposeTypes"
-	public enum ResponseType
+#endif
+    #endregion
+    #region "States and ResposeTypes"
+    public enum ResponseType
 	{
 		Publish,
 		History,
