@@ -1,4 +1,4 @@
-﻿//Build Date: March 24, 2015
+﻿//Build Date: May 11, 2015
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -1027,6 +1027,43 @@ namespace PubNubMessaging.Core
 			}
 		}
 
+        private void RemoveChannelCallback<T>(string channel, ResponseType type)
+        {
+            string[] arrChannels = channel.Split(',');
+            if (arrChannels != null && arrChannels.Length > 0)
+            {
+                foreach (string arrChannel in arrChannels)
+                {
+                    PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
+                    callbackKey.Channel = arrChannel;
+                    switch (type)
+                    {
+                        case ResponseType.Unsubscribe:
+                            callbackKey.Type = ResponseType.Subscribe;
+                            break;
+                        case ResponseType.PresenceUnsubscribe:
+                            callbackKey.Type = ResponseType.Presence;
+                            break;
+                        default:
+                            callbackKey.Type = ResponseType.Time; //overriding the default
+                            break;
+                    }
+
+                    if (channelCallbacks.Count > 0 && channelCallbacks.ContainsKey(callbackKey))
+                    {
+                        PubnubChannelCallback<T> currentPubnubCallback = channelCallbacks[callbackKey] as PubnubChannelCallback<T>;
+                        if (currentPubnubCallback != null)
+                        {
+                            currentPubnubCallback.Callback = null;
+                            currentPubnubCallback.ConnectCallback = null;
+                        }
+                    }
+
+                }
+            }
+
+        }
+
 		private void RemoveChannelCallback()
 		{
 			ICollection<PubnubChannelCallbackKey> channelCollection = channelCallbacks.Keys;
@@ -1042,6 +1079,43 @@ namespace PubNubMessaging.Core
 				}
 			}
 		}
+
+        private void RemoveChannelGroupCallback<T>(string channelGroup, ResponseType type)
+        {
+            string[] arrChannelGroups = channelGroup.Split(',');
+            if (arrChannelGroups != null && arrChannelGroups.Length > 0)
+            {
+                foreach (string arrChannelGroup in arrChannelGroups)
+                {
+                    PubnubChannelGroupCallbackKey callbackKey = new PubnubChannelGroupCallbackKey();
+                    callbackKey.ChannelGroup = arrChannelGroup;
+                    switch (type)
+                    {
+                        case ResponseType.Unsubscribe:
+                            callbackKey.Type = ResponseType.Subscribe;
+                            break;
+                        case ResponseType.PresenceUnsubscribe:
+                            callbackKey.Type = ResponseType.Presence;
+                            break;
+                        default:
+                            callbackKey.Type = ResponseType.Time; //overriding the default
+                            break;
+                    }
+
+                    if (channelGroupCallbacks.Count > 0 && channelGroupCallbacks.ContainsKey(callbackKey))
+                    {
+                        PubnubChannelGroupCallback<T> currentPubnubCallback = channelGroupCallbacks[callbackKey] as PubnubChannelGroupCallback<T>;
+                        if (currentPubnubCallback != null)
+                        {
+                            currentPubnubCallback.Callback = null;
+                            currentPubnubCallback.ConnectCallback = null;
+                        }
+                    }
+
+                }
+            }
+
+        }
 
         private void RemoveChannelGroupCallback()
         {
@@ -3165,8 +3239,15 @@ namespace PubNubMessaging.Core
 
 					if (_channelRequest.ContainsKey(multiChannelName)) 
                     {
-						LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Aborting previous subscribe/presence requests having channel(s)={1}; channelgroup(s)={2}", DateTime.Now.ToString (), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
-						PubnubWebRequest webRequest = _channelRequest[multiChannelName];
+                        string[] arrValidChannels = validChannels.ToArray();
+                        RemoveChannelCallback<T>(string.Join(",", arrValidChannels), type);
+
+                        string[] arrValidChannelGroups = validChannels.ToArray();
+                        RemoveChannelGroupCallback<T>(string.Join(",", arrValidChannelGroups), type);
+                        
+                        LoggingMethod.WriteToLog(string.Format("DateTime {0}, Aborting previous subscribe/presence requests having channel(s)={1}; channelgroup(s)={2}", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
+						
+                        PubnubWebRequest webRequest = _channelRequest[multiChannelName];
 						_channelRequest[multiChannelName] = null;
 
 						if (webRequest != null) {
@@ -4973,7 +5054,9 @@ namespace PubNubMessaging.Core
                                 PubnubChannelGroupCallback<T> currentPubnubCallback = channelGroupCallbacks[callbackKey] as PubnubChannelGroupCallback<T>;
                                 if (currentPubnubCallback != null && currentPubnubCallback.ConnectCallback != null)
                                 {
-                                    GoToCallback<T>(connectResult, currentPubnubCallback.ConnectCallback);
+                                    Action<T> targetCallback = currentPubnubCallback.ConnectCallback;
+                                    currentPubnubCallback.ConnectCallback = null;
+                                    GoToCallback<T>(connectResult, targetCallback);
                                 }
                             }
                             break;
@@ -4991,7 +5074,9 @@ namespace PubNubMessaging.Core
                                 PubnubChannelGroupCallback<T> currentPubnubCallback = channelGroupCallbacks[pCallbackKey] as PubnubChannelGroupCallback<T>;
                                 if (currentPubnubCallback != null && currentPubnubCallback.ConnectCallback != null)
                                 {
-                                    GoToCallback<T>(connectResult, currentPubnubCallback.ConnectCallback);
+                                    Action<T> targetCallback = currentPubnubCallback.ConnectCallback;
+                                    currentPubnubCallback.ConnectCallback = null;
+                                    GoToCallback<T>(connectResult, targetCallback);
                                 }
                             }
                             break;
@@ -7247,36 +7332,49 @@ namespace PubNubMessaging.Core
 	public class NewtonsoftJsonDotNet : IJsonPluggableLibrary
 	{
 	#region IJsonPlugableLibrary methods implementation
+        private bool IsValidJson(string jsonString)
+        {
+            bool ret = false;
+            try
+            {
+                JObject.Parse(jsonString);
+                ret = true;
+            }
+            catch { }
+            return ret;
+        }
 				
 		public bool IsArrayCompatible (string jsonString)
 		{
 			bool ret = false;
-			JsonTextReader reader = new JsonTextReader (new StringReader (jsonString));
-			while (reader.Read ()) {
-				if (reader.LineNumber == 1 && reader.LinePosition == 1 && reader.TokenType == JsonToken.StartArray) {
-					ret = true;
-					break;
-				} else {
-					break;
-				}
-			}
-
+            if (IsValidJson(jsonString)){
+                JsonTextReader reader = new JsonTextReader(new StringReader(jsonString));
+                while (reader.Read()){
+                    if (reader.LineNumber == 1 && reader.LinePosition == 1 && reader.TokenType == JsonToken.StartArray){
+                        ret = true;
+                        break;
+                    } else {
+                        break;
+                    }
+                }
+            }
 			return ret;
 		}
 
 		public bool IsDictionaryCompatible (string jsonString)
 		{
 			bool ret = false;
-			JsonTextReader reader = new JsonTextReader (new StringReader (jsonString));
-			while (reader.Read ()) {
-				if (reader.LineNumber == 1 && reader.LinePosition == 1 && reader.TokenType == JsonToken.StartObject) {
-					ret = true;
-					break;
-				} else {
-					break;
-				}
-			}
-
+            if (IsValidJson(jsonString)){
+                JsonTextReader reader = new JsonTextReader(new StringReader(jsonString));
+                while (reader.Read()){
+                    if (reader.LineNumber == 1 && reader.LinePosition == 1 && reader.TokenType == JsonToken.StartObject){
+                        ret = true;
+                        break;
+                    } else {
+                        break;
+                    }
+                }
+            }
 			return ret;
 		}
 
@@ -7435,10 +7533,18 @@ namespace PubNubMessaging.Core
             if (jsonObject != null)
             {
                 var jsonDict = new Dictionary<string, object>();
-                (from childToken in token 
-                    where childToken is JProperty select childToken as JProperty)
-                    .ToList()
-                    .ForEach(property => jsonDict.Add(property.Name, ConvertJTokenToDictionary(property.Value)));
+                List<JProperty> propertyList = (from childToken in token
+                                                where childToken is JProperty
+                                                select childToken as JProperty).ToList();
+                foreach (JProperty property in propertyList)
+                {
+                    jsonDict.Add(property.Name, ConvertJTokenToDictionary(property.Value));
+                }
+
+                //(from childToken in token 
+                //    where childToken is JProperty select childToken as JProperty)
+                //    .ToList()
+                //    .ForEach(property => jsonDict.Add(property.Name, ConvertJTokenToDictionary(property.Value)));
                 return jsonDict;
             }
 
