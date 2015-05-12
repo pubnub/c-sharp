@@ -191,7 +191,7 @@ namespace PubnubWindowsStore.Test
             unitTest.TestClassName = "WhenAClientIsPresented";
             unitTest.TestCaseName = "IfWhereNowIsCalledThenItShouldReturnInfo";
             pubnub.PubnubUnitTest = unitTest;
-            string uuid = "hello_my_uuid";
+            string uuid = customUUID;
             pubnub.WhereNow<string>(uuid, ThenWhereNowShouldReturnMessage, DummyErrorCallback);
             whereNowManualEvent.WaitOne();
             Assert.IsTrue(receivedWhereNowMessage, "where_now message not received");
