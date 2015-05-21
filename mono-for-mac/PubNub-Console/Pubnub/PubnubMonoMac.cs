@@ -738,7 +738,7 @@ namespace PubNubMessaging.Core
                 base.PubnubErrorLevel = (PubnubErrorFilter.Level)errorFilterValue;
             }
 
-            LoggingMethod.WriteToLog("Ver 3.6, Build Date: Sep 16, 2014", LoggingMethod.LevelInfo);
+            LoggingMethod.WriteToLog("Ver 3.7, Build Date: Sep 16, 2014", LoggingMethod.LevelInfo);
             #if (USE_JSONFX)
             LoggingMethod.WriteToLog("Using USE_JSONFX", LoggingMethod.LevelInfo);
             this.JsonPluggableLibrary = new JsonFXDotNet();
