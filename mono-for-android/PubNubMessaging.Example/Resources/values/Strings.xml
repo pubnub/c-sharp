@@ -60,7 +60,6 @@
     <string name="auth">Set Auth Key</string>
     <string name="authopt">Set Auth Key (Optional)</string>
     <string name="btnset">Set</string>
-    <string name="channel">Channel</string>
     <string name="channelgroup">ChannelGroup</string>
     <string name="grantchannel">Channel</string>
     <string name="grantchannelgroup">ChannelGroup</string>
@@ -79,7 +78,6 @@
     <string name="btnUserStateInst">enter json</string>
     <string name="btnSetUserState">Set User State</string>
     <string name="optional">optional</string>
-    <string name="btnWhereNow">Run Where Now</string>
     <string name="whereNow">Where Now</string>
     <string name="btnGlobalHereNow">Run Global Here Now</string>
     <string name="hereNow">Here Now</string>
