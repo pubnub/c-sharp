@@ -51,7 +51,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.EndPendingRequests();
             pubnub = null;
-            Assert.True(receivedGrantMessage, "WhenSubscribedToAChannel Grant access failed.");
+            Assert.True(receivedGrantMessage, "WhenSubscribedToAChannel3 Grant access failed.");
         }
 
         [Test]
@@ -59,7 +59,7 @@ namespace PubNubMessaging.Tests
         {
             receivedMessage = false;
             CommonSubscribeShouldReturnUnicodeMessageBasedOnParams("", "", false);
-            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnUnicodeMessage Failed");
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel3 --> ThenSubscribeShouldReturnUnicodeMessage Failed");
         }
 
         private void CommonSubscribeShouldReturnUnicodeMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
@@ -104,7 +104,7 @@ namespace PubNubMessaging.Tests
         {
             receivedMessage = false;
             CommonSubscribeShouldReturnUnicodeMessageBasedOnParams("", "", true);
-            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnUnicodeMessageSSL Failed");
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel3 --> ThenSubscribeShouldReturnUnicodeMessageSSL Failed");
         }
 
         [Test]
@@ -112,7 +112,7 @@ namespace PubNubMessaging.Tests
         {
             receivedMessage = false;
             CommonSubscribeReturnForwardSlashMessageBasedOnParams("", "", false);
-            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessage Failed");
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel3 --> ThenSubscribeShouldReturnForwardSlashMessage Failed");
         }
 
         private void CommonSubscribeReturnForwardSlashMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
@@ -158,7 +158,7 @@ namespace PubNubMessaging.Tests
         {
             receivedMessage = false;
             CommonSubscribeReturnForwardSlashMessageBasedOnParams("", "", true);
-            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessageSSL Failed");
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel3 --> ThenSubscribeShouldReturnForwardSlashMessageSSL Failed");
         }
 
         [Test]
@@ -166,7 +166,7 @@ namespace PubNubMessaging.Tests
         {
             receivedMessage = false;
             CommonSubscribeReturnForwardSlashMessageBasedOnParams("", "enigma", false);
-            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessageCipher Failed");
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel3 --> ThenSubscribeShouldReturnForwardSlashMessageCipher Failed");
         }
 
         [Test]
@@ -174,7 +174,7 @@ namespace PubNubMessaging.Tests
         {
             receivedMessage = false;
             CommonSubscribeReturnForwardSlashMessageBasedOnParams("", "enigma", true);
-            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessageCipherSSL Failed");
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel3 --> ThenSubscribeShouldReturnForwardSlashMessageCipherSSL Failed");
         }
 
         [Test]
@@ -182,7 +182,7 @@ namespace PubNubMessaging.Tests
         {
             receivedMessage = false;
             CommonSubscribeReturnForwardSlashMessageBasedOnParams(PubnubCommon.SecretKey, "", false);
-            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessageSecret Failed");
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel3 --> ThenSubscribeShouldReturnForwardSlashMessageSecret Failed");
         }
 
         [Test]
@@ -190,7 +190,7 @@ namespace PubNubMessaging.Tests
         {
             receivedMessage = false;
             CommonSubscribeReturnForwardSlashMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", false);
-            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessageCipherSecret Failed");
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel3 --> ThenSubscribeShouldReturnForwardSlashMessageCipherSecret Failed");
         }
 
         [Test]
@@ -198,7 +198,7 @@ namespace PubNubMessaging.Tests
         {
             receivedMessage = false;
             CommonSubscribeReturnForwardSlashMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", true);
-            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessageCipherSecretSSL Failed");
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel3 --> ThenSubscribeShouldReturnForwardSlashMessageCipherSecretSSL Failed");
         }
 
         [Test]
@@ -206,7 +206,7 @@ namespace PubNubMessaging.Tests
         {
             receivedMessage = false;
             CommonSubscribeReturnForwardSlashMessageBasedOnParams(PubnubCommon.SecretKey, "", true);
-            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessageSecretSSL Failed");
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel3 --> ThenSubscribeShouldReturnForwardSlashMessageSecretSSL Failed");
         }
 
         [Test]
@@ -214,7 +214,7 @@ namespace PubNubMessaging.Tests
         {
             receivedMessage = false;
             CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams("", "", false);
-            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessage Failed");
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel3 --> ThenSubscribeShouldReturnSpecialCharMessage Failed");
         }
 
         private void CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
@@ -259,7 +259,7 @@ namespace PubNubMessaging.Tests
         {
             receivedMessage = false;
             CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams("", "", true);
-            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessageSSL Failed");
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel3 --> ThenSubscribeShouldReturnSpecialCharMessageSSL Failed");
         }
 
         [Test]
@@ -267,7 +267,7 @@ namespace PubNubMessaging.Tests
         {
             receivedMessage = false;
             CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams("", "enigma", false);
-            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessageCipher Failed");
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel3 --> ThenSubscribeShouldReturnSpecialCharMessageCipher Failed");
         }
 
         [Test]
@@ -275,7 +275,7 @@ namespace PubNubMessaging.Tests
         {
             receivedMessage = false;
             CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams("", "enigma", true);
-            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessageCipherSSL Failed");
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel3 --> ThenSubscribeShouldReturnSpecialCharMessageCipherSSL Failed");
         }
 
         [Test]
@@ -283,7 +283,7 @@ namespace PubNubMessaging.Tests
         {
             receivedMessage = false;
             CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams(PubnubCommon.SecretKey, "", false);
-            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessageSecret Failed");
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel3 --> ThenSubscribeShouldReturnSpecialCharMessageSecret Failed");
         }
 
         [Test]
@@ -291,7 +291,7 @@ namespace PubNubMessaging.Tests
         {
             receivedMessage = false;
             CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", false);
-            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessageCipherSecret Failed");
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel3 --> ThenSubscribeShouldReturnSpecialCharMessageCipherSecret Failed");
         }
 
         [Test]
@@ -299,7 +299,7 @@ namespace PubNubMessaging.Tests
         {
             receivedMessage = false;
             CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", true);
-            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessageCipherSecretSSL Failed");
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel3 --> ThenSubscribeShouldReturnSpecialCharMessageCipherSecretSSL Failed");
         }
 
         [Test]
@@ -307,7 +307,7 @@ namespace PubNubMessaging.Tests
         {
             receivedMessage = false;
             CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams(PubnubCommon.SecretKey, "", true);
-            Assert.True(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessageSecretSSL Failed");
+            Assert.True(receivedMessage, "WhenSubscribedToAChannel3 --> ThenSubscribeShouldReturnSpecialCharMessageSecretSSL Failed");
         }
 
         void ThenSubscribeInitializeShouldReturnGrantMessage(string receivedMessage)
