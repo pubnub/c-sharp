@@ -3,14 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Foundation;
+using UIKit;
 using MonoTouch.Dialog;
 using PubNubMessaging.Core;
 using System.Threading;
 using System.Diagnostics;
-using MonoTouch.CoreGraphics;
-using System.Drawing;
+using CoreGraphics;
 
 namespace PubnubMessagingExample
 {
@@ -55,9 +54,9 @@ namespace PubnubMessagingExample
 
         public override void LayoutSubviews ()
         {
-            labelTotal.Frame = new RectangleF (10, 3, Bounds.Width - 10, height);
-            labelMinMax.Frame = new RectangleF (10, labelTotal.Frame.Top + labelTotal.Frame.Height + 3, Bounds.Width - 10, height);
-            labelAvgCurr.Frame = new RectangleF (10, labelMinMax.Frame.Top + labelMinMax.Frame.Height + 3, Bounds.Width - 10, height);
+            labelTotal.Frame = new CGRect (10, 3, Bounds.Width - 10, height);
+            labelMinMax.Frame = new CGRect (10, labelTotal.Frame.Top + labelTotal.Frame.Height + 3, Bounds.Width - 10, height);
+            labelAvgCurr.Frame = new CGRect (10, labelMinMax.Frame.Top + labelMinMax.Frame.Height + 3, Bounds.Width - 10, height);
         }
     }
 }

@@ -3,14 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using UIKit;
 using MonoTouch.Dialog;
 using PubNubMessaging.Core;
 using System.Threading;
 using System.Diagnostics;
-using MonoTouch.CoreGraphics;
-using System.Drawing;
+using CoreGraphics;
 
 namespace PubnubMessagingExample
 {
@@ -102,7 +100,7 @@ namespace PubnubMessagingExample
             UISegmentedControl segmentedControl = new UISegmentedControl ();
             segmentedControl.HorizontalAlignment = UIControlContentHorizontalAlignment.Center;
 
-            segmentedControl.Frame = new RectangleF (10, 20, UIScreen.MainScreen.Bounds.Width - 20, 40);
+            segmentedControl.Frame = new CGRect (10, 20, UIScreen.MainScreen.Bounds.Width - 20, 40);
             segmentedControl.InsertSegment ("Graph", 0, false);
             segmentedControl.InsertSegment ("SD", 1, false);
             segmentedControl.AutoresizingMask = UIViewAutoresizing.FlexibleWidth;

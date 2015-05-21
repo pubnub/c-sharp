@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Foundation;
+using UIKit;
 
 namespace PubnubMessagingExample
 {
@@ -35,7 +35,7 @@ namespace PubnubMessagingExample
             Unknown
         }
 
-        [DllImport (MonoTouch.Constants.SystemLibrary)]
+        [DllImport (ObjCRuntime.Constants.SystemLibrary)]
         static internal extern int sysctlbyname ([MarshalAs (UnmanagedType.LPStr)] string property, IntPtr output, IntPtr oldLen, IntPtr newp, uint newlen);
 
         public static HardwareVersion Version {

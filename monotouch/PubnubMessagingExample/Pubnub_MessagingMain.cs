@@ -3,11 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Foundation;
+using UIKit;
 using MonoTouch.Dialog;
 using PubNubMessaging.Core;
-using System.Drawing;
+using CoreGraphics;
 
 namespace PubnubMessagingExample
 {
@@ -24,24 +24,26 @@ namespace PubnubMessagingExample
 
         public Pubnub_MessagingMain () : base (UITableViewStyle.Grouped, null)
         {
-            UIView labelView = new UIView (new RectangleF (0, 0, this.View.Bounds.Width, 24));
+            UIView labelView = new UIView (new CGRect (0, 0, this.View.Bounds.Width, 24));
             int left = 20;
             string hardwareVer = DeviceHardware.Version.ToString ().ToLower ();
             if (hardwareVer.IndexOf ("ipad") >= 0) {
                 left = 55;
             }
 
-            labelView.AddSubview (new UILabel (new RectangleF (left, 10, this.View.Bounds.Width - left, 24)) {
+            labelView.AddSubview (new UILabel (new CGRect (left, 10, this.View.Bounds.Width - left, 24)) {
                 Font = UIFont.BoldSystemFontOfSize (16),
                 BackgroundColor = UIColor.Clear,
                 TextColor = UIColor.FromRGB (76, 86, 108),
                 Text = "Basic Settings"
             });
 
-            var headerMultipleChannels = new UILabel (new RectangleF (0, 0, this.View.Bounds.Width, 24)) {
+            var headerMultipleChannels = new UILabel (new CGRect (0, 0, this.View.Bounds.Width, 30)) {
                 Font = UIFont.SystemFontOfSize (12),
                 TextColor = UIColor.Brown,
                 BackgroundColor = UIColor.Clear,
+                LineBreakMode = UILineBreakMode.WordWrap,
+                Lines = 0,
                 TextAlignment = UITextAlignment.Center
             };
             headerMultipleChannels.Text = "Enter multiple channel/channelgroup names separated by comma";

@@ -111,7 +111,6 @@ Global
 		{A674B934-4372-441C-9817-32FB7B96B573}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = PubnubMessagingExample\PubnubMessagingExample.csproj
 		Policies = $0
 		$0.TextStylePolicy = $1
 		$1.inheritsSet = null

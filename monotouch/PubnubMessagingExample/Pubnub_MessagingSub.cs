@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Foundation;
+using UIKit;
 using MonoTouch.Dialog;
 using System.Threading;
-using System.Drawing;
-using MonoTouch.ObjCRuntime;
+using CoreGraphics;
+using ObjCRuntime;
 using PubNubMessaging.Core;
 using MonoTouch.SlideoutNavigation;
 
@@ -270,7 +270,7 @@ namespace PubnubMessagingExample
 
         UIView CreateHeaderView (int iViewHeight)
         {
-            UIView uiView = new UIView (new RectangleF (0, 0, this.View.Bounds.Width, iViewHeight));
+            UIView uiView = new UIView (new CGRect (0, 0, this.View.Bounds.Width, iViewHeight));
             uiView.MultipleTouchEnabled = true;
 
             /*UILabel lblChannel = new UILabel(new RectangleF (10, 2, 80, 25));
@@ -284,28 +284,28 @@ namespace PubnubMessagingExample
             tfChannels.Font = font12;
             uiView.Add (tfChannels);*/
 
-            UILabel lblInfo = new UILabel (new RectangleF (10, 2, 300, 25));
+            UILabel lblInfo = new UILabel (new CGRect (10, 2, 300, 25));
             lblInfo.Font = font12;
             lblInfo.Text = "Enter new channel(s)/channelgroup(s) and/or use the menu for actions";
             uiView.Add (lblInfo);
 
-            UILabel lblNewChannel = new UILabel (new RectangleF (10, 32, 100, 25));
+            UILabel lblNewChannel = new UILabel (new CGRect (10, 32, 100, 25));
             lblNewChannel.Font = font13;
             lblNewChannel.Text = "New Channel(s):";
             uiView.Add (lblNewChannel);
 
-            newChannels = new UITextField (new RectangleF (120, 32, 185, 25));
+            newChannels = new UITextField (new CGRect (120, 32, 185, 25));
             newChannels.AutocorrectionType = UITextAutocorrectionType.No;
             newChannels.BackgroundColor = UIColor.White;
             newChannels.Font = font12;
             uiView.Add (newChannels);
 
-            UILabel lblNewChannelGroup = new UILabel (new RectangleF (10, 62, 140, 25));
+            UILabel lblNewChannelGroup = new UILabel (new CGRect (10, 62, 140, 25));
             lblNewChannelGroup.Font = font13;
             lblNewChannelGroup.Text = "New ChannelGroup(s):";
             uiView.Add (lblNewChannelGroup);
 
-            newChannelGroups = new UITextField (new RectangleF (160, 62, 145, 25));
+            newChannelGroups = new UITextField (new CGRect (160, 62, 145, 25));
             newChannelGroups.AutocorrectionType = UITextAutocorrectionType.No;
             newChannelGroups.BackgroundColor = UIColor.White;
             newChannelGroups.Font = font12;
@@ -522,7 +522,7 @@ namespace PubnubMessagingExample
                         Display ("Adding Channel To ChannelGroup");
                         pubnub.AddChannelsToChannelGroup<string>(new string[]{entryChannel}, entryChannelGroup, DisplayReturnMessage, DisplayErrorMessage);
 
-                        AppDelegate.navigation.PopViewControllerAnimated (true);
+                        AppDelegate.navigation.PopViewController (true);
                     }) {
                         BackgroundColor = UIColor.Blue,
                         TextColor = UIColor.White,
@@ -558,7 +558,7 @@ namespace PubnubMessagingExample
                         Display ("Removing Channel From ChannelGroup");
                         pubnub.RemoveChannelsFromChannelGroup<string>(new string[]{entryChannel}, entryChannelGroup, DisplayReturnMessage, DisplayErrorMessage);
 
-                        AppDelegate.navigation.PopViewControllerAnimated (true);
+                        AppDelegate.navigation.PopViewController (true);
                     }) {
                         BackgroundColor = UIColor.Blue,
                         TextColor = UIColor.White,
@@ -587,7 +587,7 @@ namespace PubnubMessagingExample
                         Display ("Getting ChannelList From ChannelGroup");
                         pubnub.GetChannelsForChannelGroup<string>(entryChannelGroup, DisplayReturnMessage, DisplayErrorMessage);
 
-                        AppDelegate.navigation.PopViewControllerAnimated (true);
+                        AppDelegate.navigation.PopViewController (true);
                     }) {
                         BackgroundColor = UIColor.Blue,
                         TextColor = UIColor.White,
@@ -753,7 +753,7 @@ namespace PubnubMessagingExample
                             });
                         }
 
-                        AppDelegate.navigation.PopViewControllerAnimated (true);
+                        AppDelegate.navigation.PopViewController (true);
                     }) {
                         BackgroundColor = UIColor.Blue,
                         TextColor = UIColor.White,
@@ -1018,7 +1018,7 @@ namespace PubnubMessagingExample
                             }
                         }
 
-                        AppDelegate.navigation.PopViewControllerAnimated (true);
+                        AppDelegate.navigation.PopViewController (true);
                     }) {
                         BackgroundColor = UIColor.Blue,
                         TextColor = UIColor.White,

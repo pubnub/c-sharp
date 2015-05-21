@@ -720,7 +720,7 @@ namespace PubNubMessaging.Core
 
         protected override sealed void Init (string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
         {
-            base.Version = "PubNub-CSharp-Xamarin.iOS/3.6.1";
+            base.Version = "PubNub-CSharp-Xamarin.iOS/3.7";
             LoggingMethod.LogLevel = pubnubLogLevel;
             base.PubnubLogLevel = pubnubLogLevel;
             base.PubnubErrorLevel = errorLevel;

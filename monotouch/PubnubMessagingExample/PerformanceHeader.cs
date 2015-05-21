@@ -3,14 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Foundation;
+using UIKit;
 using MonoTouch.Dialog;
 using PubNubMessaging.Core;
 using System.Threading;
 using System.Diagnostics;
-using MonoTouch.CoreGraphics;
-using System.Drawing;
+using CoreGraphics;
 
 namespace PubnubMessagingExample
 {
@@ -20,9 +19,9 @@ namespace PubnubMessagingExample
 
         public PerformanceHeader ()
         {
-            this.View.Frame = new RectangleF (0, 2, UIScreen.MainScreen.Bounds.Width, 55);
+            this.View.Frame = new CGRect (0, 2, UIScreen.MainScreen.Bounds.Width, 55);
             performanceHeaderView = new PerformanceHeaderView ();
-            performanceHeaderView.Frame = new RectangleF (0, 0, UIScreen.MainScreen.Bounds.Width, this.View.Bounds.Height);
+            performanceHeaderView.Frame = new CGRect (0, 0, UIScreen.MainScreen.Bounds.Width, this.View.Bounds.Height);
             performanceHeaderView.AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth;
             this.View.AddSubviews (performanceHeaderView);
         }

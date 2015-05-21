@@ -3,14 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Foundation;
+using UIKit;
 using MonoTouch.Dialog;
 using PubNubMessaging.Core;
 using System.Threading;
 using System.Diagnostics;
-using MonoTouch.CoreGraphics;
-using System.Drawing;
+using CoreGraphics;
 
 namespace PubnubMessagingExample
 {
@@ -47,20 +46,20 @@ namespace PubnubMessagingExample
             SetNeedsDisplay ();
         }
 
-        public override void Draw (RectangleF rect)
+        public override void Draw (CGRect rect)
         {
             const int padright = 10;
             const int padtop = 10;
             float boxWidth = 60;
-            SizeF ssize;
+            CGSize ssize;
 
-            float fWidth = UIScreen.MainScreen.Bounds.Width;
-            this.Frame = new RectangleF (0, 0, fWidth, UIScreen.MainScreen.Bounds.Width);
+            nfloat fWidth = UIScreen.MainScreen.Bounds.Width;
+            this.Frame = new CGRect (0, 0, fWidth, UIScreen.MainScreen.Bounds.Width);
 
             CGContext ctx = UIGraphics.GetCurrentContext ();
 
             const int offset = 5;
-            float bw = Bounds.Width - offset;
+            nfloat bw = Bounds.Width - offset;
 
             int cols = (int)(bw / boxWidth);
             int rows = (int)(SpeedTestNames.Count () / cols);
@@ -79,12 +78,13 @@ namespace PubnubMessagingExample
                     if (counter < SpeedTestNames.Count ()) {
                         UIColor.White.SetFill ();
                         ctx.SetLineWidth (1f);
-                        ctx.StrokeRect (new RectangleF (x - 1, y, boxWidth, height));
+                        ctx.StrokeRect (new CGRect (x - 1, y, boxWidth, height));
                         UIColor.FromRGB (235, 231, 213).SetFill ();
-                        ctx.FillRect (new RectangleF (x, y + 1, boxWidth - 2, height - 2));
+                        ctx.FillRect (new CGRect (x, y + 1, boxWidth - 2, height - 2));
                         
                         UIColor.Black.SetFill ();
-                        DrawString ((SpeedTestSorted [counter] == null) ? "" : SpeedTestSorted [counter] + " MS", new PointF (x + offset, y + 2), boxWidth - offset - 2, font13b, UILineBreakMode.TailTruncation);
+                        NSString text = new NSString ((SpeedTestSorted [counter] == null) ? "" : SpeedTestSorted [counter] + " MS");
+                        text.DrawString(new CGPoint (x + offset, y + 2), boxWidth - offset - 2, font13b, UILineBreakMode.TailTruncation);
                         counter++;
                     } else {
                         break;
@@ -98,12 +98,13 @@ namespace PubnubMessagingExample
                     if (counter < SpeedTestNames.Count ()) {
                         UIColor.White.SetFill ();
                         ctx.SetLineWidth (1f);
-                        ctx.StrokeRect (new RectangleF (x - 1, y, boxWidth, height));
+                        ctx.StrokeRect (new CGRect (x - 1, y, boxWidth, height));
                         UIColor.FromRGB (207, 197, 161).SetFill ();
-                        ctx.FillRect (new RectangleF (x, y + 1, boxWidth - 2, height - 2));
+                        ctx.FillRect (new CGRect (x, y + 1, boxWidth - 2, height - 2));
 
                         UIColor.Black.SetFill ();
-                        DrawString (SpeedTestNames [counter], new PointF (x + offset, y + 2), boxWidth - offset, font13b, UILineBreakMode.TailTruncation);
+                        NSString text = new NSString (SpeedTestNames [counter]);
+                        text.DrawString(new CGPoint (x + offset, y + 2), boxWidth - offset, font13b, UILineBreakMode.TailTruncation);
                         counter++;
                     } else {
                         break;

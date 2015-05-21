@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Foundation;
+using UIKit;
 using MonoTouch.Dialog;
 
 namespace PubnubMessagingExample
@@ -29,7 +29,7 @@ namespace PubnubMessagingExample
         public override bool FinishedLaunching (UIApplication app, NSDictionary options)
         {
 
-            UITabBarController tabBarController;
+            //UITabBarController tabBarController;
 
             window = new UIWindow (UIScreen.MainScreen.Bounds);
 

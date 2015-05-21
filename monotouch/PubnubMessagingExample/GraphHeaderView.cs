@@ -3,14 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
-using MonoTouch.Dialog;
+using Foundation;
+using UIKit;
+//using MonoTouch.Dialog;
 using PubNubMessaging.Core;
 using System.Threading;
 using System.Diagnostics;
-using MonoTouch.CoreGraphics;
-using System.Drawing;
+using CoreGraphics;
 
 namespace PubnubMessagingExample
 {
@@ -22,7 +21,7 @@ namespace PubnubMessagingExample
 
         public GraphHeaderView ()
         {
-            dv = new DrawingView (new RectangleF (0, 0, chartWidth, chartHeight), 0, 0, 0);
+            dv = new DrawingView (new CGRect (0, 0, chartWidth, chartHeight), 0, 0, 0);
             
             this.AddSubview (dv);
         }
@@ -34,7 +33,7 @@ namespace PubnubMessagingExample
 
         public override void LayoutSubviews ()
         {
-            dv.Frame = new RectangleF ((Bounds.Width - chartWidth) / 2, 10, chartWidth, chartHeight);
+            dv.Frame = new CGRect ((Bounds.Width - chartWidth) / 2, 10, chartWidth, chartHeight);
         }
     }
 
@@ -49,7 +48,7 @@ namespace PubnubMessagingExample
 
         double min;
 
-        public DrawingView (RectangleF p, double lag, double max, double min) : base (p)
+        public DrawingView (CGRect p, double lag, double max, double min) : base (p)
         {
             BackgroundColor = UIColor.White;
             this.lag = lag;
@@ -65,12 +64,12 @@ namespace PubnubMessagingExample
             SetNeedsDisplay ();
         }
 
-        private PointF GetCenterPoint (PointF p1, PointF p2)
+        private CGPoint GetCenterPoint (CGPoint p1, CGPoint p2)
         {
-            return new PointF ((p2.X + p1.X) / 2, (p2.Y + p1.Y) / 2);
+            return new CGPoint ((p2.X + p1.X) / 2, (p2.Y + p1.Y) / 2);
         }
 
-        private double GetSlope (PointF p1, PointF p2)
+        private double GetSlope (CGPoint p1, CGPoint p2)
         {
             if ((p2.Y - p1.Y) != 0)
                 return (p1.X - p2.X) / (p2.Y - p1.Y);
@@ -78,16 +77,16 @@ namespace PubnubMessagingExample
                 return double.PositiveInfinity;
         }
 
-        private double GetIntersect (PointF p1, PointF p2)
+        private double GetIntersect (CGPoint p1, CGPoint p2)
         {
             double slope = GetSlope (p1, p2);
-            PointF center = GetCenterPoint (p1, p2);
+            CGPoint center = GetCenterPoint (p1, p2);
             if (double.IsPositiveInfinity (slope))
                 return 0;
             return center.Y - (slope * center.X);
         }
 
-        public override void Draw (RectangleF rect)
+        public override void Draw (CGRect rect)
         {
             float x = 105;
             float y = 105;
@@ -112,18 +111,21 @@ namespace PubnubMessagingExample
             ctx.FillPath ();
 
             UIColor.Black.SetFill ();
-            //Slow
-            SizeF stringSize = StringSize ("Fast", font10);
-            DrawString ("Fast", new PointF (105 - r + 7, 105 + r / 2 - 28), stringSize.Width, font10, UILineBreakMode.TailTruncation);
-            
             //fast
-            stringSize = StringSize ("Slow", font10);
-            DrawString ("Slow", new PointF (105 + r - 25, 105 - r / 2 + 20), stringSize.Width, font10, UILineBreakMode.TailTruncation);
+            NSString text = new NSString("Fast");
+            CGSize stringSize = text.GetSizeUsingAttributes(new UIStringAttributes { Font = font10 });
+            text.DrawString (new CGPoint (105 - r + 7, 105 + r / 2 - 28), stringSize.Width, font10, UILineBreakMode.TailTruncation);
+            
+            //Slow
+            text = new NSString("Slow");
+            stringSize = text.GetSizeUsingAttributes(new UIStringAttributes { Font = font10 });
+            text.DrawString (new CGPoint (105 + r - 25, 105 - r / 2 + 20), stringSize.Width, font10, UILineBreakMode.TailTruncation);
 
             //pubnub
             UIColor.Red.SetFill ();
-            stringSize = StringSize ("PubNub", font18b);
-            DrawString ("PubNub", new PointF ((r * 2 - stringSize.Width) / 2 + 5, y - r / 2f), stringSize.Width, font18b, UILineBreakMode.TailTruncation);
+            text = new NSString("PubNub");
+            stringSize = text.GetSizeUsingAttributes(new UIStringAttributes { Font = font18b });
+            text.DrawString (new CGPoint ((r * 2 - stringSize.Width) / 2 + 5, y - r / 2f), stringSize.Width, font18b, UILineBreakMode.TailTruncation);
 
 
             //needle
@@ -144,17 +146,17 @@ namespace PubnubMessagingExample
             //double angle = WrapValue(lag, max);
             
             float distance = 80;
-            PointF p = new PointF (distance * (float)Math.Cos (angle), distance * (float)Math.Sin (angle));
+            CGPoint p = new CGPoint (distance * (float)Math.Cos (angle), distance * (float)Math.Sin (angle));
             
             UIColor.Brown.SetStroke ();
             CGPath path1 = new CGPath ();
             ctx.SetLineWidth (3);
             
-            PointF newPoint = new PointF (105 - p.X, 105 - p.Y);
+            CGPoint newPoint = new CGPoint (105 - p.X, 105 - p.Y);
             
-            PointF[] linePoints = new PointF[] { 
+            CGPoint[] linePoints = new CGPoint[] { 
                 newPoint,
-                new PointF (105, 105)
+                new CGPoint (105, 105)
             };
             
             path1.AddLines (linePoints);
@@ -170,13 +172,14 @@ namespace PubnubMessagingExample
                 float bx4 = (float)(x - 4 + (r - 10) * (Math.Cos (theta * Math.PI / 180)));
                 float by4 = (float)(y - 15 + (r - 10) * (Math.Sin (theta * Math.PI / 180)));
 
+                NSString dotText = new NSString(".");
                 if ((theta > 160) && (theta < 350)) {
                     UIColor.Black.SetColor ();
-                    DrawString (".", new PointF (bx4, by4), StringSize (".", font18b).Width, font18b, UILineBreakMode.TailTruncation);
+                    dotText.DrawString (new CGPoint (bx4, by4), (dotText.GetSizeUsingAttributes(new UIStringAttributes { Font = font18b })).Width, font18b, UILineBreakMode.TailTruncation);
                 } else if (((theta >= 0) && (theta < 40)) || ((theta >= 350) && (theta <= 360))) {
                     //redline
                     UIColor.Red.SetColor ();
-                    DrawString (".", new PointF (bx4, by4), StringSize (".", font18b).Width, font18b, UILineBreakMode.TailTruncation);
+                    dotText.DrawString (new CGPoint (bx4, by4), (dotText.GetSizeUsingAttributes(new UIStringAttributes { Font = font18b })).Width, font18b, UILineBreakMode.TailTruncation);
                 }
                 theta += 10.0;
 
@@ -190,13 +193,15 @@ namespace PubnubMessagingExample
             
             //speed in small circle
             UIColor.Black.SetFill ();
-            stringSize = StringSize (Convert.ToInt32 (lag).ToString (), font18b);
-            DrawString (Convert.ToInt32 (lag).ToString (), new PointF ((r * 2 - stringSize.Width) / 2 + 4, y + r / 2f - 15), stringSize.Width, font18b, UILineBreakMode.TailTruncation);
+            NSString lagText = new NSString (Convert.ToInt32 (lag).ToString ());
+            stringSize = lagText.GetSizeUsingAttributes(new UIStringAttributes { Font = font18b });
+            lagText.DrawString (new CGPoint ((r * 2 - stringSize.Width) / 2 + 4, y + r / 2f - 15), stringSize.Width, font18b, UILineBreakMode.TailTruncation);
 
             //ms
             UIColor.Black.SetFill ();
-            stringSize = StringSize ("MS", font18b);
-            DrawString ("MS", new PointF ((r - stringSize.Width) / 2 + 55, y + r / 2f + 10), stringSize.Width, font18b, UILineBreakMode.TailTruncation);
+            NSString msText = new NSString ("MS");
+            stringSize = msText.GetSizeUsingAttributes(new UIStringAttributes { Font = font18b });
+            msText.DrawString (new CGPoint ((r - stringSize.Width) / 2 + 55, y + r / 2f + 10), stringSize.Width, font18b, UILineBreakMode.TailTruncation);
         }
     }
 }

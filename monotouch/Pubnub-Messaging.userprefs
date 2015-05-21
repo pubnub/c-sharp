@@ -1,11 +1,12 @@
-﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhone" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneDeviceTarget.Iph" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="PubnubMessagingExample/Pubnub_MessagingMain.cs">
+﻿<Properties StartupItem="PubnubMessagingExample/PubnubMessagingExample.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhone4s.8.3" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="PubnubMessaging/PubnubXamariniOS.cs">
     <Files>
-      <File FileName="PubnubMessaging/PubnubXamariniOS.cs" Line="1" Column="1" />
-      <File FileName="PubnubMessaging.Tests/WhenSubscribedToAChannel.cs" Line="1" Column="1" />
-      <File FileName="PubnubMessagingExample/Pubnub_MessagingSub.cs" Line="1" Column="1" />
-      <File FileName="PubnubMessagingExample/Pubnub_MessagingMain.cs" Line="96" Column="12" />
+      <File FileName="PubnubMessagingExample/Pubnub_MessagingMain.cs" Line="1" Column="1" />
+      <File FileName="../../../../ushare/mono-for-linux/PubNub-Messaging/PubNubTest/PubnubUnitTest.cs" Line="1" Column="1" />
+      <File FileName="Touch.Unit/AppDelegate.cs" Line="1" Column="1" />
+      <File FileName="PubnubMessaging.Tests/PubnubUnitTest.cs" Line="200" Column="29" />
+      <File FileName="PubnubMessaging/PubnubXamariniOS.cs" Line="722" Column="10" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
@@ -14,10 +15,4 @@
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <MonoDevelop.Ide.ItemProperties.PubnubMessagingExample>
-    <MonoDevelop.MacDev.AppleDevelopmentTeam DeveloperId="NK6E38LY64" TeamId="Y9X42V6EK7" />
-  </MonoDevelop.Ide.ItemProperties.PubnubMessagingExample>
-  <MonoDevelop.Ide.ItemProperties.Touch.Unit>
-    <MonoDevelop.MacDev.AppleDevelopmentTeam DeveloperId="NK6E38LY64" TeamId="Y9X42V6EK7" />
-  </MonoDevelop.Ide.ItemProperties.Touch.Unit>
 </Properties>

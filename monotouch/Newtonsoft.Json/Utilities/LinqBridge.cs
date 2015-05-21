@@ -1,4 +1,4 @@
-﻿#if NET20
+#if NET20
 
 #define LINQBRIDGE_LIB
 
