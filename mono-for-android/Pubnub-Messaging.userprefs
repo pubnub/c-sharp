@@ -1,13 +1,27 @@
 ﻿<Properties StartupItem="PubNubMessaging.Example/PubNubMessaging.Example.csproj">
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Android.MonoForAndroid_API_12" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="PubNubMessaging/PubnubXamarinAndroid.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Android.MonoForAndroid_API_22" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="MonoDroid.Dialog/Element.cs">
     <Files>
-      <File FileName="PubNubMessaging.Example/MainActivity.cs" Line="478" Column="8" />
-      <File FileName="PubNubMessaging.Example/GrantDialogFragment.cs" Line="331" Column="9" />
-      <File FileName="PubNubMessaging/PubnubCore.cs" Line="2896" Column="1" />
-      <File FileName="PubNubMessaging/PubnubXamarinAndroid.cs" Line="284" Column="21" />
-      <File FileName="PubNubMessaging/ClientNetworkStatus.cs" Line="296" Column="10" />
+      <File FileName="PubNubMessaging.Example/MainActivity.cs" Line="1" Column="1" />
+      <File FileName="PubNubMessaging.Example/GrantDialogFragment.cs" Line="1" Column="1" />
+      <File FileName="PubNubMessaging/PubnubCore.cs" Line="1" Column="1" />
+      <File FileName="PubNubMessaging/PubnubXamarinAndroid.cs" Line="1" Column="1" />
+      <File FileName="PubNubMessaging/ClientNetworkStatus.cs" Line="1" Column="1" />
+      <File FileName="PubNubMessaging.Example/obj/Debug/android/src/md5593342ec08ee40bce5d3cffda3d9a4ea/AddRemoveFromChannelGroupDialogFragment.java" Line="1" Column="1" />
+      <File FileName="MonoDroid.Dialog/Element.cs" Line="61" Column="21" />
     </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="Pubnub-Messaging" expanded="True">
+            <Node name="Andr.Unit" selected="True" />
+            <Node name="PubNubMessaging.Example" expanded="True">
+              <Node name="Packages" expanded="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
