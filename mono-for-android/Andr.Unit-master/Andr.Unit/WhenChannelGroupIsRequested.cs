@@ -47,6 +47,7 @@ namespace PubNubMessaging.Tests
             grantManualEvent.WaitOne();
 
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.True(receivedGrantMessage, "WhenChannelGroupIsRequested Grant access failed.");
         }
@@ -74,6 +75,7 @@ namespace PubNubMessaging.Tests
             channelGroupManualEvent.WaitOne();
 
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.True(receivedChannelGroupMessage, "WhenChannelGroupIsRequested -> ThenAddChannelShouldReturnSuccess failed.");
 
@@ -102,6 +104,7 @@ namespace PubNubMessaging.Tests
             channelGroupManualEvent.WaitOne();
 
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.True(receivedChannelGroupMessage, "WhenChannelGroupIsRequested -> ThenRemoveChannelShouldReturnSuccess failed.");
 
@@ -130,6 +133,7 @@ namespace PubNubMessaging.Tests
             channelGroupManualEvent.WaitOne();
 
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.True(receivedChannelGroupMessage, "WhenChannelGroupIsRequested -> ThenGetChannelListShouldReturnSuccess failed.");
 

@@ -99,6 +99,7 @@ namespace PubNubMessaging.Tests
             grantManualEvent.WaitOne();
 
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.True(receivedGrantMessage, "WhenAMessageIsPublished Grant access failed.");
         }
@@ -115,6 +116,7 @@ namespace PubNubMessaging.Tests
             pubnub.Publish<string>(channel, message, null, DummyErrorCallback);
 
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
 
@@ -147,6 +149,7 @@ namespace PubNubMessaging.Tests
                 Assert.True(isUnencryptDetailedHistory, "Unable to match the successful unencrypt Publish");
             }
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
 
@@ -181,6 +184,7 @@ namespace PubNubMessaging.Tests
                 Assert.True(isUnencryptObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
             }
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
 
@@ -222,6 +226,7 @@ namespace PubNubMessaging.Tests
                 Assert.True(isEncryptObjectDetailedHistory, "Unable to match the successful encrypt object Publish");
             }
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
 
@@ -263,6 +268,7 @@ namespace PubNubMessaging.Tests
                 Assert.True(isEncryptObjectDetailedHistory, "Unable to match the successful encrypt object Publish with SSL");
             }
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
 
@@ -298,6 +304,7 @@ namespace PubNubMessaging.Tests
                 Assert.True(isEncryptDetailedHistory, "Unable to decrypt the successful Publish");
             }
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
 
@@ -333,6 +340,7 @@ namespace PubNubMessaging.Tests
                 Assert.True(isSecretEncryptDetailedHistory, "Unable to decrypt the successful Secret key Publish");
             }
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
 
@@ -369,6 +377,7 @@ namespace PubNubMessaging.Tests
                 Assert.True(isComplexObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
             }
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
 
@@ -404,6 +413,7 @@ namespace PubNubMessaging.Tests
                 Assert.True(isSerializedObjectMessageDetailedHistory, "Unable to match the successful serialized object message Publish");
             }
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
 
@@ -426,6 +436,7 @@ namespace PubNubMessaging.Tests
             mreLaregMessagePublish.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.True(isLargeMessagePublished, "Message Too Large is not failing as expected.");
         }

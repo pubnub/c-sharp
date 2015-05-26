@@ -175,6 +175,10 @@ namespace Android.NUnitLite.UI {
             Console.WriteLine ("Fail Count = {0}", failureCount);
             Console.WriteLine ("Error Count = {0}", errorCount);
             Console.WriteLine ("Not Run count = {0}", noRunCount);
+
+            if (successCount + failureCount + errorCount + noRunCount >= testCasesCount) {
+                Console.WriteLine ("REACHED END OF TEST");
+            }
         }
     }
 }

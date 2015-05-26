@@ -60,6 +60,7 @@ namespace PubNubMessaging.Tests
             mreGrant.WaitOne();
 
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.True(receivedGrantMessage, "WhenSubscribedToAChannel Grant access failed.");
         }
@@ -106,6 +107,7 @@ namespace PubNubMessaging.Tests
                 mreUnsubscribe.WaitOne(manualResetEventsWaitTimeout);
             }
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
 
         }
@@ -187,6 +189,7 @@ namespace PubNubMessaging.Tests
             mreSubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
 
             Assert.True(receivedConnectMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnConnectStatus Failed");
@@ -217,6 +220,7 @@ namespace PubNubMessaging.Tests
             mreChannel2SubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
 
             Assert.True(receivedChannel1ConnectMessage && receivedChannel2ConnectMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnConnectStatus Failed");
@@ -247,6 +251,7 @@ namespace PubNubMessaging.Tests
             mreChannel2SubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
 
             Assert.True(receivedChannel1ConnectMessage && receivedChannel2ConnectMessage, "WhenSubscribedToAChannel --> ThenMultiSubscribeShouldReturnConnectStatusSSL Failed");
@@ -274,6 +279,7 @@ namespace PubNubMessaging.Tests
             mreAlreadySubscribed.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
 
             Assert.True(receivedAlreadySubscribedMessage, "WhenSubscribedToAChannel --> ThenDuplicateChannelShouldReturnAlreadySubscribed Failed");
@@ -312,6 +318,7 @@ namespace PubNubMessaging.Tests
             }
             mreSubscriberManyMessages.WaitOne(manualResetEventsWaitTimeout);
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
 
 

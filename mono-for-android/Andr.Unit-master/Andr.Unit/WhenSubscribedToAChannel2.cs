@@ -50,6 +50,7 @@ namespace PubNubMessaging.Tests
             mreGrant.WaitOne();
 
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.True(receivedGrantMessage, "WhenSubscribedToAChannel Grant access failed.");
         }
@@ -96,6 +97,7 @@ namespace PubNubMessaging.Tests
                 mreUnsubscribe.WaitOne(manualResetEventsWaitTimeout);
             }
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
 
         }
@@ -198,6 +200,7 @@ namespace PubNubMessaging.Tests
                 mreUnsubscribe.WaitOne(manualResetEventsWaitTimeout);
             }
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
 
         }
