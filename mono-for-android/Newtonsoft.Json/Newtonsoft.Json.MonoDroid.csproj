@@ -12,6 +12,8 @@
     <RootNamespace>Newtonsoft.Json.MonoDroid</RootNamespace>
     <AssemblyName>Newtonsoft.Json.MonoDroid</AssemblyName>
     <FileAlignment>512</FileAlignment>
+    <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>

@@ -12,6 +12,8 @@
     <RootNamespace>MonoDroid.Dialog</RootNamespace>
     <AssemblyName>MonoDroid.Dialog</AssemblyName>
     <FileAlignment>512</FileAlignment>
+    <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
