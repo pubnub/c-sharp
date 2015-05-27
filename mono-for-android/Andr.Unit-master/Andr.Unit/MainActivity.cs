@@ -24,7 +24,7 @@ using Android.NUnitLite.UI;
 namespace Andr.Unit
 {
     
-    [Activity (Label = "Xamarin's Andr.Unit", MainLauncher = true)]
+    [Activity (Name="andr.unit.mainactivity",Label = "Xamarin's Andr.Unit", MainLauncher = true)]
     public class MainActivity : RunnerActivity
     {
         
