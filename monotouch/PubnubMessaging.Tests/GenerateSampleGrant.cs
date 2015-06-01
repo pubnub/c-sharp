@@ -45,6 +45,7 @@ namespace PubNubMessaging.Tests
                 }
 
                 pubnub.EndPendingRequests();
+                pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "GenerateSampleGrant -> AtUserLevel failed.");
             }
@@ -77,6 +78,7 @@ namespace PubNubMessaging.Tests
                 }
 
                 pubnub.EndPendingRequests();
+                pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "GenerateSampleGrant -> AtChannelLevel failed.");
             }

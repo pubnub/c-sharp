@@ -43,6 +43,7 @@ namespace PubNubMessaging.Tests
                 auditManualEvent.WaitOne();
 
                 pubnub.EndPendingRequests();
+                pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedAuditMessage, "WhenAuditIsRequested -> ThenSubKeyLevelShouldReturnSuccess failed.");
             }
@@ -78,6 +79,7 @@ namespace PubNubMessaging.Tests
                 auditManualEvent.WaitOne();
 
                 pubnub.EndPendingRequests();
+                pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedAuditMessage, "WhenAuditIsRequested -> ThenChannelLevelShouldReturnSuccess failed.");
             }
@@ -112,6 +114,7 @@ namespace PubNubMessaging.Tests
                 auditManualEvent.WaitOne();
 
                 pubnub.EndPendingRequests();
+                pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedAuditMessage, "WhenAuditIsRequested -> ThenChannelGroupLevelShouldReturnSuccess failed.");
             }
