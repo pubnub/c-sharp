@@ -49,6 +49,7 @@ namespace PubNubMessaging.Tests
             grantManualEvent.WaitOne();
 
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "WhenUnsubscribedToAChannel Grant access failed.");
         }
@@ -72,6 +73,7 @@ namespace PubNubMessaging.Tests
             meNotSubscribed.WaitOne();
 
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
 
             Assert.IsTrue(receivedNotSubscribedMessage, "WhenUnsubscribedToAChannel --> ThenNoExistChannelShouldReturnNotSubscribed Failed");
@@ -103,6 +105,7 @@ namespace PubNubMessaging.Tests
             }
 
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
 
             Assert.IsTrue(receivedUnsubscribedMessage, "WhenUnsubscribedToAChannel --> ThenShouldReturnUnsubscribedMessage Failed");
