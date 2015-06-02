@@ -43,6 +43,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(timeReceived, "time() Failed");
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
                             TestComplete();
                         });
                 });
@@ -80,7 +82,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             DateTime dt = new DateTime(2012, 6, 26, 0, 0, 0, DateTimeKind.Utc);
             long nanoSecondTime = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(dt);
             //Test for 26th June 2012 GMT
-            Assert.AreEqual<long>(13406688000000000, nanoSecondTime);
+            Assert.IsTrue(13406688000000000 == nanoSecondTime);
         }
 
         [TestMethod]
@@ -89,7 +91,7 @@ namespace PubnubWindowsPhone.Test.UnitTest
             //Test for 26th June 2012 GMT
             DateTime expectedDate = new DateTime(2012, 6, 26, 0, 0, 0, DateTimeKind.Utc);
             DateTime actualDate = Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(13406688000000000);
-            Assert.AreEqual<DateTime>(expectedDate, actualDate);
+            Assert.IsTrue(expectedDate == actualDate);
         }
     }
 }

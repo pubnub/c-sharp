@@ -55,6 +55,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
+                        pubnub.PubnubUnitTest = null;
+                        pubnub = null;
                         TestComplete();
                     });
                 });
@@ -93,6 +95,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
+                        pubnub.PubnubUnitTest = null;
+                        pubnub = null;
                         TestComplete();
                     });
                 });
@@ -127,6 +131,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                             {
                                 Assert.IsTrue(receivedAuditMessage, "WhenAuditIsRequested -> ThenChannelGroupLevelShouldReturnSuccess failed.");
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
                                 TestComplete();
                             });
                     }
@@ -135,6 +141,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                             {
                                 Assert.Inconclusive("PAM Not Enabled for WhenAuditIsRequested -> ThenChannelGroupLevelShouldReturnSuccess");
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
                                 TestComplete();
                             });
                     }

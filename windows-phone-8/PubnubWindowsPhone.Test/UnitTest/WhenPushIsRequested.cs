@@ -53,6 +53,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
                     Assert.IsTrue(receivedGrantMessage, "WhenPushIsRequested Grant access failed.");
+                    pubnub.PubnubUnitTest = null;
+                    pubnub = null;
                     TestComplete();
                 });
             });
@@ -83,6 +85,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
+                    pubnub.PubnubUnitTest = null;
+                    pubnub = null;
                     TestComplete();
                 });
             });
@@ -113,6 +117,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
 
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
+                    pubnub.PubnubUnitTest = null;
+                    pubnub = null;
                     TestComplete();
                 });
             });
@@ -144,6 +150,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
 
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
+                    pubnub.PubnubUnitTest = null;
+                    pubnub = null;
                     TestComplete();
                 });
             });
@@ -192,6 +200,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
 
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
+                    pubnub.PubnubUnitTest = null;
+                    pubnub = null;
                     TestComplete();
                 });
             });
@@ -226,6 +236,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
                     Assert.IsTrue(receivedSuccessMessage, "Toast Publish Failed");
+                    pubnub.PubnubUnitTest = null;
+                    pubnub = null;
                     TestComplete();
                 });
             });
@@ -265,6 +277,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
                     Assert.IsTrue(receivedSuccessMessage, "Flip Tile Publish Failed");
+                    pubnub.PubnubUnitTest = null;
+                    pubnub = null;
                     TestComplete();
                 });
             });
@@ -302,6 +316,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
                     Assert.IsTrue(receivedSuccessMessage, "Cycle Tile Publish Failed");
+                    pubnub.PubnubUnitTest = null;
+                    pubnub = null;
                     TestComplete();
                 });
             });
@@ -339,6 +355,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
                     Assert.IsTrue(receivedSuccessMessage, "Iconic Tile Publish Failed");
+                    pubnub.PubnubUnitTest = null;
+                    pubnub = null;
                     TestComplete();
                 });
             });

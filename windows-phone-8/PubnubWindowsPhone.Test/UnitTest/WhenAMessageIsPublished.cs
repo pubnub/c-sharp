@@ -99,6 +99,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed.");
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
                             TestComplete();
                         });
                 });
@@ -151,6 +153,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                        {
                            Assert.IsTrue(isUnencryptPublished, "Unencrypt Publish Failed");
+                           pubnub.PubnubUnitTest = null;
+                           pubnub = null;
                            TestComplete();
                        });
                     }
@@ -162,6 +166,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                        {
                            Assert.IsTrue(isUnencryptDetailedHistory, "Unable to match the successful unencrypt Publish");
+                           pubnub.PubnubUnitTest = null;
+                           pubnub = null;
                            TestComplete();
                        });
                     }
@@ -193,6 +199,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                        {
                            Assert.IsTrue(isUnencryptObjectPublished, "Unencrypt Publish Failed");
+                           pubnub.PubnubUnitTest = null;
+                           pubnub = null;
                            TestComplete();
                        });
                     }
@@ -204,6 +212,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                        {
                            Assert.IsTrue(isUnencryptObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
+                           pubnub.PubnubUnitTest = null;
+                           pubnub = null;
                            TestComplete();
                        });
                     }
@@ -237,6 +247,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                        {
                            Assert.IsTrue(isEncryptObjectPublished, "Encrypt Object Publish Failed");
+                           pubnub.PubnubUnitTest = null;
+                           pubnub = null;
                            TestComplete();
                        });
                     }
@@ -248,6 +260,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                        {
                            Assert.IsTrue(isEncryptObjectDetailedHistory, "Unable to match the successful encrypt object Publish");
+                           pubnub.PubnubUnitTest = null;
+                           pubnub = null;
                            TestComplete();
                        });
                     }
@@ -278,6 +292,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                        {
                            Assert.IsTrue(isEncryptPublished, "Encrypt Publish Failed");
+                           pubnub.PubnubUnitTest = null;
+                           pubnub = null;
                            TestComplete();
                        });
                     }
@@ -289,6 +305,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                        {
                            Assert.IsTrue(isEncryptDetailedHistory, "Unable to decrypt the successful Publish");
+                           pubnub.PubnubUnitTest = null;
+                           pubnub = null;
                            TestComplete();
                        });
                     }
@@ -319,6 +337,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                        {
                            Assert.IsTrue(isSecretEncryptPublished, "Secret Encrypt Publish Failed");
+                           pubnub.PubnubUnitTest = null;
+                           pubnub = null;
                            TestComplete();
                        });
                     }
@@ -330,6 +350,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                        {
                            Assert.IsTrue(isSecretEncryptDetailedHistory, "Unable to decrypt the successful Secret key Publish");
+                           pubnub.PubnubUnitTest = null;
+                           pubnub = null;
                            TestComplete();
                        });
                     }
@@ -600,6 +622,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                                {
                                    Assert.IsTrue(isPublished2, "Publish Failed with secret key");
+                                   pubnub.PubnubUnitTest = null;
+                                   pubnub = null;
                                    TestComplete();
                                });
                 });
@@ -645,6 +669,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                                {
                                    Assert.IsTrue(isPublished3, "Publish Failed with no SSL");
+                                   pubnub.PubnubUnitTest = null;
+                                   pubnub = null;
                                    TestComplete();
                                });
                 });
@@ -698,6 +724,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                             {
                                 Assert.IsTrue(isComplexObjectPublished, "Complex Object Publish Failed");
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
                                 TestComplete();
                             });
                     }
@@ -709,6 +737,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                             {
                                 Assert.IsTrue(isComplexObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
                                 TestComplete();
                             });
                     }
@@ -790,6 +820,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                             {
                                 Assert.IsTrue(isSerializedObjectMessagePublished, "Serialized Object Message Publish Failed");
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
                                 TestComplete();
                             });
                     }
@@ -801,6 +833,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                             {
                                 Assert.IsTrue(isSerializedObjectMessageDetailedHistory, "Unable to match the successful serialized object message Publish");
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
                                 TestComplete();
                             });
                     }
@@ -874,6 +908,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(isLargeMessagePublished, "Message Too Large is not failing as expected.");
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
                             TestComplete();
                         });
                 });
