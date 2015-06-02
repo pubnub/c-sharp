@@ -67,7 +67,8 @@ namespace PubNubMessaging.Tests
 
             grantManualEvent.WaitOne();
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed.");
         }
@@ -134,6 +135,7 @@ namespace PubNubMessaging.Tests
             presenceManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedPresenceMessage, "Presence message not received");
         }
@@ -171,7 +173,8 @@ namespace PubNubMessaging.Tests
 
             presenceManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedPresenceMessage, "Presence message not received");
         }
@@ -210,7 +213,8 @@ namespace PubNubMessaging.Tests
 
             presenceUUIDManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedCustomUUID, "Custom UUID not received");
         }
@@ -241,7 +245,8 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(1000);
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedHereNowMessage, "here_now message not received");
         }
@@ -274,7 +279,8 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(1000);
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedHereNowMessage, "here_now message not received with cipher");
         }
@@ -307,7 +313,8 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(1000);
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedHereNowMessage, "here_now message not received with cipher and secret");
         }
@@ -340,7 +347,8 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(1000);
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedHereNowMessage, "here_now message not received with cipher, secret, ssl");
         }
@@ -374,6 +382,7 @@ namespace PubNubMessaging.Tests
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedHereNowMessage, "here_now message not received with cipher, ssl");
         }
@@ -406,7 +415,8 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(1000);
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedHereNowMessage, "here_now message not received with secret key");
         }
@@ -439,7 +449,8 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(1000);
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedHereNowMessage, "here_now message not received ,with secret key, ssl");
         }
@@ -472,7 +483,8 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(1000);
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedHereNowMessage, "here_now message not received with ssl");
         }
@@ -512,7 +524,8 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(1000);
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedHereNowMessage, "here_now message not received with user state");
         }
@@ -534,7 +547,8 @@ namespace PubNubMessaging.Tests
             pubnub.GlobalHereNow<string>(true, true, ThenGlobalHereNowShouldReturnMessage, DummyErrorCallback);
             globalHereNowManualEvent.WaitOne();
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedGlobalHereNowMessage, "global_here_now message not received");
         }
@@ -574,7 +588,8 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(1000);
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedGlobalHereNowMessage, "global_here_now message not received for user state");
         }
@@ -610,7 +625,8 @@ namespace PubNubMessaging.Tests
                 Thread.Sleep(1000);
                 unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
             }
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedWhereNowMessage, "where_now message not received");
         }
@@ -645,7 +661,8 @@ namespace PubNubMessaging.Tests
                 pubnub.GetUserState<string>(channel, "", GetUserStateRegularCallback, DummyErrorCallback);
                 userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
             }
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedUserStateMessage, "IfSetAndGetUserStateThenItShouldReturnInfo failed");
         }
@@ -699,7 +716,8 @@ namespace PubNubMessaging.Tests
             pubnub.GetUserState<string>(channel, "", GetUserStateRegularCallback, DummyErrorCallback);
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
             
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedUserStateMessage, "IfSetAndDeleteUserStateThenItShouldReturnInfo message not received");
         }
@@ -739,7 +757,8 @@ namespace PubNubMessaging.Tests
 
             presenceManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedPresenceMessage, "ThenPresenceHeartbeatShouldReturnMessage not received");
         }
