@@ -33,6 +33,8 @@ namespace PubnubWindowsStore.Test
 
             pubnub.Time<string>(ReturnTimeStampCallback, DummyErrorCallback);
             mreTime.WaitOne(310 * 1000);
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
             Assert.IsTrue(timeReceived, "time() Failed");
         }
 
@@ -59,6 +61,8 @@ namespace PubnubWindowsStore.Test
                 pubnub.Proxy = proxy;
                 pubnub.Time<string>(ReturnProxyPresenceTimeStampCallback, DummyErrorCallback);
                 mreProxy.WaitOne(310 * 1000);
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(timeReceivedWhenProxy, "time() Failed");
             }
             else
@@ -110,7 +114,7 @@ namespace PubnubWindowsStore.Test
             //Test for 26th June 2012 GMT
             DateTime dt = new DateTime(2012, 6, 26, 0, 0, 0, DateTimeKind.Utc);
             long nanoSecondTime = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(dt);
-            Assert.AreEqual(13406688000000000, nanoSecondTime);
+            Assert.True(13406688000000000 == nanoSecondTime);
         }
 
         [Test]
@@ -119,7 +123,7 @@ namespace PubnubWindowsStore.Test
             //Test for 26th June 2012 GMT
             DateTime expectedDate = new DateTime(2012, 6, 26, 0, 0, 0, DateTimeKind.Utc);
             DateTime actualDate = Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(13406688000000000);
-            Assert.AreEqual(expectedDate, actualDate);
+            Assert.True(expectedDate == actualDate);
         }
 
         void DummyErrorCallback(PubnubClientError result)

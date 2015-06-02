@@ -45,6 +45,8 @@ namespace PubnubWindowsStore.Test
 
                 grantManualEvent.WaitOne();
 
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithReadWriteShouldReturnSuccess failed.");
             }
             else
@@ -74,6 +76,8 @@ namespace PubnubWindowsStore.Test
 
                 grantManualEvent.WaitOne();
 
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithReadShouldReturnSuccess failed.");
             }
             else
@@ -103,6 +107,8 @@ namespace PubnubWindowsStore.Test
 
                 grantManualEvent.WaitOne();
 
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithWriteShouldReturnSuccess failed.");
             }
             else
@@ -134,6 +140,8 @@ namespace PubnubWindowsStore.Test
 
                 grantManualEvent.WaitOne();
 
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithReadWriteShouldReturnSuccess failed.");
             }
             else
@@ -165,6 +173,8 @@ namespace PubnubWindowsStore.Test
 
                 grantManualEvent.WaitOne();
 
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithReadShouldReturnSuccess failed.");
             }
             else
@@ -196,6 +206,8 @@ namespace PubnubWindowsStore.Test
 
                 grantManualEvent.WaitOne();
 
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithWriteShouldReturnSuccess failed.");
             }
             else
@@ -228,6 +240,8 @@ namespace PubnubWindowsStore.Test
 
                 grantManualEvent.WaitOne();
 
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadWriteShouldReturnSuccess failed.");
             }
             else
@@ -260,6 +274,8 @@ namespace PubnubWindowsStore.Test
 
                 grantManualEvent.WaitOne();
 
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadShouldReturnSuccess failed.");
             }
             else
@@ -292,6 +308,8 @@ namespace PubnubWindowsStore.Test
 
                 grantManualEvent.WaitOne();
 
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithWriteShouldReturnSuccess failed.");
             }
             else
@@ -344,6 +362,8 @@ namespace PubnubWindowsStore.Test
 
                 grantManualEvent.WaitOne();
 
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenMultipleChannelGrantShouldReturnSuccess failed.");
             }
             else
@@ -397,6 +417,8 @@ namespace PubnubWindowsStore.Test
 
                 grantManualEvent.WaitOne();
 
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenMultipleAuthGrantShouldReturnSuccess failed.");
             }
             else
@@ -439,6 +461,8 @@ namespace PubnubWindowsStore.Test
                     pubnub.GrantAccess<string>("", false, false, 5, RevokeToSubKeyLevelCallback, DummyErrorCallback);
                     Task.Delay(1000);
                     revokeManualEvent.WaitOne();
+                    pubnub.PubnubUnitTest = null;
+                    pubnub = null;
                     Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess -> Grant success but revoke failed.");
                 }
                 else
@@ -488,10 +512,14 @@ namespace PubnubWindowsStore.Test
                     pubnub.GrantAccess<string>("", false, false, 5, RevokeToChannelLevelCallback, DummyErrorCallback);
                     Task.Delay(1000);
                     revokeManualEvent.WaitOne();
+                    pubnub.PubnubUnitTest = null;
+                    pubnub = null;
                     Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess -> Grant success but revoke failed.");
                 }
                 else
                 {
+                    pubnub.PubnubUnitTest = null;
+                    pubnub = null;
                     Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess failed. -> Grant not occured, so is revoke");
                 }
             }
@@ -538,10 +566,14 @@ namespace PubnubWindowsStore.Test
                     pubnub.GrantAccess<string>(channel, authKey, false, false, 5, RevokeToUserLevelCallback, DummyErrorCallback);
                     Task.Delay(1000);
                     revokeManualEvent.WaitOne();
+                    pubnub.PubnubUnitTest = null;
+                    pubnub = null;
                     Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant success but revoke failed.");
                 }
                 else
                 {
+                    pubnub.PubnubUnitTest = null;
+                    pubnub = null;
                     Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess failed. -> Grant not occured, so is revoke");
                 }
             }
@@ -574,6 +606,8 @@ namespace PubnubWindowsStore.Test
 
                 grantManualEvent.WaitOne();
 
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelGroupLevelWithReadManageShouldReturnSuccess failed.");
             }
             else
@@ -605,6 +639,8 @@ namespace PubnubWindowsStore.Test
 
                 grantManualEvent.WaitOne();
 
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelGroupLevelWithReadShouldReturnSuccess failed.");
             }
             else
