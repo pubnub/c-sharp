@@ -64,7 +64,8 @@ namespace PubNubMessaging.Tests
 
             grantManualEvent.WaitOne();
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "WhenDetailedHistoryIsRequested Grant access failed.");
         }
@@ -102,7 +103,8 @@ namespace PubNubMessaging.Tests
 
                 Assert.IsTrue(!messageReceived, "Message stored for Publish when no store is expected");
             }
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
 
@@ -139,7 +141,8 @@ namespace PubNubMessaging.Tests
 
                 Assert.IsTrue(messageReceived, "Encrypted message not showed up in history");
             }
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
 
@@ -161,7 +164,8 @@ namespace PubNubMessaging.Tests
             pubnub.DetailedHistory<string>(channel, 10, DetailedHistoryCount10Callback, DummyErrorCallback);
             mreDetailedHistory.WaitOne(310 * 1000);
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(messageReceived, "Detailed History Failed");
         }
@@ -184,7 +188,8 @@ namespace PubNubMessaging.Tests
             pubnub.DetailedHistory<string>(channel, -1, -1, 10, true, DetailedHistoryCount10ReverseTrueCallback, DummyErrorCallback);
             mreMessageCount10ReverseTrue.WaitOne(310 * 1000);
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(message10ReverseTrueReceived, "Detailed History Failed");
         }
@@ -223,7 +228,8 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(2000);
             mreMessageStartReverseTrue.WaitOne(310 * 1000);
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(messageStartReverseTrue, "Detailed History with Start and Reverse True Failed");
         }
@@ -248,7 +254,8 @@ namespace PubNubMessaging.Tests
             pubnub.DetailedHistory<string>(channel, -1, -1, 10, true, DetailHistoryWithNullKeyseDummyCallback, DummyErrorCallback);
             mreDetailedHistory.WaitOne(310 * 1000);
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(messageReceived, "Detailed History With Null Keys Failed");
         }
@@ -421,7 +428,8 @@ namespace PubNubMessaging.Tests
                 pubnub.DetailedHistory<string>(channel, midtime - 1, -1, totalMessages / 2, false, CaptureFirstPublishSetRegularDetailedHistoryCallback, DummyErrorCallback);
                 mreDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
             }
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
 
@@ -524,7 +532,8 @@ namespace PubNubMessaging.Tests
             pubnub.DetailedHistory<string>(channel, midtime - 1, -1, totalMessages / 2, false, CaptureFirstPublishSetRegularDetailedHistoryCallback, DummyErrorCallback);
             mreDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
 

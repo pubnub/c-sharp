@@ -70,7 +70,8 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(1000);
             grantManualEvent.WaitOne(310 * 1000);
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "WhenSubscribedToAChannelGroup Grant access failed.");
         }
@@ -110,7 +111,8 @@ namespace PubNubMessaging.Tests
                 pubnub.Unsubscribe<string>("", channelGroupName, dummyUnsubscribeCallback, SubscribeConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummySubscribeErrorCallback);
 
                 subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
-                pubnub.EndPendingRequests();
+                pubnub.EndPendingRequests(); 
+                pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 
                 Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannelGroup --> ThenItShouldReturnReceivedMessage Failed");
@@ -153,7 +155,8 @@ namespace PubNubMessaging.Tests
                 manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
                 subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
-                pubnub.EndPendingRequests();
+                pubnub.EndPendingRequests(); 
+                pubnub.PubnubUnitTest = null;
                 pubnub = null;
 
                 Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannelGroup --> ThenSubscribeShouldReturnConnectStatus Failed");
@@ -207,7 +210,8 @@ namespace PubNubMessaging.Tests
                 pubnub.Subscribe<string>("", string.Format("{0},{1}", channelGroupName1, channelGroupName2), ReceivedMessageCallbackWhenSubscribed, SubscribeConnectCallback, DummySubscribeErrorCallback);
                 subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
-                pubnub.EndPendingRequests();
+                pubnub.EndPendingRequests(); 
+                pubnub.PubnubUnitTest = null;
                 pubnub = null;
 
                 Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannelGroup --> ThenMultiSubscribeShouldReturnConnectStatusFailed");

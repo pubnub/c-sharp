@@ -47,7 +47,8 @@ namespace PubNubMessaging.Tests
 
             mreGrant.WaitOne();
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "WhenAMessageIsPublished Grant access failed.");
         }
@@ -75,7 +76,8 @@ namespace PubNubMessaging.Tests
             pubnub.Publish<string>(channel, dicToast, PublishCallbackResult, DummyErrorCallback);
             mrePublish.WaitOne(60 * 1000);
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedSuccessMessage, "Toast Publish Failed");
         }
@@ -108,7 +110,8 @@ namespace PubNubMessaging.Tests
             pubnub.Publish<string>(channel, dicTile, PublishCallbackResult, DummyErrorCallback);
             mrePublish.WaitOne(60 * 1000);
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedSuccessMessage, "Flip Tile Publish Failed");
         }
@@ -139,7 +142,8 @@ namespace PubNubMessaging.Tests
             pubnub.Publish<string>(channel, dicTile, PublishCallbackResult, DummyErrorCallback);
             mrePublish.WaitOne(60 * 1000);
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedSuccessMessage, "Cycle Tile Publish Failed");
         }
@@ -170,7 +174,8 @@ namespace PubNubMessaging.Tests
             pubnub.Publish<string>(channel, dicTile, PublishCallbackResult, DummyErrorCallback);
             mrePublish.WaitOne(60 * 1000);
 
-            pubnub.EndPendingRequests();
+            pubnub.EndPendingRequests(); 
+            pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedSuccessMessage, "Iconic Tile Publish Failed");
         }
