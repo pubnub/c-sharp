@@ -51,6 +51,8 @@ namespace PubnubWindowsStore.Test
 
             grantManualEvent.WaitOne();
 
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "WhenDetailedHistoryIsRequested Grant access failed.");
         }
 
@@ -71,6 +73,8 @@ namespace PubnubWindowsStore.Test
 
             pubnub.DetailedHistory<string>(channel, 10, DetailedHistoryCount10Callback, DummyErrorCallback);
             mreDetailedHistory.WaitOne(310 * 1000);
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
             Assert.IsTrue(messageReceived, "Detailed History Failed");
         }
 
@@ -187,6 +191,8 @@ namespace PubnubWindowsStore.Test
             pubnub.DetailedHistory<string>(channel, startTimeWithReverseTrue, DetailedHistoryStartWithReverseTrueCallback, DummyErrorCallback, true);
             Task.Delay(2000);
             mreMessageStartReverseTrue.WaitOne(310 * 1000);
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
             Assert.IsTrue(messageStartReverseTrue, "Detailed History with Start and Reverse True Failed");
         }
 
@@ -258,6 +264,8 @@ namespace PubnubWindowsStore.Test
             mreDetailedHistory = new ManualResetEvent(false);
             pubnub.DetailedHistory<string>(channel, -1, -1, 10, true, DetailHistoryWithNullKeyseDummyCallback, DummyErrorCallback);
             mreDetailedHistory.WaitOne(310 * 1000);
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
             Assert.IsTrue(messageReceived, "Detailed History With Null Keys Failed");
         }
 

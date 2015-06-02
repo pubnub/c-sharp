@@ -73,6 +73,8 @@ namespace PubnubWindowsStore.Test
 
                 auditManualEvent.WaitOne();
 
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedAuditMessage, "WhenAuditIsRequested -> ThenChannelLevelShouldReturnSuccess failed.");
             }
             else
@@ -105,6 +107,8 @@ namespace PubnubWindowsStore.Test
 
                 auditManualEvent.WaitOne();
 
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedAuditMessage, "WhenAuditIsRequested -> ThenChannelGroupLevelShouldReturnSuccess failed.");
             }
             else

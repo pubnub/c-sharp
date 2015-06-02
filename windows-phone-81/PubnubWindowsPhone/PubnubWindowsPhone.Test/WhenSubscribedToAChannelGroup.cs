@@ -57,6 +57,8 @@ namespace PubnubWindowsStore.Test
 
             grantManualEvent.WaitOne();
 
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "WhenSubscribedToAChannelGroup Grant access failed.");
         }
 
@@ -97,6 +99,8 @@ namespace PubnubWindowsStore.Test
                 subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
                 pubnub.EndPendingRequests();
 
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannelGroup --> ThenItShouldReturnReceivedMessage Failed");
             }
             else
@@ -139,6 +143,8 @@ namespace PubnubWindowsStore.Test
 
                 pubnub.EndPendingRequests();
 
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannelGroup --> ThenSubscribeShouldReturnConnectStatus Failed");
             }
             else
@@ -192,6 +198,8 @@ namespace PubnubWindowsStore.Test
 
                 pubnub.EndPendingRequests();
 
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannelGroup --> ThenMultiSubscribeShouldReturnConnectStatusFailed");
             }
             else
