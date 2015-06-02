@@ -60,6 +60,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
                             TestComplete();
                         });
                 });
@@ -94,6 +96,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
+                        pubnub.PubnubUnitTest = null;
+                        pubnub = null;
                         TestComplete();
                     });
                 });
@@ -128,6 +132,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
+                        pubnub.PubnubUnitTest = null;
+                        pubnub = null;
                         TestComplete();
                     });
                 });
@@ -164,6 +170,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
+                        pubnub.PubnubUnitTest = null;
+                        pubnub = null;
                         TestComplete();
                     });
                 });
@@ -200,6 +208,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
+                        pubnub.PubnubUnitTest = null;
+                        pubnub = null;
                         TestComplete();
                     });
                 });
@@ -235,6 +245,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
+                        pubnub.PubnubUnitTest = null;
+                        pubnub = null;
                         TestComplete();
                     });
                 });
@@ -272,6 +284,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
+                        pubnub.PubnubUnitTest = null;
+                        pubnub = null;
                         TestComplete();
                     });
                 });
@@ -309,6 +323,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
+                        pubnub.PubnubUnitTest = null;
+                        pubnub = null;
                         TestComplete();
                     });
                 });
@@ -346,6 +362,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
+                        pubnub.PubnubUnitTest = null;
+                        pubnub = null;
                         TestComplete();
                     });
                 });
@@ -403,6 +421,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
+                        pubnub.PubnubUnitTest = null;
+                        pubnub = null;
                         TestComplete();
                     });
                 });
@@ -461,6 +481,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
+                        pubnub.PubnubUnitTest = null;
+                        pubnub = null;
                         TestComplete();
                     });
                 });
@@ -512,6 +534,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
+                        pubnub.PubnubUnitTest = null;
+                        pubnub = null;
                         TestComplete();
                     });
                 });
@@ -565,6 +589,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
+                        pubnub.PubnubUnitTest = null;
+                        pubnub = null;
                         TestComplete();
                     });
                 });
@@ -619,6 +645,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     }
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
+                        pubnub.PubnubUnitTest = null;
+                        pubnub = null;
                         TestComplete();
                     });
                 });
@@ -652,6 +680,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                             {
                                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelGroupLevelWithReadManageShouldReturnSuccess failed.");
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
                                 TestComplete();
                             });
                     }
@@ -660,6 +690,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                             {
                                 Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelGroupLevelWithReadManageShouldReturnSuccess.");
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
                                 TestComplete();
                             });
                     }
@@ -694,6 +726,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelGroupLevelWithReadShouldReturnSuccess failed.");
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
                             TestComplete();
                         });
                     }
@@ -702,6 +736,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                             {
                                 Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelGroupLevelWithReadShouldReturnSuccess.");
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
                                 TestComplete();
                             });
                     }

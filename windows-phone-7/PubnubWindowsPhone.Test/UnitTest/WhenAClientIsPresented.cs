@@ -75,6 +75,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed");
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
                             TestComplete();
                         });
                 });
@@ -111,6 +113,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                        {
                            Assert.IsTrue(receivedPresenceMessage, "Presence message not received");
+                           pubnub.PubnubUnitTest = null;
+                           pubnub = null;
                            TestComplete();
                        });
                 });
@@ -147,6 +151,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(receivedCustomUUID, "Custom UUID not received");
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
                             TestComplete();
                         });
                 });
@@ -250,6 +256,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                        {
                            Assert.IsTrue(receivedHereNowMessage, "here_now message not received");
+                           pubnub.PubnubUnitTest = null;
+                           pubnub = null;
                            TestComplete();
                        });
                 });
@@ -275,6 +283,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
                     Assert.IsTrue(receivedGlobalHereNowMessage, "global_here_now message not received");
+                    pubnub.PubnubUnitTest = null;
+                    pubnub = null;
                     TestComplete();
                 });
             });
@@ -301,6 +311,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
                     Assert.IsTrue(receivedWhereNowMessage, "where_now message not received");
+                    pubnub.PubnubUnitTest = null;
+                    pubnub = null;
                     TestComplete();
                 });
             });

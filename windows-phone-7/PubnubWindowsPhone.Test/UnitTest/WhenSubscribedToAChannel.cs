@@ -68,6 +68,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed.");
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
                             TestComplete();
                         });
                 });
@@ -131,6 +133,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenItShouldReturnReceivedMessage Failed");
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
                             TestComplete();
                         });
                 });
@@ -163,6 +167,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(receivedConnectMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnConnectStatus Failed");
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
                             TestComplete();
                         });
                 });
@@ -201,6 +207,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(receivedChannel1ConnectMessage && receivedChannel2ConnectMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnConnectStatus Failed");
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
                             TestComplete();
                         });
                 });
@@ -236,6 +244,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(receivedAlreadySubscribedMessage, "WhenSubscribedToAChannel --> ThenDuplicateChannelShouldReturnAlreadySubscribed Failed");
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
                             TestComplete();
                         });
                 });
@@ -277,6 +287,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(receivedManyMessages, "WhenSubscribedToAChannel --> ThenSubscriberShouldBeAbleToReceiveManyMessages Failed");
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
                             TestComplete();
                         });
                 });

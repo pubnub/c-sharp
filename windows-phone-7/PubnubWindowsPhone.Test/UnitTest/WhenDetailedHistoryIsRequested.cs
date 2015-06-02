@@ -63,6 +63,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed.");
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
                             TestComplete();
                         });
                 });
@@ -111,6 +113,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(messageReceived, "Detailed History Failed");
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
                             TestComplete();
                         });
                 });
@@ -158,6 +162,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(message10ReverseTrueReceived, "Detailed History Failed");
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
                             TestComplete();
                         });
                 });
@@ -223,6 +229,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(messageStartReverseTrue, "Detailed History with Start and Reverse True Failed");
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
                             TestComplete();
                         });
                 });
@@ -302,6 +310,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(messageReceived, "Detailed History With Null Keys Failed");
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
                             TestComplete();
                         });
                 });

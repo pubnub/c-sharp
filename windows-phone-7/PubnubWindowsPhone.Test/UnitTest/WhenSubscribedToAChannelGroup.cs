@@ -63,6 +63,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(receivedGrantMessage, "WhenSubscribedToAChannelGroup Grant access failed.");
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
                             TestComplete();
                         });
                 });
@@ -111,6 +113,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                             {
                                 Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannelGroup --> ThenItShouldReturnReceivedMessage Failed");
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
                                 TestComplete();
                             });
                     }
@@ -119,6 +123,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                             {
                                 Assert.IsTrue(receivedChannelGroupMessage, "WhenSubscribedToAChannelGroup --> ThenItShouldReturnReceivedMessage Failed");
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
                                 TestComplete();
                             });
                     }
@@ -164,6 +170,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                             {
                                 Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannelGroup --> ThenSubscribeShouldReturnConnectStatus Failed");
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
                                 TestComplete();
                             });
                     }
@@ -172,6 +180,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                             {
                                 Assert.IsTrue(receivedChannelGroupMessage, "WhenSubscribedToAChannelGroup --> ThenSubscribeShouldReturnConnectStatus Failed");
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
                                 TestComplete();
                             });
                     }
@@ -228,6 +238,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                             {
                                 Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannelGroup --> ThenMultiSubscribeShouldReturnConnectStatusFailed");
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
                                 TestComplete();
                             });
                     }
@@ -236,6 +248,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                             {
                                 Assert.IsTrue(receivedChannelGroupMessage1 && receivedChannelGroupMessage2, "WhenSubscribedToAChannelGroup --> ThenMultiSubscribeShouldReturnConnectStatusFailed");
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
                                 TestComplete();
                             });
                     }

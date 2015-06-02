@@ -53,6 +53,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
                             Assert.IsTrue(receivedGrantMessage, "WhenUnsubscribedToAChannelGroup Grant access failed.");
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
                             TestComplete();
                         });
                 });
@@ -102,6 +104,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                             {
                                 Assert.IsTrue(receivedMessage, "WhenUnsubscribedToAChannelGroup --> ThenShouldReturnUnsubscribedMessage Failed");
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
                                 TestComplete();
                             });
                     }
@@ -110,6 +114,8 @@ namespace PubnubWindowsPhone.Test.UnitTest
                         Deployment.Current.Dispatcher.BeginInvoke(() =>
                             {
                                 Assert.IsTrue(receivedChannelGroupMessage, "WhenUnsubscribedToAChannelGroup --> ThenShouldReturnUnsubscribedMessage Failed");
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
                                 TestComplete();
                             });
                     }
