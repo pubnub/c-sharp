@@ -47,6 +47,8 @@ namespace PubnubWindowsStore.Test
 
             grantManualEvent.WaitOne();
 
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "WhenUnsubscribedToAChannelGroup Grant access failed.");
         }
 
@@ -89,6 +91,8 @@ namespace PubnubWindowsStore.Test
 
                 pubnub.EndPendingRequests();
 
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedMessage, "WhenUnsubscribedToAChannelGroup --> ThenShouldReturnUnsubscribedMessage Failed");
             }
             else

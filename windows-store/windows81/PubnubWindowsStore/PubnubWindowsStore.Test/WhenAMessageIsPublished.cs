@@ -97,6 +97,8 @@ namespace PubnubWindowsStore.Test
 
             grantManualEvent.WaitOne();
 
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "WhenAMessageIsPublished Grant access failed.");
         }
 
@@ -118,6 +120,8 @@ namespace PubnubWindowsStore.Test
 
             if (!isUnencryptPublished)
             {
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(isUnencryptPublished, "Unencrypt Publish Failed");
             }
             else
@@ -125,6 +129,8 @@ namespace PubnubWindowsStore.Test
                 Task.Delay(1000);
                 pubnub.DetailedHistory<string>(channel, -1, unEncryptPublishTimetoken, -1, false, CaptureUnencryptDetailedHistoryCallback, DummyErrorCallback);
                 mreUnencryptDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(isUnencryptDetailedHistory, "Unable to match the successful unencrypt Publish");
             }
         }
@@ -148,6 +154,8 @@ namespace PubnubWindowsStore.Test
 
             if (!isUnencryptObjectPublished)
             {
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(isUnencryptObjectPublished, "Unencrypt Publish Failed");
             }
             else
@@ -155,6 +163,8 @@ namespace PubnubWindowsStore.Test
                 Task.Delay(1000);
                 pubnub.DetailedHistory<string>(channel, -1, unEncryptObjectPublishTimetoken, -1, false, CaptureUnencryptObjectDetailedHistoryCallback, DummyErrorCallback);
                 mreUnencryptObjectDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(isUnencryptObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
             }
         }
@@ -181,6 +191,8 @@ namespace PubnubWindowsStore.Test
 
             if (!isEncryptObjectPublished)
             {
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(isEncryptObjectPublished, "Encrypt Object Publish Failed");
             }
             else
@@ -188,6 +200,8 @@ namespace PubnubWindowsStore.Test
                 Task.Delay(1000);
                 pubnub.DetailedHistory<string>(channel, -1, encryptObjectPublishTimetoken, -1, false, CaptureEncryptObjectDetailedHistoryCallback, DummyErrorCallback);
                 mreEncryptObjectDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(isEncryptObjectDetailedHistory, "Unable to match the successful encrypt object Publish");
             }
         }
@@ -213,6 +227,8 @@ namespace PubnubWindowsStore.Test
 
             if (!isEncryptPublished)
             {
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(isEncryptPublished, "Encrypt Publish Failed");
             }
             else
@@ -220,6 +236,8 @@ namespace PubnubWindowsStore.Test
                 Task.Delay(1000);
                 pubnub.DetailedHistory<string>(channel, -1, encryptPublishTimetoken, -1, false, CaptureEncryptDetailedHistoryCallback, DummyErrorCallback);
                 mreEncryptDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(isEncryptDetailedHistory, "Unable to decrypt the successful Publish");
             }
         }
@@ -245,6 +263,8 @@ namespace PubnubWindowsStore.Test
 
             if (!isSecretEncryptPublished)
             {
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(isSecretEncryptPublished, "Secret Encrypt Publish Failed");
             }
             else
@@ -252,6 +272,8 @@ namespace PubnubWindowsStore.Test
                 Task.Delay(1000);
                 pubnub.DetailedHistory<string>(channel, -1, secretEncryptPublishTimetoken, -1, false, CaptureSecretEncryptDetailedHistoryCallback, DummyErrorCallback);
                 mreSecretEncryptDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(isSecretEncryptDetailedHistory, "Unable to decrypt the successful Secret key Publish");
             }
         }
@@ -277,12 +299,16 @@ namespace PubnubWindowsStore.Test
 
             if (!isComplexObjectPublished)
             {
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(isComplexObjectPublished, "Complex Object Publish Failed");
             }
             else
             {
                 pubnub.DetailedHistory<string>(channel, -1, complexObjectPublishTimetoken, -1, false, CaptureComplexObjectDetailedHistoryCallback, DummyErrorCallback);
                 mreComplexObjectDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(isComplexObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
             }
         }
@@ -309,12 +335,16 @@ namespace PubnubWindowsStore.Test
 
             if (!isSerializedObjectMessagePublished)
             {
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(isSerializedObjectMessagePublished, "Serialized Object Message Publish Failed");
             }
             else
             {
                 pubnub.DetailedHistory<string>(channel, -1, serializedMessagePublishTimetoken, -1, false, CaptureSerializedMessagePublishDetailedHistoryCallback, DummyErrorCallback);
                 mreSerializedMessagePublishDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(isSerializedObjectMessageDetailedHistory, "Unable to match the successful serialized object message Publish");
             }
         }
@@ -337,6 +367,8 @@ namespace PubnubWindowsStore.Test
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             mreLaregMessagePublish.WaitOne(manualResetEventsWaitTimeout);
 
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
             Assert.IsTrue(isLargeMessagePublished, "Message Too Large is not failing as expected.");
         }
 

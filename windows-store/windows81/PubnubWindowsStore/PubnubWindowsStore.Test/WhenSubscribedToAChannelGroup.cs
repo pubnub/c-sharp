@@ -56,6 +56,8 @@ namespace PubnubWindowsStore.Test
 
             grantManualEvent.WaitOne();
 
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "WhenSubscribedToAChannelGroup Grant access failed.");
         }
 
@@ -95,11 +97,15 @@ namespace PubnubWindowsStore.Test
 
                 subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
                 pubnub.EndPendingRequests();
-                
+
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannelGroup --> ThenItShouldReturnReceivedMessage Failed");
             }
             else
             {
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedChannelGroupMessage, "WhenSubscribedToAChannelGroup --> ThenItShouldReturnReceivedMessage Failed");
             }
 
@@ -138,10 +144,14 @@ namespace PubnubWindowsStore.Test
 
                 pubnub.EndPendingRequests();
 
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannelGroup --> ThenSubscribeShouldReturnConnectStatus Failed");
             }
             else
             {
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedChannelGroupMessage, "WhenSubscribedToAChannelGroup --> ThenSubscribeShouldReturnConnectStatus Failed");
             }
         }
@@ -191,10 +201,14 @@ namespace PubnubWindowsStore.Test
 
                 pubnub.EndPendingRequests();
 
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannelGroup --> ThenMultiSubscribeShouldReturnConnectStatusFailed");
             }
             else
             {
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(receivedChannelGroupMessage1 && receivedChannelGroupMessage2, "WhenSubscribedToAChannelGroup --> ThenMultiSubscribeShouldReturnConnectStatusFailed");
             }
         }

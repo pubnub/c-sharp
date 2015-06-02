@@ -62,6 +62,8 @@ namespace PubnubWindowsStore.Test
 
             grantManualEvent.WaitOne();
 
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed.");
         }
 
@@ -103,7 +105,9 @@ namespace PubnubWindowsStore.Test
             presenceManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests();
-            
+
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
             Assert.IsTrue(receivedPresenceMessage, "Presence message not received");
         }
 
@@ -141,6 +145,8 @@ namespace PubnubWindowsStore.Test
 
             pubnub.EndPendingRequests();
 
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
             Assert.IsTrue(receivedCustomUUID, "Custom UUID not received");
         }
 
@@ -157,6 +163,8 @@ namespace PubnubWindowsStore.Test
             string channel = "hello_my_channel";
             pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback);
             hereNowManualEvent.WaitOne();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
             Assert.IsTrue(receivedHereNowMessage, "here_now message not received");
         }
 
@@ -172,6 +180,8 @@ namespace PubnubWindowsStore.Test
             pubnub.PubnubUnitTest = unitTest;
             pubnub.GlobalHereNow<string>(true, true, ThenGlobalHereNowShouldReturnMessage, DummyErrorCallback);
             globalHereNowManualEvent.WaitOne();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
             Assert.IsTrue(receivedGlobalHereNowMessage, "global_here_now message not received");
         }
 
@@ -188,6 +198,8 @@ namespace PubnubWindowsStore.Test
             string uuid = customUUID;
             pubnub.WhereNow<string>(uuid, ThenWhereNowShouldReturnMessage, DummyErrorCallback);
             whereNowManualEvent.WaitOne();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
             Assert.IsTrue(receivedWhereNowMessage, "where_now message not received");
         }
 

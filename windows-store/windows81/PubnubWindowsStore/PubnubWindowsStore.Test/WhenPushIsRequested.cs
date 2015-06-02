@@ -45,6 +45,8 @@ namespace PubnubWindowsStore.Test
             pubnub.GrantAccess<string>(channel, true, true, 20, ThenPushInitializeShouldReturnGrantMessage, DummyErrorCallback);
             mreGrant.WaitOne(60 * 1000);
 
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "WhenPushIsRequested Grant access failed.");
         }
 
@@ -71,6 +73,8 @@ namespace PubnubWindowsStore.Test
             pubnub.Publish<string>(channel, dicToast, PublishCallbackResult, DummyErrorCallback);
             mrePublish.WaitOne(60 * 1000);
 
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
             Assert.IsTrue(receivedSuccessMessage, "Toast Publish Failed");
         }
 
@@ -102,6 +106,8 @@ namespace PubnubWindowsStore.Test
             pubnub.Publish<string>(channel, dicTile, PublishCallbackResult, DummyErrorCallback);
             mrePublish.WaitOne(60 * 1000);
 
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
             Assert.IsTrue(receivedSuccessMessage, "Flip Tile Publish Failed");
         }
 
@@ -131,6 +137,8 @@ namespace PubnubWindowsStore.Test
             pubnub.Publish<string>(channel, dicTile, PublishCallbackResult, DummyErrorCallback);
             mrePublish.WaitOne(60 * 1000);
 
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
             Assert.IsTrue(receivedSuccessMessage, "Cycle Tile Publish Failed");
         }
 
@@ -160,6 +168,8 @@ namespace PubnubWindowsStore.Test
             pubnub.Publish<string>(channel, dicTile, PublishCallbackResult, DummyErrorCallback);
             mrePublish.WaitOne(60 * 1000);
 
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
             Assert.IsTrue(receivedSuccessMessage, "Iconic Tile Publish Failed");
         }
 
