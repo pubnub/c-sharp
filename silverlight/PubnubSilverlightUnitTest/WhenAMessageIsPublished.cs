@@ -86,6 +86,12 @@ namespace PubnubSilverlight.UnitTest
 
                     EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed."));
 
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -148,6 +154,12 @@ namespace PubnubSilverlight.UnitTest
                         }
                     });
 
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -228,6 +240,12 @@ namespace PubnubSilverlight.UnitTest
                         }
                     });
 
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -307,6 +325,12 @@ namespace PubnubSilverlight.UnitTest
                         }
                     });
 
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -385,6 +409,12 @@ namespace PubnubSilverlight.UnitTest
                         }
                     });
 
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -463,6 +493,12 @@ namespace PubnubSilverlight.UnitTest
                         }
                     });
 
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -547,6 +583,12 @@ namespace PubnubSilverlight.UnitTest
                     mrePublish.WaitOne(310 * 1000);
                     EnqueueCallback(() => Assert.IsTrue(isPublished2, "Publish Failed with secret key"));
 
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -591,6 +633,12 @@ namespace PubnubSilverlight.UnitTest
                     mrePublish.WaitOne(310 * 1000);
                     EnqueueCallback(() => Assert.IsTrue(isPublished3, "Publish Failed with no SSL"));
 
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -651,6 +699,12 @@ namespace PubnubSilverlight.UnitTest
                             }
                         });
 
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -734,6 +788,12 @@ namespace PubnubSilverlight.UnitTest
                             }
                         });
 
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -799,6 +859,12 @@ namespace PubnubSilverlight.UnitTest
                     mrePublish.WaitOne(310 * 100);
                     EnqueueCallback(() => Assert.IsTrue(isLargeMessagePublished, "Message Too Large is not failing as expected."));
 
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }

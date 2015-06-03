@@ -49,6 +49,12 @@ namespace PubnubSilverlight.UnitTest
                     grantManualEvent.WaitOne(310 * 1000);
 
                     EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenChannelGroupIsRequested Grant access failed."));
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -76,6 +82,12 @@ namespace PubnubSilverlight.UnitTest
                     channelGroupManualEvent.WaitOne(310*1000);
 
                     EnqueueCallback(() => Assert.IsTrue(receivedChannelGroupMessage, "WhenChannelGroupIsRequested -> ThenAddChannelShouldReturnSuccess failed."));
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -104,6 +116,12 @@ namespace PubnubSilverlight.UnitTest
                     channelGroupManualEvent.WaitOne(310 * 1000);
 
                     EnqueueCallback(() => Assert.IsTrue(receivedChannelGroupMessage, "WhenChannelGroupIsRequested -> ThenRemoveChannelShouldReturnSuccess failed."));
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -131,6 +149,12 @@ namespace PubnubSilverlight.UnitTest
                     channelGroupManualEvent.WaitOne(310 * 1000);
 
                     EnqueueCallback(() => Assert.IsTrue(receivedChannelGroupMessage, "WhenChannelGroupIsRequested -> ThenGetChannelListShouldReturnSuccess failed."));
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }

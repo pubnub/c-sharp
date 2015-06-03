@@ -50,6 +50,12 @@ namespace PubnubSilverlight.UnitTest
                     {
                         EnqueueCallback(() => Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithReadWriteShouldReturnSuccess."));
                     }
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -80,6 +86,12 @@ namespace PubnubSilverlight.UnitTest
                     {
                         EnqueueCallback(() => Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithReadShouldReturnSuccess."));
                     }
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -110,6 +122,12 @@ namespace PubnubSilverlight.UnitTest
                     {
                         EnqueueCallback(() => Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithWriteShouldReturnSuccess."));
                     }
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -143,6 +161,12 @@ namespace PubnubSilverlight.UnitTest
                     {
                         EnqueueCallback(() => Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithReadWriteShouldReturnSuccess."));
                     }
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -176,6 +200,12 @@ namespace PubnubSilverlight.UnitTest
                     {
                         EnqueueCallback(() => Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithReadShouldReturnSuccess."));
                     }
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -209,6 +239,12 @@ namespace PubnubSilverlight.UnitTest
                     {
                         EnqueueCallback(() => Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithWriteShouldReturnSuccess."));
                     }
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -243,6 +279,12 @@ namespace PubnubSilverlight.UnitTest
                     {
                         EnqueueCallback(() => Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenUserLevelWithReadWriteShouldReturnSuccess."));
                     }
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -277,6 +319,12 @@ namespace PubnubSilverlight.UnitTest
                     {
                         EnqueueCallback(() => Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenUserLevelWithReadShouldReturnSuccess."));
                     }
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -311,6 +359,12 @@ namespace PubnubSilverlight.UnitTest
                     {
                         EnqueueCallback(() => Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenUserLevelWithWriteShouldReturnSuccess."));
                     }
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -365,6 +419,12 @@ namespace PubnubSilverlight.UnitTest
                     {
                         EnqueueCallback(() => Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenMultipleChannelGrantShouldReturnSuccess."));
                     }
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -420,6 +480,12 @@ namespace PubnubSilverlight.UnitTest
                     {
                         EnqueueCallback(() => Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenMultipleAuthGrantShouldReturnSuccess."));
                     }
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -470,6 +536,12 @@ namespace PubnubSilverlight.UnitTest
                     {
                         EnqueueCallback(() => Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess."));
                     }
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -522,6 +594,12 @@ namespace PubnubSilverlight.UnitTest
                     {
                         EnqueueCallback(() => Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess."));
                     }
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -575,6 +653,12 @@ namespace PubnubSilverlight.UnitTest
                     {
                         EnqueueCallback(() => Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess."));
                     }
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -608,6 +692,12 @@ namespace PubnubSilverlight.UnitTest
                     {
                         EnqueueCallback(() => Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelGroupLevelWithReadManageShouldReturnSuccess."));
                     }
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -641,6 +731,12 @@ namespace PubnubSilverlight.UnitTest
                     {
                         EnqueueCallback(() => Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelGroupLevelWithReadShouldReturnSuccess."));
                     }
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }

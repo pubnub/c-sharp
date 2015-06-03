@@ -51,6 +51,12 @@ namespace PubnubSilverlight.UnitTest
 
                 EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenPushIsRequested Grant access failed."));
 
+                EnqueueCallback(() =>
+                        {
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
+                        }
+                    );
                 EnqueueTestComplete();
             });
         }
@@ -82,6 +88,12 @@ namespace PubnubSilverlight.UnitTest
 
                 EnqueueCallback(() => Assert.IsTrue(receivedSuccessMessage, "Toast Publish Failed"));
 
+                EnqueueCallback(() =>
+                        {
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
+                        }
+                    );
                 EnqueueTestComplete();
             });
 
@@ -119,6 +131,12 @@ namespace PubnubSilverlight.UnitTest
 
                 EnqueueCallback(() => Assert.IsTrue(receivedSuccessMessage, "Flip Tile Publish Failed"));
 
+                EnqueueCallback(() =>
+                        {
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
+                        }
+                    );
                 EnqueueTestComplete();
             });
 
@@ -154,6 +172,12 @@ namespace PubnubSilverlight.UnitTest
 
                 EnqueueCallback(() => Assert.IsTrue(receivedSuccessMessage, "Cycle Tile Publish Failed"));
 
+                EnqueueCallback(() =>
+                        {
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
+                        }
+                    );
                 EnqueueTestComplete();
             });
 
@@ -188,7 +212,13 @@ namespace PubnubSilverlight.UnitTest
                 mrePublish.WaitOne(60 * 1000);
 
                 EnqueueCallback(() => Assert.IsTrue(receivedSuccessMessage, "Iconic Tile Publish Failed"));
-                
+
+                EnqueueCallback(() =>
+                        {
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
+                        }
+                    );
                 EnqueueTestComplete();
             });
 

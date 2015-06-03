@@ -24,8 +24,6 @@ namespace PubnubSilverlight.UnitTest
         bool receivedGrantMessage = false;
         bool receivedChannelGroupMessage = false;
 
-        bool receivedMessage1 = false;
-        bool receivedMessage2 = false;
         bool receivedChannelGroupMessage1 = false;
         bool receivedChannelGroupMessage2 = false;
 
@@ -63,6 +61,12 @@ namespace PubnubSilverlight.UnitTest
                     grantManualEvent.WaitOne(310 * 1000);
 
                     EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenSubscribedToAChannelGroup Grant access failed."));
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -113,6 +117,12 @@ namespace PubnubSilverlight.UnitTest
                     {
                         EnqueueCallback(() => Assert.IsTrue(receivedChannelGroupMessage, "WhenSubscribedToAChannelGroup --> ThenItShouldReturnReceivedMessage Failed. Add channel failed."));
                     }
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
 
@@ -160,6 +170,12 @@ namespace PubnubSilverlight.UnitTest
                     {
                         EnqueueCallback(() => Assert.IsTrue(receivedChannelGroupMessage, "WhenSubscribedToAChannelGroup --> ThenSubscribeShouldReturnConnectStatus Failed"));
                     }
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -217,6 +233,12 @@ namespace PubnubSilverlight.UnitTest
                     {
                         EnqueueCallback(() => Assert.IsTrue(receivedChannelGroupMessage1 && receivedChannelGroupMessage2, "WhenSubscribedToAChannelGroup --> ThenMultiSubscribeShouldReturnConnectStatusFailed. May be add channel failed."));
                     }
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }

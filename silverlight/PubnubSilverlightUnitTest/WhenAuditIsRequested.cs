@@ -48,6 +48,12 @@ namespace PubnubSilverlight.UnitTest
                     {
                         EnqueueCallback(() => Assert.Inconclusive("PAM Not Enabled for WhenAuditIsRequested -> ThenSubKeyLevelShouldReturnSuccess"));
                     }
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -82,6 +88,12 @@ namespace PubnubSilverlight.UnitTest
                     {
                         EnqueueCallback(() => Assert.Inconclusive("PAM Not Enabled for WhenAuditIsRequested -> ThenChannelLevelShouldReturnSuccess"));
                     }
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -116,6 +128,12 @@ namespace PubnubSilverlight.UnitTest
                     {
                         EnqueueCallback(() => Assert.Inconclusive("PAM Not Enabled for WhenAuditIsRequested -> ThenChannelGroupLevelShouldReturnSuccess"));
                     }
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }

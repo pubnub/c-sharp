@@ -58,6 +58,12 @@ namespace PubnubSilverlight.UnitTest
                     mreGrant.WaitOne(310 * 1000);
 
                     EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenSubscribedToAChannel Grant access failed."));
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -114,7 +120,13 @@ namespace PubnubSilverlight.UnitTest
 
                     EnqueueCallback(() => pubnub.EndPendingRequests());
                     EnqueueCallback(() => Assert.IsTrue(receivedSubscribeMessage, "WhenSubscribedToAChannel --> ThenItShouldReturnReceivedMessage Failed"));
-                    
+
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -145,6 +157,12 @@ namespace PubnubSilverlight.UnitTest
                     EnqueueCallback(() => pubnub.EndPendingRequests());
 
                     EnqueueCallback(() => Assert.IsTrue(receivedConnectMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnConnectStatus Failed"));
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -179,6 +197,12 @@ namespace PubnubSilverlight.UnitTest
                 EnqueueCallback(() => pubnub.EndPendingRequests());
 
                 EnqueueCallback(() => Assert.IsTrue(receivedChannel1ConnectMessage && receivedChannel2ConnectMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnConnectStatus Failed"));
+                EnqueueCallback(() =>
+                        {
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
+                        }
+                    );
                 EnqueueTestComplete();
                 
             });
@@ -211,6 +235,12 @@ namespace PubnubSilverlight.UnitTest
                     EnqueueCallback(() => pubnub.EndPendingRequests());
 
                     EnqueueCallback(() => Assert.IsTrue(receivedAlreadySubscribedMessage, "WhenSubscribedToAChannel --> ThenDuplicateChannelShouldReturnAlreadySubscribed Failed"));
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -248,6 +278,12 @@ namespace PubnubSilverlight.UnitTest
                     EnqueueCallback(() => pubnub.EndPendingRequests());
 
                     EnqueueCallback(() => Assert.IsTrue(receivedManyMessages, "WhenSubscribedToAChannel --> ThenSubscriberShouldBeAbleToReceiveManyMessages Failed"));
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }

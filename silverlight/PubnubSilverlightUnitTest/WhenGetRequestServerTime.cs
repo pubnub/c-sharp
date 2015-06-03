@@ -37,6 +37,12 @@ namespace PubnubSilverlight.UnitTest
                     EnqueueCallback(() => pubnub.Time<string>(ReturnTimeStampCallback, DummyErrorCallback));
                     mreTime.WaitOne(310 * 1000);
                     EnqueueCallback(() => Assert.IsTrue(timeReceived, "time() Failed"));
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -70,7 +76,7 @@ namespace PubnubSilverlight.UnitTest
             //Test for 26th June 2012 GMT
             DateTime dt = new DateTime(2012,6,26,0,0,0,DateTimeKind.Utc);
             long nanosecTime = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(dt);
-            Assert.AreEqual<long>(13406688000000000, nanosecTime);
+            Assert.IsTrue(13406688000000000 == nanosecTime);
         }
 
         [TestMethod]
@@ -79,7 +85,7 @@ namespace PubnubSilverlight.UnitTest
             //Test for 26th June 2012 GMT
             DateTime expectedDt = new DateTime(2012, 6, 26, 0, 0, 0, DateTimeKind.Utc);
             DateTime actualDt = Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(13406688000000000);
-            Assert.AreEqual<DateTime>(expectedDt, actualDt);
+            Assert.IsTrue(expectedDt == actualDt);
         }
     }
 }

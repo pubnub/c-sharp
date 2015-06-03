@@ -53,6 +53,12 @@ namespace PubnubSilverlight.UnitTest
                     grantManualEvent.WaitOne(310 * 1000);
 
                     EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenUnsubscribedToAChannelGroup Grant access failed."));
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -104,6 +110,12 @@ namespace PubnubSilverlight.UnitTest
                     {
                         EnqueueCallback(() => Assert.IsTrue(receivedChannelGroupMessage, "WhenUnsubscribedToAChannelGroup --> ThenShouldReturnUnsubscribedMessage Failed. add channel failed."));
                     }
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }

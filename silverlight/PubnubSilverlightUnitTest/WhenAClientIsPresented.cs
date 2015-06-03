@@ -28,7 +28,6 @@ namespace PubnubSilverlight.UnitTest
 
         string customUUID = "mylocalmachine.mydomain.com";
         bool receivedGrantMessage = false;
-        bool grantInitCallbackInvoked = false;
 
         [ClassInitialize, Asynchronous]
         public void Init()
@@ -55,6 +54,12 @@ namespace PubnubSilverlight.UnitTest
                     mreGrant.WaitOne(310 * 1000);
 
                     EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed."));
+                    EnqueueCallback(() =>
+                    {
+                        pubnub.PubnubUnitTest = null;
+                        pubnub = null;
+                    }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -130,7 +135,13 @@ namespace PubnubSilverlight.UnitTest
                     EnqueueCallback(() => pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback));
 
                     mrePresence.WaitOne(310 * 1000);
-                    EnqueueCallback(() => pubnub.EndPendingRequests());
+                    EnqueueCallback(() =>
+                    {
+                        pubnub.EndPendingRequests();
+                        pubnub.PubnubUnitTest = null;
+                        pubnub = null;
+                    }
+                        );
                     EnqueueCallback(() => Assert.IsTrue(receivedPresenceMessage, "Presence message not received"));
                     EnqueueTestComplete();
                     
@@ -235,7 +246,13 @@ namespace PubnubSilverlight.UnitTest
                         pubnub.Subscribe<string>(channel, DummyMethodForSubscribeUUID, SubscribeUUIDDummyMethodForConnectCallback, DummyErrorCallback);
                     });
                     mrePresence.WaitOne(310 * 1000);
-                    EnqueueCallback(() => pubnub.EndPendingRequests());
+                    EnqueueCallback(() => 
+                            {
+                                pubnub.EndPendingRequests();
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueCallback(() => Assert.IsTrue(receivedCustomUUID, "Custom UUID not received"));
                     EnqueueTestComplete();
                 });
@@ -330,6 +347,12 @@ namespace PubnubSilverlight.UnitTest
                     EnqueueCallback(() => pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback));
                     mrePresence.WaitOne(310 * 1000);
                     EnqueueCallback(() => Assert.IsTrue(receivedHereNowMessage, "here_now message not received"));
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -350,6 +373,12 @@ namespace PubnubSilverlight.UnitTest
                     EnqueueCallback(() => pubnub.GlobalHereNow<string>(true, true, ThenGlobalHereNowShouldReturnMessage, DummyErrorCallback));
                     mrePresence.WaitOne(310 * 1000);
                     EnqueueCallback(() => Assert.IsTrue(receivedGlobalHereNowMessage, "global_here_now message not received"));
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -371,6 +400,12 @@ namespace PubnubSilverlight.UnitTest
                     EnqueueCallback(() => pubnub.WhereNow<string>(uuid, ThenWhereNowShouldReturnMessage, DummyErrorCallback));
                     mrePresence.WaitOne(310 * 1000);
                     EnqueueCallback(() => Assert.IsTrue(receivedWhereNowMessage, "where_now message not received"));
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }

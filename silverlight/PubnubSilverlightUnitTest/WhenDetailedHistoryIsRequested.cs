@@ -29,15 +29,12 @@ namespace PubnubSilverlight.UnitTest
         long startTimeWithReverseTrue = 0;
 
         bool receivedGrantMessage = false;
-        bool grantInitCallbackInvoked = false;
 
         string currentTestCase = "";
 
         [ClassInitialize, Asynchronous]
         public void Init()
         {
-            grantInitCallbackInvoked = false;
-
             if (!PubnubCommon.PAMEnabled)
             {
                 EnqueueTestComplete();
@@ -61,6 +58,12 @@ namespace PubnubSilverlight.UnitTest
                     mreGrant.WaitOne(310 * 1000);
 
                     EnqueueCallback(() => Assert.IsTrue(receivedGrantMessage, "WhenDetailedHistoryIsRequested Grant access failed."));
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -111,6 +114,12 @@ namespace PubnubSilverlight.UnitTest
                     mreDetailedHistory.WaitOne(310 * 1000);
                     
                     EnqueueCallback(() => Assert.IsTrue(messageReceived, "Detailed History Failed"));
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
             
@@ -157,6 +166,12 @@ namespace PubnubSilverlight.UnitTest
                     EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, -1, -1, 10, true, DetailedHistoryCount10ReverseTrueCallback, DummyErrorCallback));
                     mreDetailedHistory.WaitOne(310 * 1000);
                     EnqueueCallback(() => Assert.IsTrue(message10ReverseTrueReceived, "Detailed History Failed"));
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -216,6 +231,12 @@ namespace PubnubSilverlight.UnitTest
                     EnqueueCallback(() => pubnub.DetailedHistory<string>(channel, startTimeWithReverseTrue, DetailedHistoryStartWithReverseTrueCallback, DummyErrorCallback, true));
                     mreDetailedHistory.WaitOne(310 * 1000);
                     EnqueueCallback(() => Assert.IsTrue(messageStartReverseTrue, "Detailed History with Start and Reverse True Failed"));
+                    EnqueueCallback(() =>
+                            {
+                                pubnub.PubnubUnitTest = null;
+                                pubnub = null;
+                            }
+                        );
                     EnqueueTestComplete();
                 });
         }
@@ -295,6 +316,12 @@ namespace PubnubSilverlight.UnitTest
                 mreDetailedHistory.WaitOne(310 * 1000);
 
                 EnqueueCallback(() => Assert.IsTrue(messageReceived, "Detailed History With Null Keys Failed"));
+                EnqueueCallback(() =>
+                        {
+                            pubnub.PubnubUnitTest = null;
+                            pubnub = null;
+                        }
+                    );
                 EnqueueTestComplete();
             });
         }
