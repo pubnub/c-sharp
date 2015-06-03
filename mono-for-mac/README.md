@@ -1,11 +1,14 @@
 # Please direct all Support Questions and Concerns to Support@PubNub.com
 
-# PubNub 3.6 Web Data Push Cloud-Hosted API - C# Mono 2.10.9 
+# PubNub 3.7 Web Data Push Cloud-Hosted API - C# Mono 2.10.9 
 ##PubNub C Sharp (Mono for Mac) Usage
 
 For a quick video walkthrough, checkout https://vimeo.com/54805916 !
 
-### Important change from previous version
+### Important Changes in PubNub 3.7
+1. Added channelgroup feature for subscribe, presence, unsubscribe, presence unsubscribe, user state and PAM grant/audit/revoke.
+
+### Important change in 3.6 from previous version 3.5
 - UserState method parameters have been modified.
 - PAM auth method parameters have been modified.
 - Implements the features of Pubnub 3.6

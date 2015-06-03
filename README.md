@@ -32,16 +32,16 @@ Xamarin.iOS, Xamarin.Android, Xamarin.Mac, mono-for-linux and Unity SDKs are NOT
 [Windows Store 8.1](windows-store/windows81/PubnubWindowsStore) (3.7)
 
 ### Xamarin, Unity
-[Xamarin.Android / Mono for Android](mono-for-android) (3.6)
+[Xamarin.Android / Mono for Android](mono-for-android) (3.7)
 
-[Xamarin.iOS / Mono Touch](monotouch) (3.6)
+[Xamarin.iOS / Mono Touch](monotouch) (3.7)
 
 [Unity 3D](unity) (3.6)
 
 ### Misc
-[Mono for Linux](mono-for-linux/PubNub-Messaging) (3.6)
+[Mono for Linux](mono-for-linux/PubNub-Messaging) (3.7)
 
-[Xamarin.Mac / Mono For Mac](mono-for-mac) (3.6)
+[Xamarin.Mac / Mono For Mac](mono-for-mac) (3.7)
 
 GTK+ (3.5)
 See the demo made under [mono-for-linux](mono-for-linux/Demo/GTK%2B)
