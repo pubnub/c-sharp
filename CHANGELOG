@@ -1,3 +1,11 @@
+06-04-2015  - 3.7.0  - 604a89
+. Implemented Channel Groups for mono clients (mono-for-mac, monotouch, mono-for-android, mono-for-linux)
+. Refactored unit tests for mono clients to support offline testing in addition to online.
+. Migrated monotouch from Xamarin.iOS Classic to Xamarin.iOS Unified API
+. Improved unit tests to avoid unwanted web requests
+. Improved Pubnub Core file to cleanup callback variable when unsubscribed channel
+. Used target android API 22 for mono-for-android client to test latest API.
+
 01-28-2015 - 3.7.0 - 08d9fd
 . Added pnsdk and UUID params
 . Provided option to store published message or not in history
