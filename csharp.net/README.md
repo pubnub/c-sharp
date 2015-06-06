@@ -45,13 +45,13 @@ PubnubExample.cs](PubNub-Messaging/PubnubExample.cs) file.  [The tests](/PubNub-
 
 ```c#
 //Basic usage for subscribe and publish
-Pubnub pubnub = new Pubnub(publishKey="demo", subscribeKey="demo");
+Pubnub pubnub = new Pubnub(publishKey:"demo", subscribeKey:"demo");
 
 //optionally, with secret key
-Pubnub pubnub = new Pubnub(publishKey="demo", subscribeKey="demo", secretKey);
+Pubnub pubnub = new Pubnub(publishKey:"demo", subscribeKey:"demo", secretKey:"your secret key");
 
 //optionally, with SSL and cipher key. This would enable encryption/decryption. enableSSL is boolean to toggle HTTP(S).
-Pubnub pubnub = new Pubnub(publishKey="demo", subscribeKey="demo", secretKey, cipherKey, enableSSL);
+Pubnub pubnub = new Pubnub(publishKey:"demo", subscribeKey:"demo", secretKey:"your secret key", cipherKey:"your cipher key", sslOn:true);
 
 ```
 
