@@ -653,6 +653,186 @@ namespace PubNubMessaging.Tests
             return data;
         }
 
+        private Dictionary<string, string> WhenSubscribedToWildcardChannel_ChannelAndChannelGroupAndWildcardChannelSubscribeShouldReturnReceivedMessageBased()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/v1/channel-registration/sub-key/demo-36/channel-group/hello_my_group?add=hello_my_channel1", "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}");
+            data.Add("/subscribe/demo-36/hello_my_channel,foo.%2A/0/0?uuid=myuuid&channel-group=hello_my_group", "[[],\"14339584751454774\",\"\",\"\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel,foo.%2A/0/14339584751454774?uuid=myuuid&channel-group=hello_my_group", "[[\"Test for cg\"],\"14339594143230275\",\"hello_my_group\",\"hello_my_channel1\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel,foo.%2A/0/14339594143230275?uuid=myuuid&channel-group=hello_my_group", "[[{\"action\": \"join\", \"timestamp\": 1433959414, \"uuid\": \"myuuid\", \"occupancy\": 1}],\"14339594149517538\",\"foo.*\",\"foo.*-pnpres\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel,foo.%2A/0/14339594149517538?uuid=myuuid&channel-group=hello_my_group", "[[\"Test for wc\"],\"14339594154592482\",\"foo.*\",\"foo.a\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel,foo.%2A/0/14339594154592482?uuid=myuuid&channel-group=hello_my_group", "[[\"Test for normal ch\"],\"14339594165903036\",\"hello_my_group\",\"hello_my_channel\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel,foo.%2A/0/14339594165903036?uuid=myuuid&channel-group=hello_my_group", "[[],\"14339594165903037\",\"\",\"\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel,foo.%2A/0/14339594165903037?uuid=myuuid&channel-group=hello_my_group", "[[],\"14339594165903037\",\"\",\"\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel,foo.%2A/leave?uuid=myuuid&channel-group=hello_my_group", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel1/0/%22Test%20for%20cg%22?uuid=myuuid", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/foo.a/0/%22Test%20for%20wc%22?uuid=myuuid", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22Test%20for%20normal%20ch%22?uuid=myuuid", "[1,\"Sent\",\"13559014566792817\"]");
+            return data;
+        }
+
+        private Dictionary<string, string> WhenSubscribedToWildcardChannelThenSubscribeShouldReturnWildCardPresenceEvent()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/subscribe/demo-36/foo.%2A/0/0", "[[{\"action\": \"join\", \"timestamp\": 1434009722, \"uuid\": \"myuuid\", \"occupancy\": 1}],\"14340097229800922\",\"foo.*\",\"foo.*-pnpres\"]");
+            data.Add("/subscribe/demo-36/foo.%2A/0/14340097229800922", "[[],\"14340097229800922\"]");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnReceivedMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/0/foo.bar/0/%22Test%20for%20WhenSubscribedToAChannel%20ThenItShouldReturnReceivedMessage%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/foo.bar/0/%22Zbr7pEF%2FGFGKj1rOstp0tWzA4nwJXEfj%2BezLtAr8qqE%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/d259936bf6578bfe1fbdce0108aa1d27/foo.bar/0/%22QoHwTga0QtOCtJRQ6sqtyateB%2FVotNt%2F50y23yXW7rpCbZdJLUAVKKbf01SpN6zghA6MqQaaHRXoYqAf84RF56C7Ky6Oi6jLqN2I5%2FlXSCw%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/191f2302ebeebdcbe473be21dd33e3f0/foo.bar/0/%22Test%20for%20WhenSubscribedToAChannel%20ThenItShouldReturnReceivedMessage%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/subscribe/demo-36/foo.%2A/0/0", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/foo.%2A/0/13559006802662768", "[[\"Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/foo.%2A/0/13559014566792816", "[[],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/foo.%2A/leave", "{\"action\": \"leave\"}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnReceivedCipherMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/0/foo.bar/0/%22QoHwTga0QtOCtJRQ6sqtyateB%2FVotNt%2F50y23yXW7rpCbZdJLUAVKKbf01SpN6zghA6MqQaaHRXoYqAf84RF56C7Ky6Oi6jLqN2I5%2FlXSCw%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/d259936bf6578bfe1fbdce0108aa1d27/foo.bar/0/%22Zbr7pEF%2FGFGKj1rOstp0tWzA4nwJXEfj%2BezLtAr8qqE%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/d259936bf6578bfe1fbdce0108aa1d27/foo.bar/0/%22QoHwTga0QtOCtJRQ6sqtyateB%2FVotNt%2F50y23yXW7rpCbZdJLUAVKKbf01SpN6zghA6MqQaaHRXoYqAf84RF56C7Ky6Oi6jLqN2I5%2FlXSCw%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/subscribe/demo-36/foo.%2A/0/0", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/foo.%2A/0/13559006802662768", "[[\"QoHwTga0QtOCtJRQ6sqtyateB/VotNt/50y23yXW7rpCbZdJLUAVKKbf01SpN6zghA6MqQaaHRXoYqAf84RF56C7Ky6Oi6jLqN2I5/lXSCw=\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/foo.%2A/0/13559014566792816", "[[],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/foo.%2A/leave", "{\"action\": \"leave\"}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnReceivedComplexMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/0/foo.bar/0/%7B%22foo%22%3A%22hi%21%22%2C%22bar%22%3A%5B1%2C2%2C3%2C4%2C5%5D%7D", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/a50a618029da59507f80118062de229a/foo.bar/0/%7B%22foo%22%3A%22hi%21%22%2C%22bar%22%3A%5B1%2C2%2C3%2C4%2C5%5D%7D", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/d4a031148880d7c3d96251f02586726c/foo.bar/0/%22Zbr7pEF%2FGFGKj1rOstp0tWzA4nwJXEfj%2BezLtAr8qqE%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/foo.bar/0/%22Zbr7pEF%2FGFGKj1rOstp0tWzA4nwJXEfj%2BezLtAr8qqE%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/subscribe/demo-36/foo.%2A/0/0", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/foo.%2A/0/13559006802662768", "[[{\"foo\":\"hi!\",\"bar\":[1,2,3,4,5]}],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/foo.%2A/0/13559014566792816", "[[],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/foo.%2A/leave", "{\"action\": \"leave\"}");
+            return data;
+        }
+        private Dictionary<string, string> LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnReceivedCipherComplexMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/0/foo.bar/0/%7B%22foo%22%3A%22hi%21%22%2C%22bar%22%3A%5B1%2C2%2C3%2C4%2C5%5D%7D", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/a50a618029da59507f80118062de229a/foo.bar/0/%7B%22foo%22%3A%22hi%21%22%2C%22bar%22%3A%5B1%2C2%2C3%2C4%2C5%5D%7D", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/d4a031148880d7c3d96251f02586726c/foo.bar/0/%22Zbr7pEF%2FGFGKj1rOstp0tWzA4nwJXEfj%2BezLtAr8qqE%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/foo.bar/0/%22Zbr7pEF%2FGFGKj1rOstp0tWzA4nwJXEfj%2BezLtAr8qqE%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/subscribe/demo-36/foo.%2A/0/0", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/foo.%2A/0/13559006802662768", "[[\"Zbr7pEF/GFGKj1rOstp0tWzA4nwJXEfj+ezLtAr8qqE=\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/foo.%2A/0/13559014566792816", "[[],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/foo.%2A/leave", "{\"action\": \"leave\"}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnReceivedEmojiMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/0/foo.bar/0/%22Text%20with%20%F0%9F%98%9C%20emoji%20%F0%9F%8E%89.%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/a39655eba4d795924da2a3192b5b3e3f/foo.bar/0/%22Text%20with%20%F0%9F%98%9C%20emoji%20%F0%9F%8E%89.%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/subscribe/demo-36/foo.%2A/0/0", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/foo.%2A/0/13559006802662768", "[[\"Text with \ud83d\ude1c emoji \ud83c\udf89.\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/foo.%2A/0/13559014566792816", "[[\"Text with \ud83d\ude1c emoji \ud83c\udf89.\"],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/foo.%2A/leave", "{\"action\": \"leave\"}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnReceivedCipherEmojiMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/1ed2b4d04cb379f5b9930ec87f211f3f/foo.bar/0/%22vaD98V5XDtEvByw6RrxT9Ya76GKQLhyrEZw9Otrsu1KBVDIqGgWkrAD8X6TM%2FXC6%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/0/foo.bar/0/%22Zbr7pEF%2FGFGKj1rOstp0tWzA4nwJXEfj%2BezLtAr8qqE%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/subscribe/demo-36/foo.%2A/0/0", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/foo.%2A/0/13559006802662768", "[[\"vaD98V5XDtEvByw6RrxT9Ya76GKQLhyrEZw9Otrsu1KBVDIqGgWkrAD8X6TM/XC6\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/foo.%2A/0/13559014566792816", "[[\"vaD98V5XDtEvByw6RrxT9Ya76GKQLhyrEZw9Otrsu1KBVDIqGgWkrAD8X6TM/XC6\"],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/foo.%2A/leave", "{\"action\": \"leave\"}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnUnicodeMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/0/foo.bar/0/%22Text%20with%20%5Cu00DC%5Cu00D6%5Cu6F22%5Cu8A9E%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/subscribe/demo-36/foo.%2A/0/0", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/foo.%2A/0/13559006802662768", "[[\"Text with \u00DC\u00D6\u6F22\u8A9E\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/foo.%2A/0/13559014566792816", "[[\"Text with \u00DC\u00D6\u6F22\u8A9E\"],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/foo.%2A/leave", "{\"action\": \"leave\"}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnUnicodeCipherMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnReceivedForwardSlashMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/0/foo.bar/0/%22Text%20with%20%2F%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/20eb1f490fd3682a417640ec5fdd0d1b/foo.bar/0/%22Text%20with%20%2F%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/subscribe/demo-36/foo.%2A/0/0", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/foo.%2A/0/13559006802662768", "[[\"Text with \\/\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/foo.%2A/0/13559014566792816", "[[],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/foo.%2A/leave", "{\"action\": \"leave\"}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnReceivedForwardSlashCipherMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/0/foo.bar/0/%22s98XlGoA68ypX1Z7A7mOwQ%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/487a1708fcddc1ff3ed45b2a43ee256b/foo.bar/0/%22s98XlGoA68ypX1Z7A7mOwQ%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/subscribe/demo-36/foo.%2A/0/0", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/foo.%2A/0/13559006802662768", "[[\"s98XlGoA68ypX1Z7A7mOwQ==\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/foo.%2A/0/13559014566792816", "[[\"s98XlGoA68ypX1Z7A7mOwQ==\"],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/foo.%2A/leave", "{\"action\": \"leave\"}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnSpecialCharMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/0/foo.bar/0/%22Text%20with%20%27%5C%22%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/45f266dc617d0e42619b8886f05015aa/foo.bar/0/%22Text%20with%20%27%5C%22%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/subscribe/demo-36/foo.%2A/0/0", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/foo.%2A/0/13559006802662768", "[[\"Text with '\\\"\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/foo.%2A/0/13559014566792816", "[[\"Text with '\\\"\"],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/foo.%2A/leave", "{\"action\": \"leave\"}");
+            return data;
+        }
+
+        private Dictionary<string, string> LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnSpecialCharCipherMessage()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("/publish/demo-36/demo-36/0/foo.bar/0/%22kl7vmPUMMz6UdliN7t6XYw%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+            data.Add("/publish/demo-36/demo-36/d99eb7e70213acb4f839ea7a9653c29d/foo.bar/0/%22kl7vmPUMMz6UdliN7t6XYw%3D%3D%22", "[1,\"Sent\",\"13559014566792817\"]");
+
+            data.Add("/subscribe/demo-36/foo.%2A/0/0", "[[],\"13559006802662768\"]");
+            data.Add("/subscribe/demo-36/foo.%2A/0/13559006802662768", "[[\"kl7vmPUMMz6UdliN7t6XYw==\"],\"13559014566792816\"]");
+            data.Add("/subscribe/demo-36/foo.%2A/0/13559014566792816", "[[\"kl7vmPUMMz6UdliN7t6XYw==\"],\"13559014566792816\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/foo.%2A/leave", "{\"action\": \"leave\"}");
+            return data;
+        }
+
 
         private Dictionary<string, string> LoadWhenUnsubscribedToAChannelThenShouldReturnUnsubscribedMessage()
         {
@@ -1139,6 +1319,58 @@ namespace PubNubMessaging.Tests
                             break;
                         case "ThenSubscribeShouldReturnSpecialCharCipherMessage":
                             responseDictionary = LoadWhenSubscribedToAChannelThenSubscribeShouldReturnSpecialCharCipherMessage();
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case "WhenSubscribedToWildcardChannel":
+                    switch (_testCaseName)
+                    {
+                        case "ChannelAndChannelGroupAndWildcardChannelSubscribeShouldReturnReceivedMessageBased":
+                            responseDictionary = WhenSubscribedToWildcardChannel_ChannelAndChannelGroupAndWildcardChannelSubscribeShouldReturnReceivedMessageBased();
+                            break;
+                        case "ThenSubscribeShouldReturnWildCardPresenceEvent":
+                            responseDictionary = WhenSubscribedToWildcardChannelThenSubscribeShouldReturnWildCardPresenceEvent();
+                            break;
+                        case "ThenSubscribeShouldReturnReceivedMessage":
+                            responseDictionary = LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnReceivedMessage();
+                            break;
+                        case "ThenSubscribeShouldReturnReceivedCipherMessage":
+                            responseDictionary = LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnReceivedCipherMessage();
+                            break;
+                        case "ThenSubscriberShouldBeAbleToReceiveManyMessages":
+                            responseDictionary = LoadWhenSubscribedToAChannelThenSubscriberShouldBeAbleToReceiveManyMessages();
+                            break;
+                        case "ThenSubscribeShouldReturnReceivedComplexMessage":
+                            responseDictionary = LoadWhenSubscribedToAChannelThenSubscribeShouldReturnReceivedComplexMessage();
+                            break;
+                        case "ThenSubscribeShouldReturnReceivedCipherComplexMessage":
+                            responseDictionary = LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnReceivedCipherComplexMessage();
+                            break;
+                        case "ThenSubscribeShouldReturnReceivedEmojiMessage":
+                            responseDictionary = LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnReceivedEmojiMessage();
+                            break;
+                        case "ThenSubscribeShouldReturnReceivedCipherEmojiMessage":
+                            responseDictionary = LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnReceivedCipherEmojiMessage();
+                            break;
+                        case "ThenSubscribeShouldReturnUnicodeMessage":
+                            responseDictionary = LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnUnicodeMessage();
+                            break;
+                        case "ThenSubscribeShouldReturnUnicodeCipherMessage":
+                            responseDictionary = LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnUnicodeCipherMessage();
+                            break;
+                        case "ThenSubscribeShouldReturnReceivedForwardSlashMessage":
+                            responseDictionary = LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnReceivedForwardSlashMessage();
+                            break;
+                        case "ThenSubscribeShouldReturnReceivedForwardSlashCipherMessage":
+                            responseDictionary = LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnReceivedForwardSlashCipherMessage();
+                            break;
+                        case "ThenSubscribeShouldReturnSpecialCharMessage":
+                            responseDictionary = LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnSpecialCharMessage();
+                            break;
+                        case "ThenSubscribeShouldReturnSpecialCharCipherMessage":
+                            responseDictionary = LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnSpecialCharCipherMessage();
                             break;
                         default:
                             break;
