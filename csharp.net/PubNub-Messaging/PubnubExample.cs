@@ -97,7 +97,7 @@ namespace PubNubMessaging.Core
             else
             {
                 Console.WriteLine("Default demo subscribe key provided");
-                subscribeKey = "demo";
+                subscribeKey = "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -113,7 +113,7 @@ namespace PubNubMessaging.Core
             else
             {
                 Console.WriteLine("Default demo publish key provided");
-                publishKey = "demo";
+                publishKey = "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -129,7 +129,7 @@ namespace PubNubMessaging.Core
             else
             {
                 Console.WriteLine("Default demo Secret key provided");
-                secretKey = "demo";
+                secretKey = "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -440,7 +440,7 @@ namespace PubNubMessaging.Core
                         else
                         {
                             Console.WriteLine("Running subscribe()");
-                            pubnub.Subscribe<string>(channel, channelGroup, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
+                            pubnub.Subscribe<string>(channel, channelGroup, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayWildCardPresenceReturnMessage, DisplayErrorMessage);
                         }
                         break;
                     case "2":
@@ -573,7 +573,7 @@ namespace PubNubMessaging.Core
                         else
                         {
                             Console.WriteLine("Running presence()");
-                            pubnub.Presence<string>(channel, channelGroup, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
+                            pubnub.Presence<string>(channel, channelGroup, DisplayPresenceReturnMessage, DisplayPresenceConnectStatusMessage, DisplayErrorMessage);
                         }
                         break;
                     case "4":
@@ -649,7 +649,7 @@ namespace PubNubMessaging.Core
                         else
                         {
                             Console.WriteLine("Running unsubscribe()");
-                            pubnub.Unsubscribe<string>(channel, channelGroup, DisplayReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeDisconnectStatusMessage, DisplayErrorMessage);
+                            pubnub.Unsubscribe<string>(channel, channelGroup, DisplayReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeDisconnectStatusMessage, DisplayWildCardPresenceReturnMessage, DisplayErrorMessage);
                         }
                         break;
                     case "7":
@@ -1635,6 +1635,18 @@ namespace PubNubMessaging.Core
         static void DisplaySubscribeReturnMessage(string result)
         {
             Console.WriteLine("SUBSCRIBE REGULAR CALLBACK:");
+            Console.WriteLine(result);
+            Console.WriteLine();
+        }
+
+
+        /// <summary>
+        /// Callback method captures wildcard presence events for Subscribe
+        /// </summary>
+        /// <param name="result"></param>
+        static void DisplayWildCardPresenceReturnMessage(string result)
+        {
+            Console.WriteLine("WILDCARD PRESENCE CALLBACK:");
             Console.WriteLine(result);
             Console.WriteLine();
         }
