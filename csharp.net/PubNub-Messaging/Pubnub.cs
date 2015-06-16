@@ -29,13 +29,11 @@ namespace PubNubMessaging.Core
             pubnub.Subscribe<T>(channel, channelGroup, subscribeCallback, connectCallback, wildcardPresenceCallback, errorCallback);
         }
 
-		[Obsolete]
         public void Subscribe(string channel, Action<object> subscribeCallback, Action<object> connectCallback, Action<PubnubClientError> errorCallback)
 		{
 			pubnub.Subscribe(channel, subscribeCallback, connectCallback, errorCallback);
 		}
 
-        [Obsolete]
         public void Subscribe(string channel, string channelGroup, Action<object> subscribeCallback, Action<object> connectCallback, Action<PubnubClientError> errorCallback)
         {
             pubnub.Subscribe(channel, channelGroup, subscribeCallback, connectCallback, errorCallback);
@@ -71,13 +69,11 @@ namespace PubNubMessaging.Core
             pubnub.Presence<T>(channel, channelGroup, presenceCallback, connectCallback, errorCallback);
         }
 
-        [Obsolete]
         public void Presence(string channel, Action<object> presenceCallback, Action<object> connectCallback, Action<PubnubClientError> errorCallback)
 		{
             pubnub.Presence(channel, presenceCallback, connectCallback, errorCallback);
 		}
 
-        [Obsolete]
         public void Presence(string channel, string channelGroup, Action<object> presenceCallback, Action<object> connectCallback, Action<PubnubClientError> errorCallback)
         {
             pubnub.Presence(channel, channelGroup, presenceCallback, connectCallback, errorCallback);
@@ -163,7 +159,6 @@ namespace PubNubMessaging.Core
             pubnub.Unsubscribe<T>(channel, channelGroup, subscribeCallback, connectCallback, disconnectCallback, null, errorCallback);
         }
 
-        [Obsolete]
         public void Unsubscribe(string channel, string channelGroup, Action<object> subscribeCallback, Action<object> connectCallback, Action<object> disconnectCallback, Action<PubnubClientError> errorCallback)
         {
             pubnub.Unsubscribe(channel, channelGroup, subscribeCallback, connectCallback, disconnectCallback, null, errorCallback);
@@ -190,13 +185,11 @@ namespace PubNubMessaging.Core
             pubnub.PresenceUnsubscribe<T>(channel, channelGroup, presenceCallback, connectCallback, disconnectCallback, errorCallback);
         }
 
-		[Obsolete]
         public void PresenceUnsubscribe(string channel, Action<object> presenceCallback, Action<object> connectCallback, Action<object> disconnectCallback, Action<PubnubClientError> errorCallback)
 		{
 			pubnub.PresenceUnsubscribe(channel, presenceCallback, connectCallback, disconnectCallback, errorCallback);
 		}
 
-        [Obsolete]
         public void PresenceUnsubscribe<T>(string channel, Action<T> presenceCallback, Action<T> connectCallback, Action<T> disconnectCallback, Action<PubnubClientError> errorCallback)
 		{
             pubnub.PresenceUnsubscribe<T>(channel, presenceCallback, connectCallback, disconnectCallback, errorCallback);
