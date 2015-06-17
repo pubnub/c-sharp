@@ -671,7 +671,7 @@ namespace PubNubMessaging.Tests
             return data;
         }
 
-        private Dictionary<string, string> WhenSubscribedToWildcardChannelThenSubscribeShouldReturnWildCardPresenceEvent()
+        private Dictionary<string, string> WhenSubscribedToWildcardChannelThenSubscribeShouldReturnWildCardPresenceEventInWildcardPresenceCallback()
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add("/subscribe/demo-36/foo.%2A/0/0", "[[{\"action\": \"join\", \"timestamp\": 1434009722, \"uuid\": \"myuuid\", \"occupancy\": 1}],\"14340097229800922\",\"foo.*\",\"foo.*-pnpres\"]");
@@ -1330,8 +1330,8 @@ namespace PubNubMessaging.Tests
                         case "ChannelAndChannelGroupAndWildcardChannelSubscribeShouldReturnReceivedMessageBased":
                             responseDictionary = WhenSubscribedToWildcardChannel_ChannelAndChannelGroupAndWildcardChannelSubscribeShouldReturnReceivedMessageBased();
                             break;
-                        case "ThenSubscribeShouldReturnWildCardPresenceEvent":
-                            responseDictionary = WhenSubscribedToWildcardChannelThenSubscribeShouldReturnWildCardPresenceEvent();
+                        case "ThenSubscribeShouldReturnWildCardPresenceEventInWildcardPresenceCallback":
+                            responseDictionary = WhenSubscribedToWildcardChannelThenSubscribeShouldReturnWildCardPresenceEventInWildcardPresenceCallback();
                             break;
                         case "ThenSubscribeShouldReturnReceivedMessage":
                             responseDictionary = LoadWhenSubscribedToWildcardChannelThenSubscribeShouldReturnReceivedMessage();

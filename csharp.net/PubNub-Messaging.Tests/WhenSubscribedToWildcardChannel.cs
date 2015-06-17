@@ -357,17 +357,17 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnWildCardPresenceEvent()
+        public void ThenSubscribeShouldReturnWildCardPresenceEventInWildcardPresenceCallback()
         {
             receivedMessage = false;
-            currentTestCase = "ThenSubscribeShouldReturnWildCardPresenceEvent";
+            currentTestCase = "ThenSubscribeShouldReturnWildCardPresenceEventInWildcardPresenceCallback";
 
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
             pubnub.SessionUUID = "myuuid";
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToWildcardChannel";
-            unitTest.TestCaseName = "ThenSubscribeShouldReturnWildCardPresenceEvent";
+            unitTest.TestCaseName = "ThenSubscribeShouldReturnWildCardPresenceEventInWildcardPresenceCallback";
 
             pubnub.PubnubUnitTest = unitTest;
 
@@ -381,7 +381,40 @@ namespace PubNubMessaging.Tests
 
             mreSubscribe.WaitOne(manualResetEventsWaitTimeout);
 
-            Assert.IsTrue(receivedMessage, "WhenSubscribedToWildcardChannel --> ThenSubscribeShouldReturnWildCardPresenceEvent Failed");
+            Assert.IsTrue(receivedMessage, "WhenSubscribedToWildcardChannel --> ThenSubscribeShouldReturnWildCardPresenceEventInWildcardPresenceCallback Failed");
+            pubnub.PubnubUnitTest = null;
+            pubnub.EndPendingRequests();
+            pubnub = null;
+
+        }
+
+        [Test]
+        public void ThenSubscribeShouldNotReturnWildCardPresenceEventWhenNoCallback()
+        {
+            receivedMessage = false;
+            currentTestCase = "ThenSubscribeShouldNotReturnWildCardPresenceEventWhenNoCallback";
+
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub.SessionUUID = "myuuid";
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenSubscribedToWildcardChannel";
+            unitTest.TestCaseName = "ThenSubscribeShouldReturnWildCardPresenceEventInWildcardPresenceCallback";
+
+            pubnub.PubnubUnitTest = unitTest;
+
+            string wildCardSubscribeChannel = "foo.*";
+
+            mreSubscribe = new ManualResetEvent(false);
+            mreSubscribeConnect = new ManualResetEvent(false);
+
+            pubnub.Subscribe<string>(channel: wildCardSubscribeChannel, channelGroup: channelGroupName, subscribeCallback: ReceivedMessageCallbackWhenSubscribed, connectCallback: SubscribeDummyMethodForConnectCallback, wildcardPresenceCallback: null, errorCallback: DummyErrorCallback);
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 10 * 1000;
+            mreSubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
+
+            mreSubscribe.WaitOne(manualResetEventsWaitTimeout);
+
+            Assert.IsTrue(!receivedMessage, "WhenSubscribedToWildcardChannel --> ThenSubscribeShouldNotReturnWildCardPresenceEventWhenNoCallback Failed");
             pubnub.PubnubUnitTest = null;
             pubnub.EndPendingRequests();
             pubnub = null;
