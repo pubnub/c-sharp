@@ -282,17 +282,17 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ChannelAndChannelGroupAndWildcardChannelSubscribeShouldReturnReceivedMessageBased()
+        public void ChannelAndChannelGroupAndWildcardChannelSubscribeShouldReturnReceivedMessage()
         {
             receivedMessage = false;
-            currentTestCase = "ChannelAndChannelGroupAndWildcardChannelSubscribeShouldReturnReceivedMessageBased";
+            currentTestCase = "ChannelAndChannelGroupAndWildcardChannelSubscribeShouldReturnReceivedMessage";
 
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
             pubnub.SessionUUID = "myuuid";
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToWildcardChannel";
-            unitTest.TestCaseName = "ChannelAndChannelGroupAndWildcardChannelSubscribeShouldReturnReceivedMessageBased";
+            unitTest.TestCaseName = "ChannelAndChannelGroupAndWildcardChannelSubscribeShouldReturnReceivedMessage";
 
             pubnub.PubnubUnitTest = unitTest;
 
@@ -349,7 +349,7 @@ namespace PubNubMessaging.Tests
                 pubnub.Unsubscribe<string>(commaDelimitedChannel, channelGroupName, dummyUnsubscribeCallback, SubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, null, DummyErrorCallback);
                 mreUnsubscribe.WaitOne(manualResetEventsWaitTimeout);
             }
-            Assert.IsTrue(receivedMessage, "WhenSubscribedToWildcardChannel --> ChannelAndChannelGroupAndWildcardChannelSubscribeShouldReturnReceivedMessageBased Failed");
+            Assert.IsTrue(receivedMessage, "WhenSubscribedToWildcardChannel --> ChannelAndChannelGroupAndWildcardChannelSubscribeShouldReturnReceivedMessage Failed");
             pubnub.PubnubUnitTest = null;
             pubnub.EndPendingRequests();
             pubnub = null;
