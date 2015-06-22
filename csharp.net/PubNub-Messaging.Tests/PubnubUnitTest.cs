@@ -657,6 +657,7 @@ namespace PubNubMessaging.Tests
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add("/v1/channel-registration/sub-key/demo-36/channel-group/hello_my_group?add=hello_my_channel1", "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}");
+            
             data.Add("/subscribe/demo-36/foo.%2A,hello_my_channel/0/0?uuid=myuuid&channel-group=hello_my_group", "[[],\"14339584751454774\",\"\",\"\"]");
             data.Add("/subscribe/demo-36/foo.%2A,hello_my_channel/0/14339584751454774?uuid=myuuid&channel-group=hello_my_group", "[[\"Test for cg\"],\"14339594143230275\",\"hello_my_group\",\"hello_my_channel1\"]");
             data.Add("/subscribe/demo-36/foo.%2A,hello_my_channel/0/14339594143230275?uuid=myuuid&channel-group=hello_my_group", "[[{\"action\": \"join\", \"timestamp\": 1433959414, \"uuid\": \"myuuid\", \"occupancy\": 1}],\"14339594149517538\",\"foo.*\",\"foo.*-pnpres\"]");
@@ -665,6 +666,16 @@ namespace PubNubMessaging.Tests
             data.Add("/subscribe/demo-36/foo.%2A,hello_my_channel/0/14339594165903036?uuid=myuuid&channel-group=hello_my_group", "[[],\"14339594165903037\",\"\",\"\"]");
             data.Add("/subscribe/demo-36/foo.%2A,hello_my_channel/0/14339594165903037?uuid=myuuid&channel-group=hello_my_group", "[[],\"14339594165903037\",\"\",\"\"]");
             data.Add("/v2/presence/sub_key/demo-36/channel/hello_my_channel,foo.%2A/leave?uuid=myuuid&channel-group=hello_my_group", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
+
+            data.Add("/subscribe/demo-36/hello_my_channel,foo.%2A/0/0?uuid=myuuid&channel-group=hello_my_group", "[[],\"14339584751454774\",\"\",\"\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel,foo.%2A/0/14339584751454774?uuid=myuuid&channel-group=hello_my_group", "[[\"Test for cg\"],\"14339594143230275\",\"hello_my_group\",\"hello_my_channel1\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel,foo.%2A/0/14339594143230275?uuid=myuuid&channel-group=hello_my_group", "[[{\"action\": \"join\", \"timestamp\": 1433959414, \"uuid\": \"myuuid\", \"occupancy\": 1}],\"14339594149517538\",\"foo.*\",\"foo.*-pnpres\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel,foo.%2A/0/14339594149517538?uuid=myuuid&channel-group=hello_my_group", "[[\"Test for wc\"],\"14339594154592482\",\"foo.*\",\"foo.a\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel,foo.%2A/0/14339594154592482?uuid=myuuid&channel-group=hello_my_group", "[[\"Test for normal ch\"],\"14339594165903036\",\"hello_my_group\",\"hello_my_channel\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel,foo.%2A/0/14339594165903036?uuid=myuuid&channel-group=hello_my_group", "[[],\"14339594165903037\",\"\",\"\"]");
+            data.Add("/subscribe/demo-36/hello_my_channel,foo.%2A/0/14339594165903037?uuid=myuuid&channel-group=hello_my_group", "[[],\"14339594165903037\",\"\",\"\"]");
+            data.Add("/v2/presence/sub_key/demo-36/channel/foo.%2A,hello_my_channel/leave?uuid=myuuid&channel-group=hello_my_group", "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}");
+
             data.Add("/publish/demo-36/demo-36/0/hello_my_channel1/0/%22Test%20for%20cg%22?uuid=myuuid", "[1,\"Sent\",\"13559014566792817\"]");
             data.Add("/publish/demo-36/demo-36/0/foo.a/0/%22Test%20for%20wc%22?uuid=myuuid", "[1,\"Sent\",\"13559014566792817\"]");
             data.Add("/publish/demo-36/demo-36/0/hello_my_channel/0/%22Test%20for%20normal%20ch%22?uuid=myuuid", "[1,\"Sent\",\"13559014566792817\"]");
