@@ -16,6 +16,8 @@ with the object.
 
 ### Important Changes in PubNub 3.7.1
 1. Added wildcard channel subscribe feature.
+2. Subscribe method: Renamed parameter name userCallback to subscribeCallback
+3. Presence method: Renamed parameter name userCallback to presenceCallback
 
 ### Important Changes in PubNub 3.7
 1. Added channelgroup feature for subscribe, presence, unsubscribe, presence unsubscribe, user state and PAM grant/audit/revoke.
