@@ -1734,6 +1734,8 @@ namespace PubNubMessaging.Core
         protected override WebRequest CreateRequest(Uri uri, bool keepAliveRequest, bool nocache)
         {
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create(uri);
+            req.Pipelined = true;
+            req.KeepAlive = true;
 #if NETFX_CORE
             req = SetUserAgent(req, keepAliveRequest);
 #else

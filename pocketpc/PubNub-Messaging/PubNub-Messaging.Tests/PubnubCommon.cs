@@ -7,7 +7,7 @@ namespace PubNubMessaging.Tests
 {
     public static class PubnubCommon
     {
-        public const bool PAMEnabled = true;
+        public const bool PAMEnabled = false;
         public const bool EnableStubTest = false;
 
         public static readonly string PublishKey = "demo-36";
