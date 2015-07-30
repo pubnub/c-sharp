@@ -8,7 +8,7 @@ Run the project in "Pocket PC 2003 SE Square Emulator" to see a working example 
 1. Windows XP OS or Windows XP Mode on Windows 7
 2. Visual Studio 2008
 3. Windows Mobile 6 Professional SDK Refresh
-4. .NET Compact Framework 2.0 SP1
+4. .NET Compact Framework 2.0 SP2
 
 ## Third party software/source code used
 1. Newtonsoft.Json.Compact library code
