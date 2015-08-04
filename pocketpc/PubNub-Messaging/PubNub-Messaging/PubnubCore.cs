@@ -5323,7 +5323,7 @@ namespace PubNubMessaging.Core
 		}
 		//#if (!UNITY_IOS)
 		//TODO:refactor
-		protected abstract void UrlProcessResponseCallback<T> (IAsyncResult asynchronousResult);
+		//protected abstract void UrlProcessResponseCallback<T> (IAsyncResult asynchronousResult);
 
         //#endif
 		//TODO:refactor
