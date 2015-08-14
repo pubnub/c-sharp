@@ -467,7 +467,7 @@ namespace PubNubMessagingExample
             if (message.Length > 100) message = message.Substring(0, 100);
 
             lbResult.Items.Insert(0, message);
-            while (lbResult.Items.Count > 7)
+            while (lbResult.Items.Count > 20)
             {
                 lbResult.Items.RemoveAt(lbResult.Items.Count - 1);
             }

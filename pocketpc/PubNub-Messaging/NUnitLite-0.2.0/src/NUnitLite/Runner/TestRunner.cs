@@ -89,6 +89,7 @@ namespace NUnitLite.Runner
         public void TestFinished(TestResult result)
         {
             System.Diagnostics.Debug.WriteLine(result.Test.Name + " TEST FINISHED");
+            System.Threading.Thread.Sleep(5000);
             foreach (TestListener listener in listeners)
                 listener.TestFinished(result);
         }

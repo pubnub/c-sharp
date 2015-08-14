@@ -15,7 +15,7 @@ using PubNubMessaging.Core;
 
 namespace PubNubMessaging.Tests
 {
-    [TestFixture]
+    //[TestFixture]
     public class TestHttpWebRequest
     {
         ManualResetEvent mreMain = new ManualResetEvent(false);
@@ -23,7 +23,7 @@ namespace PubNubMessaging.Tests
         ManualResetEvent mreSub = new ManualResetEvent(false);
         ManualResetEvent mreWCSub = new ManualResetEvent(false);
 
-        [Test]
+        //[Test]
         public void RunMyTestsOne()
         {
             mreMain = new ManualResetEvent(false);
@@ -52,7 +52,7 @@ namespace PubNubMessaging.Tests
             
         }
 
-        [Test]
+        //[Test]
         public void RunMyTestsTwo()
         {
             mreMain = new ManualResetEvent(false);

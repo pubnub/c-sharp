@@ -7349,9 +7349,9 @@ namespace PubNubMessaging.Core
 		internal IPubnubUnitTest pubnubUnitTest = null;
 		private static bool simulateNetworkFailForTesting = false;
 		private static bool machineSuspendMode = false;
-		private volatile bool terminated = false;
+		private bool terminated = false;
 		PubnubErrorFilter.Level filterErrorLevel = PubnubErrorFilter.Level.Info;
-		internal volatile HttpWebRequest request;
+		internal HttpWebRequest request;
 
 		internal static bool SimulateNetworkFailForTesting 
         {
@@ -7553,7 +7553,7 @@ namespace PubNubMessaging.Core
 
 	public abstract class PubnubWebResponseBase : WebResponse
 	{
-		protected volatile WebResponse response;
+		protected WebResponse response;
 		readonly Stream _responseStream;
 		HttpStatusCode httpStatusCode;
 
@@ -7626,7 +7626,7 @@ namespace PubNubMessaging.Core
 		private readonly object _state;
 		private readonly ManualResetEvent _waitHandle;
 		private readonly Timer _timer;
-        private volatile bool _isCompleted = false;
+        private bool _isCompleted = false;
 
 		public bool IsCompleted {
             get

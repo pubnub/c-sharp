@@ -65,6 +65,16 @@ namespace PubNubMessaging.Tests
             Assert.True(receivedGrantMessage, "WhenSubscribedToAChannel Grant access failed.");
         }
 
+        [TearDown]
+        public void Teardown()
+        {
+            if (pubnub != null)
+            {
+                pubnub.EndPendingRequests();
+                pubnub = null;
+            }
+        }
+
         [Test]
         public void ThenComplexMessageSubscribeShouldReturnReceivedMessage()
         {
