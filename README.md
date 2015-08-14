@@ -36,7 +36,7 @@ Xamarin.iOS, Xamarin.Android, Xamarin.Mac, mono-for-linux and Unity SDKs are NOT
 
 [Xamarin.iOS / Mono Touch](monotouch) (3.7)
 
-[Unity 3D](unity) (3.6)
+[Unity 3D](https://github.com/pubnub/unity) (3.6)
 
 ### Misc
 [Mono for Linux](mono-for-linux/PubNub-Messaging) (3.7)
