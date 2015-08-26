@@ -7,19 +7,19 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using System.Threading;
 
 namespace PubnubWindowsStore.Test
 {
-    [TestFixture]
+    [TestClass]
     public class WhenAuditIsRequested
     {
         ManualResetEvent auditManualEvent = new ManualResetEvent(false);
         bool receivedAuditMessage = false;
         string currentUnitTestCase = "";
 
-        [Test]
+        [TestMethod]
         public void ThenSubKeyLevelShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenSubKeyLevelShouldReturnSuccess";
@@ -46,12 +46,12 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("PAM Not Enabled for WhenAuditIsRequested -> ThenSubKeyLevelShouldReturnSuccess");
+                Assert.Inconclusive("PAM Not Enabled for WhenAuditIsRequested -> ThenSubKeyLevelShouldReturnSuccess");
             }
 
         }
 
-        [Test]
+        [TestMethod]
         public void ThenChannelLevelShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenChannelLevelShouldReturnSuccess";
@@ -81,11 +81,11 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("PAM Not Enabled for WhenAuditIsRequested -> ThenChannelLevelShouldReturnSuccess");
+                Assert.Inconclusive("PAM Not Enabled for WhenAuditIsRequested -> ThenChannelLevelShouldReturnSuccess");
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenChannelGroupLevelShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenChannelGroupLevelShouldReturnSuccess";
@@ -115,7 +115,7 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("PAM Not Enabled for WhenAuditIsRequested -> ThenChannelGroupLevelShouldReturnSuccess");
+                Assert.Inconclusive("PAM Not Enabled for WhenAuditIsRequested -> ThenChannelGroupLevelShouldReturnSuccess");
             }
         }
 

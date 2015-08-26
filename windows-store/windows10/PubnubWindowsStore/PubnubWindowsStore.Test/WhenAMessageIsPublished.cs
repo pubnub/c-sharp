@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using System.Threading;
 
 namespace PubnubWindowsStore.Test
 {
-    [TestFixture]
+    [TestClass]
     public class WhenAMessageIsPublished
     {
         ManualResetEvent mreUnencryptedPublish = new ManualResetEvent(false);
@@ -76,7 +76,7 @@ namespace PubnubWindowsStore.Test
 
         int manualResetEventsWaitTimeout = 310 * 1000;
 
-        [TestFixtureSetUp]
+        [TestInitialize]
         public void Init()
         {
             if (!PubnubCommon.PAMEnabled) return;
@@ -102,7 +102,7 @@ namespace PubnubWindowsStore.Test
             Assert.IsTrue(receivedGrantMessage, "WhenAMessageIsPublished Grant access failed.");
         }
 
-        [Test]
+        [TestMethod]
         public void ThenUnencryptPublishShouldReturnSuccessCodeAndInfo()
         {
             isUnencryptPublished = false;
@@ -135,7 +135,7 @@ namespace PubnubWindowsStore.Test
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo()
         {
             isUnencryptObjectPublished = false;
@@ -169,7 +169,7 @@ namespace PubnubWindowsStore.Test
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo()
         {
             isEncryptObjectPublished = false;
@@ -206,7 +206,7 @@ namespace PubnubWindowsStore.Test
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenEncryptPublishShouldReturnSuccessCodeAndInfo()
         {
             isEncryptPublished = false;
@@ -242,7 +242,7 @@ namespace PubnubWindowsStore.Test
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo()
         {
             isSecretEncryptPublished = false;
@@ -278,7 +278,7 @@ namespace PubnubWindowsStore.Test
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo()
         {
             isComplexObjectPublished = false;
@@ -294,7 +294,7 @@ namespace PubnubWindowsStore.Test
             messageComplexObjectForPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
 
             pubnub.Publish<string>(channel, message, ReturnSuccessComplexObjectPublishCodeCallback, DummyErrorCallback);
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 310 * 1000 : 310 * 1000;
             mreComplexObjectPublish.WaitOne(manualResetEventsWaitTimeout);
 
             if (!isComplexObjectPublished)
@@ -313,7 +313,7 @@ namespace PubnubWindowsStore.Test
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenDisableJsonEncodeShouldSendSerializedObjectMessage()
         {
             isSerializedObjectMessagePublished = false;
@@ -349,7 +349,7 @@ namespace PubnubWindowsStore.Test
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenLargeMessageShoudFailWithMessageTooLargeInfo()
         {
             isLargeMessagePublished = false;
@@ -649,7 +649,7 @@ namespace PubnubWindowsStore.Test
             mreLaregMessagePublish.Set();
         }
 
-        [Test]
+        [TestMethod]
         public void ThenPubnubShouldGenerateUniqueIdentifier()
         {
             Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
@@ -657,7 +657,8 @@ namespace PubnubWindowsStore.Test
             Assert.IsNotNull(pubnub.GenerateGuid());
         }
 
-        [Test]
+        //        [ExpectedException(typeof(MissingMemberException))]
+        [TestMethod]
         public void ThenPublishKeyShouldNotBeEmpty()
         {
             Pubnub pubnub = new Pubnub("", PubnubCommon.SubscribeKey, "", "", false);
@@ -672,15 +673,15 @@ namespace PubnubWindowsStore.Test
             string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
 
-            
-            Assert.Throws<MissingMemberException>(() => 
+            Assert.ThrowsException<MissingMemberException>(() => 
             {
                 pubnub.Publish<string>(channel, message, null, DummyErrorCallback);
             });
+            
         }
 
 
-        [Test]
+        [TestMethod]
         public void ThenOptionalSecretKeyShouldBeProvidedInConstructor()
         {
             isPublished2 = false;
@@ -720,7 +721,7 @@ namespace PubnubWindowsStore.Test
             mreOptionalSecretKeyPublish.Set();
         }
 
-        [Test]
+        [TestMethod]
         public void IfSSLNotProvidedThenDefaultShouldBeFalse()
         {
             isPublished3 = false;

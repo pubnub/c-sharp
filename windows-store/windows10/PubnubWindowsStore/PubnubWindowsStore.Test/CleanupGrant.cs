@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using System.Threading;
 
 namespace PubnubWindowsStore.Test
 {
-    [TestFixture]
+    [TestClass]
     public class CleanupGrant
     {
         ManualResetEvent auditManualEvent = new ManualResetEvent(false);
@@ -20,7 +20,7 @@ namespace PubnubWindowsStore.Test
         bool receivedAuditMessage = false;
         bool receivedRevokeMessage = false;
 
-        [Test]
+        [TestMethod]
         public void AtUserLevel()
         {
             if (!PubnubCommon.EnableStubTest)
@@ -36,11 +36,11 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("Only for live test; CleanupGrant -> AtUserLevel.");
+                Assert.Inconclusive("Only for live test; CleanupGrant -> AtUserLevel.");
             }
         }
 
-        [Test]
+        [TestMethod]
         public void AtChannelLevel()
         {
             if (!PubnubCommon.EnableStubTest)
@@ -56,7 +56,7 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("Only for live test; CleanupGrant -> AtChannelLevel.");
+                Assert.Inconclusive("Only for live test; CleanupGrant -> AtChannelLevel.");
             }
         }
 

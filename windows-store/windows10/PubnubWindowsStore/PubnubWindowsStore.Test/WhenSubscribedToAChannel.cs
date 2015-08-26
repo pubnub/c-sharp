@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using System.Threading;
 
 namespace PubnubWindowsStore.Test
 {
-    [TestFixture]
+    [TestClass]
     public class WhenSubscribedToAChannel
     {
         ManualResetEvent meSubscribeNoConnect = new ManualResetEvent(false);
@@ -37,8 +37,8 @@ namespace PubnubWindowsStore.Test
         int numberOfReceivedMessages = 0;
         int manualResetEventsWaitTimeout = 310 * 1000;
 
-        [TestFixtureSetUp]
-        public void Init()
+        [TestInitialize]
+        public  void Init()
         {
             if (!PubnubCommon.PAMEnabled) return;
 
@@ -63,7 +63,7 @@ namespace PubnubWindowsStore.Test
             Assert.IsTrue(receivedGrantMessage, "WhenSubscribedToAChannel Grant access failed.");
         }
 
-        [Test]
+        [TestMethod]
         public void ThenSubscribeShouldReturnReceivedMessage()
         {
             receivedMessage = false;
@@ -95,7 +95,7 @@ namespace PubnubWindowsStore.Test
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenItShouldReturnReceivedMessage Failed");
         }
 
-        [Test]
+        [TestMethod]
         public void ThenSubscribeShouldReturnConnectStatus()
         {
             receivedConnectMessage = false;
@@ -121,7 +121,7 @@ namespace PubnubWindowsStore.Test
             Assert.IsTrue(receivedConnectMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnConnectStatus Failed");
         }
 
-        [Test]
+        [TestMethod]
         public void ThenMultiSubscribeShouldReturnConnectStatus()
         {
             receivedChannel1ConnectMessage = false;
@@ -150,7 +150,7 @@ namespace PubnubWindowsStore.Test
             Assert.IsTrue(receivedChannel1ConnectMessage && receivedChannel2ConnectMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnConnectStatus Failed");
         }
 
-        [Test]
+        [TestMethod]
         public void ThenDuplicateChannelShouldReturnAlreadySubscribed()
         {
             receivedAlreadySubscribedMessage = false;
@@ -178,7 +178,7 @@ namespace PubnubWindowsStore.Test
             Assert.IsTrue(receivedAlreadySubscribedMessage, "WhenSubscribedToAChannel --> ThenDuplicateChannelShouldReturnAlreadySubscribed Failed");
         }
 
-        [Test]
+        [TestMethod]
         public void ThenSubscriberShouldBeAbleToReceiveManyMessages()
         {
             receivedManyMessages = false;

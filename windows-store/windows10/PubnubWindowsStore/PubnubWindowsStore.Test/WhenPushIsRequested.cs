@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using System.Threading;
 
 namespace PubnubWindowsStore.Test
 {
-    [TestFixture]
+    [TestClass]
     public class WhenPushIsRequested
     {
         string currentUnitTestCase = "";
@@ -23,7 +23,7 @@ namespace PubnubWindowsStore.Test
         ManualResetEvent mreGrant = new ManualResetEvent(false);
         ManualResetEvent mrePublish = new ManualResetEvent(false);
 
-        [TestFixtureSetUp]
+        [TestInitialize]
         public void Init()
         {
             if (!PubnubCommon.PAMEnabled)
@@ -50,7 +50,7 @@ namespace PubnubWindowsStore.Test
             Assert.IsTrue(receivedGrantMessage, "WhenPushIsRequested Grant access failed.");
         }
 
-        [Test]
+        [TestMethod]
         public void ThenPublishMpnsToastShouldReturnSuccess()
         {
             receivedSuccessMessage = false;
@@ -78,7 +78,7 @@ namespace PubnubWindowsStore.Test
             Assert.IsTrue(receivedSuccessMessage, "Toast Publish Failed");
         }
 
-        [Test]
+        [TestMethod]
         public void ThenPublishMpnsFlipTileShouldReturnSuccess()
         {
             receivedSuccessMessage = false;
@@ -111,7 +111,7 @@ namespace PubnubWindowsStore.Test
             Assert.IsTrue(receivedSuccessMessage, "Flip Tile Publish Failed");
         }
 
-        [Test]
+        [TestMethod]
         public void ThenPublishMpnsCycleTileShouldReturnSuccess()
         {
             receivedSuccessMessage = false;
@@ -142,7 +142,7 @@ namespace PubnubWindowsStore.Test
             Assert.IsTrue(receivedSuccessMessage, "Cycle Tile Publish Failed");
         }
 
-        [Test]
+        [TestMethod]
         public void ThenPublishMpnsIconicTileShouldReturnSuccess()
         {
             receivedSuccessMessage = false;

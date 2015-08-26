@@ -7,19 +7,19 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using System.Threading;
 
 namespace PubnubWindowsStore.Test
 {
-    [TestFixture]
+    [TestClass]
     public class GenerateSampleGrant
     {
         ManualResetEvent grantManualEvent = new ManualResetEvent(false);
         bool receivedGrantMessage = false;
         int sampleCount = 100;
 
-        [Test]
+        [TestMethod]
         public void AtUserLevel()
         {
             if (!PubnubCommon.EnableStubTest)
@@ -40,11 +40,11 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("Only for live test; GenerateSampleGrant -> AtUserLevel.");
+                Assert.Inconclusive("Only for live test; GenerateSampleGrant -> AtUserLevel.");
             }
         }
 
-        [Test]
+        [TestMethod]
         public void AtChannelLevel()
         {
             if (!PubnubCommon.EnableStubTest)
@@ -64,7 +64,7 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("Only for live test; GenerateSampleGrant -> AtChannelLevel.");
+                Assert.Inconclusive("Only for live test; GenerateSampleGrant -> AtChannelLevel.");
             }
         }
 

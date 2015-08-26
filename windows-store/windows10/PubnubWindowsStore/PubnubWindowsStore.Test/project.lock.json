@@ -209,14 +209,6 @@
           "lib/netcore45/Newtonsoft.Json.dll": {}
         }
       },
-      "NUnit/3.0.0-beta-4": {
-        "compile": {
-          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/nunit.framework.dll": {}
-        },
-        "runtime": {
-          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/nunit.framework.dll": {}
-        }
-      },
       "System.AppContext/4.0.0": {
         "dependencies": {
           "System.Runtime": "[4.0.20, )",
@@ -1801,14 +1793,6 @@
         },
         "runtime": {
           "lib/netcore45/Newtonsoft.Json.dll": {}
-        }
-      },
-      "NUnit/3.0.0-beta-4": {
-        "compile": {
-          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/nunit.framework.dll": {}
-        },
-        "runtime": {
-          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/nunit.framework.dll": {}
         }
       },
       "System.AppContext/4.0.0": {
@@ -3428,14 +3412,6 @@
         },
         "runtime": {
           "lib/netcore45/Newtonsoft.Json.dll": {}
-        }
-      },
-      "NUnit/3.0.0-beta-4": {
-        "compile": {
-          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/nunit.framework.dll": {}
-        },
-        "runtime": {
-          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/nunit.framework.dll": {}
         }
       },
       "System.AppContext/4.0.0": {
@@ -5062,14 +5038,6 @@
           "lib/netcore45/Newtonsoft.Json.dll": {}
         }
       },
-      "NUnit/3.0.0-beta-4": {
-        "compile": {
-          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/nunit.framework.dll": {}
-        },
-        "runtime": {
-          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/nunit.framework.dll": {}
-        }
-      },
       "System.AppContext/4.0.0": {
         "dependencies": {
           "System.Runtime": "[4.0.20, )",
@@ -6687,14 +6655,6 @@
         },
         "runtime": {
           "lib/netcore45/Newtonsoft.Json.dll": {}
-        }
-      },
-      "NUnit/3.0.0-beta-4": {
-        "compile": {
-          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/nunit.framework.dll": {}
-        },
-        "runtime": {
-          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/nunit.framework.dll": {}
         }
       },
       "System.AppContext/4.0.0": {
@@ -8321,14 +8281,6 @@
           "lib/netcore45/Newtonsoft.Json.dll": {}
         }
       },
-      "NUnit/3.0.0-beta-4": {
-        "compile": {
-          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/nunit.framework.dll": {}
-        },
-        "runtime": {
-          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/nunit.framework.dll": {}
-        }
-      },
       "System.AppContext/4.0.0": {
         "dependencies": {
           "System.Runtime": "[4.0.20, )",
@@ -9946,14 +9898,6 @@
         },
         "runtime": {
           "lib/netcore45/Newtonsoft.Json.dll": {}
-        }
-      },
-      "NUnit/3.0.0-beta-4": {
-        "compile": {
-          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/nunit.framework.dll": {}
-        },
-        "runtime": {
-          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/nunit.framework.dll": {}
         }
       },
       "System.AppContext/4.0.0": {
@@ -12002,29 +11946,6 @@
         "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.xml",
         "tools/install.ps1",
         "package/services/metadata/core-properties/461b1ced7b6e4e6da9908e24495599dd.psmdcp",
-        "[Content_Types].xml"
-      ]
-    },
-    "NUnit/3.0.0-beta-4": {
-      "sha512": "n2kVsrJM7IlvoDFUkUqyMB+1K3/rc/fUJ/Wr2uIap13AFlVoAKJRaegoXkBZg7CHkbVSDClpAWVFIeZPUFY6fg==",
-      "type": "Package",
-      "files": [
-        "_rels/.rels",
-        "NUnit.nuspec",
-        "LICENSE.txt",
-        "NOTICES.txt",
-        "CHANGES.txt",
-        "lib/net20/nunit.framework.dll",
-        "lib/net20/nunit.framework.xml",
-        "lib/net40/nunit.framework.dll",
-        "lib/net40/nunit.framework.xml",
-        "lib/net45/nunit.framework.dll",
-        "lib/net45/nunit.framework.xml",
-        "lib/sl50/nunit.framework.dll",
-        "lib/sl50/nunit.framework.xml",
-        "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/nunit.framework.dll",
-        "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/nunit.framework.xml",
-        "package/services/metadata/core-properties/418d6a316dbd41d0a498e0132976da3b.psmdcp",
         "[Content_Types].xml"
       ]
     },
@@ -14727,8 +14648,7 @@
   "projectFileDependencyGroups": {
     "": [
       "Microsoft.NETCore.UniversalWindowsPlatform >= 5.0.0",
-      "Newtonsoft.Json >= 6.0.3",
-      "NUnit >= 3.0.0-beta-4"
+      "Newtonsoft.Json >= 6.0.3"
     ],
     "UAP,Version=v10.0": []
   }

@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using System.Threading;
 
 namespace PubnubWindowsStore.Test
 {
-    [TestFixture]
+    [TestClass]
     public class WhenChannelGroupIsRequested
     {
         ManualResetEvent channelGroupManualEvent = new ManualResetEvent(false);
@@ -24,7 +24,7 @@ namespace PubnubWindowsStore.Test
         string currentUnitTestCase = "";
         string channelGroupName = "hello_my_group";
 
-        [TestFixtureSetUp]
+        [TestInitialize]
         public void Init()
         {
             if (!PubnubCommon.PAMEnabled) return;
@@ -48,7 +48,7 @@ namespace PubnubWindowsStore.Test
             Assert.IsTrue(receivedGrantMessage, "WhenChannelGroupIsRequested Grant access failed.");
         }
 
-        [Test]
+        [TestMethod]
         public void ThenAddChannelShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenAddChannelShouldReturnSuccess";
@@ -76,7 +76,7 @@ namespace PubnubWindowsStore.Test
 
         }
 
-        [Test]
+        [TestMethod]
         public void ThenRemoveChannelShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenRemoveChannelShouldReturnSuccess";
@@ -104,7 +104,7 @@ namespace PubnubWindowsStore.Test
 
         }
 
-        [Test]
+        [TestMethod]
         public void ThenGetChannelListShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenGetChannelListShouldReturnSuccess";

@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using System.Threading;
 
 namespace PubnubWindowsStore.Test
 {
-    [TestFixture]
+    [TestClass]
     public class WhenUnsubscribedToAChannel
     {
         ManualResetEvent meNotSubscribed = new ManualResetEvent(false);
@@ -25,7 +25,7 @@ namespace PubnubWindowsStore.Test
         bool receivedChannelConnectedMessage = false;
         bool receivedGrantMessage = false;
 
-        [TestFixtureSetUp]
+        [TestInitialize]
         public void Init()
         {
             if (!PubnubCommon.PAMEnabled) return;
@@ -51,7 +51,7 @@ namespace PubnubWindowsStore.Test
             Assert.IsTrue(receivedGrantMessage, "WhenUnsubscribedToAChannel Grant access failed.");
         }
 
-        [Test]
+        [TestMethod]
         public void ThenNoExistChannelShouldReturnNotSubscribed()
         {
             receivedNotSubscribedMessage = false;
@@ -76,7 +76,7 @@ namespace PubnubWindowsStore.Test
             Assert.IsTrue(receivedNotSubscribedMessage, "WhenUnsubscribedToAChannel --> ThenNoExistChannelShouldReturnNotSubscribed Failed");
         }
 
-        [Test]
+        [TestMethod]
         public void ThenShouldReturnUnsubscribedMessage()
         {
             receivedChannelConnectedMessage = false;

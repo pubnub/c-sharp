@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using System.Threading;
 
 namespace PubnubWindowsStore.Test
 {
-    [TestFixture]
+    [TestClass]
     public class WhenGrantIsRequested
     {
 
@@ -24,7 +24,7 @@ namespace PubnubWindowsStore.Test
         int multipleAuthGrantCount = 5;
         string currentUnitTestCase = "";
 
-        [Test]
+        [TestMethod]
         public void ThenSubKeyLevelWithReadWriteShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenSubKeyLevelWithReadWriteShouldReturnSuccess";
@@ -51,11 +51,11 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithReadWriteShouldReturnSuccess.");
+                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithReadWriteShouldReturnSuccess.");
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenSubKeyLevelWithReadShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenSubKeyLevelWithReadShouldReturnSuccess";
@@ -82,11 +82,11 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithReadShouldReturnSuccess.");
+                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithReadShouldReturnSuccess.");
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenSubKeyLevelWithWriteShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenSubKeyLevelWithWriteShouldReturnSuccess";
@@ -113,11 +113,11 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithWriteShouldReturnSuccess.");
+                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithWriteShouldReturnSuccess.");
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenChannelLevelWithReadWriteShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenChannelLevelWithReadWriteShouldReturnSuccess";
@@ -146,11 +146,11 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithReadWriteShouldReturnSuccess.");
+                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithReadWriteShouldReturnSuccess.");
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenChannelLevelWithReadShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenChannelLevelWithReadShouldReturnSuccess";
@@ -179,11 +179,11 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithReadShouldReturnSuccess.");
+                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithReadShouldReturnSuccess.");
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenChannelLevelWithWriteShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenChannelLevelWithWriteShouldReturnSuccess";
@@ -212,11 +212,11 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithWriteShouldReturnSuccess.");
+                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithWriteShouldReturnSuccess.");
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenUserLevelWithReadWriteShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenUserLevelWithReadWriteShouldReturnSuccess";
@@ -246,11 +246,11 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenUserLevelWithReadWriteShouldReturnSuccess.");
+                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenUserLevelWithReadWriteShouldReturnSuccess.");
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenUserLevelWithReadShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenUserLevelWithReadShouldReturnSuccess";
@@ -280,11 +280,11 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenUserLevelWithReadShouldReturnSuccess.");
+                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenUserLevelWithReadShouldReturnSuccess.");
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenUserLevelWithWriteShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenUserLevelWithWriteShouldReturnSuccess";
@@ -314,11 +314,11 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenUserLevelWithWriteShouldReturnSuccess.");
+                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenUserLevelWithWriteShouldReturnSuccess.");
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenMultipleChannelGrantShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenMultipleChannelGrantShouldReturnSuccess";
@@ -368,11 +368,11 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenMultipleChannelGrantShouldReturnSuccess.");
+                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenMultipleChannelGrantShouldReturnSuccess.");
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenMultipleAuthGrantShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenMultipleAuthGrantShouldReturnSuccess";
@@ -423,11 +423,11 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenMultipleAuthGrantShouldReturnSuccess.");
+                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenMultipleAuthGrantShouldReturnSuccess.");
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenRevokeAtSubKeyLevelReturnSuccess()
         {
             currentUnitTestCase = "ThenRevokeAtSubKeyLevelReturnSuccess";
@@ -472,11 +472,11 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess.");
+                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess.");
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenRevokeAtChannelLevelReturnSuccess()
         {
             currentUnitTestCase = "ThenRevokeAtChannelLevelReturnSuccess";
@@ -525,11 +525,11 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess.");
+                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess.");
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenRevokeAtUserLevelReturnSuccess()
         {
             currentUnitTestCase = "ThenRevokeAtUserLevelReturnSuccess";
@@ -579,11 +579,11 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess.");
+                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess.");
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenChannelGroupLevelWithReadManageShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenChannelGroupLevelWithReadManageShouldReturnSuccess";
@@ -612,11 +612,11 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelGroupLevelWithReadManageShouldReturnSuccess.");
+                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelGroupLevelWithReadManageShouldReturnSuccess.");
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenChannelGroupLevelWithReadShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenChannelGroupLevelWithReadShouldReturnSuccess";
@@ -645,7 +645,7 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelGroupLevelWithReadShouldReturnSuccess.");
+                Assert.Inconclusive("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelGroupLevelWithReadShouldReturnSuccess.");
             }
         }
 

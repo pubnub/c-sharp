@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using System.Threading;
 
 namespace PubnubWindowsStore.Test
 {
-    [TestFixture]
+    [TestClass]
     public class WhenDetailedHistoryIsRequested
     {
         ManualResetEvent mreDetailedHistory = new ManualResetEvent(false);
@@ -30,7 +30,7 @@ namespace PubnubWindowsStore.Test
         long startTimeWithReverseTrue = 0;
         string currentTestCase = "";
 
-        [TestFixtureSetUp]
+        [TestInitialize]
         public void Init()
         {
             if (!PubnubCommon.PAMEnabled) return;
@@ -56,7 +56,7 @@ namespace PubnubWindowsStore.Test
             Assert.IsTrue(receivedGrantMessage, "WhenDetailedHistoryIsRequested Grant access failed.");
         }
 
-        [Test]
+        [TestMethod]
         public void DetailHistoryCount10ReturnsRecords()
         {
             messageReceived = false;
@@ -121,7 +121,7 @@ namespace PubnubWindowsStore.Test
             mreDetailedHistory.Set();
         }
 
-        [Test]
+        [TestMethod]
         public void DetailHistoryCount10ReverseTrueReturnsRecords()
         {
             message10ReverseTrueReceived = false;
@@ -164,7 +164,7 @@ namespace PubnubWindowsStore.Test
             mreMessageCount10ReverseTrue.Set();
         }
 
-        [Test]
+        [TestMethod]
         public void DetailedHistoryStartWithReverseTrue()
         {
             expectedCountAtStartTimeWithReverseTrue = 0;
@@ -247,7 +247,7 @@ namespace PubnubWindowsStore.Test
             mrePublishStartReverseTrue.Set();
         }
 
-        [Test]
+        [TestMethod]
         public void DetailHistoryWithNullKeysReturnsError()
         {
             currentTestCase = "DetailHistoryWithNullKeysReturnsError";

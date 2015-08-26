@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using System.Threading;
 
 namespace PubnubWindowsStore.Test
@@ -37,7 +37,7 @@ namespace PubnubWindowsStore.Test
 
         int manualResetEventsWaitTimeout = 310 * 1000;
 
-        [TestFixtureSetUp]
+        [TestInitialize]
         public void Init()
         {
             if (!PubnubCommon.PAMEnabled) return;
@@ -61,7 +61,7 @@ namespace PubnubWindowsStore.Test
             Assert.IsTrue(receivedGrantMessage, "WhenSubscribedToAChannelGroup Grant access failed.");
         }
 
-        [Test]
+        [TestMethod]
         public void ThenSubscribeShouldReturnReceivedMessage()
         {
             currentUnitTestCase = "ThenSubscribeShouldReturnReceivedMessage";
@@ -111,7 +111,7 @@ namespace PubnubWindowsStore.Test
 
         }
 
-        [Test]
+        [TestMethod]
         public void ThenSubscribeShouldReturnConnectStatus()
         {
             currentUnitTestCase = "ThenSubscribeShouldReturnConnectStatus";
@@ -156,7 +156,7 @@ namespace PubnubWindowsStore.Test
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ThenMultiSubscribeShouldReturnConnectStatus()
         {
             currentUnitTestCase = "ThenMultiSubscribeShouldReturnConnectStatus";

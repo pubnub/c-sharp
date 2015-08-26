@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PubNubMessaging.Core;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using System.Threading;
 
 namespace PubnubWindowsStore.Test
 {
-    [TestFixture]
+    [TestClass]
     public class WhenGetRequestServerTime
     {
         ManualResetEvent mreTime = new ManualResetEvent(false);
@@ -20,7 +20,7 @@ namespace PubnubWindowsStore.Test
         bool timeReceived = false;
         bool timeReceivedWhenProxy = false;
 
-        [Test]
+        [TestMethod]
         public void ThenItShouldReturnTimeStamp()
         {
             Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
@@ -38,7 +38,7 @@ namespace PubnubWindowsStore.Test
             Assert.IsTrue(timeReceived, "time() Failed");
         }
 
-        [Test]
+        [TestMethod]
         public void ThenWithProxyItShouldReturnTimeStamp()
         {
             bool proxyConfigured = false;
@@ -67,7 +67,7 @@ namespace PubnubWindowsStore.Test
             }
             else
             {
-                Assert.Ignore("Proxy setup not configured. After setup Set proxyConfigured to true");
+                Assert.Inconclusive("Proxy setup not configured. After setup Set proxyConfigured to true");
             }
 
         }
@@ -108,22 +108,22 @@ namespace PubnubWindowsStore.Test
             mreProxy.Set();
         }
 
-        [Test]
+        [TestMethod]
         public void TranslateDateTimeToUnixTime()
         {
             //Test for 26th June 2012 GMT
             DateTime dt = new DateTime(2012, 6, 26, 0, 0, 0, DateTimeKind.Utc);
             long nanoSecondTime = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(dt);
-            Assert.True(13406688000000000 == nanoSecondTime);
+            Assert.IsTrue(13406688000000000 == nanoSecondTime);
         }
 
-        [Test]
+        [TestMethod]
         public void TranslateUnixTimeToDateTime()
         {
             //Test for 26th June 2012 GMT
             DateTime expectedDate = new DateTime(2012, 6, 26, 0, 0, 0, DateTimeKind.Utc);
             DateTime actualDate = Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(13406688000000000);
-            Assert.True(expectedDate == actualDate);
+            Assert.IsTrue(expectedDate == actualDate);
         }
 
         void DummyErrorCallback(PubnubClientError result)
