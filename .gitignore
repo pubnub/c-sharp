@@ -43,6 +43,12 @@
 /windows-store/*/PubnubWindowsStore/packages/*
 /windows-store/*/PubnubWindowsStore/*/bin/Debug/*
 /windows-store/*/PubnubWindowsStore/*/obj/Debug/*
+/windows-store/*/PubnubWindowsStore/*/bin/Release/*
+/windows-store/*/PubnubWindowsStore/*/obj/Release/*
+/windows-store/*/PubnubWindowsStore/*/bin/*/Debug/*
+/windows-store/*/PubnubWindowsStore/*/obj/*/Debug/*
+/windows-store/*/PubnubWindowsStore/*/bin/*/Release/*
+/windows-store/*/PubnubWindowsStore/*/obj/*/Release/*
 /demos/epoll/packages/*
 /demos/ePoll/WebPoll/bin/*.pdb
 /demos/ePoll/WebPoll/obj/*
