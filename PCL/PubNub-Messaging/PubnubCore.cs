@@ -1,4 +1,4 @@
-﻿//Build Date: June 17, 2015
+﻿//Build Date: September 23, 2015
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -6542,7 +6542,8 @@ namespace PubNubMessaging.Core
 				}
 
 
-				if (overrideTcpKeepAlive) {
+                //overrideTcpKeepAlive must be true
+                if (overrideTcpKeepAlive) {
 					TimerWhenOverrideTcpKeepAlive (requestUri, pubnubRequestState);
 				} else {
 					request = SetServicePointSetTcpKeepAlive (request);

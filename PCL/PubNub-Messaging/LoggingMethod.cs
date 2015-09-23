@@ -325,20 +325,20 @@ namespace PubNubMessaging.Core
 			PubnubErrorCode ret = PubnubErrorCode.None;
 			switch (webExceptionStatus)
             {
-                #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !NETFX_CORE)
-				case WebExceptionStatus.NameResolutionFailure:
-				ret = PubnubErrorCode.NameResolutionFailure;
-				break;
-				case WebExceptionStatus.ProtocolError:
-				ret = PubnubErrorCode.ProtocolError;
-				break;
-				case WebExceptionStatus.ServerProtocolViolation:
-				ret = PubnubErrorCode.ServerProtocolViolation;
-				break;
-                case WebExceptionStatus.ReceiveFailure:
-                ret = PubnubErrorCode.ReceiveFailure;
-                break;
-                #endif
+                //#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !NETFX_CORE)
+                //case WebExceptionStatus.NameResolutionFailure:
+                //ret = PubnubErrorCode.NameResolutionFailure;
+                //break;
+                //case WebExceptionStatus.ProtocolError:
+                //ret = PubnubErrorCode.ProtocolError;
+                //break;
+                //case WebExceptionStatus.ServerProtocolViolation:
+                //ret = PubnubErrorCode.ServerProtocolViolation;
+                //break;
+                //case WebExceptionStatus.ReceiveFailure:
+                //ret = PubnubErrorCode.ReceiveFailure;
+                //break;
+                //#endif
                 case WebExceptionStatus.RequestCanceled:
 				ret = PubnubErrorCode.WebRequestCanceled;
 				break;

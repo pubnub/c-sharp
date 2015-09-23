@@ -1,4 +1,4 @@
-﻿//Build Date: January 22, 2015
+﻿//Build Date: September 23, 2015
 using System;
 using System.Text;
 using System.IO;
@@ -123,7 +123,7 @@ namespace PubNubMessaging.Core
 		protected override PubnubWebRequest SetServicePointSetTcpKeepAlive (PubnubWebRequest request)
         {
 #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !NETFX_CORE)
-            request.ServicePoint.SetTcpKeepAlive(true, base.LocalClientHeartbeatInterval * 1000, 1000);
+            //request.ServicePoint.SetTcpKeepAlive(true, base.LocalClientHeartbeatInterval * 1000, 1000);
 #endif
             //do nothing for mono
 			return request;
@@ -249,12 +249,12 @@ namespace PubNubMessaging.Core
                 }
             }
 #elif ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
-            // Force canonical path and query
-            string paq = requestUri.PathAndQuery;
-            FieldInfo flagsFieldInfo = typeof(Uri).GetField("m_Flags", BindingFlags.Instance | BindingFlags.NonPublic);
-            ulong flags = (ulong)flagsFieldInfo.GetValue(requestUri);
-            flags &= ~((ulong)0x30); // Flags.PathNotCanonical|Flags.QueryNotCanonical
-            flagsFieldInfo.SetValue(requestUri, flags);
+            //// Force canonical path and query
+            //string paq = requestUri.PathAndQuery;
+            //FieldInfo flagsFieldInfo = typeof(Uri).GetField("m_Flags", BindingFlags.Instance | BindingFlags.NonPublic);
+            //ulong flags = (ulong)flagsFieldInfo.GetValue(requestUri);
+            //flags &= ~((ulong)0x30); // Flags.PathNotCanonical|Flags.QueryNotCanonical
+            //flagsFieldInfo.SetValue(requestUri, flags);
 #endif
             //don't do anything for mono and SL and WP
 		}
@@ -1539,13 +1539,13 @@ namespace PubNubMessaging.Core
     {
 
 #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !NETFX_CORE)
-		public override long ContentLength
-		{
-			get
-			{
-				return request.ContentLength;
-			}
-		}
+        //public override long ContentLength
+        //{
+        //    get
+        //    {
+        //        return request.ContentLength;
+        //    }
+        //}
 #endif
 #if (!SILVERLIGHT && !WINDOWS_PHONE && !NETFX_CORE)
 //        private int _timeout;
@@ -1606,7 +1606,7 @@ namespace PubNubMessaging.Core
 #endif
 
 #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !NETFX_CORE)
-        public ServicePoint ServicePoint;
+        //public ServicePoint ServicePoint;
 #endif
 
 #if (!SILVERLIGHT && !WINDOWS_PHONE && !NETFX_CORE)
@@ -1620,14 +1620,14 @@ namespace PubNubMessaging.Core
             : base(request)
         {
 #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !NETFX_CORE)
-			this.ServicePoint = this.request.ServicePoint;
+			//this.ServicePoint = this.request.ServicePoint;
 #endif
         }
         public PubnubWebRequest(HttpWebRequest request, IPubnubUnitTest pubnubUnitTest)
             : base(request, pubnubUnitTest)
         {
 #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !NETFX_CORE)
-			this.ServicePoint = this.request.ServicePoint;
+			//this.ServicePoint = this.request.ServicePoint;
 #endif
         }
     }
