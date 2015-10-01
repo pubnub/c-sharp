@@ -425,12 +425,16 @@ namespace PubNubMessaging.Core
 			{
 				ret = PubnubErrorCode.PubnubInterOpSEHException;
 			}
-			else
-			{
-				//Console.WriteLine("ATTENTION: Error Type = " + errorType);
-				//Console.WriteLine("ATTENTION: Error Message = " + errorMessage);
-				ret = PubnubErrorCode.None;
-			}
+            else if (errorType == "System.OutOfMemoryException")
+            {
+                ret = PubnubErrorCode.DeviceOutOfMemory;
+            }
+            else
+            {
+                //Console.WriteLine("ATTENTION: Error Type = " + errorType);
+                //Console.WriteLine("ATTENTION: Error Message = " + errorMessage);
+                ret = PubnubErrorCode.None;
+            }
 			return ret;
 		}
 
@@ -565,6 +569,7 @@ namespace PubNubMessaging.Core
         ReceiveFailure = 140,
         TrustFailure = 141,
         RequestTimeout = 142,
+        DeviceOutOfMemory = 143,
 
 		MessageTooLarge = 4000,
 		BadRequest = 4001,
@@ -653,6 +658,7 @@ namespace PubNubMessaging.Core
             dictionaryCodes.Add(140, "WebExcepton. The underlying connection was closed: An unexpected error occurred on a receive. If it continues, please contact PubNub support");
             dictionaryCodes.Add(141, "TrustFailure. The security cetificate is not from a trusted certification authority.");
             dictionaryCodes.Add(142, "Timeout occured");
+            dictionaryCodes.Add(143, "Device - Out of memory. Please check available space to run the application.");
 			dictionaryCodes.Add(0, "Undocumented error. Please contact PubNub support with full error object details for further investigation");
 		}
 

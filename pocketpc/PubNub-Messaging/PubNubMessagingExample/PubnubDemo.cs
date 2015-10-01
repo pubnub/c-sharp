@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using PubNubMessaging.Core;
+using System.Threading;
 
 namespace PubNubMessagingExample
 {
@@ -40,6 +41,15 @@ namespace PubNubMessagingExample
         {
           
             InitializeComponent();
+
+            int workerThreads;
+            int completionPortThreads;
+            ThreadPool.GetMaxThreads(out workerThreads, out completionPortThreads);
+            bool result = ThreadPool.SetMaxThreads(100, completionPortThreads);
+            if (!result)
+            {
+                //int j = 0;
+            }
         }
 
         public void PubnubInitialize()
