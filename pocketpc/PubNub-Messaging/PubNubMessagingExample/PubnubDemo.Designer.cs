@@ -61,6 +61,7 @@
             this.btnGlobalHereNow = new System.Windows.Forms.Button();
             this.btnUserState = new System.Windows.Forms.Button();
             this.btnPush = new System.Windows.Forms.Button();
+            this.menuItem4 = new System.Windows.Forms.MenuItem();
             this.SuspendLayout();
             // 
             // menuPAM
@@ -69,6 +70,7 @@
             this.menuPAM.MenuItems.Add(this.menuItemSettings);
             this.menuPAM.MenuItems.Add(this.menuItem2);
             this.menuPAM.MenuItems.Add(this.menuItemChannelGroup);
+            this.menuPAM.MenuItems.Add(this.menuItem4);
             // 
             // menuItem1
             // 
@@ -160,7 +162,7 @@
             // 
             this.lbResult.Location = new System.Drawing.Point(12, 165);
             this.lbResult.Name = "lbResult";
-            this.lbResult.Size = new System.Drawing.Size(213, 100);
+            this.lbResult.Size = new System.Drawing.Size(213, 92);
             this.lbResult.TabIndex = 7;
             // 
             // lblChannel
@@ -174,7 +176,7 @@
             // 
             this.txtChannel.Location = new System.Drawing.Point(59, 1);
             this.txtChannel.Name = "txtChannel";
-            this.txtChannel.Size = new System.Drawing.Size(166, 21);
+            this.txtChannel.Size = new System.Drawing.Size(166, 25);
             this.txtChannel.TabIndex = 1;
             this.txtChannel.Text = "my_hello_channel";
             // 
@@ -182,7 +184,7 @@
             // 
             this.txtChannelGroup.Location = new System.Drawing.Point(91, 25);
             this.txtChannelGroup.Name = "txtChannelGroup";
-            this.txtChannelGroup.Size = new System.Drawing.Size(134, 21);
+            this.txtChannelGroup.Size = new System.Drawing.Size(134, 25);
             this.txtChannelGroup.TabIndex = 2;
             // 
             // lblChannelGroup
@@ -292,6 +294,11 @@
             this.btnPush.Text = "Push";
             this.btnPush.Click += new System.EventHandler(this.btnPush_Click);
             // 
+            // menuItem4
+            // 
+            this.menuItem4.Text = "Close";
+            this.menuItem4.Click += new System.EventHandler(this.OnClickClose);
+            // 
             // PubnubDemo
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -317,8 +324,10 @@
             this.Controls.Add(this.lbResult);
             this.Controls.Add(this.btnTime);
             this.Menu = this.menuPAM;
+            this.MinimizeBox = false;
             this.Name = "PubnubDemo";
             this.Text = "PubNub Demo";
+            this.Closed += new System.EventHandler(this.OnFormClosed);
             this.ResumeLayout(false);
 
         }
@@ -356,6 +365,7 @@
         private System.Windows.Forms.MenuItem menuItemCGAddRemoveChannel;
         private System.Windows.Forms.MenuItem menuItemChangeAuthKey;
         private System.Windows.Forms.MenuItem menuItemChangeUUID;
+        private System.Windows.Forms.MenuItem menuItem4;
     }
 }
 

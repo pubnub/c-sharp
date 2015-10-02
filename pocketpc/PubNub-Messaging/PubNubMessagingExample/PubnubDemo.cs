@@ -74,9 +74,19 @@ namespace PubNubMessagingExample
             UpdateListBoxForDisplay("Running Subscribe");
             pubnub.Subscribe<string>(_channelName, _channelGroupName, DisplayReturnMessage, DisplayReturnMessage, null, DisplayErrorMessage);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnPresence_Click(object sender, EventArgs e)
         {
+            // Check if presense channel value is present
+            if (string.IsNullOrEmpty(txtChannel.Text.Trim()))
+            {
+                MessageBox.Show("Please enter channel name");
+                return;
+            }
             CaptureInputData();
             UpdateListBoxForDisplay("Running Presence");
             pubnub.Presence<string>(_channelName, _channelGroupName, DisplayReturnMessage, DisplayReturnMessage, DisplayErrorMessage);
@@ -607,6 +617,42 @@ namespace PubNubMessagingExample
             this.SessionUUID = newUUID;
             UpdateListBoxForDisplay("Updating UUID");
             pubnub.ChangeUUID(newUUID);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnFormClosed(object sender, EventArgs e)
+        {
+            try
+            {
+               Application.Exit();
+            }
+            catch( Exception ex)
+            {
+               string errMsg = ex.Message;
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnClickClose(object sender, EventArgs e)
+        {
+            try
+            {
+                if (pubnub != null)
+                {
+                    pubnub.EndPendingRequests();
+               }
+                this.Close();
+            }
+            catch (Exception ex)
+            {
+                string errMsg = ex.Message;
+            }
         }
 
         

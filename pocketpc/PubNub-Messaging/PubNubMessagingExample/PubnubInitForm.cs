@@ -15,9 +15,32 @@ namespace PubNubMessagingExample
         {
             InitializeComponent();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnNext_Click(object sender, EventArgs e)
         {
+            // Check mandetory Inputs
+           if (string.IsNullOrEmpty(txtOrigin.Text.Trim()))
+            {
+                MessageBox.Show("Please enter origin");
+                return;
+            }
+            if (string.IsNullOrEmpty(txtPublishKey.Text.Trim()))
+            {
+                MessageBox.Show("Please enter publish key");
+                return;
+            }
+            if (string.IsNullOrEmpty(txtSubscribeKey.Text.Trim()))
+            {
+                MessageBox.Show("Please enter subscribe key");
+                return;
+            }
+
+           
+            
             PubnubDemo demoForm = new PubnubDemo();
             demoForm.Origin = txtOrigin.Text;
             demoForm.PublishKey = txtPublishKey.Text;
@@ -44,6 +67,31 @@ namespace PubNubMessagingExample
             demoForm.Show();
 
             this.Hide();
+        }
+        
+        /// <summary>
+        /// Numeric Inputs Only
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void txtPresenceHeartbeatInterval_KeyPressed(object sender, KeyPressEventArgs e)
+        {
+            if (!Char.IsDigit(e.KeyChar) && e.KeyChar != '\b')
+            {
+                e.Handled = true;
+            }
+        }
+        /// <summary>
+        /// Numeric Inputs Only
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void txtPresenceHeartbeat_OnKeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!Char.IsDigit(e.KeyChar) && e.KeyChar != '\b')
+            {
+                e.Handled = true;
+            }
         }
 
         

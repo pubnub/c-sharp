@@ -59,8 +59,9 @@
             // txtOrigin
             // 
             this.txtOrigin.Location = new System.Drawing.Point(98, 0);
+            this.txtOrigin.MaxLength = 2048;
             this.txtOrigin.Name = "txtOrigin";
-            this.txtOrigin.Size = new System.Drawing.Size(139, 21);
+            this.txtOrigin.Size = new System.Drawing.Size(139, 25);
             this.txtOrigin.TabIndex = 1;
             this.txtOrigin.Text = "pubsub.pubnub.com";
             // 
@@ -74,16 +75,18 @@
             // txtPublishKey
             // 
             this.txtPublishKey.Location = new System.Drawing.Point(98, 27);
+            this.txtPublishKey.MaxLength = 64;
             this.txtPublishKey.Name = "txtPublishKey";
-            this.txtPublishKey.Size = new System.Drawing.Size(139, 21);
+            this.txtPublishKey.Size = new System.Drawing.Size(139, 25);
             this.txtPublishKey.TabIndex = 2;
             this.txtPublishKey.Text = "demo";
             // 
             // txtSubscribeKey
             // 
             this.txtSubscribeKey.Location = new System.Drawing.Point(98, 54);
+            this.txtSubscribeKey.MaxLength = 64;
             this.txtSubscribeKey.Name = "txtSubscribeKey";
-            this.txtSubscribeKey.Size = new System.Drawing.Size(139, 21);
+            this.txtSubscribeKey.Size = new System.Drawing.Size(139, 25);
             this.txtSubscribeKey.TabIndex = 3;
             this.txtSubscribeKey.Text = "demo";
             // 
@@ -97,8 +100,9 @@
             // txtSecretKey
             // 
             this.txtSecretKey.Location = new System.Drawing.Point(98, 81);
+            this.txtSecretKey.MaxLength = 64;
             this.txtSecretKey.Name = "txtSecretKey";
-            this.txtSecretKey.Size = new System.Drawing.Size(139, 21);
+            this.txtSecretKey.Size = new System.Drawing.Size(139, 25);
             this.txtSecretKey.TabIndex = 4;
             this.txtSecretKey.Text = "demo";
             // 
@@ -112,8 +116,9 @@
             // txtCipherKey
             // 
             this.txtCipherKey.Location = new System.Drawing.Point(98, 108);
+            this.txtCipherKey.MaxLength = 64;
             this.txtCipherKey.Name = "txtCipherKey";
-            this.txtCipherKey.Size = new System.Drawing.Size(139, 21);
+            this.txtCipherKey.Size = new System.Drawing.Size(139, 25);
             this.txtCipherKey.TabIndex = 5;
             // 
             // label5
@@ -143,8 +148,9 @@
             // txtSessionUUID
             // 
             this.txtSessionUUID.Location = new System.Drawing.Point(98, 135);
+            this.txtSessionUUID.MaxLength = 36;
             this.txtSessionUUID.Name = "txtSessionUUID";
-            this.txtSessionUUID.Size = new System.Drawing.Size(139, 21);
+            this.txtSessionUUID.Size = new System.Drawing.Size(139, 25);
             this.txtSessionUUID.TabIndex = 6;
             this.txtSessionUUID.Text = "netcfuuid";
             // 
@@ -175,18 +181,22 @@
             // txtPresenceHeartbeat
             // 
             this.txtPresenceHeartbeat.Location = new System.Drawing.Point(137, 162);
+            this.txtPresenceHeartbeat.MaxLength = 13;
             this.txtPresenceHeartbeat.Name = "txtPresenceHeartbeat";
-            this.txtPresenceHeartbeat.Size = new System.Drawing.Size(100, 21);
+            this.txtPresenceHeartbeat.Size = new System.Drawing.Size(100, 25);
             this.txtPresenceHeartbeat.TabIndex = 16;
             this.txtPresenceHeartbeat.Text = "0";
+            this.txtPresenceHeartbeat.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtPresenceHeartbeat_OnKeyPress);
             // 
             // txtPresenceHeartbeatInterval
             // 
             this.txtPresenceHeartbeatInterval.Location = new System.Drawing.Point(178, 189);
+            this.txtPresenceHeartbeatInterval.MaxLength = 13;
             this.txtPresenceHeartbeatInterval.Name = "txtPresenceHeartbeatInterval";
-            this.txtPresenceHeartbeatInterval.Size = new System.Drawing.Size(59, 21);
+            this.txtPresenceHeartbeatInterval.Size = new System.Drawing.Size(59, 25);
             this.txtPresenceHeartbeatInterval.TabIndex = 18;
             this.txtPresenceHeartbeatInterval.Text = "0";
+            this.txtPresenceHeartbeatInterval.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtPresenceHeartbeatInterval_KeyPressed);
             // 
             // label8
             // 
