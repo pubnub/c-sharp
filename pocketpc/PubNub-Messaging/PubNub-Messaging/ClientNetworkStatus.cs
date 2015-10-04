@@ -129,7 +129,7 @@ namespace PubNubMessaging.Core
 			#endif
 
 #if (SILVERLIGHT || WINDOWS_PHONE|| WindowsCE || PocketPC)
-            mres.WaitOne();
+            mres.WaitOne(500, false);
 			#elif(!UNITY_ANDROID && !UNITY_IOS)
 			mres.Wait();
 			#endif

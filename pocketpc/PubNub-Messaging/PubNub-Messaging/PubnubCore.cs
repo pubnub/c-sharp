@@ -82,7 +82,7 @@ namespace PubNubMessaging.Core
 		protected bool overrideTcpKeepAlive = true;
 		bool _enableJsonEncodingForPublish = true;
         bool _enableDebugForPushPublish = false;
-		LoggingMethod.Level _pubnubLogLevel = LoggingMethod.Level.Off;
+		LoggingMethod.Level _pubnubLogLevel = LoggingMethod.Level.Info;
 		PubnubErrorFilter.Level _errorLevel = PubnubErrorFilter.Level.Info;
 		protected ConcurrentDictionary<string, long> multiChannelSubscribe = new ConcurrentDictionary<string, long>();
         protected ConcurrentDictionary<string, long> multiChannelGroupSubscribe = new ConcurrentDictionary<string, long>();

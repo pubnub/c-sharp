@@ -38,7 +38,7 @@ namespace PubNubMessaging.Core
 	{
 
 		#region "Constants"
-		const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Off;
+		const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Info;
 		const PubnubErrorFilter.Level errorLevel = PubnubErrorFilter.Level.Info;
 
 		#if (!SILVERLIGHT && !WINDOWS_PHONE)

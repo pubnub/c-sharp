@@ -332,7 +332,7 @@ namespace PubNubMessaging.Tests
 
         private void dummyUnsubscribeCallback(string result)
         {
-
+            mreUnsubscribe.Set();
         }
 
         void SubscribeDummyMethodForConnectCallback(string receivedMessage)
