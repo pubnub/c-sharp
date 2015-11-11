@@ -213,7 +213,8 @@ namespace TvdP.Threading
                             return false;
 
                         //System.Threading.Thread.Sleep(0);
-						System.Threading.Tasks.Task.Delay(0).Wait();
+						//System.Threading.Tasks.Task.Delay(0).Wait();
+						new System.Threading.ManualResetEvent(false).WaitOne(0);
 
                     }
                 }
@@ -318,7 +319,8 @@ namespace TvdP.Threading
                             return false;
 
                         //System.Threading.Thread.Sleep(0);
-						System.Threading.Tasks.Task.Delay(0).Wait();
+						//System.Threading.Tasks.Task.Delay(0).Wait();
+						new System.Threading.ManualResetEvent(false).WaitOne(0);
                     }
                 }
             }

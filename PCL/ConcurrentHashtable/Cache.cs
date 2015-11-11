@@ -32,11 +32,7 @@ namespace TvdP.Collections
         public Level1CacheClass(IEqualityComparer<TKey> keyComparer)
         {
             _KeyComparer = keyComparer;
-#if !SILVERLIGHT
-            _GC2Count = GC.CollectionCount(2);
-#else
-            _GC2Count = (int)(System.DateTime.Now.Ticks / 100000000L); //10 second intervals
-#endif
+			_GC2Count = (int)(System.DateTime.Now.Ticks / 100000000L); //10 second intervals
             base.Initialize();
         }
 
@@ -57,11 +53,7 @@ namespace TvdP.Collections
         /// </remarks>
         public override bool DoMaintenance()
         {
-#if !SILVERLIGHT
-            _GC2Count = GC.CollectionCount(2);
-#else
-            _GC2Count = (int)( System.DateTime.Now.Ticks / 100000000L ); //10 second intervals
-#endif
+			_GC2Count = (int)( System.DateTime.Now.Ticks / 100000000L ); //10 second intervals
             return base.DoMaintenance();
         }
 

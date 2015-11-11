@@ -1,14 +1,6 @@
 ﻿using System;
 using System.Threading;
-//#if NETFX_CORE
-//using Windows.Networking.Sockets;
-//using Windows.Networking;
-//using Windows.Foundation;
-//#else
-//using System.Net.Sockets;
-//#endif
 using System.Net;
-using Sockets.Plugin;
 
 namespace PubNubMessaging.Core
 {
@@ -36,7 +28,7 @@ namespace PubNubMessaging.Core
 		private static ManualResetEvent mres = new ManualResetEvent(false);
 		private static ManualResetEvent mreSocketAsync = new ManualResetEvent(false);
 		#elif(!UNITY_IOS && !UNITY_ANDROID)
-		private static ManualResetEventSlim mres = new ManualResetEventSlim(false);
+		private static ManualResetEvent mres = new ManualResetEvent(false);
 		#endif
 		internal static bool SimulateNetworkFailForTesting
 		{
@@ -144,7 +136,7 @@ namespace PubNubMessaging.Core
 						mres.Set();
 					}, null);
 				
-				mres.Wait(100);
+				mres.WaitOne(100);
 //				using (UdpSocketClient socket = new UdpSocketClient())
 //				{
 //					await socket.ConnectAsync("pubsub.pubnub.com", 80);

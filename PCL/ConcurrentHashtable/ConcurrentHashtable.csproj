@@ -8,8 +8,8 @@
     <OutputType>Library</OutputType>
     <RootNamespace>ConcurrentHashtable</RootNamespace>
     <AssemblyName>ConcurrentHashtable</AssemblyName>
-    <TargetFrameworkProfile>Profile78</TargetFrameworkProfile>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Profile136</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -50,10 +50,4 @@
     <Compile Include="WeakSegmentrange.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
-  <ItemGroup>
-    <ProjectReference Include="..\TimerExtension\TimerExtension.csproj">
-      <Project>{4588F44D-6189-4A10-BC11-D630E3BB2668}</Project>
-      <Name>TimerExtension</Name>
-    </ProjectReference>
-  </ItemGroup>
 </Project>

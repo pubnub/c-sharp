@@ -59,7 +59,7 @@ namespace TvdP.Collections
         /// </summary>
         //static Timer _Timer = new Timer(CheckGCCount, null, 100, 100);
 
-        static int _Level2GCCount;
+        //static int _Level2GCCount;
 #else
         /// <summary>
         /// Small timer that will start a garbage sweep every 10 seconds.
@@ -77,17 +77,11 @@ namespace TvdP.Collections
         /// <param name="dummy"></param>
         static internal void CheckGCCount(object dummy)
         {
-#if !SILVERLIGHT
-            if (_Level2GCCount != GC.CollectionCount(2) && Interlocked.CompareExchange(ref _TableMaintenanceIsPending, 1, 0) == 0)
-            {
-                _Level2GCCount = GC.CollectionCount(2);
-#else
-            if (Interlocked.CompareExchange(ref _TableMaintenanceIsPending, 1, 0) == 0)
-            {
-#endif
+			if (Interlocked.CompareExchange(ref _TableMaintenanceIsPending, 1, 0) == 0)
+			{
                 RemoveVoidTables();
 
-				System.Threading.Tasks.Task.Run(() => 
+				System.Threading.Tasks.Task.Factory.StartNew(() => 
 					{
 						try
 						{
@@ -120,8 +114,7 @@ namespace TvdP.Collections
 								{
 									if (sleepCounter-- == 0)
 									{
-										//Thread.Sleep(0);
-										System.Threading.Tasks.Task.Delay(0).Wait();
+										new System.Threading.ManualResetEvent(false).WaitOne(0);
 										sleepCounter = delayedQueue.Count;
 									}
 
@@ -137,17 +130,7 @@ namespace TvdP.Collections
 							_TableMaintenanceIsPending = 0;
 						}
 					});
-
-//                var thread = new System.Threading.Thread(
-//                    new ThreadStart(
-//                        delegate
-//                        {
-//                        }
-//                    )
-//                );
-//					
-//                thread.Start();
-                
+						                
             }
         }
 

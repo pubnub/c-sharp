@@ -8,7 +8,7 @@ namespace System.Threading
 {
 	public delegate void TimerCallback(object state);
 
-	public sealed class Timer : CancellationTokenSource, IDisposable
+	public sealed class Timer : IDisposable
 	{
 		TimerCallback callback;
 		object state;

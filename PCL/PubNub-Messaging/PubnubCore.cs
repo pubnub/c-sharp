@@ -1,4 +1,4 @@
-﻿//Build Date: September 23, 2015
+﻿//Build Date: November 11, 2015
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -13,20 +13,10 @@ using System.Net;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-//#if !NETFX_CORE
-//using System.Security.Cryptography;
-//#endif
 using System.ComponentModel;
 using System.Reflection;
 using System.Threading;
 using System.Diagnostics;
-//#if WINDOWS_PHONE && WP7
-//using System.Collections.Concurrent;
-//#elif WINDOWS_PHONE
-//using TvdP.Collections;
-//#else
-//using System.Collections.Concurrent;
-//#endif
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -2588,7 +2578,9 @@ namespace PubNubMessaging.Core
 						o.Append (ch.ToString ());
 					} 
 					else if (Char.IsSurrogatePair(s,positionOfChar)){
-						string codepoint = char.ConvertToUtf32(s, positionOfChar).ToString("X4");
+						string codepoint = ConvertToUtf32(s, positionOfChar).ToString("X4");
+						//string codepoint = get_char_code(ch).ToString("X4");
+						//string codepoint = "U+" + ((int)ch).ToString("X4");
 
 						int cpValue = int.Parse (codepoint, NumberStyles.HexNumber);
 						if (cpValue <= 0x7F)
@@ -2645,6 +2637,57 @@ namespace PubNubMessaging.Core
 			}
 
 			return encodedUri;
+		}
+
+//		public int get_char_code(char character){ 
+//			System.Text.UTF8Encoding encoding = new System.Text.UnicodeEncoding(); 
+//			byte[] bytes = encoding.GetBytes(character.ToString().ToCharArray()); 
+//			return BitConverter.ToInt32(bytes, 0); 
+//		}
+		internal const int HIGH_SURROGATE_START  = 0x00d800;
+		internal const int LOW_SURROGATE_END     = 0x00dfff;
+		internal const int LOW_SURROGATE_START   = 0x00dc00;
+		internal const int UNICODE_PLANE01_START = 0x10000;
+
+//		internal const char  HIGH_SURROGATE_START  = '\ud800';
+//		internal const char  HIGH_SURROGATE_END    = '\udbff';
+//		internal const char  LOW_SURROGATE_START   = '\udc00';
+//		internal const char  LOW_SURROGATE_END     = '\udfff';
+
+		public static int ConvertToUtf32(String s, int index) {
+			if (s == null) {
+				throw new ArgumentNullException("s");
+			}
+
+			if (index < 0 || index >= s.Length) {
+				throw new ArgumentOutOfRangeException("index");
+			}
+			//Contract.EndContractBlock();
+			// Check if the character at index is a high surrogate.
+			int temp1 = (int)s[index] - HIGH_SURROGATE_START;
+			if (temp1 >= 0 && temp1 <= 0x7ff) {
+				// Found a surrogate char.
+				if (temp1 <= 0x3ff) {
+					// Found a high surrogate.
+					if (index < s.Length - 1) {
+						int temp2 = (int)s[index+1] - LOW_SURROGATE_START;
+						if (temp2 >= 0 && temp2 <= 0x3ff) {
+							// Found a low surrogate.
+							return ((temp1 * 0x400) + temp2 + UNICODE_PLANE01_START);
+						} else {
+							throw new ArgumentException("index"); 
+						}
+					} else {
+						// Found a high surrogate at the end of the string.
+						throw new ArgumentException("index"); 
+					}
+				} else {
+					// Find a low surrogate at the character pointed by index.
+					throw new ArgumentException("index"); 
+				}
+			}
+			// Not a high-surrogate or low-surrogate. Genereate the UTF32 value for the BMP characters.
+			return ((int)s[index]);
 		}
 
 		protected char ToHex (int ch)

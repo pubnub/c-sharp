@@ -1,33 +1,13 @@
-﻿//Build Date: September 23, 2015
+﻿//Build Date: November 11, 2015
 using System;
 using System.Text;
 using System.IO;
 using System.Net;
 using System.Collections.Generic;
-//#if NETFX_CORE
-//using Windows.Security.Cryptography.Core;
-//using Windows.Storage.Streams;
-//using System.Runtime.InteropServices.WindowsRuntime;
-//using System.Security.Principal;
-//using Windows.Networking.Sockets;
-//using Windows.Security.Cryptography;
-//using System.Threading.Tasks;
-//#else
-//using System.Net.Sockets;
-//using Microsoft.Win32;
-//using System.Configuration;
-//using System.Security.Cryptography;
-//#endif
 using System.Threading;
 using System.Reflection;
 using System.Linq;
 
-//#if (SILVERLIGHT || WINDOWS_PHONE)
-//using System.Windows.Threading;
-//using System.IO.IsolatedStorage;
-//using System.Net.Browser;
-//#endif
-using Sockets.Plugin;
 using System.Threading.Tasks;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Digests;
@@ -37,7 +17,6 @@ using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Paddings;
 using Org.BouncyCastle.Security;
-using PCLCrypto;
 
 namespace PubNubMessaging.Core
 {
@@ -387,7 +366,8 @@ namespace PubNubMessaging.Core
                         channelGroupInternetStatus[channelGroup] = false;
                     }
                 }
-				Task.Delay(base.NetworkCheckRetryInterval * 1000);
+				//Task.Delay(base.NetworkCheckRetryInterval * 1000);
+				new System.Threading.ManualResetEvent(false).WaitOne(base.NetworkCheckRetryInterval * 1000);
             }
             return reconnect;
         }
@@ -978,46 +958,46 @@ namespace PubNubMessaging.Core
 #endif
 
 #if (__MonoCS__)
-		bool RequestIsUnsafe(Uri requestUri)
-		{
-			bool isUnsafe = false;
-			StringBuilder requestMessage = new StringBuilder();
-			if (requestUri.Segments.Length > 7)
-			{
-				for (int i = 7; i < requestUri.Segments.Length; i++)
-				{
-					requestMessage.Append(requestUri.Segments[i]);
-				}
-			}
-			foreach (char ch in requestMessage.ToString().ToCharArray())
-			{
-				if (" ~`!@#$^&*()+=[]\\{}|;':\"./<>?".IndexOf(ch) >= 0)
-				{
-					isUnsafe = true;
-					break;
-				}
-			}
-			return isUnsafe;
-		}
+//		bool RequestIsUnsafe(Uri requestUri)
+//		{
+//			bool isUnsafe = false;
+//			StringBuilder requestMessage = new StringBuilder();
+//			if (requestUri.Segments.Length > 7)
+//			{
+//				for (int i = 7; i < requestUri.Segments.Length; i++)
+//				{
+//					requestMessage.Append(requestUri.Segments[i]);
+//				}
+//			}
+//			foreach (char ch in requestMessage.ToString().ToCharArray())
+//			{
+//				if (" ~`!@#$^&*()+=[]\\{}|;':\"./<>?".IndexOf(ch) >= 0)
+//				{
+//					isUnsafe = true;
+//					break;
+//				}
+//			}
+//			return isUnsafe;
+//		}
 #endif
 
 #if (__MonoCS__ && !UNITY_ANDROID && !UNITY_IOS) 
-		string CreateRequest(Uri requestUri)
-		{
-			StringBuilder requestBuilder = new StringBuilder();
-			requestBuilder.Append("GET ");
-			requestBuilder.Append(requestUri.OriginalString);
-
-			if (ssl)
-			{
-				requestBuilder.Append(string.Format(" HTTP/1.1\r\nConnection: close\r\nHost: {0}:443\r\n\r\n", this._domainName));
-			}
-			else
-			{
-				requestBuilder.Append(string.Format(" HTTP/1.1\r\nConnection: close\r\nHost: {0}:80\r\n\r\n", this._domainName));
-			}
-			return requestBuilder.ToString();
-		}
+//		string CreateRequest(Uri requestUri)
+//		{
+//			StringBuilder requestBuilder = new StringBuilder();
+//			requestBuilder.Append("GET ");
+//			requestBuilder.Append(requestUri.OriginalString);
+//
+//			if (ssl)
+//			{
+//				requestBuilder.Append(string.Format(" HTTP/1.1\r\nConnection: close\r\nHost: {0}:443\r\n\r\n", this._domainName));
+//			}
+//			else
+//			{
+//				requestBuilder.Append(string.Format(" HTTP/1.1\r\nConnection: close\r\nHost: {0}:80\r\n\r\n", this._domainName));
+//			}
+//			return requestBuilder.ToString();
+//		}
 
 //		void ConnectToHostAndSendRequest<T>(bool sslEnabled, TcpSocketClient tcpClient, RequestState<T> pubnubRequestState, string requestString)
 //		{

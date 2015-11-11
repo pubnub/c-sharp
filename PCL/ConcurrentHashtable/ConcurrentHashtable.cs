@@ -328,8 +328,7 @@ namespace TvdP.Collections
                     //once we retried them all and we are still not done.. wait a bit.
                     if (ctr-- == 0)
                     {
-						//Thread.Sleep(0);
-						System.Threading.Tasks.Task.Delay(0).Wait();
+						new System.Threading.ManualResetEvent(false).WaitOne(0);
                         ctr = lockedSegmentIxs.Count;
                     }
 
