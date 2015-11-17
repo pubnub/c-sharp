@@ -202,31 +202,39 @@ namespace PubNubMessaging.Core
 
 		protected override void ForceCanonicalPathAndQuery (Uri requestUri)
         {
+
+			FieldInfo flagsFieldInfo = typeof(Uri).GetField("m_Flags", BindingFlags.Instance | BindingFlags.NonPublic);
+			if (flagsFieldInfo != null) {
+				ulong flags = (ulong)flagsFieldInfo.GetValue (requestUri);
+				flags &= ~((ulong)0x30); // Flags.PathNotCanonical|Flags.QueryNotCanonical
+				flagsFieldInfo.SetValue (requestUri, flags);
+			}
+
 #if  NETFX_CORE
-            if (base.PubnubUnitTest != null && base.PubnubUnitTest is IPubnubUnitTest)
-            {
-                // Force canonical path and query
-                string paq = requestUri.PathAndQuery;
-
-                IEnumerable<FieldInfo> ienumFlagsFieldInfo = from p in typeof(Uri).GetRuntimeFields()
-                                                             where (p.Name == "m_Flags")
-                                                             select (FieldInfo)p;
-
-                if (ienumFlagsFieldInfo != null)
-                {
-                    FieldInfo[] arrFieldInfo = ienumFlagsFieldInfo.ToArray();
-                    if (arrFieldInfo.Length > 0)
-                    {
-                        FieldInfo flagsFieldInfo = arrFieldInfo[0];
-                        if (flagsFieldInfo != null)
-                        {
-                            ulong flags = (ulong)flagsFieldInfo.GetValue(requestUri);
-                            flags &= ~((ulong)0x30); // Flags.PathNotCanonical|Flags.QueryNotCanonical
-                            flagsFieldInfo.SetValue(requestUri, flags);
-                        }
-                    }
-                }
-            }
+//            if (base.PubnubUnitTest != null && base.PubnubUnitTest is IPubnubUnitTest)
+//            {
+//                // Force canonical path and query
+//                string paq = requestUri.PathAndQuery;
+//
+//                IEnumerable<FieldInfo> ienumFlagsFieldInfo = from p in typeof(Uri).GetRuntimeFields()
+//                                                             where (p.Name == "m_Flags")
+//                                                             select (FieldInfo)p;
+//
+//                if (ienumFlagsFieldInfo != null)
+//                {
+//                    FieldInfo[] arrFieldInfo = ienumFlagsFieldInfo.ToArray();
+//                    if (arrFieldInfo.Length > 0)
+//                    {
+//                        FieldInfo flagsFieldInfo = arrFieldInfo[0];
+//                        if (flagsFieldInfo != null)
+//                        {
+//                            ulong flags = (ulong)flagsFieldInfo.GetValue(requestUri);
+//                            flags &= ~((ulong)0x30); // Flags.PathNotCanonical|Flags.QueryNotCanonical
+//                            flagsFieldInfo.SetValue(requestUri, flags);
+//                        }
+//                    }
+//                }
+//            }
 #elif ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
             //// Force canonical path and query
             //string paq = requestUri.PathAndQuery;
