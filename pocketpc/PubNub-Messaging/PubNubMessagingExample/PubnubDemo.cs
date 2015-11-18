@@ -60,6 +60,7 @@ namespace PubNubMessagingExample
             pubnub.EnableResumeOnReconnect = this.EnableResumeOnReconnect;
             pubnub.PresenceHeartbeat = this.PresenceHeartbeatInSec;
             pubnub.PresenceHeartbeatInterval = this.PresenceHeartbeatIntervalInSec;
+            pubnub.NetworkCheckMaxRetries = Int32.MaxValue;
         }
 
         private void CaptureInputData()
