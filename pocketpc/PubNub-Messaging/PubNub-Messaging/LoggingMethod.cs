@@ -72,7 +72,16 @@ namespace PubNubMessaging.Core
 		{
 			if (writeToLog)
             {
-                #if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || __IOS__ || MONODROID || __ANDROID__ || NETFX_CORE)
+                #if PocketPC || WindowsCE
+                string myDocs = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+                string path = System.IO.Path.Combine(myDocs, "pubnubmessaging.log");
+                using (System.IO.TextWriter writer = new System.IO.StreamWriter(path, true))
+                {
+                    writer.WriteLine(logText);
+                    writer.Flush();
+                    writer.Close();
+                }
+                #elif (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || __IOS__ || MONODROID || __ANDROID__ || NETFX_CORE)
                 System.Diagnostics.Debug.WriteLine(logText);
 				#elif (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
 				print(logText);
