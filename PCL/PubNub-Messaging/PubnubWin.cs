@@ -1,4 +1,4 @@
-﻿//Build Date: November 13, 2015
+﻿//Build Date: November 24, 2015
 using System;
 using System.Text;
 using System.IO;
@@ -24,8 +24,8 @@ namespace PubNubMessaging.Core
 	{
 
 		#region "Constants"
-		const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Off;
-		const PubnubErrorFilter.Level errorLevel = PubnubErrorFilter.Level.Info;
+		LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Off;
+		PubnubErrorFilter.Level errorLevel = PubnubErrorFilter.Level.Info;
 
 		#if (!SILVERLIGHT && !WINDOWS_PHONE)
 		protected bool pubnubEnableProxyConfig = true;
@@ -167,8 +167,8 @@ namespace PubNubMessaging.Core
 			base.JsonPluggableLibrary = new NewtonsoftJsonDotNet();
 			#endif
 
-			LoggingMethod.LogLevel = pubnubLogLevel;
-			PubnubErrorFilter.ErrorLevel = errorLevel;
+			base.PubnubLogLevel = pubnubLogLevel;
+			base.PubnubErrorLevel = errorLevel;
 
 #if (SILVERLIGHT || WINDOWS_PHONE)
             HttpWebRequest.RegisterPrefix("https://", WebRequestCreator.ClientHttp);

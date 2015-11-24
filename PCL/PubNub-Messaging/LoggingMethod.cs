@@ -8,13 +8,36 @@ namespace PubNubMessaging.Core
 {
 	#region "Logging and error codes -- code split required"
 
+	public interface IPubnubLog
+	{
+		LoggingMethod.Level LogLevel {
+			get;
+			set;
+		}
+
+		void WriteToLog (string logText);
+	}
+
 	#if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
-	internal class LoggingMethod:MonoBehaviour
+	public class LoggingMethod:MonoBehaviour
 	#else
-	internal class LoggingMethod
+	public class LoggingMethod
 	#endif
 	{
 		private static int logLevel = 0;
+		private static IPubnubLog _pubnubLog = null;
+
+		public static IPubnubLog PubnubLog
+		{
+			get{
+				return _pubnubLog;
+			}
+			set {
+				_pubnubLog = value;
+				logLevel = (int)_pubnubLog.LogLevel;
+
+			}
+		}
 		public static Level LogLevel
 		{
 			get
@@ -72,6 +95,16 @@ namespace PubNubMessaging.Core
 			if (writeToLog)
             {
 				System.Diagnostics.Debug.WriteLine(logText);
+				try
+				{
+					if (_pubnubLog != null)
+					{
+						_pubnubLog.WriteToLog(logText);
+					}
+				}
+				catch(Exception ex) {
+					System.Diagnostics.Debug.WriteLine(ex.ToString());
+				}
 			}
 		}
 	}

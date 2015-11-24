@@ -1,4 +1,4 @@
-﻿//Build Date: November 11, 2015
+﻿//Build Date: November 24, 2015
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -295,6 +295,24 @@ namespace PubNubMessaging.Core
 			}
 		}
 
+		private IPubnubLog _pubnubLog = null;
+		public IPubnubLog PubnubLog
+		{
+			get{
+				return _pubnubLog;
+			}
+			set {
+				_pubnubLog = value;
+				if (_pubnubLog != null) {
+					LoggingMethod.PubnubLog = _pubnubLog;
+					this.PubnubLogLevel = _pubnubLog.LogLevel;
+				} else {
+					_pubnubLog = null;
+					throw new ArgumentException("Missing or Incorrect PubnubLog value");
+				}
+			}
+		}
+
 		public string Origin 
         {
 			get 
@@ -367,7 +385,7 @@ namespace PubNubMessaging.Core
 			}
 		}
 
-		protected LoggingMethod.Level PubnubLogLevel 
+		public LoggingMethod.Level PubnubLogLevel 
         {
 			get 
             {
@@ -381,7 +399,7 @@ namespace PubNubMessaging.Core
 			}
 		}
 
-		protected PubnubErrorFilter.Level PubnubErrorLevel 
+		public PubnubErrorFilter.Level PubnubErrorLevel 
         {
 			get 
             {

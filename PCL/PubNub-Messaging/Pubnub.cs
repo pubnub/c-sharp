@@ -583,6 +583,15 @@ namespace PubNubMessaging.Core
             return PubnubWin.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
         }
 
+		public void SetErrorLevel(PubnubErrorFilter.Level errorLevel)
+		{
+			pubnub.PubnubErrorLevel = errorLevel;
+		}
+
+		public void SetPubnubLog(IPubnubLog pubnubLog)
+		{
+			pubnub.PubnubLog = pubnubLog;
+		}
 
 		#endregion
 
