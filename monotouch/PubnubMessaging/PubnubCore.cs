@@ -2857,8 +2857,11 @@ namespace PubNubMessaging.Core
 					if (_channelRequest.ContainsKey(multiChannelName)) 
                     {
                         LoggingMethod.WriteToLog(string.Format("DateTime {0}, Aborting previous subscribe/presence requests having channel(s)={1}; channelgroup(s)={2}", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
-						PubnubWebRequest webRequest = _channelRequest [multiChannelName];
-						_channelRequest [multiChannelName] = null;
+                        PubnubWebRequest webRequest = null;
+                        if (_channelRequest.ContainsKey (multiChannelName)) {
+                            webRequest = _channelRequest [multiChannelName];
+                            _channelRequest [multiChannelName] = null;
+                        }
 
 						if (webRequest != null)
 							TerminateLocalClientHeartbeatTimer (webRequest.RequestUri);
