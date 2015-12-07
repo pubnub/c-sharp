@@ -1,4 +1,4 @@
-﻿//Build Date: January 22, 2015
+﻿//Build Date: August 21, 2015
 using System;
 using System.Text;
 using System.IO;
@@ -461,6 +461,11 @@ namespace PubNubMessaging.Core
             {
                 if (asyncWebRequest != null)
                 {
+                    
+#if (!__MonoCS__ && !SILVERLIGHT && !WINDOWS_PHONE && !NETFX_CORE)
+                    asyncWebRequest.request.Pipelined = true;
+#endif
+
                     using (PubnubWebResponse asyncWebResponse = (PubnubWebResponse)asyncWebRequest.EndGetResponse(asynchronousResult))
                     {
                         asyncRequestState.Response = asyncWebResponse;

@@ -70,6 +70,10 @@
 /monotouch/Newtonsoft.Json/obj/Debug/*
 /monotouch/PubnubMessagingExample/bin/iPhoneSimulator/Debug/*
 /monotouch/PubnubMessagingExample/obj/iPhoneSimulator/Debug/*
+/monotouch/PubnubMessagingExample/bin/iPhone/Debug/*
+/monotouch/PubnubMessagingExample/obj/iPhone/Debug/*
+/monotouch/PubnubMessaging.Tests/bin/iPhone/Debug/*
+/monotouch/PubnubMessaging.Tests/obj/iPhone/Debug/*
 /monotouch/Launcher/bin/Debug/*
 /monotouch/Launcher/obj/iPhoneSimulator/Debug/*
 /monotouch/PubnubMessaging.Tests/bin/iPhoneSimulator/Debug/*
@@ -79,6 +83,7 @@
 /monotouch/Touch.Server/obj/iPhone/Debug/*
 /monotouch/Touch.Unit/bin/iPhoneSimulator/Debug/
 /monotouch/Touch.Unit/bin/iPhoneSimulator/Debug/TouchUnit.app/
+/monotouch/Touch.Unit/bin/iPhone/Debug/*
 /monotouch/Touch.Unit/obj/*
 /mono-for-android/MonoDroid.Dialog/bin/Debug/*
 /mono-for-android/MonoDroid.Dialog/obj/Debug/*

@@ -1,4 +1,4 @@
-//Build Date: May 11, 2015
+//Build Date: Nov 25, 2015
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -2857,8 +2857,11 @@ namespace PubNubMessaging.Core
 					if (_channelRequest.ContainsKey(multiChannelName)) 
                     {
                         LoggingMethod.WriteToLog(string.Format("DateTime {0}, Aborting previous subscribe/presence requests having channel(s)={1}; channelgroup(s)={2}", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
-						PubnubWebRequest webRequest = _channelRequest [multiChannelName];
-						_channelRequest [multiChannelName] = null;
+                        PubnubWebRequest webRequest = null;
+                        if (_channelRequest.ContainsKey (multiChannelName)) {
+                            webRequest = _channelRequest [multiChannelName];
+                            _channelRequest [multiChannelName] = null;
+                        }
 
 						if (webRequest != null)
 							TerminateLocalClientHeartbeatTimer (webRequest.RequestUri);
