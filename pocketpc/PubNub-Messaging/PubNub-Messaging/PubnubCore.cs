@@ -3157,10 +3157,11 @@ namespace PubNubMessaging.Core
 					} else {
 						lastTimetoken = lastSubscribeTimetoken;
 					}
-				}
-                LoggingMethod.WriteToLog(string.Format("DateTime {0}, Building request for channel(s)={1}, channelgroup(s)={2} with timetoken={3}", DateTime.Now.ToString(), multiChannel, multiChannelGroup, lastTimetoken), LoggingMethod.LevelInfo);
+                }
+                long requestTimetoken = (IsInt64Numeric(timetoken.ToString())) ? Convert.ToInt64(timetoken.ToString()) : lastTimetoken;
+                LoggingMethod.WriteToLog(string.Format("DateTime {0}, Building request for channel(s)={1}, channelgroup(s)={2} with timetoken={3}", DateTime.Now.ToString(), multiChannel, multiChannelGroup, requestTimetoken), LoggingMethod.LevelInfo);
 				// Build URL
-                Uri requestUrl = BuildMultiChannelSubscribeRequest(channels, channelGroups,(Convert.ToInt64(timetoken.ToString()) == 0) ? Convert.ToInt64(timetoken.ToString()) : lastTimetoken);
+                Uri requestUrl = BuildMultiChannelSubscribeRequest(channels, channelGroups, requestTimetoken);
 
 				RequestState<T> pubnubRequestState = new RequestState<T> ();
 				pubnubRequestState.Channels = channels;

@@ -7,12 +7,12 @@ using System.Globalization;
 
 namespace PubNubMessaging.Core
 {
-	#region "Logging and error codes -- code split required"
+    #region "Logging and error codes -- code split required"
 
-	#if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
+#if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
 	internal class LoggingMethod:MonoBehaviour
-	#else
-	internal class LoggingMethod
+#else
+    internal class LoggingMethod
 	#endif
 	{
 		private static int logLevel = 0;
@@ -67,34 +67,41 @@ namespace PubNubMessaging.Core
 				return (int)LogLevel >= 4;
 			}
 		}
-
+        private static object _logLock = new object();
 		public static void WriteToLog(string logText, bool writeToLog)
 		{
-			if (writeToLog)
+            try
             {
-                #if PocketPC || WindowsCE
-                string myDocs = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-                string path = System.IO.Path.Combine(myDocs, "pubnubmessaging.log");
-                using (System.IO.TextWriter writer = new System.IO.StreamWriter(path, true))
+                if (writeToLog)
                 {
-                    writer.WriteLine(logText);
-                    writer.Flush();
-                    writer.Close();
+                    string myDocs = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+                    string path = System.IO.Path.Combine(myDocs, "pubnubmessaging.log");
+                    lock (_logLock)
+                    {
+                        using (System.IO.TextWriter writer = new System.IO.StreamWriter(path, true))
+                        {
+                            writer.WriteLine(logText);
+                            writer.Flush();
+                            writer.Close();
+                        }
+                    }
                 }
-                #elif (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || __IOS__ || MONODROID || __ANDROID__ || NETFX_CORE)
-                System.Diagnostics.Debug.WriteLine(logText);
-				#elif (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
-				print(logText);
-				UnityEngine.Debug.Log (logText);
-				#else
-				try
-				{
-					Debug.WriteLine(logText);
-					Debug.Flush();
-				}
-				catch { }
-				#endif
-			}
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    string myDocs = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+                    string path = System.IO.Path.Combine(myDocs, "pubnubcrash.log");
+                    using (System.IO.TextWriter writer = new System.IO.StreamWriter(path, true))
+                    {
+                        writer.WriteLine(ex.ToString());
+                        writer.Flush();
+                        writer.Close();
+                    }
+                }
+                catch { }
+            }
 		}
 	}
 

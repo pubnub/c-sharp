@@ -44,6 +44,7 @@
             this.menuItemCGAddRemoveChannel = new System.Windows.Forms.MenuItem();
             this.menuItemChangeAuthKey = new System.Windows.Forms.MenuItem();
             this.menuItemChangeUUID = new System.Windows.Forms.MenuItem();
+            this.menuItem4 = new System.Windows.Forms.MenuItem();
             this.btnTime = new System.Windows.Forms.Button();
             this.lbResult = new System.Windows.Forms.ListBox();
             this.lblChannel = new System.Windows.Forms.Label();
@@ -61,7 +62,6 @@
             this.btnGlobalHereNow = new System.Windows.Forms.Button();
             this.btnUserState = new System.Windows.Forms.Button();
             this.btnPush = new System.Windows.Forms.Button();
-            this.menuItem4 = new System.Windows.Forms.MenuItem();
             this.SuspendLayout();
             // 
             // menuPAM
@@ -149,6 +149,11 @@
             this.menuItemChangeUUID.Text = "Change UUID";
             this.menuItemChangeUUID.Click += new System.EventHandler(this.menuItemChangeUUID_Click);
             // 
+            // menuItem4
+            // 
+            this.menuItem4.Text = "Close";
+            this.menuItem4.Click += new System.EventHandler(this.OnClickClose);
+            // 
             // btnTime
             // 
             this.btnTime.Location = new System.Drawing.Point(163, 104);
@@ -162,7 +167,7 @@
             // 
             this.lbResult.Location = new System.Drawing.Point(12, 165);
             this.lbResult.Name = "lbResult";
-            this.lbResult.Size = new System.Drawing.Size(213, 92);
+            this.lbResult.Size = new System.Drawing.Size(213, 86);
             this.lbResult.TabIndex = 7;
             // 
             // lblChannel
@@ -176,15 +181,15 @@
             // 
             this.txtChannel.Location = new System.Drawing.Point(59, 1);
             this.txtChannel.Name = "txtChannel";
-            this.txtChannel.Size = new System.Drawing.Size(166, 25);
+            this.txtChannel.Size = new System.Drawing.Size(166, 21);
             this.txtChannel.TabIndex = 1;
-            this.txtChannel.Text = "my_hello_channel";
+            this.txtChannel.Text = "a";
             // 
             // txtChannelGroup
             // 
             this.txtChannelGroup.Location = new System.Drawing.Point(91, 25);
             this.txtChannelGroup.Name = "txtChannelGroup";
-            this.txtChannelGroup.Size = new System.Drawing.Size(134, 25);
+            this.txtChannelGroup.Size = new System.Drawing.Size(134, 21);
             this.txtChannelGroup.TabIndex = 2;
             // 
             // lblChannelGroup
@@ -293,11 +298,6 @@
             this.btnPush.TabIndex = 19;
             this.btnPush.Text = "Push";
             this.btnPush.Click += new System.EventHandler(this.btnPush_Click);
-            // 
-            // menuItem4
-            // 
-            this.menuItem4.Text = "Close";
-            this.menuItem4.Click += new System.EventHandler(this.OnClickClose);
             // 
             // PubnubDemo
             // 

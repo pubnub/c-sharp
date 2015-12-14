@@ -116,6 +116,10 @@
 /pocketpc/PubNub-Messaging/NUnitLite-0.2.0/src/NUnitLiteCF/obj/Debug/*
 /pocketpc/PubNub-Messaging/NUnitLite-0.2.0/src/NUnitLiteCF/bin/Release/*
 /pocketpc/PubNub-Messaging/NUnitLite-0.2.0/src/NUnitLiteCF/obj/Release/*
+/pocketpc/PubNub-Messaging/PubnubCAB/obj/Release/*
+/pocketpc/PubNub-Messaging/PubnubCAB/obj/Debug/*
+/pocketpc/PubNub-Messaging/PubnubCAB/bin/Debug/*
+/pocketpc/PubNub-Messaging/PubnubCAB/bin/Release/*
 .DS_Store
 *.cache
 *.suo

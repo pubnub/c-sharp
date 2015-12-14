@@ -130,6 +130,8 @@
             // 
             // chkEnableSSL
             // 
+            this.chkEnableSSL.Checked = true;
+            this.chkEnableSSL.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkEnableSSL.Location = new System.Drawing.Point(3, 213);
             this.chkEnableSSL.Name = "chkEnableSSL";
             this.chkEnableSSL.Size = new System.Drawing.Size(100, 20);
@@ -185,7 +187,7 @@
             this.txtPresenceHeartbeat.Name = "txtPresenceHeartbeat";
             this.txtPresenceHeartbeat.Size = new System.Drawing.Size(100, 21);
             this.txtPresenceHeartbeat.TabIndex = 16;
-            this.txtPresenceHeartbeat.Text = "30";
+            this.txtPresenceHeartbeat.Text = "300";
             this.txtPresenceHeartbeat.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtPresenceHeartbeat_OnKeyPress);
             // 
             // txtPresenceHeartbeatInterval
@@ -195,7 +197,7 @@
             this.txtPresenceHeartbeatInterval.Name = "txtPresenceHeartbeatInterval";
             this.txtPresenceHeartbeatInterval.Size = new System.Drawing.Size(59, 21);
             this.txtPresenceHeartbeatInterval.TabIndex = 18;
-            this.txtPresenceHeartbeatInterval.Text = "14";
+            this.txtPresenceHeartbeatInterval.Text = "299";
             this.txtPresenceHeartbeatInterval.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtPresenceHeartbeatInterval_KeyPressed);
             // 
             // label8

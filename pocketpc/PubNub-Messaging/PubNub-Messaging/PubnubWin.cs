@@ -608,14 +608,14 @@ namespace PubNubMessaging.Core
 
                             if ((asyncRequestState.Type == ResponseType.Subscribe || asyncRequestState.Type == ResponseType.Presence) && (result != null) && (result.Count > 0))
                             {
-                                if (asyncRequestState.Channels != null)
+                                if (asyncRequestState.Channels != null && result != null && result.Count > 0)
                                 {
                                     foreach (string currentChannel in asyncRequestState.Channels)
                                     {
                                         multiChannelSubscribe.AddOrUpdate(currentChannel, Convert.ToInt64(result[1].ToString()), (key, oldValue) => Convert.ToInt64(result[1].ToString()));
                                     }
                                 }
-                                if (asyncRequestState.ChannelGroups != null && asyncRequestState.ChannelGroups.Length > 0)
+                                if (asyncRequestState.ChannelGroups != null && asyncRequestState.ChannelGroups.Length > 0 && result != null && result.Count > 0)
                                 {
                                     foreach (string currentChannelGroup in asyncRequestState.ChannelGroups)
                                     {
