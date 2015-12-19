@@ -149,7 +149,7 @@ namespace PubNubMessaging.Core
 				ParseCheckSocketConnectException<T>(ex, channels, channelGroups, errorCallback, callback);
                 if (myRequest != null)
                 {
-                    myRequest.Abort();
+                    //myRequest.Abort();
                     myRequest = null;
                 }
             }

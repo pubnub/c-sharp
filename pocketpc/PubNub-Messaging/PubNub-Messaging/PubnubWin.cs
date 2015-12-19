@@ -228,7 +228,7 @@ namespace PubNubMessaging.Core
 
 			//Initiate System Events for PowerModeChanged - to monitor suspend/resume
 			InitiatePowerModeCheck();
-
+            pubnubSessionTerminated = false;
 		}
 
 		protected override bool InternetConnectionStatus<T> (string channel, string channelGroup, Action<PubnubClientError> errorCallback, string[] rawChannels, string[] rawChannelGroups)
@@ -296,12 +296,18 @@ namespace PubNubMessaging.Core
         private object _processUrlRequestLock = new object();
 		protected override sealed void SendRequestAndGetResult<T> (Uri requestUri, RequestState<T> pubnubRequestState, PubnubWebRequest request)
         {
-            lock (base._endPendingRequestLock)
+            //lock (base._endPendingRequestLock)
+            //{
+            //    if (base.pubnubSessionTerminated)
+            //    {
+            //        LoggingMethod.WriteToLog(string.Format("DateTime {0}, SendRequestAndGetResult. pubnubSessionTerminated=true", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
+            //        return;
+            //    }
+            //}
+            if (request == null)
             {
-                if (base.pubnubSessionTerminated)
-                {
-                    return;
-                }
+                LoggingMethod.WriteToLog(string.Format("DateTime {0}, SendRequestAndGetResult. request is null", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
+                return; 
             }
             lock (_processUrlRequestLock)
             {
@@ -310,10 +316,17 @@ namespace PubNubMessaging.Core
                 //For SL, Ensure that the RequestURI length <= 1482 for Large Text Message. If RequestURI Length < 1343, Successful Publish occurs
                 System.Diagnostics.Debug.WriteLine(string.Format("{0} | {1} Req Uri = {2}",DateTime.Now.ToString(), pubnubRequestState.Type.ToString(), requestUri.ToString()));
                 //_httpRequestQueue.Enqueue(requestUri,pubnubRequestState);
-                if (!_httpRequestTracker.ContainsKey(pubnubRequestState.Type))
+                if (_httpRequestTracker != null && !_httpRequestTracker.ContainsKey(pubnubRequestState.Type))
                 {
                     _httpRequestTracker.Add(pubnubRequestState.Type, pubnubRequestState);
                 }
+                if (request == null || request.RequestUri == null)
+                {
+                    LoggingMethod.WriteToLog(string.Format("DateTime {0}, SendRequestAndGetResult. request or request.RequestUri is null", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
+                }
+                int connections = (request != null && request.ServicePoint != null) ? request.ServicePoint.CurrentConnections : 0;
+                LoggingMethod.WriteToLog(string.Format("DateTime {0}, SendRequestAndGetResult. Before BeginGetResponse. ServicePoint.CurrentConnections={1}", DateTime.Now.ToString(), connections.ToString()), LoggingMethod.LevelInfo);
+                
                 IAsyncResult asyncResult = request.BeginGetResponse
                     (asynchronousResult => 
                     {
@@ -341,8 +354,13 @@ namespace PubNubMessaging.Core
                         {
                             #region Try code block
                             bool processMessage = true;
+                            if (asyncWebRequest == null || asyncWebRequest.RequestUri == null || asyncWebRequest.request == null || asyncWebRequest.request.RequestUri == null)
+                            {
+                                LoggingMethod.WriteToLog(string.Format("DateTime {0}, SendRequestAndGetResult. asyncWebRequest or asyncWebRequest.RequestUri is null", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
+                            }
                             if (asyncWebRequest != null)
                             {
+                                LoggingMethod.WriteToLog(string.Format("DateTime {0}, SendRequestAndGetResult. Before EndGetResponse", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
                                 using (PubnubWebResponse asyncWebResponse = (PubnubWebResponse)asyncWebRequest.EndGetResponse(asynchronousResult))
                                 {
                                     if (base.pubnubSessionTerminated)
@@ -999,8 +1017,8 @@ namespace PubNubMessaging.Core
 			if (asynchRequestState.Response != null)
 				asynchRequestState.Response.Close ();
 #endif
-
-            LoggingMethod.WriteToLog(string.Format("DateTime {0} Exception= {1} for URL: {2}", DateTime.Now.ToString(), ex.ToString(), asynchRequestState.Request.RequestUri.ToString()), LoggingMethod.LevelError);
+            string requestUri = (asynchRequestState.Request != null && asynchRequestState.Request.RequestUri != null) ? asynchRequestState.Request.RequestUri.ToString() : "";
+            LoggingMethod.WriteToLog(string.Format("DateTime {0} Exception= {1} for URL: {2}", DateTime.Now.ToString(), ex.ToString(), requestUri), LoggingMethod.LevelError);
             UrlRequestCommonExceptionHandler<T>(asynchRequestState.Type, asynchRequestState.Channels, asynchRequestState.ChannelGroups, asynchRequestState.Timeout, asynchRequestState.SubscribeOrPresenceOrRegularCallback, asynchRequestState.ConnectCallback, asynchRequestState.WildcardPresenceCallback, asynchRequestState.ErrorCallback, false);
         }
 
@@ -1735,6 +1753,7 @@ namespace PubNubMessaging.Core
         protected override WebRequest CreateRequest(Uri uri, bool keepAliveRequest, bool nocache)
         {
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create(uri);
+            req.ConnectionGroupName = "TimetokenString";
             req.Pipelined = true;
             req.KeepAlive = true;
 #if NETFX_CORE
@@ -1854,6 +1873,15 @@ namespace PubNubMessaging.Core
 #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !NETFX_CORE)
 			this.ServicePoint = this.request.ServicePoint;
 #endif
+        }
+
+        public void Nullify()
+        {
+            if (this.request != null)
+            {
+                base.request = null;
+                this.request = null;
+            }
         }
     }
     #endregion

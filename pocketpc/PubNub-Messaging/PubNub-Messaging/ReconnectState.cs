@@ -13,6 +13,12 @@ namespace PubNubMessaging.Core
 		public Action<T> ConnectCallback;
 		public object Timetoken;
         public bool Reconnect;
+        public string PublishKey;
+        public string SubscribeKey;
+        public string SecretKey;
+        public string Origin;
+        public string CipherKey;
+        public bool Ssl;
 
 		public ReconnectState()
 		{
@@ -23,6 +29,12 @@ namespace PubNubMessaging.Core
 			ConnectCallback = null;
 			Timetoken = null;
             Reconnect = false;
+            PublishKey = "";
+            SubscribeKey = "";
+            SecretKey = "";
+            Origin = "";
+            CipherKey = "";
+            Ssl = false;
 		}
 	}
 }

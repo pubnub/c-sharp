@@ -9,6 +9,11 @@ namespace PubNubMessaging.Core
         PubnubWin pubnub;
         
         #region "PubNub API Channel Methods"
+        public void SetReconnectCallback<T>(Action<ReconnectState<T>> reconnectCallback)
+        {
+            pubnub.SetReconnectCallback<T>(reconnectCallback);
+        }
+
 		public void Subscribe<T>(string channel, Action<T> subscribeCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback)
 		{
 			pubnub.Subscribe<T>(channel, "", subscribeCallback, connectCallback, null, errorCallback);
@@ -27,6 +32,10 @@ namespace PubNubMessaging.Core
         public void Subscribe<T>(string channel, string channelGroup, Action<T> subscribeCallback, Action<T> connectCallback, Action<T> wildcardPresenceCallback, Action<PubnubClientError> errorCallback)
         {
             pubnub.Subscribe<T>(channel, channelGroup, subscribeCallback, connectCallback, wildcardPresenceCallback, errorCallback);
+        }
+        public void Subscribe<T>(string channel, string channelGroup, Action<T> subscribeCallback, Action<T> connectCallback, Action<T> wildcardPresenceCallback, Action<PubnubClientError> errorCallback, long timetoken)
+        {
+            pubnub.Subscribe<T>(channel, channelGroup, subscribeCallback, connectCallback, wildcardPresenceCallback, errorCallback, timetoken);
         }
 
         public void Subscribe(string channel, Action<object> subscribeCallback, Action<object> connectCallback, Action<PubnubClientError> errorCallback)
@@ -741,6 +750,7 @@ namespace PubNubMessaging.Core
                 pubnub.PushServiceName = value;
             }
         }
+
 		#endregion
 
 		#region "Constructors"

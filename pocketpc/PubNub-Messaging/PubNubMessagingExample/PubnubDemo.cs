@@ -61,7 +61,27 @@ namespace PubNubMessagingExample
             pubnub.PresenceHeartbeat = this.PresenceHeartbeatInSec;
             pubnub.PresenceHeartbeatInterval = this.PresenceHeartbeatIntervalInSec;
             pubnub.NetworkCheckMaxRetries = Int32.MaxValue;
+            //pubnub.SetReconnectCallback<string>(ReconnectCallbackMethod);
         }
+
+        //private void ReconnectCallbackMethod(ReconnectState<string> state)
+        //{
+        //    string channel = (state.Channels != null) ? string.Join(",",state.Channels) : "";
+        //    string channelGroup = (state.ChannelGroups != null) ? string.Join(",",state.ChannelGroups) : "";
+        //    //pubnub.Unsubscribe<string>(channel, channelGroup, DisplayReturnMessage, DisplayReturnMessage, DisplayReturnMessage, DisplayErrorMessage);
+        //    //Thread.Sleep(5000);
+        //    pubnub.EndPendingRequests();
+        //    pubnub = null;
+        //    Thread.Sleep(5000);
+        //    System.Diagnostics.Debug.WriteLine("Reinitializing Pubnub instance");
+        //    PubnubInitialize();
+        //    Thread.Sleep(3000);
+        //    System.Diagnostics.Debug.WriteLine("Subscribe with  new instance");
+        //    long timetoken = Int64.Parse(state.Timetoken.ToString());
+        //    System.Diagnostics.Debug.WriteLine("TT = " + timetoken.ToString());
+        //    pubnub.Subscribe<string>(channel, channelGroup, DisplayReturnMessage, DisplayReturnMessage, null, DisplayErrorMessage, timetoken);
+        //    Thread.Sleep(4000);
+        //}
 
         private void CaptureInputData()
         {
