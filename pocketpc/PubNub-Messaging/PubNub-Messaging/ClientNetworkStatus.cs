@@ -110,6 +110,7 @@ namespace PubNubMessaging.Core
 			{
                 myRequest = (HttpWebRequest)System.Net.WebRequest.Create("http://pubsub.pubnub.com/time/0");
                 LoggingMethod.WriteToLog(string.Format("DateTime {0} CheckSocketConnect Req {1}", DateTime.Now.ToString(), myRequest.RequestUri.ToString()), LoggingMethod.LevelInfo);
+                ServicePointManager.DefaultConnectionLimit = 200;
                 myRequest.BeginGetResponse(cb =>
                 {
                     try
@@ -118,14 +119,17 @@ namespace PubNubMessaging.Core
                         {
                             if (resp != null && resp.StatusCode == HttpStatusCode.OK)
                             {
-                                System.IO.Stream stream = resp.GetResponseStream();
-                                using (System.IO.StreamReader streamReader = new System.IO.StreamReader(stream))
-                                {
-                                    stream.Flush();
-                                    string jsonString = streamReader.ReadToEnd();
-                                    LoggingMethod.WriteToLog(string.Format("DateTime {0} CheckSocketConnect Resp {1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
-                                    _status = true;
-                                }
+                                LoggingMethod.WriteToLog(string.Format("DateTime {0} CheckSocketConnect Resp {1}", DateTime.Now.ToString(), HttpStatusCode.OK.ToString()), LoggingMethod.LevelInfo);
+                                _status = true;
+                                //System.IO.Stream stream = resp.GetResponseStream();
+                                //using (System.IO.StreamReader streamReader = new System.IO.StreamReader(stream))
+                                //{
+                                //    stream.Flush();
+                                //    string jsonString = streamReader.ReadToEnd();
+                                //    LoggingMethod.WriteToLog(string.Format("DateTime {0} CheckSocketConnect Resp {1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
+                                //    _status = true;
+                                //    stream.Close();
+                                //}
                             }
                             resp.Close();
                         }
@@ -139,7 +143,6 @@ namespace PubNubMessaging.Core
                         mreSocketAsync.Set();
                     }
                 }, null);
-
                 mreSocketAsync.WaitOne(330, false);
             }
 			catch (Exception ex)

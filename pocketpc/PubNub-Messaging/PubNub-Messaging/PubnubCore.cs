@@ -473,6 +473,15 @@ namespace PubNubMessaging.Core
 			this.ssl = sslOn;
 
 			VerifyOrSetSessionUUID();
+
+            int workerThreads;
+            int completionPortThreads;
+            ThreadPool.GetMaxThreads(out workerThreads, out completionPortThreads);
+            bool result = ThreadPool.SetMaxThreads(200, completionPortThreads);
+            if (!result)
+            {
+                //int j = 0;
+            }
 		}
 
 		#endregion
@@ -3227,10 +3236,10 @@ namespace PubNubMessaging.Core
 			} 
             catch (Exception ex) 
             {
-				LoggingMethod.WriteToLog (string.Format ("DateTime {0} method:_subscribe \n channel={1} \n timetoken={2} \n Exception Details={3}", DateTime.Now.ToString (), string.Join (",", channels), timetoken.ToString (), ex.ToString ()), LoggingMethod.LevelError);
+				LoggingMethod.WriteToLog (string.Format ("DateTime {0} method:_subscribe \n channel={1} \n timetoken={2} \n Exception Details={3}", DateTime.Now.ToString (), multiChannel, timetoken.ToString (), ex.ToString ()), LoggingMethod.LevelError);
 
 				CallErrorCallback (PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
-					string.Join (",", channels), string.Join (",", channelGroups), errorCallback, ex, null, null);
+					multiChannel, multiChannelGroup, errorCallback, ex, null, null);
 
                 this.MultiChannelSubscribeRequest<T>(type, channels, channelGroups, timetoken, subscribeOrPresenceRegularCallback, connectCallback, wildcardPresenceCallback, errorCallback, false);
 			}

@@ -45,7 +45,7 @@ namespace PubNubMessagingExample
             int workerThreads;
             int completionPortThreads;
             ThreadPool.GetMaxThreads(out workerThreads, out completionPortThreads);
-            bool result = ThreadPool.SetMaxThreads(100, completionPortThreads);
+            bool result = ThreadPool.SetMaxThreads(200, completionPortThreads);
             if (!result)
             {
                 //int j = 0;
