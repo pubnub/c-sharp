@@ -354,38 +354,39 @@ namespace PubNubMessaging.Core
 			PubnubErrorCode ret = PubnubErrorCode.None;
 			switch (webExceptionStatus)
             {
-                #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !NETFX_CORE)
 				case WebExceptionStatus.NameResolutionFailure:
-				ret = PubnubErrorCode.NameResolutionFailure;
-				break;
+				    ret = PubnubErrorCode.NameResolutionFailure;
+				    break;
 				case WebExceptionStatus.ProtocolError:
-				ret = PubnubErrorCode.ProtocolError;
-				break;
+				    ret = PubnubErrorCode.ProtocolError;
+				    break;
 				case WebExceptionStatus.ServerProtocolViolation:
-				ret = PubnubErrorCode.ServerProtocolViolation;
-				break;
+				    ret = PubnubErrorCode.ServerProtocolViolation;
+				    break;
                 case WebExceptionStatus.ReceiveFailure:
-                ret = PubnubErrorCode.ReceiveFailure;
-                break;
-                #endif
+                    ret = PubnubErrorCode.ReceiveFailure;
+                    break;
+                case WebExceptionStatus.SecureChannelFailure:
+                    ret = PubnubErrorCode.ReceiveFailure;
+                    break;
                 case WebExceptionStatus.RequestCanceled:
-				ret = PubnubErrorCode.WebRequestCanceled;
-				break;
+				    ret = PubnubErrorCode.WebRequestCanceled;
+				    break;
 				case WebExceptionStatus.ConnectFailure:
                     ret = PubnubErrorCode.ConnectFailure;
-				break;
+				    break;
                 case WebExceptionStatus.TrustFailure:
                     ret = PubnubErrorCode.TrustFailure;
                 break;
                 case WebExceptionStatus.Timeout:
                     ret = PubnubErrorCode.RequestTimeout;
-                break;
+                    break;
 				case WebExceptionStatus.Pending:
-				if (webExceptionMessage == "Machine suspend mode enabled. No request will be processed.")
-				{
-					ret = PubnubErrorCode.PubnubClientMachineSleep;
-				}
-				break;
+				    if (webExceptionMessage == "Machine suspend mode enabled. No request will be processed.")
+				    {
+					    ret = PubnubErrorCode.PubnubClientMachineSleep;
+				    }
+				    break;
 				default:
 #if NETFX_CORE
                 if (webExceptionStatus.ToString() == "NameResolutionFailure")
@@ -433,6 +434,10 @@ namespace PubNubMessaging.Core
 			{
 				ret = PubnubErrorCode.PubnubSocketConnectException;
 			}
+            else if (errorType == "System.Net.Sockets.SocketException")
+            {
+                ret = PubnubErrorCode.PubnubSocketConnectException;
+            }
 			else if (errorType == "System.Security.Cryptography.CryptographicException" && errorMessage == "Padding is invalid and cannot be removed.")
 			{
 				ret = PubnubErrorCode.PubnubCryptographicException;
@@ -671,7 +676,7 @@ namespace PubNubMessaging.Core
             dictionaryCodes.Add(137, "Timeout occured while registering device for push notifications. Please try again. If it continues, please contact PubNub support");
             dictionaryCodes.Add(138, "Timeout occured while performing operation related to channel group. Please try again. If it continues, please contact PubNub support");
             dictionaryCodes.Add(139, "Duplicate channel group subscription is not allowed. Internally Pubnub API removes the duplicates before processing");
-            dictionaryCodes.Add(140, "WebExcepton. The underlying connection was closed: An unexpected error occurred on a receive. If it continues, please contact PubNub support");
+            dictionaryCodes.Add(140, "Connection Error. WebExcepton. The underlying connection was closed: An unexpected error occurred on a receive. If it continues, please contact PubNub support");
             dictionaryCodes.Add(141, "TrustFailure. The security cetificate is not from a trusted certification authority.");
             dictionaryCodes.Add(142, "Timeout occured");
             dictionaryCodes.Add(143, "Device - Out of memory. Please check available space to run the application.");
