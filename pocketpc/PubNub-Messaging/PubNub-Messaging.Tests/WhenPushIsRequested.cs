@@ -43,7 +43,6 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
 
             pubnub.GrantAccess<string>(channel, true, true, 20, ThenPublishInitializeShouldReturnGrantMessage, DummyErrorCallback);
-            Thread.Sleep(1000);
 
             mreGrant.WaitOne(10 * 1000, false);
 

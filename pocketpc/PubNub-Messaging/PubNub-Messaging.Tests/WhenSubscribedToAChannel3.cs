@@ -45,7 +45,6 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel,hello_my_channel1,hello_my_channel2";
 
             pubnub.GrantAccess<string>(channel, true, true, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
-            Thread.Sleep(1000);
 
             mreGrant.WaitOne();
 
@@ -136,7 +135,7 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
             mreSubscribeConnect.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
+            Thread.Sleep(1000);
             mrePublish = new ManualResetEvent(false);
             publishedMessage = "Text with /";
             pubnub.Publish<string>(channel, publishedMessage, dummyPublishCallback, DummyErrorCallback);
@@ -145,7 +144,7 @@ namespace PubNubMessaging.Tests
 
             if (isPublished)
             {
-                Thread.Sleep(3000);
+                Thread.Sleep(1000);
                 mreSubscribe.WaitOne(manualResetEventsWaitTimeout, false);
 
                 mreUnsubscribe = new ManualResetEvent(false);

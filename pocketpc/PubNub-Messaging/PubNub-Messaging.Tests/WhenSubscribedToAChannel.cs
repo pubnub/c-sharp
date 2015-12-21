@@ -55,7 +55,6 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel,hello_my_channel1,hello_my_channel2";
 
             pubnub.GrantAccess<string>(channel, true, true, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
-            Thread.Sleep(1000);
 
             mreGrant.WaitOne();
 
@@ -102,7 +101,7 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
             mreSubscribeConnect.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
+            Thread.Sleep(1000);
             mrePublish = new ManualResetEvent(false);
             publishedMessage = new CustomClass();
             pubnub.Publish<string>(channel, publishedMessage, dummyPublishCallback, DummyErrorCallback);
@@ -111,7 +110,7 @@ namespace PubNubMessaging.Tests
 
             if (isPublished)
             {
-                Thread.Sleep(3000);
+                Thread.Sleep(1000);
                 mreSubscribe.WaitOne(manualResetEventsWaitTimeout, false);
 
                 mreUnsubscribe = new ManualResetEvent(false);
@@ -119,9 +118,7 @@ namespace PubNubMessaging.Tests
                 mreUnsubscribe.WaitOne(manualResetEventsWaitTimeout, false);
             }
             
-            Thread.Sleep(2000);
             pubnub.EndPendingRequests();
-            Thread.Sleep(1000);
             pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
@@ -316,7 +313,7 @@ namespace PubNubMessaging.Tests
             //Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Iniatiating Subscribe");
             mreSubscribe = new ManualResetEvent(false);
             pubnub.Subscribe<string>(channel, SubscriberDummyMethodForManyMessagesUserCallback, SubscribeDummyMethodForManyMessagesConnectCallback, DummyErrorCallback);
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
             
             mreSubscribe.WaitOne(manualResetEventsWaitTimeout, false);
 
@@ -325,9 +322,9 @@ namespace PubNubMessaging.Tests
                 for (int index = 0; index < 10; index++)
                 {
                     //Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Publishing " + index.ToString());
-                    Thread.Sleep(2000);
+                    Thread.Sleep(1000);
                     pubnub.Publish<string>(channel, index.ToString(), dummyPublishCallback, DummyErrorCallback);
-                    Thread.Sleep(2000);
+                    Thread.Sleep(1000);
                     //Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Publishing..waiting for confirmation " + index.ToString());
                     //mePublish.WaitOne(10*1000);
                 }

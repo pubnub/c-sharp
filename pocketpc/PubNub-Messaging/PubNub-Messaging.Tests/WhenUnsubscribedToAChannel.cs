@@ -44,7 +44,6 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
 
             pubnub.GrantAccess<string>(channel, true, true, 20, ThenUnsubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
-            Thread.Sleep(1000);
 
             grantManualEvent.WaitOne();
 

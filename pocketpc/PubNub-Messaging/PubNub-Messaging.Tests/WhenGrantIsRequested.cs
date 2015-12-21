@@ -44,7 +44,6 @@ namespace PubNubMessaging.Tests
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>("", true, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne(10 * 1000, false);
 
@@ -76,7 +75,6 @@ namespace PubNubMessaging.Tests
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>("", true, false, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne(10 * 1000, false);
 
@@ -108,7 +106,6 @@ namespace PubNubMessaging.Tests
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>("", false, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne(10 * 1000, false);
 
@@ -142,7 +139,6 @@ namespace PubNubMessaging.Tests
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>(channel, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne(10 * 1000, false);
 
@@ -176,8 +172,6 @@ namespace PubNubMessaging.Tests
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>(channel, true, false, 5, AccessToChannelLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
-
                 grantManualEvent.WaitOne(10 * 1000, false);
 
                 pubnub.EndPendingRequests(); 
@@ -210,8 +204,6 @@ namespace PubNubMessaging.Tests
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>(channel, false, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
-
                 grantManualEvent.WaitOne(10 * 1000, false);
 
                 pubnub.EndPendingRequests(); 
@@ -245,7 +237,6 @@ namespace PubNubMessaging.Tests
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>(channel, authKey, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne(10 * 1000, false);
 
@@ -280,7 +271,6 @@ namespace PubNubMessaging.Tests
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>(channel, authKey, true, false, 5, AccessToUserLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne(10 * 1000, false);
 
@@ -315,7 +305,6 @@ namespace PubNubMessaging.Tests
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>(channel, authKey, false, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne(10 * 1000, false);
 
@@ -370,7 +359,6 @@ namespace PubNubMessaging.Tests
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>(channel, true, true, 5, AccessToMultiChannelGrantCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne(10 * 1000, false);
 
@@ -426,7 +414,6 @@ namespace PubNubMessaging.Tests
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>(channel, auth, true, true, 5, AccessToMultiAuthGrantCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne(10 * 1000, false);
 
@@ -461,7 +448,6 @@ namespace PubNubMessaging.Tests
                 {
                     grantManualEvent = new ManualResetEvent(false);
                     pubnub.GrantAccess<string>("", true, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
                     grantManualEvent.WaitOne(10 * 1000, false);
                 }
                 else
@@ -473,7 +459,6 @@ namespace PubNubMessaging.Tests
                     revokeManualEvent = new ManualResetEvent(false);
                     Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess -> Grant ok..Now trying Revoke");
                     pubnub.GrantAccess<string>("", false, false, 5, RevokeToSubKeyLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
                     revokeManualEvent.WaitOne(10 * 1000, false);
                     
                     pubnub.EndPendingRequests(); 
@@ -514,7 +499,6 @@ namespace PubNubMessaging.Tests
                 {
                     grantManualEvent = new ManualResetEvent(false);
                     pubnub.GrantAccess<string>(channel, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
                     grantManualEvent.WaitOne(10*1000, false);
                 }
                 else
@@ -526,7 +510,6 @@ namespace PubNubMessaging.Tests
                     revokeManualEvent = new ManualResetEvent(false);
                     Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess -> Grant ok..Now trying Revoke");
                     pubnub.GrantAccess<string>("", false, false, 5, RevokeToChannelLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
                     revokeManualEvent.WaitOne(10 * 1000, false);
 
                     pubnub.EndPendingRequests(); 
@@ -568,7 +551,6 @@ namespace PubNubMessaging.Tests
                 {
                     grantManualEvent = new ManualResetEvent(false);
                     pubnub.GrantAccess<string>(channel, authKey, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
                     grantManualEvent.WaitOne(10 * 1000, false);
                 }
                 else
@@ -577,18 +559,14 @@ namespace PubNubMessaging.Tests
                 }
                 if (receivedGrantMessage)
                 {
-                    Thread.Sleep(3000);
                     revokeManualEvent = new ManualResetEvent(false);
                     Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant ok..Now trying Revoke");
                     pubnub.GrantAccess<string>(channel, authKey, false, false, 5, RevokeToUserLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
                     revokeManualEvent.WaitOne(10 * 1000, false);
 
-                    Thread.Sleep(3000);
                     pubnub.EndPendingRequests(); 
                     pubnub.PubnubUnitTest = null;
                     pubnub = null;
-                    Thread.Sleep(3000);
                     Assert.True(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant success but revoke failed.");
                 }
                 else
@@ -621,7 +599,6 @@ namespace PubNubMessaging.Tests
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.ChannelGroupGrantAccess<string>(channelgroup, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne(10 * 1000, false);
 
@@ -655,7 +632,6 @@ namespace PubNubMessaging.Tests
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.ChannelGroupGrantAccess<string>(channelgroup, true, false, 5, AccessToChannelLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne(10 * 1000, false);
 

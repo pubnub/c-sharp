@@ -38,7 +38,6 @@ namespace PubNubMessaging.Tests
             {
                 auditManualEvent = new ManualResetEvent(false);
                 pubnub.AuditAccess<string>(AccessToSubKeyLevelCallback, DummyErrorCallback);
-                Thread.Sleep(3000);
 
                 auditManualEvent.WaitOne(10 * 1000, false);
 
@@ -74,7 +73,6 @@ namespace PubNubMessaging.Tests
             {
                 auditManualEvent = new ManualResetEvent(false);
                 pubnub.AuditAccess<string>(channel, AccessToChannelLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne(10 * 1000, false);
 
@@ -109,7 +107,6 @@ namespace PubNubMessaging.Tests
             {
                 auditManualEvent = new ManualResetEvent(false);
                 pubnub.ChannelGroupAuditAccess<string>(channelgroup, AccessToChannelLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne(10 * 1000, false);
 

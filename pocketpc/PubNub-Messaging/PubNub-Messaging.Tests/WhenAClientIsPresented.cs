@@ -125,11 +125,9 @@ namespace PubNubMessaging.Tests
             
             //since presence expects from stimulus from sub/unsub...
             pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
             pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
             presenceManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
@@ -168,7 +166,6 @@ namespace PubNubMessaging.Tests
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
             pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
             presenceManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
@@ -199,7 +196,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             pubnub.Presence<string>(channel, ThenPresenceWithCustomUUIDShouldReturnMessage, PresenceUUIDDummyMethodForConnectCallback, DummyErrorCallback);
-            Thread.Sleep(3000);
+            Thread.Sleep(1000);
             
             //since presence expects from stimulus from sub/unsub...
             pubnub.SessionUUID = customUUID;
@@ -207,18 +204,15 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(1000);
             subscribeUUIDManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
             pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribeUUID, UnsubscribeUUIDDummyMethodForConnectCallback, UnsubscribeUUIDDummyMethodForDisconnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
             unsubscribeUUIDManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
             presenceUUIDManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
             pubnub.EndPendingRequests(); 
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Thread.Sleep(3000);
+
             Assert.True(receivedCustomUUID, "Custom UUID not received");
         }
 
@@ -236,25 +230,20 @@ namespace PubNubMessaging.Tests
 
             subscribeManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
             hereNowManualEvent = new ManualResetEvent(false);
             pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback);
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
             unsubscribeManualEvent = new ManualResetEvent(false);
             pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
             pubnub.EndPendingRequests(); 
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Thread.Sleep(3000);
             Assert.True(receivedHereNowMessage, "here_now message not received");
         }
 
@@ -277,22 +266,18 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(1000);
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
             hereNowManualEvent = new ManualResetEvent(false);
             pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback);
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
             unsubscribeManualEvent = new ManualResetEvent(false);
             pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
             pubnub.EndPendingRequests(); 
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Thread.Sleep(3000);
             Assert.True(receivedHereNowMessage, "here_now message not received with cipher");
         }
 
@@ -325,10 +310,8 @@ namespace PubNubMessaging.Tests
             //Thread.Sleep(6000);
 
             pubnub.EndPendingRequests();
-            //Thread.Sleep(3000);
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            //Thread.Sleep(3000);
             Assert.True(receivedHereNowMessage, "here_now message not received with cipher and secret");
         }
 
@@ -381,28 +364,21 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
 
-            Thread.Sleep(3000);
             subscribeManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
             hereNowManualEvent = new ManualResetEvent(false);
             pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback);
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
             unsubscribeManualEvent = new ManualResetEvent(false);
             pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
             pubnub.EndPendingRequests(); 
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Thread.Sleep(3000);
             Assert.True(receivedHereNowMessage, "here_now message not received with cipher, ssl");
         }
 
@@ -420,28 +396,21 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
 
-            Thread.Sleep(3000);
             subscribeManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
             hereNowManualEvent = new ManualResetEvent(false);
             pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback);
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
             unsubscribeManualEvent = new ManualResetEvent(false);
             pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
             pubnub.EndPendingRequests(); 
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Thread.Sleep(3000);
             Assert.True(receivedHereNowMessage, "here_now message not received with secret key");
         }
 
@@ -459,28 +428,25 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
 
-            Thread.Sleep(3000);
             subscribeManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
+            Thread.Sleep(1000);
             hereNowManualEvent = new ManualResetEvent(false);
             pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback);
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
+            Thread.Sleep(1000);
             unsubscribeManualEvent = new ManualResetEvent(false);
             pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
             pubnub.EndPendingRequests(); 
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Thread.Sleep(3000);
+
             Assert.True(receivedHereNowMessage, "here_now message not received ,with secret key, ssl");
         }
 
@@ -503,22 +469,21 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(1000);
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
+            Thread.Sleep(1000);
             hereNowManualEvent = new ManualResetEvent(false);
             pubnub.HereNow<string>(channel, ThenHereNowShouldReturnMessage, DummyErrorCallback);
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
+            Thread.Sleep(1000);
             unsubscribeManualEvent = new ManualResetEvent(false);
             pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
             pubnub.EndPendingRequests(); 
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Thread.Sleep(3000);
+
             Assert.True(receivedHereNowMessage, "here_now message not received with ssl");
         }
 
@@ -540,31 +505,28 @@ namespace PubNubMessaging.Tests
 
             subscribeManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
+            Thread.Sleep(1000);
             userStateManualEvent = new ManualResetEvent(false);
             jsonUserState = "{\"testkey\":\"testval\"}";
             pubnub.SetUserState<string>(channel, jsonUserState, SetUserStateDummyMethodCallback, DummyErrorCallback);
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
+            Thread.Sleep(1000);
             hereNowManualEvent = new ManualResetEvent(false);
             pubnub.HereNow<string>(channel, true, true, ThenHereNowShouldReturnMessage, DummyErrorCallback);
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
+            Thread.Sleep(1000);
             unsubscribeManualEvent = new ManualResetEvent(false);
             pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
             pubnub.EndPendingRequests(); 
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Thread.Sleep(3000);
             Assert.True(receivedHereNowMessage, "here_now message not received with user state");
         }
 
@@ -581,16 +543,14 @@ namespace PubNubMessaging.Tests
             
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
 
-            Thread.Sleep(3000);
+            Thread.Sleep(1000);
             globalHereNowManualEvent = new ManualResetEvent(false);
             pubnub.GlobalHereNow<string>(true, true, ThenGlobalHereNowShouldReturnMessage, DummyErrorCallback);
             globalHereNowManualEvent.WaitOne();
 
-            Thread.Sleep(3000);
             pubnub.EndPendingRequests(); 
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Thread.Sleep(3000);
             Assert.True(receivedGlobalHereNowMessage, "global_here_now message not received");
         }
 
@@ -615,28 +575,26 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(1000);
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
+            Thread.Sleep(1000);
             userStateManualEvent = new ManualResetEvent(false);
             jsonUserState = "{\"testkey\":\"testval\"}";
             pubnub.SetUserState<string>(channel, jsonUserState, SetUserStateDummyMethodCallback, DummyErrorCallback);
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
+            Thread.Sleep(1000);
             globalHereNowManualEvent = new ManualResetEvent(false);
             pubnub.GlobalHereNow<string>(true, true, ThenGlobalHereNowShouldReturnMessage, DummyErrorCallback);
             globalHereNowManualEvent.WaitOne();
 
-            Thread.Sleep(3000);
+            Thread.Sleep(1000);
             unsubscribeManualEvent = new ManualResetEvent(false);
             pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
             pubnub.EndPendingRequests(); 
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Thread.Sleep(3000);
             Assert.True(receivedGlobalHereNowMessage, "global_here_now message not received for user state");
         }
 
@@ -655,31 +613,26 @@ namespace PubNubMessaging.Tests
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             whereNowChannel = "hello_my_channel";
 
-            Thread.Sleep(3000);
             subscribeManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>(whereNowChannel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
+            Thread.Sleep(1000);
             whereNowManualEvent = new ManualResetEvent(false);
             pubnub.WhereNow<string>(customUUID, ThenWhereNowShouldReturnMessage, DummyErrorCallback);
             whereNowManualEvent.WaitOne();
 
             if (!pubnub.PubnubUnitTest.EnableStubTest)
             {
-                Thread.Sleep(3000);
                 unsubscribeManualEvent = new ManualResetEvent(false);
                 pubnub.Unsubscribe<string>(whereNowChannel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
                 unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
             }
 
-            Thread.Sleep(3000);
             pubnub.EndPendingRequests(); 
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Thread.Sleep(3000);
             Assert.True(receivedWhereNowMessage, "where_now message not received");
         }
 
@@ -700,7 +653,6 @@ namespace PubNubMessaging.Tests
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             string channel = "hello_my_channel";
 
-            Thread.Sleep(3000);
             jsonUserState = "{\"testkey\":\"testval\"}";
             userStateManualEvent = new ManualResetEvent(false);
             pubnub.SetUserState<string>(channel, jsonUserState, SetUserStateDummyMethodCallback, DummyErrorCallback);
@@ -708,17 +660,15 @@ namespace PubNubMessaging.Tests
 
             if (receivedUserStateMessage)
             {
-                Thread.Sleep(2000);
+                Thread.Sleep(1000);
                 receivedUserStateMessage = false;
                 userStateManualEvent = new ManualResetEvent(false);
                 pubnub.GetUserState<string>(channel, "", GetUserStateRegularCallback, DummyErrorCallback);
                 userStateManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
             }
-            Thread.Sleep(3000);
             pubnub.EndPendingRequests(); 
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Thread.Sleep(3000);
             Assert.True(receivedUserStateMessage, "IfSetAndGetUserStateThenItShouldReturnInfo failed");
         }
 
@@ -739,34 +689,34 @@ namespace PubNubMessaging.Tests
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             string channel = "hello_my_channel";
 
-            Thread.Sleep(3000);
+            Thread.Sleep(1000);
             jsonUserState = "{\"k\":\"v\"}";
             KeyValuePair<string, object> kvp = new KeyValuePair<string, object>("k", "v");
             userStateManualEvent = new ManualResetEvent(false);
             pubnub.SetUserState<string>(channel, kvp, SetUserStateDummyMethodCallback, DummyErrorCallback);
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
             receivedUserStateMessage = false;
             KeyValuePair<string, object> kvp2 = new KeyValuePair<string, object>("k2", "v2");
             userStateManualEvent = new ManualResetEvent(false);
             pubnub.SetUserState<string>(channel, kvp2, SetUserStateDummyMethodCallback, DummyErrorCallback);
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
             receivedUserStateMessage = false;
             userStateManualEvent = new ManualResetEvent(false);
             pubnub.GetUserState<string>(channel, "", GetUserStateRegularCallback, DummyErrorCallback);
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
             receivedUserStateMessage = false;
             KeyValuePair<string, object> kvp22 = new KeyValuePair<string, object>("k2", null);
             userStateManualEvent = new ManualResetEvent(false);
             pubnub.SetUserState<string>(channel, kvp22, SetUserStateDummyMethodCallback, DummyErrorCallback);
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
             receivedUserStateMessage = false;
             userStateManualEvent = new ManualResetEvent(false);
             pubnub.GetUserState<string>(channel, "", GetUserStateRegularCallback, DummyErrorCallback);
@@ -795,30 +745,26 @@ namespace PubNubMessaging.Tests
             subscribeManualEvent = new ManualResetEvent(false);
             unsubscribeManualEvent = new ManualResetEvent(false);
 
-            Thread.Sleep(3000);
             string channel = "hello_my_channel";
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             pubnub.Presence<string>(channel, ThenPresenceShouldReturnMessage, PresenceDummyMethodForConnectCallback, DummyErrorCallback);
 
-            Thread.Sleep(3000);
+            Thread.Sleep(1000);
             //since presence expects from stimulus from sub/unsub...
             pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
-            Thread.Sleep(3000);
+            Thread.Sleep(1000);
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
             Thread.Sleep(pubnub.PresenceHeartbeat+3 * 1000);
 
             pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
-            Thread.Sleep(3000);
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
             presenceManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
             pubnub.EndPendingRequests(); 
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Thread.Sleep(3000);
             Assert.True(receivedPresenceMessage, "ThenPresenceHeartbeatShouldReturnMessage not received");
         }
 

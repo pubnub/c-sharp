@@ -44,9 +44,8 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
 
             pubnub.ChannelGroupGrantAccess<string>(channelGroupName, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummyUnsubscribeErrorCallback);
-            Thread.Sleep(1000);
 
-            grantManualEvent.WaitOne();
+            grantManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
             pubnub.EndPendingRequests();
             pubnub = null;

@@ -55,7 +55,6 @@ namespace PubNubMessaging.Tests
             string channel = "foo.*";
             mreGrant = new ManualResetEvent(false);
             pubnub.GrantAccess<string>(channel, true, true, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
-            Thread.Sleep(1000);
             mreGrant.WaitOne();
 
             if (receivedGrantMessage)
@@ -63,8 +62,7 @@ namespace PubNubMessaging.Tests
                 channel = "hello_my_channel";
                 mreGrant = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>(channel, true, true, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
-                Thread.Sleep(1000);
-                mreGrant.WaitOne();
+                mreGrant.WaitOne(manualResetEventsWaitTimeout, false);
             }
 
             if (receivedGrantMessage)
@@ -72,8 +70,7 @@ namespace PubNubMessaging.Tests
                 channel = "hello_my_channel1";
                 mreGrant = new ManualResetEvent(false);
                 pubnub.GrantAccess<string>(channel, true, true, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
-                Thread.Sleep(1000);
-                mreGrant.WaitOne();
+                mreGrant.WaitOne(manualResetEventsWaitTimeout, false);
             }
 
             if (receivedMessage)
@@ -81,8 +78,7 @@ namespace PubNubMessaging.Tests
                 channelGroupName = "hello_my_group";
                 mreGrant = new ManualResetEvent(false);
                 pubnub.ChannelGroupGrantAccess<string>(channelGroupName, true, true, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
-                Thread.Sleep(1000);
-                mreGrant.WaitOne();
+                mreGrant.WaitOne(manualResetEventsWaitTimeout, false);
             }
             pubnub.EndPendingRequests();
             pubnub = null;
@@ -134,8 +130,6 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = null;
             pubnub.EndPendingRequests();
             pubnub = null;
-
-            Thread.Sleep(2000);
         }
 
         [Test]
@@ -314,7 +308,7 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>(commaDelimitedChannel, channelGroupName, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback, null, DummyErrorCallback);
             mreSubscribeConnect.WaitOne(manualResetEventsWaitTimeout, false);
 
-            Thread.Sleep(3000);
+            Thread.Sleep(1000);
             mrePublish = new ManualResetEvent(false);
             publishedMessage = "Test for cg";
             pubnub.Publish<string>(channelAddForGroup, publishedMessage, dummyPublishCallback, DummyErrorCallback);
@@ -323,7 +317,7 @@ namespace PubNubMessaging.Tests
 
             if (isPublished)
             {
-                Thread.Sleep(3000);
+                Thread.Sleep(1000);
                 mrePublish = new ManualResetEvent(false);
                 publishedMessage = "Test for wc";
                 pubnub.Publish<string>(pubWildChannelName, publishedMessage, dummyPublishCallback, DummyErrorCallback);
@@ -333,7 +327,7 @@ namespace PubNubMessaging.Tests
 
             if (isPublished)
             {
-                Thread.Sleep(3000);
+                Thread.Sleep(1000);
                 mrePublish = new ManualResetEvent(false);
                 publishedMessage = "Test for normal ch";
                 pubnub.Publish<string>(subChannelName, publishedMessage, dummyPublishCallback, DummyErrorCallback);
@@ -344,7 +338,6 @@ namespace PubNubMessaging.Tests
             endOfPublish = true;
             if (isPublished)
             {
-                Thread.Sleep(3000);
                 mreSubscribe.WaitOne(manualResetEventsWaitTimeout, false);
 
                 mreUnsubscribe = new ManualResetEvent(false);

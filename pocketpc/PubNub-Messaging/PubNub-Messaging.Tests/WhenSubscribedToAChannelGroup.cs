@@ -57,17 +57,14 @@ namespace PubNubMessaging.Tests
 
             grantManualEvent = new ManualResetEvent(false);
             pubnub.ChannelGroupGrantAccess<string>(channelGroupName, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummySubscribeErrorCallback);
-            Thread.Sleep(1000);
             grantManualEvent.WaitOne(310*1000, false);
 
             grantManualEvent = new ManualResetEvent(false);
             pubnub.ChannelGroupGrantAccess<string>(channelGroupName1, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummySubscribeErrorCallback);
-            Thread.Sleep(1000);
             grantManualEvent.WaitOne(310 * 1000, false);
 
             grantManualEvent = new ManualResetEvent(false);
             pubnub.ChannelGroupGrantAccess<string>(channelGroupName2, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummySubscribeErrorCallback);
-            Thread.Sleep(1000);
             grantManualEvent.WaitOne(310 * 1000, false);
 
             pubnub.EndPendingRequests(); 
@@ -196,12 +193,10 @@ namespace PubNubMessaging.Tests
 
             subscribeManualEvent = new ManualResetEvent(false);
             pubnub.AddChannelsToChannelGroup<string>(new string[] { channelName1 }, channelGroupName1, ChannelGroupAddCallback, DummySubscribeErrorCallback);
-            Thread.Sleep(1000);
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
             subscribeManualEvent = new ManualResetEvent(false);
             pubnub.AddChannelsToChannelGroup<string>(new string[] { channelName2 }, channelGroupName2, ChannelGroupAddCallback, DummySubscribeErrorCallback);
-            Thread.Sleep(1000);
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
             if (receivedChannelGroupMessage1 && receivedChannelGroupMessage2)

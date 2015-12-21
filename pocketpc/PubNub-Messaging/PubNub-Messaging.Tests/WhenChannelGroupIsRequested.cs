@@ -42,7 +42,6 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
 
             pubnub.ChannelGroupGrantAccess<string>(channelGroupName, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummyErrorCallback);
-            Thread.Sleep(1000);
 
             grantManualEvent.WaitOne();
 
@@ -70,7 +69,6 @@ namespace PubNubMessaging.Tests
             string channelName = "hello_my_channel";
             
             pubnub.AddChannelsToChannelGroup<string>(new string[] { channelName }, channelGroupName, ChannelGroupCRUDCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
 
             channelGroupManualEvent.WaitOne(10 * 1000, false);
 
@@ -99,7 +97,6 @@ namespace PubNubMessaging.Tests
             string channelName = "hello_my_channel";
 
             pubnub.RemoveChannelsFromChannelGroup<string>(new string[] { channelName }, channelGroupName, ChannelGroupCRUDCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
 
             channelGroupManualEvent.WaitOne(10 * 1000, false);
 
@@ -128,7 +125,6 @@ namespace PubNubMessaging.Tests
             //string channelName = "hello_my_channel";
 
             pubnub.GetChannelsForChannelGroup<string>(channelGroupName, ChannelGroupCRUDCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
 
             channelGroupManualEvent.WaitOne(10 * 1000, false);
 
