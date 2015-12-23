@@ -86,35 +86,62 @@ namespace PubNubMessaging.Core
 			_status = status;
 		}
 
+        private static object _internetCheckLock = new object();
+        private static bool isInternetCheckRunning = false;
 		private static void CheckClientNetworkAvailability<T>(Action<bool> callback, Action<PubnubClientError> errorCallback, string[] channels, string[] channelGroups)
 		{
-			InternetState<T> state = new InternetState<T>();
-			state.Callback = callback;
-			state.ErrorCallback = errorCallback;
-			state.Channels = channels;
+            lock (_internetCheckLock)
+            {
+                if (isInternetCheckRunning)
+                {
+                    LoggingMethod.WriteToLog(string.Format("DateTime {0} InternetCheckRunning Already running", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
+                    return;
+                }
+            }
+            mres = new ManualResetEvent(false);
+
+            InternetState<T> state = new InternetState<T>();
+            state.Callback = callback;
+            state.ErrorCallback = errorCallback;
+            state.Channels = channels;
             state.ChannelGroups = channelGroups;
-			ThreadPool.QueueUserWorkItem(CheckSocketConnect<T>, state);
+            ThreadPool.QueueUserWorkItem(CheckSocketConnect<T>, state);
 
             mres.WaitOne(500, false);
+
         }
 
 		private static void CheckSocketConnect<T>(object internetState)
 		{
-			InternetState<T> state = internetState as InternetState<T>;
-			Action<bool> callback = state.Callback;
-			Action<PubnubClientError> errorCallback = state.ErrorCallback;
-			string[] channels = state.Channels;
-            string[] channelGroups = state.ChannelGroups;
+            lock (_internetCheckLock)
+            {
+                isInternetCheckRunning = true;
+            }
             HttpWebRequest myRequest = null;
-			try
+            Action<bool> callback = null;
+            Action<PubnubClientError> errorCallback = null;
+            string[] channels = null;
+            string[] channelGroups = null;
+            try
 			{
-                myRequest = (HttpWebRequest)System.Net.WebRequest.Create("http://pubsub.pubnub.com/time/0");
+                InternetState<T> state = internetState as InternetState<T>;
+                if (state != null)
+                {
+                    callback = state.Callback;
+                    errorCallback = state.ErrorCallback;
+                    channels = state.Channels;
+                    channelGroups = state.ChannelGroups;
+                }
+                mreSocketAsync = new ManualResetEvent(false);
+
+                myRequest = (HttpWebRequest)System.Net.WebRequest.Create("https://pubsub.pubnub.com/time/0");
                 LoggingMethod.WriteToLog(string.Format("DateTime {0} CheckSocketConnect Req {1}", DateTime.Now.ToString(), myRequest.RequestUri.ToString()), LoggingMethod.LevelInfo);
                 ServicePointManager.DefaultConnectionLimit = 200;
                 myRequest.BeginGetResponse(cb =>
                 {
                     try
                     {
+                        if (myRequest == null) return;
                         using (HttpWebResponse resp = myRequest.EndGetResponse(cb) as HttpWebResponse)
                         {
                             if (resp != null && resp.StatusCode == HttpStatusCode.OK)
@@ -140,9 +167,15 @@ namespace PubNubMessaging.Core
                     }
                     finally
                     {
+                        if (myRequest != null)
+                        {
+                            myRequest = null;
+                        }
+
                         mreSocketAsync.Set();
                     }
                 }, null);
+                
                 mreSocketAsync.WaitOne(330, false);
             }
 			catch (Exception ex)
@@ -150,14 +183,10 @@ namespace PubNubMessaging.Core
                 _status = false;
                 LoggingMethod.WriteToLog(string.Format("DateTime {0} CheckSocketConnectTime FAILED {1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelInfo);
 				ParseCheckSocketConnectException<T>(ex, channels, channelGroups, errorCallback, callback);
-                if (myRequest != null)
-                {
-                    //myRequest.Abort();
-                    myRequest = null;
-                }
             }
             finally
             {
+                isInternetCheckRunning = false;
                 mres.Set();
             }
 
@@ -175,7 +204,10 @@ namespace PubNubMessaging.Core
 			GoToCallback(error, errorCallback);
 
             LoggingMethod.WriteToLog(string.Format("DateTime {0} checkInternetStatus Error. {1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelError);
-			callback(false);
+            if (callback != null)
+            {
+                callback(false);
+            }
 		}
 
 		private static void GoToCallback<T>(object result, Action<T> Callback)

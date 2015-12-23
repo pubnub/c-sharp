@@ -19,6 +19,7 @@ namespace PubNubMessaging.Tests
 
         ManualResetEvent subscribeUUIDManualEvent = new ManualResetEvent(false);
         ManualResetEvent presenceUUIDManualEvent = new ManualResetEvent(false);
+        ManualResetEvent presenceUUIDConnectEvent = new ManualResetEvent(false);
         ManualResetEvent unsubscribeUUIDManualEvent = new ManualResetEvent(false);
 
         ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
@@ -42,7 +43,7 @@ namespace PubNubMessaging.Tests
         string jsonUserState = "";
         string currentTestCase = "";
         string whereNowChannel = "";
-        int manualResetEventsWaitTimeout = 310 * 1000;
+        int manualResetEventsWaitTimeout = 180 * 1000;
 
         Pubnub pubnub = null;
 
@@ -63,9 +64,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel,hello_my_channel-pnpres";
 
             pubnub.GrantAccess<string>(channel, true, true, 20, ThenPresenceInitializeShouldReturnGrantMessage, DummyErrorCallback);
-            Thread.Sleep(1000);
-
-            grantManualEvent.WaitOne();
+            grantManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
             pubnub.EndPendingRequests(); 
             pubnub.PubnubUnitTest = null;
@@ -114,12 +113,13 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "ThenPresenceShouldReturnReceivedMessage";
             pubnub.PubnubUnitTest = unitTest;
 
+            string channel = "hello_my_channel";
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : manualResetEventsWaitTimeout;
+            
             presenceManualEvent = new ManualResetEvent(false);
             subscribeManualEvent = new ManualResetEvent(false);
             unsubscribeManualEvent = new ManualResetEvent(false);
 
-            string channel = "hello_my_channel";
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             pubnub.Presence<string>(channel, ThenPresenceShouldReturnMessage, PresenceDummyMethodForConnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
             
@@ -127,10 +127,10 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
+            presenceManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
+
             pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
-
-            presenceManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
             pubnub.EndPendingRequests(); 
             pubnub.PubnubUnitTest = null;
@@ -156,24 +156,24 @@ namespace PubNubMessaging.Tests
             unsubscribeManualEvent = new ManualResetEvent(false);
 
             string channel = "hello_my_channel";
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : manualResetEventsWaitTimeout;
+            
             pubnub.Presence<string>(channel, ThenPresenceShouldReturnMessage, PresenceDummyMethodForConnectCallback, DummyErrorCallback);
             Thread.Sleep(1000);
 
             //since presence expects from stimulus from sub/unsub...
             pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
+
+            presenceManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
             pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
-            presenceManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
-
             pubnub.EndPendingRequests(); 
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.True(receivedPresenceMessage, "Presence message not received");
+            Assert.True(receivedPresenceMessage, "Presence SSL message not received");
         }
 
         [Test]
@@ -182,7 +182,7 @@ namespace PubNubMessaging.Tests
             receivedCustomUUID = false;
             currentTestCase = "ThenPresenceShouldReturnCustomUUID";
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", true);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAClientIsPresented";
@@ -193,21 +193,21 @@ namespace PubNubMessaging.Tests
             subscribeUUIDManualEvent = new ManualResetEvent(false);
             unsubscribeUUIDManualEvent = new ManualResetEvent(false);
 
-            string channel = "hello_my_channel";
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            string channel = "hello_my_channel_test";
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : manualResetEventsWaitTimeout;
+            pubnub.SessionUUID = customUUID;
+            
             pubnub.Presence<string>(channel, ThenPresenceWithCustomUUIDShouldReturnMessage, PresenceUUIDDummyMethodForConnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
+            presenceUUIDConnectEvent.WaitOne(manualResetEventsWaitTimeout, false);
             
             //since presence expects from stimulus from sub/unsub...
-            pubnub.SessionUUID = customUUID;
             pubnub.Subscribe<string>(channel, DummyMethodForSubscribeUUID, SubscribeUUIDDummyMethodForConnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
             subscribeUUIDManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
+            presenceUUIDManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
+            
             pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribeUUID, UnsubscribeUUIDDummyMethodForConnectCallback, UnsubscribeUUIDDummyMethodForDisconnectCallback, DummyErrorCallback);
             unsubscribeUUIDManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
-
-            presenceUUIDManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
             pubnub.EndPendingRequests(); 
             pubnub.PubnubUnitTest = null;
@@ -238,7 +238,6 @@ namespace PubNubMessaging.Tests
 
             unsubscribeManualEvent = new ManualResetEvent(false);
             pubnub.Unsubscribe<string>(channel, DummyMethodForUnSubscribe, UnsubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
-            Thread.Sleep(1000);
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout, false);
 
             pubnub.EndPendingRequests(); 
@@ -259,7 +258,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
             
             string channel = "hello_my_channel";
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : manualResetEventsWaitTimeout;
 
             subscribeManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
@@ -293,7 +292,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
             
             string channel = "hello_my_channel";
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : manualResetEventsWaitTimeout;
 
             subscribeManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
@@ -327,7 +326,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
             
             string channel = "hello_my_channel1";
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : manualResetEventsWaitTimeout;
 
             subscribeManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
@@ -362,7 +361,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
             
             string channel = "hello_my_channel";
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : manualResetEventsWaitTimeout;
 
             subscribeManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
@@ -394,7 +393,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
             
             string channel = "hello_my_channel";
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : manualResetEventsWaitTimeout;
 
             subscribeManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
@@ -426,7 +425,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
             
             string channel = "hello_my_channel";
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : manualResetEventsWaitTimeout;
 
             subscribeManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
@@ -462,7 +461,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
             
             string channel = "hello_my_channel";
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : manualResetEventsWaitTimeout;
 
             subscribeManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
@@ -501,7 +500,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
             
             string channel = "hello_my_channel";
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : manualResetEventsWaitTimeout;
 
             subscribeManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
@@ -540,8 +539,8 @@ namespace PubNubMessaging.Tests
             unitTest.TestClassName = "WhenAClientIsPresented";
             unitTest.TestCaseName = "IfGlobalHereNowIsCalledThenItShouldReturnInfo";
             pubnub.PubnubUnitTest = unitTest;
-            
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : manualResetEventsWaitTimeout;
 
             Thread.Sleep(1000);
             globalHereNowManualEvent = new ManualResetEvent(false);
@@ -568,7 +567,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
 
             string channel = "hello_my_channel";
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : manualResetEventsWaitTimeout;
 
             subscribeManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>(channel, DummyMethodForSubscribe, SubscribeDummyMethodForConnectCallback, DummyErrorCallback);
@@ -610,7 +609,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "IfWhereNowIsCalledThenItShouldReturnInfo";
             pubnub.PubnubUnitTest = unitTest;
 
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : manualResetEventsWaitTimeout;
             whereNowChannel = "hello_my_channel";
 
             subscribeManualEvent = new ManualResetEvent(false);
@@ -650,7 +649,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "IfSetAndGetUserStateThenItShouldReturnInfo";
             pubnub.PubnubUnitTest = unitTest;
 
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : manualResetEventsWaitTimeout;
             string channel = "hello_my_channel";
 
             jsonUserState = "{\"testkey\":\"testval\"}";
@@ -686,7 +685,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "IfSetAndDeleteUserStateThenItShouldReturnInfo";
             pubnub.PubnubUnitTest = unitTest;
 
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : manualResetEventsWaitTimeout;
             string channel = "hello_my_channel";
 
             Thread.Sleep(1000);
@@ -746,7 +745,7 @@ namespace PubNubMessaging.Tests
             unsubscribeManualEvent = new ManualResetEvent(false);
 
             string channel = "hello_my_channel";
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : manualResetEventsWaitTimeout;
             pubnub.Presence<string>(channel, ThenPresenceShouldReturnMessage, PresenceDummyMethodForConnectCallback, DummyErrorCallback);
 
             Thread.Sleep(1000);
@@ -1137,6 +1136,7 @@ namespace PubNubMessaging.Tests
 
         void PresenceUUIDDummyMethodForConnectCallback(string receivedMessage)
         {
+            presenceUUIDConnectEvent.Set();
         }
 
         void SubscribeDummyMethodForConnectCallback(string receivedMessage)

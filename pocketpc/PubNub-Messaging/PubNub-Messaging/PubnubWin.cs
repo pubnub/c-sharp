@@ -296,14 +296,14 @@ namespace PubNubMessaging.Core
         private object _processUrlRequestLock = new object();
 		protected override sealed void SendRequestAndGetResult<T> (Uri requestUri, RequestState<T> pubnubRequestState, PubnubWebRequest request)
         {
-            //lock (base._endPendingRequestLock)
-            //{
-            //    if (base.pubnubSessionTerminated)
-            //    {
-            //        LoggingMethod.WriteToLog(string.Format("DateTime {0}, SendRequestAndGetResult. pubnubSessionTerminated=true", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
-            //        return;
-            //    }
-            //}
+            lock (base._endPendingRequestLock)
+            {
+                if (base.pubnubSessionTerminated)
+                {
+                    LoggingMethod.WriteToLog(string.Format("DateTime {0}, SendRequestAndGetResult. pubnubSessionTerminated=true", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
+                    return;
+                }
+            }
             if (request == null)
             {
                 LoggingMethod.WriteToLog(string.Format("DateTime {0}, SendRequestAndGetResult. request is null", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
@@ -324,8 +324,6 @@ namespace PubNubMessaging.Core
                 {
                     LoggingMethod.WriteToLog(string.Format("DateTime {0}, SendRequestAndGetResult. request or request.RequestUri is null", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
                 }
-                int connections = (request != null && request.ServicePoint != null) ? request.ServicePoint.CurrentConnections : 0;
-                LoggingMethod.WriteToLog(string.Format("DateTime {0}, SendRequestAndGetResult. Before BeginGetResponse. ServicePoint.CurrentConnections={1}", DateTime.Now.ToString(), connections.ToString()), LoggingMethod.LevelInfo);
                 
                 IAsyncResult asyncResult = request.BeginGetResponse
                     (asynchronousResult => 
@@ -354,10 +352,6 @@ namespace PubNubMessaging.Core
                         {
                             #region Try code block
                             bool processMessage = true;
-                            if (asyncWebRequest == null || asyncWebRequest.RequestUri == null || asyncWebRequest.request == null || asyncWebRequest.request.RequestUri == null)
-                            {
-                                LoggingMethod.WriteToLog(string.Format("DateTime {0}, SendRequestAndGetResult. asyncWebRequest or asyncWebRequest.RequestUri is null", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
-                            }
                             if (asyncWebRequest != null)
                             {
                                 LoggingMethod.WriteToLog(string.Format("DateTime {0}, SendRequestAndGetResult. Before EndGetResponse", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
@@ -423,8 +417,6 @@ namespace PubNubMessaging.Core
                                         //    }
                                         //}
 
-                                        System.Diagnostics.Debug.WriteLine(string.Format("{0} | {1} Resp Uri = {2}  JSON = {3}", DateTime.Now.ToString(), asyncRequestState.Type.ToString(), asyncWebResponse.ResponseUri.ToString(), jsonString));
-                                        //System.Diagnostics.Debug.WriteLine(string.Format("{0} | {1} JSON = {2}", DateTime.Now.ToString(), asyncRequestState.Type.ToString(), jsonString));
 #if !NETFX_CORE
                                         streamReader.Close();
 #endif
@@ -1753,7 +1745,6 @@ namespace PubNubMessaging.Core
         protected override WebRequest CreateRequest(Uri uri, bool keepAliveRequest, bool nocache)
         {
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create(uri);
-            req.ConnectionGroupName = "TimetokenString";
             req.Pipelined = true;
             req.KeepAlive = true;
 #if NETFX_CORE

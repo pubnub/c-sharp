@@ -113,7 +113,7 @@ namespace PubNubMessaging.Core
 
 		protected static long lastSubscribeTimetoken = 0;
 		// Pubnub Core API implementation
-		private string _origin = "pubsub.pubnub.com";
+		private static string _origin = "pubsub.pubnub.com";
         protected string publishKey = "";
 		protected string subscribeKey = "";
 		protected string secretKey = "";
@@ -1396,7 +1396,6 @@ namespace PubNubMessaging.Core
             this.subscribeKey = "";
             this.secretKey = "";
             this.cipherKey = "";
-            this._origin = "";
         }
 
 		public void EndPendingRequests()
@@ -1424,8 +1423,9 @@ namespace PubNubMessaging.Core
 				PubnubWebRequest request = (_channelRequest.ContainsKey (multiChannel)) ? _channelRequest [multiChannel] : null;
 				if (request != null) {
 					request.Abort (null, _errorLevel);
+                    request = null;
 
-					LoggingMethod.WriteToLog (string.Format ("DateTime {0} TerminateCurrentSubsciberRequest {1}", DateTime.Now.ToString (), request.RequestUri.ToString ()), LoggingMethod.LevelInfo);
+                    LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateCurrentSubsciberRequest {1}", DateTime.Now.ToString(), (request != null && request.RequestUri != null) ? request.RequestUri.ToString() : ""), LoggingMethod.LevelInfo);
 				}
 			}
 		}
@@ -1547,7 +1547,6 @@ namespace PubNubMessaging.Core
             this.subscribeKey = "";
             this.secretKey = "";
             this.cipherKey = "";
-            this._origin = "";
         }
         #endregion
 
@@ -3106,6 +3105,11 @@ namespace PubNubMessaging.Core
 		/// <param name="reconnect"></param>
         private void MultiChannelSubscribeRequest<T>(ResponseType type, string[] channels, string[] channelGroups, object timetoken, Action<T> subscribeOrPresenceRegularCallback, Action<T> connectCallback, Action<T> wildcardPresenceCallback, Action<PubnubClientError> errorCallback, bool reconnect)
 		{
+            if (string.IsNullOrEmpty(_origin))
+            {
+                LoggingMethod.WriteToLog(string.Format("DateTime {0}, Origin is empty", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
+                return;
+            }
 			//Exit if the channel is unsubscribed
 			if (multiChannelSubscribe != null && multiChannelSubscribe.Count <= 0 && multiChannelGroupSubscribe != null && multiChannelGroupSubscribe.Count <= 0) {
 				LoggingMethod.WriteToLog (string.Format ("DateTime {0}, All channels are Unsubscribed. Further subscription was stopped", DateTime.Now.ToString ()), LoggingMethod.LevelInfo);
@@ -3156,7 +3160,7 @@ namespace PubNubMessaging.Core
                     return;
                 }
 
-                if (ReconnectNetworkIfOverrideTcpKeepAlive<T>(type, channels, channelGroups, timetoken, subscribeOrPresenceRegularCallback, connectCallback, errorCallback, this._origin, this.publishKey, this.subscribeKey, this.secretKey, this.cipherKey, this.ssl))
+                if (ReconnectNetworkIfOverrideTcpKeepAlive<T>(type, channels, channelGroups, timetoken, subscribeOrPresenceRegularCallback, connectCallback, errorCallback, _origin, this.publishKey, this.subscribeKey, this.secretKey, this.cipherKey, this.ssl))
                 {
 					return;
 				}
@@ -6839,7 +6843,7 @@ namespace PubNubMessaging.Core
 			}
 
 			// Add Origin To The Request
-			url.Append (this._origin);
+			url.Append (_origin);
 
 			// Generate URL with UTF-8 Encoding
 			for (int componentIndex = 0; componentIndex < urlComponents.Count; componentIndex++) 
@@ -7406,22 +7410,16 @@ namespace PubNubMessaging.Core
 
         public WebRequest Create(Uri uri)
         {
-            WebRequest ret = CreateRequest(uri, true, true);
-            //ret.ConnectionGroupName = this.pubnubConnectionGroupName;
-            return ret;
+            return CreateRequest(uri, true, true);
         }
 
         public WebRequest Create(Uri uri, bool keepAliveRequest)
         {
-            WebRequest ret = CreateRequest(uri, keepAliveRequest, true);
-            //ret.ConnectionGroupName = this.pubnubConnectionGroupName;
-            return ret;
+            return CreateRequest(uri, keepAliveRequest, true);
         }
         public WebRequest Create(Uri uri, bool keepAliveRequest, bool nocache)
         {
-            WebRequest ret = CreateRequest(uri, keepAliveRequest, nocache);
-            //ret.ConnectionGroupName = this.pubnubConnectionGroupName;
-            return ret;
+            return CreateRequest(uri, keepAliveRequest, nocache);
         }
 	}
 
@@ -7458,7 +7456,6 @@ namespace PubNubMessaging.Core
 		public PubnubWebRequestBase (HttpWebRequest request)
 		{
 			this.request = request;
-            //this.ConnectionGroupName = 
             this.request.Pipelined = true;
             this.request.KeepAlive = true;
 		}
