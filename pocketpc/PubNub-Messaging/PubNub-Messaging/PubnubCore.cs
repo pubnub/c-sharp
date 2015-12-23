@@ -3018,7 +3018,13 @@ namespace PubNubMessaging.Core
                             LoggingMethod.WriteToLog(string.Format("DateTime {0}, Unable to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelSubscribeInit).", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
                         }
                         if (webRequest != null)
-                            TerminatePendingWebRequest(webRequest, errorCallback);
+                        {
+                            new Timer((o) => 
+                                {
+                                    TerminatePendingWebRequest(webRequest, errorCallback);
+                                }, null, 10000, Timeout.Infinite);
+                            
+                        }
                     }
                     else
                     {

@@ -294,6 +294,7 @@ namespace PubNubMessaging.Core
 		}
 
         private object _processUrlRequestLock = new object();
+        private int _threadPoolCounter = 0;
 		protected override sealed void SendRequestAndGetResult<T> (Uri requestUri, RequestState<T> pubnubRequestState, PubnubWebRequest request)
         {
             lock (base._endPendingRequestLock)
@@ -324,7 +325,7 @@ namespace PubNubMessaging.Core
                 {
                     LoggingMethod.WriteToLog(string.Format("DateTime {0}, SendRequestAndGetResult. request or request.RequestUri is null", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
                 }
-                
+                //Thread.Sleep(0);
                 IAsyncResult asyncResult = request.BeginGetResponse
                     (asynchronousResult => 
                     {
@@ -400,22 +401,6 @@ namespace PubNubMessaging.Core
                                                 }
                                             }
                                         }
-                                        //RequestState<T> queuedRequestState = null;
-                                        //object queuedObject = null;
-                                        //_httpRequestQueue.TryDequeue(out queuedObject);
-                                        //if (queuedObject != null)
-                                        //{
-                                        //    queuedRequestState = queuedObject as RequestState<T>;
-                                        //    if (queuedRequestState != null)
-                                        //    {
-                                        //        if (queuedRequestState.Request.RequestUri != asyncWebResponse.ResponseUri)
-                                        //        {
-                                        //            System.Diagnostics.Debug.WriteLine(string.Format("Expecting {0} with Uri {1}", queuedRequestState.Type.ToString(), queuedRequestState.Request.RequestUri));
-                                        //            System.Diagnostics.Debug.WriteLine(string.Format("But received {0} with Uri {1}", asyncRequestState.Type.ToString(), asyncRequestState.Request.RequestUri));
-                                        //            asyncRequestState = queuedRequestState;
-                                        //        }
-                                        //    }
-                                        //}
 
 #if !NETFX_CORE
                                         streamReader.Close();
@@ -832,6 +817,19 @@ namespace PubNubMessaging.Core
                                         LoggingMethod.WriteToLog(string.Format("DateTime {0}, PubnubClientError = {1}", DateTime.Now.ToString(), error.ToString()), LoggingMethod.LevelInfo);
                                     }
                                 }
+                                if (webEx.Message.IndexOf("There were not enough free threads in the ThreadPool object to complete the operation") != -1)
+                                {
+                                    int workerThreads;
+                                    int completionPortThreads;
+                                    ThreadPool.GetMaxThreads(out workerThreads, out completionPortThreads);
+                                    LoggingMethod.WriteToLog(string.Format("DateTime {0}, current workerThreads = {1}", DateTime.Now.ToString(), workerThreads.ToString()), LoggingMethod.LevelInfo);
+                                    bool setStatus = ThreadPool.SetMaxThreads(150, completionPortThreads);
+                                    if (!setStatus)
+                                    {
+                                        LoggingMethod.WriteToLog(string.Format("DateTime {0}, SetMaxThreads = {1}", DateTime.Now.ToString(), setStatus.ToString()), LoggingMethod.LevelInfo);
+                                    }
+                                    //Thread.Sleep(0);
+                                }
                                 ProcessResponseCallbackWebExceptionHandler<T>(webEx, asyncRequestState, channel, channelGroup);
                             }
                             #endregion
@@ -916,29 +914,10 @@ namespace PubNubMessaging.Core
                             ProcessResponseCallbackExceptionHandler<T>(ex, asyncRequestState);
                             #endregion
                         }
+                        asynchronousResult.AsyncWaitHandle.Close();
                     }, pubnubRequestState);
                 Timer webRequestTimer = new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.Type) * 1000, Timeout.Infinite);
 #else
-            if (!ClientNetworkStatus.MachineSuspendMode && !PubnubWebRequest.MachineSuspendMode)
-            {
-                IAsyncResult asyncResult = request.BeginGetResponse(new AsyncCallback(UrlProcessResponseCallback<T>), pubnubRequestState);
-                ThreadPool.RegisterWaitForSingleObject(asyncResult.AsyncWaitHandle, new WaitOrTimerCallback(OnPubnubWebRequestTimeout<T>), pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.Type) * 1000, true);
-            }
-            else
-            {
-                ReconnectState<T> netState = new ReconnectState<T>();
-                netState.Channels = pubnubRequestState.Channels;
-                netState.ChannelGroups = pubnubRequestState.ChannelGroups;
-                netState.Type = pubnubRequestState.Type;
-                netState.SubscribeOrPresenceRegularCallback = pubnubRequestState.SubscribeOrPresenceOrRegularCallback;
-                netState.ErrorCallback = pubnubRequestState.ErrorCallback;
-                netState.ConnectCallback = pubnubRequestState.ConnectCallback;
-                netState.Timetoken = pubnubRequestState.Timetoken;
-                netState.Reconnect = pubnubRequestState.Reconnect;
-
-                _reconnectFromSuspendMode = netState;
-                return;
-            }
 #endif
                 #region "Presence Heartbeat code block"
                 if (pubnubRequestState.Type == ResponseType.Presence || pubnubRequestState.Type == ResponseType.Subscribe)
