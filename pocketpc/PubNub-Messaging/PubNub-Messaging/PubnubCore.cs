@@ -3019,10 +3019,11 @@ namespace PubNubMessaging.Core
                         }
                         if (webRequest != null)
                         {
+                            //Wait for 60 seconds to terminate pending web request to allow any presence events
                             new Timer((o) => 
                                 {
                                     TerminatePendingWebRequest(webRequest, errorCallback);
-                                }, null, 10000, Timeout.Infinite);
+                                }, null, 60*1000, Timeout.Infinite);
                             
                         }
                     }
