@@ -6540,10 +6540,11 @@ namespace PubNubMessaging.Core
                                 }
                                 else
                                 {
-                                    Console.WriteLine(timetokenFromResult.ToString());
+                                    System.Diagnostics.Debug.WriteLine(timetokenFromResult.ToString());
                                 }
                             }
-
+                            LoggingMethod.WriteToLog(string.Format("DateTime: {0}, **WrapResultBasedOnResponseType**", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
+                            LoggingMethod.WriteToLog(string.Format("DateTime: {0}, **receivedTimetoken** = {1}", DateTime.Now.ToString(), receivedTimetoken), LoggingMethod.LevelInfo);
                             long minimumTimetoken1 = multiChannelSubscribe.Min();
                             //foreach (string channel in multiChannelSubscribe.Keys)
                             //{
@@ -6583,7 +6584,10 @@ namespace PubNubMessaging.Core
                             //}
                             
                             long maximumTimetoken = Math.Max(maximumTimetoken1, maximumTimetoken2);
-
+                            LoggingMethod.WriteToLog(string.Format("DateTime: {0}, **type** = {1}", DateTime.Now.ToString(), type.ToString()), LoggingMethod.LevelInfo);
+                            LoggingMethod.WriteToLog(string.Format("DateTime: {0}, **maximumTimetoken** = {1}", DateTime.Now.ToString(), maximumTimetoken), LoggingMethod.LevelInfo);
+                            LoggingMethod.WriteToLog(string.Format("DateTime: {0}, **minimumTimetoken** = {1}", DateTime.Now.ToString(), minimumTimetoken), LoggingMethod.LevelInfo);
+                            LoggingMethod.WriteToLog(string.Format("DateTime: {0}, **lastTimetoken** = {1}", DateTime.Now.ToString(), lastTimetoken), LoggingMethod.LevelInfo);
 							if (minimumTimetoken == 0 || lastTimetoken == 0) {
 								if (maximumTimetoken == 0) {
                                     if (!reconnect)
@@ -6594,7 +6598,14 @@ namespace PubNubMessaging.Core
 									if (!_enableResumeOnReconnect) {
 										lastSubscribeTimetoken = receivedTimetoken;
 									} else {
-										//do nothing. keep last subscribe token
+                                        if (minimumTimetoken == maximumTimetoken)
+                                        {
+                                            lastSubscribeTimetoken = receivedTimetoken;
+                                        }
+                                        else
+                                        {
+                                            //do nothing. keep last subscribe token
+                                        }
 									}
 								}
 							} else {
@@ -6608,6 +6619,7 @@ namespace PubNubMessaging.Core
 									lastSubscribeTimetoken = receivedTimetoken;
 								}
 							}
+                            LoggingMethod.WriteToLog(string.Format("DateTime: {0}, **lastSubscribeTimetoken** = {1}", DateTime.Now.ToString(), lastSubscribeTimetoken), LoggingMethod.LevelInfo);
 							break;
 						case ResponseType.Leave:
 							result.Add (multiChannel);
