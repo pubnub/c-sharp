@@ -325,7 +325,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "IfHereNowIsCalledThenItShouldReturnInfo";
             pubnub.PubnubUnitTest = unitTest;
             
-            string channel = "hello_my_channel1";
+            string channel = "hello_my_channel";
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : manualResetEventsWaitTimeout;
 
             subscribeManualEvent = new ManualResetEvent(false);
