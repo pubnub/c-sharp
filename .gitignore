@@ -99,6 +99,7 @@
 /mono-for-android/PubNubMessaging.Example/obj/Release/*
 /mono-for-android/PubNubMessaging/obj/Release/*
 /mono-for-android/PubNubMessaging/bin/Release/*
+<<<<<<< HEAD
 /pocketpc/PubNub-Messaging/ConcurrentHashtable/bin/Debug/*
 /pocketpc/PubNub-Messaging/ConcurrentHashtable/obj/Debug/*
 /pocketpc/PubNub-Messaging/ConcurrentHashtable/bin/Release/*
@@ -125,6 +126,30 @@
 /pocketpc/PubNub-Messaging/PubnubCAB/obj/Debug/*
 /pocketpc/PubNub-Messaging/PubnubCAB/bin/Debug/*
 /pocketpc/PubNub-Messaging/PubnubCAB/bin/Release/*
+=======
+/PCL/TimerExtension/bin/Debug/*
+/PCL/TimerExtension/obj/Debug/*
+/PCL/TimerExtension/bin/Release/*
+/PCL/TimerExtension/obj/Release/*
+/PCL/PubnubConsole/bin/Debug/*
+/PCL/PubnubConsole/obj/Debug/*
+/PCL/PubnubConsole/bin/Release/*
+/PCL/PubnubConsole/obj/Release/*
+/PCL/Components/*
+/PCL/packages/*
+/PCL/ConcurrentHashtable/obj/Debug/*
+/PCL/ConcurrentHashtable/bin/Debug/*
+/PCL/ConcurrentHashtable/obj/Release/*
+/PCL/ConcurrentHashtable/bin/Release/*
+/PCL/PubNub-Messaging.Tests/bin/Debug/*
+/PCL/PubNub-Messaging.Tests/obj/Debug/*
+/PCL/PubNub-Messaging.Tests/bin/Release/*
+/PCL/PubNub-Messaging.Tests/obj/Release/*
+/PCL/PubNub-Messaging/bin/Debug/*
+/PCL/PubNub-Messaging/obj/Debug/*
+/PCL/PubNub-Messaging/bin/Release/*
+/PCL/PubNub-Messaging/obj/Release/*
+>>>>>>> ppt102374092
 .DS_Store
 *.cache
 *.suo

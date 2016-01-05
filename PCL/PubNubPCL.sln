@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubNub-Messaging", "PubNub-Messaging\PubNub-Messaging.csproj", "{4372294C-56B1-44D9-B5C3-E0DF7E0D1BCC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConcurrentHashtable", "ConcurrentHashtable\ConcurrentHashtable.csproj", "{551A7076-410C-4AE9-A515-67BB2BF3123A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimerExtension", "TimerExtension\TimerExtension.csproj", "{4588F44D-6189-4A10-BC11-D630E3BB2668}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubnubConsole", "PubnubConsole\PubnubConsole.csproj", "{5FD61FD3-AFB7-41BC-8E2C-321F30AD38DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubNub-Messaging.Tests", "PubNub-Messaging.Tests\PubNub-Messaging.Tests.csproj", "{419A0298-DD33-44A0-81CB-212782ED4150}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{419A0298-DD33-44A0-81CB-212782ED4150}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{419A0298-DD33-44A0-81CB-212782ED4150}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{419A0298-DD33-44A0-81CB-212782ED4150}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{419A0298-DD33-44A0-81CB-212782ED4150}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4372294C-56B1-44D9-B5C3-E0DF7E0D1BCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4372294C-56B1-44D9-B5C3-E0DF7E0D1BCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4372294C-56B1-44D9-B5C3-E0DF7E0D1BCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4372294C-56B1-44D9-B5C3-E0DF7E0D1BCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4588F44D-6189-4A10-BC11-D630E3BB2668}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4588F44D-6189-4A10-BC11-D630E3BB2668}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4588F44D-6189-4A10-BC11-D630E3BB2668}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4588F44D-6189-4A10-BC11-D630E3BB2668}.Release|Any CPU.Build.0 = Release|Any CPU
+		{551A7076-410C-4AE9-A515-67BB2BF3123A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{551A7076-410C-4AE9-A515-67BB2BF3123A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{551A7076-410C-4AE9-A515-67BB2BF3123A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{551A7076-410C-4AE9-A515-67BB2BF3123A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FD61FD3-AFB7-41BC-8E2C-321F30AD38DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FD61FD3-AFB7-41BC-8E2C-321F30AD38DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FD61FD3-AFB7-41BC-8E2C-321F30AD38DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FD61FD3-AFB7-41BC-8E2C-321F30AD38DB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
