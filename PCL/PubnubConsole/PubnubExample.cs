@@ -9,41 +9,44 @@ using System.Globalization;
 
 namespace PubNubMessaging.Core
 {
+	public class PlatformPubnubLog : IPubnubLog
+	{
+		private LoggingMethod.Level _logLevel = LoggingMethod.Level.Info;
+		//LoggingMethod.Level.Info => To  capture verbose info
+
+		public LoggingMethod.Level LogLevel
+		{
+			get
+			{
+				return _logLevel;
+			}
+			set
+			{
+				_logLevel = value;
+			}
+		}
+
+		public void WriteToLog(string log)
+		{
+			// This method implementation varies baed on the target environment and platform
+			string folder = System.IO.Directory.GetCurrentDirectory(); //For console
+			//string folder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments); // For iOS
+			System.Diagnostics.Debug.WriteLine(folder);
+			string path = System.IO.Path.Combine(folder, "pubnubmessaging.log");
+			using (System.IO.TextWriter writer = new System.IO.StreamWriter(path, true))
+			{
+				writer.WriteLine(log);
+				writer.Flush();
+				writer.Close();
+			}
+		}
+	}
+
+
 	public class PubnubExample
 	{
-        public class PlatformPubnubLog : IPubnubLog
-        {
-            private LoggingMethod.Level _logLevel = LoggingMethod.Level.Info;
-
-            public LoggingMethod.Level LogLevel
-            {
-                get
-                {
-                    return _logLevel;
-                }
-                set
-                {
-                    _logLevel = value;
-                }
-            }
-
-            public void WriteToLog(string log)
-            {
-                string folder = System.IO.Directory.GetCurrentDirectory(); //For console
-                //string folder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments); // For iOS
-                System.Diagnostics.Debug.WriteLine(folder);
-                string path = System.IO.Path.Combine(folder, "pubnubmessaging.log");
-                using (System.IO.TextWriter writer = new System.IO.StreamWriter(path, true))
-                {
-                    writer.WriteLine(log);
-                    writer.Flush();
-                    writer.Close();
-                }
-            }
-        }
-
 		static public Pubnub pubnub;
-        static public PlatformPubnubLog pubnugLog = new PlatformPubnubLog();
+        //static public PlatformPubnubLog pubnugLog = new PlatformPubnubLog();
 
 		static public bool deliveryStatus = false;
 		static public string channel = "";
@@ -171,7 +174,7 @@ namespace PubNubMessaging.Core
 			pubnub = new Pubnub(publishKey, subscribeKey, secretKey, cipherKey,
 				(enableSSL.Trim().ToLower() == "y") ? true : false);
 
-            pubnub.SetPubnubLog(pubnugLog);
+			pubnub.SetPubnubLog(new PlatformPubnubLog());
 
 			pubnub.Origin = origin;
 
