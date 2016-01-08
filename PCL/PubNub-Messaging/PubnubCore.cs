@@ -1428,7 +1428,7 @@ namespace PubNubMessaging.Core
             if (IsNullOrWhiteSpace(publishKey)) { publishKey = ""; }
             if (IsNullOrWhiteSpace(subscribeKey)) { subscribeKey = ""; }
             
-            this.Init(publishKey, subscribeKey, "", "", false);
+			this.Init(publishKey, subscribeKey, "", "", true);
 		}
 
 		/// <summary>
@@ -1444,7 +1444,7 @@ namespace PubNubMessaging.Core
             if (IsNullOrWhiteSpace(subscribeKey)) { subscribeKey = ""; }
             if (IsNullOrWhiteSpace(secretKey)) { secretKey = ""; }
             
-            this.Init(publishKey, subscribeKey, secretKey, "", false);
+			this.Init(publishKey, subscribeKey, secretKey, "", true);
 		}
 
         public static bool IsNullOrWhiteSpace(string value)
