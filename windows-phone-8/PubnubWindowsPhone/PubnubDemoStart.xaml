@@ -30,7 +30,7 @@
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Margin="12,142,12,0" Grid.RowSpan="2">
             <StackPanel Orientation="Horizontal" Margin="20,3,19,0" Name="spnlInput1" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="72">
-                <CheckBox Content="SSL" Height="65" Name="chkSSL" VerticalAlignment="Center" Background="Gray" HorizontalAlignment="Stretch" />
+                <CheckBox Content="SSL" Height="65" Name="chkSSL" VerticalAlignment="Center" Background="Gray" HorizontalAlignment="Stretch"  IsChecked="True" />
                 <Line Name="separatorCheck" X1="0" Y1="45" StrokeThickness="3" Stroke="White" VerticalAlignment="Center"></Line>
                 <CheckBox Content="Resume On Reconnect" Height="65" Name="chkResumeOnReconnect" VerticalAlignment="Center" HorizontalAlignment="Stretch" Background="Gray" IsChecked="True" />
             </StackPanel>
