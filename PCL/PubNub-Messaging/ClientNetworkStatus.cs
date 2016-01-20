@@ -24,13 +24,10 @@ namespace PubNubMessaging.Core
 			}
 		}
 
-		#if (SILVERLIGHT  || WINDOWS_PHONE)
-		private static ManualResetEvent mres = new ManualResetEvent(false);
-		private static ManualResetEvent mreSocketAsync = new ManualResetEvent(false);
-		#elif(!UNITY_IOS && !UNITY_ANDROID)
-		private static ManualResetEvent mres = new ManualResetEvent(false);
-		#endif
-		internal static bool SimulateNetworkFailForTesting
+        private static ManualResetEvent mres = new ManualResetEvent(false);
+        private static ManualResetEvent mreSocketAsync = new ManualResetEvent(false);
+
+        internal static bool SimulateNetworkFailForTesting
 		{
 			get
 			{
@@ -81,66 +78,87 @@ namespace PubNubMessaging.Core
 			_status = status;
 		}
 
+        private static object _internetCheckLock = new object();
+        private static bool isInternetCheckRunning = false;
+
 		private static void CheckClientNetworkAvailability<T>(Action<bool> callback, Action<PubnubClientError> errorCallback, string[] channels, string[] channelGroups)
 		{
+            lock (_internetCheckLock)
+            {
+                if (isInternetCheckRunning)
+                {
+                    LoggingMethod.WriteToLog(string.Format("DateTime {0} InternetCheckRunning Already running", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
+                    return;
+                }
+            }
+            mres = new ManualResetEvent(false);
+
+
 			InternetState<T> state = new InternetState<T>();
 			state.Callback = callback;
 			state.ErrorCallback = errorCallback;
 			state.Channels = channels;
             state.ChannelGroups = channelGroups;
 
-			CheckSocketConnect<T>(state);
+            ThreadPool.QueueUserWorkItem(CheckSocketConnect<T>, state);
+
+            mres.WaitOne(500);
 
 		}
 
 		private static void CheckSocketConnect<T>(object internetState)
 		{
-			InternetState<T> state = internetState as InternetState<T>;
-			Action<bool> callback = state.Callback;
-			Action<PubnubClientError> errorCallback = state.ErrorCallback;
-			string[] channels = state.Channels;
-            string[] channelGroups = state.ChannelGroups;
+            lock (_internetCheckLock)
+            {
+                isInternetCheckRunning = true;
+            }
+
+            HttpWebRequest myRequest = null;
+            Action<bool> callback = null;
+            Action<PubnubClientError> errorCallback = null;
+            string[] channels = null;
+            string[] channelGroups = null;
+
 			try
 			{
-				//_status = true;
-				//callback(true);
-				//System.Net.WebRequest test = System.Net.WebRequest.Create("http://pubsub.pubnub.com");
+                InternetState<T> state = internetState as InternetState<T>;
+                if (state != null)
+                {
+                    callback = state.Callback;
+                    errorCallback = state.ErrorCallback;
+                    channels = state.Channels;
+                    channelGroups = state.ChannelGroups;
+                }
 
-				HttpWebRequest myRequest = (HttpWebRequest)System.Net.WebRequest.Create("http://pubsub.pubnub.com");
-				myRequest.Method = "HEAD";
+                mreSocketAsync = new ManualResetEvent(false);
+
+                myRequest = (HttpWebRequest)System.Net.WebRequest.Create("https://pubsub.pubnub.com/time/0");
 				myRequest.BeginGetResponse(cb => 
 					{
 						try
 						{
-							//Just want to check whether we can hit server to check internet connection.
-							//Expecting webexception with code 404. No response is expected.
-							myRequest.EndGetResponse(cb);
-							_status = true;
+                            using (HttpWebResponse resp = myRequest.EndGetResponse(cb) as HttpWebResponse)
+                            {
+                                if (resp != null && resp.StatusCode == HttpStatusCode.OK)
+                                {
+                                    LoggingMethod.WriteToLog(string.Format("DateTime {0} CheckSocketConnect Resp {1}", DateTime.Now.ToString(), HttpStatusCode.OK.ToString()), LoggingMethod.LevelInfo);
+                                    _status = true;
+                                }
+                            }
 						}
-						catch(WebException webEx)
+						catch(Exception ex)
 						{
-							if (webEx.Response != null)
-							{
-								HttpStatusCode currentHttpStatusCode = ((HttpWebResponse)webEx.Response).StatusCode;
-								if ((int)currentHttpStatusCode == 404)
-								{
-									//The remote server returned an error: (404) Nothing
-									_status = true;
-								}
-							}
-							else
-							{
-								_status = false;
-							}
-						}
-						mres.Set();
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} CheckSocketConnect Failed {1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelInfo);
+                        }
+                        finally
+                        {
+                            mreSocketAsync.Set();
+                        }
+
 					}, null);
-				
-				mres.WaitOne(100);
-//				using (UdpSocketClient socket = new UdpSocketClient())
-//				{
-//					await socket.ConnectAsync("pubsub.pubnub.com", 80);
-//				}
+
+                mreSocketAsync.WaitOne(330);
+
 			}
 			catch (Exception ex)
 			{
@@ -150,6 +168,8 @@ namespace PubNubMessaging.Core
 			}
 			finally
 			{
+                isInternetCheckRunning = false;
+                mres.Set();
 			}
 		}
 
