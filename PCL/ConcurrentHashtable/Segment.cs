@@ -366,12 +366,15 @@ namespace TvdP.Collections
         /// <returns>The index position the next item has been found or -1 otherwise.</returns>
         public int GetNextItem(int beyond, out TStored item, ConcurrentHashtable<TStored, TSearch> traits)
         {
-            for (int end = _List.Length; ++beyond < end; )
+            if (_List != null)
             {
-                if (!traits.IsEmpty(ref _List[beyond]))
+                for (int end = _List.Length; ++beyond < end; )
                 {
-                    item = _List[beyond];
-                    return beyond;
+                    if (!traits.IsEmpty(ref _List[beyond]))
+                    {
+                        item = _List[beyond];
+                        return beyond;
+                    }
                 }
             }
 

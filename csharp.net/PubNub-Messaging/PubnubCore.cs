@@ -1,4 +1,4 @@
-﻿//Build Date: June 17, 2015
+﻿//Build Date: Jan 13, 2016
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -516,6 +516,16 @@ namespace PubNubMessaging.Core
                         if (channelInternetStatus.ContainsKey(channel)
                                  && (netState.Type == ResponseType.Subscribe || netState.Type == ResponseType.Presence))
                         {
+                            bool networkConnection;
+                            if (_pubnubUnitTest is IPubnubUnitTest && _pubnubUnitTest.EnableStubTest)
+                            {
+                                networkConnection = true;
+                            }
+                            else
+                            {
+                                networkConnection = CheckInternetConnectionStatus<T>(pubnetSystemActive, netState.ErrorCallback, netState.Channels, netState.ChannelGroups);
+                            }
+
                             if (channelInternetStatus[channel])
                             {
                                 //Reset Retry if previous state is true
@@ -523,6 +533,8 @@ namespace PubNubMessaging.Core
                             }
                             else
                             {
+                                channelInternetStatus.AddOrUpdate(channel, networkConnection, (key, oldValue) => networkConnection);
+
                                 channelInternetRetry.AddOrUpdate(channel, 1, (key, oldValue) => oldValue + 1);
                                 LoggingMethod.WriteToLog(string.Format("DateTime {0}, channel={1} {2} reconnectNetworkCallback. Retry {3} of {4}", DateTime.Now.ToString(), channel, netState.Type, channelInternetRetry[channel], _pubnubNetworkCheckRetries), LoggingMethod.LevelInfo);
 
@@ -1418,7 +1430,7 @@ namespace PubNubMessaging.Core
             if (IsNullOrWhiteSpace(publishKey)) { publishKey = ""; }
             if (IsNullOrWhiteSpace(subscribeKey)) { subscribeKey = ""; }
             
-            this.Init(publishKey, subscribeKey, "", "", false);
+            this.Init(publishKey, subscribeKey, "", "", true);
 		}
 
 		/// <summary>
@@ -1434,7 +1446,7 @@ namespace PubNubMessaging.Core
             if (IsNullOrWhiteSpace(subscribeKey)) { subscribeKey = ""; }
             if (IsNullOrWhiteSpace(secretKey)) { secretKey = ""; }
             
-            this.Init(publishKey, subscribeKey, secretKey, "", false);
+            this.Init(publishKey, subscribeKey, secretKey, "", true);
 		}
 
         public static bool IsNullOrWhiteSpace(string value)
@@ -3008,6 +3020,21 @@ namespace PubNubMessaging.Core
             {
 				return;
 			}
+
+            bool networkConnection;
+            if (_pubnubUnitTest is IPubnubUnitTest && _pubnubUnitTest.EnableStubTest)
+            {
+                networkConnection = true;
+            }
+            else
+            {
+                networkConnection = CheckInternetConnectionStatus<T>(pubnetSystemActive, errorCallback, channels, channelGroups);
+            }
+            if (!networkConnection)
+            {
+                channelInternetStatus.AddOrUpdate(multiChannel, networkConnection, (key, oldValue) => networkConnection);
+                channelGroupInternetStatus.AddOrUpdate(multiChannelGroup, networkConnection, (key, oldValue) => networkConnection);
+            }
 
             if (((channelInternetStatus.ContainsKey(multiChannel) && !channelInternetStatus[multiChannel])
                 || (multiChannelGroup != "" && channelGroupInternetStatus.ContainsKey(multiChannelGroup) && !channelGroupInternetStatus[multiChannelGroup]))

@@ -46,7 +46,7 @@
             <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
                         IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="0,0,30,40"/>
         </Grid>
-        <CheckBox x:Name="chkSSL" Content="Use SSL" HorizontalAlignment="Left" Margin="121,2,0,0" Grid.Row="1" VerticalAlignment="Top"/>
+        <CheckBox x:Name="chkSSL" Content="Use SSL" HorizontalAlignment="Left" Margin="121,2,0,0" Grid.Row="1" VerticalAlignment="Top" IsChecked="True"/>
         <CheckBox x:Name="chkReconnect" Content="Resume on Reconnect" HorizontalAlignment="Left" Margin="280,2,0,0" Grid.Row="1" VerticalAlignment="Top" IsChecked="True"/>
         <TextBlock HorizontalAlignment="Left" Margin="124,53,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Text="Publish Key" FontSize="14"/>
         <TextBox x:Name="txtPublishKey" HorizontalAlignment="Left" Margin="213,38,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="313" Text="demo"/>

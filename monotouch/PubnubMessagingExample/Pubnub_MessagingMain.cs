@@ -90,7 +90,7 @@ namespace PubnubMessagingExample
 
             BooleanElement proxyEnabled = new BooleanElement ("Proxy", false);
 
-            BooleanElement sslEnabled = new BooleanElement ("Enable SSL", false);
+            BooleanElement sslEnabled = new BooleanElement ("Enable SSL", true);
             Root = new RootElement ("Pubnub Messaging") {
                 new Section (labelView) {
                 },

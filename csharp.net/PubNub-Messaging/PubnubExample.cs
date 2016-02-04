@@ -57,16 +57,21 @@ namespace PubNubMessaging.Core
             Console.ResetColor();
             Console.WriteLine();
 
-            Console.WriteLine("Enable SSL? ENTER Y for Yes, else N");
+            Console.WriteLine("Enable SSL? ENTER Y for Yes, else N. (Default Y)");
             string enableSSL = Console.ReadLine();
             Console.ForegroundColor = ConsoleColor.Blue;
             if (enableSSL.Trim().ToLower() == "y")
             {
                 Console.WriteLine("SSL Enabled");
             }
-            else
+            else if (enableSSL.Trim().ToLower() == "n")
             {
                 Console.WriteLine("SSL NOT Enabled");
+            }
+            else
+            {
+                enableSSL = "Y";
+                Console.WriteLine("SSL Enabled (default)");
             }
             Console.ResetColor();
             Console.WriteLine();
