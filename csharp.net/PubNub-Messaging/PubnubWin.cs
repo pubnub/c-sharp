@@ -1,4 +1,4 @@
-﻿//Build Date: August 21, 2015
+﻿//Build Date: Feb 08, 2016
 using System;
 using System.Text;
 using System.IO;
@@ -969,7 +969,11 @@ namespace PubNubMessaging.Core
 				TerminatePendingWebRequest();
                 if (overrideTcpKeepAlive && localClientHeartBeatTimer != null)
 				{
-					localClientHeartBeatTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                    try
+                    {
+                        localClientHeartBeatTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                    }
+                    catch { }
 				}
 
 				LoggingMethod.WriteToLog(string.Format("DateTime {0}, System entered into Suspend Mode.", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
