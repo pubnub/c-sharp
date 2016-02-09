@@ -1,4 +1,4 @@
-﻿//Build Date: Jan 13, 2016
+﻿//Build Date: Feb 08, 2016
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -571,8 +571,12 @@ namespace PubNubMessaging.Core
                         {
                             if (_channelReconnectTimer.ContainsKey(channel))
                             {
-                                _channelReconnectTimer[channel].Change(Timeout.Infinite, Timeout.Infinite);
-                                _channelReconnectTimer[channel].Dispose();
+                                try
+                                {
+                                    _channelReconnectTimer[channel].Change(Timeout.Infinite, Timeout.Infinite);
+                                    _channelReconnectTimer[channel].Dispose();
+                                }
+                                catch { }
                             }
                             string multiChannel = (netState.Channels != null) ? string.Join(",", netState.Channels) : "";
                             string multiChannelGroup = (netState.ChannelGroups != null) ? string.Join(",", netState.ChannelGroups) : "";
@@ -596,8 +600,12 @@ namespace PubNubMessaging.Core
                         {
                             if (_channelReconnectTimer.ContainsKey(channel))
                             {
-                                _channelReconnectTimer[channel].Change(Timeout.Infinite, Timeout.Infinite);
-                                _channelReconnectTimer[channel].Dispose();
+                                try
+                                {
+                                    _channelReconnectTimer[channel].Change(Timeout.Infinite, Timeout.Infinite);
+                                    _channelReconnectTimer[channel].Dispose();
+                                }
+                                catch { }
                             }
                             switch (netState.Type)
                             {
@@ -659,8 +667,12 @@ namespace PubNubMessaging.Core
                         {
                             if (_channelGroupReconnectTimer.ContainsKey(channelGroup))
                             {
-                                _channelGroupReconnectTimer[channelGroup].Change(Timeout.Infinite, Timeout.Infinite);
-                                _channelGroupReconnectTimer[channelGroup].Dispose();
+                                try
+                                {
+                                    _channelGroupReconnectTimer[channelGroup].Change(Timeout.Infinite, Timeout.Infinite);
+                                    _channelGroupReconnectTimer[channelGroup].Dispose();
+                                }
+                                catch { }
                             }
                             string multiChannel = (netState.Channels != null) ? string.Join(",", netState.Channels) : "";
                             string multiChannelGroup = (netState.ChannelGroups != null) ? string.Join(",", netState.ChannelGroups) : "";
@@ -684,8 +696,12 @@ namespace PubNubMessaging.Core
                         {
                             if (_channelGroupReconnectTimer.ContainsKey(channelGroup))
                             {
-                                _channelGroupReconnectTimer[channelGroup].Change(Timeout.Infinite, Timeout.Infinite);
-                                _channelGroupReconnectTimer[channelGroup].Dispose();
+                                try
+                                {
+                                    _channelGroupReconnectTimer[channelGroup].Change(Timeout.Infinite, Timeout.Infinite);
+                                    _channelGroupReconnectTimer[channelGroup].Dispose();
+                                }
+                                catch { }
                             }
                             switch (netState.Type)
                             {
