@@ -145,7 +145,7 @@ namespace PubNubMessaging.Core
 			_errorSeverity = errorSeverity;
 			_messageSource = source;
 			_channel = channel;
-            _channel = channelGroup;
+            _channelGroup = channelGroup;
 			_detailedDotNetException = null;
 			_pubnubWebRequest = pubnubWebRequest;
 			_pubnubWebResponse = pubnubWebResponse;

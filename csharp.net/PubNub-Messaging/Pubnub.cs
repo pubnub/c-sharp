@@ -9,19 +9,28 @@ namespace PubNubMessaging.Core
         PubnubWin pubnub;
         
         #region "PubNub API Channel Methods"
+
 		public void Subscribe<T>(string channel, Action<T> subscribeCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback)
 		{
+            if (string.IsNullOrEmpty(channel) || channel.Trim().Length <= 0)
+            {
+                throw new ArgumentException("Channel should be provided.");
+            }
 			pubnub.Subscribe<T>(channel, "", subscribeCallback, connectCallback, null, errorCallback);
 		}
 
         public void Subscribe<T>(string channel, Action<T> subscribeCallback, Action<T> connectCallback, Action<T> wildcardPresenceCallback, Action<PubnubClientError> errorCallback)
         {
+            if (string.IsNullOrEmpty(channel) || channel.Trim().Length <= 0)
+            {
+                throw new ArgumentException("Channel should be provided.");
+            }
             pubnub.Subscribe<T>(channel, "", subscribeCallback, connectCallback, wildcardPresenceCallback, errorCallback);
         }
 
         public void Subscribe<T>(string channel, string channelGroup, Action<T> subscribeCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback)
         {
-            pubnub.Subscribe<T>(channel, channelGroup, subscribeCallback, connectCallback, errorCallback);
+            pubnub.Subscribe<T>(channel, channelGroup, subscribeCallback, connectCallback, null, errorCallback);
         }
 
         public void Subscribe<T>(string channel, string channelGroup, Action<T> subscribeCallback, Action<T> connectCallback, Action<T> wildcardPresenceCallback, Action<PubnubClientError> errorCallback)
@@ -29,19 +38,28 @@ namespace PubNubMessaging.Core
             pubnub.Subscribe<T>(channel, channelGroup, subscribeCallback, connectCallback, wildcardPresenceCallback, errorCallback);
         }
 
+        public void Subscribe<T1, T2, T3, T4>(string channel, string channelGroup, Action<T1> subscribeCallback, Action<T2> presenceCallback, Action<T3> connectCallback, Action<T4> wildcardPresenceCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.Subscribe<T1, T2, T3, T4>(channel, channelGroup, subscribeCallback, presenceCallback, connectCallback, wildcardPresenceCallback, errorCallback);
+        }
+
         public void Subscribe(string channel, Action<object> subscribeCallback, Action<object> connectCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.Subscribe(channel, subscribeCallback, connectCallback, errorCallback);
+            if (string.IsNullOrEmpty(channel) || channel.Trim().Length <= 0)
+            {
+                throw new ArgumentException("Channel should be provided.");
+            }
+			pubnub.Subscribe<object>(channel, "", subscribeCallback, connectCallback, null, errorCallback);
 		}
 
         public void Subscribe(string channel, string channelGroup, Action<object> subscribeCallback, Action<object> connectCallback, Action<PubnubClientError> errorCallback)
         {
-            pubnub.Subscribe(channel, channelGroup, subscribeCallback, connectCallback, errorCallback);
+            pubnub.Subscribe<object>(channel, channelGroup, subscribeCallback, connectCallback, null, errorCallback);
         }
 
 		public bool Publish(string channel, object message, Action<object> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			return pubnub.Publish(channel, message, true, userCallback, errorCallback);
+			return pubnub.Publish<object>(channel, message, true, userCallback, errorCallback);
 		}
 
 		public bool Publish<T>(string channel, object message, Action<T> userCallback, Action<PubnubClientError> errorCallback)
@@ -51,7 +69,7 @@ namespace PubNubMessaging.Core
 
         public bool Publish(string channel, object message, bool storeInHistory, Action<object> userCallback, Action<PubnubClientError> errorCallback)
         {
-            return pubnub.Publish(channel, message, storeInHistory, userCallback, errorCallback);
+            return pubnub.Publish<object>(channel, message, storeInHistory, userCallback, errorCallback);
         }
 
         public bool Publish<T>(string channel, object message, bool storeInHistory, Action<T> userCallback, Action<PubnubClientError> errorCallback)
@@ -61,7 +79,12 @@ namespace PubNubMessaging.Core
 
 		public void Presence<T>(string channel, Action<T> presenceCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.Presence<T>(channel, presenceCallback, connectCallback, errorCallback);
+            if (string.IsNullOrEmpty(channel) || channel.Trim().Length <= 0)
+            {
+                throw new ArgumentException("Channel should be provided.");
+            }
+
+			pubnub.Presence<T>(channel, "", presenceCallback, connectCallback, errorCallback);
 		}
 
         public void Presence<T>(string channel, string channelGroup, Action<T> presenceCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback)
@@ -69,14 +92,24 @@ namespace PubNubMessaging.Core
             pubnub.Presence<T>(channel, channelGroup, presenceCallback, connectCallback, errorCallback);
         }
 
+        public void Presence<T1, T2, T3, T4>(string channel, string channelGroup, Action<T1> subscribeCallback, Action<T2> presenceCallback, Action<T3> connectCallback, Action<T4> wildcardPresenceCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.Presence<T1, T2, T3, T4>(channel, channelGroup, subscribeCallback, presenceCallback, connectCallback, wildcardPresenceCallback, errorCallback);
+        }
+
         public void Presence(string channel, Action<object> presenceCallback, Action<object> connectCallback, Action<PubnubClientError> errorCallback)
 		{
-            pubnub.Presence(channel, presenceCallback, connectCallback, errorCallback);
+            if (string.IsNullOrEmpty(channel) || channel.Trim().Length <= 0)
+            {
+                throw new ArgumentException("Channel should be provided.");
+            }
+
+            pubnub.Presence<object>(channel, "", presenceCallback, connectCallback, errorCallback);
 		}
 
         public void Presence(string channel, string channelGroup, Action<object> presenceCallback, Action<object> connectCallback, Action<PubnubClientError> errorCallback)
         {
-            pubnub.Presence(channel, channelGroup, presenceCallback, connectCallback, errorCallback);
+            pubnub.Presence<object>(channel, channelGroup, presenceCallback, connectCallback, errorCallback);
         }
 
 		public bool DetailedHistory(string channel, long start, long end, int count, bool reverse, Action<object> userCallback, Action<PubnubClientError> errorCallback)
@@ -161,23 +194,30 @@ namespace PubNubMessaging.Core
 
         public void Unsubscribe(string channel, string channelGroup, Action<object> subscribeCallback, Action<object> connectCallback, Action<object> disconnectCallback, Action<PubnubClientError> errorCallback)
         {
-            pubnub.Unsubscribe(channel, channelGroup, subscribeCallback, connectCallback, disconnectCallback, null, errorCallback);
+            pubnub.Unsubscribe<object>(channel, channelGroup, subscribeCallback, connectCallback, disconnectCallback, null, errorCallback);
         }
-
 
         public void Unsubscribe<T>(string channel, Action<T> subscribeCallback, Action<T> connectCallback, Action<T> disconnectCallback, Action<PubnubClientError> errorCallback)
 		{
+            if (string.IsNullOrEmpty(channel) || channel.Trim().Length <= 0)
+            {
+                throw new ArgumentException("Channel should be provided.");
+            }
             pubnub.Unsubscribe<T>(channel, null, subscribeCallback, connectCallback, disconnectCallback, null, errorCallback);
 		}
 
         public void Unsubscribe(string channel, Action<object> subscribeCallback, Action<object> connectCallback, Action<object> disconnectCallback, Action<PubnubClientError> errorCallback)
 		{
+            if (string.IsNullOrEmpty(channel) || channel.Trim().Length <= 0)
+            {
+                throw new ArgumentException("Channel should be provided.");
+            }
             pubnub.Unsubscribe(channel, null, subscribeCallback, connectCallback, disconnectCallback, null,errorCallback);
 		}
 
         public void PresenceUnsubscribe(string channel, string channelGroup, Action<object> presenceCallback, Action<object> connectCallback, Action<object> disconnectCallback, Action<PubnubClientError> errorCallback)
         {
-            pubnub.PresenceUnsubscribe(channel, channelGroup, presenceCallback, connectCallback, disconnectCallback, errorCallback);
+            pubnub.PresenceUnsubscribe<object>(channel, channelGroup, presenceCallback, connectCallback, disconnectCallback, errorCallback);
         }
 
         public void PresenceUnsubscribe<T>(string channel, string channelGroup, Action<T> presenceCallback, Action<T> connectCallback, Action<T> disconnectCallback, Action<PubnubClientError> errorCallback)
@@ -187,12 +227,12 @@ namespace PubNubMessaging.Core
 
         public void PresenceUnsubscribe(string channel, Action<object> presenceCallback, Action<object> connectCallback, Action<object> disconnectCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.PresenceUnsubscribe(channel, presenceCallback, connectCallback, disconnectCallback, errorCallback);
+			pubnub.PresenceUnsubscribe<object>(channel, "", presenceCallback, connectCallback, disconnectCallback, errorCallback);
 		}
 
         public void PresenceUnsubscribe<T>(string channel, Action<T> presenceCallback, Action<T> connectCallback, Action<T> disconnectCallback, Action<PubnubClientError> errorCallback)
 		{
-            pubnub.PresenceUnsubscribe<T>(channel, presenceCallback, connectCallback, disconnectCallback, errorCallback);
+            pubnub.PresenceUnsubscribe<T>(channel, "", presenceCallback, connectCallback, disconnectCallback, errorCallback);
 		}
 
 		public bool Time(Action<object> userCallback, Action<PubnubClientError> errorCallback)
@@ -583,6 +623,10 @@ namespace PubNubMessaging.Core
             return PubnubWin.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
         }
 
+        public static DateTime TranslatePubnubUnixNanoSecondsToDateTime(string unixNanoSecondTime)
+        {
+            return PubnubWin.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
+        }
 
 		#endregion
 

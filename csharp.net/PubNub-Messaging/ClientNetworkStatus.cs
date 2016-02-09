@@ -88,7 +88,7 @@ namespace PubNubMessaging.Core
 			}
 		}
 		#endif
-		internal static bool CheckInternetStatus<T>(bool systemActive, Action<PubnubClientError> errorCallback, string[] channels, string[] channelGroups)
+		internal static bool CheckInternetStatus(bool systemActive, Action<PubnubClientError> errorCallback, string[] channels, string[] channelGroups)
 		{
 			if (_failClientNetworkForTesting || _machineSuspendMode)
 			{
@@ -97,7 +97,7 @@ namespace PubNubMessaging.Core
 			}
 			else
 			{
-                CheckClientNetworkAvailability<T>(CallbackClientNetworkStatus, errorCallback, channels, channelGroups);
+                CheckClientNetworkAvailability(CallbackClientNetworkStatus, errorCallback, channels, channelGroups);
 				return _status;
 			}
 		}
@@ -113,19 +113,19 @@ namespace PubNubMessaging.Core
 			_status = status;
 		}
 
-		private static void CheckClientNetworkAvailability<T>(Action<bool> callback, Action<PubnubClientError> errorCallback, string[] channels, string[] channelGroups)
+		private static void CheckClientNetworkAvailability(Action<bool> callback, Action<PubnubClientError> errorCallback, string[] channels, string[] channelGroups)
 		{
-			InternetState<T> state = new InternetState<T>();
+			InternetState state = new InternetState();
 			state.Callback = callback;
 			state.ErrorCallback = errorCallback;
 			state.Channels = channels;
             state.ChannelGroups = channelGroups;
             #if (UNITY_ANDROID || UNITY_IOS || NETFX_CORE)
-            CheckSocketConnect<T>(state);
+            CheckSocketConnect(state);
 			#elif(__MonoCS__)
-			CheckSocketConnect<T>(state);
+			CheckSocketConnect(state);
 			#else
-			ThreadPool.QueueUserWorkItem(CheckSocketConnect<T>, state);
+			ThreadPool.QueueUserWorkItem(CheckSocketConnect, state);
 			#endif
 
 			#if (SILVERLIGHT || WINDOWS_PHONE)
@@ -135,9 +135,9 @@ namespace PubNubMessaging.Core
 			#endif
 		}
 
-		private static void CheckSocketConnect<T>(object internetState)
+		private static void CheckSocketConnect(object internetState)
 		{
-			InternetState<T> state = internetState as InternetState<T>;
+			InternetState state = internetState as InternetState;
 			Action<bool> callback = state.Callback;
 			Action<PubnubClientError> errorCallback = state.ErrorCallback;
 			string[] channels = state.Channels;
@@ -150,11 +150,11 @@ namespace PubNubMessaging.Core
 					SocketAsyncEventArgs sae = new SocketAsyncEventArgs();
 					sae.UserToken = state;
 					sae.RemoteEndPoint = new DnsEndPoint("pubsub.pubnub.com", 80);
-					sae.Completed += new EventHandler<SocketAsyncEventArgs>(socketAsync_Completed<T>);
+					sae.Completed += new EventHandler<SocketAsyncEventArgs>(socketAsync_Completed);
 					bool test = socket.ConnectAsync(sae);
 
 					mreSocketAsync.WaitOne(1000);
-					sae.Completed -= new EventHandler<SocketAsyncEventArgs>(socketAsync_Completed<T>);
+					sae.Completed -= new EventHandler<SocketAsyncEventArgs>(socketAsync_Completed);
 					socket.Close();
 				}
                 #elif NETFX_CORE
@@ -223,7 +223,7 @@ namespace PubNubMessaging.Core
 				#if(__MonoCS__)
 				_status = false;
 				#endif
-				ParseCheckSocketConnectException<T>(ex, channels, channelGroups, errorCallback, callback);
+				ParseCheckSocketConnectException(ex, channels, channelGroups, errorCallback, callback);
 			}
 			finally
 			{
@@ -263,7 +263,7 @@ namespace PubNubMessaging.Core
         }
 #endif
 
-        static void ParseCheckSocketConnectException<T> (Exception ex, string[] channels, string[] channelGroups, Action<PubnubClientError> errorCallback, Action<bool> callback)
+        static void ParseCheckSocketConnectException(Exception ex, string[] channels, string[] channelGroups, Action<PubnubClientError> errorCallback, Action<bool> callback)
 		{
 			PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(ex);
 			int statusCode = (int)errorType;
@@ -319,12 +319,12 @@ namespace PubNubMessaging.Core
 		}
 
 		#if (SILVERLIGHT || WINDOWS_PHONE)
-		static void socketAsync_Completed<T>(object sender, SocketAsyncEventArgs e)
+		static void socketAsync_Completed(object sender, SocketAsyncEventArgs e)
 		{
 			if (e.LastOperation == SocketAsyncOperation.Connect)
 			{
 				Socket skt = sender as Socket;
-				InternetState<T> state = e.UserToken as InternetState<T>;
+				InternetState state = e.UserToken as InternetState;
 				if (state != null)
 				{
 					LoggingMethod.WriteToLog(string.Format("DateTime {0} socketAsync_Completed.", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
