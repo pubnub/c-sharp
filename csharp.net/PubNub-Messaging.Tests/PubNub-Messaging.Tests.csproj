@@ -81,6 +81,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files (x86)\NUnit 2.6.1\bin\framework\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Threading">
       <HintPath>v3.5\System.Threading.dll</HintPath>
     </Reference>
@@ -88,6 +89,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CleanupGrant.cs" />
+    <Compile Include="CustomGenerics.cs" />
     <Compile Include="EncryptionTests.cs" />
     <Compile Include="GenerateSampleGrant.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

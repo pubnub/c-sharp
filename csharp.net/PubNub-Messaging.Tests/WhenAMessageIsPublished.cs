@@ -369,7 +369,7 @@ namespace PubNubMessaging.Tests
             }
             else
             {
-                Thread.Sleep(100);
+                Thread.Sleep(500);
                 Console.WriteLine("WhenAMessageIsPublished-ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo - Publish OK. Now checking detailed history");
                 pubnub.DetailedHistory<string>(channel, -1, complexObjectPublishTimetoken, -1, false, CaptureComplexObjectDetailedHistoryCallback, DummyErrorCallback);
                 mreComplexObjectDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
@@ -407,7 +407,7 @@ namespace PubNubMessaging.Tests
             }
             else
             {
-                Thread.Sleep(100);
+                Thread.Sleep(500);
                 pubnub.DetailedHistory<string>(channel, -1, serializedMessagePublishTimetoken, -1, false, CaptureSerializedMessagePublishDetailedHistoryCallback, DummyErrorCallback);
                 mreSerializedMessagePublishDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
                 Assert.IsTrue(isSerializedObjectMessageDetailedHistory, "Unable to match the successful serialized object message Publish");
