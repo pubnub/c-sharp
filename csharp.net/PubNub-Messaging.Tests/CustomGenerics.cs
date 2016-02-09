@@ -124,6 +124,7 @@ namespace PubNubMessaging.Tests
     public class CustomGenerics
     {
         static Pubnub pubnub = null;
+        ManualResetEvent mreDisconnect = new ManualResetEvent(false);
         ManualResetEvent mreConnect = new ManualResetEvent(false);
         ManualResetEvent mrePresence = new ManualResetEvent(false);
         ManualResetEvent mreSubscribe = new ManualResetEvent(false);
@@ -400,6 +401,11 @@ namespace PubNubMessaging.Tests
             mrePublish.WaitOne(mreWaitTimeout);
             
             mreSubscribe.WaitOne(mreWaitTimeout);
+
+            mreDisconnect = new ManualResetEvent(false);
+            pubnub.Unsubscribe<Message<UserCreated>, JoinOrLeaveAck, ConnectOrDisconnectAck, JoinOrLeaveAck>(channel, "", SubscribeCallback, PresenceCallback, ConnectCallback, DisconnectCallback, WildcardPresenceCallback, ErrorCallback);
+            mreDisconnect.WaitOne(mreWaitTimeout);
+
             mrePresence.WaitOne(mreWaitTimeout);
 
             pubnub.EndPendingRequests();
@@ -463,6 +469,15 @@ namespace PubNubMessaging.Tests
             mrePublish.WaitOne(mreWaitTimeout);
 
             mreSubscribe.WaitOne(mreWaitTimeout);
+
+            channel = "";
+            channelGroup = "cg1";
+            mreDisconnect = new ManualResetEvent(false);
+            pubnub.Unsubscribe<Message<UserCreated>, JoinOrLeaveAck, ConnectOrDisconnectAck, JoinOrLeaveAck>(channel, channelGroup, SubscribeCallback, PresenceCallback, ConnectCallback, DisconnectCallback,  WildcardPresenceCallback, ErrorCallback);
+            mreDisconnect.WaitOne(mreWaitTimeout);
+
+            Thread.Sleep(6000); //Wait for channel group channels to unsub
+
             mrePresence.WaitOne(mreWaitTimeout);
 
             pubnub.EndPendingRequests();
@@ -471,6 +486,7 @@ namespace PubNubMessaging.Tests
 
             Assert.IsTrue(receivedMessage, "Subscribe callback unable to receive the published message");
         }
+        
         private void SubscribeCallback(Message<UserCreated> message)
         {
             receivedMessage = true;
@@ -482,6 +498,12 @@ namespace PubNubMessaging.Tests
         {
             Console.WriteLine("ConnectCallback: " + ack);
             mreConnect.Set();
+        }
+
+        private void DisconnectCallback(ConnectOrDisconnectAck ack)
+        {
+            Console.WriteLine("DisconnectCallback: " + ack);
+            mreDisconnect.Set();
         }
 
         private void PresenceCallback(JoinOrLeaveAck ack)

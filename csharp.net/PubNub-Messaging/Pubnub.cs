@@ -182,6 +182,11 @@ namespace PubNubMessaging.Core
             pubnub.WhereNow<T>(uuid, userCallback, errorCallback);
         }
 
+        public void Unsubscribe<T1, T2, T3, T4>(string channel, string channelGroup, Action<T1> subscribeCallback, Action<T2> presenceCallback, Action<T3> connectCallback, Action<T3> disconnectCallback, Action<T4> wildcardPresenceCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.Unsubscribe<T1, T2, T3, T4>(channel, channelGroup, subscribeCallback, presenceCallback, connectCallback, disconnectCallback, wildcardPresenceCallback, errorCallback);
+        }
+
         public void Unsubscribe<T>(string channel, string channelGroup, Action<T> subscribeCallback, Action<T> connectCallback, Action<T> disconnectCallback, Action<T> wildcardPresenceCallback, Action<PubnubClientError> errorCallback)
         {
             pubnub.Unsubscribe<T>(channel, channelGroup, subscribeCallback, connectCallback, disconnectCallback, wildcardPresenceCallback, errorCallback);
@@ -218,6 +223,11 @@ namespace PubNubMessaging.Core
         public void PresenceUnsubscribe(string channel, string channelGroup, Action<object> presenceCallback, Action<object> connectCallback, Action<object> disconnectCallback, Action<PubnubClientError> errorCallback)
         {
             pubnub.PresenceUnsubscribe<object>(channel, channelGroup, presenceCallback, connectCallback, disconnectCallback, errorCallback);
+        }
+
+        public void PresenceUnsubscribe<T1, T2, T3, T4>(string channel, string channelGroup, Action<T1> subscribeCallback, Action<T2> presenceCallback, Action<T3> connectCallback, Action<T3> disconnectCallback, Action<T4> wildcardPresenceCallback, Action<PubnubClientError> errorCallback)
+        {
+            pubnub.PresenceUnsubscribe<T1, T2, T3, T4>(channel, channelGroup, subscribeCallback, presenceCallback, connectCallback, disconnectCallback, wildcardPresenceCallback, errorCallback);
         }
 
         public void PresenceUnsubscribe<T>(string channel, string channelGroup, Action<T> presenceCallback, Action<T> connectCallback, Action<T> disconnectCallback, Action<PubnubClientError> errorCallback)

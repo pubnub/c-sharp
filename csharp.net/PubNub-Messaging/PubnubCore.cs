@@ -3155,7 +3155,7 @@ namespace PubNubMessaging.Core
         {
             if (typeof(T).FullName.ToLower() == "system.string" || typeof(T).FullName.ToLower() == "system.object")
             {
-                PresenceUnsubscribe<T, T, T, T>(channel, channelGroup, null, presenceCallback, connectCallback, disconnectCallback, errorCallback);
+                PresenceUnsubscribe<T, T, T, T>(channel, channelGroup, null, presenceCallback, connectCallback, disconnectCallback, null, errorCallback);
             }
             else
             {
@@ -3163,7 +3163,7 @@ namespace PubNubMessaging.Core
             }
         }
 
-        public void PresenceUnsubscribe<T1, T2, T3, T4>(string channel, string channelGroup, Action<T1> subscribeCallback, Action<T2> presenceCallback, Action<T3> connectCallback, Action<T3> disconnectCallback, Action<PubnubClientError> errorCallback)
+        public void PresenceUnsubscribe<T1, T2, T3, T4>(string channel, string channelGroup, Action<T1> subscribeCallback, Action<T2> presenceCallback, Action<T3> connectCallback, Action<T3> disconnectCallback, Action<T4> wildcardPresenceCallback, Action<PubnubClientError> errorCallback)
         {
             if ((string.IsNullOrEmpty(channel) || channel.Trim().Length <= 0) && (string.IsNullOrEmpty(channelGroup) || channelGroup.Trim().Length <= 0))
             {
@@ -3191,7 +3191,7 @@ namespace PubNubMessaging.Core
             }
 
             LoggingMethod.WriteToLog(string.Format("DateTime {0}, requested presence-unsubscribe for channel(s)={1}", DateTime.Now.ToString(), channel), LoggingMethod.LevelInfo);
-            MultiChannelUnSubscribeInit<T1, T2, T3, T4>(ResponseType.PresenceUnsubscribe, channel, channelGroup, subscribeCallback, presenceCallback, connectCallback, disconnectCallback, null, errorCallback);
+            MultiChannelUnSubscribeInit<T1, T2, T3, T4>(ResponseType.PresenceUnsubscribe, channel, channelGroup, subscribeCallback, presenceCallback, connectCallback, disconnectCallback, wildcardPresenceCallback, errorCallback);
         }
 
         private void MultiChannelUnSubscribeInit<T1, T2, T3, T4>(ResponseType type, string channel, string channelGroup, Action<T1> subscribeCallback, Action<T2> presenceCallback, Action<T3> connectCallback, Action<T3> disconnectCallback, Action<T4> wildcardPresenceCallback, Action<PubnubClientError> errorCallback)
