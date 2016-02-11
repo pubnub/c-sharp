@@ -162,6 +162,7 @@
     <Compile Include="ClientNetworkStatus.cs" />
     <Compile Include="LoggingMethod.cs" />
     <Compile Include="MD5.cs" />
+    <Compile Include="Models.cs" />
     <Compile Include="Pubnub.cs" />
     <Compile Include="PubnubCore.cs" />
     <Compile Include="PubnubExample.cs" />
