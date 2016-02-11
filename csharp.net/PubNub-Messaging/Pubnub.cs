@@ -301,9 +301,9 @@ namespace PubNubMessaging.Core
         }
 
 
-		public bool GrantPresenceAccess<T>(string channel, bool read, bool write, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		public bool GrantPresenceAccess(string channel, bool read, bool write, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-            return pubnub.GrantPresenceAccess<T>(channel, read, write, userCallback, errorCallback);
+            return pubnub.GrantPresenceAccess<GrantAck>(channel, read, write, userCallback, errorCallback);
 		}
 
 		public bool GrantPresenceAccess<T>(string channel, bool read, bool write, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)

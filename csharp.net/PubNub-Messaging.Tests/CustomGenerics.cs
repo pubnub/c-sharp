@@ -260,7 +260,7 @@ namespace PubNubMessaging.Tests
 
             mreGrant = new ManualResetEvent(false);
             //Request Grant for Presence Channel (Presence Channel = Subscribe Channel + "-pnpres")
-            pubnub.GrantPresenceAccess<GrantAck>(channel, true, true, ThenSubscribeInitializeShouldReturnGrantMessage, ErrorCallback);
+            pubnub.GrantPresenceAccess(channel, true, true, ThenSubscribeInitializeShouldReturnGrantMessage, ErrorCallback);
             mreGrant.WaitOne();
 
             pubnub.EndPendingRequests();
