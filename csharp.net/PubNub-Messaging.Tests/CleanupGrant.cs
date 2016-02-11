@@ -200,7 +200,7 @@ namespace PubNubMessaging.Tests
                                             //Dictionary<string, object> channelContainer = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(channels[channelName]);
                                             Console.WriteLine(channelName);
                                             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
-                                            pubnub.GrantAccess<string>(channelName, false, false, UserCallbackForRevokeAccess, ErrorCallbackForRevokeAccess);
+                                            pubnub.GrantAccess<string>(channelName, false, false, -1, UserCallbackForRevokeAccess, ErrorCallbackForRevokeAccess);
                                             revokeManualEvent.WaitOne();
 
                                         }

@@ -72,7 +72,7 @@ namespace PubNubMessaging.Tests
                 {
                     grantManualEvent = new ManualResetEvent(false);
                     string channelName = string.Format("csharp-pam-cl-channel-{0}", index);
-                    pubnub.GrantAccess<string>(channelName, true, true, UserCallbackForSampleGrantAtChannelLevel, ErrorCallbackForSampleGrantAtChannelLevel);
+                    pubnub.GrantAccess<string>(channelName, true, true, -1, UserCallbackForSampleGrantAtChannelLevel, ErrorCallbackForSampleGrantAtChannelLevel);
                     grantManualEvent.WaitOne();
                 }
 

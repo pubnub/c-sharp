@@ -255,7 +255,7 @@ namespace PubNubMessaging.Tests
             mreGrant = new ManualResetEvent(false);
 
             //Request Grant for Subscribe Channel
-            pubnub.GrantAccess<GrantAck>(channel, true, true, ThenSubscribeInitializeShouldReturnGrantMessage, ErrorCallback);
+            pubnub.GrantAccess(channel, true, true, ThenSubscribeInitializeShouldReturnGrantMessage, ErrorCallback);
             mreGrant.WaitOne();
 
             mreGrant = new ManualResetEvent(false);

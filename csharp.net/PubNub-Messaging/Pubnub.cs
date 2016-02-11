@@ -285,9 +285,9 @@ namespace PubNubMessaging.Core
 			return pubnub.GrantAccess<T>(channel, read, write, ttl, userCallback, errorCallback);
 		}
 
-		public bool GrantAccess<T>(string channel, bool read, bool write, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		public bool GrantAccess(string channel, bool read, bool write, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			return pubnub.GrantAccess<T>(channel, read, write, userCallback, errorCallback);
+			return pubnub.GrantAccess<GrantAck>(channel, read, write, userCallback, errorCallback);
 		}
 
         public bool GrantAccess<T>(string channel, string authenticationKey, bool read, bool write, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)
