@@ -5,18 +5,15 @@ using System.Text;
 
 namespace PubNubMessaging.Core
 {
-    public class Models
+    public class Message<T>
     {
-        public class Message<T>
-        {
-            public T Data { get; set; }
-            public DateTime Time { get; set; }
-            public string ChannelName { get; set; }
+        public T Data { get; set; }
+        public DateTime Time { get; set; }
+        public string ChannelName { get; set; }
 
-            public override string ToString()
-            {
-                return Data.ToString();
-            }
+        public override string ToString()
+        {
+            return Data.ToString();
         }
     }
 

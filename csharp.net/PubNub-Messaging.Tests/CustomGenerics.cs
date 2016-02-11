@@ -72,9 +72,9 @@ namespace PubNubMessaging.Tests
             public override T DeserializeToObject<T>(List<object> listObject)
             {
                 T ret = default(T);
-                if (typeof(T) == typeof(Models.Message<UserCreated>))
+                if (typeof(T) == typeof(Message<UserCreated>))
                 {
-                    var message = new Models.Message<UserCreated>
+                    var message = new Message<UserCreated>
                     {
                         Time = Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(listObject[1].ToString()),
                         ChannelName = (listObject.Count == 4) ? listObject[3].ToString() : listObject[2].ToString(),
@@ -83,7 +83,7 @@ namespace PubNubMessaging.Tests
                     string json = pubnub.JsonPluggableLibrary.SerializeToJsonString(listObject[0]);
                     message.Data = pubnub.JsonPluggableLibrary.DeserializeToObject<UserCreated>(json);
 
-                    ret = (T)Convert.ChangeType(message, typeof(Models.Message<UserCreated>), CultureInfo.InvariantCulture);
+                    ret = (T)Convert.ChangeType(message, typeof(Message<UserCreated>), CultureInfo.InvariantCulture);
                 }
                 else if (typeof(T) == typeof(GrantAck))
                 {
@@ -291,12 +291,12 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             mrePresence = new ManualResetEvent(false);
             mreConnect = new ManualResetEvent(false);
-            pubnub.Presence<Models.Message<UserCreated>, JoinOrLeaveAck, ConnectOrDisconnectAck, JoinOrLeaveAck>(channel, "", SubscribeCallback, PresenceCallback, ConnectCallback, WildcardPresenceCallback, ErrorCallback);
+            pubnub.Presence<Message<UserCreated>, JoinOrLeaveAck, ConnectOrDisconnectAck, JoinOrLeaveAck>(channel, "", SubscribeCallback, PresenceCallback, ConnectCallback, WildcardPresenceCallback, ErrorCallback);
             mreConnect.WaitOne(mreWaitTimeout);
 
             mreSubscribe = new ManualResetEvent(false);
             mreConnect = new ManualResetEvent(false);
-            pubnub.Subscribe<Models.Message<UserCreated>, JoinOrLeaveAck, ConnectOrDisconnectAck, JoinOrLeaveAck>(channel, "", SubscribeCallback, PresenceCallback, ConnectCallback, WildcardPresenceCallback, ErrorCallback);
+            pubnub.Subscribe<Message<UserCreated>, JoinOrLeaveAck, ConnectOrDisconnectAck, JoinOrLeaveAck>(channel, "", SubscribeCallback, PresenceCallback, ConnectCallback, WildcardPresenceCallback, ErrorCallback);
             mreConnect.WaitOne(mreWaitTimeout);
             
 
@@ -308,7 +308,7 @@ namespace PubNubMessaging.Tests
             user.Name = "Pubnub";
             user.Phones = new List<Phone>() { new Phone() { Number = "111-222-3333", Extenion = "4444", PhoneType = PhoneType.Home }, new Phone() { Number = "999-888-7777", Extenion = "6666", PhoneType = PhoneType.Work } };
 
-            Models.Message<UserCreated> messageObject = new Models.Message<UserCreated>();
+            Message<UserCreated> messageObject = new Message<UserCreated>();
             
             UserCreated userCreated = new UserCreated();
             userCreated.TimeStamp = DateTime.Now;
@@ -324,7 +324,7 @@ namespace PubNubMessaging.Tests
             mreSubscribe.WaitOne(mreWaitTimeout);
 
             mreDisconnect = new ManualResetEvent(false);
-            pubnub.Unsubscribe<Models.Message<UserCreated>, JoinOrLeaveAck, ConnectOrDisconnectAck, JoinOrLeaveAck>(channel, "", SubscribeCallback, PresenceCallback, ConnectCallback, DisconnectCallback, WildcardPresenceCallback, ErrorCallback);
+            pubnub.Unsubscribe<Message<UserCreated>, JoinOrLeaveAck, ConnectOrDisconnectAck, JoinOrLeaveAck>(channel, "", SubscribeCallback, PresenceCallback, ConnectCallback, DisconnectCallback, WildcardPresenceCallback, ErrorCallback);
             mreDisconnect.WaitOne(mreWaitTimeout);
 
             mrePresence.WaitOne(mreWaitTimeout);
@@ -358,12 +358,12 @@ namespace PubNubMessaging.Tests
             string channelGroup = "cg1";
             mrePresence = new ManualResetEvent(false);
             mreConnect = new ManualResetEvent(false);
-            pubnub.Presence<Models.Message<UserCreated>, JoinOrLeaveAck, ConnectOrDisconnectAck, JoinOrLeaveAck>(channel, channelGroup, SubscribeCallback, PresenceCallback, ConnectCallback, WildcardPresenceCallback, ErrorCallback);
+            pubnub.Presence<Message<UserCreated>, JoinOrLeaveAck, ConnectOrDisconnectAck, JoinOrLeaveAck>(channel, channelGroup, SubscribeCallback, PresenceCallback, ConnectCallback, WildcardPresenceCallback, ErrorCallback);
             mreConnect.WaitOne(mreWaitTimeout);
 
             mreSubscribe = new ManualResetEvent(false);
             mreConnect = new ManualResetEvent(false);
-            pubnub.Subscribe<Models.Message<UserCreated>, JoinOrLeaveAck, ConnectOrDisconnectAck, JoinOrLeaveAck>(channel, channelGroup, SubscribeCallback, PresenceCallback, ConnectCallback, WildcardPresenceCallback, ErrorCallback);
+            pubnub.Subscribe<Message<UserCreated>, JoinOrLeaveAck, ConnectOrDisconnectAck, JoinOrLeaveAck>(channel, channelGroup, SubscribeCallback, PresenceCallback, ConnectCallback, WildcardPresenceCallback, ErrorCallback);
             mreConnect.WaitOne(mreWaitTimeout);
 
             Thread.Sleep(2000);
@@ -375,7 +375,7 @@ namespace PubNubMessaging.Tests
             user.Name = "Pubnub";
             user.Phones = new List<Phone>() { new Phone() { Number = "111-222-3333", Extenion = "4444", PhoneType = PhoneType.Home }, new Phone() { Number = "999-888-7777", Extenion = "6666", PhoneType = PhoneType.Work } };
 
-            Models.Message<UserCreated> messageObject = new Models.Message<UserCreated>();
+            Message<UserCreated> messageObject = new Message<UserCreated>();
 
             UserCreated userCreated = new UserCreated();
             userCreated.TimeStamp = DateTime.Now;
@@ -394,7 +394,7 @@ namespace PubNubMessaging.Tests
             channel = "";
             channelGroup = "cg1";
             mreDisconnect = new ManualResetEvent(false);
-            pubnub.Unsubscribe<Models.Message<UserCreated>, JoinOrLeaveAck, ConnectOrDisconnectAck, JoinOrLeaveAck>(channel, channelGroup, SubscribeCallback, PresenceCallback, ConnectCallback, DisconnectCallback,  WildcardPresenceCallback, ErrorCallback);
+            pubnub.Unsubscribe<Message<UserCreated>, JoinOrLeaveAck, ConnectOrDisconnectAck, JoinOrLeaveAck>(channel, channelGroup, SubscribeCallback, PresenceCallback, ConnectCallback, DisconnectCallback,  WildcardPresenceCallback, ErrorCallback);
             mreDisconnect.WaitOne(mreWaitTimeout);
 
             Thread.Sleep(6000); //Wait for channel group channels to unsub
@@ -408,7 +408,7 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedMessage, "Subscribe callback unable to receive the published message");
         }
         
-        private void SubscribeCallback(Models.Message<UserCreated> message)
+        private void SubscribeCallback(Message<UserCreated> message)
         {
             receivedMessage = true;
             Console.WriteLine("SubscribeCallback : " + pubnub.JsonPluggableLibrary.SerializeToJsonString(message));
