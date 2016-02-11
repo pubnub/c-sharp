@@ -92,9 +92,9 @@ namespace PubNubMessaging.Core
             pubnub.Presence<T>(channel, channelGroup, presenceCallback, connectCallback, errorCallback);
         }
 
-        public void Presence<T1, T2, T3, T4>(string channel, string channelGroup, Action<T1> subscribeCallback, Action<T2> presenceCallback, Action<T3> connectCallback, Action<T4> wildcardPresenceCallback, Action<PubnubClientError> errorCallback)
+        public void Presence<T>(string channel, string channelGroup, Action<Message<T>> subscribeCallback, Action<JoinOrLeaveAck> presenceCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<JoinOrLeaveAck> wildcardPresenceCallback, Action<PubnubClientError> errorCallback)
         {
-            pubnub.Presence<T1, T2, T3, T4>(channel, channelGroup, subscribeCallback, presenceCallback, connectCallback, wildcardPresenceCallback, errorCallback);
+            pubnub.Presence<Message<T>, JoinOrLeaveAck, ConnectOrDisconnectAck, JoinOrLeaveAck>(channel, channelGroup, subscribeCallback, presenceCallback, connectCallback, wildcardPresenceCallback, errorCallback);
         }
 
         public void Presence(string channel, Action<object> presenceCallback, Action<object> connectCallback, Action<PubnubClientError> errorCallback)

@@ -291,7 +291,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             mrePresence = new ManualResetEvent(false);
             mreConnect = new ManualResetEvent(false);
-            pubnub.Presence<Message<UserCreated>, JoinOrLeaveAck, ConnectOrDisconnectAck, JoinOrLeaveAck>(channel, "", SubscribeCallback, PresenceCallback, ConnectCallback, WildcardPresenceCallback, ErrorCallback);
+            pubnub.Presence<UserCreated>(channel, "", SubscribeCallback, PresenceCallback, ConnectCallback, WildcardPresenceCallback, ErrorCallback);
             mreConnect.WaitOne(mreWaitTimeout);
 
             mreSubscribe = new ManualResetEvent(false);
@@ -358,7 +358,7 @@ namespace PubNubMessaging.Tests
             string channelGroup = "cg1";
             mrePresence = new ManualResetEvent(false);
             mreConnect = new ManualResetEvent(false);
-            pubnub.Presence<Message<UserCreated>, JoinOrLeaveAck, ConnectOrDisconnectAck, JoinOrLeaveAck>(channel, channelGroup, SubscribeCallback, PresenceCallback, ConnectCallback, WildcardPresenceCallback, ErrorCallback);
+            pubnub.Presence<UserCreated>(channel, channelGroup, SubscribeCallback, PresenceCallback, ConnectCallback, WildcardPresenceCallback, ErrorCallback);
             mreConnect.WaitOne(mreWaitTimeout);
 
             mreSubscribe = new ManualResetEvent(false);
