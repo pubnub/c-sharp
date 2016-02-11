@@ -296,7 +296,7 @@ namespace PubNubMessaging.Tests
 
             mreSubscribe = new ManualResetEvent(false);
             mreConnect = new ManualResetEvent(false);
-            pubnub.Subscribe<Message<UserCreated>, JoinOrLeaveAck, ConnectOrDisconnectAck, JoinOrLeaveAck>(channel, "", SubscribeCallback, PresenceCallback, ConnectCallback, WildcardPresenceCallback, ErrorCallback);
+            pubnub.Subscribe<UserCreated>(channel, "", SubscribeCallback, PresenceCallback, ConnectCallback, WildcardPresenceCallback, ErrorCallback);
             mreConnect.WaitOne(mreWaitTimeout);
             
 
@@ -363,7 +363,7 @@ namespace PubNubMessaging.Tests
 
             mreSubscribe = new ManualResetEvent(false);
             mreConnect = new ManualResetEvent(false);
-            pubnub.Subscribe<Message<UserCreated>, JoinOrLeaveAck, ConnectOrDisconnectAck, JoinOrLeaveAck>(channel, channelGroup, SubscribeCallback, PresenceCallback, ConnectCallback, WildcardPresenceCallback, ErrorCallback);
+            pubnub.Subscribe<UserCreated>(channel, channelGroup, SubscribeCallback, PresenceCallback, ConnectCallback, WildcardPresenceCallback, ErrorCallback);
             mreConnect.WaitOne(mreWaitTimeout);
 
             Thread.Sleep(2000);

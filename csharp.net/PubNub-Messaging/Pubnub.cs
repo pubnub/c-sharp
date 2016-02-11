@@ -38,9 +38,9 @@ namespace PubNubMessaging.Core
             pubnub.Subscribe<T>(channel, channelGroup, subscribeCallback, connectCallback, wildcardPresenceCallback, errorCallback);
         }
 
-        public void Subscribe<T1, T2, T3, T4>(string channel, string channelGroup, Action<T1> subscribeCallback, Action<T2> presenceCallback, Action<T3> connectCallback, Action<T4> wildcardPresenceCallback, Action<PubnubClientError> errorCallback)
+        public void Subscribe<T>(string channel, string channelGroup, Action<Message<T>> subscribeCallback, Action<JoinOrLeaveAck> presenceCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<JoinOrLeaveAck> wildcardPresenceCallback, Action<PubnubClientError> errorCallback)
         {
-            pubnub.Subscribe<T1, T2, T3, T4>(channel, channelGroup, subscribeCallback, presenceCallback, connectCallback, wildcardPresenceCallback, errorCallback);
+            pubnub.Subscribe<Message<T>, JoinOrLeaveAck, ConnectOrDisconnectAck, JoinOrLeaveAck>(channel, channelGroup, subscribeCallback, presenceCallback, connectCallback, wildcardPresenceCallback, errorCallback);
         }
 
         public void Subscribe(string channel, Action<object> subscribeCallback, Action<object> connectCallback, Action<PubnubClientError> errorCallback)
