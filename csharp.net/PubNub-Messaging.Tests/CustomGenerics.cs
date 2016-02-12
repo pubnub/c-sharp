@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Globalization;
+using System.Reflection;
 using PubNubMessaging.Core;
 using System.Threading;
 using NUnit.Framework;
@@ -72,18 +74,39 @@ namespace PubNubMessaging.Tests
             public override T DeserializeToObject<T>(List<object> listObject)
             {
                 T ret = default(T);
-                if (typeof(T) == typeof(Message<UserCreated>))
+                if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(Message<>))
                 {
-                    var message = new Message<UserCreated>
-                    {
-                        Time = Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(listObject[1].ToString()),
-                        ChannelName = (listObject.Count == 4) ? listObject[3].ToString() : listObject[2].ToString(),
-                    };
+                    Type dataType = typeof (T).GetGenericArguments()[0];
+                    Type generic = typeof (Message<>);
+                    Type specific = generic.MakeGenericType(dataType);
+                    ConstructorInfo ci = specific.GetConstructor(Type.EmptyTypes);
                     
-                    string json = pubnub.JsonPluggableLibrary.SerializeToJsonString(listObject[0]);
-                    message.Data = pubnub.JsonPluggableLibrary.DeserializeToObject<UserCreated>(json);
+                    object message = ci.Invoke(new object[] { });
 
-                    ret = (T)Convert.ChangeType(message, typeof(Message<UserCreated>), CultureInfo.InvariantCulture);
+                    // Set Time
+                    PropertyInfo timeProp = specific.GetProperty("Time");
+                    timeProp.SetValue(message, Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(listObject[1].ToString()), null);
+
+                    // Set ChannelName
+                    PropertyInfo channelNameProp = specific.GetProperty("ChannelName");
+                    channelNameProp.SetValue(message, (listObject.Count == 4) ? listObject[3].ToString() : listObject[2].ToString(), null);
+
+                    // Set Data
+                    string json = pubnub.JsonPluggableLibrary.SerializeToJsonString(listObject[0]);
+                    dynamic dataObject = pubnub.JsonPluggableLibrary.DeserializeToObject(json);
+                    var data = Convert.ChangeType(dataObject, dataType);
+                    //message.Data = Convert.ChangeType(o, dataType);
+                    //message.Data = pubnub.JsonPluggableLibrary.DeserializeToObject<T>(json);
+                    PropertyInfo dataProp = specific.GetProperty("Data");
+                    dataProp.SetValue(message, data, null);
+
+                    //var message = new Message<string>
+                    //{
+                    //    Time = Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(listObject[1].ToString()),
+                    //    ChannelName = (listObject.Count == 4) ? listObject[3].ToString() : listObject[2].ToString(),
+                    //};
+                    
+                    ret = (T)Convert.ChangeType(message, specific, CultureInfo.InvariantCulture);
                 }
                 else if (typeof(T) == typeof(GrantAck))
                 {
