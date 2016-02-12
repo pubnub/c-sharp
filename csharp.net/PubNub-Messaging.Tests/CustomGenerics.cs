@@ -80,8 +80,10 @@ namespace PubNubMessaging.Tests
                     Type generic = typeof (Message<>);
                     Type specific = generic.MakeGenericType(dataType);
                     ConstructorInfo ci = specific.GetConstructor(Type.EmptyTypes);
-                    
                     object message = ci.Invoke(new object[] { });
+
+                    // Set data
+                    JsonConvert.PopulateObject(listObject[0].ToString(), message);
 
                     // Set Time
                     PropertyInfo timeProp = specific.GetProperty("Time");
@@ -90,21 +92,6 @@ namespace PubNubMessaging.Tests
                     // Set ChannelName
                     PropertyInfo channelNameProp = specific.GetProperty("ChannelName");
                     channelNameProp.SetValue(message, (listObject.Count == 4) ? listObject[3].ToString() : listObject[2].ToString(), null);
-
-                    // Set Data
-                    string json = pubnub.JsonPluggableLibrary.SerializeToJsonString(listObject[0]);
-                    dynamic dataObject = pubnub.JsonPluggableLibrary.DeserializeToObject(json);
-                    var data = Convert.ChangeType(dataObject, dataType);
-                    //message.Data = Convert.ChangeType(o, dataType);
-                    //message.Data = pubnub.JsonPluggableLibrary.DeserializeToObject<T>(json);
-                    PropertyInfo dataProp = specific.GetProperty("Data");
-                    dataProp.SetValue(message, data, null);
-
-                    //var message = new Message<string>
-                    //{
-                    //    Time = Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(listObject[1].ToString()),
-                    //    ChannelName = (listObject.Count == 4) ? listObject[3].ToString() : listObject[2].ToString(),
-                    //};
                     
                     ret = (T)Convert.ChangeType(message, specific, CultureInfo.InvariantCulture);
                 }
