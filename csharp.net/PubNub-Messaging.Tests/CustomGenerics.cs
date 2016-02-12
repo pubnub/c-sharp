@@ -83,7 +83,7 @@ namespace PubNubMessaging.Tests
                     object message = ci.Invoke(new object[] { });
 
                     // Set data
-                    JsonConvert.PopulateObject(listObject[0].ToString(), message);
+                    pubnub.JsonPluggableLibrary.PopulateObject(listObject[0].ToString(), message);
 
                     // Set Time
                     PropertyInfo timeProp = specific.GetProperty("Time");

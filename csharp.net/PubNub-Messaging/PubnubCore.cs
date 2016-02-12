@@ -7332,6 +7332,8 @@ namespace PubNubMessaging.Core
         Dictionary<string, object>[] ConvertToDictionaryObjectArray(object localContainer);
 
         object[] ConvertToObjectArray(object localContainer);
+
+	    void PopulateObject(string value, object target);
 	}
 	#if (USE_JSONFX)|| (USE_JSONFX_UNITY)
 	public class JsonFXDotNet : IJsonPluggableLibrary
@@ -7873,6 +7875,11 @@ namespace PubNubMessaging.Core
 
             return null;
         }
+
+	    public void PopulateObject(string value, object target)
+	    {
+	        JsonConvert.PopulateObject(value, target);
+	    }
 
     #endregion
 	
