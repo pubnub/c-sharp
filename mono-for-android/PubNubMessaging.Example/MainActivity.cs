@@ -423,7 +423,7 @@ namespace PubNubMessaging.Example
             Display ("Running Subscribe");
             ThreadPool.QueueUserWorkItem (o => 
                 pubnub.Subscribe<string> (channel, channelGroup, DisplayReturnMessage, 
-                    DisplayConnectStatusMessage, DisplayErrorMessage)
+                    DisplayConnectStatusMessage, DisplayWildcardSubscribeMessage, DisplayErrorMessage)
             );
         }
 
@@ -883,6 +883,11 @@ namespace PubNubMessaging.Example
         }
 
         void DisplayReturnMessage (string result)
+        {
+            Display (result);
+        }
+
+        void DisplayWildcardSubscribeMessage(string result)
         {
             Display (result);
         }
