@@ -434,7 +434,7 @@ namespace PubNubMessaging.Core
 			switch (statusCode)
 			{
 				case 400:
-				if (httpErrorCodeMessage.ToUpper() == "MESSAGE TOO LARGE")
+				if (httpErrorCodeMessage.ToUpper().Contains("MESSAGE TOO LARGE"))
 				{
 					ret = PubnubErrorCode.MessageTooLarge;
 				}
