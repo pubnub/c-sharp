@@ -89,6 +89,16 @@ namespace PubNubMessaging.Core
 			return pubnub.DetailedHistory<T>(channel, start, end, count, reverse, userCallback, errorCallback);
 		}
 
+        public bool DetailedHistory(string channel, long start, long end, int count, bool reverse, bool includeToken, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return pubnub.DetailedHistory(channel, start, end, count, reverse, includeToken, userCallback, errorCallback);
+        }
+
+        public bool DetailedHistory<T>(string channel, long start, long end, int count, bool reverse, bool includeToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return pubnub.DetailedHistory<T>(channel, start, end, count, reverse, includeToken, userCallback, errorCallback);
+        }
+        //
 		public bool DetailedHistory(string channel, long start, Action<object> userCallback, Action<PubnubClientError> errorCallback, bool reverse)
 		{
 			return DetailedHistory<object>(channel, start, -1, -1, reverse, userCallback, errorCallback);
@@ -99,6 +109,17 @@ namespace PubNubMessaging.Core
 			return DetailedHistory<T>(channel, start, -1, -1, reverse, userCallback, errorCallback);
 		}
 
+        public bool DetailedHistory(string channel, long start, Action<object> userCallback, Action<PubnubClientError> errorCallback, bool reverse, bool includeToken)
+        {
+            return DetailedHistory<object>(channel, start, -1, -1, reverse, includeToken, userCallback, errorCallback);
+        }
+
+        public bool DetailedHistory<T>(string channel, long start, Action<T> userCallback, Action<PubnubClientError> errorCallback, bool reverse, bool includeToken)
+        {
+            return DetailedHistory<T>(channel, start, -1, -1, reverse, includeToken, userCallback, errorCallback);
+        }
+        //
+
 		public bool DetailedHistory(string channel, int count, Action<object> userCallback, Action<PubnubClientError> errorCallback)
 		{
 			return DetailedHistory<object>(channel, -1, -1, count, false, userCallback, errorCallback);
@@ -108,6 +129,16 @@ namespace PubNubMessaging.Core
 		{
 			return DetailedHistory<T>(channel, -1, -1, count, false, userCallback, errorCallback);
 		}
+
+        public bool DetailedHistory(string channel, int count, bool includeToken, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return DetailedHistory<object>(channel, -1, -1, count, false, includeToken, userCallback, errorCallback);
+        }
+
+        public bool DetailedHistory<T>(string channel, int count, bool includeToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return DetailedHistory<T>(channel, -1, -1, count, false, includeToken, userCallback, errorCallback);
+        }
 
 		public bool HereNow(string channel, Action<object> userCallback, Action<PubnubClientError> errorCallback)
 		{
