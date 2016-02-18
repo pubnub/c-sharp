@@ -1,4 +1,4 @@
-﻿#if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
+#if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
 #define TRACE
 #endif
 using System;
@@ -148,7 +148,7 @@ namespace PubNubMessaging.Core
 			_errorSeverity = errorSeverity;
 			_messageSource = source;
 			_channel = channel;
-            _channel = channelGroup;
+            _channelGroup = channelGroup;
 			_detailedDotNetException = null;
 			_pubnubWebRequest = pubnubWebRequest;
 			_pubnubWebResponse = pubnubWebResponse;
@@ -437,7 +437,7 @@ namespace PubNubMessaging.Core
 			switch (statusCode)
 			{
 				case 400:
-                if (httpErrorCodeMessage.ToUpper().Contains("MESSAGE TOO LARGE"))
+				if (httpErrorCodeMessage.ToUpper().Contains("MESSAGE TOO LARGE"))
 				{
 					ret = PubnubErrorCode.MessageTooLarge;
 				}
