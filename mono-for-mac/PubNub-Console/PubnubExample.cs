@@ -432,7 +432,7 @@ namespace PubNubMessaging.Core
                         else
                         {
                             Console.WriteLine("Running subscribe()");
-                            pubnub.Subscribe<string>(channel, channelGroup, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
+                        pubnub.Subscribe<string>(channel, channelGroup, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayPresenceWildcardMessage, DisplayErrorMessage);
                         }
                         break;
                     case "2":
@@ -569,16 +569,24 @@ namespace PubNubMessaging.Core
                         }
                         break;
                     case "4":
-                        Console.WriteLine("Enter CHANNEL name for Detailed History");
-                        channel = Console.ReadLine();
+                    bool includeToken = false;
+                    Console.WriteLine("Enter CHANNEL name for Detailed History");
+                    channel = Console.ReadLine();
 
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}",channel));
-                        Console.ResetColor();
-                        Console.WriteLine();
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.WriteLine(string.Format("Channel = {0}",channel));
+                    Console.ResetColor();
+                    Console.WriteLine();
 
-                        Console.WriteLine("Running detailed history()");
-                        pubnub.DetailedHistory<string>(channel, 100, DisplayReturnMessage, DisplayErrorMessage);
+                    Console.WriteLine("Include Token? Y or N? Default is N. Press Y for Yes Else press ENTER");
+                    string userChoiceIncludeTokenForHistory = Console.ReadLine();
+                    if (userChoiceIncludeTokenForHistory.ToLower() == "y")
+                    {
+                        includeToken = true;
+                    }
+
+                    Console.WriteLine("Running detailed history()");
+                    pubnub.DetailedHistory<string>(channel, 100, includeToken, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "5":
                         bool showUUID = true;
@@ -1449,6 +1457,13 @@ namespace PubNubMessaging.Core
         static void DisplayPresenceDisconnectStatusMessage(string result)
         {
             Console.WriteLine("PRESENCE DISCONNECT CALLBACK:");
+            Console.WriteLine(result);
+            Console.WriteLine();
+        }
+
+        static void DisplayPresenceWildcardMessage(string result)
+        {
+            Console.WriteLine("PRESENCEWILDCARD CALLBACK:");
             Console.WriteLine(result);
             Console.WriteLine();
         }
