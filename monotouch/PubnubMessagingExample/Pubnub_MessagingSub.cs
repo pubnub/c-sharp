@@ -319,7 +319,7 @@ namespace PubnubMessagingExample
             Display ("Running Subscribe");
             Channel = newChannels.Text;
             InvokeInBackground(() => {
-                pubnub.Subscribe<string> (Channel, ChannelGroup, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayErrorMessage);
+                pubnub.Subscribe<string> (Channel, ChannelGroup, DisplayReturnMessage, DisplayConnectStatusMessage, DisplayWildcardPresenceMessage,DisplayErrorMessage);
             });
         }
 
@@ -1072,6 +1072,11 @@ namespace PubnubMessagingExample
         }
 
         void DisplayReturnMessage (string result)
+        {
+            Display (result);
+        }
+
+        void DisplayWildcardPresenceMessage(string result)
         {
             Display (result);
         }
