@@ -76,7 +76,7 @@ namespace PubNubMessaging
                 || secretKey != txtSecret.Text
                 || cipherKey != txtCipher.Text)
             {
-                //pubnub.EndPendingRequests();
+                Session["pubnub"] = null;
                 pubnub = null;
             }
             ssl = chkSSL.Checked;
@@ -108,10 +108,13 @@ namespace PubNubMessaging
 
             Int32.TryParse(txtPresenceHeartbeatInterval.Text, out presenceHeartbeatInterval);
 
-            if (pubnub == null)
+            if (Session["pubnub"] == null)
             {
                 pubnub = new Pubnub(publishKey, subscriberKey, secretKey, cipherKey, ssl);
                 pubnub.Origin = origin;
+
+                Session["pubnub"] = pubnub;
+
                 txtOrigin.Enabled = false;
                 txtPubKey.Enabled = false;
                 txtSubKey.Enabled = false;
@@ -131,6 +134,11 @@ namespace PubNubMessaging
 
                 btnReset.Enabled = true;
             }
+            else
+            {
+                pubnub = (Pubnub)Session["pubnub"];
+            }
+
             pubnub.SessionUUID = uuid;
             pubnub.AuthenticationKey = authKey;
             pubnub.SubscribeTimeout = subscribeTimeoutInSeconds;

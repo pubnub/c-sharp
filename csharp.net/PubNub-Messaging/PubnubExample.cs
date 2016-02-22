@@ -582,6 +582,7 @@ namespace PubNubMessaging.Core
                         }
                         break;
                     case "4":
+                        bool includeToken = false;
                         Console.WriteLine("Enter CHANNEL name for Detailed History");
                         channel = Console.ReadLine();
 
@@ -590,8 +591,15 @@ namespace PubNubMessaging.Core
                         Console.ResetColor();
                         Console.WriteLine();
 
+                        Console.WriteLine("Include Token? Y or N? Default is N. Press Y for Yes Else press ENTER");
+                        string userChoiceIncludeTokenForHistory = Console.ReadLine();
+                        if (userChoiceIncludeTokenForHistory.ToLower() == "y")
+                        {
+                            includeToken = true;
+                        }
+
                         Console.WriteLine("Running detailed history()");
-                        pubnub.DetailedHistory<string>(channel, 100, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.DetailedHistory<string>(channel, 100, includeToken, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "5":
                         bool showUUID = true;
@@ -606,8 +614,8 @@ namespace PubNubMessaging.Core
                         Console.WriteLine();
 
                         Console.WriteLine("Show UUID List? Y or N? Default is Y. Press N for No Else press ENTER");
-                        string userChoiceShowUUID = Console.ReadLine();
-                        if (userChoiceShowUUID.ToLower() == "n")
+                        string userChoiceIncludeToken = Console.ReadLine();
+                        if (userChoiceIncludeToken.ToLower() == "n")
                         {
                             showUUID = false;
                         }

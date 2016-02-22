@@ -1,4 +1,4 @@
-﻿//Build Date: January 19, 2016
+﻿//Build Date: Feb 17, 2016
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -581,8 +581,12 @@ namespace PubNubMessaging.Core
                         {
                             if (_channelReconnectTimer.ContainsKey(channel))
                             {
-                                _channelReconnectTimer[channel].Change(Timeout.Infinite, Timeout.Infinite);
-                                _channelReconnectTimer[channel].Dispose();
+                                try
+                                {
+                                    _channelReconnectTimer[channel].Change(Timeout.Infinite, Timeout.Infinite);
+                                    _channelReconnectTimer[channel].Dispose();
+                                }
+                                catch { }
                             }
                             string multiChannel = (netState.Channels != null) ? string.Join(",", netState.Channels) : "";
                             string multiChannelGroup = (netState.ChannelGroups != null) ? string.Join(",", netState.ChannelGroups) : "";
@@ -606,8 +610,12 @@ namespace PubNubMessaging.Core
                         {
                             if (_channelReconnectTimer.ContainsKey(channel))
                             {
-                                _channelReconnectTimer[channel].Change(Timeout.Infinite, Timeout.Infinite);
-                                _channelReconnectTimer[channel].Dispose();
+                                try
+                                {
+                                    _channelReconnectTimer[channel].Change(Timeout.Infinite, Timeout.Infinite);
+                                    _channelReconnectTimer[channel].Dispose();
+                                }
+                                catch { }
                             }
                             switch (netState.Type)
                             {
@@ -669,8 +677,12 @@ namespace PubNubMessaging.Core
                         {
                             if (_channelGroupReconnectTimer.ContainsKey(channelGroup))
                             {
-                                _channelGroupReconnectTimer[channelGroup].Change(Timeout.Infinite, Timeout.Infinite);
-                                _channelGroupReconnectTimer[channelGroup].Dispose();
+                                try
+                                {
+                                    _channelGroupReconnectTimer[channelGroup].Change(Timeout.Infinite, Timeout.Infinite);
+                                    _channelGroupReconnectTimer[channelGroup].Dispose();
+                                }
+                                catch { }
                             }
                             string multiChannel = (netState.Channels != null) ? string.Join(",", netState.Channels) : "";
                             string multiChannelGroup = (netState.ChannelGroups != null) ? string.Join(",", netState.ChannelGroups) : "";
@@ -694,8 +706,12 @@ namespace PubNubMessaging.Core
                         {
                             if (_channelGroupReconnectTimer.ContainsKey(channelGroup))
                             {
-                                _channelGroupReconnectTimer[channelGroup].Change(Timeout.Infinite, Timeout.Infinite);
-                                _channelGroupReconnectTimer[channelGroup].Dispose();
+                                try
+                                {
+                                    _channelGroupReconnectTimer[channelGroup].Change(Timeout.Infinite, Timeout.Infinite);
+                                    _channelGroupReconnectTimer[channelGroup].Dispose();
+                                }
+                                catch { }
                             }
                             switch (netState.Type)
                             {
@@ -1558,12 +1574,22 @@ namespace PubNubMessaging.Core
 		/**
          * Detailed History
          */
-		public bool DetailedHistory (string channel, long start, long end, int count, bool reverse, Action<object> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			return DetailedHistory<object> (channel, start, end, count, reverse, userCallback, errorCallback);
-		}
+        public bool DetailedHistory(string channel, long start, long end, int count, bool reverse, bool includeToken, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return DetailedHistory<object>(channel, start, end, count, reverse, includeToken, userCallback, errorCallback);
+        }
 
-		public bool DetailedHistory<T> (string channel, long start, long end, int count, bool reverse, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        public bool DetailedHistory(string channel, long start, long end, int count, bool reverse, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return DetailedHistory<object>(channel, start, end, count, reverse, false, userCallback, errorCallback);
+        }
+
+        public bool DetailedHistory<T>(string channel, long start, long end, int count, bool reverse, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return DetailedHistory<T>(channel, start, end, count, reverse, false, userCallback, errorCallback);
+        }
+
+        public bool DetailedHistory<T>(string channel, long start, long end, int count, bool reverse, bool includeToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
 			if (string.IsNullOrEmpty (channel) || string.IsNullOrEmpty (channel.Trim ())) {
 				throw new ArgumentException ("Missing Channel");
@@ -1579,7 +1605,7 @@ namespace PubNubMessaging.Core
 			}
 
 
-			Uri request = BuildDetailedHistoryRequest (channel, start, end, count, reverse);
+			Uri request = BuildDetailedHistoryRequest (channel, start, end, count, reverse, includeToken);
 
 			RequestState<T> requestState = new RequestState<T> ();
 			requestState.Channels = new string[] { channel };
@@ -1591,27 +1617,27 @@ namespace PubNubMessaging.Core
 			return UrlProcessRequest<T> (request, requestState);
 		}
 
-		public bool DetailedHistory (string channel, long start, Action<object> userCallback, Action<PubnubClientError> errorCallback, bool reverse)
-		{
-			return DetailedHistory<object> (channel, start, -1, -1, reverse, userCallback, errorCallback);
-		}
+        public bool DetailedHistory(string channel, long start, Action<object> userCallback, Action<PubnubClientError> errorCallback, bool reverse)
+        {
+            return DetailedHistory<object>(channel, start, -1, -1, reverse, false, userCallback, errorCallback);
+        }
 
-		public bool DetailedHistory<T> (string channel, long start, Action<T> userCallback, Action<PubnubClientError> errorCallback, bool reverse)
-		{
-			return DetailedHistory<T> (channel, start, -1, -1, reverse, userCallback, errorCallback);
-		}
+        public bool DetailedHistory<T>(string channel, long start, Action<T> userCallback, Action<PubnubClientError> errorCallback, bool reverse)
+        {
+            return DetailedHistory<T>(channel, start, -1, -1, reverse, false, userCallback, errorCallback);
+        }
 
-		public bool DetailedHistory (string channel, int count, Action<object> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			return DetailedHistory<object> (channel, -1, -1, count, false, userCallback, errorCallback);
-		}
+        public bool DetailedHistory(string channel, int count, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return DetailedHistory<object>(channel, -1, -1, count, false, false, userCallback, errorCallback);
+        }
 
-		public bool DetailedHistory<T> (string channel, int count, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			return DetailedHistory<T> (channel, -1, -1, count, false, userCallback, errorCallback);
-		}
+        public bool DetailedHistory<T>(string channel, int count, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return DetailedHistory<T>(channel, -1, -1, count, false, false, userCallback, errorCallback);
+        }
 
-		private Uri BuildDetailedHistoryRequest (string channel, long start, long end, int count, bool reverse)
+        private Uri BuildDetailedHistoryRequest(string channel, long start, long end, int count, bool reverse, bool includeToken)
 		{
             StringBuilder parameterBuilder = new StringBuilder();
 			parameters = "";
@@ -1637,6 +1663,10 @@ namespace PubNubMessaging.Core
 			}
 
             parameterBuilder.AppendFormat("&uuid={0}", EncodeUricomponent(sessionUUID, ResponseType.DetailedHistory, false, false));
+            if (includeToken)
+            {
+                parameterBuilder.AppendFormat("&include_token={0}", includeToken.ToString().ToLower());
+            }
             parameterBuilder.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, ResponseType.DetailedHistory, false, true));
 
             parameters = parameterBuilder.ToString();

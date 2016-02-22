@@ -7,7 +7,8 @@ namespace PubNubMessaging.Core
 		public string[] Channels;
         public string[] ChannelGroups;
 		public ResponseType Type;
-		public Action<T> Callback;
+		public Action<T> SubscribeOrPresenceRegularCallback;
+        public Action<T> WildcardPresenceCallback;
 		public Action<PubnubClientError> ErrorCallback;
 		public Action<T> ConnectCallback;
 		public object Timetoken;
@@ -17,7 +18,8 @@ namespace PubNubMessaging.Core
 		{
 			Channels = null;
             ChannelGroups = null;
-			Callback = null;
+			SubscribeOrPresenceRegularCallback = null;
+            WildcardPresenceCallback = null;
 			ConnectCallback = null;
 			Timetoken = null;
             Reconnect = false;
