@@ -1,4 +1,4 @@
-﻿//Build Date: Feb 17, 2016
+﻿//Build Date: Feb 22, 2016
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -3501,6 +3501,8 @@ namespace PubNubMessaging.Core
 					}
 				}
 
+                Dictionary<string, long> originalMultiChannelSubscribe = multiChannelSubscribe.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                Dictionary<string, long> originalMultiChannelGroupSubscribe = multiChannelGroupSubscribe.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
 				//Remove the valid channels from subscribe list for unsubscribe 
 				for (int index = 0; index < validChannels.Count; index++) {
@@ -3561,6 +3563,22 @@ namespace PubNubMessaging.Core
 				//Get all the channels
 				string[] channels = multiChannelSubscribe.Keys.ToArray<string>();
                 string[] channelGroups = multiChannelGroupSubscribe.Keys.ToArray<string>();
+
+                //Check any chained subscribes while unsubscribe
+                foreach (string key in multiChannelSubscribe.Keys)
+                {
+                    if (!originalMultiChannelSubscribe.ContainsKey(key))
+                    {
+                        return;
+                    }
+                }
+                foreach (string key in multiChannelGroupSubscribe.Keys)
+                {
+                    if (!originalMultiChannelGroupSubscribe.ContainsKey(key))
+                    {
+                        return;
+                    }
+                }
 
                 channels = (channels != null) ? channels : new string[] { };
                 channelGroups = (channelGroups != null) ? channelGroups : new string[] { };
