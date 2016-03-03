@@ -1,0 +1,45 @@
+﻿<UserControl
+    x:Class="PubnubWindowsStore.PAMChannelUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PubnubWindowsStore"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+    
+    <Grid>
+        <StackPanel HorizontalAlignment="Stretch" Margin="1,1,1,1" Name="stackPanel1">
+            <StackPanel Orientation="Horizontal" Name="spnlChannel" HorizontalAlignment="Stretch" Margin="5,5,5,5">
+                <TextBlock Height="30" x:Name="lblChannelName" Text="Channel : " Foreground="Black" FontSize="16" ></TextBlock>
+                <TextBox x:Name="txtChannelName" Text="" Foreground="Black" Width="300" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Name="spnlAuthKey" HorizontalAlignment="Stretch" Margin="5,5,5,5">
+                <TextBlock Height="30" x:Name="lblAuthKey" Text="AuthKey : " Foreground="Black" FontSize="16" ></TextBlock>
+                <TextBox x:Name="txtAuthKey" Text="" Foreground="Black" Width="300" />
+            </StackPanel>
+            <StackPanel Orientation="Vertical" Margin="5,5,5,5" Name="spnlPAMChannel" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <RadioButton x:Name="radGrantChannel" GroupName="grpPAM"  Margin="0,0,0,0" Padding="0">Grant Channel</RadioButton>
+                <RadioButton x:Name="radAuditChannel" GroupName="grpPAM"  Margin="0,0,0,0" Padding="0">Audit Channel</RadioButton>
+                <RadioButton x:Name="radRevokeChannel" GroupName="grpPAM"  Margin="0,0,0,0">Revoke Channel</RadioButton>
+                <RadioButton x:Name="radGrantPresenceChannel" GroupName="grpPAM">Grant Presence Channel</RadioButton>
+                <RadioButton x:Name="radAuditPresenceChannel" GroupName="grpPAM">Audit Presence Channel</RadioButton>
+                <RadioButton x:Name="radRevokePresenceChannel" GroupName="grpPAM">Revoke Presence Channel</RadioButton>
+
+                <!--<RadioButton x:Name="radGrantChannelGroup" GroupName="grpPAM">Grant ChannelGroup</RadioButton>
+                <RadioButton x:Name="radAuditChannelGroup" GroupName="grpPAM">Audit ChannelGroup</RadioButton>
+                <RadioButton x:Name="radRevokeChannelGroup" GroupName="grpPAM">Revoke ChannelGroup</RadioButton>-->
+            </StackPanel>
+            <!--<StackPanel Orientation="Vertical" Margin="5,0,5,5" Name="spnlPAMChannelGroup" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+            </StackPanel>-->
+
+            <StackPanel Orientation="Horizontal" Margin="5,5,10,5" Name="spnlCommands" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <Button Content="Go" Height="40" x:Name="btnOK" Width="100" HorizontalContentAlignment="Center"  Click="btnOK_Click" Margin="0,0,10,0"/>
+                <Button Content="Cancel" Height="40" x:Name="btnCancel" Width="100" HorizontalContentAlignment="Center" Click="btnCancel_Click" Margin="0,0,5,0"/>
+            </StackPanel>
+        </StackPanel>
+
+
+    </Grid>
+</UserControl>
