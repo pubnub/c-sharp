@@ -1,4 +1,4 @@
-﻿//Build Date: Feb 22, 2016
+﻿//Build Date: Mar 08, 2016
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -3451,37 +3451,44 @@ namespace PubNubMessaging.Core
                     string multiChannelName = (currentChannels.Length > 0) ? string.Join(",", currentChannels) : ",";
                     string multiChannelGroupName = (currentChannelGroups.Length > 0) ? string.Join(",", currentChannelGroups) : "";
 
-					if (_channelRequest.ContainsKey(multiChannelName)) 
-                    {
-                        string[] arrValidChannels = validChannels.ToArray();
-                        RemoveChannelCallback<T>(string.Join(",", arrValidChannels), type);
+                    System.Threading.Tasks.Task.Factory.StartNew(() =>
+                        {
+                            if (_channelRequest.ContainsKey(multiChannelName))
+                            {
+                                string[] arrValidChannels = validChannels.ToArray();
+                                RemoveChannelCallback<T>(string.Join(",", arrValidChannels), type);
 
-                        string[] arrValidChannelGroups = validChannels.ToArray();
-                        RemoveChannelGroupCallback<T>(string.Join(",", arrValidChannelGroups), type);
-                        
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0}, Aborting previous subscribe/presence requests having channel(s)={1}; channelgroup(s)={2}", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
-						
-                        PubnubWebRequest webRequest = _channelRequest[multiChannelName];
-						_channelRequest[multiChannelName] = null;
+                                string[] arrValidChannelGroups = validChannels.ToArray();
+                                RemoveChannelGroupCallback<T>(string.Join(",", arrValidChannelGroups), type);
 
-						if (webRequest != null) {
-							TerminateLocalClientHeartbeatTimer (webRequest.RequestUri);
-						}
+                                LoggingMethod.WriteToLog(string.Format("DateTime {0}, Aborting previous subscribe/presence requests having channel(s)={1}; channelgroup(s)={2}", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
 
-						PubnubWebRequest removedRequest;
-						bool removedChannel = _channelRequest.TryRemove(multiChannelName, out removedRequest);
-						if (removedChannel) {
-							LoggingMethod.WriteToLog (string.Format ("DateTime {0}, Success to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelUnSubscribeInit).", DateTime.Now.ToString (), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
-						} else {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0}, Unable to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelUnSubscribeInit).", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
-						}
-						if (webRequest != null)
-							TerminatePendingWebRequest (webRequest, errorCallback);
-					} 
-                    else 
-                    {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0}, Unable to capture channel(s)={1}; channelgroup(s)={2} from _channelRequest to abort request.", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
-					}
+                                PubnubWebRequest webRequest = _channelRequest[multiChannelName];
+                                _channelRequest[multiChannelName] = null;
+
+                                if (webRequest != null)
+                                {
+                                    TerminateLocalClientHeartbeatTimer(webRequest.RequestUri);
+                                }
+
+                                PubnubWebRequest removedRequest;
+                                bool removedChannel = _channelRequest.TryRemove(multiChannelName, out removedRequest);
+                                if (removedChannel)
+                                {
+                                    LoggingMethod.WriteToLog(string.Format("DateTime {0}, Success to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelUnSubscribeInit).", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
+                                }
+                                else
+                                {
+                                    LoggingMethod.WriteToLog(string.Format("DateTime {0}, Unable to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelUnSubscribeInit).", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
+                                }
+                                if (webRequest != null)
+                                    TerminatePendingWebRequest(webRequest, errorCallback);
+                            }
+                            else
+                            {
+                                LoggingMethod.WriteToLog(string.Format("DateTime {0}, Unable to capture channel(s)={1}; channelgroup(s)={2} from _channelRequest to abort request.", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
+                            }
+                        });
 
 					if (type == ResponseType.Unsubscribe) {
 						//just fire leave() event to REST API for safeguard
