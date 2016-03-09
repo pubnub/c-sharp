@@ -3376,25 +3376,25 @@ namespace PubNubMessaging.Core
                             LoggingMethod.WriteToLog(string.Format("DateTime {0}, Unable to capture channel(s)={1}; channelgroup(s)={2} from _channelRequest to abort request.", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
                         }
 
-                        if (type == ResponseType.Unsubscribe)
-                        {
-                            //just fire leave() event to REST API for safeguard
-                            Uri request = BuildMultiChannelLeaveRequest(validChannels.ToArray(), validChannelGroups.ToArray());
-
-                            RequestState<T> requestState = new RequestState<T>();
-                            requestState.Channels = new string[] { channel };
-                            requestState.ChannelGroups = new string[] { channelGroup };
-                            requestState.Type = ResponseType.Leave;
-                            requestState.SubscribeOrPresenceOrRegularCallback = null;
-                            requestState.WildcardPresenceCallback = null;
-                            requestState.ErrorCallback = null;
-                            requestState.ConnectCallback = null;
-                            requestState.Reconnect = false;
-
-                            UrlProcessRequest<T>(request, requestState); // connectCallback = null
-                        }
                     });
 					
+                    if (type == ResponseType.Unsubscribe)
+                    {
+                        //just fire leave() event to REST API for safeguard
+                        Uri request = BuildMultiChannelLeaveRequest(validChannels.ToArray(), validChannelGroups.ToArray());
+
+                        RequestState<T> requestState = new RequestState<T>();
+                        requestState.Channels = new string[] { channel };
+                        requestState.ChannelGroups = new string[] { channelGroup };
+                        requestState.Type = ResponseType.Leave;
+                        requestState.SubscribeOrPresenceOrRegularCallback = null;
+                        requestState.WildcardPresenceCallback = null;
+                        requestState.ErrorCallback = null;
+                        requestState.ConnectCallback = null;
+                        requestState.Reconnect = false;
+
+                        UrlProcessRequest<T>(request, requestState); // connectCallback = null
+                    }
 				}
 
                 Dictionary<string, long> originalMultiChannelSubscribe = multiChannelSubscribe.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
