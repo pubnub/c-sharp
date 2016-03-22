@@ -11,7 +11,7 @@ namespace PubNubMessaging.Core
 	#if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
 	internal class LoggingMethod:MonoBehaviour
 	#else
-	internal class LoggingMethod
+	public class LoggingMethod
 	#endif
 	{
 		private static int logLevel = 0;
@@ -26,6 +26,7 @@ namespace PubNubMessaging.Core
 				logLevel = (int)value;
 			}
 		}
+
 		public enum Level
 		{
 			Off,
@@ -67,7 +68,7 @@ namespace PubNubMessaging.Core
 			}
 		}
 
-		public static void WriteToLog(string logText, bool writeToLog)
+		internal static void WriteToLog(string logText, bool writeToLog)
 		{
 			if (writeToLog)
             {
