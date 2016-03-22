@@ -1,4 +1,4 @@
-﻿//Build Date: Mar 08, 2016
+﻿//Build Date: Mar 22, 2016
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -375,7 +375,7 @@ namespace PubNubMessaging.Core
 			}
 		}
 
-		protected LoggingMethod.Level PubnubLogLevel 
+		internal LoggingMethod.Level PubnubLogLevel 
         {
 			get 
             {
@@ -389,7 +389,7 @@ namespace PubNubMessaging.Core
 			}
 		}
 
-		protected PubnubErrorFilter.Level PubnubErrorLevel 
+        internal PubnubErrorFilter.Level PubnubErrorLevel 
         {
 			get 
             {
@@ -2421,7 +2421,15 @@ namespace PubNubMessaging.Core
 
         #region "Publish"
 
-        public bool Publish<T>(string channel, object message, bool storeInHistory, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        /// <summary>
+        /// Publish
+        /// Send a message to a channel
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <param name="message"></param>
+        /// <param name="userCallback"></param>
+        /// <returns></returns>
+        public bool Publish<T>(string channel, object message, bool storeInHistory, string jsonUserMetaData, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
             {
@@ -2454,8 +2462,12 @@ namespace PubNubMessaging.Core
                     message = dicMessage;
                 }
             }
+            if (string.IsNullOrEmpty(jsonUserMetaData) || !_jsonPluggableLibrary.IsDictionaryCompatible(jsonUserMetaData))
+            {
+                jsonUserMetaData = "";
+            }
 
-            Uri request = BuildPublishRequest(channel, message, storeInHistory);
+            Uri request = BuildPublishRequest(channel, message, storeInHistory, jsonUserMetaData);
 
             RequestState<T> requestState = new RequestState<T>();
             requestState.Channels = new string[] { channel };
@@ -2467,34 +2479,27 @@ namespace PubNubMessaging.Core
             return UrlProcessRequest<T>(request, requestState);
         }
 
-        public bool Publish(string channel, object message, bool storeInHistory, Action<object> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            return Publish<object>(channel, message, storeInHistory, userCallback, errorCallback);
-        }
-
-		/// <summary>
-		/// Publish
-		/// Send a message to a channel
-		/// </summary>
-		/// <param name="channel"></param>
-		/// <param name="message"></param>
-		/// <param name="userCallback"></param>
-		/// <returns></returns>
-		public bool Publish (string channel, object message, Action<object> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			return Publish<object> (channel, message, true, userCallback, errorCallback);
-		}
-
-		public bool Publish<T> (string channel, object message, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            return Publish<T>(channel, message, true, userCallback, errorCallback);
-		}
-
-		private Uri BuildPublishRequest (string channel, object originalMessage, bool storeInHistory)
+        private Uri BuildPublishRequest(string channel, object originalMessage, bool storeInHistory, string jsonUserMetaData)
 		{
 			string message = (_enableJsonEncodingForPublish) ? JsonEncodePublishMsg (originalMessage) : originalMessage.ToString ();
 
-            parameters = (storeInHistory) ? "" : "store=0";
+            StringBuilder publishParamBuilder = new StringBuilder();
+            if (!storeInHistory)
+            {
+                publishParamBuilder.Append("store=0");
+            }
+            if (!string.IsNullOrEmpty(jsonUserMetaData) && _jsonPluggableLibrary != null && _jsonPluggableLibrary.IsDictionaryCompatible(jsonUserMetaData))
+            {
+                if (publishParamBuilder.ToString().Length > 0)
+                {
+                    publishParamBuilder.AppendFormat("&meta={0}", EncodeUricomponent(jsonUserMetaData, ResponseType.Publish, false, false));
+                }
+                else
+                {
+                    publishParamBuilder.AppendFormat("meta={0}", EncodeUricomponent(jsonUserMetaData, ResponseType.Publish, false, false));
+                }
+            }
+            parameters = publishParamBuilder.ToString();
 
 			// Generate String to Sign
 			string signature = "0";
