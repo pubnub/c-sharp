@@ -38,6 +38,7 @@
 /unity/*/*/UnityUnitTest/*.userprefs
 /unity/*/*/UnityUnitTest/UnityUnitTestBuild_Data/*
 /silverlight/*.suo
+/silverlight/packages/*
 /silverlight/*/bin/Debug/*
 /silverlight/*/bin/Release/*
 /silverlight/*/obj/Debug/*
