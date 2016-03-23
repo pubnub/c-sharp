@@ -90,7 +90,7 @@ namespace PubNubMessaging.Core
 			}
 		}
 
-		internal static void WriteToLog(string logText, bool writeToLog)
+		public static void WriteToLog(string logText, bool writeToLog)
 		{
 			if (writeToLog)
             {
