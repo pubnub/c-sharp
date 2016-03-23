@@ -2,6 +2,14 @@
 *~
 /csharp.net/PubNub-Messaging*/bin/*
 /csharp.net/PubNub-Messaging*/obj/*
+/csharp.net/PubNub-Messaging*/bin/release/*
+/csharp.net/PubNub-Messaging*/obj/release/*
+/csharp.net/PubNub-Messaging*/bin/debug/*
+/csharp.net/PubNub-Messaging*/obj/debug/*
+/csharp.net/PubnubConsole/bin/release/*
+/csharp.net/PubnubConsole/bin/debug/*
+/csharp.net/PubnubConsole/obj/release/*
+/csharp.net/PubnubConsole/obj/debug/*
 /csharp.net/packages/*
 /csharp.net/*.suo
 /windows-phone-*/*/packages/*
