@@ -200,9 +200,9 @@
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PubnubWindowsPhone\PubnubWindowsPhone.csproj">
-      <Project>{22D86202-AF98-47F6-85BE-C04125393790}</Project>
-      <Name>PubnubWindowsPhone</Name>
+    <ProjectReference Include="..\PubnubCore\PubnubCore.csproj">
+      <Project>{5B11152B-D2B9-4EB2-9DF4-6678CAA6BD5C}</Project>
+      <Name>PubnubCore</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />

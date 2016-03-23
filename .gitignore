@@ -2,6 +2,7 @@
 *~
 /csharp.net/PubNub-Messaging*/bin/*
 /csharp.net/PubNub-Messaging*/obj/*
+/csharp.net/packages/*
 /csharp.net/*.suo
 /windows-phone-*/*/packages/*
 /windows-phone-*/*/packages.config
@@ -11,6 +12,7 @@
 /windows-phone-*/*/obj/*
 /windows-phone-*/*.suo
 /windows-phone-*/*/*.user
+/windows-phone-*/packages/*
 /iis/PubNubExampleASPNET*/bin/*
 /iis/PubNubExampleASPNET*/obj/*
 /iis/PubNubExampleASPNET*/obj/debug/*
