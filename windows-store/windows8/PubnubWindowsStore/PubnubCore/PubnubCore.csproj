@@ -9,8 +9,8 @@
     <ProjectGuid>{398A6159-A0F3-4D45-8502-2F8247F9B014}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PubnubCore</RootNamespace>
-    <AssemblyName>PubnubCore</AssemblyName>
+    <RootNamespace>PubNubMessaging</RootNamespace>
+    <AssemblyName>PubNub-Messaging</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{BC8A1FFA-BEE3-4634-8014-F334798102B3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
