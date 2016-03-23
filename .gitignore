@@ -8,6 +8,8 @@
 /windows-phone-*/*/packages.config
 /windows-phone-*/*/*/bin/debug/*
 /windows-phone-*/*/*/obj/debug/*
+/windows-phone-*/*/*/bin/release/*
+/windows-phone-*/*/*/obj/release/*
 /windows-phone-*/*/bin/*
 /windows-phone-*/*/obj/*
 /windows-phone-*/*.suo
