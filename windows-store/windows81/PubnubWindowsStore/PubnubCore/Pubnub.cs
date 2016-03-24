@@ -41,22 +41,32 @@ namespace PubNubMessaging.Core
 
 		public bool Publish(string channel, object message, Action<object> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			return pubnub.Publish(channel, message, true, userCallback, errorCallback);
+			return pubnub.Publish(channel, message, true, "", userCallback, errorCallback);
 		}
 
 		public bool Publish<T>(string channel, object message, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			return pubnub.Publish<T>(channel, message, true, userCallback, errorCallback);
+            return pubnub.Publish<T>(channel, message, true, "", userCallback, errorCallback);
 		}
 
         public bool Publish(string channel, object message, bool storeInHistory, Action<object> userCallback, Action<PubnubClientError> errorCallback)
         {
-            return pubnub.Publish(channel, message, storeInHistory, userCallback, errorCallback);
+            return pubnub.Publish(channel, message, storeInHistory, "", userCallback, errorCallback);
         }
 
         public bool Publish<T>(string channel, object message, bool storeInHistory, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
-            return pubnub.Publish<T>(channel, message, storeInHistory, userCallback, errorCallback);
+            return pubnub.Publish<T>(channel, message, storeInHistory, "", userCallback, errorCallback);
+        }
+
+        public bool Publish(string channel, object message, bool storeInHistory, string jsonUserMetaData, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return pubnub.Publish(channel, message, storeInHistory, jsonUserMetaData, userCallback, errorCallback);
+        }
+
+        public bool Publish<T>(string channel, object message, bool storeInHistory, string jsonUserMetaData, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return pubnub.Publish<T>(channel, message, storeInHistory, jsonUserMetaData, userCallback, errorCallback);
         }
 
 		public void Presence<T>(string channel, Action<T> presenceCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback)
@@ -614,6 +624,16 @@ namespace PubNubMessaging.Core
             return PubnubWin.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
         }
 
+        public void SetInternalLogLevel(LoggingMethod.Level logLevel)
+        {
+            pubnub.PubnubLogLevel = logLevel;
+        }
+
+        public void SetErrorFilterLevel(PubnubErrorFilter.Level errorLevel)
+        {
+            pubnub.PubnubErrorLevel = errorLevel;
+        }
+
 
 		#endregion
 
@@ -772,6 +792,7 @@ namespace PubNubMessaging.Core
                 pubnub.PushServiceName = value;
             }
         }
+
 		#endregion
 
 		#region "Constructors"

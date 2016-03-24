@@ -57,16 +57,21 @@ namespace PubNubMessaging.Core
             Console.ResetColor();
             Console.WriteLine();
 
-            Console.WriteLine("Enable SSL? ENTER Y for Yes, else N");
+            Console.WriteLine("Enable SSL? ENTER Y for Yes, else N. (Default Y)");
             string enableSSL = Console.ReadLine();
             Console.ForegroundColor = ConsoleColor.Blue;
             if (enableSSL.Trim().ToLower() == "y")
             {
                 Console.WriteLine("SSL Enabled");
             }
-            else
+            else if (enableSSL.Trim().ToLower() == "n")
             {
                 Console.WriteLine("SSL NOT Enabled");
+            }
+            else
+            {
+                enableSSL = "Y";
+                Console.WriteLine("SSL Enabled (default)");
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -97,7 +102,7 @@ namespace PubNubMessaging.Core
             else
             {
                 Console.WriteLine("Default demo subscribe key provided");
-                subscribeKey = "demo";
+                subscribeKey = "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -113,7 +118,7 @@ namespace PubNubMessaging.Core
             else
             {
                 Console.WriteLine("Default demo publish key provided");
-                publishKey = "demo";
+                publishKey = "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -129,7 +134,7 @@ namespace PubNubMessaging.Core
             else
             {
                 Console.WriteLine("Default demo Secret key provided");
-                secretKey = "demo";
+                secretKey = "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -318,6 +323,27 @@ namespace PubNubMessaging.Core
             Console.ResetColor();
             Console.WriteLine();
 
+
+            Console.WriteLine("Enable Internal Logging? Enter Y for Yes, Else N for No.");
+            Console.WriteLine("Default = Y  ");
+            string enableLoggingString = Console.ReadLine();
+            Console.ForegroundColor = ConsoleColor.Blue;
+            if (enableLoggingString.Trim().ToLower() == "n")
+            {
+                pubnub.SetInternalLogLevel(LoggingMethod.Level.Off);
+                Console.WriteLine("Disabled internal logging");
+            }
+            else
+            {
+                pubnub.SetInternalLogLevel(LoggingMethod.Level.Info);
+                Console.WriteLine("Enabled internal logging");
+            }
+            Console.ResetColor();
+            Console.WriteLine();
+
+
+
+
             Console.WriteLine("Display ErrorCallback messages? Enter Y for Yes, Else N for No.");
             Console.WriteLine("Default = N  ");
             string displayErrMessage = Console.ReadLine();
@@ -432,7 +458,7 @@ namespace PubNubMessaging.Core
                         else
                         {
                             Console.WriteLine("Running subscribe()");
-                        pubnub.Subscribe<string>(channel, channelGroup, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayPresenceWildcardMessage, DisplayErrorMessage);
+                            pubnub.Subscribe<string>(channel, channelGroup, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayWildCardPresenceReturnMessage, DisplayErrorMessage);
                         }
                         break;
                     case "2":
@@ -455,15 +481,21 @@ namespace PubNubMessaging.Core
                         {
                             store = false;
                         }
-
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Store In History = {0}", storeInHistory));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter User Meta Data in JSON dictionary format. If you don't want to enter for now, just press ENTER");
+                        string jsonUserMetaData = Console.ReadLine();
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("User Meta Data = {0}", jsonUserMetaData));
                         Console.ResetColor();
 
 
 
 
-                        Console.WriteLine("Direct JSON String? Enter Y for Yes or N for No. To accept default(N), just press ENTER");
+                        Console.WriteLine("Publishing message as direct JSON String? Enter Y for Yes or N for No. To accept default(N), just press ENTER");
                         string directJson = Console.ReadLine();
                         bool jsonPublish = false;
                         if (directJson.ToLower() == "y")
@@ -507,11 +539,11 @@ namespace PubNubMessaging.Core
                         int intData;
                         if (int.TryParse(publishMsg, out intData)) //capture numeric data
                         {
-                            pubnub.Publish<string>(channel, intData, store, DisplayReturnMessage, DisplayErrorMessage);
+                            pubnub.Publish<string>(channel, intData, store, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
                         }
                         else if (double.TryParse(publishMsg, out doubleData)) //capture numeric data
                         {
-                            pubnub.Publish<string>(channel, doubleData, store, DisplayReturnMessage, DisplayErrorMessage);
+                            pubnub.Publish<string>(channel, doubleData, store, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
                         }
                         else
                         {
@@ -521,20 +553,20 @@ namespace PubNubMessaging.Core
                                 string strMsg = publishMsg.Substring(1, publishMsg.Length - 2);
                                 if (int.TryParse(strMsg, out intData))
                                 {
-                                    pubnub.Publish<string>(channel, strMsg, store, DisplayReturnMessage, DisplayErrorMessage);
+                                    pubnub.Publish<string>(channel, strMsg, store, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
                                 }
                                 else if (double.TryParse(strMsg, out doubleData))
                                 {
-                                    pubnub.Publish<string>(channel, strMsg, store, DisplayReturnMessage, DisplayErrorMessage);
+                                    pubnub.Publish<string>(channel, strMsg, store, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
                                 }
                                 else
                                 {
-                                    pubnub.Publish<string>(channel, publishMsg, store, DisplayReturnMessage, DisplayErrorMessage);
+                                    pubnub.Publish<string>(channel, publishMsg, store, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
                                 }
                             }
                             else
                             {
-                                pubnub.Publish<string>(channel, publishMsg, store, DisplayReturnMessage, DisplayErrorMessage);
+                                pubnub.Publish<string>(channel, publishMsg, store, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
                             }
                         }
                         break;
@@ -565,28 +597,28 @@ namespace PubNubMessaging.Core
                         else
                         {
                             Console.WriteLine("Running presence()");
-                            pubnub.Presence<string>(channel, channelGroup, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
+                            pubnub.Presence<string>(channel, channelGroup, DisplayPresenceReturnMessage, DisplayPresenceConnectStatusMessage, DisplayErrorMessage);
                         }
                         break;
                     case "4":
-                    bool includeToken = false;
-                    Console.WriteLine("Enter CHANNEL name for Detailed History");
-                    channel = Console.ReadLine();
+                        bool includeToken = false;
+                        Console.WriteLine("Enter CHANNEL name for Detailed History");
+                        channel = Console.ReadLine();
 
-                    Console.ForegroundColor = ConsoleColor.Blue;
-                    Console.WriteLine(string.Format("Channel = {0}",channel));
-                    Console.ResetColor();
-                    Console.WriteLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}",channel));
+                        Console.ResetColor();
+                        Console.WriteLine();
 
-                    Console.WriteLine("Include Token? Y or N? Default is N. Press Y for Yes Else press ENTER");
-                    string userChoiceIncludeTokenForHistory = Console.ReadLine();
-                    if (userChoiceIncludeTokenForHistory.ToLower() == "y")
-                    {
-                        includeToken = true;
-                    }
+                        Console.WriteLine("Include Token? Y or N? Default is N. Press Y for Yes Else press ENTER");
+                        string userChoiceIncludeTokenForHistory = Console.ReadLine();
+                        if (userChoiceIncludeTokenForHistory.ToLower() == "y")
+                        {
+                            includeToken = true;
+                        }
 
-                    Console.WriteLine("Running detailed history()");
-                    pubnub.DetailedHistory<string>(channel, 100, includeToken, DisplayReturnMessage, DisplayErrorMessage);
+                        Console.WriteLine("Running detailed history()");
+                        pubnub.DetailedHistory<string>(channel, 100, includeToken, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "5":
                         bool showUUID = true;
@@ -601,8 +633,8 @@ namespace PubNubMessaging.Core
                         Console.WriteLine();
 
                         Console.WriteLine("Show UUID List? Y or N? Default is Y. Press N for No Else press ENTER");
-                        string userChoiceShowUUID = Console.ReadLine();
-                        if (userChoiceShowUUID.ToLower() == "n")
+                        string userChoiceIncludeToken = Console.ReadLine();
+                        if (userChoiceIncludeToken.ToLower() == "n")
                         {
                             showUUID = false;
                         }
@@ -649,7 +681,7 @@ namespace PubNubMessaging.Core
                         else
                         {
                             Console.WriteLine("Running unsubscribe()");
-                            pubnub.Unsubscribe<string>(channel, channelGroup, DisplayReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeDisconnectStatusMessage, DisplayErrorMessage);
+                            pubnub.Unsubscribe<string>(channel, channelGroup, DisplayReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeDisconnectStatusMessage, DisplayWildCardPresenceReturnMessage, DisplayErrorMessage);
                         }
                         break;
                     case "7":
@@ -1414,6 +1446,18 @@ namespace PubNubMessaging.Core
             Console.WriteLine();
         }
 
+
+        /// <summary>
+        /// Callback method captures wildcard presence events for Subscribe
+        /// </summary>
+        /// <param name="result"></param>
+        static void DisplayWildCardPresenceReturnMessage(string result)
+        {
+            Console.WriteLine("WILDCARD PRESENCE CALLBACK:");
+            Console.WriteLine(result);
+            Console.WriteLine();
+        }
+
         /// <summary>
         /// Callback method captures the response in JSON string format for Presence
         /// </summary>
@@ -1457,13 +1501,6 @@ namespace PubNubMessaging.Core
         static void DisplayPresenceDisconnectStatusMessage(string result)
         {
             Console.WriteLine("PRESENCE DISCONNECT CALLBACK:");
-            Console.WriteLine(result);
-            Console.WriteLine();
-        }
-
-        static void DisplayPresenceWildcardMessage(string result)
-        {
-            Console.WriteLine("PRESENCEWILDCARD CALLBACK:");
             Console.WriteLine(result);
             Console.WriteLine();
         }

@@ -6,7 +6,7 @@ namespace PubNubMessaging.Core
 {
 	public class Pubnub
 	{
-		PubnubMonoLinux pubnub;
+       	PubnubMonoLinux pubnub;
         
         #region "PubNub API Channel Methods"
 		public void Subscribe<T>(string channel, Action<T> subscribeCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback)
@@ -39,24 +39,34 @@ namespace PubNubMessaging.Core
             pubnub.Subscribe(channel, channelGroup, subscribeCallback, connectCallback, errorCallback);
         }
 
-		public bool Publish(string channel, object message, Action<object> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			return pubnub.Publish(channel, message, true, userCallback, errorCallback);
-		}
+        public bool Publish(string channel, object message, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return pubnub.Publish(channel, message, true, "", userCallback, errorCallback);
+        }
 
-		public bool Publish<T>(string channel, object message, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			return pubnub.Publish<T>(channel, message, true, userCallback, errorCallback);
-		}
+        public bool Publish<T>(string channel, object message, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return pubnub.Publish<T>(channel, message, true, "", userCallback, errorCallback);
+        }
 
         public bool Publish(string channel, object message, bool storeInHistory, Action<object> userCallback, Action<PubnubClientError> errorCallback)
         {
-            return pubnub.Publish(channel, message, storeInHistory, userCallback, errorCallback);
+            return pubnub.Publish(channel, message, storeInHistory, "", userCallback, errorCallback);
         }
 
         public bool Publish<T>(string channel, object message, bool storeInHistory, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
-            return pubnub.Publish<T>(channel, message, storeInHistory, userCallback, errorCallback);
+            return pubnub.Publish<T>(channel, message, storeInHistory, "", userCallback, errorCallback);
+        }
+
+        public bool Publish(string channel, object message, bool storeInHistory, string jsonUserMetaData, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return pubnub.Publish(channel, message, storeInHistory, jsonUserMetaData, userCallback, errorCallback);
+        }
+
+        public bool Publish<T>(string channel, object message, bool storeInHistory, string jsonUserMetaData, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            return pubnub.Publish<T>(channel, message, storeInHistory, jsonUserMetaData, userCallback, errorCallback);
         }
 
 		public void Presence<T>(string channel, Action<T> presenceCallback, Action<T> connectCallback, Action<PubnubClientError> errorCallback)
@@ -606,14 +616,23 @@ namespace PubNubMessaging.Core
 
         public static long TranslateDateTimeToPubnubUnixNanoSeconds(DateTime dotNetUTCDateTime)
         {
-			return PubnubMonoLinux.TranslateDateTimeToPubnubUnixNanoSeconds(dotNetUTCDateTime);
+            return PubnubMonoLinux.TranslateDateTimeToPubnubUnixNanoSeconds(dotNetUTCDateTime);
         }
 
         public static DateTime TranslatePubnubUnixNanoSecondsToDateTime(long unixNanoSecondTime)
         {
-			return PubnubMonoLinux.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
+            return PubnubMonoLinux.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
         }
 
+        public void SetInternalLogLevel(LoggingMethod.Level logLevel)
+        {
+            pubnub.PubnubLogLevel = logLevel;
+        }
+
+        public void SetErrorFilterLevel(PubnubErrorFilter.Level errorLevel)
+        {
+            pubnub.PubnubErrorLevel = errorLevel;
+        }
 
 		#endregion
 
@@ -778,17 +797,17 @@ namespace PubNubMessaging.Core
 
 		public Pubnub(string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
 		{
-			pubnub = new PubnubMonoLinux (publishKey, subscribeKey, secretKey, cipherKey, sslOn);
+            pubnub = new PubnubMonoLinux (publishKey, subscribeKey, secretKey, cipherKey, sslOn);
 		}
 
 		public Pubnub(string publishKey, string subscribeKey, string secretKey)
 		{
-			pubnub = new PubnubMonoLinux (publishKey, subscribeKey, secretKey);
+            pubnub = new PubnubMonoLinux (publishKey, subscribeKey, secretKey);
 		}
 
 		public Pubnub(string publishKey, string subscribeKey)
 		{
-			pubnub = new PubnubMonoLinux (publishKey, subscribeKey);
+            pubnub = new PubnubMonoLinux (publishKey, subscribeKey);
 		}
 		#endregion
 	}

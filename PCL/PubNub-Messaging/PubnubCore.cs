@@ -1,4 +1,4 @@
-﻿//Build Date: Mar 10, 2016
+﻿//Build Date: Mar 22, 2016
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -384,7 +384,7 @@ namespace PubNubMessaging.Core
 			}
 		}
 
-		public LoggingMethod.Level PubnubLogLevel 
+        internal LoggingMethod.Level PubnubLogLevel 
         {
 			get 
             {
@@ -398,7 +398,7 @@ namespace PubNubMessaging.Core
 			}
 		}
 
-		public PubnubErrorFilter.Level PubnubErrorLevel 
+        internal PubnubErrorFilter.Level PubnubErrorLevel 
         {
 			get 
             {
@@ -2477,7 +2477,15 @@ namespace PubNubMessaging.Core
 
         #region "Publish"
 
-        public bool Publish<T>(string channel, object message, bool storeInHistory, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		/// <summary>
+		/// Publish
+		/// Send a message to a channel
+		/// </summary>
+		/// <param name="channel"></param>
+		/// <param name="message"></param>
+		/// <param name="userCallback"></param>
+		/// <returns></returns>
+        public bool Publish<T>(string channel, object message, bool storeInHistory, string jsonUserMetaData, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
             {
@@ -2503,15 +2511,19 @@ namespace PubNubMessaging.Core
 
             if (_enableDebugForPushPublish)
             {
-                if (message is Dictionary<string,object>)
+                if (message is Dictionary<string, object>)
                 {
                     Dictionary<string, object> dicMessage = message as Dictionary<string, object>;
                     dicMessage.Add("pn_debug", true);
                     message = dicMessage;
                 }
             }
+            if (string.IsNullOrEmpty(jsonUserMetaData) || !_jsonPluggableLibrary.IsDictionaryCompatible(jsonUserMetaData))
+            {
+                jsonUserMetaData = "";
+            }
 
-            Uri request = BuildPublishRequest(channel, message, storeInHistory);
+            Uri request = BuildPublishRequest(channel, message, storeInHistory, jsonUserMetaData);
 
             RequestState<T> requestState = new RequestState<T>();
             requestState.Channels = new string[] { channel };
@@ -2523,66 +2535,60 @@ namespace PubNubMessaging.Core
             return UrlProcessRequest<T>(request, requestState);
         }
 
-        public bool Publish(string channel, object message, bool storeInHistory, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        private Uri BuildPublishRequest(string channel, object originalMessage, bool storeInHistory, string jsonUserMetaData)
         {
-            return Publish<object>(channel, message, storeInHistory, userCallback, errorCallback);
+            string message = (_enableJsonEncodingForPublish) ? JsonEncodePublishMsg(originalMessage) : originalMessage.ToString();
+
+            StringBuilder publishParamBuilder = new StringBuilder();
+            if (!storeInHistory)
+            {
+                publishParamBuilder.Append("store=0");
+            }
+            if (!string.IsNullOrEmpty(jsonUserMetaData) && _jsonPluggableLibrary != null && _jsonPluggableLibrary.IsDictionaryCompatible(jsonUserMetaData))
+            {
+                if (publishParamBuilder.ToString().Length > 0)
+                {
+                    publishParamBuilder.AppendFormat("&meta={0}", EncodeUricomponent(jsonUserMetaData, ResponseType.Publish, false, false));
+                }
+                else
+                {
+                    publishParamBuilder.AppendFormat("meta={0}", EncodeUricomponent(jsonUserMetaData, ResponseType.Publish, false, false));
+                }
+            }
+            parameters = publishParamBuilder.ToString();
+
+            // Generate String to Sign
+            string signature = "0";
+            if (this.secretKey.Length > 0)
+            {
+                StringBuilder string_to_sign = new StringBuilder();
+                string_to_sign
+                    .Append(this.publishKey)
+                        .Append('/')
+                        .Append(this.subscribeKey)
+                        .Append('/')
+                        .Append(this.secretKey)
+                        .Append('/')
+                        .Append(channel)
+                        .Append('/')
+                        .Append(message); // 1
+
+                // Sign Message
+                signature = Md5(string_to_sign.ToString());
+            }
+
+            // Build URL
+            List<string> url = new List<string>();
+            url.Add("publish");
+            url.Add(this.publishKey);
+            url.Add(this.subscribeKey);
+            url.Add(signature);
+            url.Add(channel);
+            url.Add("0");
+            url.Add(message);
+
+            return BuildRestApiRequest<Uri>(url, ResponseType.Publish);
         }
-
-		/// <summary>
-		/// Publish
-		/// Send a message to a channel
-		/// </summary>
-		/// <param name="channel"></param>
-		/// <param name="message"></param>
-		/// <param name="userCallback"></param>
-		/// <returns></returns>
-		public bool Publish (string channel, object message, Action<object> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			return Publish<object> (channel, message, true, userCallback, errorCallback);
-		}
-
-		public bool Publish<T> (string channel, object message, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            return Publish<T>(channel, message, true, userCallback, errorCallback);
-		}
-
-		private Uri BuildPublishRequest (string channel, object originalMessage, bool storeInHistory)
-		{
-			string message = (_enableJsonEncodingForPublish) ? JsonEncodePublishMsg (originalMessage) : originalMessage.ToString ();
-
-            parameters = (storeInHistory) ? "" : "store=0";
-
-			// Generate String to Sign
-			string signature = "0";
-			if (this.secretKey.Length > 0) {
-				StringBuilder string_to_sign = new StringBuilder ();
-				string_to_sign
-					.Append (this.publishKey)
-						.Append ('/')
-						.Append (this.subscribeKey)
-						.Append ('/')
-						.Append (this.secretKey)
-						.Append ('/')
-						.Append (channel)
-						.Append ('/')
-						.Append (message); // 1
-
-				// Sign Message
-				signature = Md5 (string_to_sign.ToString ());
-			}
-
-			// Build URL
-			List<string> url = new List<string> ();
-			url.Add ("publish");
-			url.Add (this.publishKey);
-			url.Add (this.subscribeKey);
-			url.Add (signature);
-			url.Add (channel);
-			url.Add ("0");
-			url.Add (message);
-
-			return BuildRestApiRequest<Uri> (url, ResponseType.Publish);
-		}
 
 		#endregion
 

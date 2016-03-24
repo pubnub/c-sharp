@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.ComponentModel;
@@ -10,7 +11,7 @@ namespace PubNubMessaging.Core
     public class PubnubExample
     {
         static public Pubnub pubnub;
-        //static public Pubnub pubnub2;
+
         static public bool deliveryStatus = false;
         static public string channel = "";
         static public bool showErrorMessageSegments = false;
@@ -19,11 +20,11 @@ namespace PubNubMessaging.Core
         static public int presenceHeartbeat = 0;
         static public int presenceHeartbeatInterval = 0;
 
-        static void UnhandledExceptionTrapper (object sender, UnhandledExceptionEventArgs e)
+        static void UnhandledExceptionTrapper(object sender, UnhandledExceptionEventArgs e)
         {
             //Console.WriteLine(e.ExceptionObject.ToString());
-            Console.WriteLine ("Unhandled exception occured inside Pubnub C# API. Exiting the application. Please try again.");
-            Environment.Exit (1);
+            Console.WriteLine("Unhandled exception occured inside Pubnub C# API. Exiting the application. Please try again.");
+            Environment.Exit(1);
         }
 
         static public void Main()
@@ -31,7 +32,7 @@ namespace PubNubMessaging.Core
             AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionTrapper;
 
             PubnubProxy proxy = null;
-
+            
             Console.WriteLine("HINT: TO TEST RE-CONNECT AND CATCH-UP,");
             Console.WriteLine("      DISCONNECT YOUR MACHINE FROM NETWORK/INTERNET AND ");
             Console.WriteLine("      RE-CONNECT YOUR MACHINE AFTER SOMETIME.");
@@ -56,16 +57,21 @@ namespace PubNubMessaging.Core
             Console.ResetColor();
             Console.WriteLine();
 
-            Console.WriteLine("Enable SSL? ENTER Y for Yes, else N");
+            Console.WriteLine("Enable SSL? ENTER Y for Yes, else N. (Default Y)");
             string enableSSL = Console.ReadLine();
             Console.ForegroundColor = ConsoleColor.Blue;
             if (enableSSL.Trim().ToLower() == "y")
             {
                 Console.WriteLine("SSL Enabled");
             }
-            else
+            else if (enableSSL.Trim().ToLower() == "n")
             {
                 Console.WriteLine("SSL NOT Enabled");
+            }
+            else
+            {
+                enableSSL = "Y";
+                Console.WriteLine("SSL Enabled (default)");
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -96,7 +102,7 @@ namespace PubNubMessaging.Core
             else
             {
                 Console.WriteLine("Default demo subscribe key provided");
-                subscribeKey = "demo";
+                subscribeKey = "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -112,7 +118,7 @@ namespace PubNubMessaging.Core
             else
             {
                 Console.WriteLine("Default demo publish key provided");
-                publishKey = "demo";
+                publishKey = "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -128,7 +134,7 @@ namespace PubNubMessaging.Core
             else
             {
                 Console.WriteLine("Default demo Secret key provided");
-                secretKey = "demo";
+                secretKey = "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -180,7 +186,7 @@ namespace PubNubMessaging.Core
             Console.ForegroundColor = ConsoleColor.Blue;
             if (subscribeTimeout > 0)
             {
-                Console.WriteLine("Subscribe Timeout = {0}", subscribeTimeout);
+                Console.WriteLine("Subscribe Timeout = {0}",subscribeTimeout);
                 pubnub.SubscribeTimeout = subscribeTimeout;
             }
             else
@@ -278,7 +284,7 @@ namespace PubNubMessaging.Core
                     string proxyUsername = Console.ReadLine();
                     Console.WriteLine("ENTER password for proxy server authentication.");
                     string proxyPassword = Console.ReadLine();
-
+                    
                     proxy = new PubnubProxy();
                     proxy.ProxyServer = proxyServer;
                     proxy.ProxyPort = port;
@@ -317,11 +323,32 @@ namespace PubNubMessaging.Core
             Console.ResetColor();
             Console.WriteLine();
 
+
+            Console.WriteLine("Enable Internal Logging? Enter Y for Yes, Else N for No.");
+            Console.WriteLine("Default = Y  ");
+            string enableLoggingString = Console.ReadLine();
+            Console.ForegroundColor = ConsoleColor.Blue;
+            if (enableLoggingString.Trim().ToLower() == "n")
+            {
+                pubnub.SetInternalLogLevel(LoggingMethod.Level.Off);
+                Console.WriteLine("Disabled internal logging");
+            }
+            else
+            {
+                pubnub.SetInternalLogLevel(LoggingMethod.Level.Info);
+                Console.WriteLine("Enabled internal logging");
+            }
+            Console.ResetColor();
+            Console.WriteLine();
+
+
+
+
             Console.WriteLine("Display ErrorCallback messages? Enter Y for Yes, Else N for No.");
             Console.WriteLine("Default = N  ");
             string displayErrMessage = Console.ReadLine();
             Console.ForegroundColor = ConsoleColor.Blue;
-            if (displayErrMessage.Trim().ToLower() == "y")
+            if (displayErrMessage.Trim().ToLower() == "y" )
             {
                 showErrorMessageSegments = true;
                 Console.WriteLine("ErrorCallback messages will  be displayed");
@@ -353,7 +380,7 @@ namespace PubNubMessaging.Core
 
 
             bool exitFlag = false;
-            string channel = "";
+            string channel="";
             string channelGroup = "";
             int currentUserChoice = 0;
             string userinput = "";
@@ -391,14 +418,6 @@ namespace PubNubMessaging.Core
                     Console.WriteLine("Enter 27 FOR WhereNow");
                     Console.WriteLine("Enter 28 FOR GlobalHere_Now");
                     Console.WriteLine("Enter 29 TO change UUID. (Current value = {0})", pubnub.SessionUUID);
-                    Console.WriteLine("Enter 30 FOR Push - Register Device");
-                    Console.WriteLine("Enter 31 FOR Push - Unregister Device");
-                    Console.WriteLine("Enter 32 FOR Push - Remove Channel");
-                    Console.WriteLine("Enter 33 FOR Push - Get Current Channels");
-                    Console.WriteLine("Enter 34 FOR Push - Publish Toast message");
-                    Console.WriteLine("Enter 35 FOR Push - Publish Flip Tile message");
-                    Console.WriteLine("Enter 36 FOR Push - Publish Cycle Tile message");
-                    Console.WriteLine("Enter 37 FOR Push - Publish Iconic Tile message");
                     Console.WriteLine("Enter 38 FOR Channel Group - Add channel(s)");
                     Console.WriteLine("Enter 39 FOR Channel Group - Remove channel/group/namespace");
                     Console.WriteLine("Enter 40 FOR Channel Group - Get channel(s)/namespace(s)");
@@ -418,7 +437,7 @@ namespace PubNubMessaging.Core
                         channel = Console.ReadLine();
 
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", channel));
+                        Console.WriteLine(string.Format("Channel = {0}",channel));
                         Console.ResetColor();
                         Console.WriteLine();
 
@@ -439,7 +458,7 @@ namespace PubNubMessaging.Core
                         else
                         {
                             Console.WriteLine("Running subscribe()");
-                            pubnub.Subscribe<string>(channel, channelGroup, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
+                            pubnub.Subscribe<string>(channel, channelGroup, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayWildCardPresenceReturnMessage, DisplayErrorMessage);
                         }
                         break;
                     case "2":
@@ -447,7 +466,7 @@ namespace PubNubMessaging.Core
                         channel = Console.ReadLine();
 
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", channel));
+                        Console.WriteLine(string.Format("Channel = {0}",channel));
                         Console.ResetColor();
 
                         if (channel == "")
@@ -462,15 +481,21 @@ namespace PubNubMessaging.Core
                         {
                             store = false;
                         }
-
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Store In History = {0}", storeInHistory));
+                        Console.ResetColor();
+
+                        Console.WriteLine("Enter User Meta Data in JSON dictionary format. If you don't want to enter for now, just press ENTER");
+                        string jsonUserMetaData = Console.ReadLine();
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("User Meta Data = {0}", jsonUserMetaData));
                         Console.ResetColor();
 
 
 
 
-                        Console.WriteLine("Direct JSON String? Enter Y for Yes or N for No. To accept default(N), just press ENTER");
+                        Console.WriteLine("Publishing message as direct JSON String? Enter Y for Yes or N for No. To accept default(N), just press ENTER");
                         string directJson = Console.ReadLine();
                         bool jsonPublish = false;
                         if (directJson.ToLower() == "y")
@@ -507,18 +532,18 @@ namespace PubNubMessaging.Core
                         } while (enteredKey.Key != ConsoleKey.Enter);
                         string publishMsg = publishBuilder.ToString();
                         #endregion
-
+                        
                         Console.WriteLine("Running publish()");
 
                         double doubleData;
                         int intData;
                         if (int.TryParse(publishMsg, out intData)) //capture numeric data
                         {
-                            pubnub.Publish<string>(channel, intData, store, DisplayReturnMessage, DisplayErrorMessage);
+                            pubnub.Publish<string>(channel, intData, store, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
                         }
                         else if (double.TryParse(publishMsg, out doubleData)) //capture numeric data
                         {
-                            pubnub.Publish<string>(channel, doubleData, store, DisplayReturnMessage, DisplayErrorMessage);
+                            pubnub.Publish<string>(channel, doubleData, store, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
                         }
                         else
                         {
@@ -528,20 +553,20 @@ namespace PubNubMessaging.Core
                                 string strMsg = publishMsg.Substring(1, publishMsg.Length - 2);
                                 if (int.TryParse(strMsg, out intData))
                                 {
-                                    pubnub.Publish<string>(channel, strMsg, store, DisplayReturnMessage, DisplayErrorMessage);
+                                    pubnub.Publish<string>(channel, strMsg, store, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
                                 }
                                 else if (double.TryParse(strMsg, out doubleData))
                                 {
-                                    pubnub.Publish<string>(channel, strMsg, store, DisplayReturnMessage, DisplayErrorMessage);
+                                    pubnub.Publish<string>(channel, strMsg, store, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
                                 }
                                 else
                                 {
-                                    pubnub.Publish<string>(channel, publishMsg, store, DisplayReturnMessage, DisplayErrorMessage);
+                                    pubnub.Publish<string>(channel, publishMsg, store, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
                                 }
                             }
                             else
                             {
-                                pubnub.Publish<string>(channel, publishMsg, store, DisplayReturnMessage, DisplayErrorMessage);
+                                pubnub.Publish<string>(channel, publishMsg, store, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
                             }
                         }
                         break;
@@ -551,7 +576,7 @@ namespace PubNubMessaging.Core
                         channel = Console.ReadLine();
 
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Presence Channel = {0}", channel));
+                        Console.WriteLine(string.Format("Presence Channel = {0}",channel));
                         Console.ResetColor();
                         Console.WriteLine();
 
@@ -572,20 +597,28 @@ namespace PubNubMessaging.Core
                         else
                         {
                             Console.WriteLine("Running presence()");
-                            pubnub.Presence<string>(channel, channelGroup, DisplaySubscribeReturnMessage, DisplaySubscribeConnectStatusMessage, DisplayErrorMessage);
+                            pubnub.Presence<string>(channel, channelGroup, DisplayPresenceReturnMessage, DisplayPresenceConnectStatusMessage, DisplayErrorMessage);
                         }
                         break;
                     case "4":
+                        bool includeToken = false;
                         Console.WriteLine("Enter CHANNEL name for Detailed History");
                         channel = Console.ReadLine();
 
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", channel));
+                        Console.WriteLine(string.Format("Channel = {0}",channel));
                         Console.ResetColor();
                         Console.WriteLine();
 
+                        Console.WriteLine("Include Token? Y or N? Default is N. Press Y for Yes Else press ENTER");
+                        string userChoiceIncludeTokenForHistory = Console.ReadLine();
+                        if (userChoiceIncludeTokenForHistory.ToLower() == "y")
+                        {
+                            includeToken = true;
+                        }
+
                         Console.WriteLine("Running detailed history()");
-                        pubnub.DetailedHistory<string>(channel, 100, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.DetailedHistory<string>(channel, 100, includeToken, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "5":
                         bool showUUID = true;
@@ -595,18 +628,18 @@ namespace PubNubMessaging.Core
                         channel = Console.ReadLine();
 
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", channel));
+                        Console.WriteLine(string.Format("Channel = {0}",channel));
                         Console.ResetColor();
                         Console.WriteLine();
 
                         Console.WriteLine("Show UUID List? Y or N? Default is Y. Press N for No Else press ENTER");
-                        string userChoiceShowUUID = Console.ReadLine();
-                        if (userChoiceShowUUID.ToLower() == "n")
+                        string userChoiceIncludeToken = Console.ReadLine();
+                        if (userChoiceIncludeToken.ToLower() == "n")
                         {
                             showUUID = false;
                         }
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Show UUID = {0}", showUUID));
+                        Console.WriteLine(string.Format("Show UUID = {0}",showUUID));
                         Console.ResetColor();
                         Console.WriteLine();
 
@@ -630,7 +663,7 @@ namespace PubNubMessaging.Core
                         channel = Console.ReadLine();
 
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", channel));
+                        Console.WriteLine(string.Format("Channel = {0}",channel));
                         Console.ResetColor();
                         Console.WriteLine();
 
@@ -648,7 +681,7 @@ namespace PubNubMessaging.Core
                         else
                         {
                             Console.WriteLine("Running unsubscribe()");
-                            pubnub.Unsubscribe<string>(channel, channelGroup, DisplayReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeDisconnectStatusMessage, DisplayErrorMessage);
+                            pubnub.Unsubscribe<string>(channel, channelGroup, DisplayReturnMessage, DisplaySubscribeConnectStatusMessage, DisplaySubscribeDisconnectStatusMessage, DisplayWildCardPresenceReturnMessage, DisplayErrorMessage);
                         }
                         break;
                     case "7":
@@ -656,7 +689,7 @@ namespace PubNubMessaging.Core
                         channel = Console.ReadLine();
 
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", channel));
+                        Console.WriteLine(string.Format("Channel = {0}",channel));
                         Console.ResetColor();
                         Console.WriteLine();
 
@@ -698,7 +731,7 @@ namespace PubNubMessaging.Core
                     case "11":
                         Console.WriteLine("Enabling Network Connection (yes internet)");
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Stopping Simulation of Internet non-availability");
+                        Console.WriteLine("Stopping Simulation of Internet non-availability");  
                         Console.ResetColor();
                         pubnub.DisableSimulateNetworkFailForTestingOnly();
                         break;
@@ -721,7 +754,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine("Enter the auth_key for PAM Grant (optional)");
                         Console.WriteLine("Press Enter Key if there is no auth_key at this time.");
                         string authGrant = Console.ReadLine();
-
+                        
                         Console.WriteLine("Read Access? Enter Y for Yes (default), N for No.");
                         string readAccess = Console.ReadLine();
                         bool read = (readAccess.ToLower() == "n") ? false : true;
@@ -734,7 +767,7 @@ namespace PubNubMessaging.Core
                             write = (writeAccess.ToLower() == "n") ? false : true;
                         }
 
-                        bool manage = false;
+                        bool manage=false;
                         if (channel.Trim().Length <= 0)
                         {
                             Console.WriteLine("Manage Access? Enter Y for Yes (default), N for No.");
@@ -756,7 +789,7 @@ namespace PubNubMessaging.Core
                         }
 
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", channel));
+                        Console.WriteLine(string.Format("Channel = {0}",channel));
                         Console.WriteLine(string.Format("ChannelGroup = {0}", channelGroup));
                         Console.WriteLine(string.Format("auth_key = {0}", authGrant));
                         Console.WriteLine(string.Format("Read Access = {0}", read.ToString()));
@@ -810,7 +843,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine("Enter the auth_key for PAM Audit (optional)");
                         Console.WriteLine("Press Enter Key if there is no auth_key at this time.");
                         string authAudit = Console.ReadLine();
-
+                        
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("auth_key = {0}", authAudit));
                         Console.ResetColor();
@@ -830,7 +863,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine("Enter CHANNEL name for PAM Revoke");
                         Console.WriteLine("To enter CHANNEL GROUP name, just hit ENTER");
                         channel = Console.ReadLine();
-
+                        
                         if (channel.Trim().Length <= 0)
                         {
                             Console.WriteLine("Enter CHANNEL GROUP name for PAM Revoke.");
@@ -855,7 +888,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine("Enter the auth_key for PAM Revoke (optional)");
                         Console.WriteLine("Press Enter Key if there is no auth_key at this time.");
                         string authRevoke = Console.ReadLine();
-
+                        
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("auth_key = {0}", authRevoke));
                         Console.ResetColor();
@@ -887,11 +920,11 @@ namespace PubNubMessaging.Core
                             Console.WriteLine("Channel or ChannelGroup not provided. Please try again.");
                             break;
                         }
-
+                        
                         Console.WriteLine("Enter the auth_key for PAM Grant Presence (optional)");
                         Console.WriteLine("Press Enter Key if there is no auth_key at this time.");
                         string authGrantPresence = Console.ReadLine();
-
+                        
                         Console.WriteLine("Read Access? Enter Y for Yes (default), N for No.");
                         string readPresenceAccess = Console.ReadLine();
                         bool readPresence = (readPresenceAccess.ToLower() == "n") ? false : true;
@@ -904,7 +937,7 @@ namespace PubNubMessaging.Core
                             writePresence = (writePresenceAccess.ToLower() == "n") ? false : true;
                         }
 
-                        bool managePresence = false;
+                        bool managePresence=false;
                         if (channel.Trim().Length <= 0)
                         {
                             Console.WriteLine("Manage Access? Enter Y for Yes (default), N for No.");
@@ -966,7 +999,7 @@ namespace PubNubMessaging.Core
                         {
                             Console.WriteLine("Enter CHANNEL GROUP name for PAM Presence Audit.");
                             channelGroup = Console.ReadLine();
-
+                            
                             Console.ForegroundColor = ConsoleColor.Blue;
                             Console.WriteLine(string.Format("ChannelGroup = {0}", channelGroup));
                             Console.ResetColor();
@@ -982,7 +1015,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine("Enter the auth_key for PAM Presence Audit (optional)");
                         Console.WriteLine("Press Enter Key if there is no auth_key at this time.");
                         string authPresenceAudit = Console.ReadLine();
-
+                        
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("auth_key = {0}", authPresenceAudit));
                         Console.ResetColor();
@@ -1028,7 +1061,7 @@ namespace PubNubMessaging.Core
                         Console.WriteLine("Enter the auth_key for PAM Presence Revoke (optional)");
                         Console.WriteLine("Press Enter Key if there is no auth_key at this time.");
                         string authPresenceRevoke = Console.ReadLine();
-
+                        
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("auth_key = {0}", authPresenceRevoke));
                         Console.ResetColor();
@@ -1057,18 +1090,18 @@ namespace PubNubMessaging.Core
 
                         break;
                     case "19":
-                        Console.WriteLine("Enabling simulation of Sleep/Suspend Mode");
+                        Console.WriteLine("Enabling simulation of Sleep/Suspend Mode");  
                         pubnub.EnableMachineSleepModeForTestingOnly();
-                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.ForegroundColor = ConsoleColor.Red;  
                         Console.WriteLine("Machine Sleep Mode simulation activated");
-                        Console.ResetColor();
+                        Console.ResetColor();  
                         break;
                     case "20":
-                        Console.WriteLine("Disabling simulation of Sleep/Suspend Mode");
+                        Console.WriteLine("Disabling simulation of Sleep/Suspend Mode");  
                         pubnub.DisableMachineSleepModeForTestingOnly();
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Simulation going to awake mode");
-                        Console.ResetColor();
+                        Console.ForegroundColor = ConsoleColor.Red;  
+                        Console.WriteLine("Simulation going to awake mode");  
+                        Console.ResetColor();  
                         break;
                     case "21":
                         Console.WriteLine("Enter Presence Heartbeat in seconds");
@@ -1252,240 +1285,15 @@ namespace PubNubMessaging.Core
                         Console.WriteLine();
 
                         Console.WriteLine("Running Global HereNow()");
-                        pubnub.GlobalHereNow<string>(globalHereNowShowUUID, globalHereNowIncludeUserState, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.GlobalHereNow<string>(globalHereNowShowUUID, globalHereNowIncludeUserState,DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "29":
                         Console.WriteLine("ENTER UUID.");
                         string sessionUUID = Console.ReadLine();
                         pubnub.ChangeUUID(sessionUUID);
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine("UUID = {0}", pubnub.SessionUUID);
+                        Console.WriteLine("UUID = {0}",pubnub.SessionUUID);
                         Console.ResetColor();
-                        break;
-                    case "30":
-                        Console.WriteLine("Enter channel name");
-                        string pushRegisterChannel = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", pushRegisterChannel));
-                        Console.ResetColor();
-
-                        Console.WriteLine("Enter Push Token for MPNS");
-                        string pushToken = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Push Token = {0}", pushToken));
-                        Console.ResetColor();
-
-                        Console.WriteLine("Running RegisterDeviceForPush()");
-                        pubnub.RegisterDeviceForPush<string>(pushRegisterChannel, PushTypeService.MPNS, pushToken, DisplayReturnMessage, DisplayErrorMessage);
-                        break;
-                    case "31":
-                        Console.WriteLine("Enter Push Token for MPNS");
-                        string unRegisterPushToken = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Push Token = {0}", unRegisterPushToken));
-                        Console.ResetColor();
-
-                        Console.WriteLine("Running UnregisterDeviceForPush()");
-                        pubnub.UnregisterDeviceForPush<string>(PushTypeService.MPNS, unRegisterPushToken, DisplayReturnMessage, DisplayErrorMessage);
-                        break;
-                    case "32":
-                        Console.WriteLine("Enter channel name");
-                        string pushRemoveChannel = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", pushRemoveChannel));
-                        Console.ResetColor();
-
-                        Console.WriteLine("Enter Push Token for MPNS");
-                        string pushTokenRemove = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Push Token = {0}", pushTokenRemove));
-                        Console.ResetColor();
-
-                        Console.WriteLine("Running RegisterDeviceForPush()");
-                        pubnub.RemoveChannelForDevicePush<string>(pushRemoveChannel, PushTypeService.MPNS, pushTokenRemove, DisplayReturnMessage, DisplayErrorMessage);
-                        break;
-                    case "33":
-                        Console.WriteLine("Enter Push Token for MPNS");
-                        string pushTokenGetChannel = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Push Token = {0}", pushTokenGetChannel));
-                        Console.ResetColor();
-
-                        Console.WriteLine("Running RegisterDeviceForPush()");
-                        pubnub.GetChannelsForDevicePush<string>(PushTypeService.MPNS, pushTokenGetChannel, DisplayReturnMessage, DisplayErrorMessage);
-                        break;
-                    case "34":
-                        //Toast message publish
-                        Console.WriteLine("Enter channel name");
-                        string toastChannel = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", toastChannel));
-                        Console.ResetColor();
-
-                        Console.WriteLine("Enter title for Toast");
-                        string text1 = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Text1 = {0}", text1));
-                        Console.ResetColor();
-
-                        MpnsToastNotification toast = new MpnsToastNotification();
-                        toast.text1 = text1;
-                        Dictionary<string, object> dicToast = new Dictionary<string, object>();
-                        dicToast.Add("pn_mpns", toast);
-                        pubnub.EnableDebugForPushPublish = true;
-
-                        Console.WriteLine("Running Publish for Toast");
-                        pubnub.Publish<string>(toastChannel, dicToast, DisplayReturnMessage, DisplayErrorMessage);
-                        break;
-                    case "35":
-                        //Flip Tile message publish
-                        Console.WriteLine("Enter channel name");
-                        string flipTileChannel = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", flipTileChannel));
-                        Console.ResetColor();
-
-                        Console.WriteLine("Enter front title for Flip Tile");
-                        string flipFrontTitle = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Front Title = {0}", flipFrontTitle));
-                        Console.ResetColor();
-
-                        Console.WriteLine("Enter back title for Flip Tile");
-                        string flipBackTitle = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Back Title = {0}", flipBackTitle));
-                        Console.ResetColor();
-
-                        Console.WriteLine("Enter back content for Flip Tile");
-                        string flipBackContent = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Back Content = {0}", flipBackContent));
-                        Console.ResetColor();
-
-                        Console.WriteLine("Enter numeric count for Flip Tile. Invalid entry will be set to null");
-                        string stringFlipCount = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Count = {0}", stringFlipCount));
-                        Console.ResetColor();
-                        int? flipTileCount = null;
-                        if (!string.IsNullOrEmpty(stringFlipCount) && stringFlipCount.Trim().Length > 0)
-                        {
-                            int outValue;
-                            flipTileCount = int.TryParse(stringFlipCount, out outValue) ? (int?)outValue : null;
-                        }
-
-                        Console.WriteLine("Enter background image path with fully qualified URI or device local relative Path for Flip Tile");
-                        string imageBackground = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Small Background Image = {0}", imageBackground));
-                        Console.ResetColor();
-
-                        Console.WriteLine("Enter Back background image path with fully qualified URI or device local relative Path for Flip Tile");
-                        string imageBackBackground = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Small Background Image = {0}", imageBackBackground));
-                        Console.ResetColor();
-
-                        pubnub.PushRemoteImageDomainUri.Add(new Uri("http://cdn.flaticon.com"));
-
-                        MpnsFlipTileNotification flipTile = new MpnsFlipTileNotification();
-                        flipTile.title = flipFrontTitle;
-                        flipTile.count = flipTileCount;
-                        flipTile.back_title = flipBackTitle;
-                        flipTile.back_content = flipBackContent;
-                        flipTile.background_image = imageBackground;
-                        flipTile.back_background_image = imageBackBackground;
-                        Dictionary<string, object> dicFlipTile = new Dictionary<string, object>();
-                        dicFlipTile.Add("pn_mpns", flipTile);
-
-                        pubnub.EnableDebugForPushPublish = true;
-                        pubnub.Publish<string>(flipTileChannel, dicFlipTile, DisplayReturnMessage, DisplayErrorMessage);
-                        break;
-                    case "36":
-                        //Cycle Tile message publish
-                        Console.WriteLine("Enter channel name");
-                        string cycleTileChannel = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", cycleTileChannel));
-                        Console.ResetColor();
-
-                        Console.WriteLine("Enter front title for Cycle Tile");
-                        string cycleFrontTitle = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Front Title = {0}", cycleFrontTitle));
-                        Console.ResetColor();
-
-                        Console.WriteLine("Enter numeric count for Cycle Tile. Invalid entry will be set to null");
-                        string stringCycleCount = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Count = {0}", stringCycleCount));
-                        Console.ResetColor();
-                        int? cycleTileCount = null;
-                        if (!string.IsNullOrEmpty(stringCycleCount) && stringCycleCount.Trim().Length > 0)
-                        {
-                            int outValue;
-                            cycleTileCount = int.TryParse(stringCycleCount, out outValue) ? (int?)outValue : null;
-                        }
-
-                        Console.WriteLine("Enter image path (fully qualified URI/device local Path) for Cycle Tile");
-                        Console.WriteLine("Multiple image paths can be entered with comma delimiter");
-                        string imageCycleTile = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Image Path(s) = {0}", imageCycleTile));
-                        Console.ResetColor();
-
-                        MpnsCycleTileNotification cycleTile = new MpnsCycleTileNotification();
-                        cycleTile.title = cycleFrontTitle;
-                        cycleTile.count = cycleTileCount;
-                        cycleTile.images = imageCycleTile.Split(','); // new string[] { imageCycleTile };
-                        Dictionary<string, object> dicCycleTile = new Dictionary<string, object>();
-                        dicCycleTile.Add("pn_mpns", cycleTile);
-
-                        pubnub.EnableDebugForPushPublish = true;
-                        pubnub.Publish<string>(cycleTileChannel, dicCycleTile, DisplayReturnMessage, DisplayErrorMessage);
-                        break;
-                    case "37":
-                        //Iconic Tile message publish
-                        Console.WriteLine("Enter channel name");
-                        string iconicTileChannel = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", iconicTileChannel));
-                        Console.ResetColor();
-
-                        Console.WriteLine("Enter front title for Iconic Tile");
-                        string iconicFrontTitle = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Front Title = {0}", iconicFrontTitle));
-                        Console.ResetColor();
-
-                        Console.WriteLine("Enter numeric count for Iconic Tile. Invalid entry will be set to null");
-                        string stringIconicCount = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Count = {0}", stringIconicCount));
-                        Console.ResetColor();
-                        int? iconicTileCount = null;
-                        if (!string.IsNullOrEmpty(stringIconicCount) && stringIconicCount.Trim().Length > 0)
-                        {
-                            int outValue;
-                            iconicTileCount = int.TryParse(stringIconicCount, out outValue) ? (int?)outValue : null;
-                        }
-
-                        Console.WriteLine("Enter Content1 for Iconic Tile.");
-                        string iconicTileContent1 = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("iconicTileContent1 = {0}", iconicTileContent1));
-                        Console.ResetColor();
-
-                        MpnsIconicTileNotification iconicTile = new MpnsIconicTileNotification();
-                        iconicTile.title = iconicFrontTitle;
-                        iconicTile.count = iconicTileCount;
-                        iconicTile.wide_content_1 = iconicTileContent1;
-                        Dictionary<string, object> dicIconicTile = new Dictionary<string, object>();
-                        dicIconicTile.Add("pn_mpns", iconicTile);
-
-                        pubnub.EnableDebugForPushPublish = true;
-                        pubnub.Publish<string>(iconicTileChannel, dicIconicTile, DisplayReturnMessage, DisplayErrorMessage);
                         break;
                     case "38":
                         Console.WriteLine("Enter namespace");
@@ -1493,18 +1301,18 @@ namespace PubNubMessaging.Core
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("namespace = {0}", addChannelGroupNamespace));
                         Console.ResetColor();
-
+                        
                         Console.WriteLine("Enter channel group name");
                         string addChannelGroupName = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("channel group name = {0}", addChannelGroupName));
                         Console.ResetColor();
-
+                        
 
                         Console.WriteLine("Enter CHANNEL name. Use comma to enter multiple channels.");
                         channel = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", channel));
+                        Console.WriteLine(string.Format("Channel = {0}",channel));
                         Console.ResetColor();
                         Console.WriteLine();
                         pubnub.AddChannelsToChannelGroup<string>(channel.Split(','), addChannelGroupNamespace, addChannelGroupName, DisplayReturnMessage, DisplayErrorMessage);
@@ -1545,11 +1353,11 @@ namespace PubNubMessaging.Core
                             pubnub.RemoveChannelGroup<string>(removeChannelGroupNamespace, removeChannelGroupName, DisplayReturnMessage, DisplayErrorMessage);
                             break;
                         }
-
+                        
                         Console.WriteLine("Enter CHANNEL name. Use comma to enter multiple channels.");
                         channel = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", channel));
+                        Console.WriteLine(string.Format("Channel = {0}",channel));
                         Console.ResetColor();
                         Console.WriteLine();
                         pubnub.RemoveChannelsFromChannelGroup<string>(channel.Split(','), removeChannelGroupNamespace, removeChannelGroupName, DisplayReturnMessage, DisplayErrorMessage);
@@ -1589,7 +1397,7 @@ namespace PubNubMessaging.Core
                                 break;
                             }
                         }
-
+                        
                         Console.WriteLine("Enter channel group name");
                         string channelGroupName = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
@@ -1620,271 +1428,245 @@ namespace PubNubMessaging.Core
         /// Callback method captures the response in JSON string format for all operations
         /// </summary>
         /// <param name="result"></param>
-        static void DisplayReturnMessage (string result)
+        static void DisplayReturnMessage(string result)
         {
-            Console.WriteLine ("REGULAR CALLBACK:");
-            Console.WriteLine (result);
-            Console.WriteLine ();
-        }
-
-        static void DisplayReturnMessage (object result)
-        {
-            Console.WriteLine ("REGULAR CALLBACK:");
-            List<object> lst = result as List<object>;
-            Console.WriteLine (lst [0].ToString ());
-            Console.WriteLine (lst [1].ToString ());
-            if (lst.Count == 3)
-                Console.WriteLine (lst [2].ToString ());
-            if (lst.Count == 4)
-                Console.WriteLine (lst [3].ToString ());
-            Console.WriteLine ();
+            Console.WriteLine("REGULAR CALLBACK:");
+            Console.WriteLine(result);
+            Console.WriteLine();
         }
 
         /// <summary>
         /// Callback method captures the response in JSON string format for Subscribe
         /// </summary>
         /// <param name="result"></param>
-        static void DisplaySubscribeReturnMessage (string result)
+        static void DisplaySubscribeReturnMessage(string result)
         {
-            Console.WriteLine ("SUBSCRIBE REGULAR CALLBACK:");
-            Console.WriteLine (result);
-            Console.WriteLine ();
+            Console.WriteLine("SUBSCRIBE REGULAR CALLBACK:");
+            Console.WriteLine(result);
+            Console.WriteLine();
         }
 
+
         /// <summary>
-        /// Callback method captures the response in JSON string format for Subscribe
+        /// Callback method captures wildcard presence events for Subscribe
         /// </summary>
         /// <param name="result"></param>
-        static void DisplaySubscribeReturnMessage (object result)
+        static void DisplayWildCardPresenceReturnMessage(string result)
         {
-            Console.WriteLine ("SUBSCRIBE OBJECT CALLBACK:");
-            Console.WriteLine (result.ToString ());
-            Console.WriteLine ();
+            Console.WriteLine("WILDCARD PRESENCE CALLBACK:");
+            Console.WriteLine(result);
+            Console.WriteLine();
         }
 
         /// <summary>
         /// Callback method captures the response in JSON string format for Presence
         /// </summary>
         /// <param name="result"></param>
-        static void DisplayPresenceReturnMessage (string result)
+        static void DisplayPresenceReturnMessage(string result)
         {
-            Console.WriteLine ("PRESENCE REGULAR CALLBACK:");
-            Console.WriteLine (result);
-            Console.WriteLine ();
+            Console.WriteLine("PRESENCE REGULAR CALLBACK:");
+            Console.WriteLine(result);
+            Console.WriteLine();
         }
 
         /// <summary>
         /// Callback method to provide the connect status of Subscribe call
         /// </summary>
         /// <param name="result"></param>
-        static void DisplaySubscribeConnectStatusMessage (string result)
+        static void DisplaySubscribeConnectStatusMessage(string result)
         {
-            Console.WriteLine ("SUBSCRIBE CONNECT CALLBACK:");
-            Console.WriteLine (result);
-            Console.WriteLine ();
-        }
-
-        /// <summary>
-        /// Callback method to provide the connect status of Subscribe call
-        /// </summary>
-        /// <param name="result"></param>
-        static void DisplaySubscribeConnectStatusMessage (object result)
-        {
-            Console.WriteLine ("SUBSCRIBE CONNECT CALLBACK (o):");
-            Console.WriteLine (result.ToString ());
-            Console.WriteLine ();
+            Console.WriteLine("SUBSCRIBE CONNECT CALLBACK:");
+            Console.WriteLine(result);
+            Console.WriteLine();
         }
 
         /// <summary>
         /// Callback method to provide the connect status of Presence call
         /// </summary>
         /// <param name="result"></param>
-        static void DisplayPresenceConnectStatusMessage (string result)
+        static void DisplayPresenceConnectStatusMessage(string result)
         {
-            Console.WriteLine ("PRESENCE CONNECT CALLBACK:");
-            Console.WriteLine (result);
-            Console.WriteLine ();
+            Console.WriteLine("PRESENCE CONNECT CALLBACK:");
+            Console.WriteLine(result);
+            Console.WriteLine();
         }
 
-        static void DisplaySubscribeDisconnectStatusMessage (string result)
+        static void DisplaySubscribeDisconnectStatusMessage(string result)
         {
-            Console.WriteLine ("SUBSCRIBE DISCONNECT CALLBACK:");
-            Console.WriteLine (result);
-            Console.WriteLine ();
+            Console.WriteLine("SUBSCRIBE DISCONNECT CALLBACK:");
+            Console.WriteLine(result);
+            Console.WriteLine();
         }
 
-        static void DisplayPresenceDisconnectStatusMessage (string result)
+        static void DisplayPresenceDisconnectStatusMessage(string result)
         {
-            Console.WriteLine ("PRESENCE DISCONNECT CALLBACK:");
-            Console.WriteLine (result);
-            Console.WriteLine ();
+            Console.WriteLine("PRESENCE DISCONNECT CALLBACK:");
+            Console.WriteLine(result);
+            Console.WriteLine();
         }
 
         /// <summary>
         /// Callback method for error messages
         /// </summary>
         /// <param name="result"></param>
-        static void DisplayErrorMessage (PubnubClientError result)
+        static void DisplayErrorMessage(PubnubClientError result)
         {
-            Console.WriteLine ();
-            Console.WriteLine (result.Description);
-            Console.WriteLine ();
+            Console.WriteLine();
+            Console.WriteLine(result.Description);
+            Console.WriteLine();
 
-            switch (result.StatusCode) {
-            case 103:
-				//Warning: Verify origin host name and internet connectivity
-                break;
-            case 104:
-				//Critical: Verify your cipher key
-                break;
-            case 106:
-				//Warning: Check network/internet connection
-                break;
-            case 108:
-				//Warning: Check network/internet connection
-                break;
-            case 109:
-				//Warning: No network/internet connection. Please check network/internet connection
-                break;
-            case 110:
-				//Informational: Network/internet connection is back. Active subscriber/presence channels will be restored.
-                break;
-            case 111:
-				//Informational: Duplicate channel subscription is not allowed. Internally Pubnub API removes the duplicates before processing.
-                break;
-            case 112:
-				//Informational: Channel Already Subscribed/Presence Subscribed. Duplicate channel subscription not allowed
-                break;
-            case 113:
-				//Informational: Channel Already Presence-Subscribed. Duplicate channel presence-subscription not allowed
-                break;
-            case 114:
-				//Warning: Please verify your cipher key
-                break;
-            case 115:
-				//Warning: Protocol Error. Please contact PubNub with error details.
-                break;
-            case 116:
-				//Warning: ServerProtocolViolation. Please contact PubNub with error details.
-                break;
-            case 117:
-				//Informational: Input contains invalid channel name
-                break;
-            case 118:
-				//Informational: Channel not subscribed yet
-                break;
-            case 119:
-				//Informational: Channel not subscribed for presence yet
-                break;
-            case 120:
-				//Informational: Incomplete unsubscribe. Try again for unsubscribe.
-                break;
-            case 121:
-				//Informational: Incomplete presence-unsubscribe. Try again for presence-unsubscribe.
-                break;
-            case 122:
-				//Informational: Network/Internet connection not available. C# client retrying again to verify connection. No action is needed from your side.
-                break;
-            case 123:
-				//Informational: During non-availability of network/internet, max retries for connection were attempted. So unsubscribed the channel.
-                break;
-            case 124:
-				//Informational: During non-availability of network/internet, max retries for connection were attempted. So presence-unsubscribed the channel.
-                break;
-            case 125:
-				//Informational: Publish operation timeout occured.
-                break;
-            case 126:
-				//Informational: HereNow operation timeout occured
-                break;
-            case 127:
-				//Informational: Detailed History operation timeout occured
-                break;
-            case 128:
-				//Informational: Time operation timeout occured
-                break;
-            case 4000:
-				//Warning: Message too large. Your message was not sent. Try to send this again smaller sized
-                break;
-            case 4001:
-				//Warning: Bad Request. Please check the entered inputs or web request URL
-                break;
-            case 4002:
-				//Warning: Invalid Key. Please verify the publish key
-                break;
-            case 4010:
-				//Critical: Please provide correct subscribe key. This corresponds to a 401 on the server due to a bad sub key
-                break;
-            case 4020:
-				// PAM is not enabled. Please contact PubNub support
-                break;
-            case 4030:
-				//Warning: Not authorized. Check the permimissions on the channel. Also verify authentication key, to check access.
-                break;
-            case 4031:
-				//Warning: Incorrect public key or secret key.
-                break;
-            case 4140:
-				//Warning: Length of the URL is too long. Reduce the length by reducing subscription/presence channels or grant/revoke/audit channels/auth key list
-                break;
-            case 5000:
-				//Critical: Internal Server Error. Unexpected error occured at PubNub Server. Please try again. If same problem persists, please contact PubNub support
-                break;
-            case 5020:
-				//Critical: Bad Gateway. Unexpected error occured at PubNub Server. Please try again. If same problem persists, please contact PubNub support
-                break;
-            case 5030:
-				//"Service Unavailable. Please try again. If the issue continues, please contact PubNub support"
-                break;
-            case 5040:
-				//Critical: Gateway Timeout. No response from server due to PubNub server timeout. Please try again. If same problem persists, please contact PubNub support
-                break;
-            case 0:
-				//Undocumented error. Please contact PubNub support with full error object details for further investigation
-                break;
-            default:
-                break;
+            switch (result.StatusCode)
+            {
+                case 103:
+                    //Warning: Verify origin host name and internet connectivity
+                    break;
+                case 104:
+                    //Critical: Verify your cipher key
+                    break;
+                case 106:
+                    //Warning: Check network/internet connection
+                    break;
+                case 108:
+                    //Warning: Check network/internet connection
+                    break;
+                case 109:
+                    //Warning: No network/internet connection. Please check network/internet connection
+                    break;
+                case 110:
+                    //Informational: Network/internet connection is back. Active subscriber/presence channels will be restored.
+                    break;
+                case 111:
+                    //Informational: Duplicate channel subscription is not allowed. Internally Pubnub API removes the duplicates before processing.
+                    break;
+                case 112:
+                    //Informational: Channel Already Subscribed/Presence Subscribed. Duplicate channel subscription not allowed
+                    break;
+                case 113:
+                    //Informational: Channel Already Presence-Subscribed. Duplicate channel presence-subscription not allowed
+                    break;
+                case 114:
+                    //Warning: Please verify your cipher key
+                    break;
+                case 115:
+                    //Warning: Protocol Error. Please contact PubNub with error details.
+                    break;
+                case 116:
+                    //Warning: ServerProtocolViolation. Please contact PubNub with error details.
+                    break;
+                case 117:
+                    //Informational: Input contains invalid channel name
+                    break;
+                case 118:
+                    //Informational: Channel not subscribed yet
+                    break;
+                case 119:
+                    //Informational: Channel not subscribed for presence yet
+                    break;
+                case 120:
+                    //Informational: Incomplete unsubscribe. Try again for unsubscribe.
+                    break;
+                case 121:
+                    //Informational: Incomplete presence-unsubscribe. Try again for presence-unsubscribe.
+                    break;
+                case 122:
+                    //Informational: Network/Internet connection not available. C# client retrying again to verify connection. No action is needed from your side.
+                    break;
+                case 123:
+                    //Informational: During non-availability of network/internet, max retries for connection were attempted. So unsubscribed the channel.
+                    break;
+                case 124:
+                    //Informational: During non-availability of network/internet, max retries for connection were attempted. So presence-unsubscribed the channel.
+                    break;
+                case 125:
+                    //Informational: Publish operation timeout occured.
+                    break;
+                case 126:
+                    //Informational: HereNow operation timeout occured
+                    break;
+                case 127:
+                    //Informational: Detailed History operation timeout occured
+                    break;
+                case 128:
+                    //Informational: Time operation timeout occured
+                    break;
+                case 4000:
+                    //Warning: Message too large. Your message was not sent. Try to send this again smaller sized
+                    break;
+                case 4001:
+                    //Warning: Bad Request. Please check the entered inputs or web request URL
+                    break;
+                case 4002:
+                    //Warning: Invalid Key. Please verify the publish key
+                    break;
+                case 4010:
+                    //Critical: Please provide correct subscribe key. This corresponds to a 401 on the server due to a bad sub key
+                    break;
+                case 4020:
+                    // PAM is not enabled. Please contact PubNub support
+                    break;
+                case 4030:
+                    //Warning: Not authorized. Check the permimissions on the channel. Also verify authentication key, to check access.
+                    break;
+                case 4031:
+                    //Warning: Incorrect public key or secret key.
+                    break;
+                case 4140:
+                    //Warning: Length of the URL is too long. Reduce the length by reducing subscription/presence channels or grant/revoke/audit channels/auth key list
+                    break;
+                case 5000:
+                    //Critical: Internal Server Error. Unexpected error occured at PubNub Server. Please try again. If same problem persists, please contact PubNub support
+                    break;
+                case 5020:
+                    //Critical: Bad Gateway. Unexpected error occured at PubNub Server. Please try again. If same problem persists, please contact PubNub support
+                    break;
+                case 5040:
+                    //Critical: Gateway Timeout. No response from server due to PubNub server timeout. Please try again. If same problem persists, please contact PubNub support
+                    break;
+                case 0:
+                    //Undocumented error. Please contact PubNub support with full error object details for further investigation
+                    break;
+                default:
+                    break;
             }
-            if (showErrorMessageSegments) {
-                DisplayErrorMessageSegments (result);
-                Console.WriteLine ();
+            if (showErrorMessageSegments)
+            {
+                DisplayErrorMessageSegments(result);
+                Console.WriteLine();
             }
         }
 
-        static void DisplayErrorMessageSegments (PubnubClientError pubnubError)
+
+        static void DisplayErrorMessageSegments(PubnubClientError pubnubError)
         {
             // These are all the attributes you may be interested in logging, switchiing on etc:
 
-            Console.WriteLine ("<STATUS CODE>: {0}", pubnubError.StatusCode); // Unique ID of Error
+            Console.WriteLine("<STATUS CODE>: {0}", pubnubError.StatusCode); // Unique ID of Error
 
-            Console.WriteLine ("<MESSAGE>: {0}", pubnubError.Message); // Message received from server/clent or from .NET exception
+            Console.WriteLine("<MESSAGE>: {0}", pubnubError.Message); // Message received from server/clent or from .NET exception
 
-            Console.WriteLine ("<SEVERITY>: {0}", pubnubError.Severity); // Info can be ignored, Warning and Error should be handled
+            Console.WriteLine("<SEVERITY>: {0}", pubnubError.Severity); // Info can be ignored, Warning and Error should be handled
 
-            if (pubnubError.DetailedDotNetException != null) {
-                Console.WriteLine (pubnubError.IsDotNetException); // Boolean flag to check .NET exception
-                Console.WriteLine ("<DETAILED DOT.NET EXCEPTION>: {0}", pubnubError.DetailedDotNetException.ToString ()); // Full Details of .NET exception
+            if (pubnubError.DetailedDotNetException != null)
+            {
+                Console.WriteLine(pubnubError.IsDotNetException); // Boolean flag to check .NET exception
+                Console.WriteLine("<DETAILED DOT.NET EXCEPTION>: {0}", pubnubError.DetailedDotNetException.ToString()); // Full Details of .NET exception
             }
-            Console.WriteLine ("<MESSAGE SOURCE>: {0}", pubnubError.MessageSource); // Did this originate from Server or Client-side logic
-            if (pubnubError.PubnubWebRequest != null) {
+            Console.WriteLine("<MESSAGE SOURCE>: {0}", pubnubError.MessageSource); // Did this originate from Server or Client-side logic
+            if (pubnubError.PubnubWebRequest != null)
+            {
                 //Captured Web Request details
-                Console.WriteLine ("<HTTP WEB REQUEST>: {0}", pubnubError.PubnubWebRequest.RequestUri.ToString ()); 
-                Console.WriteLine ("<HTTP WEB REQUEST - HEADERS>: {0}", pubnubError.PubnubWebRequest.Headers.ToString ()); 
+                Console.WriteLine("<HTTP WEB REQUEST>: {0}", pubnubError.PubnubWebRequest.RequestUri.ToString()); 
+                Console.WriteLine("<HTTP WEB REQUEST - HEADERS>: {0}", pubnubError.PubnubWebRequest.Headers.ToString()); 
             }
-            if (pubnubError.PubnubWebResponse != null) {
+            if (pubnubError.PubnubWebResponse != null)
+            {
                 //Captured Web Response details
-                Console.WriteLine ("<HTTP WEB RESPONSE - HEADERS>: {0}", pubnubError.PubnubWebResponse.Headers.ToString ());
+                Console.WriteLine("<HTTP WEB RESPONSE - HEADERS>: {0}", pubnubError.PubnubWebResponse.Headers.ToString());
             }
-            Console.WriteLine ("<DESCRIPTION>: {0}", pubnubError.Description); // Useful for logging and troubleshooting and support
-            Console.WriteLine ("<CHANNEL>: {0}", pubnubError.Channel); //Channel name(s) at the time of error
-            Console.WriteLine ("<DATETIME>: {0}", pubnubError.ErrorDateTimeGMT); //GMT time of error
+            Console.WriteLine("<DESCRIPTION>: {0}", pubnubError.Description); // Useful for logging and troubleshooting and support
+            Console.WriteLine("<CHANNEL>: {0}", pubnubError.Channel); //Channel name(s) at the time of error
+            Console.WriteLine("<DATETIME>: {0}", pubnubError.ErrorDateTimeGMT); //GMT time of error
 
         }
-    }
-
-    class CustomClass
-    {
-        public string foo = "hi!";
-        public int[] bar = { 1, 2, 3, 4, 5 };
     }
 }

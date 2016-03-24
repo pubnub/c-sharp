@@ -6,10 +6,10 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{B1ED98C3-FD0B-4B45-B0BE-40AFD37182CB}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PubNubMessaging.Core</RootNamespace>
-    <AssemblyName>PubNubMessaging.Core</AssemblyName>
+    <RootNamespace>PubNubMessaging</RootNamespace>
+    <AssemblyName>PubNub-Messaging</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -51,7 +51,8 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>PubNubMessaging.Core.PubnubExample</StartupObject>
+    <StartupObject>
+    </StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -100,10 +101,6 @@
         <Reference Include="System" />
         <Reference Include="System.ComponentModel.DataAnnotations" />
         <Reference Include="System.Net" />
-        <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-          <HintPath>v4.0\Newtonsoft.Json.dll</HintPath>
-          <Private>True</Private>
-        </Reference>
       </ItemGroup>
     </When>
     <When Condition=" '$(TargetFrameworkVersion.Replace(&quot;v&quot;,&quot;&quot;))' == '3.5' ">
@@ -132,11 +129,6 @@
     </When>
   </Choose>
   <ItemGroup>
-    <None Include="app.config">
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
@@ -164,7 +156,6 @@
     <Compile Include="MD5.cs" />
     <Compile Include="Pubnub.cs" />
     <Compile Include="PubnubCore.cs" />
-    <Compile Include="PubnubExample.cs" />
     <Compile Include="PubnubWin.cs" />
     <Compile Include="ReconnectState.cs" />
   </ItemGroup>
@@ -179,9 +170,16 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>v4.0\JsonFx.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Configuration" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web.Extensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
