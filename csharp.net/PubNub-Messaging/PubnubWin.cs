@@ -612,7 +612,7 @@ namespace PubNubMessaging.Core
                                 }
                                 if (!errorCallbackRaised)
                                 {
-                                    result = WrapResultBasedOnResponseType<T>(asyncRequestState.Type, jsonString, asyncRequestState.Channels, asyncRequestState.ChannelGroups, asyncRequestState.Reconnect, asyncRequestState.Timetoken, asyncRequestState.ErrorCallback);
+                                    result = WrapResultBasedOnResponseType<T>(asyncRequestState.Type, jsonString, asyncRequestState.Channels, asyncRequestState.ChannelGroups, asyncRequestState.Reconnect, asyncRequestState.Timetoken, asyncRequestState.Request, asyncRequestState.ErrorCallback);
                                 }
                             }
                         }
@@ -734,7 +734,7 @@ namespace PubNubMessaging.Core
                             }
                             else if (jsonString != "[]")
                             {
-                                result = WrapResultBasedOnResponseType<T>(asyncRequestState.Type, jsonString, asyncRequestState.Channels, asyncRequestState.ChannelGroups, asyncRequestState.Reconnect, asyncRequestState.Timetoken, asyncRequestState.ErrorCallback);
+                                result = WrapResultBasedOnResponseType<T>(asyncRequestState.Type, jsonString, asyncRequestState.Channels, asyncRequestState.ChannelGroups, asyncRequestState.Reconnect, asyncRequestState.Timetoken, asyncRequestState.Request, asyncRequestState.ErrorCallback);
                             }
                             else
                             {

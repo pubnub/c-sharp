@@ -132,6 +132,7 @@ namespace PubNubMessaging.Core
         private string channelGroupRemoveParameters = "";
         private string _pnsdkVersion = "PubNub-CSharp-.NET/3.7.1";
         private string _pushServiceName = "push.pubnub.com";
+        private bool _addPayloadToPublishResponse = false;
 
 		#endregion
 
@@ -428,6 +429,17 @@ namespace PubNubMessaging.Core
             }
         }
 
+        public bool AddPayloadToPublishResponse
+        {
+            get
+            {
+                return _addPayloadToPublishResponse;
+            }
+            set
+            {
+                _addPayloadToPublishResponse = value;
+            }
+        }
 		#endregion
 
 		#region "Init"
@@ -1545,7 +1557,7 @@ namespace PubNubMessaging.Core
 						string jsonString = streamReader.ReadToEnd ();
 						Action<PubnubClientError> dummyCallback = obj => {
 						};
-						WrapResultBasedOnResponseType<string> (type, jsonString, new string[] { channelName }, null, false, 0, dummyCallback);
+						WrapResultBasedOnResponseType<string> (type, jsonString, new string[] { channelName }, null, false, 0, null, dummyCallback);
 					}
 				}), request
 
@@ -6294,7 +6306,7 @@ namespace PubNubMessaging.Core
 		/// <param name="lastTimetoken"></param>
 		/// <param name="errorCallback"></param>
 		/// <returns></returns>
-		protected List<object> WrapResultBasedOnResponseType<T> (ResponseType type, string jsonString, string[] channels, string[] channelGroups, bool reconnect, long lastTimetoken, Action<PubnubClientError> errorCallback)
+        protected List<object> WrapResultBasedOnResponseType<T>(ResponseType type, string jsonString, string[] channels, string[] channelGroups, bool reconnect, long lastTimetoken, PubnubWebRequest request, Action<PubnubClientError> errorCallback)
 		{
 			List<object> result = new List<object> ();
 
@@ -6316,6 +6328,41 @@ namespace PubNubMessaging.Core
 						switch (type) {
 						case ResponseType.Publish:
 							result.Add (multiChannel);
+                            if (_addPayloadToPublishResponse && request != null & request.RequestUri != null)
+                            {
+                                Uri webUri = request.RequestUri;
+                                string absolutePath = webUri.AbsolutePath.ToString();
+                                int posLastSlash = absolutePath.LastIndexOf("/");
+                                if (posLastSlash > 1)
+                                {
+                                    bool stringType = false;
+                                    //object publishMsg = absolutePath.Substring(posLastSlash + 1);
+                                    string publishPayload = absolutePath.Substring(posLastSlash+1);
+                                    int posOfStartDQ = publishPayload.IndexOf("%22");
+                                    int posOfEndDQ = publishPayload.LastIndexOf("%22");
+                                    if (posOfStartDQ == 0 && posOfEndDQ + 3 == publishPayload.Length)
+                                    {
+                                        publishPayload = publishPayload.Remove(posOfEndDQ).Remove(posOfStartDQ,3);
+                                        stringType = true;
+                                    }
+                                    string publishMsg = System.Uri.UnescapeDataString(publishPayload);
+
+                                    double doubleData;
+                                    int intData;
+                                    if (!stringType && int.TryParse(publishMsg, out intData)) //capture numeric data
+                                    {
+                                        result.Add(intData);
+                                    }
+                                    else if (!stringType && double.TryParse(publishMsg, out doubleData)) //capture numeric data
+                                    {
+                                        result.Add(doubleData);
+                                    }
+                                    else
+                                    {
+                                        result.Add(publishMsg);
+                                    }
+                                }
+                            }
 							break;
 						case ResponseType.History:
 							if (this.cipherKey.Length > 0) {
