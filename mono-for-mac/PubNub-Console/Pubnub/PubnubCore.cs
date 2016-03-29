@@ -1,4 +1,4 @@
-﻿//Build Date: Mar 22, 2016
+﻿//Build Date: Mar 28, 2016
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -132,6 +132,7 @@ namespace PubNubMessaging.Core
         private string channelGroupRemoveParameters = "";
         private string _pnsdkVersion = "PubNub-CSharp-.NET/3.7.1";
         private string _pushServiceName = "push.pubnub.com";
+        private bool _addPayloadToPublishResponse = false;
 
 		#endregion
 
@@ -375,7 +376,7 @@ namespace PubNubMessaging.Core
 			}
 		}
 
-        internal LoggingMethod.Level PubnubLogLevel 
+		internal LoggingMethod.Level PubnubLogLevel 
         {
 			get 
             {
@@ -428,6 +429,17 @@ namespace PubNubMessaging.Core
             }
         }
 
+        public bool AddPayloadToPublishResponse
+        {
+            get
+            {
+                return _addPayloadToPublishResponse;
+            }
+            set
+            {
+                _addPayloadToPublishResponse = value;
+            }
+        }
 		#endregion
 
 		#region "Init"
@@ -1545,7 +1557,7 @@ namespace PubNubMessaging.Core
 						string jsonString = streamReader.ReadToEnd ();
 						Action<PubnubClientError> dummyCallback = obj => {
 						};
-						WrapResultBasedOnResponseType<string> (type, jsonString, new string[] { channelName }, null, false, 0, dummyCallback);
+						WrapResultBasedOnResponseType<string> (type, jsonString, new string[] { channelName }, null, false, 0, null, dummyCallback);
 					}
 				}), request
 
@@ -2421,14 +2433,14 @@ namespace PubNubMessaging.Core
 
         #region "Publish"
 
-		/// <summary>
-		/// Publish
-		/// Send a message to a channel
-		/// </summary>
-		/// <param name="channel"></param>
-		/// <param name="message"></param>
-		/// <param name="userCallback"></param>
-		/// <returns></returns>
+        /// <summary>
+        /// Publish
+        /// Send a message to a channel
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <param name="message"></param>
+        /// <param name="userCallback"></param>
+        /// <returns></returns>
         public bool Publish<T>(string channel, object message, bool storeInHistory, string jsonUserMetaData, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
@@ -2455,7 +2467,7 @@ namespace PubNubMessaging.Core
 
             if (_enableDebugForPushPublish)
             {
-                if (message is Dictionary<string, object>)
+                if (message is Dictionary<string,object>)
                 {
                     Dictionary<string, object> dicMessage = message as Dictionary<string, object>;
                     dicMessage.Add("pn_debug", true);
@@ -2480,8 +2492,8 @@ namespace PubNubMessaging.Core
         }
 
         private Uri BuildPublishRequest(string channel, object originalMessage, bool storeInHistory, string jsonUserMetaData)
-        {
-            string message = (_enableJsonEncodingForPublish) ? JsonEncodePublishMsg(originalMessage) : originalMessage.ToString();
+		{
+			string message = (_enableJsonEncodingForPublish) ? JsonEncodePublishMsg (originalMessage) : originalMessage.ToString ();
 
             StringBuilder publishParamBuilder = new StringBuilder();
             if (!storeInHistory)
@@ -2501,38 +2513,37 @@ namespace PubNubMessaging.Core
             }
             parameters = publishParamBuilder.ToString();
 
-            // Generate String to Sign
-            string signature = "0";
-            if (this.secretKey.Length > 0)
-            {
-                StringBuilder string_to_sign = new StringBuilder();
-                string_to_sign
-                    .Append(this.publishKey)
-                    .Append('/')
-                    .Append(this.subscribeKey)
-                    .Append('/')
-                    .Append(this.secretKey)
-                    .Append('/')
-                    .Append(channel)
-                    .Append('/')
-                    .Append(message); // 1
+			// Generate String to Sign
+			string signature = "0";
+			if (this.secretKey.Length > 0) {
+				StringBuilder string_to_sign = new StringBuilder ();
+				string_to_sign
+					.Append (this.publishKey)
+						.Append ('/')
+						.Append (this.subscribeKey)
+						.Append ('/')
+						.Append (this.secretKey)
+						.Append ('/')
+						.Append (channel)
+						.Append ('/')
+						.Append (message); // 1
 
-                // Sign Message
-                signature = Md5(string_to_sign.ToString());
-            }
+				// Sign Message
+				signature = Md5 (string_to_sign.ToString ());
+			}
 
-            // Build URL
-            List<string> url = new List<string>();
-            url.Add("publish");
-            url.Add(this.publishKey);
-            url.Add(this.subscribeKey);
-            url.Add(signature);
-            url.Add(channel);
-            url.Add("0");
-            url.Add(message);
+			// Build URL
+			List<string> url = new List<string> ();
+			url.Add ("publish");
+			url.Add (this.publishKey);
+			url.Add (this.subscribeKey);
+			url.Add (signature);
+			url.Add (channel);
+			url.Add ("0");
+			url.Add (message);
 
-            return BuildRestApiRequest<Uri>(url, ResponseType.Publish);
-        }
+			return BuildRestApiRequest<Uri> (url, ResponseType.Publish);
+		}
 
 		#endregion
 
@@ -6295,7 +6306,7 @@ namespace PubNubMessaging.Core
 		/// <param name="lastTimetoken"></param>
 		/// <param name="errorCallback"></param>
 		/// <returns></returns>
-		protected List<object> WrapResultBasedOnResponseType<T> (ResponseType type, string jsonString, string[] channels, string[] channelGroups, bool reconnect, long lastTimetoken, Action<PubnubClientError> errorCallback)
+        protected List<object> WrapResultBasedOnResponseType<T>(ResponseType type, string jsonString, string[] channels, string[] channelGroups, bool reconnect, long lastTimetoken, PubnubWebRequest request, Action<PubnubClientError> errorCallback)
 		{
 			List<object> result = new List<object> ();
 
@@ -6317,6 +6328,41 @@ namespace PubNubMessaging.Core
 						switch (type) {
 						case ResponseType.Publish:
 							result.Add (multiChannel);
+                            if (_addPayloadToPublishResponse && request != null & request.RequestUri != null)
+                            {
+                                Uri webUri = request.RequestUri;
+                                string absolutePath = webUri.AbsolutePath.ToString();
+                                int posLastSlash = absolutePath.LastIndexOf("/");
+                                if (posLastSlash > 1)
+                                {
+                                    bool stringType = false;
+                                    //object publishMsg = absolutePath.Substring(posLastSlash + 1);
+                                    string publishPayload = absolutePath.Substring(posLastSlash+1);
+                                    int posOfStartDQ = publishPayload.IndexOf("%22");
+                                    int posOfEndDQ = publishPayload.LastIndexOf("%22");
+                                    if (posOfStartDQ == 0 && posOfEndDQ + 3 == publishPayload.Length)
+                                    {
+                                        publishPayload = publishPayload.Remove(posOfEndDQ).Remove(posOfStartDQ,3);
+                                        stringType = true;
+                                    }
+                                    string publishMsg = System.Uri.UnescapeDataString(publishPayload);
+
+                                    double doubleData;
+                                    int intData;
+                                    if (!stringType && int.TryParse(publishMsg, out intData)) //capture numeric data
+                                    {
+                                        result.Add(intData);
+                                    }
+                                    else if (!stringType && double.TryParse(publishMsg, out doubleData)) //capture numeric data
+                                    {
+                                        result.Add(doubleData);
+                                    }
+                                    else
+                                    {
+                                        result.Add(publishMsg);
+                                    }
+                                }
+                            }
 							break;
 						case ResponseType.History:
 							if (this.cipherKey.Length > 0) {
