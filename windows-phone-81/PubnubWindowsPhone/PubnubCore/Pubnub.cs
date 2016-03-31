@@ -793,6 +793,17 @@ namespace PubNubMessaging.Core
             }
         }
 
+        public bool AddPayloadToPublishResponse
+        {
+            get
+            {
+                return pubnub.AddPayloadToPublishResponse;
+            }
+            set
+            {
+                pubnub.AddPayloadToPublishResponse = value;
+            }
+        }
 		#endregion
 
 		#region "Constructors"

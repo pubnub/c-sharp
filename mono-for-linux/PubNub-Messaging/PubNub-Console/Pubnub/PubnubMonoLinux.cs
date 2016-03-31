@@ -278,7 +278,7 @@ namespace PubNubMessaging.Core
                                 }
                                 if (!errorCallbackRaised)
                                 {
-                                    result = WrapResultBasedOnResponseType<T>(asynchRequestState.Type, jsonString, asynchRequestState.Channels, asynchRequestState.ChannelGroups, asynchRequestState.Reconnect, asynchRequestState.Timetoken, asynchRequestState.ErrorCallback);
+									result = WrapResultBasedOnResponseType<T>(asynchRequestState.Type, jsonString, asynchRequestState.Channels, asynchRequestState.ChannelGroups, asynchRequestState.Reconnect, asynchRequestState.Timetoken, asynchRequestState.Request, asynchRequestState.ErrorCallback);
                                 }
                             }
                         }
@@ -395,7 +395,7 @@ namespace PubNubMessaging.Core
                             } 
                             else if (jsonString != "[]") 
                             {
-                                result = WrapResultBasedOnResponseType<T>(asynchRequestState.Type, jsonString, asynchRequestState.Channels, asynchRequestState.ChannelGroups, asynchRequestState.Reconnect, asynchRequestState.Timetoken, asynchRequestState.ErrorCallback);
+								result = WrapResultBasedOnResponseType<T>(asynchRequestState.Type, jsonString, asynchRequestState.Channels, asynchRequestState.ChannelGroups, asynchRequestState.Reconnect, asynchRequestState.Timetoken, asynchRequestState.Request, asynchRequestState.ErrorCallback);
                             } 
                             else 
                             {
@@ -1356,7 +1356,7 @@ namespace PubNubMessaging.Core
                 }
 
                 if (jsonString != null && !string.IsNullOrEmpty (jsonString) && !string.IsNullOrEmpty (channel.Trim ())) {
-                    result = WrapResultBasedOnResponseType<T> (asynchRequestState.Type, jsonString, asynchRequestState.Channels, asynchRequestState.ChannelGroups, asynchRequestState.Reconnect, asynchRequestState.Timetoken, asynchRequestState.ErrorCallback);
+					result = WrapResultBasedOnResponseType<T> (asynchRequestState.Type, jsonString, asynchRequestState.Channels, asynchRequestState.ChannelGroups, asynchRequestState.Reconnect, asynchRequestState.Timetoken, asynchRequestState.Request, asynchRequestState.ErrorCallback);
                 }
 
                 ProcessResponseCallbacks<T> (result, asynchRequestState);

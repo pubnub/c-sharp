@@ -39,15 +39,15 @@ namespace PubNubMessaging.Core
             pubnub.Subscribe(channel, channelGroup, subscribeCallback, connectCallback, errorCallback);
         }
 
-        public bool Publish(string channel, object message, Action<object> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            return pubnub.Publish(channel, message, true, "", userCallback, errorCallback);
-        }
+		public bool Publish(string channel, object message, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+		{
+			return pubnub.Publish(channel, message, true, "", userCallback, errorCallback);
+		}
 
-        public bool Publish<T>(string channel, object message, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-        {
+		public bool Publish<T>(string channel, object message, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		{
             return pubnub.Publish<T>(channel, message, true, "", userCallback, errorCallback);
-        }
+		}
 
         public bool Publish(string channel, object message, bool storeInHistory, Action<object> userCallback, Action<PubnubClientError> errorCallback)
         {
@@ -634,6 +634,7 @@ namespace PubNubMessaging.Core
             pubnub.PubnubErrorLevel = errorLevel;
         }
 
+
 		#endregion
 
 		#region "Properties"
@@ -791,23 +792,35 @@ namespace PubNubMessaging.Core
                 pubnub.PushServiceName = value;
             }
         }
+
+        public bool AddPayloadToPublishResponse
+        {
+            get
+            {
+                return pubnub.AddPayloadToPublishResponse;
+            }
+            set
+            {
+                pubnub.AddPayloadToPublishResponse = value;
+            }
+        }
 		#endregion
 
 		#region "Constructors"
 
 		public Pubnub(string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
 		{
-            pubnub = new PubnubXamariniOS (publishKey, subscribeKey, secretKey, cipherKey, sslOn);
+			pubnub = new PubnubXamariniOS (publishKey, subscribeKey, secretKey, cipherKey, sslOn);
 		}
 
 		public Pubnub(string publishKey, string subscribeKey, string secretKey)
 		{
-            pubnub = new PubnubXamariniOS (publishKey, subscribeKey, secretKey);
+			pubnub = new PubnubXamariniOS (publishKey, subscribeKey, secretKey);
 		}
 
 		public Pubnub(string publishKey, string subscribeKey)
 		{
-            pubnub = new PubnubXamariniOS (publishKey, subscribeKey);
+			pubnub = new PubnubXamariniOS (publishKey, subscribeKey);
 		}
 		#endregion
 	}
