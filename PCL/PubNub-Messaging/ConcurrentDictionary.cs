@@ -24,9 +24,11 @@ namespace PubNubMessaging
         {
             lock (syncRoot)
             {
-                if (d.ContainsKey(key))
+                TValue findValue;
+
+                if (d.TryGetValue(key, out findValue))
                 {
-                    d[key] = value;
+                    d[key] = f(key, findValue);
                 }
                 else
                 {
