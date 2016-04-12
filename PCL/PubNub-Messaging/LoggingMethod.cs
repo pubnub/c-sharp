@@ -439,12 +439,20 @@ namespace PubNubMessaging.Core
 			{
 				ret = PubnubErrorCode.PubnubInterOpSEHException;
 			}
-			else
-			{
-				//Console.WriteLine("ATTENTION: Error Type = " + errorType);
-				//Console.WriteLine("ATTENTION: Error Message = " + errorMessage);
-				ret = PubnubErrorCode.None;
-			}
+            else if (errorType == "System.Net.WebException" && errorMessage.Contains("The remote name could not be resolved:"))
+            {
+                ret = PubnubErrorCode.NameResolutionFailure;
+            }
+            else if (errorType == "System.Net.WebException" && errorMessage.Contains("Unable to connect to the remote server"))
+            {
+                ret = PubnubErrorCode.NameResolutionFailure;
+            }
+            else
+            {
+                //Console.WriteLine("ATTENTION: Error Type = " + errorType);
+                //Console.WriteLine("ATTENTION: Error Message = " + errorMessage);
+                ret = PubnubErrorCode.None;
+            }
 			return ret;
 		}
 

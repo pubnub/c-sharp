@@ -148,6 +148,8 @@ namespace PubNubMessaging.Core
 						}
 						catch(Exception ex)
 						{
+                            _status = false;
+                            ParseCheckSocketConnectException<T>(ex, channels, channelGroups, errorCallback, callback);
                             LoggingMethod.WriteToLog(string.Format("DateTime {0} CheckSocketConnect Failed {1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelInfo);
                         }
                         finally

@@ -1,4 +1,4 @@
-﻿//Build Date: Mar 28, 2016
+﻿//Build Date: Apr 12, 2016
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -1377,37 +1377,41 @@ namespace PubNubMessaging.Core
 		{
             ConcurrentDictionary<string, Timer> channelReconnectCollection = _channelReconnectTimer;
             ICollection<string> keyCollection = channelReconnectCollection.Keys;
-            foreach (string key in keyCollection)
-            {
-                if (_channelReconnectTimer.ContainsKey(key))
-                {
-                    Timer currentTimer = _channelReconnectTimer[key];
-                    currentTimer.Dispose();
-                    Timer removedTimer = null;
-                    bool removed = _channelReconnectTimer.TryRemove(key, out removedTimer);
-                    if (!removed)
-                    {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channel reconnect timer reference from collection for {1}", DateTime.Now.ToString(), key.ToString()), LoggingMethod.LevelInfo);
-                    }
-                }
-            }
+			if (keyCollection != null && keyCollection.Count > 0) {
+				List<string> keyList = keyCollection.ToList ();
+				foreach (string key in keyList)
+				{
+					if (_channelReconnectTimer.ContainsKey(key))
+					{
+						Timer currentTimer = _channelReconnectTimer[key];
+						currentTimer.Dispose();
+						Timer removedTimer = null;
+						bool removed = _channelReconnectTimer.TryRemove(key, out removedTimer);
+						if (!removed)
+						{
+							LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channel reconnect timer reference from collection for {1}", DateTime.Now.ToString(), key.ToString()), LoggingMethod.LevelInfo);
+						}
+					}
+				}
+			}
+            
 
             ConcurrentDictionary<string, Timer> channelGroupReconnectCollection = _channelGroupReconnectTimer;
             ICollection<string> groupKeyCollection = channelGroupReconnectCollection.Keys;
-            foreach (string key in groupKeyCollection)
-            {
-                if (_channelGroupReconnectTimer.ContainsKey(key))
-                {
-                    Timer currentTimer = _channelGroupReconnectTimer[key];
-                    currentTimer.Dispose();
-                    Timer removedTimer = null;
-                    bool removed = _channelGroupReconnectTimer.TryRemove(key, out removedTimer);
-                    if (!removed)
-                    {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channelgroup reconnect timer reference from collection for {1}", DateTime.Now.ToString(), key.ToString()), LoggingMethod.LevelInfo);
-                    }
-                }
-            }
+			if (groupKeyCollection != null && groupKeyCollection.Count > 0) {
+				List<string> groupKeyList = groupKeyCollection.ToList ();
+				foreach (string groupKey in groupKeyList) {
+					if (_channelGroupReconnectTimer.ContainsKey (groupKey)) {
+						Timer currentTimer = _channelGroupReconnectTimer [groupKey];
+						currentTimer.Dispose ();
+						Timer removedTimer = null;
+						bool removed = _channelGroupReconnectTimer.TryRemove (groupKey, out removedTimer);
+						if (!removed) {
+							LoggingMethod.WriteToLog (string.Format ("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channelgroup reconnect timer reference from collection for {1}", DateTime.Now.ToString (), groupKey.ToString ()), LoggingMethod.LevelInfo);
+						}
+					}
+				}
+			}
         }
 
 		public void EndPendingRequests()
