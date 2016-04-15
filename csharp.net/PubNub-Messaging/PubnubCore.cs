@@ -1,4 +1,4 @@
-﻿//Build Date: Mar 28, 2016
+﻿//Build Date: Apr 16, 2016
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -2379,6 +2379,10 @@ namespace PubNubMessaging.Core
                 url.Add("remove");
             }
             else if (nameSpaceAvailable && !groupNameAvailable && !channelAvaiable)
+            {
+                url.Add("remove");
+            }
+            else if (!nameSpaceAvailable && groupNameAvailable && !channelAvaiable)
             {
                 url.Add("remove");
             }
