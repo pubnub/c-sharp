@@ -1,0 +1,58 @@
+﻿<Page
+    x:Class="PubnubWindowsPhone.PubnubTimeoutSettings"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PubnubWindowsPhone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid x:Name="LayoutRoot">
+
+        <Grid.ChildrenTransitions>
+            <TransitionCollection>
+                <EntranceThemeTransition/>
+            </TransitionCollection>
+        </Grid.ChildrenTransitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title Panel -->
+        <StackPanel Grid.Row="0" Margin="19,0,0,0">
+            <TextBlock Style="{ThemeResource TitleTextBlockStyle}" Margin="0,12,0,0">
+            	<Span Foreground="Blue" FontSize="12.6666666666667" FontFamily="Consolas">
+            		<Run Text="PubNub C# Windows Phone"/>
+            	</Span>
+            	<LineBreak/>
+            	<Span Foreground="Blue" FontSize="12.6666666666667" FontFamily="Consolas">
+            		<Run/>
+            	</Span>
+            </TextBlock>
+            <TextBlock Text="Demo" Margin="0,-6.5,0,26.5" Style="{ThemeResource HeaderTextBlockStyle}" CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}"/>
+        </StackPanel>
+
+        <!--TODO: Content should be placed within the following grid-->
+        <Grid Grid.Row="1" x:Name="ContentRoot" Margin="19,9.5,19,0">
+            <TextBlock HorizontalAlignment="Left" Margin="77,53,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Subscribe Timeout (in sec)" FontSize="14"/>
+            <TextBox x:Name="txtSubscribeTimeout" HorizontalAlignment="Left" Margin="262,38,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="71" Text="310"/>
+            <TextBlock HorizontalAlignment="Left" Margin="47,96,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Non Subscribe Timeout (in sec)" FontSize="14"/>
+            <TextBox x:Name="txtNonSubscribeTimeout" HorizontalAlignment="Left" Margin="262,81,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="71" Text="15"/>
+            <TextBlock HorizontalAlignment="Left" Margin="96,140,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Number of MAX retries" FontSize="14"/>
+            <TextBox x:Name="txtNetworkMaxRetries" HorizontalAlignment="Left" Margin="262,125,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="71" Text="50"/>
+            <TextBlock HorizontalAlignment="Left" Margin="110,182,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Retry Interval (in sec)" FontSize="14"/>
+            <TextBox x:Name="txtRetryInterval" HorizontalAlignment="Left" Margin="262,167,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="71" Text="10"/>
+            <TextBlock HorizontalAlignment="Left" Margin="5,225,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Local Client Heartbeat Interval (in sec)" FontSize="14"/>
+            <TextBox x:Name="txtLocalClientHeartbeatInterval" HorizontalAlignment="Left" Margin="262,210,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="71" Text="10"/>
+            <TextBlock HorizontalAlignment="Left" Margin="71,268,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Presence Heartbeat (in sec)" FontSize="14"/>
+            <TextBox x:Name="txtPresenceHeartbeat" HorizontalAlignment="Left" Margin="262,253,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="71" Text="0"/>
+            <TextBlock HorizontalAlignment="Left" Margin="22,311,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Presence Heartbeat Interval (in sec)" FontSize="14"/>
+            <TextBox x:Name="txtPresenceHeartbeatInterval" HorizontalAlignment="Left" Margin="262,296,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="71" Text="0"/>
+            <Button Content="Continue" HorizontalAlignment="Left" Margin="241,348,0,0" VerticalAlignment="Top" Click="btnContinue_Click"/>
+
+        </Grid>
+    </Grid>
+</Page>
