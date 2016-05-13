@@ -52,12 +52,6 @@
     <Compile Include="PubnubExample.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PubnubApi\PubnubApi.csproj">
-      <Project>{58f2c5b3-f900-46f9-b919-71a07f4b99df}</Project>
-      <Name>PubnubApi</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
