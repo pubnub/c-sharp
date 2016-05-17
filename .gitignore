@@ -80,6 +80,10 @@
 /src/Examples/PubnubApiPCL.WindowsPhone80Example/obj/*
 /src/Examples/PubnubApiPCL.WindowsPhone80Example/*.user
 
+/src/Examples/PubnubApiPCL.WindowsStore80Example/bin/*
+/src/Examples/PubnubApiPCL.WindowsStore80Example/obj/*
+/src/Examples/PubnubApiPCL.WindowsStore80Example/*.user
+
 /csharp.net/PubNub-Messaging*/bin/*
 /csharp.net/PubNub-Messaging*/obj/*
 /csharp.net/PubNub-Messaging*/bin/release/*

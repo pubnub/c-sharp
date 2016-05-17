@@ -1,0 +1,30 @@
+﻿<UserControl
+    x:Class="PubnubWindowsStore.ChangeUUIDUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PubnubWindowsStore"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+    
+    <Grid>
+        <StackPanel HorizontalAlignment="Stretch" Margin="1,1,1,1" Name="stackPanel1" VerticalAlignment="Stretch">
+            <StackPanel Orientation="Vertical" Margin="5,5,10,5" Name="spnlCurrent" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <TextBlock Height="20" FontSize="16" FontWeight="Bold" x:Name="lblCurrentUUIDTitle" Text="Current UUID" Foreground="Black" HorizontalAlignment="Left"></TextBlock>
+                <TextBlock Height="20" FontSize="16" x:Name="lblCurrentUUID" Text="UUID" Foreground="Black" HorizontalAlignment="Left"></TextBlock>
+            </StackPanel>
+            <TextBlock Height="10"></TextBlock>
+            <StackPanel Orientation="Vertical" Margin="5,5,10,5" Name="spnlNew" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <TextBlock Height="20" FontSize="16" FontWeight="Bold" x:Name="lblNewUUIDTitle" Text="New UUID" Foreground="Black" HorizontalAlignment="Left"></TextBlock>
+                <TextBox x:Name="txtNewUUID" Text="" Foreground="Black" HorizontalContentAlignment="Left" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="5,5,10,5" Name="spnlCommands" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <Button Content="Go" Height="71" Name="btnOK" Width="150" HorizontalContentAlignment="Center" Click="btnOK_Click" />
+                <Button Content="Cancel" Height="70" Name="btnCancel" Width="150" HorizontalContentAlignment="Center" Click="btnCancel_Click" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -1,0 +1,40 @@
+﻿<UserControl
+    x:Class="PubnubWindowsStore.UserStateUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PubnubWindowsStore"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+
+    <Grid Height="300" Width="451">
+        <StackPanel HorizontalAlignment="Stretch" Margin="1,1,1,1" Name="stackPanel1" VerticalAlignment="Stretch">
+
+            <StackPanel Orientation="Horizontal" Margin="5,5,10,5" Name="spnlChoice1" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <RadioButton x:Name="radSetUserState" GroupName="UserState">Set User State</RadioButton>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="5,5,10,5" Name="spnlKey1" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <TextBlock x:Name="lblKey1" VerticalAlignment="Center" Text="Key 1" Width="70"></TextBlock>
+                <TextBox x:Name="txtKey1" Text="" Width="270"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="5,5,10,5" Name="spnlValue1" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <TextBlock x:Name="lblValue1" VerticalAlignment="Center" Text="Value 1" Width="70"></TextBlock>
+                <TextBox x:Name="txtValue1" Text="" Width="270"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="5,5,10,5" Name="spnlChoice2" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <RadioButton x:Name="radGetUserState" GroupName="UserState" IsChecked="true">Get User State</RadioButton>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="5,5,10,5" Name="spnlGetUserStateUUID" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <TextBlock x:Name="lblGetUserStateUUID" VerticalAlignment="Center" Text="UUID" Width="70"></TextBlock>
+                <TextBox x:Name="txtGetUserStateUUID" Text="" Width="270"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="5,5,10,5" Name="spnlCommands" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <Button Content="Go" Height="71" x:Name="btnOK" Width="100" HorizontalContentAlignment="Center"  Click="btnOK_Click"/>
+                <Button Content="Cancel" Height="70" x:Name="btnCancel" Width="100" HorizontalContentAlignment="Center" Click="btnCancel_Click"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>
