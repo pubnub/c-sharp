@@ -102,8 +102,8 @@
 </head>
 <body>
     <form id="form1" runat="server">
-    <asp:ScriptManager ID="ScriptManager1" EnablePartialRendering="true" runat="server">
-    </asp:ScriptManager>
+    <asp:ToolkitScriptManager  ID="ScriptManager1" EnablePartialRendering="true" runat="server">
+    </asp:ToolkitScriptManager >
     <div>
         <table class="mainContainer">
             <colgroup>

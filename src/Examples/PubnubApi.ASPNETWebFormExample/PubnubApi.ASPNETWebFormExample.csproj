@@ -107,8 +107,7 @@
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.6.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.DynamicData" />
@@ -132,12 +131,10 @@
     <Content Include="PubnubExampleNET35.aspx" />
     <Content Include="PubnubExampleNET40.aspx" />
     <Content Include="v3.5\AjaxControlToolkit.dll" />
-    <Content Include="v3.5\Newtonsoft.Json.dll" />
     <Content Include="v3.5\Notes.txt" />
     <Content Include="v3.5\SanitizerProviders.dll" />
     <Content Include="v3.5\System.Threading.dll" />
     <Content Include="v4.0\AjaxControlToolkit.dll" />
-    <Content Include="v4.0\Newtonsoft.Json.dll" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +162,12 @@
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Api\PubnubApi\PubnubApi.csproj">
+      <Project>{58f2c5b3-f900-46f9-b919-71a07f4b99df}</Project>
+      <Name>PubnubApi</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

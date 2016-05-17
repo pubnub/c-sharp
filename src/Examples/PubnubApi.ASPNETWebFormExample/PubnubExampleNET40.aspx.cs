@@ -325,174 +325,191 @@ namespace PubNubMessaging
         void DisplayRemoveChannelGroupNamespaceReturnMessage(RemoveNamespaceAck result)
         {
             UpdateTimer.Enabled = true;
-            Console.WriteLine("RemoveNamespaceAck CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            AddToPubnubResultContainer("RemoveNamespaceAck CALLBACK:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
 
         void DisplayRemoveChannelGroupReturnMessage(RemoveChannelGroupAck result)
         {
             UpdateTimer.Enabled = true;
-            Console.WriteLine("RemoveChannelFromChannelGroupAck CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            AddToPubnubResultContainer("RemoveChannelFromChannelGroupAck CALLBACK:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
 
         void DisplayRemoveChannelFromChannelGroupReturnMessage(RemoveChannelFromChannelGroupAck result)
         {
             UpdateTimer.Enabled = true;
-            Console.WriteLine("RemoveChannelFromChannelGroupAck CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            AddToPubnubResultContainer("RemoveChannelFromChannelGroupAck CALLBACK:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
 
         void DisplayAddChannelToChannelGroupReturnMessage(AddChannelToChannelGroupAck result)
         {
             UpdateTimer.Enabled = true;
-            Console.WriteLine("AddChannelToChannelGroupAck CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            AddToPubnubResultContainer("AddChannelToChannelGroupAck CALLBACK:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
 
         void DisplayAllNamespacesReturnMessage(GetAllNamespacesAck result)
         {
             UpdateTimer.Enabled = true;
-            Console.WriteLine("GetAllNamespacesAck CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            AddToPubnubResultContainer("GetAllNamespacesAck CALLBACK:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
 
-        static void DisplayGetAllChannelGroupsReturnMessage(GetAllChannelGroupsAck result)
+        void DisplayGetAllChannelGroupsReturnMessage(GetAllChannelGroupsAck result)
         {
-            Console.WriteLine("GetAllChannelGroupsAck CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("GetAllChannelGroupsAck CALLBACK:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
 
-        static void DisplayGetChannelsForChannelGroupReturnMessage(GetChannelGroupChannelsAck result)
+        void DisplayGetChannelsForChannelGroupReturnMessage(GetChannelGroupChannelsAck result)
         {
-            Console.WriteLine("GetChannelGroupChannelsAck CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("GetChannelGroupChannelsAck CALLBACK:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
 
-        static void DisplayTimeReturnMessage(long result)
+        void DisplayTimeReturnMessage(long result)
         {
-            Console.WriteLine("TIME CALLBACK:");
-            Console.WriteLine(result.ToString());
-            Console.WriteLine();
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("TIME CALLBACK:");
+            AddToPubnubResultContainer(result.ToString());
+            AddToPubnubResultContainer("");
         }
 
-        static void DisplayGetUserStateReturnMessage(GetUserStateAck result)
+        void DisplayGetUserStateReturnMessage(GetUserStateAck result)
         {
-            Console.WriteLine("GET USERSTATE CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("GET USERSTATE CALLBACK:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
 
-        static void DisplaySetUserStateReturnMessage(SetUserStateAck result)
+        void DisplaySetUserStateReturnMessage(SetUserStateAck result)
         {
-            Console.WriteLine("SET USERSTATE CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("SET USERSTATE CALLBACK:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
 
-        static void DisplayWhereNowReturnMessage(WhereNowAck result)
+        void DisplayWhereNowReturnMessage(WhereNowAck result)
         {
-            Console.WriteLine("WHERENOW CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("WHERENOW CALLBACK:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
 
-        static void DisplayGlobalHereNowReturnMessage(GlobalHereNowAck result)
+        void DisplayGlobalHereNowReturnMessage(GlobalHereNowAck result)
         {
-            Console.WriteLine("GlobalHereNow CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("GlobalHereNow CALLBACK:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
 
-        static void DisplayHereNowReturnMessage(HereNowAck result)
+        void DisplayHereNowReturnMessage(HereNowAck result)
         {
-            Console.WriteLine("HERENOW CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("HERENOW CALLBACK:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
 
-        static void DisplayDetailedHistoryReturnMessage(DetailedHistoryAck result)
+        void DisplayDetailedHistoryReturnMessage(DetailedHistoryAck result)
         {
-            Console.WriteLine("DETAILED HISTORY CALLBACK:");
-            Console.WriteLine("Total Records = " + result.Message.Length.ToString());
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("DETAILED HISTORY CALLBACK:");
+            AddToPubnubResultContainer("Total Records = " + result.Message.Length.ToString());
             for (int index = 0; index < result.Message.Length; index++)
             {
-                Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result.Message[index]));
+                AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result.Message[index]));
             }
 
-            Console.WriteLine();
+            AddToPubnubResultContainer("");
         }
 
-        static void DisplayPublishReturnMessage(PublishAck result)
+        void DisplayPublishReturnMessage(PublishAck result)
         {
-            Console.WriteLine("PUBLISH CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("PUBLISH CALLBACK:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
 
-        static void DisplayPresenceAckMessage(PresenceAck result)
+        void DisplayPresenceAckMessage(PresenceAck result)
         {
-            Console.WriteLine("PRESENCE CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("PRESENCE CALLBACK:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
 
         /// <summary>
         /// Callback method captures the response for Grant requests
         /// </summary>
         /// <param name="result"></param>
-        static void DisplayGrantReturnMessage(GrantAck result)
+        void DisplayGrantReturnMessage(GrantAck result)
         {
-            Console.WriteLine("GRANT CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("GRANT CALLBACK:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
 
         /// <summary>
         /// Callback method captures the response for Audit requests
         /// </summary>
         /// <param name="result"></param>
-        static void DisplayAuditReturnMessage(AuditAck result)
+        void DisplayAuditReturnMessage(AuditAck result)
         {
-            Console.WriteLine("AUDIT CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("AUDIT CALLBACK:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
 
         /// <summary>
         /// Callback method captures the response in JSON string format for Subscribe
         /// </summary>
         /// <param name="result"></param>
-        static void DisplaySubscribeReturnMessage(Message<string> result)
+        void DisplaySubscribeReturnMessage(Message<string> result)
         {
-            Console.WriteLine("SUBSCRIBE REGULAR CALLBACK for string:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("SUBSCRIBE REGULAR CALLBACK for string:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
-        static void DisplaySubscribeReturnMessage(Message<object> result)
+        void DisplaySubscribeReturnMessage(Message<object> result)
         {
-            Console.WriteLine("SUBSCRIBE REGULAR CALLBACK for object:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("SUBSCRIBE REGULAR CALLBACK for object:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
-        static void DisplaySubscribeReturnMessage(Message<PubnubDemoObject> result)
+        void DisplaySubscribeReturnMessage(Message<PubnubDemoObject> result)
         {
-            Console.WriteLine("SUBSCRIBE REGULAR CALLBACK for PubnubDemoObject:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("SUBSCRIBE REGULAR CALLBACK for PubnubDemoObject:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
-        static void DisplaySubscribeReturnMessage(Message<UserCreated> result)
+        void DisplaySubscribeReturnMessage(Message<UserCreated> result)
         {
-            Console.WriteLine("SUBSCRIBE REGULAR CALLBACK for UserCreated:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("SUBSCRIBE REGULAR CALLBACK for UserCreated:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
 
 
@@ -500,58 +517,64 @@ namespace PubNubMessaging
         /// Callback method captures wildcard presence events for Subscribe
         /// </summary>
         /// <param name="result"></param>
-        static void DisplayWildCardPresenceReturnMessage(PresenceAck result)
+        void DisplayWildCardPresenceReturnMessage(PresenceAck result)
         {
-            Console.WriteLine("WILDCARD PRESENCE CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("WILDCARD PRESENCE CALLBACK:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
 
         /// <summary>
         /// Callback method captures the response in JSON string format for Presence
         /// </summary>
         /// <param name="result"></param>
-        static void DisplayPresenceReturnMessage(PresenceAck result)
+        void DisplayPresenceReturnMessage(PresenceAck result)
         {
-            Console.WriteLine("PRESENCE REGULAR CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("PRESENCE REGULAR CALLBACK:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
 
         /// <summary>
         /// Callback method to provide the connect status of Subscribe call
         /// </summary>
         /// <param name="result"></param>
-        static void DisplayConnectDisconnectStatusMessage(ConnectOrDisconnectAck result)
+        void DisplayConnectDisconnectStatusMessage(ConnectOrDisconnectAck result)
         {
-            Console.WriteLine("CONNECT OR DISCONNECT CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("CONNECT OR DISCONNECT CALLBACK:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
 
         /// <summary>
         /// Callback method to provide the connect status of Presence call
         /// </summary>
         /// <param name="result"></param>
-        static void DisplayPresenceConnectStatusMessage(ConnectOrDisconnectAck result)
+        void DisplayPresenceConnectStatusMessage(ConnectOrDisconnectAck result)
         {
-            Console.WriteLine("PRESENCE CONNECT CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("PRESENCE CONNECT CALLBACK:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
 
-        static void DisplaySubscribeDisconnectStatusMessage(ConnectOrDisconnectAck result)
+        void DisplaySubscribeDisconnectStatusMessage(ConnectOrDisconnectAck result)
         {
-            Console.WriteLine("SUBSCRIBE DISCONNECT CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("SUBSCRIBE DISCONNECT CALLBACK:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
 
-        static void DisplayPresenceDisconnectStatusMessage(ConnectOrDisconnectAck result)
+        void DisplayPresenceDisconnectStatusMessage(ConnectOrDisconnectAck result)
         {
-            Console.WriteLine("PRESENCE DISCONNECT CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
+            UpdateTimer.Enabled = true;
+            AddToPubnubResultContainer("PRESENCE DISCONNECT CALLBACK:");
+            AddToPubnubResultContainer(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            AddToPubnubResultContainer("");
         }
 
         protected void btnTime_Command(object sender, CommandEventArgs e)
