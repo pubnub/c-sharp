@@ -84,9 +84,14 @@
 /src/Examples/PubnubApiPCL.WindowsStore80Example/obj/*
 /src/Examples/PubnubApiPCL.WindowsStore80Example/*.user
 
+/src/Examples/PubnubApiPCL.XamarinAndroidExample/bin/*
+/src/Examples/PubnubApiPCL.XamarinAndroidExample/obj/*
+
 /src/UnitTests/PubnubApiPCL.WindowsPhone80.Tests/bin/*
 /src/UnitTests/PubnubApiPCL.WindowsPhone80.Tests/obj/*
 /src/UnitTests/PubnubApiPCL.WindowsPhone80.Tests/*.user
+
+/src/*.userprefs
 
 /csharp.net/PubNub-Messaging*/bin/*
 /csharp.net/PubNub-Messaging*/obj/*
