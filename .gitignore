@@ -87,6 +87,9 @@
 /src/Examples/PubnubApiPCL.XamarinAndroidExample/bin/*
 /src/Examples/PubnubApiPCL.XamarinAndroidExample/obj/*
 
+/src/Examples/PubnubApiPCL.XamariniOSExample/bin/*
+/src/Examples/PubnubApiPCL.XamariniOSExample/obj/*
+
 /src/UnitTests/PubnubApiPCL.WindowsPhone80.Tests/bin/*
 /src/UnitTests/PubnubApiPCL.WindowsPhone80.Tests/obj/*
 /src/UnitTests/PubnubApiPCL.WindowsPhone80.Tests/*.user
