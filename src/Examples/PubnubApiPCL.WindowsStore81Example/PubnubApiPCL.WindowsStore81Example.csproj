@@ -223,6 +223,12 @@
       <Private>True</Private>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Api\PubnubApiPCL\PubnubApiPCL.csproj">
+      <Project>{84a6a216-af4f-4ac1-bb88-7a78f2e2521c}</Project>
+      <Name>PubnubApiPCL</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
   </PropertyGroup>
