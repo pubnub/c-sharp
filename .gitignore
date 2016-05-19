@@ -90,6 +90,9 @@
 /src/Examples/PubnubApiPCL.XamariniOSExample/bin/*
 /src/Examples/PubnubApiPCL.XamariniOSExample/obj/*
 
+src/Examples/PubnubApiPCL.XamariniMacExample/bin/*
+src/Examples/PubnubApiPCL.XamariniMacExample/obj/*
+
 /src/UnitTests/PubnubApiPCL.WindowsPhone80.Tests/bin/*
 /src/UnitTests/PubnubApiPCL.WindowsPhone80.Tests/obj/*
 /src/UnitTests/PubnubApiPCL.WindowsPhone80.Tests/*.user
