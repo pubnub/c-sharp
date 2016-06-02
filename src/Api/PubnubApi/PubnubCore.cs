@@ -5986,11 +5986,6 @@ namespace PubnubApi
         
         internal bool GrantAccess<T> (string channel, string authenticationKey, bool read, bool write, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
-            if (typeof(T).FullName.ToLower() != "pubnubmessaging.core.grantack")
-            {
-                throw new NotSupportedException("Method cannot be used. No support for this type");
-            }
-
 			if (string.IsNullOrEmpty (this.secretKey) || string.IsNullOrEmpty (this.secretKey.Trim ()) || this.secretKey.Length <= 0) {
                 throw new MissingMemberException("Invalid secret key");
 			}
@@ -8117,7 +8112,7 @@ namespace PubnubApi
             }
             else if (typeof(T) == typeof(AuditAck))
             {
-#region "AuditAck"
+                #region "AuditAck"
                 Dictionary<string, object> auditDicObj = ConvertToDictionaryObject(listObject[0]);
 
                 AuditAck ack = null;
@@ -8187,7 +8182,7 @@ namespace PubnubApi
                                                             authData.Access = new AuditAck.Data.ChannelData.AuthData.AuthAccess();
                                                             authData.Access.read = auditAckChannelAuthDataDic["r"].ToString() == "1";
                                                             authData.Access.write = auditAckChannelAuthDataDic["w"].ToString() == "1";
-                                                            authData.Access.manage = auditAckChannelAuthDataDic["m"].ToString() == "1";
+                                                            authData.Access.manage = auditAckChannelAuthDataDic.ContainsKey("m") ? auditAckChannelAuthDataDic["m"].ToString() == "1" : false;
                                                             if (auditAckChannelAuthDataDic.ContainsKey("ttl"))
                                                             {
                                                                 authData.Access.TTL = Int32.Parse(auditAckChannelAuthDataDic["ttl"].ToString());
@@ -8204,7 +8199,7 @@ namespace PubnubApi
                                                 auditAckChannelData.Access = new AuditAck.Data.ChannelData.ChannelAccess();
                                                 auditAckChannelData.Access.read = auditAckChannelDataDic["r"].ToString() == "1";
                                                 auditAckChannelData.Access.write = auditAckChannelDataDic["w"].ToString() == "1";
-                                                auditAckChannelData.Access.manage = auditAckChannelDataDic["m"].ToString() == "1";
+                                                auditAckChannelData.Access.manage = auditAckChannelDataDic.ContainsKey("m") ? auditAckChannelDataDic["m"].ToString() == "1" : false;
                                                 if (auditAckChannelDataDic.ContainsKey("ttl"))
                                                 {
                                                     auditAckChannelData.Access.TTL = Int32.Parse(auditAckChannelDataDic["ttl"].ToString());
@@ -8245,7 +8240,7 @@ namespace PubnubApi
                                                             authData.Access = new AuditAck.Data.ChannelGroupData.AuthData.AuthAccess();
                                                             authData.Access.read = auditAckCgAuthDataDic["r"].ToString() == "1";
                                                             authData.Access.write = auditAckCgAuthDataDic["w"].ToString() == "1";
-                                                            authData.Access.manage = auditAckCgAuthDataDic["m"].ToString() == "1";
+                                                            authData.Access.manage = auditAckCgAuthDataDic.ContainsKey("m") ? auditAckCgAuthDataDic["m"].ToString() == "1" : false;
                                                             if (auditAckCgAuthDataDic.ContainsKey("ttl"))
                                                             {
                                                                 authData.Access.TTL = Int32.Parse(auditAckCgAuthDataDic["ttl"].ToString());
@@ -8262,7 +8257,7 @@ namespace PubnubApi
                                                 auditAckCgData.Access = new AuditAck.Data.ChannelGroupData.ChannelGroupAccess();
                                                 auditAckCgData.Access.read = auditAckCgDataDic["r"].ToString() == "1";
                                                 auditAckCgData.Access.write = auditAckCgDataDic["w"].ToString() == "1";
-                                                auditAckCgData.Access.manage = auditAckCgDataDic["m"].ToString() == "1";
+                                                auditAckCgData.Access.manage = auditAckCgDataDic.ContainsKey("m") ? auditAckCgDataDic["m"].ToString() == "1" : false;
                                                 if (auditAckCgDataDic.ContainsKey("ttl"))
                                                 {
                                                     auditAckCgData.Access.TTL = Int32.Parse(auditAckCgDataDic["ttl"].ToString());
@@ -8280,7 +8275,7 @@ namespace PubnubApi
                 }
 
                 ret = (T)Convert.ChangeType(ack, typeof(AuditAck), CultureInfo.InvariantCulture);
-#endregion
+                #endregion
             }
             else if (typeof(T) == typeof(ConnectOrDisconnectAck))
             {
