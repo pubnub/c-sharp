@@ -1,4 +1,4 @@
-﻿//Build Date: Apr 26, 2016
+﻿//Build Date: June 06, 2016
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -675,14 +675,26 @@ namespace PubnubApi
 						if (channelGroup != "" && channelGroupInternetStatus.ContainsKey(channelGroup)
 							&& (netState.ResponseType == ResponseType.Subscribe || netState.ResponseType == ResponseType.Presence))
 						{
-							if (channelGroupInternetStatus[channelGroup])
+                            bool networkConnection;
+                            if (_pubnubUnitTest is IPubnubUnitTest && _pubnubUnitTest.EnableStubTest)
+                            {
+                                networkConnection = true;
+                            }
+                            else
+                            {
+                                networkConnection = CheckInternetConnectionStatus(pubnetSystemActive, netState.ErrorCallback, netState.Channels, netState.ChannelGroups);
+                            }
+
+                            if (channelGroupInternetStatus[channelGroup])
 							{
 								//Reset Retry if previous state is true
 								channelGroupInternetRetry.AddOrUpdate(channelGroup, 0, (key, oldValue) => 0);
 							}
 							else
 							{
-								channelGroupInternetRetry.AddOrUpdate(channelGroup, 1, (key, oldValue) => oldValue + 1);
+                                channelGroupInternetStatus.AddOrUpdate(channelGroup, networkConnection, (key, oldValue) => networkConnection);
+
+                                channelGroupInternetRetry.AddOrUpdate(channelGroup, 1, (key, oldValue) => oldValue + 1);
 								LoggingMethod.WriteToLog(string.Format("DateTime {0}, channelgroup={1} {2} reconnectNetworkCallback. Retry {3} of {4}", DateTime.Now.ToString(), channelGroup, netState.ResponseType, channelGroupInternetRetry[channelGroup], _pubnubNetworkCheckRetries), LoggingMethod.LevelInfo);
 
 								if (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)
@@ -8829,7 +8841,7 @@ namespace PubnubApi
                             {
                                 //ack.Payload.channels = null;
                                 object[] whereNowChannelList = ConvertToObjectArray(whereNowPayloadDic["channels"]);
-                                if (whereNowChannelList != null && whereNowChannelList.Length > 0)
+                                if (whereNowChannelList != null && whereNowChannelList.Length >= 0)
                                 {
                                     List<string> channelList = new List<string>();
                                     foreach (string channel in whereNowChannelList)
