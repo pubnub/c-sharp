@@ -97,6 +97,12 @@ src/Examples/PubnubApiPCL.XamariniMacExample/obj/*
 /src/UnitTests/PubnubApiPCL.WindowsPhone80.Tests/obj/*
 /src/UnitTests/PubnubApiPCL.WindowsPhone80.Tests/*.user
 
+/src/UnitTests/PubnubApiPCL.Silverlight50.Tests/Bin/Debug/*
+/src/UnitTests/PubnubApiPCL.Silverlight50.Tests/Bin/Release/*
+/src/UnitTests/PubnubApiPCL.Silverlight50.Tests/obj/Debug/*
+/src/UnitTests/PubnubApiPCL.Silverlight50.Tests/obj/Release/*
+/src/UnitTests/PubnubApiPCL.Silverlight50.Tests/*.user
+
 /src/*.userprefs
 
 /csharp.net/PubNub-Messaging*/bin/*
