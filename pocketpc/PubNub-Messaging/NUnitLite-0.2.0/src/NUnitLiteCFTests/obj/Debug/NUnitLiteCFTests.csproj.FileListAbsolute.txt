@@ -1,7 +1,0 @@
-C:\Pandu\downloads\NUnitLite-0.2.0\src\NUnitLiteCFTests\bin\Debug\NUnitLiteTests.exe
-C:\Pandu\downloads\NUnitLite-0.2.0\src\NUnitLiteCFTests\bin\Debug\NUnitLiteTests.pdb
-C:\Pandu\downloads\NUnitLite-0.2.0\src\NUnitLiteCFTests\bin\Debug\NUnitLite.dll
-C:\Pandu\downloads\NUnitLite-0.2.0\src\NUnitLiteCFTests\bin\Debug\NUnitLite.pdb
-C:\Pandu\downloads\NUnitLite-0.2.0\src\NUnitLiteCFTests\obj\Debug\ResolveAssemblyReference.cache
-C:\Pandu\downloads\NUnitLite-0.2.0\src\NUnitLiteCFTests\obj\Debug\NUnitLiteTests.exe
-C:\Pandu\downloads\NUnitLite-0.2.0\src\NUnitLiteCFTests\obj\Debug\NUnitLiteTests.pdb

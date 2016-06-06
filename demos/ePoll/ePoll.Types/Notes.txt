@@ -1,3 +1,0 @@
-﻿XSD.EXE PollQuestion.xsd /c /l:cs /n:ePoll.Types
-
-XSD.EXE PollUserAnswer.xsd /c /l:cs /n:ePoll.Types
