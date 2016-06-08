@@ -1,0 +1,4 @@
+name: c-sharp
+features:
+  publish:
+   - STORE-FLAG
