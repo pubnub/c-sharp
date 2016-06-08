@@ -1,3 +1,4 @@
+.vs/*
 .settings
 *~
 /csharp.net/PubNub-Messaging*/bin/*
@@ -169,6 +170,18 @@
 /PCL/PubNub-Messaging/bin/Release/*
 /PCL/PubNub-Messaging/obj/Release/*
 >>>>>>> ppt102374092
+/dotnetcore/PubnubConsole/bin/Debug/*
+/dotnetcore/PubnubConsole/obj/Debug/*
+/dotnetcore/PubnubConsole/bin/Release/*
+/dotnetcore/PubnubConsole/obj/Release/*
+/dotnetcore/PubNub-Messaging.Tests/bin/Debug/*
+/dotnetcore/PubNub-Messaging.Tests/obj/Debug/*
+/dotnetcore/PubNub-Messaging.Tests/bin/Release/*
+/dotnetcore/PubNub-Messaging.Tests/obj/Release/*
+/dotnetcore/PubNub-Messaging/bin/Debug/*
+/dotnetcore/PubNub-Messaging/obj/Debug/*
+/dotnetcore/PubNub-Messaging/bin/Release/*
+/dotnetcore/PubNub-Messaging/obj/Release/*
 .DS_Store
 *.cache
 *.suo
