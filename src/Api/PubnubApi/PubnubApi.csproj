@@ -43,18 +43,77 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Callback\PubnubChannelGroupCallbackKey.cs" />
+    <Compile Include="Callback\PubnubPresenceChannelGroupCallback.cs" />
+    <Compile Include="Callback\PubnubSubscribeChannelCallback.cs" />
+    <Compile Include="Callback\PubnubSubscribeChannelGroupCallback.cs" />
     <Compile Include="ClientNetworkStatus.cs" />
+    <Compile Include="Consumer\Ack\AddChannelToChannelGroupAck.cs" />
+    <Compile Include="Consumer\Ack\AuditAck.cs" />
+    <Compile Include="Consumer\Ack\AuditAckPayload.cs" />
+    <Compile Include="Consumer\Ack\ConnectOrDisconnectAck.cs" />
+    <Compile Include="Consumer\Ack\DetailedHistoryAck.cs" />
+    <Compile Include="Consumer\Ack\GetAllChannelGroupsAck.cs" />
+    <Compile Include="Consumer\Ack\GetAllNamespacesAck.cs" />
+    <Compile Include="Consumer\Ack\GetChannelGroupChannelsAck.cs" />
+    <Compile Include="Consumer\Ack\GetUserStateAck.cs" />
+    <Compile Include="Consumer\Ack\GlobalHereNowAck.cs" />
+    <Compile Include="Consumer\Ack\GrantAckPayload.cs" />
+    <Compile Include="Consumer\Ack\PresenceAck.cs" />
+    <Compile Include="Consumer\Ack\PublishAck.cs" />
+    <Compile Include="Consumer\Ack\RemoveChannelFromChannelGroupAck.cs" />
+    <Compile Include="Consumer\Ack\RemoveChannelGroupAck.cs" />
+    <Compile Include="Consumer\Ack\RemoveNamespaceAck.cs" />
+    <Compile Include="Consumer\Ack\SetUserStateAck.cs" />
+    <Compile Include="Consumer\Ack\WhereNowAck.cs" />
+    <Compile Include="Enum\PushTypeService.cs" />
+    <Compile Include="Consumer\Ack\GrantAck.cs" />
+    <Compile Include="Consumer\Ack\HereNowAck.cs" />
+    <Compile Include="Interface\IJsonPluggableLibrary.cs" />
+    <Compile Include="Interface\IPubnubUnitTest.cs" />
+    <Compile Include="Interface\ResponseType.cs" />
+    <Compile Include="InternetState.cs" />
     <Compile Include="LoggingMethod.cs" />
     <Compile Include="MD5.cs" />
+    <Compile Include="MD5CryptoServiceProvider.cs" />
+    <Compile Include="Message.cs" />
+    <Compile Include="NewtonsoftJsonDotNet.cs" />
+    <Compile Include="Callback\PubnubChannelCallbackKey.cs" />
+    <Compile Include="Callback\PubnubPresenceChannelCallback.cs" />
+    <Compile Include="PNConfiguration.cs" />
+    <Compile Include="Enum\PNHeartbeatNotificationOption.cs" />
+    <Compile Include="PubnubProxy.cs" />
+    <Compile Include="PubnubWebAsyncResult.cs" />
+    <Compile Include="PubnubWebRequestBase.cs" />
+    <Compile Include="PubnubWebRequestCreatorBase.cs" />
+    <Compile Include="PubnubWebResponseBase.cs" />
+    <Compile Include="Push\Mpns\MpnsCycleTileNotification.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Pubnub.cs" />
+    <Compile Include="PubnubClientError.cs" />
     <Compile Include="PubnubCore.cs" />
+    <Compile Include="Enum\PubnubErrorSeverity.cs" />
+    <Compile Include="Enum\PubnubMessageSource.cs" />
+    <Compile Include="Enum\PubnubErrorCode.cs" />
+    <Compile Include="PubnubCrypto.cs" />
+    <Compile Include="PubnubCryptoBase.cs" />
+    <Compile Include="PubnubErrorCodeDescription.cs" />
+    <Compile Include="PubnubErrorCodeHelper.cs" />
+    <Compile Include="PubnubErrorFilter.cs" />
+    <Compile Include="PubnubWebRequest.cs" />
+    <Compile Include="PubnubWebRequestCreator.cs" />
+    <Compile Include="PubnubWebResponse.cs" />
     <Compile Include="PubnubWin.cs" />
+    <Compile Include="Push\Mpns\MpnsFlipTileNotification.cs" />
+    <Compile Include="Push\Mpns\MpnsIconicTileNotification.cs" />
+    <Compile Include="Push\Mpns\MpnsToastNotification.cs" />
     <Compile Include="ReconnectState.cs" />
+    <Compile Include="RequestState.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

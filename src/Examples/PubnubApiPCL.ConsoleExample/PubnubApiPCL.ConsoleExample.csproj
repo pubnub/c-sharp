@@ -53,13 +53,13 @@
     <Compile Include="PubnubExample.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\Api\PubnubApiPCL\PubnubApiPCL.csproj">
       <Project>{84a6a216-af4f-4ac1-bb88-7a78f2e2521c}</Project>
       <Name>PubnubApiPCL</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
