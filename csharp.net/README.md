@@ -1,6 +1,6 @@
 # Please direct all Support Questions and Concerns to Support@PubNub.com
 
-## PubNub 3.7 for C Sharp (C#)
+## PubNub 3.7.6 for C Sharp (C#)
 ### Supporting .net 3.5, 4.0, and 4.5
 
 Open PubNub-Messaging/PubNub-Messaging.csproj, and the example file PubnubExample.cs should demonstrate all functionality, asyncronously using delegates.
