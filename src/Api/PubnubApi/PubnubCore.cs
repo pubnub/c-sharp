@@ -1,9 +1,6 @@
 ﻿//Build Date: June 06, 2016
 #region "Header"
-#if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
-#define USE_JSONFX_UNITY_IOS
-#endif
-#if (__MonoCS__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER)
+#if (__MonoCS__)
 #define TRACE
 #endif
 using System;
@@ -358,23 +355,8 @@ namespace PubnubApi
          */
 		protected virtual void Init()
 		{
-			#if (USE_JSONFX) || (USE_JSONFX_UNITY)
-			LoggingMethod.WriteToLog ("USE_JSONFX", LoggingMethod.LevelInfo);
-			this.JsonPluggableLibrary = new JsonFXDotNet();
-			#elif (USE_DOTNET_SERIALIZATION)
-						LoggingMethod.WriteToLog("USE_DOTNET_SERIALIZATION", LoggingMethod.LevelInfo);
-						this.JsonPluggableLibrary = new JscriptSerializer();
-			#elif (USE_MiniJSON)
-						LoggingMethod.WriteToLog("USE_MiniJSON", LoggingMethod.LevelInfo);
-						this.JsonPluggableLibrary = new MiniJSONObjectSerializer();
-			#elif (USE_JSONFX_UNITY_IOS)
-						LoggingMethod.WriteToLog("USE_JSONFX_UNITY_IOS", LoggingMethod.LevelInfo);
-						this.JsonPluggableLibrary = new JsonFxUnitySerializer();
-            #else
             LoggingMethod.WriteToLog("NewtonsoftJsonDotNet", LoggingMethod.LevelInfo);
 						this.JsonPluggableLibrary = new NewtonsoftJsonDotNet();
-			#endif
-            
             //this.SubscribeMessageType = new PubnubSubscribeMessageType();
 		}
 
@@ -5193,7 +5175,6 @@ namespace PubnubApi
                 ResponseToUserCallback<T>(result, asyncRequestState.ResponseType, asyncRequestState.Channels, asyncRequestState.ChannelGroups, asyncRequestState.NonSubscribeRegularCallback);
             }
         }
-		//#if (!UNITY_IOS)
 		//TODO:refactor
         protected abstract void UrlProcessResponseCallback<T>(IAsyncResult asynchronousResult);
         
@@ -5224,7 +5205,6 @@ namespace PubnubApi
         //    return null;
         //}
 
-        //#endif
 		//TODO:refactor
         
         private void ResponseToUserCallback<T>(List<object> result, ResponseType type, string[] channels, string[] channelGroups, Action<T> userCallback)
@@ -5241,18 +5221,6 @@ namespace PubnubApi
                     if (messages != null && messages.Length > 0)
                     {
                         object[] messageList = messages[0] as object[];
-#if (USE_MiniJSON)
-										int i=0;
-										foreach (object o in result){
-											if(i==0)
-											{
-												IList collection = (IList)o;
-												messageList = new object[collection.Count];
-												collection.CopyTo(messageList, 0);
-											}
-											i++;
-										}
-#endif
                         if (messageList != null && messageList.Length > 0)
                         {
                             if (messages.Length == 4 || messages.Length == 6)
@@ -5605,18 +5573,7 @@ namespace PubnubApi
                     }
                     else
                     {
-#if (USE_JSONFX)|| (USE_JSONFX_UNITY)
-	                    JsonFXDotNet jsonLib = new JsonFXDotNet();
-#elif (USE_DOTNET_SERIALIZATION)
-	                    JscriptSerializer jsonLib = new JscriptSerializer();
-#elif (USE_MiniJSON)
-	                    MiniJSONObjectSerializer jsonLib = new MiniJSONObjectSerializer();
-#elif (USE_JSONFX_UNITY_IOS)
-	                    JsonFxUnitySerializer jsonLib = new JsonFxUnitySerializer();
-#else
                         NewtonsoftJsonDotNet jsonLib = new NewtonsoftJsonDotNet();
-#endif
-
                         ret = jsonLib.DeserializeToObject<T>(result);
                     }
 
@@ -7008,6 +6965,4 @@ namespace PubnubApi
     //}
     
     #endregion
-
-
 }

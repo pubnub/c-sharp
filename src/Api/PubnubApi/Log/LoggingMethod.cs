@@ -8,26 +8,9 @@ namespace PubnubApi
 {
 	#region "Logging and error codes -- code split required"
 
-	#if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
-	public class LoggingMethod:MonoBehaviour
-	#else
 	public class LoggingMethod
-	#endif
 	{
 		private static int logLevel = 0;
-		private static IPubnubLog _pubnubLog = null;
-
-		public static IPubnubLog PubnubLog
-		{
-			get{
-				return _pubnubLog;
-			}
-			set {
-				_pubnubLog = value;
-				logLevel = (int)_pubnubLog.LogLevel;
-
-			}
-		}
 		public static Level LogLevel
 		{
 			get
@@ -84,20 +67,20 @@ namespace PubnubApi
 		{
 			if (writeToLog)
             {
-				System.Diagnostics.Debug.WriteLine(logText);
+                #if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || __IOS__ || MONODROID || __ANDROID__ || NETFX_CORE)
+                System.Diagnostics.Debug.WriteLine(logText);
+				#else
 				try
 				{
-					if (_pubnubLog != null)
-					{
-						_pubnubLog.WriteToLog(logText);
-					}
+					Trace.WriteLine(logText);
+					Trace.Flush();
 				}
-				catch(Exception ex) {
-					System.Diagnostics.Debug.WriteLine(ex.ToString());
-				}
+				catch { }
+				#endif
 			}
 		}
 	}
+
 	#endregion
 }
 

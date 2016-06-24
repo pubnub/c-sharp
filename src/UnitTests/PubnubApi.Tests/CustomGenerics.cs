@@ -323,7 +323,7 @@ namespace PubNubMessaging.Tests
             mreWaitTimeout = (unitTest.EnableStubTest) ? 1000 : mreWaitTimeout;
 
             //WHEN USING BOTH PRESENCE AND SUBSCRIBE REQUESTS, FIRST DO PRESENCE THEN SUBSCRIBE
-            string channel = "";
+            string channel = "ch1";
             string channelGroup = "cg1";
             mrePresence = new ManualResetEvent(false);
             mreConnect = new ManualResetEvent(false);

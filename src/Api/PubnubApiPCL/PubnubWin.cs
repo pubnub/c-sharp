@@ -74,7 +74,7 @@ namespace PubnubApi
 
 		#region "Constructors and destructors"
 
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID && !NETFX_CORE)
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !NETFX_CORE)
 //        ~PubnubWin()
 //		{
 //			//detach
@@ -133,7 +133,7 @@ namespace PubnubApi
 
 		protected override void GeneratePowerSuspendEvent ()
         {
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID && !NETFX_CORE)
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !NETFX_CORE)
 
 //            PowerModeChangedEventArgs powerChangeEvent = new PowerModeChangedEventArgs(PowerModes.Suspend);
 //            SystemEvents_PowerModeChanged(null, powerChangeEvent);
@@ -143,7 +143,7 @@ namespace PubnubApi
 
 		protected override void GeneratePowerResumeEvent ()
         {
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID && !NETFX_CORE)
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !NETFX_CORE)
 //            PowerModeChangedEventArgs powerChangeEvent = new PowerModeChangedEventArgs(PowerModes.Resume);
 //            SystemEvents_PowerModeChanged(null, powerChangeEvent);
 #endif
@@ -941,7 +941,7 @@ namespace PubnubApi
 
 		private void InitiatePowerModeCheck()
         {
-//#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID && !NETFX_CORE)
+//#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !NETFX_CORE)
 //			try
 //			{
 //				SystemEvents.PowerModeChanged += new PowerModeChangedEventHandler(SystemEvents_PowerModeChanged);
@@ -955,7 +955,7 @@ namespace PubnubApi
 //#endif
         }
 
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID && !NETFX_CORE)
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !NETFX_CORE)
 //		void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
 //		{
 //			if (e.Mode == PowerModes.Suspend)
@@ -1030,7 +1030,7 @@ namespace PubnubApi
 //		}
 #endif
 
-#if (__MonoCS__ && !UNITY_ANDROID && !UNITY_IOS) 
+#if (__MonoCS__) 
 //		string CreateRequest(Uri requestUri)
 //		{
 //			StringBuilder requestBuilder = new StringBuilder();
@@ -1192,7 +1192,7 @@ namespace PubnubApi
 //		{
 //#if(MONODROID || __ANDROID__)
 //			SslStream sslStream = new SslStream(netStream, true, Validator, null);
-//#elif(UNITY_ANDROID|| MONOTOUCH || __IOS__)
+//#elif(MONOTOUCH || __IOS__)
 //			ServicePointManager.ServerCertificateValidationCallback = ValidatorUnity;
 //			SslStream sslStream = new SslStream(netStream, true, ValidatorUnity, null);
 //#else
@@ -1214,7 +1214,7 @@ namespace PubnubApi
 //
 //			sslStream.Write(sendBuffer);
 //			sslStream.Flush();
-//#if(!MONODROID && !__ANDROID__ && !UNITY_ANDROID)         
+//#if(!MONODROID && !__ANDROID__)         
 //			sslStream.ReadTimeout = state.RequestState.Request.Timeout;
 //#endif
 //			sslStream.BeginRead(state.buffer, 0, state.buffer.Length, new AsyncCallback(SendRequestUsingTcpClientCallback<T>), state);
@@ -1269,7 +1269,7 @@ namespace PubnubApi
 //			System.IO.StreamWriter streamWriter = new System.IO.StreamWriter(netStream);
 //			streamWriter.Write(requestString);
 //			streamWriter.Flush();
-//#if(!MONODROID && !__ANDROID__ && !UNITY_ANDROID)
+//#if(!MONODROID && !__ANDROID__)
 //			netStream.ReadTimeout = pubnubRequestState.Request.Timeout;
 //#endif
 //			netStream.BeginRead(state.buffer, 0, state.buffer.Length, new AsyncCallback(SendRequestUsingTcpClientCallback<T>), state);
@@ -1280,7 +1280,7 @@ namespace PubnubApi
 //		{
 //			TcpClient tcpClient = new TcpClient();
 //			tcpClient.NoDelay = false;
-//#if(!MONODROID && !__ANDROID__ && !UNITY_ANDROID)
+//#if(!MONODROID && !__ANDROID__)
 //			tcpClient.SendTimeout = pubnubRequestState.Request.Timeout;
 //#endif          
 //
@@ -1415,7 +1415,7 @@ namespace PubnubApi
 		}
 #endif
 
-#if(UNITY_ANDROID || MONOTOUCH || __IOS__)      
+#if(MONOTOUCH || __IOS__)      
 		/// <summary>
 		/// Workaround for the bug described here 
 		/// https://bugzilla.xamarin.com/show_bug.cgi?id=6501
@@ -1488,7 +1488,7 @@ namespace PubnubApi
         #endregion
 
         #region "Nested Classes"
-#if (__MonoCS__ && !UNITY_ANDROID && !UNITY_IOS)
+#if (__MonoCS__)
 //		class StateObject<T>
 //		{
 //			public RequestState<T> RequestState

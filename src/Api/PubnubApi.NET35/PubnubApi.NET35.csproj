@@ -67,66 +67,6 @@
     <Compile Include="..\PubnubApi\ClientNetworkStatus.cs">
       <Link>ClientNetworkStatus.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\Consumer\Ack\AddChannelToChannelGroupAck.cs">
-      <Link>Consumer\Ack\AddChannelToChannelGroupAck.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Consumer\Ack\AuditAck.cs">
-      <Link>Consumer\Ack\AuditAck.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Consumer\Ack\AuditAckPayload.cs">
-      <Link>Consumer\Ack\AuditAckPayload.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Consumer\Ack\ConnectOrDisconnectAck.cs">
-      <Link>Consumer\Ack\ConnectOrDisconnectAck.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Consumer\Ack\DetailedHistoryAck.cs">
-      <Link>Consumer\Ack\DetailedHistoryAck.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Consumer\Ack\GetAllChannelGroupsAck.cs">
-      <Link>Consumer\Ack\GetAllChannelGroupsAck.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Consumer\Ack\GetAllNamespacesAck.cs">
-      <Link>Consumer\Ack\GetAllNamespacesAck.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Consumer\Ack\GetChannelGroupChannelsAck.cs">
-      <Link>Callback\GetChannelGroupChannelsAck.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Consumer\Ack\GetUserStateAck.cs">
-      <Link>Consumer\Ack\GetUserStateAck.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Consumer\Ack\GlobalHereNowAck.cs">
-      <Link>Consumer\Ack\GlobalHereNowAck.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Consumer\Ack\GrantAck.cs">
-      <Link>Consumer\Ack\GrantAck.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Consumer\Ack\GrantAckPayload.cs">
-      <Link>Consumer\Ack\GrantAckPayload.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Consumer\Ack\HereNowAck.cs">
-      <Link>Consumer\Ack\HereNowAck.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Consumer\Ack\PresenceAck.cs">
-      <Link>Consumer\Ack\PresenceAck.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Consumer\Ack\PublishAck.cs">
-      <Link>Consumer\Ack\PublishAck.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Consumer\Ack\RemoveChannelFromChannelGroupAck.cs">
-      <Link>Consumer\Ack\RemoveChannelFromChannelGroupAck.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Consumer\Ack\RemoveChannelGroupAck.cs">
-      <Link>Consumer\Ack\RemoveChannelGroupAck.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Consumer\Ack\RemoveNamespaceAck.cs">
-      <Link>Consumer\Ack\RemoveNamespaceAck.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Consumer\Ack\SetUserStateAck.cs">
-      <Link>Consumer\Ack\SetUserStateAck.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Consumer\Ack\WhereNowAck.cs">
-      <Link>Consumer\Ack\WhereNowAck.cs</Link>
-    </Compile>
     <Compile Include="..\PubnubApi\Enum\PNHeartbeatNotificationOption.cs">
       <Link>Enum\PNHeartbeatNotificationOption.cs</Link>
     </Compile>
@@ -142,6 +82,27 @@
     <Compile Include="..\PubnubApi\Enum\PushTypeService.cs">
       <Link>Enum\PushTypeService.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Http\PubnubWebAsyncResult.cs">
+      <Link>Http\PubnubWebAsyncResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Http\PubnubWebRequest.cs">
+      <Link>Http\PubnubWebRequest.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Http\PubnubWebRequestBase.cs">
+      <Link>Http\PubnubWebRequestBase.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Http\PubnubWebRequestCreator.cs">
+      <Link>Http\PubnubWebRequestCreator.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Http\PubnubWebRequestCreatorBase.cs">
+      <Link>Http\PubnubWebRequestCreatorBase.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Http\PubnubWebResponse.cs">
+      <Link>Http\PubnubWebResponse.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Http\PubnubWebResponseBase.cs">
+      <Link>Http\PubnubWebResponseBase.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\Interface\IJsonPluggableLibrary.cs">
       <Link>Interface\IJsonPluggableLibrary.cs</Link>
     </Compile>
@@ -151,20 +112,92 @@
     <Compile Include="..\PubnubApi\Interface\ResponseType.cs">
       <Link>Interface\ResponseType.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\InternetState.cs">
-      <Link>InternetState.cs</Link>
+    <Compile Include="..\PubnubApi\Log\LoggingMethod.cs">
+      <Link>Log\LoggingMethod.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\LoggingMethod.cs">
-      <Link>LoggingMethod.cs</Link>
+    <Compile Include="..\PubnubApi\Model\Consumer\Ack\AddChannelToChannelGroupAck.cs">
+      <Link>Model\Consumer\Ack\AddChannelToChannelGroupAck.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\MD5.cs">
-      <Link>MD5.cs</Link>
+    <Compile Include="..\PubnubApi\Model\Consumer\Ack\AuditAck.cs">
+      <Link>Model\Consumer\Ack\AuditAck.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\MD5CryptoServiceProvider.cs">
-      <Link>MD5CryptoServiceProvider.cs</Link>
+    <Compile Include="..\PubnubApi\Model\Consumer\Ack\AuditAckPayload.cs">
+      <Link>Model\Consumer\Ack\AuditAckPayload.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\Message.cs">
-      <Link>Message.cs</Link>
+    <Compile Include="..\PubnubApi\Model\Consumer\Ack\ConnectOrDisconnectAck.cs">
+      <Link>Model\Consumer\Ack\ConnectOrDisconnectAck.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Ack\DetailedHistoryAck.cs">
+      <Link>Model\Consumer\Ack\DetailedHistoryAck.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Ack\GetAllChannelGroupsAck.cs">
+      <Link>Model\Consumer\Ack\GetAllChannelGroupsAck.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Ack\GetAllNamespacesAck.cs">
+      <Link>Model\Consumer\Ack\GetAllNamespacesAck.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Ack\GetChannelGroupChannelsAck.cs">
+      <Link>Model\Consumer\Ack\GetChannelGroupChannelsAck.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Ack\GetUserStateAck.cs">
+      <Link>Model\Consumer\Ack\GetUserStateAck.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Ack\GlobalHereNowAck.cs">
+      <Link>Model\Consumer\Ack\GlobalHereNowAck.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Ack\GrantAck.cs">
+      <Link>Model\Consumer\Ack\GrantAck.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Ack\GrantAckPayload.cs">
+      <Link>Model\Consumer\Ack\GrantAckPayload.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Ack\HereNowAck.cs">
+      <Link>Model\Consumer\Ack\HereNowAck.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Ack\Message.cs">
+      <Link>Model\Consumer\Ack\Message.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Ack\PresenceAck.cs">
+      <Link>Model\Consumer\Ack\PresenceAck.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Ack\PublishAck.cs">
+      <Link>Model\Consumer\Ack\PublishAck.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Ack\PubnubClientError.cs">
+      <Link>Model\Consumer\Ack\PubnubClientError.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Ack\RemoveChannelFromChannelGroupAck.cs">
+      <Link>Model\Consumer\Ack\RemoveChannelFromChannelGroupAck.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Ack\RemoveChannelGroupAck.cs">
+      <Link>Model\Consumer\Ack\RemoveChannelGroupAck.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Ack\RemoveNamespaceAck.cs">
+      <Link>Model\Consumer\Ack\RemoveNamespaceAck.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Ack\SetUserStateAck.cs">
+      <Link>Model\Consumer\Ack\SetUserStateAck.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Ack\WhereNowAck.cs">
+      <Link>Model\Consumer\Ack\WhereNowAck.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\InternetState.cs">
+      <Link>Model\InternetState.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\PubnubErrorCodeDescription.cs">
+      <Link>Model\PubnubErrorCodeDescription.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\PubnubErrorCodeHelper.cs">
+      <Link>Model\PubnubErrorCodeHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\PubnubErrorFilter.cs">
+      <Link>Model\PubnubErrorFilter.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\ReconnectState.cs">
+      <Link>Model\ReconnectState.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\RequestState.cs">
+      <Link>Model\RequestState.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\NewtonsoftJsonDotNet.cs">
       <Link>NewtonsoftJsonDotNet.cs</Link>
@@ -172,53 +205,14 @@
     <Compile Include="..\PubnubApi\PNConfiguration.cs">
       <Link>PNConfiguration.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Proxy\PubnubProxy.cs">
+      <Link>Proxy\PubnubProxy.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\Pubnub.cs">
       <Link>Pubnub.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\PubnubClientError.cs">
-      <Link>PubnubClientError.cs</Link>
-    </Compile>
     <Compile Include="..\PubnubApi\PubnubCore.cs">
       <Link>PubnubCore.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\PubnubCrypto.cs">
-      <Link>PubnubCrypto.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\PubnubCryptoBase.cs">
-      <Link>PubnubCryptoBase.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\PubnubErrorCodeDescription.cs">
-      <Link>PubnubErrorCodeDescription.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\PubnubErrorCodeHelper.cs">
-      <Link>PubnubErrorCodeHelper.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\PubnubErrorFilter.cs">
-      <Link>PubnubErrorFilter.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\PubnubProxy.cs">
-      <Link>PubnubProxy.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\PubnubWebAsyncResult.cs">
-      <Link>PubnubWebAsyncResult.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\PubnubWebRequest.cs">
-      <Link>PubnubWebRequest.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\PubnubWebRequestBase.cs">
-      <Link>PubnubWebRequestBase.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\PubnubWebRequestCreator.cs">
-      <Link>PubnubWebRequestCreator.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\PubnubWebRequestCreatorBase.cs">
-      <Link>PubnubWebRequestCreatorBase.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\PubnubWebResponse.cs">
-      <Link>PubnubWebResponse.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\PubnubWebResponseBase.cs">
-      <Link>PubnubWebResponseBase.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\PubnubWin.cs">
       <Link>PubnubWin.cs</Link>
@@ -235,11 +229,17 @@
     <Compile Include="..\PubnubApi\Push\Mpns\MpnsToastNotification.cs">
       <Link>Push\Mpns\MpnsToastNotification.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\ReconnectState.cs">
-      <Link>ReconnectState.cs</Link>
+    <Compile Include="..\PubnubApi\Security\MD5.cs">
+      <Link>Security\MD5.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\RequestState.cs">
-      <Link>RequestState.cs</Link>
+    <Compile Include="..\PubnubApi\Security\MD5CryptoServiceProvider.cs">
+      <Link>Security\MD5CryptoServiceProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Security\PubnubCrypto.cs">
+      <Link>Security\PubnubCrypto.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Security\PubnubCryptoBase.cs">
+      <Link>Security\PubnubCryptoBase.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

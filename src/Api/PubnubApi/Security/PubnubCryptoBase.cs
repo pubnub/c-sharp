@@ -107,10 +107,6 @@ namespace PubnubApi
         /// </param>
         protected string EncodeNonAsciiCharacters(string value)
         {
-#if (USE_JSONFX || USE_JSONFX_FOR_UNITY)
-			value = ConvertHexToUnicodeChars(value);
-#endif
-
             StringBuilder sb = new StringBuilder();
             foreach (char c in value)
             {
@@ -160,7 +156,5 @@ namespace PubnubApi
             }
 #endif
         }
-
-
     }
 }

@@ -34,7 +34,7 @@ namespace PubnubApi
 		#if (SILVERLIGHT  || WINDOWS_PHONE)
 		private static ManualResetEvent mres = new ManualResetEvent(false);
 		private static ManualResetEvent mreSocketAsync = new ManualResetEvent(false);
-		#elif(!UNITY_IOS && !UNITY_ANDROID)
+		#else
 		private static ManualResetEventSlim mres = new ManualResetEventSlim(false);
 		#endif
 		internal static bool SimulateNetworkFailForTesting
@@ -62,11 +62,11 @@ namespace PubnubApi
 				_machineSuspendMode = value;
 			}
 		}
-		#if(__MonoCS__ && !UNITY_IOS && !UNITY_ANDROID)
+		#if(__MonoCS__)
 		static UdpClient udp;
 		#endif
 
-		#if(UNITY_IOS || UNITY_ANDROID || __MonoCS__)
+		#if(__MonoCS__)
 		static HttpWebRequest request;
 		static WebResponse response;
 		internal static int HeartbeatInterval {
@@ -120,7 +120,7 @@ namespace PubnubApi
 			state.ErrorCallback = errorCallback;
 			state.Channels = channels;
             state.ChannelGroups = channelGroups;
-            #if (UNITY_ANDROID || UNITY_IOS || NETFX_CORE)
+            #if (NETFX_CORE)
             CheckSocketConnect(state);
 			#elif(__MonoCS__)
 			CheckSocketConnect(state);
@@ -130,7 +130,7 @@ namespace PubnubApi
 
 			#if (SILVERLIGHT || WINDOWS_PHONE)
 			mres.WaitOne();
-			#elif(!UNITY_ANDROID && !UNITY_IOS)
+			#else
 			mres.Wait();
 			#endif
 		}
@@ -159,30 +159,6 @@ namespace PubnubApi
 				}
                 #elif NETFX_CORE
                 CheckSocketConnectAsync();
-                #elif (UNITY_IOS || UNITY_ANDROID)
-				request = (HttpWebRequest)WebRequest.Create("http://pubsub.pubnub.com");
-				if(request!= null){
-					request.Timeout = HeartbeatInterval * 1000;
-					request.ContentType = "application/json";
-					response = request.GetResponse ();
-					if(response != null){
-						if(((HttpWebResponse)response).ContentLength <= 0){
-							_status = false;
-							throw new Exception("Failed to connect");
-						} else {
-							using(Stream dataStream = response.GetResponseStream ()){
-								using(StreamReader reader = new StreamReader (dataStream)){
-									string responseFromServer = reader.ReadToEnd ();
-									LoggingMethod.WriteToLog(string.Format("DateTime {0}, Response:{1}", DateTime.Now.ToString(), responseFromServer), LoggingMethod.LevelInfo);
-									_status = true;
-									callback(true);
-									reader.Close();
-								}
-								dataStream.Close();
-							}
-						}
-					} 
-				}
 				#elif(__MonoCS__)
 				udp = new UdpClient("pubsub.pubnub.com", 80);
 				IPAddress localAddress = ((IPEndPoint)udp.Client.LocalEndPoint).Address;
@@ -206,18 +182,6 @@ namespace PubnubApi
 				}
 				#endif
 			}
-			#if (UNITY_IOS || UNITY_ANDROID)
-			catch (WebException webEx){
-
-				if(webEx.Message.Contains("404")){
-					_status =true;
-					callback(true);
-				} else {
-					_status =false;
-					ParseCheckSocketConnectException<T>(webEx, channels, errorCallback, callback);
-				}
-			}
-			#endif
 			catch (Exception ex)
 			{
 				#if(__MonoCS__)
@@ -227,28 +191,13 @@ namespace PubnubApi
 			}
 			finally
 			{
-				#if (UNITY_IOS || UNITY_ANDROID)
-				if(response!=null){
-					response.Close();
-
-					response = null;
-				}
-
-				if(request!=null){
-					request = null;
-				}
-				#elif(__MonoCS__)
+				#if(__MonoCS__)
 				if(udp!=null){
 					udp.Close();
 				}
 				#endif
-				#if(UNITY_IOS)
-				GC.Collect();
-				#endif
 			}
-			#if (!UNITY_ANDROID && !UNITY_IOS)
 			mres.Set();
-			#endif
 		}
 
 #if NETFX_CORE
@@ -338,4 +287,3 @@ namespace PubnubApi
 	}
 	#endregion
 }
-

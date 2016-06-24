@@ -13,7 +13,7 @@ namespace PubnubApi
 
         protected override string ComputeHashRaw(string input)
         {
-#if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || __IOS__ || MONODROID || __ANDROID__ || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
+#if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || __IOS__ || MONODROID || __ANDROID__ )
             HashAlgorithm algorithm = new System.Security.Cryptography.SHA256Managed();
 #elif NETFX_CORE
             HashAlgorithmProvider algorithm = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha256);
