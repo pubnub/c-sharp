@@ -804,6 +804,14 @@ namespace PubNubMessaging.Core
                 pubnub.AddPayloadToPublishResponse = value;
             }
         }
+
+        public string Version
+        {
+            get
+            {
+                return pubnub.Version;
+            }
+        }
 		#endregion
 
 		#region "Constructors"
