@@ -810,11 +810,18 @@ namespace PubNubMessaging.Core
             }
         }
 
-		#endregion
+        public string Version
+        {
+            get
+            {
+                return pubnub.Version;
+            }
+        }
+        #endregion
 
-		#region "Constructors"
+        #region "Constructors"
 
-		public Pubnub(string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
+        public Pubnub(string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
 		{
 			pubnub = new PubnubWin (publishKey, subscribeKey, secretKey, cipherKey, sslOn);
 		}

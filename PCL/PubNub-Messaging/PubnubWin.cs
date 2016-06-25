@@ -1445,14 +1445,14 @@ namespace PubNubMessaging.Core
         {
         }
 
-        public PubnubWebRequestCreator(IPubnubUnitTest pubnubUnitTest)
-            : base(pubnubUnitTest)
+        public PubnubWebRequestCreator(IPubnubUnitTest pubnubUnitTest, string pnSdk)
+            : base(pubnubUnitTest, pnSdk)
         {
         }
 
 		protected HttpWebRequest SetUserAgent(HttpWebRequest req, bool keepAliveRequest)
 		{
-			req.Headers["UserAgent"] = string.Format("ua_string=({0}) PubNub-csharp/3.7", "PCL"); 
+			req.Headers["UserAgent"] = string.Format("ua_string=({0}) {1}", "PCL", base.Version); 
 			return req;
 		}
 
