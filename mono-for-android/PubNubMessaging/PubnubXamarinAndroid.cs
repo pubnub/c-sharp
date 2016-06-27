@@ -1,5 +1,4 @@
-//ver3.7.0
-//Build Date: Apr 07, 2015
+//Build Date: June 25,2016
 //#define USE_JSONFX
 using System;
 using System.Text;
@@ -708,7 +707,6 @@ namespace PubNubMessaging.Core
 
         protected override sealed void Init (string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
         {
-            base.Version = "PubNub-CSharp-Xamarin.Android/3.7";
             LoggingMethod.LogLevel = pubnubLogLevel;
             base.PubnubLogLevel = pubnubLogLevel;
             base.PubnubErrorLevel = errorLevel;
@@ -728,8 +726,6 @@ namespace PubNubMessaging.Core
             LoggingMethod.WriteToLog ("Using NewtonsoftJsonDotNet", LoggingMethod.LevelInfo);
             base.JsonPluggableLibrary = new NewtonsoftJsonDotNet ();
             #endif
-
-            LoggingMethod.WriteToLog ("Ver 3.7.0, Build Date: Apr, 2015", LoggingMethod.LevelInfo);
 
             base.publishKey = publishKey;
             base.subscribeKey = subscribeKey;
@@ -1309,7 +1305,7 @@ namespace PubNubMessaging.Core
         {
         }
 
-        public PubnubWebRequestCreator (IPubnubUnitTest pubnubUnitTest) : base (pubnubUnitTest)
+        public PubnubWebRequestCreator (IPubnubUnitTest pubnubUnitTest, string pnSdk) : base (pubnubUnitTest, pnSdk)
         {
         }
 
@@ -1331,7 +1327,7 @@ namespace PubNubMessaging.Core
         protected HttpWebRequest SetUserAgent (HttpWebRequest req, bool keepAliveRequest, OperatingSystem userOS)
         {
             req.KeepAlive = keepAliveRequest;
-            req.UserAgent = string.Format ("ua_string=({0}) PubNub-csharp-Xamarin.Android/3.7", userOS.VersionString);
+            req.UserAgent = string.Format ("ua_string=({0}) {1}", userOS.VersionString, base.Version);
             return req;
         }
 
