@@ -804,11 +804,19 @@ namespace PubNubMessaging.Core
                 pubnub.AddPayloadToPublishResponse = value;
             }
         }
-		#endregion
 
-		#region "Constructors"
+        public string Version
+        {
+            get
+            {
+                return pubnub.Version;
+            }
+        }
+        #endregion
 
-		public Pubnub(string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
+        #region "Constructors"
+
+        public Pubnub(string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
 		{
 			pubnub = new PubnubMonoLinux (publishKey, subscribeKey, secretKey, cipherKey, sslOn);
 		}
