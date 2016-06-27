@@ -1,4 +1,4 @@
-﻿//Build Date: Mar 28, 2016
+﻿//Build Date: June 25, 2016
 using System;
 using System.Text;
 using System.IO;
@@ -1521,31 +1521,31 @@ namespace PubNubMessaging.Core
     #region "PubnubWebRequestCreator"
     internal class PubnubWebRequestCreator : PubnubWebRequestCreatorBase
     {
-
         public PubnubWebRequestCreator()
             : base()
         {
         }
 
-        public PubnubWebRequestCreator(IPubnubUnitTest pubnubUnitTest)
-            : base(pubnubUnitTest)
+        public PubnubWebRequestCreator(IPubnubUnitTest pubnubUnitTest, string pnSdk)
+            : base(pubnubUnitTest, pnSdk)
         {
         }
+
 
 #if NETFX_CORE
         protected HttpWebRequest SetUserAgent(HttpWebRequest req, bool keepAliveRequest)
         {
-            req.Headers["UserAgent"] = string.Format("ua_string=({0} {1}) PubNub-csharp/3.6", "WindowsStore", "Win8.1"); 
+            req.Headers["UserAgent"] = string.Format("ua_string=({0} {1}) {2}", "WindowsStore", "Win8.1", base.Version); 
             return req;
         }
 #else
         protected HttpWebRequest SetUserAgent(HttpWebRequest req, bool keepAliveRequest, OperatingSystem userOS)
         {
-            #if (SILVERLIGHT || WINDOWS_PHONE)
-            req.Headers["UserAgent"] = string.Format("ua_string=({0} {1}) PubNub-csharp/3.6", userOS.Platform.ToString(), userOS.Version.ToString());
-            #else
-			req.KeepAlive = keepAliveRequest;
-			req.UserAgent = string.Format("ua_string=({0}) PubNub-csharp/3.6", userOS.VersionString);
+#if (SILVERLIGHT || WINDOWS_PHONE)
+            req.Headers["UserAgent"] = string.Format("ua_string=({0} {1}) {2}", userOS.Platform.ToString(), userOS.Version.ToString(), base.Version);
+#else
+            req.KeepAlive = keepAliveRequest;
+			req.UserAgent = string.Format("ua_string=({0}) {1}", userOS.VersionString, base.Version);
             #endif
             return req;
         }
