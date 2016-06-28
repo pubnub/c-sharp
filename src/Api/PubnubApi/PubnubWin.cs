@@ -84,7 +84,7 @@ namespace PubnubApi
 
 		#region "Constructors and destructors"
 
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID && !NETFX_CORE)
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !NETFX_CORE)
         ~PubnubWin()
 		{
 			//detach
@@ -143,7 +143,7 @@ namespace PubnubApi
         }
 		protected override void GeneratePowerSuspendEvent ()
         {
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID && !NETFX_CORE)
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !NETFX_CORE)
 
             PowerModeChangedEventArgs powerChangeEvent = new PowerModeChangedEventArgs(PowerModes.Suspend);
             SystemEvents_PowerModeChanged(null, powerChangeEvent);
@@ -153,7 +153,7 @@ namespace PubnubApi
 
 		protected override void GeneratePowerResumeEvent ()
         {
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID && !NETFX_CORE)
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !NETFX_CORE)
             PowerModeChangedEventArgs powerChangeEvent = new PowerModeChangedEventArgs(PowerModes.Resume);
             SystemEvents_PowerModeChanged(null, powerChangeEvent);
 #endif
@@ -165,17 +165,8 @@ namespace PubnubApi
 		#region "Overridden methods"
 		protected override sealed void Init()
 		{
-
-			#if (USE_JSONFX)
-			LoggingMethod.WriteToLog("Using USE_JSONFX", LoggingMethod.LevelInfo);
-			this.JsonPluggableLibrary = new JsonFXDotNet();
-			#elif (USE_DOTNET_SERIALIZATION)
-			LoggingMethod.WriteToLog("Using USE_DOTNET_SERIALIZATION", LoggingMethod.LevelInfo);
-			this.JsonPluggableLibrary = new JscriptSerializer();   
-			#else
 			LoggingMethod.WriteToLog("Using NewtonsoftJsonDotNet", LoggingMethod.LevelInfo);
 			base.JsonPluggableLibrary = new NewtonsoftJsonDotNet();
-			#endif
 
             //base.SubscribeMessageType = new PubnubSubscribeMessageType();
 
@@ -263,7 +254,7 @@ namespace PubnubApi
                     }
                 }
             }
-#elif ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID)
+#elif ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE)
             // Force canonical path and query
             string paq = requestUri.PathAndQuery;
             FieldInfo flagsFieldInfo = typeof(Uri).GetField("m_Flags", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -1028,7 +1019,7 @@ namespace PubnubApi
 
 		private void InitiatePowerModeCheck()
         {
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID && !NETFX_CORE)
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !NETFX_CORE)
 			try
 			{
 				SystemEvents.PowerModeChanged += new PowerModeChangedEventHandler(SystemEvents_PowerModeChanged);
@@ -1042,7 +1033,7 @@ namespace PubnubApi
 #endif
         }
 
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID && !NETFX_CORE)
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !NETFX_CORE)
 		void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
 		{
 			if (e.Mode == PowerModes.Suspend)
@@ -1121,7 +1112,7 @@ namespace PubnubApi
 		}
 #endif
 
-#if (__MonoCS__ && !UNITY_ANDROID && !UNITY_IOS) 
+#if (__MonoCS__) 
 		string CreateRequest(Uri requestUri)
 		{
 			StringBuilder requestBuilder = new StringBuilder();
@@ -1283,7 +1274,7 @@ namespace PubnubApi
 		{
 #if(MONODROID || __ANDROID__)
 			SslStream sslStream = new SslStream(netStream, true, Validator, null);
-#elif(UNITY_ANDROID|| MONOTOUCH || __IOS__)
+#elif(MONOTOUCH || __IOS__)
 			ServicePointManager.ServerCertificateValidationCallback = ValidatorUnity;
 			SslStream sslStream = new SslStream(netStream, true, ValidatorUnity, null);
 #else
@@ -1305,7 +1296,7 @@ namespace PubnubApi
 
 			sslStream.Write(sendBuffer);
 			sslStream.Flush();
-#if(!MONODROID && !__ANDROID__ && !UNITY_ANDROID)         
+#if(!MONODROID && !__ANDROID__)         
 			sslStream.ReadTimeout = state.RequestState.Request.Timeout;
 #endif
 			sslStream.BeginRead(state.buffer, 0, state.buffer.Length, new AsyncCallback(SendRequestUsingTcpClientCallback<T>), state);
@@ -1360,7 +1351,7 @@ namespace PubnubApi
 			System.IO.StreamWriter streamWriter = new System.IO.StreamWriter(netStream);
 			streamWriter.Write(requestString);
 			streamWriter.Flush();
-#if(!MONODROID && !__ANDROID__ && !UNITY_ANDROID)
+#if(!MONODROID && !__ANDROID__)
 			netStream.ReadTimeout = pubnubRequestState.Request.Timeout;
 #endif
 			netStream.BeginRead(state.buffer, 0, state.buffer.Length, new AsyncCallback(SendRequestUsingTcpClientCallback<T>), state);
@@ -1371,7 +1362,7 @@ namespace PubnubApi
 		{
 			TcpClient tcpClient = new TcpClient();
 			tcpClient.NoDelay = false;
-#if(!MONODROID && !__ANDROID__ && !UNITY_ANDROID)
+#if(!MONODROID && !__ANDROID__)
 			tcpClient.SendTimeout = pubnubRequestState.Request.Timeout;
 #endif          
 
@@ -1506,7 +1497,7 @@ namespace PubnubApi
 		}
 #endif
 
-#if(UNITY_ANDROID || MONOTOUCH || __IOS__)      
+#if(MONOTOUCH || __IOS__)      
 		/// <summary>
 		/// Workaround for the bug described here 
 		/// https://bugzilla.xamarin.com/show_bug.cgi?id=6501
@@ -1579,7 +1570,7 @@ namespace PubnubApi
         #endregion
 
         #region "Nested Classes"
-#if (__MonoCS__ && !UNITY_ANDROID && !UNITY_IOS)
+#if (__MonoCS__)
 		class StateObject<T>
 		{
 			public RequestState<T> RequestState
@@ -1600,392 +1591,5 @@ namespace PubnubApi
         #endregion
 
     }
-
-
-    #region "PubnubWebRequestCreator"
-    internal class PubnubWebRequestCreator : PubnubWebRequestCreatorBase
-    {
-
-        public PubnubWebRequestCreator()
-            : base()
-        {
-        }
-
-        public PubnubWebRequestCreator(IPubnubUnitTest pubnubUnitTest)
-            : base(pubnubUnitTest)
-        {
-        }
-
-#if NETFX_CORE
-        protected HttpWebRequest SetUserAgent(HttpWebRequest req, bool keepAliveRequest)
-        {
-            req.Headers["UserAgent"] = string.Format("ua_string=({0} {1}) PubNub-csharp/3.6", "WindowsStore", "Win8.1"); 
-            return req;
-        }
-#else
-        protected HttpWebRequest SetUserAgent(HttpWebRequest req, bool keepAliveRequest, OperatingSystem userOS)
-        {
-            #if (SILVERLIGHT || WINDOWS_PHONE)
-            req.Headers["UserAgent"] = string.Format("ua_string=({0} {1}) PubNub-csharp/3.6", userOS.Platform.ToString(), userOS.Version.ToString());
-            #else
-			req.KeepAlive = keepAliveRequest;
-			req.UserAgent = string.Format("ua_string=({0}) PubNub-csharp/3.6", userOS.VersionString);
-            #endif
-            return req;
-        }
-#endif
-
-        protected override HttpWebRequest SetNoCache(HttpWebRequest req, bool nocache)
-        {
-            if (nocache)
-            {
-                req.Headers["Cache-Control"] = "no-cache";
-                req.Headers["Pragma"] = "no-cache";
-#if (WINDOWS_PHONE)
-                req.Headers[HttpRequestHeader.IfModifiedSince] = DateTime.UtcNow.ToString();
-#endif
-            }
-            return req;
-        }
-
-        protected override WebRequest CreateRequest(Uri uri, bool keepAliveRequest, bool nocache)
-        {
-            HttpWebRequest req = (HttpWebRequest)WebRequest.Create(uri);
-#if NETFX_CORE
-            req = SetUserAgent(req, keepAliveRequest);
-#else
-            OperatingSystem userOS = System.Environment.OSVersion;
-            req = SetUserAgent(req, keepAliveRequest, userOS);
-#endif
-
-            req = SetNoCache(req, nocache);
-            if (this.pubnubUnitTest is IPubnubUnitTest)
-            {
-                return new PubnubWebRequest(req, pubnubUnitTest);
-            }
-            else
-            {
-                return new PubnubWebRequest(req);
-            }
-        }
-
-    }
-    #endregion
-
-    #region "PubnubWebRequest"
-    public class PubnubWebRequest : PubnubWebRequestBase
-    {
-
-#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !NETFX_CORE)
-		public override long ContentLength
-		{
-			get
-			{
-				return request.ContentLength;
-			}
-		}
-#endif
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !NETFX_CORE)
-        private int _timeout;
-		public override int Timeout
-		{
-			get
-			{
-				return _timeout;
-			}
-			set
-			{
-				_timeout = value;
-				if (request != null)
-				{
-					request.Timeout = _timeout;
-				}
-			}
-		}
-
-		public override IWebProxy Proxy
-		{
-			get
-			{
-				return request.Proxy;
-			}
-			set
-			{
-				request.Proxy = value;
-			}
-		}
-
-		public override bool PreAuthenticate
-		{
-			get
-			{
-				return request.PreAuthenticate;
-			}
-			set
-			{
-				request.PreAuthenticate = value;
-			}
-		}
-		public override System.Net.Cache.RequestCachePolicy CachePolicy
-		{
-			get
-			{
-				return request.CachePolicy;
-			}
-		}
-
-		public override string ConnectionGroupName
-		{
-			get
-			{
-				return request.ConnectionGroupName;
-			}
-		}
-#endif
-
-#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !NETFX_CORE)
-        public ServicePoint ServicePoint;
-#endif
-
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !NETFX_CORE)
-        public override WebResponse GetResponse()
-		{
-			return request.GetResponse();
-		}
-#endif
-
-        public PubnubWebRequest(HttpWebRequest request)
-            : base(request)
-        {
-#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !NETFX_CORE)
-			this.ServicePoint = this.request.ServicePoint;
-#endif
-        }
-        public PubnubWebRequest(HttpWebRequest request, IPubnubUnitTest pubnubUnitTest)
-            : base(request, pubnubUnitTest)
-        {
-#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !NETFX_CORE)
-			this.ServicePoint = this.request.ServicePoint;
-#endif
-        }
-    }
-    #endregion
-
-    #region "PubnubWebResponse"
-    public class PubnubWebResponse : PubnubWebResponseBase
-    {
-        public PubnubWebResponse(WebResponse response):base(response)
-        {
-        }
-
-        public PubnubWebResponse(WebResponse response, HttpStatusCode statusCode):base(response,statusCode)
-        {
-        }
-
-        public PubnubWebResponse(Stream responseStream):base(responseStream)
-        {
-        }
-
-        public PubnubWebResponse(Stream responseStream, HttpStatusCode statusCode):base(responseStream, statusCode)
-        {
-        }
-
-        #if !NETFX_CORE
-		public override void Close ()
-		{
-			if (response != null) {
-				response.Close ();
-			}
-		}
-        #endif
-
-    }
-    #endregion
-
-    #region "PubnubCrypto"
-
-    public class PubnubCrypto : PubnubCryptoBase
-    {
-        public PubnubCrypto(string cipher_key)
-            : base(cipher_key)
-        {
-        }
-
-        protected override string ComputeHashRaw(string input)
-        {
-#if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || __IOS__ || MONODROID || __ANDROID__ || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_IOS || UNITY_ANDROID)
-            HashAlgorithm algorithm = new System.Security.Cryptography.SHA256Managed();
-#elif NETFX_CORE
-            HashAlgorithmProvider algorithm = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha256);
-#else
-			HashAlgorithm algorithm = new SHA256CryptoServiceProvider();
-#endif
-
-#if (SILVERLIGHT || WINDOWS_PHONE)
-            Byte[] inputBytes = System.Text.Encoding.UTF8.GetBytes(input);
-#elif NETFX_CORE
-            IBuffer inputBuffer = CryptographicBuffer.ConvertStringToBinary(input, BinaryStringEncoding.Utf8);
-#else
-			Byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
-#endif
-#if NETFX_CORE
-            IBuffer hashedBuffer = algorithm.HashData(inputBuffer);
-            byte[] inputBytes;
-            CryptographicBuffer.CopyToByteArray(hashedBuffer, out inputBytes);
-            return BitConverter.ToString(inputBytes);
-#else
-            Byte[] hashedBytes = algorithm.ComputeHash(inputBytes);
-            return BitConverter.ToString(hashedBytes);
-#endif
-        }
-
-        protected override string EncryptOrDecrypt(bool type, string plainStr)
-        {
-            byte[] cipherText = null;
-
-            #if (SILVERLIGHT || WINDOWS_PHONE)
-                AesManaged aesEncryption = new AesManaged();
-                aesEncryption.KeySize = 256;
-                aesEncryption.BlockSize = 128;
-                //get ASCII bytes of the string
-                aesEncryption.IV = System.Text.Encoding.UTF8.GetBytes("0123456789012345");
-                aesEncryption.Key = System.Text.Encoding.UTF8.GetBytes(GetEncryptionKey());
-            #elif NETFX_CORE
-            SymmetricKeyAlgorithmProvider algoritmProvider = SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithmNames.AesCbcPkcs7);
-            IBuffer keyMaterial = CryptographicBuffer.ConvertStringToBinary(GetEncryptionKey(), BinaryStringEncoding.Utf8);
-            CryptographicKey key = algoritmProvider.CreateSymmetricKey(keyMaterial);
-            IBuffer iv = CryptographicBuffer.ConvertStringToBinary("0123456789012345", BinaryStringEncoding.Utf8);
-            #else
-				RijndaelManaged aesEncryption = new RijndaelManaged();
-				aesEncryption.KeySize = 256;
-				aesEncryption.BlockSize = 128;
-				//Mode CBC
-				aesEncryption.Mode = CipherMode.CBC;
-				//padding
-				aesEncryption.Padding = PaddingMode.PKCS7;
-				//get ASCII bytes of the string
-				aesEncryption.IV = System.Text.Encoding.ASCII.GetBytes("0123456789012345");
-				aesEncryption.Key = System.Text.Encoding.ASCII.GetBytes(GetEncryptionKey());
-            #endif
-
-
-            if (type)
-            {
-                plainStr = EncodeNonAsciiCharacters(plainStr);
-                #if (SILVERLIGHT || WINDOWS_PHONE)
-                ICryptoTransform crypto = aesEncryption.CreateEncryptor();
-                byte[] plainText = Encoding.UTF8.GetBytes(plainStr);
-                
-                //encrypt
-                cipherText = crypto.TransformFinalBlock(plainText, 0, plainText.Length);
-                #elif NETFX_CORE
-                IBuffer buffMsg = CryptographicBuffer.ConvertStringToBinary(plainStr, BinaryStringEncoding.Utf8);
-                IBuffer buffEncrypt = CryptographicEngine.Encrypt(key, buffMsg, iv);
-                CryptographicBuffer.CopyToByteArray(buffEncrypt, out cipherText);
-                #else
-                ICryptoTransform crypto = aesEncryption.CreateEncryptor();
-                byte[] plainText = Encoding.ASCII.GetBytes(plainStr);
-                
-                //encrypt
-                cipherText = crypto.TransformFinalBlock(plainText, 0, plainText.Length);
-                #endif
-
-                return Convert.ToBase64String(cipherText);
-            }
-            else
-            {
-                string decrypted = "";
-                try
-                {
-                    //decode
-                    byte[] decryptedBytes = Convert.FromBase64CharArray(plainStr.ToCharArray(), 0, plainStr.Length);
-
-                    
-                    #if (SILVERLIGHT || WINDOWS_PHONE)
-                    ICryptoTransform decrypto = aesEncryption.CreateDecryptor();
-                    //decrypt
-                    var data = decrypto.TransformFinalBlock(decryptedBytes, 0, decryptedBytes.Length);
-                    decrypted = Encoding.UTF8.GetString(data, 0, data.Length);
-                    #elif NETFX_CORE
-                    IBuffer buffMsg = CryptographicBuffer.DecodeFromBase64String(plainStr);
-                    IBuffer buffDecrypted = CryptographicEngine.Decrypt(key, buffMsg, iv);
-                    CryptographicBuffer.CopyToByteArray(buffDecrypted, out decryptedBytes);
-                    decrypted = Encoding.UTF8.GetString(decryptedBytes, 0, decryptedBytes.Length);
-                    #else
-                    ICryptoTransform decrypto = aesEncryption.CreateDecryptor();
-                    //decrypt                    
-                    decrypted = System.Text.Encoding.ASCII.GetString(decrypto.TransformFinalBlock(decryptedBytes, 0, decryptedBytes.Length));
-                    #endif
-
-                    return decrypted;
-                }
-                catch (Exception ex)
-                {
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0} Decrypt Error. {1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelVerbose);
-                    throw ex;
-                    //LoggingMethod.WriteToLog(string.Format("DateTime {0} Decrypt Error. {1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelVerbose);
-                    //return "**DECRYPT ERROR**";
-                }
-            }
-        }
-
-    }
-
-    #endregion
-
-    #region "MPNS Toast/Tiles"
-    
-    public class MpnsToastNotification
-    {
-        public string type = "toast";
-        public string text1 = "";
-        public string text2 = "";
-        public string param = "";
-    }
-
-    public class MpnsFlipTileNotification
-    {
-        public string type = "flip";
-        public int delay = 0;
-        public string title = "";
-        public int? count = 0;
-        public string small_background_image = "";
-        public string background_image = "";
-        public string back_background_image = "";
-        public string back_content = "";
-        public string back_title = "";
-        public string wide_background_image = "";
-        public string wide_back_background_image = "";
-        public string wide_back_content = "";
-    }
-
-    public class MpnsCycleTileNotification
-    {
-        public string type = "cycle";
-        public int delay = 0;
-        public string title = "";
-        public int? count = 0;
-        public string small_background_image = "";
-        public string[] images = null;
-    }
-
-    public class MpnsIconicTileNotification
-    {
-        public string type = "iconic";
-        public int delay = 0;
-        public string title = "";
-        public int? count = 0;
-        public string icon_image = "";
-        public string small_icon_image = "";
-        public string background_color = "";
-        public string wide_content_1 = "";
-        public string wide_content_2 = "";
-        public string wide_content_3 = "";
-    }
-    
-    #endregion
-
-
-
 }
 

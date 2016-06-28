@@ -225,6 +225,7 @@ namespace PubNubMessaging.Tests
             config.SecretKey = "";
             config.CiperKey = "";
             config.Secure = false;
+            config.Uuid = customUUID;
 
             pubnub = new Pubnub(config);
 
@@ -244,7 +245,7 @@ namespace PubNubMessaging.Tests
             pubnub.Presence(channel, ThenPresenceWithCustomUUIDShouldReturnMessage, PresenceUUIDDummyMethodForConnectCallback, UnsubscribeUUIDDummyMethodForDisconnectCallback, DummyErrorCallback);
             presenceUUIDManualEvent.WaitOne(manualResetEventsWaitTimeout);
             
-            //Thread.Sleep(1000);
+            Thread.Sleep(1000);
             presenceUUIDManualEvent = new ManualResetEvent(false);
             
             //since presence expects from stimulus from sub/unsub...
@@ -254,6 +255,7 @@ namespace PubNubMessaging.Tests
             subscribeUUIDManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             presenceUUIDManualEvent.WaitOne(manualResetEventsWaitTimeout);
+            Thread.Sleep(1000);
 
             pubnub.Unsubscribe<string>(channel, DummyErrorCallback);
             Thread.Sleep(1000);

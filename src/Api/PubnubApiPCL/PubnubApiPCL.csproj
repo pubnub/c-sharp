@@ -34,22 +34,83 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Model\Consumer\Ack\AddChannelToChannelGroupAck.cs" />
+    <Compile Include="Model\Consumer\Ack\AuditAck.cs" />
+    <Compile Include="Model\Consumer\Ack\AuditAckPayload.cs" />
     <Compile Include="ClientNetworkStatus.cs" />
     <Compile Include="ConcurrentDictionary.cs" />
-    <Compile Include="LoggingMethod.cs" />
-    <Compile Include="MD5.cs" />
+    <Compile Include="Model\Consumer\Ack\ConnectOrDisconnectAck.cs" />
+    <Compile Include="Model\Consumer\Ack\DetailedHistoryAck.cs" />
+    <Compile Include="Model\Consumer\Ack\GetAllChannelGroupsAck.cs" />
+    <Compile Include="Model\Consumer\Ack\GetAllNamespacesAck.cs" />
+    <Compile Include="Model\Consumer\Ack\GetChannelGroupChannelsAck.cs" />
+    <Compile Include="Model\Consumer\Ack\GetUserStateAck.cs" />
+    <Compile Include="Model\Consumer\Ack\GlobalHereNowAck.cs" />
+    <Compile Include="Model\Consumer\Ack\GrantAck.cs" />
+    <Compile Include="Model\Consumer\Ack\GrantAckPayload.cs" />
+    <Compile Include="Model\Consumer\Ack\HereNowAck.cs" />
+    <Compile Include="Interface\IJsonPluggableLibrary.cs" />
+    <Compile Include="Model\InternetState.cs" />
+    <Compile Include="Interface\IPubnubLog.cs" />
+    <Compile Include="Interface\IPubnubSubscribeMessageType.cs" />
+    <Compile Include="Interface\IPubnubUnitTest.cs" />
+    <Compile Include="Log\LoggingMethod.cs" />
+    <Compile Include="Security\MD5.cs" />
+    <Compile Include="Security\MD5CryptoServiceProvider.cs" />
+    <Compile Include="Model\Consumer\Ack\Message.cs" />
+    <Compile Include="Push\Mpns\MpnsCycleTileNotification.cs" />
+    <Compile Include="Push\Mpns\MpnsFlipTileNotification.cs" />
+    <Compile Include="Push\Mpns\MpnsIconicTileNotification.cs" />
+    <Compile Include="Push\Mpns\MpnsToastNotification.cs" />
+    <Compile Include="NewtonsoftJsonDotNet.cs" />
+    <Compile Include="Model\Consumer\Ack\PresenceAck.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Model\Consumer\Ack\PublishAck.cs" />
     <Compile Include="Pubnub.cs" />
+    <Compile Include="Callback\PubnubChannelCallbackKey.cs" />
+    <Compile Include="Callback\PubnubChannelGroupCallbackKey.cs" />
+    <Compile Include="Model\Consumer\Ack\PubnubClientError.cs" />
     <Compile Include="PubnubCore.cs" />
+    <Compile Include="Security\PubnubCrypto.cs" />
+    <Compile Include="Security\PubnubCryptoBase.cs" />
+    <Compile Include="Enum\PubnubErrorCode.cs" />
+    <Compile Include="Model\PubnubErrorCodeDescription.cs" />
+    <Compile Include="Model\PubnubErrorCodeHelper.cs" />
+    <Compile Include="Model\PubnubErrorFilter.cs" />
+    <Compile Include="Enum\PubnubErrorSeverity.cs" />
+    <Compile Include="Enum\PubnubMessageSource.cs" />
+    <Compile Include="Callback\PubnubPresenceChannelCallback.cs" />
+    <Compile Include="Callback\PubnubPresenceChannelGroupCallback.cs" />
+    <Compile Include="Proxy\PubnubProxy.cs" />
+    <Compile Include="Callback\PubnubSubscribeChannelCallback.cs" />
+    <Compile Include="Callback\PubnubSubscribeChannelGroupCallback.cs" />
+    <Compile Include="Model\PubnubSubscribeMessageType.cs" />
+    <Compile Include="Http\PubnubWebAsyncResult.cs" />
+    <Compile Include="Http\PubnubWebRequest.cs" />
+    <Compile Include="Http\PubnubWebRequestBase.cs" />
+    <Compile Include="Http\PubnubWebRequestCreator.cs" />
+    <Compile Include="Http\PubnubWebRequestCreatorBase.cs" />
+    <Compile Include="Http\PubnubWebResponse.cs" />
+    <Compile Include="Http\PubnubWebResponseBase.cs" />
     <Compile Include="PubnubWin.cs" />
-    <Compile Include="ReconnectState.cs" />
+    <Compile Include="Enum\PushTypeService.cs" />
+    <Compile Include="Model\ReconnectState.cs" />
+    <Compile Include="Model\Consumer\Ack\RemoveChannelFromChannelGroupAck.cs" />
+    <Compile Include="Model\Consumer\Ack\RemoveChannelGroupAck.cs" />
+    <Compile Include="Model\Consumer\Ack\RemoveNamespaceAck.cs" />
+    <Compile Include="Model\RequestState.cs" />
+    <Compile Include="Enum\ResponseType.cs" />
+    <Compile Include="Model\Consumer\Ack\SetUserStateAck.cs" />
+    <Compile Include="Model\Consumer\Ack\WhereNowAck.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="crypto, Version=1.7.0.0, Culture=neutral, PublicKeyToken=52d7d8cd84e8295f">
+    <Reference Include="crypto, Version=1.7.0.0, Culture=neutral, PublicKeyToken=52d7d8cd84e8295f, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Portable.BouncyCastle-Signed.1.7.0.2\lib\portable-net4+sl5+wp8+win8+wpa81+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10\crypto.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.7.0.1\lib\portable-net40+sl5+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -74,7 +74,7 @@ namespace PubnubApi
 
 		#region "Constructors and destructors"
 
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID && !NETFX_CORE)
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !NETFX_CORE)
 //        ~PubnubWin()
 //		{
 //			//detach
@@ -133,7 +133,7 @@ namespace PubnubApi
 
 		protected override void GeneratePowerSuspendEvent ()
         {
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID && !NETFX_CORE)
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !NETFX_CORE)
 
 //            PowerModeChangedEventArgs powerChangeEvent = new PowerModeChangedEventArgs(PowerModes.Suspend);
 //            SystemEvents_PowerModeChanged(null, powerChangeEvent);
@@ -143,7 +143,7 @@ namespace PubnubApi
 
 		protected override void GeneratePowerResumeEvent ()
         {
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID && !NETFX_CORE)
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !NETFX_CORE)
 //            PowerModeChangedEventArgs powerChangeEvent = new PowerModeChangedEventArgs(PowerModes.Resume);
 //            SystemEvents_PowerModeChanged(null, powerChangeEvent);
 #endif
@@ -155,17 +155,8 @@ namespace PubnubApi
 		#region "Overridden methods"
 		protected override sealed void Init(string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
 		{
-
-			#if (USE_JSONFX)
-			LoggingMethod.WriteToLog("Using USE_JSONFX", LoggingMethod.LevelInfo);
-			this.JsonPluggableLibrary = new JsonFXDotNet();
-			#elif (USE_DOTNET_SERIALIZATION)
-			LoggingMethod.WriteToLog("Using USE_DOTNET_SERIALIZATION", LoggingMethod.LevelInfo);
-			this.JsonPluggableLibrary = new JscriptSerializer();   
-			#else
 			LoggingMethod.WriteToLog("Using NewtonsoftJsonDotNet", LoggingMethod.LevelInfo);
 			base.JsonPluggableLibrary = new NewtonsoftJsonDotNet();
-			#endif
 
 			base.PubnubLogLevel = pubnubLogLevel;
 			base.PubnubErrorLevel = errorLevel;
@@ -950,7 +941,7 @@ namespace PubnubApi
 
 		private void InitiatePowerModeCheck()
         {
-//#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID && !NETFX_CORE)
+//#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !NETFX_CORE)
 //			try
 //			{
 //				SystemEvents.PowerModeChanged += new PowerModeChangedEventHandler(SystemEvents_PowerModeChanged);
@@ -964,7 +955,7 @@ namespace PubnubApi
 //#endif
         }
 
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID && !NETFX_CORE)
+#if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !NETFX_CORE)
 //		void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
 //		{
 //			if (e.Mode == PowerModes.Suspend)
@@ -1039,377 +1030,7 @@ namespace PubnubApi
 //		}
 #endif
 
-#if (__MonoCS__ && !UNITY_ANDROID && !UNITY_IOS) 
-//		string CreateRequest(Uri requestUri)
-//		{
-//			StringBuilder requestBuilder = new StringBuilder();
-//			requestBuilder.Append("GET ");
-//			requestBuilder.Append(requestUri.OriginalString);
-//
-//			if (ssl)
-//			{
-//				requestBuilder.Append(string.Format(" HTTP/1.1\r\nConnection: close\r\nHost: {0}:443\r\n\r\n", this._domainName));
-//			}
-//			else
-//			{
-//				requestBuilder.Append(string.Format(" HTTP/1.1\r\nConnection: close\r\nHost: {0}:80\r\n\r\n", this._domainName));
-//			}
-//			return requestBuilder.ToString();
-//		}
-
-//		void ConnectToHostAndSendRequest<T>(bool sslEnabled, TcpSocketClient tcpClient, RequestState<T> pubnubRequestState, string requestString)
-//		{
-//			Stream stream = tcpClient.ReadStream;
-//
-//			string proxyAuth = string.Format("{0}:{1}", Proxy.ProxyUserName, Proxy.ProxyPassword);
-//			byte[] proxyAuthBytes = Encoding.UTF8.GetBytes(proxyAuth);
-//
-//			//Proxy-Authenticate: authentication mode Basic, Digest and NTLM
-//			string connectRequest = "";
-//			if (sslEnabled)
-//			{
-//				connectRequest = string.Format("CONNECT {0}:443  HTTP/1.1\r\nProxy-Authorization: Basic {1}\r\nHost: {0}\r\n\r\n", this._domainName, Convert.ToBase64String(proxyAuthBytes));
-//			}
-//			else
-//			{
-//				connectRequest = string.Format("CONNECT {0}:80  HTTP/1.1\r\nProxy-Authorization: Basic {1}\r\nHost: {0}\r\n\r\n", this._domainName, Convert.ToBase64String(proxyAuthBytes));
-//			}
-//
-//			byte[] tunnelRequest = Encoding.UTF8.GetBytes(connectRequest);
-//			stream.Write(tunnelRequest, 0, tunnelRequest.Length);
-//			stream.Flush();
-//
-//			stream.ReadTimeout = pubnubRequestState.Request.Timeout * 5;
-//
-//			StateObject<T> state = new StateObject<T>();
-//			state.tcpClient = tcpClient;
-//			state.RequestState = pubnubRequestState;
-//			state.requestString = requestString;
-//			state.netStream = stream;
-//
-//			//stream.BeginRead(state.buffer, 0, state.buffer.Length, new AsyncCallback(ConnectToHostAndSendRequestCallback<T>), state);
-//
-//			StringBuilder response = new StringBuilder();
-//			var responseStream = new StreamReader(stream);
-//
-//			char[] buffer = new char[2048];
-//
-//			int charsRead = responseStream.Read(buffer, 0, buffer.Length);
-//			bool connEstablished = false;
-//			while (charsRead > 0)
-//			{
-//				response.Append(buffer);
-//				if ((response.ToString().IndexOf("200 Connection established") > 0) || (response.ToString().IndexOf("200 OK") > 0))
-//				{
-//					connEstablished = true;
-//					break;
-//				}
-//				charsRead = responseStream.Read(buffer, 0, buffer.Length);
-//			}
-//
-//			if (connEstablished)
-//			{
-//				if (sslEnabled)
-//				{
-//					SendSslRequest<T>(stream, tcpClient, pubnubRequestState, requestString);
-//				}
-//				else
-//				{
-//					SendRequest<T>(tcpClient, pubnubRequestState, requestString);
-//				}
-//
-//			}
-//			else if (response.ToString().IndexOf("407 Proxy Authentication Required") > 0)
-//			{
-//				int pos = response.ToString().IndexOf("Proxy-Authenticate");
-//				string desc = "";
-//				if (pos > 0)
-//				{
-//					desc = response.ToString().Substring(pos, response.ToString().IndexOf("\r\n", pos) - pos);
-//				}
-//				throw new WebException(string.Format("Proxy Authentication Required. Desc: {0}", desc));
-//			}
-//			else
-//			{
-//				throw new WebException("Couldn't connect to the server");
-//			}
-//		}
-
-//		private void ConnectToHostAndSendRequestCallback<T>(IAsyncResult asynchronousResult)
-//		{
-//			StateObject<T> asynchStateObject = asynchronousResult.AsyncState as StateObject<T>;
-//			RequestState<T> asynchRequestState = asynchStateObject.RequestState;
-//
-//			string channels = "";
-//			if (asynchRequestState != null && asynchRequestState.Channels != null)
-//			{
-//				channels = string.Join(",", asynchRequestState.Channels);
-//			}
-//
-//			try
-//			{
-//				string requestString = asynchStateObject.requestString;
-//				TcpClient tcpClient = asynchStateObject.tcpClient;
-//
-//				NetworkStream netStream = asynchStateObject.netStream;
-//				int bytesRead = netStream.EndRead(asynchronousResult);
-//
-//				if (bytesRead > 0)
-//				{
-//					asynchStateObject.sb.Append(Encoding.ASCII.GetString(asynchStateObject.buffer, 0, bytesRead));
-//
-//					netStream.BeginRead(asynchStateObject.buffer, 0, StateObject<T>.BufferSize,
-//					                    new AsyncCallback(ConnectToHostAndSendRequestCallback<T>), asynchStateObject);
-//				}
-//				else
-//				{
-//					string resp = asynchStateObject.sb.ToString();
-//					if (resp.IndexOf("200 Connection established") > 0)
-//					{
-//						SendSslRequest<T>(netStream, tcpClient, asynchRequestState, requestString);
-//					}
-//					else
-//					{
-//						throw new WebException("Couldn't connect to the server");
-//					}
-//				}
-//			}
-//			catch (WebException webEx)
-//			{
-//				if (asynchRequestState != null && asynchRequestState.ErrorCallback != null)
-//				{
-//					Action<PubnubClientError> errorCallback = asynchRequestState.ErrorCallback;
-//
-//					CallErrorCallback (PubnubErrorSeverity.Warn, PubnubMessageSource.Client,
-//					                   channels, errorCallback, webEx, null, null);
-//				}
-//				ProcessResponseCallbackWebExceptionHandler<T>(webEx, asynchRequestState, channels);
-//			}
-//			catch (Exception ex)
-//			{
-//				if (asynchRequestState != null && asynchRequestState.ErrorCallback != null)
-//				{
-//					Action<PubnubClientError> errorCallback = asynchRequestState.ErrorCallback;
-//					CallErrorCallback (PubnubErrorSeverity.Warn, PubnubMessageSource.Client,
-//					                   channels, errorCallback, ex, null, null);
-//				}
-//				ProcessResponseCallbackExceptionHandler<T>(ex, asynchRequestState);
-//			}
-//		}
-
-//		void SendSslRequest<T>(Stream netStream, TcpSocketClient tcpClient, RequestState<T> pubnubRequestState, string requestString)
-//		{
-//#if(MONODROID || __ANDROID__)
-//			SslStream sslStream = new SslStream(netStream, true, Validator, null);
-//#elif(UNITY_ANDROID|| MONOTOUCH || __IOS__)
-//			ServicePointManager.ServerCertificateValidationCallback = ValidatorUnity;
-//			SslStream sslStream = new SslStream(netStream, true, ValidatorUnity, null);
-//#else
-//			SslStream sslStream = new SslStream(netStream);
-//#endif
-//			StateObject<T> state = new StateObject<T>();
-//			state.tcpClient = tcpClient;
-//			state.sslns = sslStream;
-//			state.RequestState = pubnubRequestState;
-//			state.requestString = requestString;
-//			sslStream.AuthenticateAsClient(this._domainName);
-//			AfterAuthentication(state);
-//		}
-
-//		void AfterAuthentication<T> (StateObject<T> state)
-//		{
-//			SslStream sslStream = state.sslns;
-//			byte[] sendBuffer = UTF8Encoding.UTF8.GetBytes(state.requestString);
-//
-//			sslStream.Write(sendBuffer);
-//			sslStream.Flush();
-//#if(!MONODROID && !__ANDROID__ && !UNITY_ANDROID)         
-//			sslStream.ReadTimeout = state.RequestState.Request.Timeout;
-//#endif
-//			sslStream.BeginRead(state.buffer, 0, state.buffer.Length, new AsyncCallback(SendRequestUsingTcpClientCallback<T>), state);
-//		}
-
-//		private void SendSslRequestAuthenticationCallback<T>(IAsyncResult asynchronousResult)
-//		{
-//			StateObject<T> state = asynchronousResult.AsyncState as StateObject<T>;
-//			RequestState<T> asynchRequestState = state.RequestState;
-//			string channels = "";
-//
-//			if (asynchRequestState != null && asynchRequestState.Channels != null)
-//			{
-//				channels = string.Join(",", asynchRequestState.Channels);
-//			}
-//			try{
-//				AfterAuthentication(state);
-//			}
-//			catch (WebException webEx)
-//			{
-//				if (asynchRequestState != null && asynchRequestState.ErrorCallback != null)
-//				{
-//					Action<PubnubClientError> errorCallback = asynchRequestState.ErrorCallback;
-//
-//					CallErrorCallback (PubnubErrorSeverity.Warn, PubnubMessageSource.Client,
-//					                   channels, errorCallback, webEx, null, null);
-//				}
-//				ProcessResponseCallbackWebExceptionHandler<T>(webEx, asynchRequestState, channels);
-//			}
-//			catch (Exception ex)
-//			{
-//				if (asynchRequestState != null && asynchRequestState.ErrorCallback != null)
-//				{
-//					Action<PubnubClientError> errorCallback = asynchRequestState.ErrorCallback;
-//
-//					CallErrorCallback (PubnubErrorSeverity.Warn, PubnubMessageSource.Client,
-//					                   channels, errorCallback, ex, null, null);
-//				}
-//				ProcessResponseCallbackExceptionHandler<T>(ex, asynchRequestState);
-//			}
-//		}
-
-//		void SendRequest<T>(TcpSocketClient tcpClient, RequestState<T> pubnubRequestState, string requestString)
-//		{
-//			Stream netStream = tcpClient.ReadStream();
-//
-//			StateObject<T> state = new StateObject<T>();
-//			state.tcpClient = tcpClient;
-//			state.netStream = netStream;
-//			state.RequestState = pubnubRequestState;
-//
-//			System.IO.StreamWriter streamWriter = new System.IO.StreamWriter(netStream);
-//			streamWriter.Write(requestString);
-//			streamWriter.Flush();
-//#if(!MONODROID && !__ANDROID__ && !UNITY_ANDROID)
-//			netStream.ReadTimeout = pubnubRequestState.Request.Timeout;
-//#endif
-//			netStream.BeginRead(state.buffer, 0, state.buffer.Length, new AsyncCallback(SendRequestUsingTcpClientCallback<T>), state);
-//
-//		}
-
-//		private void SendRequestUsingTcpClient<T>(Uri requestUri, RequestState<T> pubnubRequestState)
-//		{
-//			TcpClient tcpClient = new TcpClient();
-//			tcpClient.NoDelay = false;
-//#if(!MONODROID && !__ANDROID__ && !UNITY_ANDROID)
-//			tcpClient.SendTimeout = pubnubRequestState.Request.Timeout;
-//#endif          
-//
-//			string requestString = CreateRequest(requestUri);
-//
-//			if (ssl)
-//			{
-//				if (pubnubEnableProxyConfig && Proxy != null)
-//				{
-//					tcpClient.Connect(Proxy.ProxyServer, Proxy.ProxyPort);
-//
-//					ConnectToHostAndSendRequest<T>(ssl, tcpClient, pubnubRequestState, requestString);
-//				}
-//				else
-//				{
-//					tcpClient.Connect(this._domainName, 443);
-//					NetworkStream netStream = tcpClient.GetStream();
-//					SendSslRequest<T>(netStream, tcpClient, pubnubRequestState, requestString);
-//				}
-//			}
-//			else
-//			{
-//				if (pubnubEnableProxyConfig && Proxy != null)
-//				{
-//					tcpClient.Connect(Proxy.ProxyServer, Proxy.ProxyPort);
-//
-//					ConnectToHostAndSendRequest(ssl, tcpClient, pubnubRequestState, requestString);
-//				}
-//				else
-//				{
-//					tcpClient.Connect(this._domainName, 80);
-//					SendRequest<T>(tcpClient, pubnubRequestState, requestString);
-//				}
-//			}
-//		}
-//
-//		private void SendRequestUsingTcpClientCallback<T>(IAsyncResult asynchronousResult)
-//		{
-//			StateObject<T> state = asynchronousResult.AsyncState as StateObject<T>;
-//			RequestState<T> asynchRequestState = state.RequestState;
-//			string channel = "";
-//			if (asynchRequestState != null && asynchRequestState.Channels != null)
-//			{
-//				channel = string.Join(",", asynchRequestState.Channels);
-//			}
-//			try
-//			{
-//				//StateObject<T> state = (StateObject<T>) asynchronousResult.AsyncState;
-//				if (ssl)
-//				{
-//					SslStream sslns = state.sslns;
-//					int bytesRead = sslns.EndRead(asynchronousResult);
-//
-//					if (bytesRead > 0)
-//					{
-//						Decoder decoder = Encoding.UTF8.GetDecoder();
-//						char[] chars = new char[decoder.GetCharCount(state.buffer, 0, bytesRead)];
-//						decoder.GetChars(state.buffer, 0, bytesRead, chars, 0);
-//						state.sb.Append(chars);
-//
-//						sslns.BeginRead(state.buffer, 0, StateObject<T>.BufferSize,
-//						                new AsyncCallback(SendRequestUsingTcpClientCallback<T>), state);
-//					}
-//					else
-//					{
-//						HandleTcpClientResponse(state, asynchRequestState, channel, asynchronousResult);
-//					}
-//				}
-//				else
-//				{
-//					NetworkStream netStream = state.netStream;
-//					int bytesRead = netStream.EndRead(asynchronousResult);
-//
-//					if (bytesRead > 0)
-//					{
-//						state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
-//
-//						netStream.BeginRead(state.buffer, 0, StateObject<T>.BufferSize,
-//						                    new AsyncCallback(SendRequestUsingTcpClientCallback<T>), state);
-//					}
-//					else
-//					{
-//						HandleTcpClientResponse(state, asynchRequestState, channel, asynchronousResult);
-//					}
-//				}
-//			}
-//			catch (WebException webEx)
-//			{
-//				ProcessResponseCallbackWebExceptionHandler<T>(webEx, asynchRequestState, channel);
-//			}
-//			catch (Exception ex)
-//			{
-//				ProcessResponseCallbackExceptionHandler<T>(ex, asynchRequestState);
-//			}
-//		}
-
-//		void HandleTcpClientResponse<T>(StateObject<T> state, RequestState<T> asynchRequestState, string channel, IAsyncResult asynchronousResult)
-//		{
-//			List<object> result = new List<object>();
-//			if (state.sb.Length > 1)
-//			{
-//				string jsonString = ParseResponse<T>(state.sb.ToString(), asynchronousResult);
-//				LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON for channel={1} ({2}) ={3}", DateTime.Now.ToString(), channel, asynchRequestState.ResponseType.ToString(), jsonString), LoggingMethod.LevelInfo);
-//
-//				if (overrideTcpKeepAlive)
-//				{
-//					TerminateHeartbeatTimer(state.RequestState.Request.RequestUri);
-//				}
-//
-//				if (jsonString != null && !string.IsNullOrEmpty(jsonString) && !string.IsNullOrEmpty(channel.Trim()))
-//				{
-//					result = WrapResultBasedOnResponseType<T>(asynchRequestState.ResponseType, jsonString, asynchRequestState.Channels, asynchRequestState.Reconnect, asynchRequestState.Timetoken, asynchRequestState.ErrorCallback);
-//				}
-//
-//				ProcessResponseCallbacks<T>(result, asynchRequestState);
-//			}
-//			if (state.tcpClient != null)
-//				state.tcpClient.Close();
-//		}
-
+#if (__MonoCS__) 
 		string ParseResponse<T>(string responseString, IAsyncResult asynchronousResult)
 		{
 			string json = "";
@@ -1424,7 +1045,7 @@ namespace PubnubApi
 		}
 #endif
 
-#if(UNITY_ANDROID || MONOTOUCH || __IOS__)      
+#if(MONOTOUCH || __IOS__)      
 		/// <summary>
 		/// Workaround for the bug described here 
 		/// https://bugzilla.xamarin.com/show_bug.cgi?id=6501
@@ -1497,7 +1118,7 @@ namespace PubnubApi
         #endregion
 
         #region "Nested Classes"
-#if (__MonoCS__ && !UNITY_ANDROID && !UNITY_IOS)
+#if (__MonoCS__)
 //		class StateObject<T>
 //		{
 //			public RequestState<T> RequestState
@@ -1518,323 +1139,5 @@ namespace PubnubApi
         #endregion
 
     }
-
-
-    #region "PubnubWebRequestCreator"
-    internal class PubnubWebRequestCreator : PubnubWebRequestCreatorBase
-    {
-
-        public PubnubWebRequestCreator()
-            : base()
-        {
-        }
-
-        public PubnubWebRequestCreator(IPubnubUnitTest pubnubUnitTest)
-            : base(pubnubUnitTest)
-        {
-        }
-
-		protected HttpWebRequest SetUserAgent(HttpWebRequest req, bool keepAliveRequest)
-		{
-			req.Headers["UserAgent"] = string.Format("ua_string=({0}) PubNub-csharp/3.7", "PCL"); 
-			return req;
-		}
-
-        protected override HttpWebRequest SetNoCache(HttpWebRequest req, bool nocache)
-        {
-            if (nocache)
-            {
-                req.Headers["Cache-Control"] = "no-cache";
-                req.Headers["Pragma"] = "no-cache";
-#if (WINDOWS_PHONE)
-                req.Headers[HttpRequestHeader.IfModifiedSince] = DateTime.UtcNow.ToString();
-#endif
-            }
-            return req;
-        }
-
-        protected override WebRequest CreateRequest(Uri uri, bool keepAliveRequest, bool nocache)
-        {
-            HttpWebRequest req = (HttpWebRequest)WebRequest.Create(uri);
-			req = SetUserAgent(req, keepAliveRequest);
-
-            req = SetNoCache(req, nocache);
-            if (this.pubnubUnitTest is IPubnubUnitTest)
-            {
-                return new PubnubWebRequest(req, pubnubUnitTest);
-            }
-            else
-            {
-                return new PubnubWebRequest(req);
-            }
-        }
-
-    }
-    #endregion
-
-    #region "PubnubWebRequest"
-    public class PubnubWebRequest : PubnubWebRequestBase
-    {
-
-#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !NETFX_CORE)
-        //public override long ContentLength
-        //{
-        //    get
-        //    {
-        //        return request.ContentLength;
-        //    }
-        //}
-#endif
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !NETFX_CORE)
-//        private int _timeout;
-//		public override int Timeout
-//		{
-//			get
-//			{
-//				return _timeout;
-//			}
-//			set
-//			{
-//				_timeout = value;
-//				if (request != null)
-//				{
-//					request.Timeout = _timeout;
-//				}
-//			}
-//		}
-//
-//		public override IWebProxy Proxy
-//		{
-//			get
-//			{
-//				return request.Proxy;
-//			}
-//			set
-//			{
-//				request.Proxy = value;
-//			}
-//		}
-//
-//		public override bool PreAuthenticate
-//		{
-//			get
-//			{
-//				return request.PreAuthenticate;
-//			}
-//			set
-//			{
-//				request.PreAuthenticate = value;
-//			}
-//		}
-//		public override System.Net.Cache.RequestCachePolicy CachePolicy
-//		{
-//			get
-//			{
-//				return request.CachePolicy;
-//			}
-//		}
-//
-//		public override string ConnectionGroupName
-//		{
-//			get
-//			{
-//				return request.ConnectionGroupName;
-//			}
-//		}
-#endif
-
-#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !NETFX_CORE)
-        //public ServicePoint ServicePoint;
-#endif
-
-#if (!SILVERLIGHT && !WINDOWS_PHONE && !NETFX_CORE)
-//        public override WebResponse GetResponse()
-//		{
-//			return request.GetResponse();
-//		}
-#endif
-
-        public PubnubWebRequest(HttpWebRequest request)
-            : base(request)
-        {
-#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !NETFX_CORE)
-			//this.ServicePoint = this.request.ServicePoint;
-#endif
-        }
-        public PubnubWebRequest(HttpWebRequest request, IPubnubUnitTest pubnubUnitTest)
-            : base(request, pubnubUnitTest)
-        {
-#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !NETFX_CORE)
-			//this.ServicePoint = this.request.ServicePoint;
-#endif
-        }
-    }
-    #endregion
-
-    #region "PubnubWebResponse"
-    public class PubnubWebResponse : PubnubWebResponseBase
-    {
-        public PubnubWebResponse(WebResponse response):base(response)
-        {
-        }
-
-        public PubnubWebResponse(WebResponse response, HttpStatusCode statusCode):base(response,statusCode)
-        {
-        }
-
-        public PubnubWebResponse(Stream responseStream):base(responseStream)
-        {
-        }
-
-        public PubnubWebResponse(Stream responseStream, HttpStatusCode statusCode):base(responseStream, statusCode)
-        {
-        }
-
-        #if !NETFX_CORE
-//		public override void Close ()
-//		{
-//			if (response != null) {
-//				response.Close ();
-//			}
-//		}
-        #endif
-
-    }
-    #endregion
-
-    #region "PubnubCrypto"
-
-    public class PubnubCrypto : PubnubCryptoBase
-    {
-        public PubnubCrypto(string cipher_key)
-            : base(cipher_key)
-        {
-        }
-
-        protected override string ComputeHashRaw(string input)
-        {
-			Sha256Digest algorithm = new Sha256Digest();
-			Byte[] inputBytes = System.Text.Encoding.UTF8.GetBytes(input);
-			Byte[] bufferBytes = new byte[algorithm.GetDigestSize()];
-			algorithm.BlockUpdate(inputBytes, 0, inputBytes.Length);
-			algorithm.DoFinal(bufferBytes, 0);
-			return BitConverter.ToString(bufferBytes);
-        }
-
-        protected override string EncryptOrDecrypt(bool type, string plainStr)
-        {
-			//Demo params
-			string keyString = GetEncryptionKey();   
-
-			string input = plainStr;
-			byte[] inputBytes;
-			byte[] iv = System.Text.Encoding.UTF8.GetBytes("0123456789012345");
-			byte[] keyBytes = System.Text.Encoding.UTF8.GetBytes (keyString);
-
-			//Set up
-			AesEngine engine = new AesEngine();
-			CbcBlockCipher blockCipher = new CbcBlockCipher(engine); //CBC
-			PaddedBufferedBlockCipher cipher = new PaddedBufferedBlockCipher(blockCipher); //Default scheme is PKCS5/PKCS7
-			KeyParameter keyParam = new KeyParameter(keyBytes);
-			ParametersWithIV keyParamWithIV = new ParametersWithIV(keyParam, iv, 0, iv.Length);
-
-            if (type)
-            {
-				// Encrypt
-				input = EncodeNonAsciiCharacters(input);
-				inputBytes = Encoding.UTF8.GetBytes(input);            
-				cipher.Init(true, keyParamWithIV);
-				byte[] outputBytes = new byte[cipher.GetOutputSize(inputBytes.Length)];
-				int length = cipher.ProcessBytes(inputBytes, outputBytes, 0);
-				cipher.DoFinal(outputBytes, length); //Do the final block
-				string encryptedInput = Convert.ToBase64String(outputBytes);
-
-				return encryptedInput;
-            }
-            else
-            {
-                try
-                {
-					//Decrypt
-					inputBytes = Convert.FromBase64CharArray(input.ToCharArray(), 0, input.Length);            
-					cipher.Init(false, keyParamWithIV);
-					byte[] encryptedBytes = new byte[cipher.GetOutputSize(inputBytes.Length)];
-					int encryptLength = cipher.ProcessBytes(inputBytes, encryptedBytes, 0);
-					int numOfOutputBytes = cipher.DoFinal(encryptedBytes, encryptLength); //Do the final block
-					//string actualInput = Encoding.UTF8.GetString(encryptedBytes, 0, encryptedBytes.Length);
-					int len = Array.IndexOf(encryptedBytes, (byte)0);
-					len = (len == -1) ? encryptedBytes.Length : len;
-					string actualInput = Encoding.UTF8.GetString(encryptedBytes, 0, len);
-					return actualInput;
-
-                }
-                catch (Exception ex)
-                {
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0} Decrypt Error. {1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelVerbose);
-                    throw ex;
-                    //LoggingMethod.WriteToLog(string.Format("DateTime {0} Decrypt Error. {1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelVerbose);
-                    //return "**DECRYPT ERROR**";
-                }
-            }
-        }
-
-    }
-
-    #endregion
-
-    #region "MPNS Toast/Tiles"
-    
-    public class MpnsToastNotification
-    {
-        public string type = "toast";
-        public string text1 = "";
-        public string text2 = "";
-        public string param = "";
-    }
-
-    public class MpnsFlipTileNotification
-    {
-        public string type = "flip";
-        public int delay = 0;
-        public string title = "";
-        public int? count = 0;
-        public string small_background_image = "";
-        public string background_image = "";
-        public string back_background_image = "";
-        public string back_content = "";
-        public string back_title = "";
-        public string wide_background_image = "";
-        public string wide_back_background_image = "";
-        public string wide_back_content = "";
-    }
-
-    public class MpnsCycleTileNotification
-    {
-        public string type = "cycle";
-        public int delay = 0;
-        public string title = "";
-        public int? count = 0;
-        public string small_background_image = "";
-        public string[] images = null;
-    }
-
-    public class MpnsIconicTileNotification
-    {
-        public string type = "iconic";
-        public int delay = 0;
-        public string title = "";
-        public int? count = 0;
-        public string icon_image = "";
-        public string small_icon_image = "";
-        public string background_color = "";
-        public string wide_content_1 = "";
-        public string wide_content_2 = "";
-        public string wide_content_3 = "";
-    }
-    
-    #endregion
-
-
-
 }
 
