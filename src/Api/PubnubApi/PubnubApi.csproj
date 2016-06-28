@@ -71,7 +71,7 @@
     <Compile Include="Model\Consumer\Ack\HereNowAck.cs" />
     <Compile Include="Interface\IJsonPluggableLibrary.cs" />
     <Compile Include="Interface\IPubnubUnitTest.cs" />
-    <Compile Include="Interface\ResponseType.cs" />
+    <Compile Include="Enum\ResponseType.cs" />
     <Compile Include="Model\InternetState.cs" />
     <Compile Include="Log\LoggingMethod.cs" />
     <Compile Include="Security\MD5.cs" />
@@ -113,7 +113,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

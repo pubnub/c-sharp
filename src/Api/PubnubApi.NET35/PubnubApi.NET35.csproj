@@ -82,6 +82,9 @@
     <Compile Include="..\PubnubApi\Enum\PushTypeService.cs">
       <Link>Enum\PushTypeService.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Enum\ResponseType.cs">
+      <Link>Enum\ResponseType.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\Http\PubnubWebAsyncResult.cs">
       <Link>Http\PubnubWebAsyncResult.cs</Link>
     </Compile>
@@ -108,9 +111,6 @@
     </Compile>
     <Compile Include="..\PubnubApi\Interface\IPubnubUnitTest.cs">
       <Link>Interface\IPubnubUnitTest.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Interface\ResponseType.cs">
-      <Link>Interface\ResponseType.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Log\LoggingMethod.cs">
       <Link>Log\LoggingMethod.cs</Link>
@@ -249,7 +249,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

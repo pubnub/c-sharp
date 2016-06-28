@@ -257,6 +257,7 @@ namespace PubNubMessaging.Tests
             //startTimeWithReverseTrue = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(new DateTime(2012, 12, 1));
             startTimeWithReverseTrue = 0;
             pubnub.Time((s) => { startTimeWithReverseTrue = s; }, (e) => { });
+            Thread.Sleep(2000);
             for (int index = 0; index < 10; index++)
             {
                 mrePublish = new ManualResetEvent(false);
