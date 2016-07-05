@@ -2,7 +2,7 @@
 
 namespace PubnubApi
 {
-    internal class RequestState<T>
+    public sealed class RequestState<T>
     {
         public Action<T> NonSubscribeRegularCallback;
         public Action<Message<T>> SubscribeRegularCallback;

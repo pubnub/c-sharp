@@ -22,25 +22,8 @@ using System.Text.RegularExpressions;
 
 namespace PubnubApi
 {
-	// INotifyPropertyChanged provides a standard event for objects to notify clients that one of its properties has changed
-	internal abstract class PubnubCore : INotifyPropertyChanged
+	internal abstract partial class PubnubCore 
 	{
-
-		#region "Events"
-
-		// Common property changed event
-		public event PropertyChangedEventHandler PropertyChanged;
-
-		public void RaisePropertyChanged(string propertyName)
-		{
-			var handler = PropertyChanged;
-			if (handler != null) 
-            {
-				handler(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-
-		#endregion
 
 		#region "Class variables"
 
@@ -81,10 +64,6 @@ namespace PubnubApi
 		protected System.Threading.Timer presenceHeartbeatTimer = null;
 		protected static bool pubnetSystemActive = true;
         protected Collection<Uri> pushRemoteImageDomainUri = new Collection<Uri>();
-        // History of Messages (Obsolete)
-		private List<object> _history = new List<object>();
-
-        public List<object> History { get { return _history; } set { _history = value; RaisePropertyChanged("History"); } }
 
 		private static long lastSubscribeTimetoken = 0;
 		// Pubnub Core API implementation
@@ -3901,51 +3880,6 @@ namespace PubnubApi
 
 		#endregion
 
-		#region "Time"
-
-		/// <summary>
-		/// Time
-		/// Timestamp from PubNub Cloud
-		/// </summary>
-		/// <param name="userCallback"></param>
-		/// <param name="errorCallback"></param>
-		/// <returns></returns>
-		public bool Time(Action<long> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			if (userCallback == null) {
-				throw new ArgumentException ("Missing userCallback");
-			}
-			if (errorCallback == null) {
-				throw new ArgumentException ("Missing errorCallback");
-			}
-			if (_jsonPluggableLibrary == null) {
-				throw new NullReferenceException ("Missing Json Pluggable Library for Pubnub Instance");
-			}
-
-			Uri request = BuildTimeRequest ();
-
-			RequestState<long> requestState = new RequestState<long>();
-			requestState.Channels = null;
-			requestState.ResponseType = ResponseType.Time;
-			requestState.NonSubscribeRegularCallback = userCallback;
-			requestState.ErrorCallback = errorCallback;
-			requestState.Reconnect = false;
-
-			return UrlProcessRequest<long>(request, requestState);
-		}
-
-		public Uri BuildTimeRequest ()
-		{
-			List<string> url = new List<string> ();
-
-			url.Add ("time");
-			url.Add ("0");
-
-			return BuildRestApiRequest<Uri> (url, ResponseType.Time);
-		}
-
-		#endregion
-
 		#region "User State"
 
 		private string AddOrUpdateOrDeleteLocalUserState (string channel, string channelGroup, string userStateKey, object userStateValue)
@@ -6621,18 +6555,6 @@ namespace PubnubApi
                                 }
                             }
                             break;
-                        case ResponseType.History:
-							if (this.cipherKey.Length > 0) {
-								List<object> historyDecrypted = new List<object> ();
-								PubnubCrypto aes = new PubnubCrypto (this.cipherKey);
-								foreach (object message in result) {
-									historyDecrypted.Add (aes.Decrypt (message.ToString ()));
-								}
-								History = historyDecrypted;
-							} else {
-								History = result;
-							}
-							break;
 						case ResponseType.DetailedHistory:
 							result = DecodeDecryptLoop (result, channels, channelGroups, errorCallback);
 							result.Add (multiChannel);
@@ -6867,7 +6789,7 @@ namespace PubnubApi
 
 		protected abstract void SendRequestAndGetResult<T> (Uri requestUri, RequestState<T> pubnubRequestState, PubnubWebRequest request);
 
-		private bool UrlProcessRequest<T> (Uri requestUri, RequestState<T> pubnubRequestState)
+		internal protected bool UrlProcessRequest<T> (Uri requestUri, RequestState<T> pubnubRequestState)
 		{
 			string channel = "";
             string channelGroup = "";

@@ -34,6 +34,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Builder\UrlRequestBuilder.cs" />
+    <Compile Include="EndPoint\Time.cs" />
+    <Compile Include="Enum\PNHeartbeatNotificationOption.cs" />
+    <Compile Include="Interface\IPubnubHttp.cs" />
+    <Compile Include="Interface\IUrlRequestBuilder.cs" />
     <Compile Include="Model\Consumer\Ack\AddChannelToChannelGroupAck.cs" />
     <Compile Include="Model\Consumer\Ack\AuditAck.cs" />
     <Compile Include="Model\Consumer\Ack\AuditAckPayload.cs" />
@@ -55,6 +60,9 @@
     <Compile Include="Interface\IPubnubSubscribeMessageType.cs" />
     <Compile Include="Interface\IPubnubUnitTest.cs" />
     <Compile Include="Log\LoggingMethod.cs" />
+    <Compile Include="PNConfiguration.cs" />
+    <Compile Include="PubnubCoreBase.cs" />
+    <Compile Include="PubnubHttp.cs" />
     <Compile Include="Security\MD5.cs" />
     <Compile Include="Security\MD5CryptoServiceProvider.cs" />
     <Compile Include="Model\Consumer\Ack\Message.cs" />

@@ -132,7 +132,8 @@ namespace PubnubApi
 
 		public bool Time(Action<long> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			return pubnub.Time(userCallback, errorCallback);
+            PubnubApi.EndPoint.TimeOperation core = new PubnubApi.EndPoint.TimeOperation(new PNConfiguration());
+			return core.Time(userCallback, errorCallback);
 		}
 
 		public void AuditAccess(string channel, string authenticationKey, Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
