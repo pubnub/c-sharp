@@ -35,7 +35,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Builder\UrlRequestBuilder.cs" />
-    <Compile Include="EndPoint\Time.cs" />
+    <Compile Include="Callback\PNCallbackService.cs" />
+    <Compile Include="EndPoint\HistoryOperation.cs" />
+    <Compile Include="EndPoint\Presence\GlobalHereNowOperation.cs" />
+    <Compile Include="EndPoint\Presence\HereNowOperation.cs" />
+    <Compile Include="EndPoint\PubSub\PublishOperation.cs" />
+    <Compile Include="EndPoint\TimeOperation.cs" />
     <Compile Include="Enum\PNHeartbeatNotificationOption.cs" />
     <Compile Include="Interface\IPubnubHttp.cs" />
     <Compile Include="Interface\IUrlRequestBuilder.cs" />
@@ -122,7 +127,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="EndPoint\Access\" />
+    <Folder Include="EndPoint\ChannelGroup\" />
+    <Folder Include="EndPoint\Push\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

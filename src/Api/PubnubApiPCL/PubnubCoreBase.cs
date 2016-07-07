@@ -29,7 +29,7 @@ namespace PubnubApi
         IPubnubHttp _pubnubHttp = null;
 
         private PNConfiguration _pnConfig = null;
-        private IJsonPluggableLibrary _jsonPluggableLibrary = null;
+        private IJsonPluggableLibrary _jsonLib = null;
 
         public PubnubCoreBase(PNConfiguration pnConfiguation)
         {
@@ -60,9 +60,9 @@ namespace PubnubApi
         private void InternalConstructor(PNConfiguration pnConfiguation, IJsonPluggableLibrary jsonPluggableLibrary)
         {
             this._pnConfig = pnConfiguation;
-            this._jsonPluggableLibrary = jsonPluggableLibrary;
+            this._jsonLib = jsonPluggableLibrary;
 
-            _pubnubHttp = new PubnubHttp(pnConfiguation, _jsonPluggableLibrary);
+            _pubnubHttp = new PubnubHttp(pnConfiguation, _jsonLib);
 
             //if (!IsNullOrWhiteSpace(pnConfiguation.PublishKey)) { this.publishKey = pnConfiguation.PublishKey; }
             //if (!IsNullOrWhiteSpace(pnConfiguation.SubscribeKey)) { this.subscribeKey = pnConfiguation.SubscribeKey; }
@@ -92,8 +92,6 @@ namespace PubnubApi
         bool _enableResumeOnReconnect = true;
         bool _uuidChanged = false;
         protected bool overrideTcpKeepAlive = true;
-        bool _enableJsonEncodingForPublish = true;
-        bool _enableDebugForPushPublish = false;
         LoggingMethod.Level _pubnubLogLevel = LoggingMethod.Level.Off;
         PubnubErrorFilter.Level _errorLevel = PubnubErrorFilter.Level.Info;
         protected ConcurrentDictionary<string, long> multiChannelSubscribe = new ConcurrentDictionary<string, long>();
@@ -122,69 +120,6 @@ namespace PubnubApi
 
         private static long lastSubscribeTimetoken = 0;
         // Pubnub Core API implementation
-        #endregion
-
-        #region "Error Callbacks"
-
-        protected PubnubClientError CallErrorCallback(PubnubErrorSeverity errSeverity, PubnubMessageSource msgSource,
-                                                         string channel, string channelGroup, Action<PubnubClientError> errorCallback,
-                                                         string message, PubnubErrorCode errorType, PubnubWebRequest req,
-                                                         PubnubWebResponse res)
-        {
-            int statusCode = (int)errorType;
-
-            string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(errorType);
-
-            PubnubClientError error = new PubnubClientError(statusCode, errSeverity, message, msgSource, req, res, errorDescription, channel, channelGroup);
-            GoToCallback(error, errorCallback);
-            return error;
-        }
-
-        protected PubnubClientError CallErrorCallback(PubnubErrorSeverity errSeverity, PubnubMessageSource msgSource,
-                                                         string channel, string channelGroup, Action<PubnubClientError> errorCallback,
-                                                         string message, int currentHttpStatusCode, string statusMessage,
-                                                         PubnubWebRequest req, PubnubWebResponse res)
-        {
-            PubnubErrorCode pubnubErrorType = PubnubErrorCodeHelper.GetErrorType((int)currentHttpStatusCode, statusMessage);
-
-            int statusCode = (int)pubnubErrorType;
-
-            string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(pubnubErrorType);
-
-            PubnubClientError error = new PubnubClientError(statusCode, errSeverity, message, msgSource, req, res, errorDescription, channel, channelGroup);
-            GoToCallback(error, errorCallback);
-            return error;
-        }
-
-        protected PubnubClientError CallErrorCallback(PubnubErrorSeverity errSeverity, PubnubMessageSource msgSource,
-                                                         string channel, string channelGroup, Action<PubnubClientError> errorCallback,
-                                                         Exception ex, PubnubWebRequest req,
-                                                         PubnubWebResponse res)
-        {
-            PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(ex);
-
-            int statusCode = (int)errorType;
-            string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(errorType);
-
-            PubnubClientError error = new PubnubClientError(statusCode, errSeverity, true, ex.Message, ex, msgSource, req, res, errorDescription, channel, channelGroup);
-            GoToCallback(error, errorCallback);
-            return error;
-        }
-
-        protected PubnubClientError CallErrorCallback(PubnubErrorSeverity errSeverity, PubnubMessageSource msgSource,
-                                                         string channel, string channelGroup, Action<PubnubClientError> errorCallback,
-                                                         WebException webex, PubnubWebRequest req,
-                                                         PubnubWebResponse res)
-        {
-            PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(webex.Status, webex.Message);
-            int statusCode = (int)errorType;
-            string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(errorType);
-
-            PubnubClientError error = new PubnubClientError(statusCode, errSeverity, true, webex.Message, webex, msgSource, req, res, errorDescription, channel, channelGroup);
-            GoToCallback(error, errorCallback);
-            return error;
-        }
-
         #endregion
 
         #region "Constructors"
@@ -273,7 +208,7 @@ namespace PubnubApi
 
                 LoggingMethod.WriteToLog(string.Format("DateTime {0}, TimeExceptionHandler response={1}", DateTime.Now.ToString(), message), LoggingMethod.LevelInfo);
 
-                CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
+                new PNCallbackService(_jsonLib).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
                     "", "", errorCallback, message, PubnubErrorCode.TimeOperationTimeout, null, null);
             }
         }
@@ -340,7 +275,7 @@ namespace PubnubApi
                         case ResponseType.Subscribe:
                             jsonString = string.Format("[1, \"Connected\"]");
 
-                            connectResult = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
+                            connectResult = _jsonLib.DeserializeToListOfObject(jsonString);
                             connectResult.Add("");
                             connectResult.Add(channel);
 
@@ -355,13 +290,13 @@ namespace PubnubApi
                                 {
                                     Action<ConnectOrDisconnectAck> targetCallback = currentPubnubCallback.ConnectCallback;
                                     currentPubnubCallback.ConnectCallback = null;
-                                    GoToCallback<ConnectOrDisconnectAck>(connectResult, targetCallback, true, type);
+                                    new PNCallbackService(_jsonLib).GoToCallback<ConnectOrDisconnectAck>(connectResult, targetCallback, true, type);
                                 }
                             }
                             break;
                         case ResponseType.Presence:
                             jsonString = string.Format("[1, \"Presence Connected\"]");
-                            connectResult = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
+                            connectResult = _jsonLib.DeserializeToListOfObject(jsonString);
                             connectResult.Add("");
                             connectResult.Add(channel.Replace("-pnpres", ""));
 
@@ -376,7 +311,7 @@ namespace PubnubApi
                                 {
                                     Action<ConnectOrDisconnectAck> targetCallback = currentPubnubCallback.ConnectCallback;
                                     currentPubnubCallback.ConnectCallback = null;
-                                    GoToCallback<ConnectOrDisconnectAck>(connectResult, targetCallback, true, type);
+                                    new PNCallbackService(_jsonLib).GoToCallback<ConnectOrDisconnectAck>(connectResult, targetCallback, true, type);
                                 }
                             }
                             break;
@@ -399,7 +334,7 @@ namespace PubnubApi
                     {
                         case ResponseType.Subscribe:
                             jsonString = string.Format("[1, \"Connected\"]");
-                            connectResult = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
+                            connectResult = _jsonLib.DeserializeToListOfObject(jsonString);
                             connectResult.Add(channelGroup);
                             connectResult.Add("");
 
@@ -414,14 +349,14 @@ namespace PubnubApi
                                 {
                                     Action<ConnectOrDisconnectAck> targetCallback = currentPubnubCallback.ConnectCallback;
                                     currentPubnubCallback.ConnectCallback = null;
-                                    GoToCallback<ConnectOrDisconnectAck>(connectResult, targetCallback, true, type);
+                                    new PNCallbackService(_jsonLib).GoToCallback<ConnectOrDisconnectAck>(connectResult, targetCallback, true, type);
                                 }
 
                             }
                             break;
                         case ResponseType.Presence:
                             jsonString = string.Format("[1, \"Presence Connected\"]");
-                            connectResult = _jsonPluggableLibrary.DeserializeToListOfObject(jsonString);
+                            connectResult = _jsonLib.DeserializeToListOfObject(jsonString);
                             connectResult.Add(channelGroup.Replace("-pnpres", ""));
                             connectResult.Add("");
 
@@ -436,115 +371,12 @@ namespace PubnubApi
                                 {
                                     Action<ConnectOrDisconnectAck> targetCallback = currentPubnubCallback.ConnectCallback;
                                     currentPubnubCallback.ConnectCallback = null;
-                                    GoToCallback<ConnectOrDisconnectAck>(connectResult, targetCallback, true, type);
+                                    new PNCallbackService(_jsonLib).GoToCallback<ConnectOrDisconnectAck>(connectResult, targetCallback, true, type);
                                 }
                             }
                             break;
                         default:
                             break;
-                    }
-                }
-            }
-        }
-
-        private void JsonResponseToCallback<T>(List<object> result, Action<T> callback)
-        {
-            string callbackJson = "";
-
-            if (typeof(T) == typeof(string))
-            {
-                callbackJson = _jsonPluggableLibrary.SerializeToJsonString(result);
-
-                Action<string> castCallback = callback as Action<string>;
-                castCallback(callbackJson);
-            }
-        }
-
-        private void JsonResponseToCallback<T>(object result, Action<T> callback)
-        {
-            string callbackJson = "";
-
-            if (typeof(T) == typeof(string))
-            {
-                callbackJson = _jsonPluggableLibrary.SerializeToJsonString(result);
-
-                Action<string> castCallback = callback as Action<string>;
-                castCallback(callbackJson);
-            }
-        }
-
-        private void JsonResponseToCallback<T>(long result, Action<T> callback)
-        {
-            if (typeof(T) == typeof(long))
-            {
-                Action<long> castCallback = callback as Action<long>;
-                castCallback(result);
-            }
-        }
-
-        protected void GoToCallback<T>(List<object> result, Action<T> Callback, bool internalObject, ResponseType type)
-        {
-            if (Callback != null)
-            {
-                if (typeof(T) == typeof(string))
-                {
-                    JsonResponseToCallback(result, Callback);
-                }
-                else if (typeof(T) == typeof(long) && type == ResponseType.Time)
-                {
-                    long timetoken;
-                    Int64.TryParse(result[0].ToString(), out timetoken);
-                    JsonResponseToCallback(timetoken, Callback);
-                }
-                else
-                {
-                    T ret = default(T);
-                    if (!internalObject)
-                    {
-                        ret = _jsonPluggableLibrary.DeserializeToObject<T>(result);
-                    }
-                    else
-                    {
-                        NewtonsoftJsonDotNet jsonLib = new NewtonsoftJsonDotNet();
-                        ret = jsonLib.DeserializeToObject<T>(result);
-                    }
-
-                    Callback(ret);
-                }
-            }
-        }
-
-        protected void GoToCallback(object result, Action<string> Callback)
-        {
-            if (Callback != null)
-            {
-                JsonResponseToCallback(result, Callback);
-            }
-        }
-
-        protected void GoToCallback(object result, Action<object> Callback)
-        {
-            if (Callback != null)
-            {
-                Callback(result);
-            }
-        }
-
-        protected void GoToCallback(PubnubClientError error, Action<PubnubClientError> Callback)
-        {
-            if (Callback != null && error != null)
-            {
-                if ((int)error.Severity <= (int)_errorLevel)
-                { //Checks whether the error serverity falls in the range of error filter level
-                  //Do not send 107 = PubnubObjectDisposedException
-                  //Do not send 105 = WebRequestCancelled
-                  //Do not send 130 = PubnubClientMachineSleep
-                    if (error.StatusCode != 107
-                        && error.StatusCode != 105
-                        && error.StatusCode != 130
-                        && error.StatusCode != 4040) //Error Code that should not go out
-                    {
-                        Callback(error);
                     }
                 }
             }
@@ -729,7 +561,7 @@ namespace PubnubApi
 
         #region "Build, process and send request"
 
-        internal protected bool UrlProcessRequest<T>(Uri requestUri, RequestState<T> pubnubRequestState)
+        internal protected void UrlProcessRequest<T>(Uri requestUri, RequestState<T> pubnubRequestState)
         {
             string channel = "";
             string channelGroup = "";
@@ -749,7 +581,7 @@ namespace PubnubApi
             {
                 if (!_channelRequest.ContainsKey(channel) && (pubnubRequestState.ResponseType == ResponseType.Subscribe || pubnubRequestState.ResponseType == ResponseType.Presence))
                 {
-                    return false;
+                    return;
                 }
 
                 // Create Request
@@ -795,7 +627,7 @@ namespace PubnubApi
                 //REVISIT
                 _pubnubHttp.SendRequestAndGetResult(requestUri, pubnubRequestState, request);
 
-                return true;
+                return;
             }
             catch (System.Exception ex)
             {
@@ -807,13 +639,13 @@ namespace PubnubApi
                         string multiChannel = (pubnubRequestState.Channels != null) ? string.Join(",", pubnubRequestState.Channels) : "";
                         string multiChannelGroup = (pubnubRequestState.ChannelGroups != null) ? string.Join(",", pubnubRequestState.ChannelGroups) : "";
 
-                        CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
+                        new PNCallbackService(_jsonLib).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
                             multiChannel, multiChannelGroup, pubnubRequestState.ErrorCallback, ex, pubnubRequestState.Request, pubnubRequestState.Response);
                     }
                     LoggingMethod.WriteToLog(string.Format("DateTime {0} Exception={1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelError);
                     UrlRequestCommonExceptionHandler<T>(pubnubRequestState.ResponseType, pubnubRequestState.Channels, pubnubRequestState.ChannelGroups, false, pubnubRequestState.SubscribeRegularCallback, pubnubRequestState.PresenceRegularCallback, pubnubRequestState.ConnectCallback, pubnubRequestState.WildcardPresenceCallback, pubnubRequestState.ErrorCallback, false);
                 }
-                return false;
+                return;
             }
         }
 

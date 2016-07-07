@@ -99,6 +99,7 @@ namespace PubnubApi
 
         static public void Main()
         {
+            PNConfiguration config = new PNConfiguration();
             AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionTrapper;
 
             PubnubProxy proxy = null;
@@ -209,17 +210,17 @@ namespace PubnubApi
             Console.ResetColor();
             Console.WriteLine();
 
-            pubnub = new Pubnub(publishKey, subscribeKey, secretKey, cipherKey,
-                (enableSSL.Trim().ToLower() == "y") ? true : false);
+            //pubnub = new Pubnub(publishKey, subscribeKey, secretKey, cipherKey,
+            //    (enableSSL.Trim().ToLower() == "y") ? true : false);
 
-            pubnub.SetPubnubLog(new PlatformPubnubLog());
-            pubnub.Origin = origin;
-            pubnub.AddPayloadToPublishResponse = true;
+            //pubnub.SetPubnubLog(new PlatformPubnubLog());
+            //pubnub.Origin = origin;
+            //pubnub.AddPayloadToPublishResponse = true;
 
             //TO SUPPORT GENERICS, ENSURE THAT YOU IMPLEMENT "NewtonsoftJsonDotNet" METHODS FOR JSON DESERIALIZATION 
             //pubnub.JsonPluggableLibrary = new MyCustomJsonNet();
 
-            pubnub.SubscribeMessageType = new MyCustomObjectTypeHelper();
+            //pubnub.SubscribeMessageType = new MyCustomObjectTypeHelper();
 
             Console.WriteLine("Use Custom Session UUID? ENTER Y for Yes, else N");
             string enableCustomUUID = Console.ReadLine();
@@ -227,7 +228,14 @@ namespace PubnubApi
             {
                 Console.WriteLine("ENTER Session UUID.");
                 string sessionUUID = Console.ReadLine();
-                pubnub.SessionUUID = sessionUUID;
+                if (string.IsNullOrEmpty(sessionUUID) || sessionUUID.Trim().Length == 0)
+                {
+                    Console.WriteLine("Invalid UUID. Default value will be set.");
+                }
+                else
+                {
+                    config.Uuid = sessionUUID;
+                }
                 Console.ForegroundColor = ConsoleColor.Blue;
                 Console.WriteLine("Accepted Custom Session UUID.");
                 Console.ResetColor();
@@ -240,160 +248,9 @@ namespace PubnubApi
             }
             Console.WriteLine();
 
-            Console.WriteLine("By default Resume On Reconnect is enabled. Do you want to disable it? ENTER Y for Yes, else N");
-            string disableResumeOnReconnect = Console.ReadLine();
-            Console.ForegroundColor = ConsoleColor.Blue;
-            if (disableResumeOnReconnect.Trim().ToLower() == "y")
-            {
-                Console.WriteLine("Resume On Reconnect Disabled");
-                pubnub.EnableResumeOnReconnect = false;
-            }
-            else
-            {
-                Console.WriteLine("Resume On Reconnect Enabled by default");
-                pubnub.EnableResumeOnReconnect = true;
-            }
-            Console.ResetColor();
-            Console.WriteLine();
-
-            Console.WriteLine("Subscribe Timeout = 310 seconds (default). Enter the value to change, else press ENTER");
-            string subscribeTimeoutEntry = Console.ReadLine();
-            int subscribeTimeout;
-            Int32.TryParse(subscribeTimeoutEntry, out subscribeTimeout);
-            Console.ForegroundColor = ConsoleColor.Blue;
-            if (subscribeTimeout > 0)
-            {
-                Console.WriteLine("Subscribe Timeout = {0}", subscribeTimeout);
-                pubnub.SubscribeTimeout = subscribeTimeout;
-            }
-            else
-            {
-                Console.WriteLine("Subscribe Timeout = {0} (default)", pubnub.SubscribeTimeout);
-            }
-            Console.ResetColor();
-            Console.WriteLine();
-
-            Console.WriteLine("Non Subscribe Timeout = 15 seconds (default). Enter the value to change, else press ENTER");
-            string nonSubscribeTimeoutEntry = Console.ReadLine();
-            int nonSubscribeTimeout;
-            Int32.TryParse(nonSubscribeTimeoutEntry, out nonSubscribeTimeout);
-            Console.ForegroundColor = ConsoleColor.Blue;
-            if (nonSubscribeTimeout > 0)
-            {
-                Console.WriteLine("Non Subscribe Timeout = {0}", nonSubscribeTimeout);
-                pubnub.NonSubscribeTimeout = nonSubscribeTimeout;
-            }
-            else
-            {
-                Console.WriteLine("Non Subscribe Timeout = {0} (default)", pubnub.NonSubscribeTimeout);
-            }
-            Console.ResetColor();
-            Console.WriteLine();
-
-            Console.WriteLine("Network Check MAX retries = 50 (default). Enter the value to change, else press ENTER");
-            string networkCheckMaxRetriesEntry = Console.ReadLine();
-            int networkCheckMaxRetries;
-            Int32.TryParse(networkCheckMaxRetriesEntry, out networkCheckMaxRetries);
-            Console.ForegroundColor = ConsoleColor.Blue;
-            if (networkCheckMaxRetries > 0)
-            {
-                Console.WriteLine("Network Check MAX retries = {0}", networkCheckMaxRetries);
-                pubnub.NetworkCheckMaxRetries = networkCheckMaxRetries;
-            }
-            else
-            {
-                Console.WriteLine("Network Check MAX retries = {0} (default)", pubnub.NetworkCheckMaxRetries);
-            }
-            Console.ResetColor();
-            Console.WriteLine();
-
-            Console.WriteLine("Network Check Retry Interval = 10 seconds (default). Enter the value to change, else press ENTER");
-            string networkCheckRetryIntervalEntry = Console.ReadLine();
-            int networkCheckRetryInterval;
-            Int32.TryParse(networkCheckRetryIntervalEntry, out networkCheckRetryInterval);
-            Console.ForegroundColor = ConsoleColor.Blue;
-            if (networkCheckRetryInterval > 0)
-            {
-                Console.WriteLine("Network Check Retry Interval = {0} seconds", networkCheckRetryInterval);
-                pubnub.NetworkCheckRetryInterval = networkCheckRetryInterval;
-            }
-            else
-            {
-                Console.WriteLine("Network Check Retry Interval = {0} seconds (default)", pubnub.NetworkCheckRetryInterval);
-            }
-            Console.ResetColor();
-            Console.WriteLine();
-
-            Console.WriteLine("Local Client Heartbeat Interval = 15 seconds (default). Enter the value to change, else press ENTER");
-            string heartbeatIntervalEntry = Console.ReadLine();
-            int localClientHeartbeatInterval;
-            Int32.TryParse(heartbeatIntervalEntry, out localClientHeartbeatInterval);
-            Console.ForegroundColor = ConsoleColor.Blue;
-            if (localClientHeartbeatInterval > 0)
-            {
-                Console.WriteLine("Heartbeat Interval = {0} seconds", localClientHeartbeatInterval);
-                pubnub.LocalClientHeartbeatInterval = localClientHeartbeatInterval;
-            }
-            else
-            {
-                Console.WriteLine("Heartbeat Interval = {0} seconds (default)", pubnub.LocalClientHeartbeatInterval);
-            }
-            Console.ResetColor();
-            Console.WriteLine();
-
-            Console.WriteLine("HTTP Proxy Server with NTLM authentication(IP + username/pwd) exists? ENTER Y for Yes, else N");
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("NOTE: Pubnub example is being tested with CCProxy 7.3 Demo version");
-            Console.ResetColor();
-            string enableProxy = Console.ReadLine();
-            if (enableProxy.Trim().ToLower() == "y")
-            {
-                bool proxyAccepted = false;
-                while (!proxyAccepted)
-                {
-                    Console.WriteLine("ENTER proxy server name or IP.");
-                    string proxyServer = Console.ReadLine();
-                    Console.WriteLine("ENTER port number of proxy server.");
-                    string proxyPort = Console.ReadLine();
-                    int port;
-                    Int32.TryParse(proxyPort, out port);
-                    Console.WriteLine("ENTER user name for proxy server authentication.");
-                    string proxyUsername = Console.ReadLine();
-                    Console.WriteLine("ENTER password for proxy server authentication.");
-                    string proxyPassword = Console.ReadLine();
-
-                    proxy = new PubnubProxy();
-                    proxy.ProxyServer = proxyServer;
-                    proxy.ProxyPort = port;
-                    proxy.ProxyUserName = proxyUsername;
-                    proxy.ProxyPassword = proxyPassword;
-                    Console.ForegroundColor = ConsoleColor.Blue;
-                    try
-                    {
-                        pubnub.Proxy = proxy;
-                        proxyAccepted = true;
-                        Console.WriteLine("Proxy details accepted");
-                        Console.ResetColor();
-                    }
-                    catch (MissingFieldException mse)
-                    {
-                        Console.WriteLine(mse.Message);
-                        Console.WriteLine("Please RE-ENTER Proxy Server details.");
-                    }
-                    Console.ResetColor();
-                }
-            }
-            else
-            {
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.WriteLine("No Proxy");
-                Console.ResetColor();
-            }
-            Console.WriteLine();
-
             Console.WriteLine("Enter Auth Key. If you don't want to use Auth Key, Press ENTER Key");
             authKey = Console.ReadLine();
-            pubnub.AuthenticationKey = authKey;
+            config.AuthKey = authKey;
 
             Console.ForegroundColor = ConsoleColor.Blue;
             Console.WriteLine(string.Format("Auth Key = {0}", authKey));
@@ -406,16 +263,176 @@ namespace PubnubApi
             Console.ForegroundColor = ConsoleColor.Blue;
             if (enableLoggingString.Trim().ToLower() == "n")
             {
-                pubnub.SetInternalLogLevel(LoggingMethod.Level.Off);
+                config.LogVerbosity = LoggingMethod.Level.Off;
                 Console.WriteLine("Disabled internal logging");
             }
             else
             {
-                pubnub.SetInternalLogLevel(LoggingMethod.Level.Info);
+                config.LogVerbosity = LoggingMethod.Level.Info;
                 Console.WriteLine("Enabled internal logging");
             }
             Console.ResetColor();
             Console.WriteLine();
+
+            Console.WriteLine("Subscribe Timeout = 310 seconds (default). Enter the value to change, else press ENTER");
+            string subscribeTimeoutEntry = Console.ReadLine();
+            int subscribeTimeout;
+            Int32.TryParse(subscribeTimeoutEntry, out subscribeTimeout);
+            Console.ForegroundColor = ConsoleColor.Blue;
+            if (subscribeTimeout > 0)
+            {
+                Console.WriteLine("Subscribe Timeout = {0}", subscribeTimeout);
+                config.SubscribeTimeout = subscribeTimeout;
+            }
+            else
+            {
+                Console.WriteLine("Subscribe Timeout = {0} (default)", config.SubscribeTimeout);
+            }
+            Console.ResetColor();
+            Console.WriteLine();
+
+            Console.WriteLine("Non Subscribe Timeout = 15 seconds (default). Enter the value to change, else press ENTER");
+            string nonSubscribeTimeoutEntry = Console.ReadLine();
+            int nonSubscribeTimeout;
+            Int32.TryParse(nonSubscribeTimeoutEntry, out nonSubscribeTimeout);
+            Console.ForegroundColor = ConsoleColor.Blue;
+            if (nonSubscribeTimeout > 0)
+            {
+                Console.WriteLine("Non Subscribe Timeout = {0}", nonSubscribeTimeout);
+                config.NonSubscribeRequestTimeout = nonSubscribeTimeout;
+            }
+            else
+            {
+                Console.WriteLine("Non Subscribe Timeout = {0} (default)", config.NonSubscribeRequestTimeout);
+            }
+            Console.ResetColor();
+            Console.WriteLine();
+
+            config.Origin = origin;
+            config.Secure = (enableSSL.Trim().ToLower() == "y") ? true : false;
+            config.CiperKey = cipherKey;
+            config.SubscribeKey = subscribeKey;
+            config.PublishKey = publishKey;
+            config.SecretKey = secretKey;
+
+            pubnub = new Pubnub(config);
+
+            //Console.WriteLine("By default Resume On Reconnect is enabled. Do you want to disable it? ENTER Y for Yes, else N");
+            //string disableResumeOnReconnect = Console.ReadLine();
+            //Console.ForegroundColor = ConsoleColor.Blue;
+            //if (disableResumeOnReconnect.Trim().ToLower() == "y")
+            //{
+            //    Console.WriteLine("Resume On Reconnect Disabled");
+            //    pubnub.EnableResumeOnReconnect = false;
+            //}
+            //else
+            //{
+            //    Console.WriteLine("Resume On Reconnect Enabled by default");
+            //    pubnub.EnableResumeOnReconnect = true;
+            //}
+            //Console.ResetColor();
+            //Console.WriteLine();
+
+            //Console.WriteLine("Network Check MAX retries = 50 (default). Enter the value to change, else press ENTER");
+            //string networkCheckMaxRetriesEntry = Console.ReadLine();
+            //int networkCheckMaxRetries;
+            //Int32.TryParse(networkCheckMaxRetriesEntry, out networkCheckMaxRetries);
+            //Console.ForegroundColor = ConsoleColor.Blue;
+            //if (networkCheckMaxRetries > 0)
+            //{
+            //    Console.WriteLine("Network Check MAX retries = {0}", networkCheckMaxRetries);
+            //    pubnub.NetworkCheckMaxRetries = networkCheckMaxRetries;
+            //}
+            //else
+            //{
+            //    Console.WriteLine("Network Check MAX retries = {0} (default)", pubnub.NetworkCheckMaxRetries);
+            //}
+            //Console.ResetColor();
+            //Console.WriteLine();
+
+            //Console.WriteLine("Network Check Retry Interval = 10 seconds (default). Enter the value to change, else press ENTER");
+            //string networkCheckRetryIntervalEntry = Console.ReadLine();
+            //int networkCheckRetryInterval;
+            //Int32.TryParse(networkCheckRetryIntervalEntry, out networkCheckRetryInterval);
+            //Console.ForegroundColor = ConsoleColor.Blue;
+            //if (networkCheckRetryInterval > 0)
+            //{
+            //    Console.WriteLine("Network Check Retry Interval = {0} seconds", networkCheckRetryInterval);
+            //    pubnub.NetworkCheckRetryInterval = networkCheckRetryInterval;
+            //}
+            //else
+            //{
+            //    Console.WriteLine("Network Check Retry Interval = {0} seconds (default)", pubnub.NetworkCheckRetryInterval);
+            //}
+            //Console.ResetColor();
+            //Console.WriteLine();
+
+            //Console.WriteLine("Local Client Heartbeat Interval = 15 seconds (default). Enter the value to change, else press ENTER");
+            //string heartbeatIntervalEntry = Console.ReadLine();
+            //int localClientHeartbeatInterval;
+            //Int32.TryParse(heartbeatIntervalEntry, out localClientHeartbeatInterval);
+            //Console.ForegroundColor = ConsoleColor.Blue;
+            //if (localClientHeartbeatInterval > 0)
+            //{
+            //    Console.WriteLine("Heartbeat Interval = {0} seconds", localClientHeartbeatInterval);
+            //    pubnub.LocalClientHeartbeatInterval = localClientHeartbeatInterval;
+            //}
+            //else
+            //{
+            //    Console.WriteLine("Heartbeat Interval = {0} seconds (default)", pubnub.LocalClientHeartbeatInterval);
+            //}
+            //Console.ResetColor();
+            //Console.WriteLine();
+
+            //Console.WriteLine("HTTP Proxy Server with NTLM authentication(IP + username/pwd) exists? ENTER Y for Yes, else N");
+            //Console.ForegroundColor = ConsoleColor.Red;
+            //Console.WriteLine("NOTE: Pubnub example is being tested with CCProxy 7.3 Demo version");
+            //Console.ResetColor();
+            //string enableProxy = Console.ReadLine();
+            //if (enableProxy.Trim().ToLower() == "y")
+            //{
+            //    bool proxyAccepted = false;
+            //    while (!proxyAccepted)
+            //    {
+            //        Console.WriteLine("ENTER proxy server name or IP.");
+            //        string proxyServer = Console.ReadLine();
+            //        Console.WriteLine("ENTER port number of proxy server.");
+            //        string proxyPort = Console.ReadLine();
+            //        int port;
+            //        Int32.TryParse(proxyPort, out port);
+            //        Console.WriteLine("ENTER user name for proxy server authentication.");
+            //        string proxyUsername = Console.ReadLine();
+            //        Console.WriteLine("ENTER password for proxy server authentication.");
+            //        string proxyPassword = Console.ReadLine();
+
+            //        proxy = new PubnubProxy();
+            //        proxy.ProxyServer = proxyServer;
+            //        proxy.ProxyPort = port;
+            //        proxy.ProxyUserName = proxyUsername;
+            //        proxy.ProxyPassword = proxyPassword;
+            //        Console.ForegroundColor = ConsoleColor.Blue;
+            //        try
+            //        {
+            //            pubnub.Proxy = proxy;
+            //            proxyAccepted = true;
+            //            Console.WriteLine("Proxy details accepted");
+            //            Console.ResetColor();
+            //        }
+            //        catch (MissingFieldException mse)
+            //        {
+            //            Console.WriteLine(mse.Message);
+            //            Console.WriteLine("Please RE-ENTER Proxy Server details.");
+            //        }
+            //        Console.ResetColor();
+            //    }
+            //}
+            //else
+            //{
+            //    Console.ForegroundColor = ConsoleColor.Blue;
+            //    Console.WriteLine("No Proxy");
+            //    Console.ResetColor();
+            //}
+            //Console.WriteLine();
 
             Console.WriteLine("Display ErrorCallback messages? Enter Y for Yes, Else N for No.");
             Console.WriteLine("Default = N  ");
@@ -482,15 +499,15 @@ namespace PubnubApi
                     Console.WriteLine("ENTER 18 FOR Change/Update Auth Key (Current value = {0})", pubnub.AuthenticationKey);
                     Console.WriteLine("ENTER 19 TO Simulate Machine Sleep Mode");
                     Console.WriteLine("ENTER 20 TO Simulate Machine Awake Mode");
-                    Console.WriteLine("ENTER 21 TO Set Presence Heartbeat (Current value = {0} sec)", pubnub.PresenceHeartbeat);
-                    Console.WriteLine("ENTER 22 TO Set Presence Heartbeat Interval (Current value = {0} sec)", pubnub.PresenceHeartbeatInterval);
+                    //Console.WriteLine("ENTER 21 TO Set Presence Heartbeat (Current value = {0} sec)", pubnub.PresenceHeartbeat);
+                    //Console.WriteLine("ENTER 22 TO Set Presence Heartbeat Interval (Current value = {0} sec)", pubnub.PresenceHeartbeatInterval);
                     Console.WriteLine("Enter 23 TO Set User State by Add/Modify Key-Pair");
                     Console.WriteLine("Enter 24 TO Set User State by Deleting existing Key-Pair");
                     Console.WriteLine("Enter 25 TO Set User State with direct json string");
                     Console.WriteLine("Enter 26 TO Get User State");
                     Console.WriteLine("Enter 27 FOR WhereNow");
                     Console.WriteLine("Enter 28 FOR GlobalHere_Now");
-                    Console.WriteLine("Enter 29 TO change UUID. (Current value = {0})", pubnub.SessionUUID);
+                    Console.WriteLine("Enter 29 TO change UUID. (Current value = {0})",  config.Uuid);
                     Console.WriteLine("Enter 30 FOR Push - Register Device");
                     Console.WriteLine("Enter 31 FOR Push - Unregister Device");
                     Console.WriteLine("Enter 32 FOR Push - Remove Channel");
@@ -583,11 +600,13 @@ namespace PubnubApi
                         if (directJson.ToLower() == "y")
                         {
                             jsonPublish = true;
-                            pubnub.EnableJsonEncodingForPublish = false;
+                            config.EnableJsonEncodingForPublish = false;
+                            //pubnub.EnableJsonEncodingForPublish = false;
                         }
                         else
                         {
-                            pubnub.EnableJsonEncodingForPublish = true;
+                            config.EnableJsonEncodingForPublish = true;
+                            //pubnub.EnableJsonEncodingForPublish = true;
                         }
 
                         Console.ForegroundColor = ConsoleColor.Blue;
@@ -1191,25 +1210,25 @@ namespace PubnubApi
                         Console.WriteLine("Simulation going to awake mode");
                         Console.ResetColor();
                         break;
-                    case "21":
-                        Console.WriteLine("Enter Presence Heartbeat in seconds");
-                        string pnHeartbeatInput = Console.ReadLine();
-                        Int32.TryParse(pnHeartbeatInput, out presenceHeartbeat);
-                        pubnub.PresenceHeartbeat = presenceHeartbeat;
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Presence Heartbeat = {0}", presenceHeartbeat));
-                        Console.ResetColor();
-                        break;
-                    case "22":
-                        Console.WriteLine("Enter Presence Heartbeat Interval in seconds");
-                        Console.WriteLine("NOTE: Ensure that it is less than Presence Heartbeat-3 seconds");
-                        string pnHeartbeatIntervalInput = Console.ReadLine();
-                        Int32.TryParse(pnHeartbeatIntervalInput, out presenceHeartbeatInterval);
-                        pubnub.PresenceHeartbeatInterval = presenceHeartbeatInterval;
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Presence Heartbeat Interval = {0}", presenceHeartbeatInterval));
-                        Console.ResetColor();
-                        break;
+                    //case "21":
+                    //    Console.WriteLine("Enter Presence Heartbeat in seconds");
+                    //    string pnHeartbeatInput = Console.ReadLine();
+                    //    Int32.TryParse(pnHeartbeatInput, out presenceHeartbeat);
+                    //    pubnub.PresenceHeartbeat = presenceHeartbeat;
+                    //    Console.ForegroundColor = ConsoleColor.Blue;
+                    //    Console.WriteLine(string.Format("Presence Heartbeat = {0}", presenceHeartbeat));
+                    //    Console.ResetColor();
+                    //    break;
+                    //case "22":
+                    //    Console.WriteLine("Enter Presence Heartbeat Interval in seconds");
+                    //    Console.WriteLine("NOTE: Ensure that it is less than Presence Heartbeat-3 seconds");
+                    //    string pnHeartbeatIntervalInput = Console.ReadLine();
+                    //    Int32.TryParse(pnHeartbeatIntervalInput, out presenceHeartbeatInterval);
+                    //    pubnub.PresenceHeartbeatInterval = presenceHeartbeatInterval;
+                    //    Console.ForegroundColor = ConsoleColor.Blue;
+                    //    Console.WriteLine(string.Format("Presence Heartbeat Interval = {0}", presenceHeartbeatInterval));
+                    //    Console.ResetColor();
+                    //    break;
                     case "23":
                         Console.WriteLine("Enter channel name");
                         Console.WriteLine("NOTE: If you want to consider only Channel Group, just hit ENTER");
@@ -1380,7 +1399,7 @@ namespace PubnubApi
                         string sessionUUID = Console.ReadLine();
                         pubnub.ChangeUUID(sessionUUID);
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine("UUID = {0}", pubnub.SessionUUID);
+                        Console.WriteLine("UUID = {0}", config.Uuid);
                         Console.ResetColor();
                         break;
                     case "30":

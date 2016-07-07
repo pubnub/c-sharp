@@ -81,6 +81,13 @@ namespace PubnubApi
 
         public bool EnableProxy { get; set; }
 
+        public bool EnableDebugForPushPublish { get; set; }
+
+        //For publishing direct JSON string
+        public bool EnableJsonEncodingForPublish { get; set; }
+
+        public bool AddPayloadToPublishResponse { get; set; }
+
         public string FilterExpression { get; set; }
 
         public PNConfiguration()

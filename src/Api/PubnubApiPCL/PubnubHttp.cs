@@ -449,7 +449,7 @@ namespace PubnubApi
                                 }
 
                                 PubnubClientError error = new PubnubClientError(pubnubStatusCode, PubnubErrorSeverity.Critical, jsonString, PubnubMessageSource.Server, asyncRequestState.Request, asyncRequestState.Response, errorDescription, channel, channelGroup);
-                                //GoToCallback(error, asyncRequestState.ErrorCallback);
+                                new PNCallbackService(_jsonLib).GoToCallback(error, asyncRequestState.ErrorCallback);
 
                             }
                             else if (jsonString != "[]")
@@ -527,6 +527,68 @@ namespace PubnubApi
                         {
                             case ResponseType.Time:
                                 break;
+                            case ResponseType.Publish:
+                                #region "Publish"
+                                result.Add(multiChannel);
+                                if (_pnConfig.AddPayloadToPublishResponse && request != null & request.RequestUri != null)
+                                {
+                                    Uri webUri = request.RequestUri;
+                                    string absolutePath = webUri.AbsolutePath.ToString();
+                                    int posLastSlash = absolutePath.LastIndexOf("/");
+                                    if (posLastSlash > 1)
+                                    {
+                                        bool stringType = false;
+                                        //object publishMsg = absolutePath.Substring(posLastSlash + 1);
+                                        string publishPayload = absolutePath.Substring(posLastSlash + 1);
+                                        int posOfStartDQ = publishPayload.IndexOf("%22");
+                                        int posOfEndDQ = publishPayload.LastIndexOf("%22");
+                                        if (posOfStartDQ == 0 && posOfEndDQ + 3 == publishPayload.Length)
+                                        {
+                                            publishPayload = publishPayload.Remove(posOfEndDQ).Remove(posOfStartDQ, 3);
+                                            stringType = true;
+                                        }
+                                        string publishMsg = System.Uri.UnescapeDataString(publishPayload);
+
+                                        double doubleData;
+                                        int intData;
+                                        if (!stringType && int.TryParse(publishMsg, out intData)) //capture numeric data
+                                        {
+                                            result.Add(intData);
+                                        }
+                                        else if (!stringType && double.TryParse(publishMsg, out doubleData)) //capture numeric data
+                                        {
+                                            result.Add(doubleData);
+                                        }
+                                        else
+                                        {
+                                            result.Add(publishMsg);
+                                        }
+                                    }
+                                }
+                                #endregion
+                                break;
+                            case ResponseType.DetailedHistory:
+                                result = DecodeDecryptLoop(result, channels, channelGroups, errorCallback);
+                                result.Add(multiChannel);
+                                break;
+                            case ResponseType.Here_Now:
+                                Dictionary<string, object> dictionary = _jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                                result = new List<object>();
+                                result.Add(dictionary);
+                                result.Add(multiChannel);
+                                break;
+                            case ResponseType.GlobalHere_Now:
+                                Dictionary<string, object> globalHereNowDictionary = _jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                                result = new List<object>();
+                                result.Add(globalHereNowDictionary);
+                                break;
+                            case ResponseType.Where_Now:
+                                Dictionary<string, object> whereNowDictionary = _jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                                result = new List<object>();
+                                result.Add(whereNowDictionary);
+                                result.Add(multiChannel);
+                                break;
+
                             default:
                                 break;
                         }
@@ -575,7 +637,6 @@ namespace PubnubApi
                 LoggingMethod.WriteToLog(string.Format("DateTime: {0}, **WP7 OnPubnubWebRequestTimeout**", DateTime.Now.ToString()), LoggingMethod.LevelError);
             }
         }
-
 
         protected int GetTimeoutInSecondsForResponseType(ResponseType type)
         {
@@ -656,7 +717,37 @@ namespace PubnubApi
                 case ResponseType.Time:
                     if (result != null && result.Count > 0)
                     {
-                        GoToCallback<T>(result, userCallback, true, type);
+                        new PNCallbackService(_jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                    }
+                    break;
+                case ResponseType.Publish:
+                    if (result != null && result.Count > 0)
+                    {
+                        new PNCallbackService(_jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                    }
+                    break;
+                case ResponseType.DetailedHistory:
+                    if (result != null && result.Count > 0)
+                    {
+                        new PNCallbackService(_jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                    }
+                    break;
+                case ResponseType.Here_Now:
+                    if (result != null && result.Count > 0)
+                    {
+                        new PNCallbackService(_jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                    }
+                    break;
+                case ResponseType.GlobalHere_Now:
+                    if (result != null && result.Count > 0)
+                    {
+                        new PNCallbackService(_jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                    }
+                    break;
+                case ResponseType.Where_Now:
+                    if (result != null && result.Count > 0)
+                    {
+                        new PNCallbackService(_jsonLib).GoToCallback<T>(result, userCallback, true, type);
                     }
                     break;
                 default:
@@ -664,119 +755,69 @@ namespace PubnubApi
             }
         }
 
-        private void JsonResponseToCallback<T>(List<object> result, Action<T> callback)
+        private List<object> DecodeDecryptLoop(List<object> message, string[] channels, string[] channelGroups, Action<PubnubClientError> errorCallback)
         {
-            string callbackJson = "";
-
-            if (typeof(T) == typeof(string))
+            List<object> returnMessage = new List<object>();
+            if (_pnConfig.CiperKey.Length > 0)
             {
-                callbackJson = _jsonLib.SerializeToJsonString(result);
-
-                Action<string> castCallback = callback as Action<string>;
-                castCallback(callbackJson);
-            }
-        }
-
-        private void JsonResponseToCallback<T>(object result, Action<T> callback)
-        {
-            string callbackJson = "";
-
-            if (typeof(T) == typeof(string))
-            {
-                callbackJson = _jsonLib.SerializeToJsonString(result);
-
-                Action<string> castCallback = callback as Action<string>;
-                castCallback(callbackJson);
-            }
-        }
-
-        private void JsonResponseToCallback<T>(long result, Action<T> callback)
-        {
-            if (typeof(T) == typeof(long))
-            {
-                Action<long> castCallback = callback as Action<long>;
-                castCallback(result);
-            }
-        }
-
-        //		protected void GoToCallback<T> (object result, Action<T> Callback)
-        //		{
-        //			if (Callback != null) {
-        //				if (typeof(T) == typeof(string)) {
-        //					JsonResponseToCallback (result, Callback);
-        //				} else {
-        //					Callback ((T)(object)result);
-        //				}
-        //			}
-        //		}
-
-        protected void GoToCallback<T>(List<object> result, Action<T> Callback, bool internalObject, ResponseType type)
-        {
-            if (Callback != null)
-            {
-                if (typeof(T) == typeof(string))
+                PubnubCrypto aes = new PubnubCrypto(_pnConfig.CiperKey);
+                var myObjectArray = (from item in message
+                                     select item as object).ToArray();
+                IEnumerable enumerable = myObjectArray[0] as IEnumerable;
+                if (enumerable != null)
                 {
-                    JsonResponseToCallback(result, Callback);
-                }
-                else if (typeof(T) == typeof(long) && type == ResponseType.Time)
-                {
-                    long timetoken;
-                    Int64.TryParse(result[0].ToString(), out timetoken);
-                    JsonResponseToCallback(timetoken, Callback);
-                }
-                else
-                {
-                    T ret = default(T);
-                    if (!internalObject)
+                    List<object> receivedMsg = new List<object>();
+                    foreach (object element in enumerable)
                     {
-                        ret = _jsonLib.DeserializeToObject<T>(result);
-                    }
-                    else
-                    {
-                        NewtonsoftJsonDotNet jsonLib = new NewtonsoftJsonDotNet();
-                        ret = jsonLib.DeserializeToObject<T>(result);
-                    }
+                        string decryptMessage = "";
+                        try
+                        {
+                            decryptMessage = aes.Decrypt(element.ToString());
+                        }
+                        catch (Exception ex)
+                        {
+                            decryptMessage = "**DECRYPT ERROR**";
 
-                    Callback(ret);
+                            string multiChannel = string.Join(",", channels);
+                            string multiChannelGroup = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups) : "";
+
+                            new PNCallbackService(_jsonLib).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
+                                multiChannel, multiChannelGroup, errorCallback, ex, null, null);
+                        }
+                        object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : _jsonLib.DeserializeToObject(decryptMessage);
+                        receivedMsg.Add(decodeMessage);
+                    }
+                    returnMessage.Add(receivedMsg);
                 }
-            }
-        }
 
-        protected void GoToCallback(object result, Action<string> Callback)
-        {
-            if (Callback != null)
+                for (int index = 1; index < myObjectArray.Length; index++)
+                {
+                    returnMessage.Add(myObjectArray[index]);
+                }
+                return returnMessage;
+            }
+            else
             {
-                JsonResponseToCallback(result, Callback);
+                var myObjectArray = (from item in message
+                                     select item as object).ToArray();
+                IEnumerable enumerable = myObjectArray[0] as IEnumerable;
+                if (enumerable != null)
+                {
+                    List<object> receivedMessage = new List<object>();
+                    foreach (object element in enumerable)
+                    {
+                        receivedMessage.Add(element);
+                    }
+                    returnMessage.Add(receivedMessage);
+                }
+                for (int index = 1; index < myObjectArray.Length; index++)
+                {
+                    returnMessage.Add(myObjectArray[index]);
+                }
+                return returnMessage;
             }
         }
 
-        protected void GoToCallback(object result, Action<object> Callback)
-        {
-            if (Callback != null)
-            {
-                Callback(result);
-            }
-        }
-
-        protected void GoToCallback(PubnubClientError error, Action<PubnubClientError> Callback)
-        {
-            //if (Callback != null && error != null)
-            //{
-            //    if ((int)error.Severity <= (int)_errorLevel)
-            //    { //Checks whether the error serverity falls in the range of error filter level
-            //      //Do not send 107 = PubnubObjectDisposedException
-            //      //Do not send 105 = WebRequestCancelled
-            //      //Do not send 130 = PubnubClientMachineSleep
-            //        if (error.StatusCode != 107
-            //            && error.StatusCode != 105
-            //            && error.StatusCode != 130
-            //            && error.StatusCode != 4040) //Error Code that should not go out
-            //        {
-            //            Callback(error);
-            //        }
-            //    }
-            //}
-        }
 
     }
 }

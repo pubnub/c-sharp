@@ -11,11 +11,23 @@ namespace PubnubApi
 {
     public class UrlRequestBuilder : IUrlRequestBuilder
     {
-        private PNConfiguration _config;
+        private PNConfiguration _pnConfig = null;
+        private IJsonPluggableLibrary _jsonLib = null;
 
-        public UrlRequestBuilder(PNConfiguration config)
+        private string publishQueryparameters = "";
+        private string hereNowParameters = "";
+        private string historyParameters = "";
+        private string globalHereNowParameters = "";
+
+        public UrlRequestBuilder(PNConfiguration pnConfig)
         {
-            this._config = config;
+            this._pnConfig = pnConfig;
+        }
+
+        public UrlRequestBuilder(PNConfiguration pnConfig, IJsonPluggableLibrary jsonPluggableLibrary)
+        {
+            this._pnConfig = pnConfig;
+            _jsonLib = jsonPluggableLibrary;
         }
 
         Uri IUrlRequestBuilder.BuildTimeRequest()
@@ -28,9 +40,162 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, ResponseType.Time);
         }
 
+        Uri IUrlRequestBuilder.BuildPublishRequest(string channel, object originalMessage, bool storeInHistory, string jsonUserMetaData)
+        {
+            string message = (_pnConfig.EnableJsonEncodingForPublish) ? JsonEncodePublishMsg(originalMessage) : originalMessage.ToString();
+
+            StringBuilder publishParamBuilder = new StringBuilder();
+
+            if (!storeInHistory)
+            {
+                publishParamBuilder.Append("store=0");
+            }
+            if (!string.IsNullOrEmpty(jsonUserMetaData) && _jsonLib != null && _jsonLib.IsDictionaryCompatible(jsonUserMetaData))
+            {
+                if (publishParamBuilder.ToString().Length > 0)
+                {
+                    publishParamBuilder.AppendFormat("&meta={0}", EncodeUricomponent(jsonUserMetaData, ResponseType.Publish, false, false));
+                }
+                else
+                {
+                    publishParamBuilder.AppendFormat("meta={0}", EncodeUricomponent(jsonUserMetaData, ResponseType.Publish, false, false));
+                }
+            }
+            publishQueryparameters = publishParamBuilder.ToString();
+
+            // Generate String to Sign
+            string signature = "0";
+            if (_pnConfig.SecretKey.Length > 0)
+            {
+                StringBuilder string_to_sign = new StringBuilder();
+                string_to_sign
+                    .Append(_pnConfig.PublishKey)
+                        .Append('/')
+                        .Append(_pnConfig.SubscribeKey)
+                        .Append('/')
+                        .Append(_pnConfig.SecretKey)
+                        .Append('/')
+                        .Append(channel)
+                        .Append('/')
+                        .Append(message); // 1
+
+                // Sign Message
+                signature = Md5(string_to_sign.ToString());
+            }
+
+            // Build URL
+            List<string> url = new List<string>();
+            url.Add("publish");
+            url.Add(_pnConfig.PublishKey);
+            url.Add(_pnConfig.SubscribeKey);
+            url.Add(signature);
+            url.Add(channel);
+            url.Add("0");
+            url.Add(message);
+
+            return BuildRestApiRequest<Uri>(url, ResponseType.Publish);
+        }
+
+        Uri IUrlRequestBuilder.BuildHereNowRequest(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState)
+        {
+            string channel = (channels != null && channels.Length > 0) ? string.Join(",", channels) : ",";
+            if (channel.Trim() == "")
+            {
+                channel = ",";
+            }
+            string channelGroup = (channelGroups != null) ? string.Join(",", channelGroups) : "";
+
+            int disableUUID = (showUUIDList) ? 0 : 1;
+            int userState = (includeUserState) ? 1 : 0;
+
+            if (!string.IsNullOrEmpty(channelGroup) && channelGroup.Trim().Length > 0)
+            {
+                hereNowParameters = string.Format("?channel-group={0}&disable_uuids={1}&state={2}", channelGroup, disableUUID, userState);
+            }
+            else
+            {
+                hereNowParameters = string.Format("?disable_uuids={0}&state={1}", disableUUID, userState);
+            }
+
+
+            List<string> url = new List<string>();
+
+            url.Add("v2");
+            url.Add("presence");
+            url.Add("sub_key");
+            url.Add(_pnConfig.SubscribeKey);
+            url.Add("channel");
+            url.Add(channel);
+
+            return BuildRestApiRequest<Uri>(url, ResponseType.Here_Now);
+        }
+
+        Uri IUrlRequestBuilder.BuildHistoryRequest(string channel, long start, long end, int count, bool reverse, bool includeToken)
+        {
+            StringBuilder parameterBuilder = new StringBuilder();
+            historyParameters = "";
+            if (count <= -1)
+                count = 100;
+
+            parameterBuilder.AppendFormat("?count={0}", count);
+            if (reverse)
+            {
+                parameterBuilder.AppendFormat("&reverse={0}", reverse.ToString().ToLower());
+            }
+            if (start != -1)
+            {
+                parameterBuilder.AppendFormat("&start={0}", start.ToString().ToLower());
+            }
+            if (end != -1)
+            {
+                parameterBuilder.AppendFormat("&end={0}", end.ToString().ToLower());
+            }
+            if (!string.IsNullOrEmpty(_pnConfig.AuthKey))
+            {
+                parameterBuilder.AppendFormat("&auth={0}", EncodeUricomponent(_pnConfig.AuthKey, ResponseType.DetailedHistory, false, false));
+            }
+
+            parameterBuilder.AppendFormat("&uuid={0}", EncodeUricomponent(_pnConfig.Uuid, ResponseType.DetailedHistory, false, false));
+            if (includeToken)
+            {
+                parameterBuilder.AppendFormat("&include_token={0}", includeToken.ToString().ToLower());
+            }
+            parameterBuilder.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnConfig.SdkVersion, ResponseType.DetailedHistory, false, true));
+
+            historyParameters = parameterBuilder.ToString();
+
+            List<string> url = new List<string>();
+
+            url.Add("v2");
+            url.Add("history");
+            url.Add("sub-key");
+            url.Add(_pnConfig.SubscribeKey);
+            url.Add("channel");
+            url.Add(channel);
+
+            return BuildRestApiRequest<Uri>(url, ResponseType.DetailedHistory);
+        }
+
+        Uri IUrlRequestBuilder.BuildGlobalHereNowRequest(bool showUUIDList, bool includeUserState)
+        {
+            int disableUUID = (showUUIDList) ? 0 : 1;
+            int userState = (includeUserState) ? 1 : 0;
+            globalHereNowParameters = string.Format("?disable_uuids={0}&state={1}", disableUUID, userState);
+
+            List<string> url = new List<string>();
+
+            url.Add("v2");
+            url.Add("presence");
+            url.Add("sub_key");
+            url.Add(_pnConfig.SubscribeKey);
+
+            return BuildRestApiRequest<Uri>(url, ResponseType.GlobalHere_Now);
+        }
+
+
         private Uri BuildRestApiRequest<T>(List<string> urlComponents, ResponseType type)
         {
-            return BuildRestApiRequest<T>(urlComponents, type, this._config.Uuid);
+            return BuildRestApiRequest<T>(urlComponents, type, this._pnConfig.Uuid);
         }
 
         private Uri BuildRestApiRequest<T>(List<string> urlComponents, ResponseType type, string uuid)
@@ -41,7 +206,7 @@ namespace PubnubApi
             uuid = EncodeUricomponent(uuid, type, false, false);
 
             // Add http or https based on SSL flag
-            if (_config.Secure)
+            if (_pnConfig.Secure)
             {
                 url.Append("https://");
             }
@@ -51,7 +216,7 @@ namespace PubnubApi
             }
 
             // Add Origin To The Request
-            url.Append(_config.Origin);
+            url.Append(_pnConfig.Origin);
 
             // Generate URL with UTF-8 Encoding
             for (int componentIndex = 0; componentIndex < urlComponents.Count; componentIndex++)
@@ -114,58 +279,58 @@ namespace PubnubApi
                 //queryParamExist = true;
                 //url.AppendFormat("?uuid={0}", uuid);
                 //url.Append(getUserStateParameters);
-                //if (!string.IsNullOrEmpty(_authenticationKey))
+                //if (!string.IsNullOrEmpty(_pnConfig.AuthKey))
                 //{
-                //    url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
+                //    url.AppendFormat("&auth={0}", EncodeUricomponent(_pnConfig.AuthKey, type, false, false));
                 //}
-                //url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
+                //url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnConfig.SdkVersion, type, false, true));
 
             }
             else if (type == ResponseType.Here_Now)
             {
-                //queryParamExist = true;
-                //url.Append(hereNowParameters);
-                //url.AppendFormat("&uuid={0}", uuid);
-                //if (!string.IsNullOrEmpty(_authenticationKey))
-                //{
-                //    url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
-                //}
-                //url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
+                queryParamExist = true;
+                url.Append(hereNowParameters);
+                url.AppendFormat("&uuid={0}", uuid);
+                if (!string.IsNullOrEmpty(_pnConfig.AuthKey))
+                {
+                    url.AppendFormat("&auth={0}", EncodeUricomponent(_pnConfig.AuthKey, type, false, false));
+                }
+                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnConfig.SdkVersion, type, false, true));
             }
             else if (type == ResponseType.GlobalHere_Now)
             {
-                //queryParamExist = true;
-                //url.Append(globalHereNowParameters);
-                //url.AppendFormat("&uuid={0}", uuid);
-                //if (!string.IsNullOrEmpty(_authenticationKey))
-                //{
-                //    url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
-                //}
-                //url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
+                queryParamExist = true;
+                url.Append(globalHereNowParameters);
+                url.AppendFormat("&uuid={0}", uuid);
+                if (!string.IsNullOrEmpty(_pnConfig.AuthKey))
+                {
+                    url.AppendFormat("&auth={0}", EncodeUricomponent(_pnConfig.AuthKey, type, false, false));
+                }
+                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnConfig.SdkVersion, type, false, true));
             }
             else if (type == ResponseType.Where_Now)
             {
-                //queryParamExist = true;
-                //url.AppendFormat("?uuid={0}", uuid);
-                //if (!string.IsNullOrEmpty(_authenticationKey))
-                //{
-                //    url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
-                //}
-                //url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
+                queryParamExist = true;
+                url.AppendFormat("?uuid={0}", uuid);
+                if (!string.IsNullOrEmpty(_pnConfig.AuthKey))
+                {
+                    url.AppendFormat("&auth={0}", EncodeUricomponent(_pnConfig.AuthKey, type, false, false));
+                }
+                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnConfig.SdkVersion, type, false, true));
             }
             else if (type == ResponseType.Publish)
             {
-                //queryParamExist = true;
-                //url.AppendFormat("?uuid={0}", uuid);
-                //if (parameters != "")
-                //{
-                //    url.AppendFormat("&{0}", parameters);
-                //}
-                //if (!string.IsNullOrEmpty(_authenticationKey))
-                //{
-                //    url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
-                //}
-                //url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
+                queryParamExist = true;
+                url.AppendFormat("?uuid={0}", uuid);
+                if (publishQueryparameters != "")
+                {
+                    url.AppendFormat("&{0}", publishQueryparameters);
+                }
+                if (!string.IsNullOrEmpty(_pnConfig.AuthKey))
+                {
+                    url.AppendFormat("&auth={0}", EncodeUricomponent(_pnConfig.AuthKey, type, false, false));
+                }
+                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnConfig.SdkVersion, type, false, true));
             }
             else if (type == ResponseType.PushRegister || type == ResponseType.PushRemove || type == ResponseType.PushGet || type == ResponseType.PushUnregister)
             {
@@ -213,14 +378,14 @@ namespace PubnubApi
                 || type == ResponseType.GrantAccess || type == ResponseType.AuditAccess || type == ResponseType.RevokeAccess
                 || type == ResponseType.ChannelGroupGrantAccess || type == ResponseType.ChannelGroupAuditAccess || type == ResponseType.ChannelGroupRevokeAccess)
             {
-                //url.Append(parameters);
-                //queryParamExist = true;
+                url.Append(historyParameters);
+                queryParamExist = true;
             }
 
             if (!queryParamExist)
             {
                 url.AppendFormat("?uuid={0}", uuid);
-                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_config.SdkVersion, type, false, true));
+                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnConfig.SdkVersion, type, false, true));
             }
 
 
@@ -329,6 +494,21 @@ namespace PubnubApi
             }
         }
 
+        private string JsonEncodePublishMsg(object originalMessage)
+        {
+            string message = _jsonLib.SerializeToJsonString(originalMessage);
+
+
+            if (_pnConfig.CiperKey.Length > 0)
+            {
+                PubnubCrypto aes = new PubnubCrypto(_pnConfig.CiperKey);
+                string encryptMessage = aes.Encrypt(message);
+                message = _jsonLib.SerializeToJsonString(encryptMessage);
+            }
+
+            return message;
+        }
+
         private char ToHex(int ch)
         {
             return (char)(ch < 10 ? '0' + ch : 'A' + ch - 10);
@@ -406,5 +586,17 @@ namespace PubnubApi
                 LoggingMethod.WriteToLog("Exception Inside ForceCanonicalPathAndQuery = " + ex.ToString(), LoggingMethod.LevelInfo);
             }
         }
+
+        private static string Md5(string text)
+        {
+            MD5 md5 = new MD5CryptoServiceProvider();
+            byte[] data = Encoding.Unicode.GetBytes(text);
+            byte[] hash = md5.ComputeHash(data);
+            string hexaHash = "";
+            foreach (byte b in hash)
+                hexaHash += String.Format("{0:x2}", b);
+            return hexaHash;
+        }
+
     }
 }

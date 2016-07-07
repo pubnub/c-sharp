@@ -15,7 +15,7 @@ namespace PubnubApi.EndPoint
             _pnConfig = pnConfig;
         }
 
-        public bool Time(Action<long> userCallback, Action<PubnubClientError> errorCallback)
+        internal void Time(Action<long> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (userCallback == null)
             {
@@ -36,7 +36,7 @@ namespace PubnubApi.EndPoint
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            return UrlProcessRequest<long>(request, requestState);
+            UrlProcessRequest<long>(request, requestState);
         }
 
     }
