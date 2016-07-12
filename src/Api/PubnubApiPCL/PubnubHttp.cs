@@ -11,13 +11,13 @@ namespace PubnubApi
 {
     public class PubnubHttp : IPubnubHttp
     {
-        private PNConfiguration _pnConfig = null;
-        private IJsonPluggableLibrary _jsonLib = null;
+        private PNConfiguration pubnubConfig = null;
+        private IJsonPluggableLibrary jsonLib = null;
 
-        public PubnubHttp(PNConfiguration pnConfiguation, IJsonPluggableLibrary jsonPluggableLibrary)
+        public PubnubHttp(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary)
         {
-            this._pnConfig = pnConfiguation;
-            this._jsonLib = jsonPluggableLibrary;
+            this.pubnubConfig = config;
+            this.jsonLib = jsonPluggableLibrary;
         }
 
         PubnubWebRequest IPubnubHttp.SetProxy<T>(PubnubWebRequest request)
@@ -306,9 +306,9 @@ namespace PubnubApi
                             else if (jsonString != "[]")
                             {
                                 bool errorCallbackRaised = false;
-                                if (_jsonLib.IsDictionaryCompatible(jsonString))
+                                if (jsonLib.IsDictionaryCompatible(jsonString))
                                 {
-                                    Dictionary<string, object> deserializeStatus = _jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                                    Dictionary<string, object> deserializeStatus = jsonLib.DeserializeToDictionaryOfObject(jsonString);
                                     int statusCode = 0; //default. assuming all is ok 
                                     if (deserializeStatus.ContainsKey("status") && deserializeStatus.ContainsKey("message"))
                                     {
@@ -425,17 +425,17 @@ namespace PubnubApi
                                     pubnubStatusCode = (int)pubnubErrorType;
                                     errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(pubnubErrorType);
                                 }
-                                else if (_jsonLib.IsArrayCompatible(jsonString))
+                                else if (jsonLib.IsArrayCompatible(jsonString))
                                 {
-                                    List<object> deserializeStatus = _jsonLib.DeserializeToListOfObject(jsonString);
+                                    List<object> deserializeStatus = jsonLib.DeserializeToListOfObject(jsonString);
                                     string statusMessage = deserializeStatus[1].ToString();
                                     PubnubErrorCode pubnubErrorType = PubnubErrorCodeHelper.GetErrorType((int)currentHttpStatusCode, statusMessage);
                                     pubnubStatusCode = (int)pubnubErrorType;
                                     errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(pubnubErrorType);
                                 }
-                                else if (_jsonLib.IsDictionaryCompatible(jsonString))
+                                else if (jsonLib.IsDictionaryCompatible(jsonString))
                                 {
-                                    Dictionary<string, object> deserializeStatus = _jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                                    Dictionary<string, object> deserializeStatus = jsonLib.DeserializeToDictionaryOfObject(jsonString);
                                     string statusMessage = deserializeStatus.ContainsKey("message") ? deserializeStatus["message"].ToString() : (deserializeStatus.ContainsKey("error") ? deserializeStatus["error"].ToString() : jsonString);
                                     PubnubErrorCode pubnubErrorType = PubnubErrorCodeHelper.GetErrorType((int)currentHttpStatusCode, statusMessage);
                                     pubnubStatusCode = (int)pubnubErrorType;
@@ -449,7 +449,7 @@ namespace PubnubApi
                                 }
 
                                 PubnubClientError error = new PubnubClientError(pubnubStatusCode, PubnubErrorSeverity.Critical, jsonString, PubnubMessageSource.Server, asyncRequestState.Request, asyncRequestState.Response, errorDescription, channel, channelGroup);
-                                new PNCallbackService(_jsonLib).GoToCallback(error, asyncRequestState.ErrorCallback);
+                                new PNCallbackService(jsonLib).GoToCallback(error, asyncRequestState.ErrorCallback);
 
                             }
                             else if (jsonString != "[]")
@@ -515,7 +515,7 @@ namespace PubnubApi
                 {
                     if (!string.IsNullOrEmpty(jsonString))
                     {
-                        object deSerializedResult = _jsonLib.DeserializeToObject(jsonString);
+                        object deSerializedResult = jsonLib.DeserializeToObject(jsonString);
                         List<object> result1 = ((IEnumerable)deSerializedResult).Cast<object>().ToList();
 
                         if (result1 != null && result1.Count > 0)
@@ -530,7 +530,7 @@ namespace PubnubApi
                             case ResponseType.Publish:
                                 #region "Publish"
                                 result.Add(multiChannel);
-                                if (_pnConfig.AddPayloadToPublishResponse && request != null & request.RequestUri != null)
+                                if (pubnubConfig.AddPayloadToPublishResponse && request != null & request.RequestUri != null)
                                 {
                                     Uri webUri = request.RequestUri;
                                     string absolutePath = webUri.AbsolutePath.ToString();
@@ -572,21 +572,37 @@ namespace PubnubApi
                                 result.Add(multiChannel);
                                 break;
                             case ResponseType.Here_Now:
-                                Dictionary<string, object> dictionary = _jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                                Dictionary<string, object> dictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
                                 result = new List<object>();
                                 result.Add(dictionary);
                                 result.Add(multiChannel);
                                 break;
                             case ResponseType.GlobalHere_Now:
-                                Dictionary<string, object> globalHereNowDictionary = _jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                                Dictionary<string, object> globalHereNowDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
                                 result = new List<object>();
                                 result.Add(globalHereNowDictionary);
                                 break;
                             case ResponseType.Where_Now:
-                                Dictionary<string, object> whereNowDictionary = _jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                                Dictionary<string, object> whereNowDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
                                 result = new List<object>();
                                 result.Add(whereNowDictionary);
                                 result.Add(multiChannel);
+                                break;
+                            case ResponseType.GrantAccess:
+                            case ResponseType.AuditAccess:
+                            case ResponseType.RevokeAccess:
+                                Dictionary<string, object> grantDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                                result = new List<object>();
+                                result.Add(grantDictionary);
+                                result.Add(multiChannel);
+                                break;
+                            case ResponseType.ChannelGroupGrantAccess:
+                            case ResponseType.ChannelGroupAuditAccess:
+                            case ResponseType.ChannelGroupRevokeAccess:
+                                Dictionary<string, object> channelGroupPAMDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                                result = new List<object>();
+                                result.Add(channelGroupPAMDictionary);
+                                result.Add(multiChannelGroup);
                                 break;
 
                             default:
@@ -643,11 +659,11 @@ namespace PubnubApi
             int timeout;
             if (type == ResponseType.Subscribe || type == ResponseType.Presence)
             {
-                timeout = _pnConfig.SubscribeTimeout;
+                timeout = pubnubConfig.SubscribeTimeout;
             }
             else
             {
-                timeout = _pnConfig.NonSubscribeRequestTimeout;
+                timeout = pubnubConfig.NonSubscribeRequestTimeout;
             }
             return timeout;
         }
@@ -717,37 +733,50 @@ namespace PubnubApi
                 case ResponseType.Time:
                     if (result != null && result.Count > 0)
                     {
-                        new PNCallbackService(_jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                        new PNCallbackService(jsonLib).GoToCallback<T>(result, userCallback, true, type);
                     }
                     break;
                 case ResponseType.Publish:
                     if (result != null && result.Count > 0)
                     {
-                        new PNCallbackService(_jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                        new PNCallbackService(jsonLib).GoToCallback<T>(result, userCallback, true, type);
                     }
                     break;
                 case ResponseType.DetailedHistory:
                     if (result != null && result.Count > 0)
                     {
-                        new PNCallbackService(_jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                        new PNCallbackService(jsonLib).GoToCallback<T>(result, userCallback, true, type);
                     }
                     break;
                 case ResponseType.Here_Now:
                     if (result != null && result.Count > 0)
                     {
-                        new PNCallbackService(_jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                        new PNCallbackService(jsonLib).GoToCallback<T>(result, userCallback, true, type);
                     }
                     break;
                 case ResponseType.GlobalHere_Now:
                     if (result != null && result.Count > 0)
                     {
-                        new PNCallbackService(_jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                        new PNCallbackService(jsonLib).GoToCallback<T>(result, userCallback, true, type);
                     }
                     break;
                 case ResponseType.Where_Now:
                     if (result != null && result.Count > 0)
                     {
-                        new PNCallbackService(_jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                        new PNCallbackService(jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                    }
+                    break;
+                case ResponseType.GrantAccess:
+                case ResponseType.AuditAccess:
+                case ResponseType.RevokeAccess:
+                case ResponseType.ChannelGroupGrantAccess:
+                case ResponseType.ChannelGroupAuditAccess:
+                case ResponseType.ChannelGroupRevokeAccess:
+                case ResponseType.GetUserState:
+                case ResponseType.SetUserState:
+                    if (result != null && result.Count > 0)
+                    {
+                        new PNCallbackService(jsonLib).GoToCallback<T>(result, userCallback, true, type);
                     }
                     break;
                 default:
@@ -758,9 +787,9 @@ namespace PubnubApi
         private List<object> DecodeDecryptLoop(List<object> message, string[] channels, string[] channelGroups, Action<PubnubClientError> errorCallback)
         {
             List<object> returnMessage = new List<object>();
-            if (_pnConfig.CiperKey.Length > 0)
+            if (pubnubConfig.CiperKey.Length > 0)
             {
-                PubnubCrypto aes = new PubnubCrypto(_pnConfig.CiperKey);
+                PubnubCrypto aes = new PubnubCrypto(pubnubConfig.CiperKey);
                 var myObjectArray = (from item in message
                                      select item as object).ToArray();
                 IEnumerable enumerable = myObjectArray[0] as IEnumerable;
@@ -781,10 +810,10 @@ namespace PubnubApi
                             string multiChannel = string.Join(",", channels);
                             string multiChannelGroup = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups) : "";
 
-                            new PNCallbackService(_jsonLib).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
+                            new PNCallbackService(jsonLib).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
                                 multiChannel, multiChannelGroup, errorCallback, ex, null, null);
                         }
-                        object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : _jsonLib.DeserializeToObject(decryptMessage);
+                        object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : jsonLib.DeserializeToObject(decryptMessage);
                         receivedMsg.Add(decodeMessage);
                     }
                     returnMessage.Add(receivedMsg);

@@ -130,10 +130,10 @@ namespace PubnubSilverlight
 
                 btnReset.IsEnabled = true;
             }
-            pubnub.NetworkCheckMaxRetries = networkMaxRetries;
-            pubnub.NetworkCheckRetryInterval = networkRetryIntervalInSeconds;
-            pubnub.LocalClientHeartbeatInterval = localClientHeartbeatIntervalInSeconds;
-            pubnub.EnableResumeOnReconnect = resumeOnReconnect;
+            //pubnub.NetworkCheckMaxRetries = networkMaxRetries;
+            //pubnub.NetworkCheckRetryInterval = networkRetryIntervalInSeconds;
+            //pubnub.LocalClientHeartbeatInterval = localClientHeartbeatIntervalInSeconds;
+            //pubnub.EnableResumeOnReconnect = resumeOnReconnect;
         }
 
         private void Subscribe_Click(object sender, RoutedEventArgs e)

@@ -15,6 +15,7 @@
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TargetFrameworkProfile>Profile328</TargetFrameworkProfile>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <StyleCopTreatErrorsAsWarnings>True</StyleCopTreatErrorsAsWarnings>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,9 +37,12 @@
   <ItemGroup>
     <Compile Include="Builder\UrlRequestBuilder.cs" />
     <Compile Include="Callback\PNCallbackService.cs" />
+    <Compile Include="EndPoint\Access\AuditOperation.cs" />
+    <Compile Include="EndPoint\Access\GrantOperation.cs" />
     <Compile Include="EndPoint\HistoryOperation.cs" />
     <Compile Include="EndPoint\Presence\GlobalHereNowOperation.cs" />
     <Compile Include="EndPoint\Presence\HereNowOperation.cs" />
+    <Compile Include="EndPoint\Presence\WhereNowOperation.cs" />
     <Compile Include="EndPoint\PubSub\PublishOperation.cs" />
     <Compile Include="EndPoint\TimeOperation.cs" />
     <Compile Include="Enum\PNHeartbeatNotificationOption.cs" />
@@ -117,6 +121,13 @@
     <Compile Include="Model\Consumer\Ack\WhereNowAck.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="EndPoint\ChannelGroup\" />
+    <Folder Include="EndPoint\Push\" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="crypto, Version=1.7.0.0, Culture=neutral, PublicKeyToken=52d7d8cd84e8295f, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Portable.BouncyCastle-Signed.1.7.0.2\lib\portable-net4+sl5+wp8+win8+wpa81+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10\crypto.dll</HintPath>
       <Private>True</Private>
@@ -126,16 +137,8 @@
       <Private>True</Private>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="EndPoint\Access\" />
-    <Folder Include="EndPoint\ChannelGroup\" />
-    <Folder Include="EndPoint\Push\" />
-  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <Import Project="$(ProgramFiles)\MSBuild\StyleCop\v4.7\StyleCop.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
