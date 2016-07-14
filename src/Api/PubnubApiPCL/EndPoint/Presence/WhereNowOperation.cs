@@ -8,18 +8,18 @@ namespace PubnubApi.EndPoint
 {
     internal class WhereNowOperation : PubnubCoreBase
     {
-        private PNConfiguration _pnConfig = null;
-        private IJsonPluggableLibrary _jsonPluggableLibrary = null;
+        private PNConfiguration config = null;
+        private IJsonPluggableLibrary jsonLibrary = null;
 
         public WhereNowOperation(PNConfiguration pnConfig):base(pnConfig)
         {
-            _pnConfig = pnConfig;
+            config = pnConfig;
         }
 
         public WhereNowOperation(PNConfiguration pnConfig, IJsonPluggableLibrary jsonPluggableLibrary):base(pnConfig, jsonPluggableLibrary)
         {
-            _pnConfig = pnConfig;
-            _jsonPluggableLibrary = jsonPluggableLibrary;
+            config = pnConfig;
+            jsonLibrary = jsonPluggableLibrary;
         }
 
         internal void WhereNow(string uuid, Action<WhereNowAck> userCallback, Action<PubnubClientError> errorCallback)
@@ -32,17 +32,17 @@ namespace PubnubApi.EndPoint
             {
                 throw new ArgumentException("Missing errorCallback");
             }
-            if (_jsonPluggableLibrary == null)
+            if (jsonLibrary == null)
             {
                 throw new NullReferenceException("Missing Json Pluggable Library for Pubnub Instance");
             }
 
             if (string.IsNullOrEmpty(uuid))
             {
-                uuid = _pnConfig.Uuid;
+                uuid = config.Uuid;
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(_pnConfig, _jsonPluggableLibrary);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
             Uri request = urlBuilder.BuildWhereNowRequest(uuid);
 
             RequestState<WhereNowAck> requestState = new RequestState<WhereNowAck>();

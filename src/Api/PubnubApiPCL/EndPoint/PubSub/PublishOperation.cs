@@ -8,18 +8,18 @@ namespace PubnubApi.EndPoint
 {
     internal class PublishOperation : PubnubCoreBase
     {
-        private PNConfiguration _pnConfig = null;
-        private IJsonPluggableLibrary _jsonPluggableLibrary = null;
+        private PNConfiguration config = null;
+        private IJsonPluggableLibrary jsonLibrary = null;
 
         public PublishOperation(PNConfiguration pnConfig):base(pnConfig)
         {
-            _pnConfig = pnConfig;
+            config = pnConfig;
         }
 
         public PublishOperation(PNConfiguration pnConfig, IJsonPluggableLibrary jsonPluggableLibrary):base(pnConfig, jsonPluggableLibrary)
         {
-            _pnConfig = pnConfig;
-            _jsonPluggableLibrary = jsonPluggableLibrary;
+            config = pnConfig;
+            jsonLibrary = jsonPluggableLibrary;
         }
 
         internal void Publish(string channel, object message, bool storeInHistory, string jsonUserMetaData, Action<PublishAck> userCallback, Action<PubnubClientError> errorCallback)
@@ -29,7 +29,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing Channel or Message");
             }
 
-            if (string.IsNullOrEmpty(_pnConfig.PublishKey) || string.IsNullOrEmpty(_pnConfig.PublishKey.Trim()) || _pnConfig.PublishKey.Length <= 0)
+            if (string.IsNullOrEmpty(config.PublishKey) || string.IsNullOrEmpty(config.PublishKey.Trim()) || config.PublishKey.Length <= 0)
             {
                 throw new MissingMemberException("Invalid publish key");
             }
@@ -43,7 +43,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing errorCallback");
             }
 
-            if (_pnConfig.EnableDebugForPushPublish)
+            if (config.EnableDebugForPushPublish)
             {
                 if (message is Dictionary<string, object>)
                 {
@@ -53,12 +53,12 @@ namespace PubnubApi.EndPoint
                 }
             }
 
-            if (string.IsNullOrEmpty(jsonUserMetaData) || _jsonPluggableLibrary.IsDictionaryCompatible(jsonUserMetaData))
+            if (string.IsNullOrEmpty(jsonUserMetaData) || jsonLibrary.IsDictionaryCompatible(jsonUserMetaData))
             {
                 jsonUserMetaData = "";
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(_pnConfig, _jsonPluggableLibrary);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
             Uri request = urlBuilder.BuildPublishRequest(channel, message, storeInHistory, jsonUserMetaData);
 
             RequestState<PublishAck> requestState = new RequestState<PublishAck>();

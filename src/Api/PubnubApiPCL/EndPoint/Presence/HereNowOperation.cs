@@ -8,18 +8,18 @@ namespace PubnubApi.EndPoint
 {
     internal class HereNowOperation : PubnubCoreBase
     {
-        private PNConfiguration _pnConfig = null;
-        private IJsonPluggableLibrary _jsonPluggableLibrary = null;
+        private PNConfiguration config = null;
+        private IJsonPluggableLibrary jsonLibrary = null;
 
         public HereNowOperation(PNConfiguration pnConfig):base(pnConfig)
         {
-            _pnConfig = pnConfig;
+            config = pnConfig;
         }
 
         public HereNowOperation(PNConfiguration pnConfig, IJsonPluggableLibrary jsonPluggableLibrary):base(pnConfig, jsonPluggableLibrary)
         {
-            _pnConfig = pnConfig;
-            _jsonPluggableLibrary = jsonPluggableLibrary;
+            config = pnConfig;
+            jsonLibrary = jsonPluggableLibrary;
         }
 
         internal void HereNow(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, Action<HereNowAck> userCallback, Action<PubnubClientError> errorCallback)
@@ -37,7 +37,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing errorCallback");
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(_pnConfig, _jsonPluggableLibrary);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
             Uri request = urlBuilder.BuildHereNowRequest(channels, channelGroups, showUUIDList, includeUserState);
 
             RequestState<HereNowAck> requestState = new RequestState<HereNowAck>();

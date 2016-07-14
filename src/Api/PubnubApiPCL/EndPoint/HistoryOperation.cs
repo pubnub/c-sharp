@@ -8,18 +8,18 @@ namespace PubnubApi.EndPoint
 {
     internal class HistoryOperation : PubnubCoreBase
     {
-        private PNConfiguration _pnConfig = null;
-        private IJsonPluggableLibrary _jsonPluggableLibrary = null;
+        private PNConfiguration config = null;
+        private IJsonPluggableLibrary jsonLibrary = null;
 
         public HistoryOperation(PNConfiguration pnConfig):base(pnConfig)
         {
-            _pnConfig = pnConfig;
+            config = pnConfig;
         }
 
         public HistoryOperation(PNConfiguration pnConfig, IJsonPluggableLibrary jsonPluggableLibrary):base(pnConfig, jsonPluggableLibrary)
         {
-            _pnConfig = pnConfig;
-            _jsonPluggableLibrary = jsonPluggableLibrary;
+            config = pnConfig;
+            jsonLibrary = jsonPluggableLibrary;
         }
 
         internal void History(string channel, long start, long end, int count, bool reverse, bool includeToken, Action<DetailedHistoryAck> userCallback, Action<PubnubClientError> errorCallback)
@@ -37,7 +37,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing errorCallback");
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(_pnConfig, _jsonPluggableLibrary);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
             Uri request = urlBuilder.BuildHistoryRequest(channel, start, end, count, reverse, includeToken);
 
             RequestState<DetailedHistoryAck> requestState = new RequestState<DetailedHistoryAck>();

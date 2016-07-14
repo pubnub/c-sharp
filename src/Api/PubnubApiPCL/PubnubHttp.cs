@@ -604,11 +604,39 @@ namespace PubnubApi
                                 result.Add(channelGroupPAMDictionary);
                                 result.Add(multiChannelGroup);
                                 break;
-
+                            case ResponseType.GetUserState:
+                            case ResponseType.SetUserState:
+                                Dictionary<string, object> userStateDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                                result = new List<object>();
+                                result.Add(userStateDictionary);
+                                result.Add(multiChannelGroup);
+                                result.Add(multiChannel);
+                                break;
+                            case ResponseType.PushRegister:
+                            case ResponseType.PushRemove:
+                            case ResponseType.PushGet:
+                            case ResponseType.PushUnregister:
+                                result.Add(multiChannel);
+                                break;
+                            case ResponseType.ChannelGroupAdd:
+                            case ResponseType.ChannelGroupRemove:
+                            case ResponseType.ChannelGroupGet:
+                                Dictionary<string, object> channelGroupDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                                result = new List<object>();
+                                result.Add(channelGroupDictionary);
+                                if (multiChannelGroup != "")
+                                {
+                                    result.Add(multiChannelGroup);
+                                }
+                                if (multiChannel != "")
+                                {
+                                    result.Add(multiChannel);
+                                }
+                                break;
                             default:
                                 break;
                         }
-                        ;//switch stmt end
+                        //switch stmt end
                     }
                 }
             }
@@ -774,6 +802,23 @@ namespace PubnubApi
                 case ResponseType.ChannelGroupRevokeAccess:
                 case ResponseType.GetUserState:
                 case ResponseType.SetUserState:
+                    if (result != null && result.Count > 0)
+                    {
+                        new PNCallbackService(jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                    }
+                    break;
+                case ResponseType.PushRegister:
+                case ResponseType.PushRemove:
+                case ResponseType.PushGet:
+                case ResponseType.PushUnregister:
+                    if (result != null && result.Count > 0)
+                    {
+                        new PNCallbackService(jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                    }
+                    break;
+                case ResponseType.ChannelGroupAdd:
+                case ResponseType.ChannelGroupRemove:
+                case ResponseType.ChannelGroupGet:
                     if (result != null && result.Count > 0)
                     {
                         new PNCallbackService(jsonLib).GoToCallback<T>(result, userCallback, true, type);

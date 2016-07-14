@@ -19,12 +19,13 @@ namespace PubnubApi.Interface
 
         Uri BuildWhereNowRequest(string uuid);
 
-        Uri BuildGrantAccessRequest(string channel, string authenticationKey, bool read, bool write, int ttl);
+        Uri BuildGrantAccessRequest(string channelsCommaDelimited, string channelGroupsCommaDelimited, string authKeysCommaDelimited, bool read, bool write, bool manage, int ttl);
 
-        Uri BuildChannelGroupGrantAccessRequest(string channelGroup, string authenticationKey, bool read, bool write, bool manage, int ttl);
+        Uri BuildAuditAccessRequest(string channel, string channelGroup, string authKeysCommaDelimited);
 
-        Uri BuildAuditAccessRequest(string channel, string authenticationKey);
+        Uri BuildGetUserStateRequest(string channelsCommaDelimited, string channelGroupsCommaDelimited, string uuid);
 
-        Uri BuildChannelGroupAuditAccessRequest(string channelGroup, string authenticationKey);
+        Uri BuildSetUserStateRequest(string channelsCommaDelimited, string channelGroupsCommaDelimited, string uuid, string jsonUserState);
+
     }
 }

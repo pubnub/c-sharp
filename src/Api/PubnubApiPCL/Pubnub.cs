@@ -150,145 +150,47 @@ namespace PubnubApi
 			endPoint.Time(userCallback, errorCallback);
 		}
 
-		public void AuditAccess(string channel, string authenticationKey, Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
+		public void AuditAccess(string channel, string channelGroup, string[] authKeys, Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
             EndPoint.AuditOperation endPoint = new EndPoint.AuditOperation(pubnubConfig, jsonPluggableLibrary);
-            endPoint.AuditAccess<AuditAck>(channel, authenticationKey, userCallback, errorCallback);
+            endPoint.AuditAccess<AuditAck>(channel, channelGroup, authKeys, userCallback, errorCallback);
 		}
 
-		public void AuditAccess(string channel, Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
+		public void AuditAccess(string channel, string channelGroup, Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
             EndPoint.AuditOperation endPoint = new EndPoint.AuditOperation(pubnubConfig, jsonPluggableLibrary);
-            endPoint.AuditAccess<AuditAck>(channel, userCallback, errorCallback);
+            endPoint.AuditAccess<AuditAck>(channel, channelGroup, null, userCallback, errorCallback);
 		}
 
 		public void AuditAccess(Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
             EndPoint.AuditOperation endPoint = new EndPoint.AuditOperation(pubnubConfig, jsonPluggableLibrary);
-            endPoint.AuditAccess<AuditAck>(userCallback, errorCallback);
+            endPoint.AuditAccess<AuditAck>("", "", null, userCallback, errorCallback);
 		}
 
-		public void AuditPresenceAccess(string channel, Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			pubnub.AuditPresenceAccess<AuditAck>(channel, userCallback, errorCallback);
-		}
-
-		public void AuditPresenceAccess(string channel, string authenticationKey, Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			pubnub.AuditPresenceAccess<AuditAck>(channel, authenticationKey, userCallback, errorCallback);
-		}
-
-		public void GrantAccess(string channel, bool read, bool write, int ttl, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
+		public void GrantAccess(string[] channels, string[] channelGroups, bool read, bool write, bool manage, int ttl, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
             EndPoint.GrantOperation endPoint = new EndPoint.GrantOperation(pubnubConfig, jsonPluggableLibrary);
-            endPoint.GrantAccess<GrantAck>(channel, read, write, ttl, userCallback, errorCallback);
+            endPoint.GrantAccess<GrantAck>(channels, channelGroups, null, read, write, manage, ttl, userCallback, errorCallback);
 		}
 
-		public void GrantAccess(string channel, bool read, bool write, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
+		public void GrantAccess(string[] channels, string[] channelGroups, bool read, bool write, bool manage, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
             EndPoint.GrantOperation endPoint = new EndPoint.GrantOperation(pubnubConfig, jsonPluggableLibrary);
-            endPoint.GrantAccess<GrantAck>(channel, read, write, userCallback, errorCallback);
+            endPoint.GrantAccess<GrantAck>(channels, channelGroups, null, read, write, manage, -1, userCallback, errorCallback);
 		}
 
-		public void GrantAccess(string channel, string authenticationKey, bool read, bool write, int ttl, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
+		public void GrantAccess(string[] channels, string[] channelGroups, string[] authenticationKeys, bool read, bool write, bool manage, int ttl, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
             EndPoint.GrantOperation endPoint = new EndPoint.GrantOperation(pubnubConfig, jsonPluggableLibrary);
-            endPoint.GrantAccess<GrantAck>(channel, authenticationKey, read, write, ttl, userCallback, errorCallback);
+            endPoint.GrantAccess<GrantAck>(channels, channelGroups, authenticationKeys, read, write, manage, ttl, userCallback, errorCallback);
 		}
 
-		public void GrantAccess(string channel, string authenticationKey, bool read, bool write, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
+		public void GrantAccess(string[] channels, string[] channelGroups, string[] authenticationKeys, bool read, bool write, bool manage, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
             EndPoint.GrantOperation endPoint = new EndPoint.GrantOperation(pubnubConfig, jsonPluggableLibrary);
-            endPoint.GrantAccess<GrantAck>(channel, authenticationKey, read, write, userCallback, errorCallback);
+            endPoint.GrantAccess<GrantAck>(channels, channelGroups, authenticationKeys, read, write, manage, -1, userCallback, errorCallback);
 		}
-
-
-		public bool GrantPresenceAccess(string channel, bool read, bool write, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			return pubnub.GrantPresenceAccess<GrantAck>(channel, read, write, userCallback, errorCallback);
-		}
-
-		public bool GrantPresenceAccess(string channel, bool read, bool write, int ttl, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			return pubnub.GrantPresenceAccess<GrantAck>(channel, read, write, ttl, userCallback, errorCallback);
-		}
-
-		public bool GrantPresenceAccess(string channel, string authenticationKey, bool read, bool write, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			return pubnub.GrantPresenceAccess<GrantAck>(channel, authenticationKey, read, write, userCallback, errorCallback);
-		}
-
-		public bool GrantPresenceAccess(string channel, string authenticationKey, bool read, bool write, int ttl, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			return pubnub.GrantPresenceAccess<GrantAck>(channel, authenticationKey, read, write, ttl, userCallback, errorCallback);
-		}
-
-		public void ChannelGroupAuditAccess(string channelGroup, string authenticationKey, Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			pubnub.ChannelGroupAuditAccess<AuditAck>(channelGroup, authenticationKey, userCallback, errorCallback);
-		}
-
-		public void ChannelGroupAuditAccess(string channelGroup, Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			pubnub.ChannelGroupAuditAccess<AuditAck>(channelGroup, userCallback, errorCallback);
-		}
-
-		public void ChannelGroupAuditAccess(Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			pubnub.ChannelGroupAuditAccess<AuditAck>(userCallback, errorCallback);
-		}
-
-		public void ChannelGroupAuditPresenceAccess(string channelGroup, Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			pubnub.ChannelGroupAuditPresenceAccess<AuditAck>(channelGroup, userCallback, errorCallback);
-		}
-
-		public void ChannelGroupAuditPresenceAccess(string channelGroup, string authenticationKey, Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			pubnub.ChannelGroupAuditPresenceAccess<AuditAck>(channelGroup, authenticationKey, userCallback, errorCallback);
-		}
-
-		public bool ChannelGroupGrantAccess(string channelGroup, bool read, bool manage, int ttl, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			return pubnub.ChannelGroupGrantAccess<GrantAck>(channelGroup, read, false, manage, ttl, userCallback, errorCallback);
-		}
-
-		public bool ChannelGroupGrantAccess(string channelGroup, bool read, bool manage, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			return pubnub.ChannelGroupGrantAccess<GrantAck>(channelGroup, read, false, manage, userCallback, errorCallback);
-		}
-
-		public bool ChannelGroupGrantAccess(string channelGroup, string authenticationKey, bool read, bool manage, int ttl, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			return pubnub.ChannelGroupGrantAccess<GrantAck>(channelGroup, authenticationKey, read, false, manage, ttl, userCallback, errorCallback);
-		}
-
-		public bool ChannelGroupGrantAccess(string channelGroup, string authenticationKey, bool read, bool manage, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			return pubnub.ChannelGroupGrantAccess<GrantAck>(channelGroup, authenticationKey, read, false, manage, userCallback, errorCallback);
-		}
-
-
-		public bool ChannelGroupGrantPresenceAccess(string channelGroup, bool read, bool manage, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			return pubnub.ChannelGroupGrantPresenceAccess<GrantAck>(channelGroup, read, false, manage, userCallback, errorCallback);
-		}
-
-		public bool ChannelGroupGrantPresenceAccess(string channelGroup, bool read, bool manage, int ttl, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			return pubnub.ChannelGroupGrantPresenceAccess<GrantAck>(channelGroup, read, false, manage, ttl, userCallback, errorCallback);
-		}
-
-		public bool ChannelGroupGrantPresenceAccess(string channelGroup, string authenticationKey, bool read, bool manage, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			return pubnub.ChannelGroupGrantPresenceAccess<GrantAck>(channelGroup, authenticationKey, read, false, manage, userCallback, errorCallback);
-		}
-
-		public bool ChannelGroupGrantPresenceAccess(string channelGroup, string authenticationKey, bool read, bool manage, int ttl, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			return pubnub.ChannelGroupGrantPresenceAccess<GrantAck>(channelGroup, authenticationKey, read, false, manage, ttl, userCallback, errorCallback);
-		}
-
 
 		public void SetUserState(string channel, string channelGroup, string uuid, string jsonUserState, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
 		{

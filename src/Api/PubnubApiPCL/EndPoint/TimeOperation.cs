@@ -8,11 +8,11 @@ namespace PubnubApi.EndPoint
 {
     internal class TimeOperation: PubnubCoreBase
     {
-        private PNConfiguration _pnConfig = null;
+        private PNConfiguration config = null;
 
         public TimeOperation(PNConfiguration pnConfig):base(pnConfig)
         {
-            _pnConfig = pnConfig;
+            config = pnConfig;
         }
 
         internal void Time(Action<long> userCallback, Action<PubnubClientError> errorCallback)
@@ -26,7 +26,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing errorCallback");
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(_pnConfig);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config);
             Uri request = urlBuilder.BuildTimeRequest();
 
             RequestState<long> requestState = new RequestState<long>();
