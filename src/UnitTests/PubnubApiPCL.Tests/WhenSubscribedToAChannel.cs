@@ -52,9 +52,10 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "Init";
             pubnub.PubnubUnitTest = unitTest;
 
-            string channel = "hello_my_channel,hello_my_channel1,hello_my_channel2";
+            string channelList = "hello_my_channel,hello_my_channel1,hello_my_channel2";
+            string[] channel = channelList.Split(',');
 
-            pubnub.GrantAccess(channel, true, true, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            pubnub.GrantAccess(channel, null, true, true, false, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
             Thread.Sleep(1000);
 
             mreGrant.WaitOne();

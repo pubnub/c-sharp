@@ -73,7 +73,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.AuditAccess(channel, AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.AuditAccess(channel, "", AccessToChannelLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();
@@ -108,7 +108,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.ChannelGroupAuditAccess(channelgroup, AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.AuditAccess("", channelgroup, AccessToChannelLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();

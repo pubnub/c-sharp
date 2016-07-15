@@ -16,6 +16,7 @@ namespace PubNubMessaging.Tests
         private bool enableStubTest = PubnubCommon.EnableStubTest;
         private string _testClassName = "";
         private string _testCaseName = "";
+        private Dictionary<Uri, string> requestResponse = null;
 
         public bool EnableStubTest
         {
@@ -26,6 +27,36 @@ namespace PubNubMessaging.Tests
             set
             {
                 enableStubTest = value;
+            }
+        }
+
+        public PubnubUnitTest()
+        {
+            requestResponse = new Dictionary<Uri, string>();
+        }
+
+        Dictionary<Uri, string> IPubnubUnitTest.StubRequestResponse(Uri request, string expectedResponse)
+        {
+            if (requestResponse.ContainsKey(request))
+            {
+                requestResponse[request] = expectedResponse;
+            }
+            else
+            {
+                requestResponse.Add(request, expectedResponse);
+            }
+            return requestResponse;
+        }
+
+        string IPubnubUnitTest.GetExpectedServerJsonResponse(Uri request)
+        {
+            if (requestResponse.ContainsKey(request))
+            {
+                return requestResponse[request];
+            }
+            else
+            {
+                return "";
             }
         }
 
@@ -1615,6 +1646,11 @@ namespace PubNubMessaging.Tests
             return stubResponse;
         }
 
+        string IPubnubUnitTest.GetStubResponse(HttpWebRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
         public string TestCaseName
         {
             get
@@ -1637,6 +1673,45 @@ namespace PubNubMessaging.Tests
             set
             {
                 _testClassName = value;
+            }
+        }
+
+        bool IPubnubUnitTest.EnableStubTest
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        string IPubnubUnitTest.TestClassName
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        string IPubnubUnitTest.TestCaseName
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
             }
         }
     }

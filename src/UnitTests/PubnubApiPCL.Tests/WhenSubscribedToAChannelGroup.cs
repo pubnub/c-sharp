@@ -56,17 +56,17 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
 
             grantManualEvent = new ManualResetEvent(false);
-            pubnub.ChannelGroupGrantAccess(channelGroupName, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummySubscribeErrorCallback);
+            pubnub.GrantAccess(null, new string[] { channelGroupName }, true, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummySubscribeErrorCallback);
             Thread.Sleep(1000);
             grantManualEvent.WaitOne(310*1000);
 
             grantManualEvent = new ManualResetEvent(false);
-            pubnub.ChannelGroupGrantAccess(channelGroupName1, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummySubscribeErrorCallback);
+            pubnub.GrantAccess(null, new string[] { channelGroupName1 }, true, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummySubscribeErrorCallback);
             Thread.Sleep(1000);
             grantManualEvent.WaitOne(310 * 1000);
 
             grantManualEvent = new ManualResetEvent(false);
-            pubnub.ChannelGroupGrantAccess(channelGroupName2, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummySubscribeErrorCallback);
+            pubnub.GrantAccess(null, new string[] { channelGroupName2 }, true, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummySubscribeErrorCallback);
             Thread.Sleep(1000);
             grantManualEvent.WaitOne(310 * 1000);
 

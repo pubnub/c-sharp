@@ -108,7 +108,7 @@ namespace PubNubMessaging.Tests
                                                 receivedRevokeMessage = false;
                                                 Console.WriteLine("Auth Key = " + authKey);
                                                 pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
-                                                pubnub.GrantAccess(channelName, authKey, false, false, UserCallbackForRevokeAccess, ErrorCallbackForRevokeAccess);
+                                                pubnub.GrantAccess(new string[] { channelName }, null, new string[] { authKey }, false, false, false, UserCallbackForRevokeAccess, ErrorCallbackForRevokeAccess);
                                                 revokeManualEvent.WaitOne();
 
                                             }
@@ -182,7 +182,7 @@ namespace PubNubMessaging.Tests
                                     //Dictionary<string, object> channelContainer = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(channels[channelName]);
                                     Console.WriteLine(channelName);
                                     pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
-                                    pubnub.GrantAccess(channelName, false, false, UserCallbackForRevokeAccess, ErrorCallbackForRevokeAccess);
+                                    pubnub.GrantAccess(new string[] { channelName }, null, false, false, false, UserCallbackForRevokeAccess, ErrorCallbackForRevokeAccess);
                                     revokeManualEvent.WaitOne();
 
                                 }

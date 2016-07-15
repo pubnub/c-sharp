@@ -21,22 +21,39 @@ namespace PubNubMessaging.Tests
         bool timeReceivedWhenProxy = false;
 
         Pubnub pubnub = null;
+        IPubnubUnitTest unitTest = null;
 
         [Test]
         public void ThenItShouldReturnTimeStamp()
         {
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGetRequestServerTime";
-            unitTest.TestCaseName = "ThenItShouldReturnTimeStamp";
+            PNConfiguration config = new PNConfiguration();
+            config.PublishKey = PubnubCommon.PublishKey;
+            config.SubscribeKey = PubnubCommon.SubscribeKey;
 
-            pubnub.PubnubUnitTest = unitTest;
+            unitTest = new PubnubUnitTest();
+            unitTest.StubRequestResponse(new Uri(string.Format("http://{0}/time/0", config.Origin)), "[14271224264234400]");
+            //unitTest.TestClassName = "WhenGetRequestServerTime";
+            //unitTest.TestCaseName = "ThenItShouldReturnTimeStamp";
+            long expected = 14271224264234400;
 
-            pubnub.Time(ReturnTimeStampCallback, DummyErrorCallback);
+            pubnub = new Pubnub(config, unitTest);
+
+
+            //pubnub.Time(ReturnTimeStampCallback, DummyErrorCallback);
+            pubnub.Time((actual) => 
+            {
+                if (expected == actual)
+                {
+                    timeReceived = true;
+                }
+                mreTime.Set();
+            }, DummyErrorCallback);
+
             mreTime.WaitOne(310 * 1000);
+
             pubnub.EndPendingRequests(); 
-            pubnub.PubnubUnitTest = null;
+
             pubnub = null;
             Assert.IsTrue(timeReceived, "time() Failed");
         }
@@ -44,7 +61,10 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenItShouldReturnTimeStampWithSSL()
         {
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", true);
+            PNConfiguration config = new PNConfiguration();
+            config.PublishKey = PubnubCommon.PublishKey;
+            config.SubscribeKey = PubnubCommon.SubscribeKey;
+            pubnub = new Pubnub(config);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGetRequestServerTime";

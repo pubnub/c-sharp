@@ -62,7 +62,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel,hello_my_channel-pnpres";
 
-            pubnub.GrantAccess(channel, true, true, 20, ThenPresenceInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            pubnub.GrantAccess(new string[] { channel }, null, true, true, false, 20, ThenPresenceInitializeShouldReturnGrantMessage, DummyErrorCallback);
             Thread.Sleep(1000);
 
             grantManualEvent.WaitOne();
@@ -537,7 +537,7 @@ namespace PubNubMessaging.Tests
 
             userStateManualEvent = new ManualResetEvent(false);
             jsonUserState = "{\"testkey\":\"testval\"}";
-            pubnub.SetUserState(channel, jsonUserState, SetUserStateDummyMethodCallback, DummyErrorCallback);
+            pubnub.SetUserState(new string[] { channel }, jsonUserState, SetUserStateDummyMethodCallback, DummyErrorCallback);
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             hereNowManualEvent = new ManualResetEvent(false);
@@ -601,7 +601,7 @@ namespace PubNubMessaging.Tests
 
             userStateManualEvent = new ManualResetEvent(false);
             jsonUserState = "{\"testkey\":\"testval\"}";
-            pubnub.SetUserState(channel, jsonUserState, SetUserStateDummyMethodCallback, DummyErrorCallback);
+            pubnub.SetUserState(new string[] { channel }, jsonUserState, SetUserStateDummyMethodCallback, DummyErrorCallback);
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             Thread.Sleep(1000);
@@ -677,7 +677,7 @@ namespace PubNubMessaging.Tests
 
             jsonUserState = "{\"testkey\":\"testval\"}";
             userStateManualEvent = new ManualResetEvent(false);
-            pubnub.SetUserState(channel, jsonUserState, SetUserStateDummyMethodCallback, DummyErrorCallback);
+            pubnub.SetUserState(new string[] { channel }, jsonUserState, SetUserStateDummyMethodCallback, DummyErrorCallback);
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             if (receivedUserStateMessage)
@@ -685,7 +685,7 @@ namespace PubNubMessaging.Tests
                 Thread.Sleep(2000);
                 receivedUserStateMessage = false;
                 userStateManualEvent = new ManualResetEvent(false);
-                pubnub.GetUserState(channel, "", GetUserStateRegularCallback, DummyErrorCallback);
+                pubnub.GetUserState(new string[] { channel }, null, GetUserStateRegularCallback, DummyErrorCallback);
                 userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
             }
             pubnub.EndPendingRequests(); 
@@ -714,33 +714,33 @@ namespace PubNubMessaging.Tests
             jsonUserState = "{\"k\":\"v\"}";
             KeyValuePair<string, object> kvp = new KeyValuePair<string, object>("k", "v");
             userStateManualEvent = new ManualResetEvent(false);
-            pubnub.SetUserState(channel, kvp, SetUserStateDummyMethodCallback, DummyErrorCallback);
+            pubnub.SetUserState(new string[] { channel }, kvp, SetUserStateDummyMethodCallback, DummyErrorCallback);
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             Thread.Sleep(2000);
             receivedUserStateMessage = false;
             KeyValuePair<string, object> kvp2 = new KeyValuePair<string, object>("k2", "v2");
             userStateManualEvent = new ManualResetEvent(false);
-            pubnub.SetUserState(channel, kvp2, SetUserStateDummyMethodCallback, DummyErrorCallback);
+            pubnub.SetUserState(new string[] { channel }, kvp2, SetUserStateDummyMethodCallback, DummyErrorCallback);
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             Thread.Sleep(2000);
             receivedUserStateMessage = false;
             userStateManualEvent = new ManualResetEvent(false);
-            pubnub.GetUserState(channel, "", GetUserStateRegularCallback, DummyErrorCallback);
+            pubnub.GetUserState(new string[] { channel }, null, GetUserStateRegularCallback, DummyErrorCallback);
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             Thread.Sleep(2000);
             receivedUserStateMessage = false;
             KeyValuePair<string, object> kvp22 = new KeyValuePair<string, object>("k2", null);
             userStateManualEvent = new ManualResetEvent(false);
-            pubnub.SetUserState(channel, kvp22, SetUserStateDummyMethodCallback, DummyErrorCallback);
+            pubnub.SetUserState(new string[] { channel }, kvp22, SetUserStateDummyMethodCallback, DummyErrorCallback);
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             Thread.Sleep(2000);
             receivedUserStateMessage = false;
             userStateManualEvent = new ManualResetEvent(false);
-            pubnub.GetUserState(channel, "", GetUserStateRegularCallback, DummyErrorCallback);
+            pubnub.GetUserState(new string[] { channel }, null, GetUserStateRegularCallback, DummyErrorCallback);
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
             
             pubnub.EndPendingRequests(); 
@@ -755,8 +755,13 @@ namespace PubNubMessaging.Tests
             receivedPresenceMessage = false;
             currentTestCase = "ThenPresenceHeartbeatShouldReturnMessage";
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
-            pubnub.PresenceHeartbeat = 5;
+            PNConfiguration config = new PNConfiguration();
+            config.PublishKey = PubnubCommon.PublishKey;
+            config.SubscribeKey = PubnubCommon.SubscribeKey;
+            config.SetPresenceHeartbeatTimeout(5);
+
+            pubnub = new Pubnub(config);
+
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAClientIsPresented";
             unitTest.TestCaseName = "ThenPresenceShouldReturnReceivedMessage";
@@ -776,7 +781,7 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(1000);
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
-            Thread.Sleep(pubnub.PresenceHeartbeat+3 * 1000);
+            Thread.Sleep(pubnub.PNConfig.PresenceHeartbeatTimeout+3 * 1000);
 
             pubnub.Unsubscribe<string>(channel, DummyErrorCallback);
             Thread.Sleep(1000);

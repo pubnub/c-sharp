@@ -54,13 +54,13 @@ namespace PubNubMessaging.Tests
 
             string channel = "foo.*";
             mreGrant = new ManualResetEvent(false);
-            pubnub.GrantAccess(channel, true, true, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            pubnub.GrantAccess(new string[] { channel }, null, true, true, false, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
             Thread.Sleep(1000);
             mreGrant.WaitOne();
 
             channel = "foo.bar";
             mreGrant = new ManualResetEvent(false);
-            pubnub.GrantAccess(channel, true, true, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            pubnub.GrantAccess(new string[] { channel }, null, true, true, false, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
             Thread.Sleep(1000);
             mreGrant.WaitOne();
 
@@ -68,7 +68,7 @@ namespace PubNubMessaging.Tests
             {
                 channel = "hello_my_channel";
                 mreGrant = new ManualResetEvent(false);
-                pubnub.GrantAccess(channel, true, true, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
+                pubnub.GrantAccess(new string[] { channel }, null, true, true, false, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
                 Thread.Sleep(1000);
                 mreGrant.WaitOne();
             }
@@ -77,7 +77,7 @@ namespace PubNubMessaging.Tests
             {
                 channel = "hello_my_channel1";
                 mreGrant = new ManualResetEvent(false);
-                pubnub.GrantAccess(channel, true, true, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
+                pubnub.GrantAccess(new string[] { channel }, null, true, true, false, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
                 Thread.Sleep(1000);
                 mreGrant.WaitOne();
             }
@@ -86,7 +86,7 @@ namespace PubNubMessaging.Tests
             {
                 channelGroupName = "hello_my_group";
                 mreGrant = new ManualResetEvent(false);
-                pubnub.ChannelGroupGrantAccess(channelGroupName, true, true, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
+                pubnub.GrantAccess(null, new string[] { channelGroupName }, true, true, true, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
                 Thread.Sleep(1000);
                 mreGrant.WaitOne();
             }
