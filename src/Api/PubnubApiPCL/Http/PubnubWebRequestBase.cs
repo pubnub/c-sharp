@@ -204,7 +204,7 @@ namespace PubnubApi
         {
             if (pubnubUnitTest is IPubnubUnitTest && pubnubUnitTest.EnableStubTest)
             {
-                string stubResponse = pubnubUnitTest.GetStubResponse(request);
+                string stubResponse = pubnubUnitTest.GetExpectedServerJsonResponse(request.RequestUri);
                 return new PubnubWebResponse(new MemoryStream(Encoding.UTF8.GetBytes(stubResponse)));
             }
             else if (machineSuspendMode)

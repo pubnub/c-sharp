@@ -8,6 +8,7 @@ namespace PubnubApi
 	{
         PNConfiguration pubnubConfig = null;
         private IJsonPluggableLibrary jsonPluggableLibrary = null;
+        private IPubnubUnitTest pubnubUnitTest = null;
 
         PubnubWin pubnub;
 
@@ -192,49 +193,52 @@ namespace PubnubApi
             endPoint.GrantAccess<GrantAck>(channels, channelGroups, authenticationKeys, read, write, manage, -1, userCallback, errorCallback);
 		}
 
-		public void SetUserState(string channel, string channelGroup, string uuid, string jsonUserState, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
+		public void SetUserState(string[] channels, string[] channelGroups, string uuid, string jsonUserState, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.SetUserState(channel, channelGroup, uuid, jsonUserState, userCallback, errorCallback);
+            EndPoint.SetStateOperation endPoint = new EndPoint.SetStateOperation(pubnubConfig, jsonPluggableLibrary);
+            endPoint.SetUserState(channels, channelGroups, uuid, jsonUserState, userCallback, errorCallback);
 		}
 
-		public void SetUserState(string channel, string channelGroup, string jsonUserState, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
+		public void SetUserState(string[] channels, string[] channelGroups, string jsonUserState, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.SetUserState(channel, channelGroup, "", jsonUserState, userCallback, errorCallback);
+            EndPoint.SetStateOperation endPoint = new EndPoint.SetStateOperation(pubnubConfig, jsonPluggableLibrary);
+            endPoint.SetUserState(channels, channelGroups, "", jsonUserState, userCallback, errorCallback);
 		}
 
-		public void SetUserState(string channel, string jsonUserState, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
+		public void SetUserState(string[] channels, string jsonUserState, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.SetUserState(channel,"", jsonUserState, userCallback, errorCallback);
+            EndPoint.SetStateOperation endPoint = new EndPoint.SetStateOperation(pubnubConfig, jsonPluggableLibrary);
+            endPoint.SetUserState(channels, null, "", jsonUserState, userCallback, errorCallback);
 		}
 
-		public void SetUserState(string channel, string channelGroup, string uuid, System.Collections.Generic.KeyValuePair<string, object> keyValuePair, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
+		public void SetUserState(string[] channels, string[] channelGroups, string uuid, System.Collections.Generic.KeyValuePair<string, object> keyValuePair, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.SetUserState(channel, channelGroup, uuid, keyValuePair, userCallback, errorCallback);
+            EndPoint.SetStateOperation endPoint = new EndPoint.SetStateOperation(pubnubConfig, jsonPluggableLibrary);
+            endPoint.SetUserState(channels, channelGroups, uuid, keyValuePair, userCallback, errorCallback);
 		}
 
-		public void SetUserState(string channel, string channelGroup, System.Collections.Generic.KeyValuePair<string, object> keyValuePair, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
+		public void SetUserState(string[] channels, string[] channelGroups, System.Collections.Generic.KeyValuePair<string, object> keyValuePair, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.SetUserState(channel, channelGroup, "", keyValuePair, userCallback, errorCallback);
+            EndPoint.SetStateOperation endPoint = new EndPoint.SetStateOperation(pubnubConfig, jsonPluggableLibrary);
+            endPoint.SetUserState(channels, channelGroups, "", keyValuePair, userCallback, errorCallback);
 		}
 
-		public void SetUserState(string channel, System.Collections.Generic.KeyValuePair<string, object> keyValuePair, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
+		public void SetUserState(string[] channels, System.Collections.Generic.KeyValuePair<string, object> keyValuePair, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.SetUserState(channel, "", keyValuePair, userCallback, errorCallback);
+            EndPoint.SetStateOperation endPoint = new EndPoint.SetStateOperation(pubnubConfig, jsonPluggableLibrary);
+            endPoint.SetUserState(channels, null, "", keyValuePair, userCallback, errorCallback);
 		}
 
-		public void GetUserState(string channel, string channelGroup, Action<GetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
+		public void GetUserState(string[] channels, string[] channelGroups, Action<GetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.GetUserState(channel, channelGroup, "", userCallback, errorCallback);
+            EndPoint.GetStateOperation endPoint = new EndPoint.GetStateOperation(pubnubConfig, jsonPluggableLibrary);
+            endPoint.GetUserState(channels, channelGroups, "", userCallback, errorCallback);
 		}
 
-		public void GetUserState(string channel, Action<GetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
+		public void GetUserState(string[] channels, string[] channelGroups, string uuid, Action<GetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.GetUserState(channel, "", userCallback, errorCallback);
-		}
-
-		public void GetUserState(string channel, string channelGroup, string uuid, Action<GetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			pubnub.GetUserState(channel, channelGroup, uuid, userCallback, errorCallback);
+            EndPoint.GetStateOperation endPoint = new EndPoint.GetStateOperation(pubnubConfig, jsonPluggableLibrary);
+            endPoint.GetUserState(channels, channelGroups, uuid, userCallback, errorCallback);
 		}
 
 		public void RegisterDeviceForPush<T>(string channel, PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
@@ -457,18 +461,18 @@ namespace PubnubApi
         //}
 
         public IPubnubUnitTest PubnubUnitTest
-		{
-			get
-			{
-				return pubnub.PubnubUnitTest;
-			}
-			set
-			{
-				pubnub.PubnubUnitTest = value;
-			}
-		}
+        {
+            get
+            {
+                return pubnubUnitTest;
+            }
+            set
+            {
+                pubnubUnitTest = value;
+            }
+        }
 
-		public bool EnableJsonEncodingForPublish
+        public bool EnableJsonEncodingForPublish
 		{
 			get
 			{
@@ -480,19 +484,27 @@ namespace PubnubApi
 			}
 		}
 
-		//public PubnubProxy Proxy
-		//{
-		//	get
-		//	{
-		//		return pubnub.Proxy;
-		//	}
-		//	set
-		//	{
-		//		pubnub.Proxy = value;
-		//	}
-		//}
+        public PubnubProxy Proxy
+        {
+            get
+            {
+                return pubnub.Proxy;
+            }
+            set
+            {
+                pubnub.Proxy = value;
+            }
+        }
 
-		public IJsonPluggableLibrary JsonPluggableLibrary
+        public PNConfiguration PNConfig
+        {
+            get
+            {
+                return pubnubConfig;
+            }
+        }
+
+        public IJsonPluggableLibrary JsonPluggableLibrary
 		{
 			get
 			{
@@ -570,6 +582,7 @@ namespace PubnubApi
             pubnubConfig = pnConfig;
             jsonPluggableLibrary = new NewtonsoftJsonDotNet();
         }
+
         public Pubnub(PNConfiguration pnConfig, IJsonPluggableLibrary jsonPluggableLibrary)
         {
             pubnubConfig = pnConfig;
@@ -578,6 +591,13 @@ namespace PubnubApi
             {
                 this.jsonPluggableLibrary = new NewtonsoftJsonDotNet();
             }
+        }
+
+        public Pubnub(PNConfiguration pnConfig, IPubnubUnitTest pubnubUnitTest)
+        {
+            this.pubnubConfig = pnConfig;
+            this.jsonPluggableLibrary = new NewtonsoftJsonDotNet();
+            this.pubnubUnitTest = pubnubUnitTest;
         }
 
         public Pubnub(string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)

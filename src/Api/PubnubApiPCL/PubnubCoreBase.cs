@@ -28,8 +28,9 @@ namespace PubnubApi
     {
         IPubnubHttp _pubnubHttp = null;
 
-        private PNConfiguration _pnConfig = null;
-        private IJsonPluggableLibrary _jsonLib = null;
+        private PNConfiguration pubnubConfig = null;
+        private IJsonPluggableLibrary jsonLib = null;
+        private IPubnubUnitTest pubnubUnitTest = null;
 
         public PubnubCoreBase(PNConfiguration pnConfiguation)
         {
@@ -38,7 +39,7 @@ namespace PubnubApi
                 throw new ArgumentException("PNConfiguration missing");
             }
 
-            InternalConstructor(pnConfiguation, new NewtonsoftJsonDotNet());
+            InternalConstructor(pnConfiguation, new NewtonsoftJsonDotNet(), null);
         }
 
         public PubnubCoreBase(PNConfiguration pnConfiguation, IJsonPluggableLibrary jsonPluggableLibrary)
@@ -49,20 +50,44 @@ namespace PubnubApi
             }
             if (jsonPluggableLibrary == null)
             {
-                InternalConstructor(pnConfiguation, new NewtonsoftJsonDotNet());
+                InternalConstructor(pnConfiguation, new NewtonsoftJsonDotNet(), null);
             }
             else
             {
-                InternalConstructor(pnConfiguation, jsonPluggableLibrary);
+                InternalConstructor(pnConfiguation, jsonPluggableLibrary, null);
             }
         }
 
-        private void InternalConstructor(PNConfiguration pnConfiguation, IJsonPluggableLibrary jsonPluggableLibrary)
+        public PubnubCoreBase(PNConfiguration pnConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest)
         {
-            this._pnConfig = pnConfiguation;
-            this._jsonLib = jsonPluggableLibrary;
+            if (pnConfiguation == null)
+            {
+                throw new ArgumentException("PNConfiguration missing");
+            }
 
-            _pubnubHttp = new PubnubHttp(pnConfiguation, _jsonLib);
+            if (pubnubUnitTest == null)
+            {
+                throw new ArgumentException("IPubnubUnitTest missing");
+            }
+
+            if (jsonPluggableLibrary == null)
+            {
+                InternalConstructor(pnConfiguation, new NewtonsoftJsonDotNet(), pubnubUnitTest);
+            }
+            else
+            {
+                InternalConstructor(pnConfiguation, jsonPluggableLibrary, pubnubUnitTest);
+            }
+        }
+
+
+        private void InternalConstructor(PNConfiguration pnConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest)
+        {
+            this.pubnubConfig = pnConfiguation;
+            this.jsonLib = jsonPluggableLibrary;
+            this.pubnubUnitTest = pubnubUnitTest;
+
+            _pubnubHttp = new PubnubHttp(pnConfiguation, jsonLib);
 
             //if (!IsNullOrWhiteSpace(pnConfiguation.PublishKey)) { this.publishKey = pnConfiguation.PublishKey; }
             //if (!IsNullOrWhiteSpace(pnConfiguation.SubscribeKey)) { this.subscribeKey = pnConfiguation.SubscribeKey; }
@@ -208,7 +233,7 @@ namespace PubnubApi
 
                 LoggingMethod.WriteToLog(string.Format("DateTime {0}, TimeExceptionHandler response={1}", DateTime.Now.ToString(), message), LoggingMethod.LevelInfo);
 
-                new PNCallbackService(_jsonLib).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
+                new PNCallbackService(pubnubConfig, jsonLib).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
                     "", "", errorCallback, message, PubnubErrorCode.TimeOperationTimeout, null, null);
             }
         }
@@ -235,14 +260,14 @@ namespace PubnubApi
                         && overrideTcpKeepAlive)
                 {
                     bool networkConnection;
-                    //if (_pubnubUnitTest is IPubnubUnitTest && _pubnubUnitTest.EnableStubTest)
-                    //{
-                    //    networkConnection = true;
-                    //}
-                    //else
-                    //{
-                    //    networkConnection = CheckInternetConnectionStatus(pubnetSystemActive, currentState.ErrorCallback, currentState.Channels, currentState.ChannelGroups);
-                    //}
+                    if (pubnubUnitTest is IPubnubUnitTest && pubnubUnitTest.EnableStubTest)
+                    {
+                        networkConnection = true;
+                    }
+                    else
+                    {
+                        networkConnection = CheckInternetConnectionStatus(pubnetSystemActive, currentState.ErrorCallback, currentState.Channels, currentState.ChannelGroups);
+                    }
                     networkConnection = CheckInternetConnectionStatus(pubnetSystemActive, currentState.ErrorCallback, currentState.Channels, currentState.ChannelGroups);
 
                     channelInternetStatus[channel] = networkConnection;
@@ -275,7 +300,7 @@ namespace PubnubApi
                         case ResponseType.Subscribe:
                             jsonString = string.Format("[1, \"Connected\"]");
 
-                            connectResult = _jsonLib.DeserializeToListOfObject(jsonString);
+                            connectResult = jsonLib.DeserializeToListOfObject(jsonString);
                             connectResult.Add("");
                             connectResult.Add(channel);
 
@@ -290,13 +315,13 @@ namespace PubnubApi
                                 {
                                     Action<ConnectOrDisconnectAck> targetCallback = currentPubnubCallback.ConnectCallback;
                                     currentPubnubCallback.ConnectCallback = null;
-                                    new PNCallbackService(_jsonLib).GoToCallback<ConnectOrDisconnectAck>(connectResult, targetCallback, true, type);
+                                    new PNCallbackService(pubnubConfig, jsonLib).GoToCallback<ConnectOrDisconnectAck>(connectResult, targetCallback, true, type);
                                 }
                             }
                             break;
                         case ResponseType.Presence:
                             jsonString = string.Format("[1, \"Presence Connected\"]");
-                            connectResult = _jsonLib.DeserializeToListOfObject(jsonString);
+                            connectResult = jsonLib.DeserializeToListOfObject(jsonString);
                             connectResult.Add("");
                             connectResult.Add(channel.Replace("-pnpres", ""));
 
@@ -311,7 +336,7 @@ namespace PubnubApi
                                 {
                                     Action<ConnectOrDisconnectAck> targetCallback = currentPubnubCallback.ConnectCallback;
                                     currentPubnubCallback.ConnectCallback = null;
-                                    new PNCallbackService(_jsonLib).GoToCallback<ConnectOrDisconnectAck>(connectResult, targetCallback, true, type);
+                                    new PNCallbackService(pubnubConfig, jsonLib).GoToCallback<ConnectOrDisconnectAck>(connectResult, targetCallback, true, type);
                                 }
                             }
                             break;
@@ -334,7 +359,7 @@ namespace PubnubApi
                     {
                         case ResponseType.Subscribe:
                             jsonString = string.Format("[1, \"Connected\"]");
-                            connectResult = _jsonLib.DeserializeToListOfObject(jsonString);
+                            connectResult = jsonLib.DeserializeToListOfObject(jsonString);
                             connectResult.Add(channelGroup);
                             connectResult.Add("");
 
@@ -349,14 +374,14 @@ namespace PubnubApi
                                 {
                                     Action<ConnectOrDisconnectAck> targetCallback = currentPubnubCallback.ConnectCallback;
                                     currentPubnubCallback.ConnectCallback = null;
-                                    new PNCallbackService(_jsonLib).GoToCallback<ConnectOrDisconnectAck>(connectResult, targetCallback, true, type);
+                                    new PNCallbackService(pubnubConfig, jsonLib).GoToCallback<ConnectOrDisconnectAck>(connectResult, targetCallback, true, type);
                                 }
 
                             }
                             break;
                         case ResponseType.Presence:
                             jsonString = string.Format("[1, \"Presence Connected\"]");
-                            connectResult = _jsonLib.DeserializeToListOfObject(jsonString);
+                            connectResult = jsonLib.DeserializeToListOfObject(jsonString);
                             connectResult.Add(channelGroup.Replace("-pnpres", ""));
                             connectResult.Add("");
 
@@ -371,7 +396,7 @@ namespace PubnubApi
                                 {
                                     Action<ConnectOrDisconnectAck> targetCallback = currentPubnubCallback.ConnectCallback;
                                     currentPubnubCallback.ConnectCallback = null;
-                                    new PNCallbackService(_jsonLib).GoToCallback<ConnectOrDisconnectAck>(connectResult, targetCallback, true, type);
+                                    new PNCallbackService(pubnubConfig, jsonLib).GoToCallback<ConnectOrDisconnectAck>(connectResult, targetCallback, true, type);
                                 }
                             }
                             break;
@@ -561,10 +586,16 @@ namespace PubnubApi
 
         #region "Build, process and send request"
 
-        internal protected void UrlProcessRequest<T>(Uri requestUri, RequestState<T> pubnubRequestState)
+        internal protected void UrlProcessRequest<T>(Uri requestUri, RequestState<T> pubnubRequestState, bool terminateCurrentSubRequest)
         {
             string channel = "";
             string channelGroup = "";
+
+            if (terminateCurrentSubRequest)
+            {
+                TerminateCurrentSubscriberRequest();
+            }
+
             if (pubnubRequestState != null)
             {
                 if (pubnubRequestState.Channels != null)
@@ -585,7 +616,7 @@ namespace PubnubApi
                 }
 
                 // Create Request
-                PubnubWebRequestCreator requestCreator = new PubnubWebRequestCreator(null);
+                PubnubWebRequestCreator requestCreator = new PubnubWebRequestCreator(pubnubUnitTest);
                 PubnubWebRequest request = (PubnubWebRequest)requestCreator.Create(requestUri);
 
                 //REVISIT
@@ -639,7 +670,7 @@ namespace PubnubApi
                         string multiChannel = (pubnubRequestState.Channels != null) ? string.Join(",", pubnubRequestState.Channels) : "";
                         string multiChannelGroup = (pubnubRequestState.ChannelGroups != null) ? string.Join(",", pubnubRequestState.ChannelGroups) : "";
 
-                        new PNCallbackService(_jsonLib).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
+                        new PNCallbackService(pubnubConfig, jsonLib).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
                             multiChannel, multiChannelGroup, pubnubRequestState.ErrorCallback, ex, pubnubRequestState.Request, pubnubRequestState.Response);
                     }
                     LoggingMethod.WriteToLog(string.Format("DateTime {0} Exception={1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelError);
@@ -650,5 +681,21 @@ namespace PubnubApi
         }
 
         #endregion
+
+        public void TerminateCurrentSubscriberRequest()
+        {
+            string[] channels = GetCurrentSubscriberChannels();
+            if (channels != null)
+            {
+                string multiChannel = (channels.Length > 0) ? string.Join(",", channels) : ",";
+                PubnubWebRequest request = (_channelRequest.ContainsKey(multiChannel)) ? _channelRequest[multiChannel] : null;
+                if (request != null)
+                {
+                    request.Abort(null, _errorLevel);
+
+                    LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateCurrentSubsciberRequest {1}", DateTime.Now.ToString(), request.RequestUri.ToString()), LoggingMethod.LevelInfo);
+                }
+            }
+        }
     }
 }

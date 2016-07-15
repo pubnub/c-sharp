@@ -60,7 +60,7 @@ namespace PubnubApi.EndPoint
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            UrlProcessRequest<AddChannelToChannelGroupAck>(request, requestState);
+            UrlProcessRequest<AddChannelToChannelGroupAck>(request, requestState, false);
         }
     }
 }

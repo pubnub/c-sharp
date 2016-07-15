@@ -41,8 +41,10 @@
     <Compile Include="EndPoint\Access\GrantOperation.cs" />
     <Compile Include="EndPoint\ChannelGroup\AddChannelsToChannelGroupOperation.cs" />
     <Compile Include="EndPoint\HistoryOperation.cs" />
+    <Compile Include="EndPoint\Presence\GetStateOperation.cs" />
     <Compile Include="EndPoint\Presence\GlobalHereNowOperation.cs" />
     <Compile Include="EndPoint\Presence\HereNowOperation.cs" />
+    <Compile Include="EndPoint\Presence\SetStateOperation.cs" />
     <Compile Include="EndPoint\Presence\WhereNowOperation.cs" />
     <Compile Include="EndPoint\PubSub\PublishOperation.cs" />
     <Compile Include="EndPoint\TimeOperation.cs" />

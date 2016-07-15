@@ -73,6 +73,8 @@ namespace PubnubApi
 
         public LoggingMethod.Level LogVerbosity { get; set; }
 
+        public PubnubErrorFilter.Level ErrorLevel { get; set; }
+
         public int ConnectTimeout { get; set; }
 
         public int NonSubscribeRequestTimeout { get; set; }

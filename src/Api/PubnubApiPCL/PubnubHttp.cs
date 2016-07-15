@@ -147,6 +147,7 @@ namespace PubnubApi
             {
                 if (asyncWebRequest != null)
                 {
+                    System.Diagnostics.Debug.WriteLine(asyncWebRequest.request.RequestUri.ToString());
                     PubnubWebResponse asyncWebResponse = (PubnubWebResponse)asyncWebRequest.EndGetResponse(asynchronousResult);
                     {
                         asyncRequestState.Response = asyncWebResponse;
@@ -264,6 +265,8 @@ namespace PubnubApi
 
                             //Deserialize the result
                             string jsonString = streamReader.ReadToEnd();
+                            System.Diagnostics.Debug.WriteLine(jsonString);
+                            System.Diagnostics.Debug.WriteLine("");
 #if !NETFX_CORE
                             //streamReader.Close ();
 #endif
@@ -449,7 +452,7 @@ namespace PubnubApi
                                 }
 
                                 PubnubClientError error = new PubnubClientError(pubnubStatusCode, PubnubErrorSeverity.Critical, jsonString, PubnubMessageSource.Server, asyncRequestState.Request, asyncRequestState.Response, errorDescription, channel, channelGroup);
-                                new PNCallbackService(jsonLib).GoToCallback(error, asyncRequestState.ErrorCallback);
+                                new PNCallbackService(pubnubConfig, jsonLib).GoToCallback(error, asyncRequestState.ErrorCallback);
 
                             }
                             else if (jsonString != "[]")
@@ -761,37 +764,37 @@ namespace PubnubApi
                 case ResponseType.Time:
                     if (result != null && result.Count > 0)
                     {
-                        new PNCallbackService(jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                        new PNCallbackService(pubnubConfig, jsonLib).GoToCallback<T>(result, userCallback, true, type);
                     }
                     break;
                 case ResponseType.Publish:
                     if (result != null && result.Count > 0)
                     {
-                        new PNCallbackService(jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                        new PNCallbackService(pubnubConfig, jsonLib).GoToCallback<T>(result, userCallback, true, type);
                     }
                     break;
                 case ResponseType.DetailedHistory:
                     if (result != null && result.Count > 0)
                     {
-                        new PNCallbackService(jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                        new PNCallbackService(pubnubConfig, jsonLib).GoToCallback<T>(result, userCallback, true, type);
                     }
                     break;
                 case ResponseType.Here_Now:
                     if (result != null && result.Count > 0)
                     {
-                        new PNCallbackService(jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                        new PNCallbackService(pubnubConfig, jsonLib).GoToCallback<T>(result, userCallback, true, type);
                     }
                     break;
                 case ResponseType.GlobalHere_Now:
                     if (result != null && result.Count > 0)
                     {
-                        new PNCallbackService(jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                        new PNCallbackService(pubnubConfig, jsonLib).GoToCallback<T>(result, userCallback, true, type);
                     }
                     break;
                 case ResponseType.Where_Now:
                     if (result != null && result.Count > 0)
                     {
-                        new PNCallbackService(jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                        new PNCallbackService(pubnubConfig, jsonLib).GoToCallback<T>(result, userCallback, true, type);
                     }
                     break;
                 case ResponseType.GrantAccess:
@@ -804,7 +807,7 @@ namespace PubnubApi
                 case ResponseType.SetUserState:
                     if (result != null && result.Count > 0)
                     {
-                        new PNCallbackService(jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                        new PNCallbackService(pubnubConfig, jsonLib).GoToCallback<T>(result, userCallback, true, type);
                     }
                     break;
                 case ResponseType.PushRegister:
@@ -813,7 +816,7 @@ namespace PubnubApi
                 case ResponseType.PushUnregister:
                     if (result != null && result.Count > 0)
                     {
-                        new PNCallbackService(jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                        new PNCallbackService(pubnubConfig, jsonLib).GoToCallback<T>(result, userCallback, true, type);
                     }
                     break;
                 case ResponseType.ChannelGroupAdd:
@@ -821,7 +824,7 @@ namespace PubnubApi
                 case ResponseType.ChannelGroupGet:
                     if (result != null && result.Count > 0)
                     {
-                        new PNCallbackService(jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                        new PNCallbackService(pubnubConfig, jsonLib).GoToCallback<T>(result, userCallback, true, type);
                     }
                     break;
                 default:
@@ -855,7 +858,7 @@ namespace PubnubApi
                             string multiChannel = string.Join(",", channels);
                             string multiChannelGroup = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups) : "";
 
-                            new PNCallbackService(jsonLib).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
+                            new PNCallbackService(pubnubConfig, jsonLib).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
                                 multiChannel, multiChannelGroup, errorCallback, ex, null, null);
                         }
                         object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : jsonLib.DeserializeToObject(decryptMessage);

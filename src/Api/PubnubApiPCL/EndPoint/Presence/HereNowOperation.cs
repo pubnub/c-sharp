@@ -48,7 +48,7 @@ namespace PubnubApi.EndPoint
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            UrlProcessRequest<HereNowAck>(request, requestState);
+            UrlProcessRequest<HereNowAck>(request, requestState, false);
         }
 
         

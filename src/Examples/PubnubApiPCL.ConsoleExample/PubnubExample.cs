@@ -314,6 +314,7 @@ namespace PubnubApi
             config.SubscribeKey = subscribeKey;
             config.PublishKey = publishKey;
             config.SecretKey = secretKey;
+            config.ErrorLevel = PubnubErrorFilter.Level.Info;
 
             pubnub = new Pubnub(config);
 
@@ -1265,15 +1266,15 @@ namespace PubnubApi
                         //string currentUserState = "";
                         if (Int32.TryParse(valueUserState, out valueInt))
                         {
-                            pubnub.SetUserState(userStateChannel, userStateChannelGroup, new KeyValuePair<string, object>(keyUserState, valueInt), DisplaySetUserStateReturnMessage, DisplayErrorMessage);
+                            pubnub.SetUserState(new string[] { userStateChannel }, new string[] { userStateChannelGroup }, new KeyValuePair<string, object>(keyUserState, valueInt), DisplaySetUserStateReturnMessage, DisplayErrorMessage);
                         }
                         else if (Double.TryParse(valueUserState, out valueDouble))
                         {
-                            pubnub.SetUserState(userStateChannel, userStateChannelGroup, new KeyValuePair<string, object>(keyUserState, valueDouble), DisplaySetUserStateReturnMessage, DisplayErrorMessage);
+                            pubnub.SetUserState(new string[] { userStateChannel }, new string[] { userStateChannelGroup }, new KeyValuePair<string, object>(keyUserState, valueDouble), DisplaySetUserStateReturnMessage, DisplayErrorMessage);
                         }
                         else
                         {
-                            pubnub.SetUserState(userStateChannel, userStateChannelGroup, new KeyValuePair<string, object>(keyUserState, valueUserState), DisplaySetUserStateReturnMessage, DisplayErrorMessage);
+                            pubnub.SetUserState(new string[] { userStateChannel }, new string[] { userStateChannelGroup }, new KeyValuePair<string, object>(keyUserState, valueUserState), DisplaySetUserStateReturnMessage, DisplayErrorMessage);
                         }
 
                         break;
@@ -1294,7 +1295,7 @@ namespace PubnubApi
 
                         Console.WriteLine("Enter key of the User State Key-Value pair to be deleted");
                         string deleteKeyUserState = Console.ReadLine();
-                        pubnub.SetUserState(deleteChannelUserState, deleteChannelGroupUserState, new KeyValuePair<string, object>(deleteKeyUserState, null), DisplaySetUserStateReturnMessage, DisplayErrorMessage);
+                        pubnub.SetUserState(new string[] { deleteChannelUserState }, new string[] { deleteChannelGroupUserState }, new KeyValuePair<string, object>(deleteKeyUserState, null), DisplaySetUserStateReturnMessage, DisplayErrorMessage);
 
                         break;
                     case "25":
@@ -1324,11 +1325,11 @@ namespace PubnubApi
                         string uuid = Console.ReadLine();
                         if (string.IsNullOrEmpty(uuid))
                         {
-                            pubnub.SetUserState(setUserStateChannel, setUserStateChannelGroup, jsonUserState, DisplaySetUserStateReturnMessage, DisplayErrorMessage);
+                            pubnub.SetUserState(new string[] { setUserStateChannel }, new string[] { setUserStateChannelGroup }, jsonUserState, DisplaySetUserStateReturnMessage, DisplayErrorMessage);
                         }
                         else
                         {
-                            pubnub.SetUserState(setUserStateChannel, setUserStateChannelGroup, uuid, jsonUserState, DisplaySetUserStateReturnMessage, DisplayErrorMessage);
+                            pubnub.SetUserState(new string[] { setUserStateChannel }, new string[] { setUserStateChannelGroup }, uuid, jsonUserState, DisplaySetUserStateReturnMessage, DisplayErrorMessage);
                         }
                         break;
                     case "26":
@@ -1341,20 +1342,23 @@ namespace PubnubApi
 
                         Console.WriteLine("Enter channel group name");
                         Console.WriteLine("NOTE: If you want to consider only Channel, just hit ENTER");
-                        string setUserStateChannelGroup2 = Console.ReadLine();
+                        string getUserStateChannelGroup2 = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("ChannelGroup = {0}", setUserStateChannelGroup2));
+                        Console.WriteLine(string.Format("ChannelGroup = {0}", getUserStateChannelGroup2));
                         Console.ResetColor();
 
                         Console.WriteLine("Enter UUID. (Optional. Press ENTER to skip it)");
                         string uuid2 = Console.ReadLine();
+
+                        string[] getUserStateChannel2List = getUserStateChannel2.Split(',');
+                        string[] getUserStateChannelGroup2List = getUserStateChannelGroup2.Split(',');
                         if (string.IsNullOrEmpty(uuid2))
                         {
-                            pubnub.GetUserState(getUserStateChannel2, setUserStateChannelGroup2, DisplayGetUserStateReturnMessage, DisplayErrorMessage);
+                            pubnub.GetUserState(getUserStateChannel2List, getUserStateChannelGroup2List, DisplayGetUserStateReturnMessage, DisplayErrorMessage);
                         }
                         else
                         {
-                            pubnub.GetUserState(getUserStateChannel2, setUserStateChannelGroup2, uuid2, DisplayGetUserStateReturnMessage, DisplayErrorMessage);
+                            pubnub.GetUserState(getUserStateChannel2List, getUserStateChannelGroup2List, uuid2, DisplayGetUserStateReturnMessage, DisplayErrorMessage);
                         }
                         break;
                     case "27":

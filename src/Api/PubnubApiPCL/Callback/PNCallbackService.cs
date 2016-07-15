@@ -8,11 +8,13 @@ namespace PubnubApi
 {
     internal class PNCallbackService
     {
-        private IJsonPluggableLibrary _jsonLib = null;
+        private PNConfiguration config = null;
+        private IJsonPluggableLibrary jsonLib = null;
 
-        public PNCallbackService(IJsonPluggableLibrary jsonPluggableLibrary)
+        public PNCallbackService(PNConfiguration pnConfiguation, IJsonPluggableLibrary jsonPluggableLibrary)
         {
-            _jsonLib = jsonPluggableLibrary;
+            this.config = pnConfiguation;
+            this.jsonLib = jsonPluggableLibrary;
         }
 
         private void JsonResponseToCallback<T>(List<object> result, Action<T> callback)
@@ -21,7 +23,7 @@ namespace PubnubApi
 
             if (typeof(T) == typeof(string))
             {
-                callbackJson = _jsonLib.SerializeToJsonString(result);
+                callbackJson = jsonLib.SerializeToJsonString(result);
 
                 Action<string> castCallback = callback as Action<string>;
                 castCallback(callbackJson);
@@ -34,7 +36,7 @@ namespace PubnubApi
 
             if (typeof(T) == typeof(string))
             {
-                callbackJson = _jsonLib.SerializeToJsonString(result);
+                callbackJson = jsonLib.SerializeToJsonString(result);
 
                 Action<string> castCallback = callback as Action<string>;
                 castCallback(callbackJson);
@@ -80,7 +82,7 @@ namespace PubnubApi
                     T ret = default(T);
                     if (!internalObject)
                     {
-                        ret = _jsonLib.DeserializeToObject<T>(result);
+                        ret = jsonLib.DeserializeToObject<T>(result);
                     }
                     else
                     {
@@ -111,22 +113,22 @@ namespace PubnubApi
 
         internal void GoToCallback(PubnubClientError error, Action<PubnubClientError> Callback)
         {
-            //if (Callback != null && error != null)
-            //{
-            //    if ((int)error.Severity <= (int)_errorLevel)
-            //    { //Checks whether the error serverity falls in the range of error filter level
-            //      //Do not send 107 = PubnubObjectDisposedException
-            //      //Do not send 105 = WebRequestCancelled
-            //      //Do not send 130 = PubnubClientMachineSleep
-            //        if (error.StatusCode != 107
-            //            && error.StatusCode != 105
-            //            && error.StatusCode != 130
-            //            && error.StatusCode != 4040) //Error Code that should not go out
-            //        {
-            //            Callback(error);
-            //        }
-            //    }
-            //}
+            if (Callback != null && error != null)
+            {
+                if ((int)error.Severity <= (int)config.ErrorLevel)
+                { //Checks whether the error serverity falls in the range of error filter level
+                  //Do not send 107 = PubnubObjectDisposedException
+                  //Do not send 105 = WebRequestCancelled
+                  //Do not send 130 = PubnubClientMachineSleep
+                    if (error.StatusCode != 107
+                        && error.StatusCode != 105
+                        && error.StatusCode != 130
+                        && error.StatusCode != 4040) //Error Code that should not go out
+                    {
+                        Callback(error);
+                    }
+                }
+            }
         }
 
         #region "Error Callbacks"

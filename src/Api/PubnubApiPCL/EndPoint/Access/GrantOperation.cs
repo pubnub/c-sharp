@@ -40,29 +40,13 @@ namespace PubnubApi.EndPoint
             if (channels != null && channels.Length > 0)
             {
                 channelList = new List<string>(channels);
-                List<string> presenceChannelList = new List<string>();
-                for (int index = 0; index < channelList.Count; index++)
-                {
-                    if (!string.IsNullOrWhiteSpace(channelList[index]) && !string.IsNullOrWhiteSpace(channelList[index].Trim()))
-                    {
-                        presenceChannelList.Add(string.Format("{0}-pnpres", channelList[index].Trim()));
-                    }
-                }
-                channelList.AddRange(presenceChannelList);
+                channelList = channelList.Where(ch => !string.IsNullOrEmpty(ch) && ch.Trim().Length > 0).Distinct<string>().ToList();
             }
 
             if (channelGroups != null && channelGroups.Length > 0)
             {
                 channelGroupList = new List<string>(channelGroups);
-                List<string> presenceChannelGroupList = new List<string>();
-                for (int index = 0; index < channelGroupList.Count; index++)
-                {
-                    if (!string.IsNullOrWhiteSpace(channelGroupList[index]) && !string.IsNullOrWhiteSpace(channelGroupList[index].Trim()))
-                    {
-                        presenceChannelGroupList.Add(string.Format("{0}-pnpres", channelGroupList[index].Trim()));
-                    }
-                }
-                channelGroupList.AddRange(presenceChannelGroupList);
+                channelGroupList = channelGroupList.Where(cg => !string.IsNullOrEmpty(cg) && cg.Trim().Length > 0).Distinct<string>().ToList();
             }
 
             string channelsCommaDelimited = string.Join(",", channelList.ToArray());
@@ -80,7 +64,7 @@ namespace PubnubApi.EndPoint
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            UrlProcessRequest<T>(request, requestState);
+            UrlProcessRequest<T>(request, requestState, false);
         }
     }
 }

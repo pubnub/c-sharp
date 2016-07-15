@@ -52,7 +52,7 @@ namespace PubnubApi.EndPoint
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            UrlProcessRequest<WhereNowAck>(request, requestState);
+            UrlProcessRequest<WhereNowAck>(request, requestState, false);
         }
 
 
