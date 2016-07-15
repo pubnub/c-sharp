@@ -24,6 +24,7 @@ namespace PubnubApi
         private string revokeParameters = "";
         private string getUserStateParameters = "";
         private string setUserStateParameters = "";
+        private string channelGroupAddParameters = "";
 
         public UrlRequestBuilder(PNConfiguration config)
         {
@@ -415,6 +416,32 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, ResponseType.SetUserState);
         }
 
+        Uri IUrlRequestBuilder.BuildAddChannelsToChannelGroupRequest(string[] channels, string nameSpace, string groupName)
+        {
+            StringBuilder parameterBuilder = new StringBuilder();
+            channelGroupAddParameters = "";
+
+            parameterBuilder.AppendFormat("?add={0}", string.Join(",", channels));
+
+            channelGroupAddParameters = parameterBuilder.ToString();
+
+            // Build URL
+            List<string> url = new List<string>();
+            url.Add("v2");
+            url.Add("channel-registration");
+            url.Add("sub-key");
+            url.Add(pubnubConfig.SubscribeKey);
+            if (!string.IsNullOrEmpty(nameSpace) && nameSpace.Trim().Length > 0)
+            {
+                url.Add("namespace");
+                url.Add(nameSpace);
+            }
+            url.Add("channel-group");
+            url.Add(groupName);
+
+            return BuildRestApiRequest<Uri>(url, ResponseType.ChannelGroupAdd);
+        }
+
         private Uri BuildRestApiRequest<T>(List<string> urlComponents, ResponseType type)
         {
             return BuildRestApiRequest<T>(urlComponents, type, this.pubnubConfig.Uuid);
@@ -588,20 +615,20 @@ namespace PubnubApi
             }
             else if (type == ResponseType.ChannelGroupAdd || type == ResponseType.ChannelGroupRemove || type == ResponseType.ChannelGroupGet)
             {
-                //queryParamExist = true;
-                //switch (type)
-                //{
-                //    case ResponseType.ChannelGroupAdd:
-                //        url.Append(channelGroupAddParameters);
-                //        break;
-                //    case ResponseType.ChannelGroupRemove:
-                //        url.Append(channelGroupRemoveParameters);
-                //        break;
-                //    case ResponseType.ChannelGroupGet:
-                //        break;
-                //    default:
-                //        break;
-                //}
+                queryParamExist = true;
+                switch (type)
+                {
+                    case ResponseType.ChannelGroupAdd:
+                        url.Append(channelGroupAddParameters);
+                        break;
+                    //case ResponseType.ChannelGroupRemove:
+                    //    url.Append(channelGroupRemoveParameters);
+                    //    break;
+                    case ResponseType.ChannelGroupGet:
+                        break;
+                    default:
+                        break;
+                }
             }
             else if (type == ResponseType.DetailedHistory)
             {

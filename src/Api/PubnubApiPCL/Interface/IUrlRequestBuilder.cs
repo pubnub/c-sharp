@@ -27,5 +27,6 @@ namespace PubnubApi.Interface
 
         Uri BuildSetUserStateRequest(string channelsCommaDelimited, string channelGroupsCommaDelimited, string uuid, string jsonUserState);
 
+        Uri BuildAddChannelsToChannelGroupRequest(string[] channels, string nameSpace, string groupName);
     }
 }

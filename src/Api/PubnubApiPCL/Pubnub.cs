@@ -265,15 +265,17 @@ namespace PubnubApi
 		#region "PubNub API Channel Group Methods"
 		public void AddChannelsToChannelGroup(string[] channels, string groupName, Action<AddChannelToChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.AddChannelsToChannelGroup(channels, groupName, userCallback, errorCallback);
+            EndPoint.AddChannelsToChannelGroupOperation endPoint = new EndPoint.AddChannelsToChannelGroupOperation(pubnubConfig, jsonPluggableLibrary);
+            endPoint.AddChannelsToChannelGroup(channels, "", groupName, userCallback, errorCallback);
 		}
 
 		public void AddChannelsToChannelGroup(string[] channels, string nameSpace, string groupName, Action<AddChannelToChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.AddChannelsToChannelGroup(channels, nameSpace, groupName, userCallback, errorCallback);
-		}
+            EndPoint.AddChannelsToChannelGroupOperation endPoint = new EndPoint.AddChannelsToChannelGroupOperation(pubnubConfig, jsonPluggableLibrary);
+            endPoint.AddChannelsToChannelGroup(channels, nameSpace, groupName, userCallback, errorCallback);
+        }
 
-		public void RemoveChannelsFromChannelGroup(string[] channels, string nameSpace, string groupName, Action<RemoveChannelFromChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
+        public void RemoveChannelsFromChannelGroup(string[] channels, string nameSpace, string groupName, Action<RemoveChannelFromChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
 			pubnub.RemoveChannelsFromChannelGroup(channels, nameSpace, groupName, userCallback, errorCallback);
 		}

@@ -39,6 +39,7 @@
     <Compile Include="Callback\PNCallbackService.cs" />
     <Compile Include="EndPoint\Access\AuditOperation.cs" />
     <Compile Include="EndPoint\Access\GrantOperation.cs" />
+    <Compile Include="EndPoint\ChannelGroup\AddChannelsToChannelGroupOperation.cs" />
     <Compile Include="EndPoint\HistoryOperation.cs" />
     <Compile Include="EndPoint\Presence\GlobalHereNowOperation.cs" />
     <Compile Include="EndPoint\Presence\HereNowOperation.cs" />
@@ -121,7 +122,6 @@
     <Compile Include="Model\Consumer\Ack\WhereNowAck.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="EndPoint\ChannelGroup\" />
     <Folder Include="EndPoint\Push\" />
   </ItemGroup>
   <ItemGroup>
