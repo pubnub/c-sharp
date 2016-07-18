@@ -281,12 +281,14 @@ namespace PubnubApi
 
         public void RemoveChannelsFromChannelGroup(string[] channels, string nameSpace, string groupName, Action<RemoveChannelFromChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.RemoveChannelsFromChannelGroup(channels, nameSpace, groupName, userCallback, errorCallback);
+            EndPoint.RemoveChannelsFromChannelGroupOperation endPoint = new EndPoint.RemoveChannelsFromChannelGroupOperation(pubnubConfig, jsonPluggableLibrary);
+            endPoint.RemoveChannelsFromChannelGroup(channels, nameSpace, groupName, userCallback, errorCallback);
 		}
 
 		public void RemoveChannelsFromChannelGroup(string[] channels, string groupName, Action<RemoveChannelFromChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.RemoveChannelsFromChannelGroup(channels, groupName, userCallback, errorCallback);
+            EndPoint.RemoveChannelsFromChannelGroupOperation endPoint = new EndPoint.RemoveChannelsFromChannelGroupOperation(pubnubConfig, jsonPluggableLibrary);
+            endPoint.RemoveChannelsFromChannelGroup(channels, "", groupName, userCallback, errorCallback);
 		}
 
 		public void RemoveChannelGroup(string nameSpace, string groupName, Action<RemoveChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
@@ -301,12 +303,14 @@ namespace PubnubApi
 
 		public void GetChannelsForChannelGroup(string nameSpace, string groupName, Action<GetChannelGroupChannelsAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.GetChannelsForChannelGroup(nameSpace, groupName, userCallback, errorCallback);
+            EndPoint.GetChannelsForChannelGroupOperation endPoint = new EndPoint.GetChannelsForChannelGroupOperation(pubnubConfig, jsonPluggableLibrary);
+            endPoint.GetChannelsForChannelGroup(nameSpace, groupName, userCallback, errorCallback);
 		}
 
 		public void GetChannelsForChannelGroup(string groupName, Action<GetChannelGroupChannelsAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.GetChannelsForChannelGroup(groupName, userCallback, errorCallback);
+            EndPoint.GetChannelsForChannelGroupOperation endPoint = new EndPoint.GetChannelsForChannelGroupOperation(pubnubConfig, jsonPluggableLibrary);
+            endPoint.GetChannelsForChannelGroup(groupName, userCallback, errorCallback);
 		}
 
 		public void GetAllChannelGroups(string nameSpace, Action<GetAllChannelGroupsAck> userCallback, Action<PubnubClientError> errorCallback)

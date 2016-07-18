@@ -25,6 +25,7 @@ namespace PubnubApi
         private string getUserStateParameters = "";
         private string setUserStateParameters = "";
         private string channelGroupAddParameters = "";
+        private string channelGroupRemoveParameters = "";
 
         public UrlRequestBuilder(PNConfiguration config)
         {
@@ -416,18 +417,18 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, ResponseType.SetUserState);
         }
 
-        Uri IUrlRequestBuilder.BuildAddChannelsToChannelGroupRequest(string[] channels, string nameSpace, string groupName)
+        Uri IUrlRequestBuilder.BuildAddChannelsToChannelGroupRequest(string channelsCommaDelimited, string nameSpace, string groupName)
         {
             StringBuilder parameterBuilder = new StringBuilder();
             channelGroupAddParameters = "";
 
-            parameterBuilder.AppendFormat("?add={0}", string.Join(",", channels));
+            parameterBuilder.AppendFormat("?add={0}", channelsCommaDelimited);
 
             channelGroupAddParameters = parameterBuilder.ToString();
 
             // Build URL
             List<string> url = new List<string>();
-            url.Add("v2");
+            url.Add("v1");
             url.Add("channel-registration");
             url.Add("sub-key");
             url.Add(pubnubConfig.SubscribeKey);
@@ -440,6 +441,98 @@ namespace PubnubApi
             url.Add(groupName);
 
             return BuildRestApiRequest<Uri>(url, ResponseType.ChannelGroupAdd);
+        }
+
+        Uri IUrlRequestBuilder.BuildRemoveChannelsFromChannelGroupRequest(string channelsCommaDelimited, string nameSpace, string groupName)
+        {
+            bool groupNameAvailable = false;
+            bool nameSpaceAvailable = false;
+            bool channelAvaiable = false;
+
+            StringBuilder parameterBuilder = new StringBuilder();
+            channelGroupRemoveParameters = "";
+
+            if (!String.IsNullOrEmpty(channelsCommaDelimited))
+            {
+                channelAvaiable = true;
+                parameterBuilder.AppendFormat("?remove={0}", channelsCommaDelimited);
+                channelGroupRemoveParameters = parameterBuilder.ToString();
+            }
+
+            // Build URL
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("channel-registration");
+            url.Add("sub-key");
+            url.Add(pubnubConfig.SubscribeKey);
+            if (!string.IsNullOrEmpty(nameSpace) && nameSpace.Trim().Length > 0)
+            {
+                nameSpaceAvailable = true;
+                url.Add("namespace");
+                url.Add(nameSpace);
+            }
+            if (!string.IsNullOrEmpty(groupName) && groupName.Trim().Length > 0)
+            {
+                groupNameAvailable = true;
+                url.Add("channel-group");
+                url.Add(groupName);
+            }
+            if (nameSpaceAvailable && groupNameAvailable && !channelAvaiable)
+            {
+                url.Add("remove");
+            }
+            else if (nameSpaceAvailable && !groupNameAvailable && !channelAvaiable)
+            {
+                url.Add("remove");
+            }
+            else if (!nameSpaceAvailable && groupNameAvailable && !channelAvaiable)
+            {
+                url.Add("remove");
+            }
+
+            return BuildRestApiRequest<Uri>(url, ResponseType.ChannelGroupRemove);
+        }
+
+        Uri IUrlRequestBuilder.BuildGetChannelsForChannelGroupRequest(string nameSpace, string groupName, bool limitToChannelGroupScopeOnly)
+        {
+            bool groupNameAvailable = false;
+            bool nameSpaceAvailable = false;
+
+            // Build URL
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("channel-registration");
+            url.Add("sub-key");
+            url.Add(pubnubConfig.SubscribeKey);
+            if (!string.IsNullOrEmpty(nameSpace) && nameSpace.Trim().Length > 0)
+            {
+                nameSpaceAvailable = true;
+                url.Add("namespace");
+                url.Add(nameSpace);
+            }
+            if (limitToChannelGroupScopeOnly)
+            {
+                url.Add("channel-group");
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(groupName) && groupName.Trim().Length > 0)
+                {
+                    groupNameAvailable = true;
+                    url.Add("channel-group");
+                    url.Add(groupName);
+                }
+
+                if (!nameSpaceAvailable && !groupNameAvailable)
+                {
+                    url.Add("namespace");
+                }
+                else if (nameSpaceAvailable && !groupNameAvailable)
+                {
+                    url.Add("channel-group");
+                }
+            }
+            return BuildRestApiRequest<Uri>(url, ResponseType.ChannelGroupGet);
         }
 
         private Uri BuildRestApiRequest<T>(List<string> urlComponents, ResponseType type)
@@ -621,9 +714,9 @@ namespace PubnubApi
                     case ResponseType.ChannelGroupAdd:
                         url.Append(channelGroupAddParameters);
                         break;
-                    //case ResponseType.ChannelGroupRemove:
-                    //    url.Append(channelGroupRemoveParameters);
-                    //    break;
+                    case ResponseType.ChannelGroupRemove:
+                        url.Append(channelGroupRemoveParameters);
+                        break;
                     case ResponseType.ChannelGroupGet:
                         break;
                     default:
