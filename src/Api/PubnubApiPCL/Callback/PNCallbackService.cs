@@ -11,9 +11,9 @@ namespace PubnubApi
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLib = null;
 
-        public PNCallbackService(PNConfiguration pnConfiguation, IJsonPluggableLibrary jsonPluggableLibrary)
+        public PNCallbackService(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary)
         {
-            this.config = pnConfiguation;
+            this.config = pubnubConfig;
             this.jsonLib = jsonPluggableLibrary;
         }
 
@@ -63,19 +63,19 @@ namespace PubnubApi
         //			}
         //		}
 
-        internal void GoToCallback<T>(List<object> result, Action<T> Callback, bool internalObject, ResponseType type)
+        internal void GoToCallback<T>(List<object> result, Action<T> callback, bool internalObject, ResponseType type)
         {
-            if (Callback != null)
+            if (callback != null)
             {
                 if (typeof(T) == typeof(string))
                 {
-                    JsonResponseToCallback(result, Callback);
+                    JsonResponseToCallback(result, callback);
                 }
                 else if (typeof(T) == typeof(long) && type == ResponseType.Time)
                 {
                     long timetoken;
                     Int64.TryParse(result[0].ToString(), out timetoken);
-                    JsonResponseToCallback(timetoken, Callback);
+                    JsonResponseToCallback(timetoken, callback);
                 }
                 else
                 {
@@ -90,30 +90,30 @@ namespace PubnubApi
                         ret = jsonLib.DeserializeToObject<T>(result);
                     }
 
-                    Callback(ret);
+                    callback(ret);
                 }
             }
         }
 
-        protected void GoToCallback(object result, Action<string> Callback)
+        protected void GoToCallback(object result, Action<string> callback)
         {
-            if (Callback != null)
+            if (callback != null)
             {
-                JsonResponseToCallback(result, Callback);
+                JsonResponseToCallback(result, callback);
             }
         }
 
-        protected void GoToCallback(object result, Action<object> Callback)
+        protected void GoToCallback(object result, Action<object> callback)
         {
-            if (Callback != null)
+            if (callback != null)
             {
-                Callback(result);
+                callback(result);
             }
         }
 
-        internal void GoToCallback(PubnubClientError error, Action<PubnubClientError> Callback)
+        internal void GoToCallback(PubnubClientError error, Action<PubnubClientError> callback)
         {
-            if (Callback != null && error != null)
+            if (callback != null && error != null)
             {
                 if ((int)error.Severity <= (int)config.ErrorLevel)
                 { //Checks whether the error serverity falls in the range of error filter level
@@ -125,7 +125,7 @@ namespace PubnubApi
                         && error.StatusCode != 130
                         && error.StatusCode != 4040) //Error Code that should not go out
                     {
-                        Callback(error);
+                        callback(error);
                     }
                 }
             }

@@ -21,65 +21,109 @@ namespace PubNubMessaging.Tests
         bool timeReceivedWhenProxy = false;
 
         Pubnub pubnub = null;
-        IPubnubUnitTest unitTest = null;
 
         [Test]
         public void ThenItShouldReturnTimeStamp()
         {
+            timeReceived = false;
+            mreTime = new ManualResetEvent(false);
 
-            PNConfiguration config = new PNConfiguration();
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid"
+            };
 
-            unitTest = new PubnubUnitTest();
-            unitTest.StubRequestResponse(new Uri(string.Format("http://{0}/time/0", config.Origin)), "[14271224264234400]");
-            //unitTest.TestClassName = "WhenGetRequestServerTime";
-            //unitTest.TestCaseName = "ThenItShouldReturnTimeStamp";
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
+            unitTest.StubRequestResponse(new Uri(string.Format("http{0}://{1}/time/0?uuid={2}&pnsdk={3}", (config.Secure) ? "s" : "", config.Origin, config.Uuid, config.SdkVersion)).ToString(), "[14271224264234400]");
+
             long expected = 14271224264234400;
 
             pubnub = new Pubnub(config, unitTest);
 
-
-            //pubnub.Time(ReturnTimeStampCallback, DummyErrorCallback);
-            pubnub.Time((actual) => 
-            {
-                if (expected == actual)
+            pubnub.Time(
+                (actual) => 
                 {
-                    timeReceived = true;
-                }
-                mreTime.Set();
-            }, DummyErrorCallback);
+                    if (unitTest.EnableStubTest)
+                    {
+                        if (expected == actual)
+                        {
+                            timeReceived = true;
+                        }
+                    }
+                    else if (actual > 0)
+                    {
+                        timeReceived = true;
+                    }
+
+                    mreTime.Set();
+                }, 
+                (error) => { }
+            );
 
             mreTime.WaitOne(310 * 1000);
 
-            pubnub.EndPendingRequests(); 
+            unitTest = null;
 
+            pubnub.EndPendingRequests(); 
             pubnub = null;
+
             Assert.IsTrue(timeReceived, "time() Failed");
         }
 
         [Test]
         public void ThenItShouldReturnTimeStampWithSSL()
         {
-            PNConfiguration config = new PNConfiguration();
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            pubnub = new Pubnub(config);
+            timeReceived = false;
+            mreTime = new ManualResetEvent(false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGetRequestServerTime";
-            unitTest.TestCaseName = "ThenItShouldReturnTimeStamp";
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = true
+            };
 
-            pubnub.PubnubUnitTest = unitTest;
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
+            unitTest.StubRequestResponse(new Uri(string.Format("http{0}://{1}/time/0?uuid={2}&pnsdk={3}", (config.Secure) ? "s" : "", config.Origin, config.Uuid, config.SdkVersion)).ToString(), "[14271224264234400]");
 
-            pubnub.Time(ReturnTimeStampCallback, DummyErrorCallback);
+            long expected = 14271224264234400;
+
+            pubnub = new Pubnub(config, unitTest);
+
+            pubnub.Time(
+                (actual) =>
+                {
+                    if (unitTest.EnableStubTest)
+                    {
+                        if (expected == actual)
+                        {
+                            timeReceived = true;
+                        }
+                    }
+                    else if (actual > 0)
+                    {
+                        timeReceived = true;
+                    }
+
+                    mreTime.Set();
+                },
+                (error) => { }
+            );
+
             mreTime.WaitOne(310 * 1000);
+
+            unitTest = null;
+
             pubnub.EndPendingRequests(); 
-            pubnub.PubnubUnitTest = null;
             pubnub = null;
+
             Assert.IsTrue(timeReceived, "time() with SSL Failed");
         }
-
 
         [Test]
         public void ThenWithProxyItShouldReturnTimeStamp()
@@ -92,21 +136,56 @@ namespace PubNubMessaging.Tests
             proxy.ProxyUserName = "tuvpnfreeproxy";
             proxy.ProxyPassword = "Rx8zW78k";
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            timeReceivedWhenProxy = false;
+            mreProxy = new ManualResetEvent(false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGetRequestServerTime";
-            unitTest.TestCaseName = "ThenWithProxyItShouldReturnTimeStamp";
-            pubnub.PubnubUnitTest = unitTest;
-            
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                EnableProxy = true
+            };
+
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
+            unitTest.StubRequestResponse(new Uri(string.Format("http{0}://{1}/time/0?uuid={2}&pnsdk={3}", (config.Secure) ? "s" : "", config.Origin, config.Uuid, config.SdkVersion)).ToString(), "[14271224264234400]");
+
+            long expected = 14271224264234400;
+
+
             if (proxyConfigured)
             {
+                pubnub = new Pubnub(config, unitTest);
                 pubnub.Proxy = proxy;
-                pubnub.Time(ReturnProxyPresenceTimeStampCallback, DummyErrorCallback);
+
+                pubnub.Time(
+                    (actual) =>
+                    {
+                        if (unitTest.EnableStubTest)
+                        {
+                            if (expected == actual)
+                            {
+                                timeReceivedWhenProxy = true;
+                            }
+                        }
+                        else if (actual > 0)
+                        {
+                            timeReceivedWhenProxy = true;
+                        }
+
+                        mreProxy.Set();
+                    },
+                    (error) => { }
+                );
+
                 mreProxy.WaitOne(310 * 1000);
+
                 pubnub.EndPendingRequests(); 
+
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
+
                 Assert.IsTrue(timeReceivedWhenProxy, "time() Failed");
             }
             else
@@ -127,21 +206,55 @@ namespace PubNubMessaging.Tests
             proxy.ProxyUserName = "tuvpnfreeproxy";
             proxy.ProxyPassword = "Rx8zW78k";
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", true);
+            timeReceivedWhenProxy = false;
+            mreProxy = new ManualResetEvent(false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGetRequestServerTime";
-            unitTest.TestCaseName = "ThenWithProxyItShouldReturnTimeStamp";
-            pubnub.PubnubUnitTest = unitTest;
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                EnableProxy = true
+            };
+
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
+            unitTest.StubRequestResponse(new Uri(string.Format("http{0}://{1}/time/0?uuid={2}&pnsdk={3}", (config.Secure) ? "s" : "", config.Origin, config.Uuid, config.SdkVersion)).ToString(), "[14271224264234400]");
+
+            long expected = 14271224264234400;
 
             if (proxyConfigured)
             {
+                pubnub = new Pubnub(config, unitTest);
                 pubnub.Proxy = proxy;
-                pubnub.Time(ReturnProxyPresenceTimeStampCallback, DummyErrorCallback);
+
+                pubnub.Time(
+                    (actual) =>
+                    {
+                        if (unitTest.EnableStubTest)
+                        {
+                            if (expected == actual)
+                            {
+                                timeReceivedWhenProxy = true;
+                            }
+                        }
+                        else if (actual > 0)
+                        {
+                            timeReceivedWhenProxy = true;
+                        }
+
+                        mreProxy.Set();
+                    },
+                    (error) => { }
+                );
+
                 mreProxy.WaitOne(310 * 1000);
-                pubnub.EndPendingRequests(); 
+
+                pubnub.EndPendingRequests();
+
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
+
                 Assert.IsTrue(timeReceivedWhenProxy, "time() with SSL through proxy Failed");
             }
             else
@@ -149,25 +262,6 @@ namespace PubNubMessaging.Tests
                 Assert.Ignore("Proxy setup for SSL not configured. After setup Set proxyConfigured to true");
             }
 
-        }
-
-
-        private void ReturnTimeStampCallback(long result)
-        {
-            if (result > 0)
-            {
-                timeReceived = true;
-            }
-            mreTime.Set();
-        }
-
-        private void ReturnProxyPresenceTimeStampCallback(long result)
-        {
-            if (result > 0)
-            {
-                timeReceivedWhenProxy = true;
-            }
-            mreProxy.Set();
         }
 
         [Test]
@@ -186,10 +280,6 @@ namespace PubNubMessaging.Tests
             DateTime expectedDate = new DateTime(2012, 6, 26, 0, 0, 0, DateTimeKind.Utc);
             DateTime actualDate = Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(13406688000000000);
             Assert.True(expectedDate == actualDate);
-        }
-
-        void DummyErrorCallback(PubnubClientError result)
-        {
         }
 
     }

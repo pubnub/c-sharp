@@ -28,8 +28,8 @@ namespace PubnubApi
 
         string GetStubResponse(HttpWebRequest request);
 
-        Dictionary<Uri, string> StubRequestResponse(Uri request, string expectedServerJsonResponse);
+        Dictionary<string, string> StubRequestResponse(string requestUriString, string expectedServerJsonResponse);
 
-        string GetExpectedServerJsonResponse(Uri request);
+        string GetExpectedServerJsonResponse(string requestUriString);
     }
 }

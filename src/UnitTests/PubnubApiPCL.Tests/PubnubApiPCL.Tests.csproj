@@ -6,7 +6,7 @@
     <ProjectGuid>{419A0298-DD33-44A0-81CB-212782ED4150}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>PubNubMessaging.Tests</RootNamespace>
-    <AssemblyName>PubNub-Messaging.Tests</AssemblyName>
+    <AssemblyName>PubNubMessaging.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

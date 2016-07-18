@@ -11,20 +11,14 @@ namespace PubnubApi.EndPoint
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
 
-        static ConcurrentDictionary<string, Dictionary<string, object>> _channelLocalUserState = new ConcurrentDictionary<string, Dictionary<string, object>>();
-        static ConcurrentDictionary<string, Dictionary<string, object>> _channelUserState = new ConcurrentDictionary<string, Dictionary<string, object>>();
-        static ConcurrentDictionary<string, Dictionary<string, object>> _channelGroupLocalUserState = new ConcurrentDictionary<string, Dictionary<string, object>>();
-        static ConcurrentDictionary<string, Dictionary<string, object>> _channelGroupUserState = new ConcurrentDictionary<string, Dictionary<string, object>>();
-
-
-        public SetStateOperation(PNConfiguration pnConfig):base(pnConfig)
+        public SetStateOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
         {
-            config = pnConfig;
+            config = pubnubConfig;
         }
 
-        public SetStateOperation(PNConfiguration pnConfig, IJsonPluggableLibrary jsonPluggableLibrary):base(pnConfig, jsonPluggableLibrary)
+        public SetStateOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary):base(pubnubConfig, jsonPluggableLibrary)
         {
-            config = pnConfig;
+            config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
         }
 
@@ -294,16 +288,16 @@ namespace PubnubApi.EndPoint
             {
                 string currentChannel = channelList[channelIndex];
 
-                _channelUserState.AddOrUpdate(currentChannel.Trim(), deserializeChannelUserState, (oldState, newState) => deserializeChannelUserState);
-                _channelLocalUserState.AddOrUpdate(currentChannel.Trim(), deserializeChannelUserState, (oldState, newState) => deserializeChannelUserState);
+                base.ChannelUserState.AddOrUpdate(currentChannel.Trim(), deserializeChannelUserState, (oldState, newState) => deserializeChannelUserState);
+                base.ChannelLocalUserState.AddOrUpdate(currentChannel.Trim(), deserializeChannelUserState, (oldState, newState) => deserializeChannelUserState);
             }
 
             for (int channelGroupIndex=0; channelGroupIndex < channelGroupList.Count; channelGroupIndex++)
             {
                 string currentChannelGroup = channelGroupList[channelGroupIndex];
 
-                _channelGroupUserState.AddOrUpdate(currentChannelGroup.Trim(), deserializeChannelGroupUserState, (oldState, newState) => deserializeChannelGroupUserState);
-                _channelGroupLocalUserState.AddOrUpdate(currentChannelGroup.Trim(), deserializeChannelGroupUserState, (oldState, newState) => deserializeChannelGroupUserState);
+                base.ChannelGroupUserState.AddOrUpdate(currentChannelGroup.Trim(), deserializeChannelGroupUserState, (oldState, newState) => deserializeChannelGroupUserState);
+                base.ChannelGroupLocalUserState.AddOrUpdate(currentChannelGroup.Trim(), deserializeChannelGroupUserState, (oldState, newState) => deserializeChannelGroupUserState);
             }
 
             string jsonUserState = "{}";
@@ -377,9 +371,9 @@ namespace PubnubApi.EndPoint
 
             if (!string.IsNullOrEmpty(channel) && channel.Trim().Length > 0)
             {
-                if (_channelLocalUserState.ContainsKey(channel))
+                if (base.ChannelLocalUserState.ContainsKey(channel))
                 {
-                    channelUserStateDictionary = _channelLocalUserState[channel];
+                    channelUserStateDictionary = base.ChannelLocalUserState[channel];
                     if (channelUserStateDictionary != null)
                     {
                         if (channelUserStateDictionary.ContainsKey(userStateKey))
@@ -407,7 +401,7 @@ namespace PubnubApi.EndPoint
                         channelUserStateDictionary.Add(userStateKey, userStateValue);
                     }
 
-                    _channelLocalUserState.AddOrUpdate(channel, channelUserStateDictionary, (oldData, newData) => channelUserStateDictionary);
+                    base.ChannelLocalUserState.AddOrUpdate(channel, channelUserStateDictionary, (oldData, newData) => channelUserStateDictionary);
                 }
                 else
                 {
@@ -416,16 +410,16 @@ namespace PubnubApi.EndPoint
                         channelUserStateDictionary = new Dictionary<string, object>();
                         channelUserStateDictionary.Add(userStateKey, userStateValue);
 
-                        _channelLocalUserState.AddOrUpdate(channel, channelUserStateDictionary, (oldData, newData) => channelUserStateDictionary);
+                        base.ChannelLocalUserState.AddOrUpdate(channel, channelUserStateDictionary, (oldData, newData) => channelUserStateDictionary);
                     }
                 }
             }
             //
             if (!string.IsNullOrEmpty(channelGroup) && channelGroup.Trim().Length > 0)
             {
-                if (_channelGroupLocalUserState.ContainsKey(channelGroup))
+                if (base.ChannelGroupLocalUserState.ContainsKey(channelGroup))
                 {
-                    channelGroupUserStateDictionary = _channelGroupLocalUserState[channelGroup];
+                    channelGroupUserStateDictionary = base.ChannelGroupLocalUserState[channelGroup];
                     if (channelGroupUserStateDictionary != null)
                     {
                         if (channelGroupUserStateDictionary.ContainsKey(userStateKey))
@@ -453,7 +447,7 @@ namespace PubnubApi.EndPoint
                         channelGroupUserStateDictionary.Add(userStateKey, userStateValue);
                     }
 
-                    _channelGroupLocalUserState.AddOrUpdate(channelGroup, channelGroupUserStateDictionary, (oldData, newData) => channelGroupUserStateDictionary);
+                    base.ChannelGroupLocalUserState.AddOrUpdate(channelGroup, channelGroupUserStateDictionary, (oldData, newData) => channelGroupUserStateDictionary);
                 }
                 else
                 {
@@ -462,13 +456,13 @@ namespace PubnubApi.EndPoint
                         channelGroupUserStateDictionary = new Dictionary<string, object>();
                         channelGroupUserStateDictionary.Add(userStateKey, userStateValue);
 
-                        _channelGroupLocalUserState.AddOrUpdate(channelGroup, channelGroupUserStateDictionary, (oldData, newData) => channelGroupUserStateDictionary);
+                        base.ChannelGroupLocalUserState.AddOrUpdate(channelGroup, channelGroupUserStateDictionary, (oldData, newData) => channelGroupUserStateDictionary);
                     }
                 }
             }
 
-            string jsonChannelUserState = BuildJsonUserState(channel, "", true);
-            string jsonChannelGroupUserState = BuildJsonUserState("", channelGroup, true);
+            string jsonChannelUserState = base.BuildJsonUserState(channel, "", true);
+            string jsonChannelGroupUserState = base.BuildJsonUserState("", channelGroup, true);
             if (jsonChannelUserState != "" && jsonChannelGroupUserState != "")
             {
                 retJsonUserState = string.Format("{{\"{0}\":{{{1}}},\"{2}\":{{{3}}}}}", channel, jsonChannelUserState, channelGroup, jsonChannelGroupUserState);
@@ -488,10 +482,10 @@ namespace PubnubApi.EndPoint
         {
             bool userStateDeleted = false;
 
-            if (_channelLocalUserState.ContainsKey(channel))
+            if (base.ChannelLocalUserState.ContainsKey(channel))
             {
                 Dictionary<string, object> returnedUserState = null;
-                userStateDeleted = _channelLocalUserState.TryRemove(channel, out returnedUserState);
+                userStateDeleted = base.ChannelLocalUserState.TryRemove(channel, out returnedUserState);
             }
 
             return userStateDeleted;
@@ -501,153 +495,153 @@ namespace PubnubApi.EndPoint
         {
             bool userStateDeleted = false;
 
-            if (_channelGroupLocalUserState.ContainsKey(channelGroup))
+            if (base.ChannelGroupLocalUserState.ContainsKey(channelGroup))
             {
                 Dictionary<string, object> returnedUserState = null;
-                userStateDeleted = _channelGroupLocalUserState.TryRemove(channelGroup, out returnedUserState);
+                userStateDeleted = base.ChannelGroupLocalUserState.TryRemove(channelGroup, out returnedUserState);
             }
 
             return userStateDeleted;
         }
 
-        private string BuildJsonUserState(string channel, string channelGroup, bool local)
-        {
-            Dictionary<string, object> channelUserStateDictionary = null;
-            Dictionary<string, object> channelGroupUserStateDictionary = null;
+        //private string BuildJsonUserState(string channel, string channelGroup, bool local)
+        //{
+        //    Dictionary<string, object> channelUserStateDictionary = null;
+        //    Dictionary<string, object> channelGroupUserStateDictionary = null;
 
-            if (!string.IsNullOrEmpty(channel) && !string.IsNullOrEmpty(channelGroup))
-            {
-                throw new ArgumentException("BuildJsonUserState takes either channel or channelGroup at one time. Send one at a time by passing empty value for other.");
-            }
+        //    if (!string.IsNullOrEmpty(channel) && !string.IsNullOrEmpty(channelGroup))
+        //    {
+        //        throw new ArgumentException("BuildJsonUserState takes either channel or channelGroup at one time. Send one at a time by passing empty value for other.");
+        //    }
 
-            if (local)
-            {
-                if (!string.IsNullOrEmpty(channel) && _channelLocalUserState.ContainsKey(channel))
-                {
-                    channelUserStateDictionary = _channelLocalUserState[channel];
-                }
-                if (!string.IsNullOrEmpty(channelGroup) && _channelGroupLocalUserState.ContainsKey(channelGroup))
-                {
-                    channelGroupUserStateDictionary = _channelGroupLocalUserState[channelGroup];
-                }
-            }
-            else
-            {
-                if (!string.IsNullOrEmpty(channel) && _channelUserState.ContainsKey(channel))
-                {
-                    channelUserStateDictionary = _channelUserState[channel];
-                }
-                if (!string.IsNullOrEmpty(channelGroup) && _channelGroupUserState.ContainsKey(channelGroup))
-                {
-                    channelGroupUserStateDictionary = _channelGroupUserState[channelGroup];
-                }
-            }
+        //    if (local)
+        //    {
+        //        if (!string.IsNullOrEmpty(channel) && base.channelLocalUserState.ContainsKey(channel))
+        //        {
+        //            channelUserStateDictionary = base.channelLocalUserState[channel];
+        //        }
+        //        if (!string.IsNullOrEmpty(channelGroup) && base.channelGroupLocalUserState.ContainsKey(channelGroup))
+        //        {
+        //            channelGroupUserStateDictionary = base.channelGroupLocalUserState[channelGroup];
+        //        }
+        //    }
+        //    else
+        //    {
+        //        if (!string.IsNullOrEmpty(channel) && base.channelUserState.ContainsKey(channel))
+        //        {
+        //            channelUserStateDictionary = base.channelUserState[channel];
+        //        }
+        //        if (!string.IsNullOrEmpty(channelGroup) && base.channelGroupUserState.ContainsKey(channelGroup))
+        //        {
+        //            channelGroupUserStateDictionary = base.channelGroupUserState[channelGroup];
+        //        }
+        //    }
 
-            StringBuilder jsonStateBuilder = new StringBuilder();
+        //    StringBuilder jsonStateBuilder = new StringBuilder();
 
-            if (channelUserStateDictionary != null)
-            {
-                string[] channelUserStateKeys = channelUserStateDictionary.Keys.ToArray<string>();
+        //    if (channelUserStateDictionary != null)
+        //    {
+        //        string[] channelUserStateKeys = channelUserStateDictionary.Keys.ToArray<string>();
 
-                for (int keyIndex = 0; keyIndex < channelUserStateKeys.Length; keyIndex++)
-                {
-                    string channelUserStateKey = channelUserStateKeys[keyIndex];
-                    object channelUserStateValue = channelUserStateDictionary[channelUserStateKey];
-                    if (channelUserStateValue == null)
-                    {
-                        jsonStateBuilder.AppendFormat("\"{0}\":{1}", channelUserStateKey, string.Format("\"{0}\"", "null"));
-                    }
-                    else
-                    {
-                        jsonStateBuilder.AppendFormat("\"{0}\":{1}", channelUserStateKey, (channelUserStateValue.GetType().ToString() == "System.String") ? string.Format("\"{0}\"", channelUserStateValue) : channelUserStateValue);
-                    }
-                    if (keyIndex < channelUserStateKeys.Length - 1)
-                    {
-                        jsonStateBuilder.Append(",");
-                    }
-                }
-            }
-            if (channelGroupUserStateDictionary != null)
-            {
-                string[] channelGroupUserStateKeys = channelGroupUserStateDictionary.Keys.ToArray<string>();
+        //        for (int keyIndex = 0; keyIndex < channelUserStateKeys.Length; keyIndex++)
+        //        {
+        //            string channelUserStateKey = channelUserStateKeys[keyIndex];
+        //            object channelUserStateValue = channelUserStateDictionary[channelUserStateKey];
+        //            if (channelUserStateValue == null)
+        //            {
+        //                jsonStateBuilder.AppendFormat("\"{0}\":{1}", channelUserStateKey, string.Format("\"{0}\"", "null"));
+        //            }
+        //            else
+        //            {
+        //                jsonStateBuilder.AppendFormat("\"{0}\":{1}", channelUserStateKey, (channelUserStateValue.GetType().ToString() == "System.String") ? string.Format("\"{0}\"", channelUserStateValue) : channelUserStateValue);
+        //            }
+        //            if (keyIndex < channelUserStateKeys.Length - 1)
+        //            {
+        //                jsonStateBuilder.Append(",");
+        //            }
+        //        }
+        //    }
+        //    if (channelGroupUserStateDictionary != null)
+        //    {
+        //        string[] channelGroupUserStateKeys = channelGroupUserStateDictionary.Keys.ToArray<string>();
 
-                for (int keyIndex = 0; keyIndex < channelGroupUserStateKeys.Length; keyIndex++)
-                {
-                    string channelGroupUserStateKey = channelGroupUserStateKeys[keyIndex];
-                    object channelGroupUserStateValue = channelGroupUserStateDictionary[channelGroupUserStateKey];
-                    if (channelGroupUserStateValue == null)
-                    {
-                        jsonStateBuilder.AppendFormat("\"{0}\":{1}", channelGroupUserStateKey, string.Format("\"{0}\"", "null"));
-                    }
-                    else
-                    {
-                        jsonStateBuilder.AppendFormat("\"{0}\":{1}", channelGroupUserStateKey, (channelGroupUserStateValue.GetType().ToString() == "System.String") ? string.Format("\"{0}\"", channelGroupUserStateValue) : channelGroupUserStateValue);
-                    }
-                    if (keyIndex < channelGroupUserStateKeys.Length - 1)
-                    {
-                        jsonStateBuilder.Append(",");
-                    }
-                }
-            }
+        //        for (int keyIndex = 0; keyIndex < channelGroupUserStateKeys.Length; keyIndex++)
+        //        {
+        //            string channelGroupUserStateKey = channelGroupUserStateKeys[keyIndex];
+        //            object channelGroupUserStateValue = channelGroupUserStateDictionary[channelGroupUserStateKey];
+        //            if (channelGroupUserStateValue == null)
+        //            {
+        //                jsonStateBuilder.AppendFormat("\"{0}\":{1}", channelGroupUserStateKey, string.Format("\"{0}\"", "null"));
+        //            }
+        //            else
+        //            {
+        //                jsonStateBuilder.AppendFormat("\"{0}\":{1}", channelGroupUserStateKey, (channelGroupUserStateValue.GetType().ToString() == "System.String") ? string.Format("\"{0}\"", channelGroupUserStateValue) : channelGroupUserStateValue);
+        //            }
+        //            if (keyIndex < channelGroupUserStateKeys.Length - 1)
+        //            {
+        //                jsonStateBuilder.Append(",");
+        //            }
+        //        }
+        //    }
 
-            return jsonStateBuilder.ToString();
-        }
+        //    return jsonStateBuilder.ToString();
+        //}
 
-        private string BuildJsonUserState(string[] channels, string[] channelGroups, bool local)
-        {
-            string retJsonUserState = "";
+        //private string BuildJsonUserState(string[] channels, string[] channelGroups, bool local)
+        //{
+        //    string retJsonUserState = "";
 
-            StringBuilder jsonStateBuilder = new StringBuilder();
+        //    StringBuilder jsonStateBuilder = new StringBuilder();
 
-            if (channels != null && channels.Length > 0)
-            {
-                for (int index = 0; index < channels.Length; index++)
-                {
-                    string currentJsonState = BuildJsonUserState(channels[index].ToString(), "", local);
-                    if (!string.IsNullOrEmpty(currentJsonState))
-                    {
-                        currentJsonState = string.Format("\"{0}\":{{{1}}}", channels[index].ToString(), currentJsonState);
-                        if (jsonStateBuilder.Length > 0)
-                        {
-                            jsonStateBuilder.Append(",");
-                        }
-                        jsonStateBuilder.Append(currentJsonState);
-                    }
-                }
-            }
+        //    if (channels != null && channels.Length > 0)
+        //    {
+        //        for (int index = 0; index < channels.Length; index++)
+        //        {
+        //            string currentJsonState = BuildJsonUserState(channels[index].ToString(), "", local);
+        //            if (!string.IsNullOrEmpty(currentJsonState))
+        //            {
+        //                currentJsonState = string.Format("\"{0}\":{{{1}}}", channels[index].ToString(), currentJsonState);
+        //                if (jsonStateBuilder.Length > 0)
+        //                {
+        //                    jsonStateBuilder.Append(",");
+        //                }
+        //                jsonStateBuilder.Append(currentJsonState);
+        //            }
+        //        }
+        //    }
 
-            if (channelGroups != null && channelGroups.Length > 0)
-            {
-                for (int index = 0; index < channelGroups.Length; index++)
-                {
-                    string currentJsonState = BuildJsonUserState("", channelGroups[index].ToString(), local);
-                    if (!string.IsNullOrEmpty(currentJsonState))
-                    {
-                        currentJsonState = string.Format("\"{0}\":{{{1}}}", channelGroups[index].ToString(), currentJsonState);
-                        if (jsonStateBuilder.Length > 0)
-                        {
-                            jsonStateBuilder.Append(",");
-                        }
-                        jsonStateBuilder.Append(currentJsonState);
-                    }
-                }
-            }
+        //    if (channelGroups != null && channelGroups.Length > 0)
+        //    {
+        //        for (int index = 0; index < channelGroups.Length; index++)
+        //        {
+        //            string currentJsonState = BuildJsonUserState("", channelGroups[index].ToString(), local);
+        //            if (!string.IsNullOrEmpty(currentJsonState))
+        //            {
+        //                currentJsonState = string.Format("\"{0}\":{{{1}}}", channelGroups[index].ToString(), currentJsonState);
+        //                if (jsonStateBuilder.Length > 0)
+        //                {
+        //                    jsonStateBuilder.Append(",");
+        //                }
+        //                jsonStateBuilder.Append(currentJsonState);
+        //            }
+        //        }
+        //    }
 
-            if (jsonStateBuilder.Length > 0)
-            {
-                retJsonUserState = string.Format("{{{0}}}", jsonStateBuilder.ToString());
-            }
+        //    if (jsonStateBuilder.Length > 0)
+        //    {
+        //        retJsonUserState = string.Format("{{{0}}}", jsonStateBuilder.ToString());
+        //    }
 
-            return retJsonUserState;
-        }
+        //    return retJsonUserState;
+        //}
 
         private string GetLocalUserState(string channel, string channelGroup)
         {
             string retJsonUserState = "";
             StringBuilder jsonStateBuilder = new StringBuilder();
 
-            string channelJsonUserState = BuildJsonUserState(channel, "", false);
-            string channelGroupJsonUserState = BuildJsonUserState("", channelGroup, false);
+            string channelJsonUserState = base.BuildJsonUserState(channel, "", false);
+            string channelGroupJsonUserState = base.BuildJsonUserState("", channelGroup, false);
 
             if (channelJsonUserState.Trim().Length > 0 && channelGroupJsonUserState.Trim().Length <= 0)
             {

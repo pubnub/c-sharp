@@ -50,7 +50,7 @@ namespace PubNubMessaging.Tests
 
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "GrantRequestUnitTest";
             unitTest.TestCaseName = "Init3";
             pubnub.PubnubUnitTest = unitTest;
@@ -84,7 +84,7 @@ namespace PubNubMessaging.Tests
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
             pubnub.SessionUUID = "myuuid";
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannelGroup";
             unitTest.TestCaseName = "ThenSubscribeShouldReturnReceivedMessage";
 
@@ -132,7 +132,7 @@ namespace PubNubMessaging.Tests
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
             pubnub.SessionUUID = "myuuid";
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannelGroup";
             unitTest.TestCaseName = "ThenSubscribeShouldReturnConnectStatus";
 
@@ -180,7 +180,7 @@ namespace PubNubMessaging.Tests
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
             pubnub.SessionUUID = "myuuid";
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannelGroup";
             unitTest.TestCaseName = "ThenMultiSubscribeShouldReturnConnectStatus";
 

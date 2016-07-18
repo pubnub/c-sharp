@@ -35,7 +35,7 @@ namespace PubNubMessaging.Tests
 
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGrantIsRequested";
             unitTest.TestCaseName = "ThenSubKeyLevelWithReadWriteShouldReturnSuccess";
             pubnub.PubnubUnitTest = unitTest;
@@ -67,7 +67,7 @@ namespace PubNubMessaging.Tests
 
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGrantIsRequested";
             unitTest.TestCaseName = "ThenSubKeyLevelWithReadShouldReturnSuccess";
             pubnub.PubnubUnitTest = unitTest;
@@ -99,7 +99,7 @@ namespace PubNubMessaging.Tests
 
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGrantIsRequested";
             unitTest.TestCaseName = "ThenSubKeyLevelWithWriteShouldReturnSuccess";
             pubnub.PubnubUnitTest = unitTest;
@@ -131,7 +131,7 @@ namespace PubNubMessaging.Tests
 
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGrantIsRequested";
             unitTest.TestCaseName = "ThenChannelLevelWithReadWriteShouldReturnSuccess";
             pubnub.PubnubUnitTest = unitTest;
@@ -165,7 +165,7 @@ namespace PubNubMessaging.Tests
 
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGrantIsRequested";
             unitTest.TestCaseName = "ThenChannelLevelWithReadShouldReturnSuccess";
             pubnub.PubnubUnitTest = unitTest;
@@ -199,7 +199,7 @@ namespace PubNubMessaging.Tests
 
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGrantIsRequested";
             unitTest.TestCaseName = "ThenChannelLevelWithWriteShouldReturnSuccess";
             pubnub.PubnubUnitTest = unitTest;
@@ -233,7 +233,7 @@ namespace PubNubMessaging.Tests
 
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGrantIsRequested";
             unitTest.TestCaseName = "ThenUserLevelWithReadWriteShouldReturnSuccess";
             pubnub.PubnubUnitTest = unitTest;
@@ -268,7 +268,7 @@ namespace PubNubMessaging.Tests
 
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGrantIsRequested";
             unitTest.TestCaseName = "ThenUserLevelWithReadShouldReturnSuccess";
             pubnub.PubnubUnitTest = unitTest;
@@ -303,7 +303,7 @@ namespace PubNubMessaging.Tests
 
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGrantIsRequested";
             unitTest.TestCaseName = "ThenUserLevelWithWriteShouldReturnSuccess";
             pubnub.PubnubUnitTest = unitTest;
@@ -338,7 +338,7 @@ namespace PubNubMessaging.Tests
 
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGrantIsRequested";
             unitTest.TestCaseName = "ThenMultipleChannelGrantShouldReturnSuccess";
             pubnub.PubnubUnitTest = unitTest;
@@ -393,7 +393,7 @@ namespace PubNubMessaging.Tests
 
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGrantIsRequested";
             unitTest.TestCaseName = "ThenMultipleAuthGrantShouldReturnSuccess";
             pubnub.PubnubUnitTest = unitTest;
@@ -454,7 +454,7 @@ namespace PubNubMessaging.Tests
 
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGrantIsRequested";
             unitTest.TestCaseName = "ThenRevokeAtSubKeyLevelReturnSuccess";
             pubnub.PubnubUnitTest = unitTest;
@@ -505,7 +505,7 @@ namespace PubNubMessaging.Tests
 
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGrantIsRequested";
             unitTest.TestCaseName = "ThenRevokeAtChannelLevelReturnSuccess";
             pubnub.PubnubUnitTest = unitTest;
@@ -558,7 +558,7 @@ namespace PubNubMessaging.Tests
 
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGrantIsRequested";
             unitTest.TestCaseName = "ThenRevokeAtUserLevelReturnSuccess";
             pubnub.PubnubUnitTest = unitTest;
@@ -611,7 +611,7 @@ namespace PubNubMessaging.Tests
 
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGrantIsRequested";
             unitTest.TestCaseName = "ThenChannelGroupLevelWithReadManageShouldReturnSuccess";
             pubnub.PubnubUnitTest = unitTest;
@@ -645,7 +645,7 @@ namespace PubNubMessaging.Tests
 
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenGrantIsRequested";
             unitTest.TestCaseName = "ThenChannelGroupLevelWithReadShouldReturnSuccess";
             pubnub.PubnubUnitTest = unitTest;

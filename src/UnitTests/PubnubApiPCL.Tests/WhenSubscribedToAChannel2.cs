@@ -37,7 +37,7 @@ namespace PubNubMessaging.Tests
 
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "GrantRequestUnitTest";
             unitTest.TestCaseName = "Init";
             pubnub.PubnubUnitTest = unitTest;
@@ -68,7 +68,7 @@ namespace PubNubMessaging.Tests
             receivedMessage = false;
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, secretKey, cipherKey, ssl);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannel";
             unitTest.TestCaseName = (string.IsNullOrEmpty(cipherKey)) ? "ThenSubscribeShouldReturnReceivedMessage" : "ThenSubscribeShouldReturnReceivedCipherMessage";
 
@@ -171,7 +171,7 @@ namespace PubNubMessaging.Tests
             receivedMessage = false;
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, secretKey, cipherKey, ssl);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannel";
             unitTest.TestCaseName = (string.IsNullOrEmpty(cipherKey)) ? "ThenSubscribeShouldReturnReceivedEmojiMessage" : "ThenSubscribeShouldReturnReceivedCipherEmojiMessage";
 

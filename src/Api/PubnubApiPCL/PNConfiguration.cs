@@ -10,7 +10,6 @@ namespace PubnubApi
         private int _presenceHeartbeatTimeout;
         private int _presenceHeartbeatInterval;
         private string _uuid = "";
-        private bool _enableProxy = false;
 
         public string Origin { get; set; }
 
