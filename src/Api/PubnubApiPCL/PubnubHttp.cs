@@ -326,7 +326,7 @@ namespace PubnubApi
 
                                             PubnubClientError error = new PubnubClientError(pubnubStatusCode, PubnubErrorSeverity.Critical, statusMessage, PubnubMessageSource.Server, asyncRequestState.Request, asyncRequestState.Response, errorDescription, channel, channelGroup);
                                             errorCallbackRaised = true;
-                                            //GoToCallback(error, asyncRequestState.ErrorCallback);
+                                            new PNCallbackService(pubnubConfig, jsonLib).GoToCallback(error, asyncRequestState.ErrorCallback);
                                         }
                                     }
                                 }

@@ -10,9 +10,19 @@ namespace PubnubApi.EndPoint
     {
         private PNConfiguration config = null;
 
-        public TimeOperation(PNConfiguration pnConfig):base(pnConfig)
+        public TimeOperation(PNConfiguration pubnubConfig):base(pubnubConfig)
         {
-            config = pnConfig;
+            config = pubnubConfig;
+        }
+
+        public TimeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary):base(pubnubConfig, jsonPluggableLibrary)
+        {
+            config = pubnubConfig;
+        }
+
+        public TimeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
+        {
+            config = pubnubConfig;
         }
 
         internal void Time(Action<long> userCallback, Action<PubnubClientError> errorCallback)

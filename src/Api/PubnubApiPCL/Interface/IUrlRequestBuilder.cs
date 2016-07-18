@@ -9,6 +9,8 @@ namespace PubnubApi.Interface
     {
         Uri BuildTimeRequest();
 
+        Uri BuildMultiChannelSubscribeRequest(string[] channels, string[] channelGroups, object timetoken, string channelsJsonState);
+
         Uri BuildPublishRequest(string channel, object originalMessage, bool storeInHistory, string jsonUserMetaData);
 
         Uri BuildHereNowRequest(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState);

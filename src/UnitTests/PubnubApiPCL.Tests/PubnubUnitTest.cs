@@ -16,9 +16,9 @@ namespace PubNubMessaging.Tests
         private bool enableStubTest = PubnubCommon.EnableStubTest;
         private string _testClassName = "";
         private string _testCaseName = "";
-        private Dictionary<Uri, string> requestResponse = null;
+        private Dictionary<string, string> requestResponse = null;
 
-        public bool EnableStubTest
+        bool IPubnubUnitTest.EnableStubTest
         {
             get
             {
@@ -32,31 +32,59 @@ namespace PubNubMessaging.Tests
 
         public PubnubUnitTest()
         {
-            requestResponse = new Dictionary<Uri, string>();
+            requestResponse = new Dictionary<string, string>();
         }
 
-        Dictionary<Uri, string> IPubnubUnitTest.StubRequestResponse(Uri request, string expectedResponse)
+        Dictionary<string, string> IPubnubUnitTest.StubRequestResponse(string requestUriString, string expectedResponse)
         {
-            if (requestResponse.ContainsKey(request))
+            if (requestResponse.ContainsKey(requestUriString))
             {
-                requestResponse[request] = expectedResponse;
+                requestResponse[requestUriString] = expectedResponse;
             }
             else
             {
-                requestResponse.Add(request, expectedResponse);
+                requestResponse.Add(requestUriString, expectedResponse);
             }
             return requestResponse;
         }
 
-        string IPubnubUnitTest.GetExpectedServerJsonResponse(Uri request)
+        string IPubnubUnitTest.GetExpectedServerJsonResponse(string requestUriString)
         {
-            if (requestResponse.ContainsKey(request))
+            if (requestResponse.ContainsKey(requestUriString))
             {
-                return requestResponse[request];
+                return requestResponse[requestUriString];
             }
             else
             {
                 return "";
+            }
+        }
+
+        
+
+        string IPubnubUnitTest.TestClassName
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        string IPubnubUnitTest.TestCaseName
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
             }
         }
 
@@ -1676,43 +1704,5 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        bool IPubnubUnitTest.EnableStubTest
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        string IPubnubUnitTest.TestClassName
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        string IPubnubUnitTest.TestCaseName
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
     }
 }

@@ -11,14 +11,14 @@ namespace PubnubApi.EndPoint
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
 
-        public HereNowOperation(PNConfiguration pnConfig):base(pnConfig)
+        public HereNowOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
         {
-            config = pnConfig;
+            config = pubnubConfig;
         }
 
-        public HereNowOperation(PNConfiguration pnConfig, IJsonPluggableLibrary jsonPluggableLibrary):base(pnConfig, jsonPluggableLibrary)
+        public HereNowOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary):base(pubnubConfig, jsonPluggableLibrary)
         {
-            config = pnConfig;
+            config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
         }
 

@@ -47,7 +47,7 @@ namespace PubNubMessaging.Tests
 
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "GrantRequestUnitTest";
             unitTest.TestCaseName = "Init";
             pubnub.PubnubUnitTest = unitTest;
@@ -79,7 +79,7 @@ namespace PubNubMessaging.Tests
             receivedMessage = false;
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, secretKey, cipherKey, ssl);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannel";
             unitTest.TestCaseName = (string.IsNullOrEmpty(cipherKey)) ? "ThenSubscribeShouldReturnReceivedComplexMessage" : "ThenSubscribeShouldReturnReceivedCipherComplexMessage";
 
@@ -175,7 +175,7 @@ namespace PubNubMessaging.Tests
             receivedConnectMessage = false;
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannel";
             unitTest.TestCaseName = "ThenSubscribeShouldReturnConnectStatus";
 
@@ -203,7 +203,7 @@ namespace PubNubMessaging.Tests
             receivedChannel2ConnectMessage = false;
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannel";
             unitTest.TestCaseName = "ThenMultiSubscribeShouldReturnConnectStatus";
 
@@ -234,7 +234,7 @@ namespace PubNubMessaging.Tests
             receivedChannel2ConnectMessage = false;
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", true);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannel";
             unitTest.TestCaseName = "ThenMultiSubscribeShouldReturnConnectStatus";
 
@@ -264,7 +264,7 @@ namespace PubNubMessaging.Tests
             receivedAlreadySubscribedMessage = false;
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannel";
             unitTest.TestCaseName = "ThenDuplicateChannelShouldReturnAlreadySubscribed";
 
@@ -292,7 +292,7 @@ namespace PubNubMessaging.Tests
             receivedManyMessages = false;
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenSubscribedToAChannel";
             unitTest.TestCaseName = "ThenSubscriberShouldBeAbleToReceiveManyMessages";
             pubnub.PubnubUnitTest = unitTest;

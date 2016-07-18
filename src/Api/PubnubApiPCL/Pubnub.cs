@@ -44,13 +44,13 @@ namespace PubnubApi
 
 		public void Publish(string channel, object message, Action<PublishAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-            EndPoint.PublishOperation endPoint = new EndPoint.PublishOperation(pubnubConfig);
+            EndPoint.PublishOperation endPoint = new EndPoint.PublishOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
             endPoint.Publish(channel, message, true, "", userCallback, errorCallback);
 		}
 
         public void Publish(string channel, object message, bool storeInHistory, string jsonUserMetaData, Action<PublishAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-            EndPoint.PublishOperation endPoint = new EndPoint.PublishOperation(pubnubConfig, jsonPluggableLibrary);
+            EndPoint.PublishOperation endPoint = new EndPoint.PublishOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
             endPoint.Publish(channel, message, storeInHistory, jsonUserMetaData, userCallback, errorCallback);
 		}
 
@@ -92,7 +92,8 @@ namespace PubnubApi
             EndPoint.HereNowOperation endPoint = new EndPoint.HereNowOperation(pubnubConfig, jsonPluggableLibrary);
             endPoint.HereNow(channels, null, true, false, userCallback, errorCallback);
 		}
-		public void HereNow(string[] channels, string[] channelGroups, Action<HereNowAck> userCallback, Action<PubnubClientError> errorCallback)
+
+        public void HereNow(string[] channels, string[] channelGroups, Action<HereNowAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
             EndPoint.HereNowOperation endPoint = new EndPoint.HereNowOperation(pubnubConfig, jsonPluggableLibrary);
             endPoint.HereNow(channels, channelGroups, true, false, userCallback, errorCallback);
@@ -103,7 +104,8 @@ namespace PubnubApi
             EndPoint.HereNowOperation endPoint = new EndPoint.HereNowOperation(pubnubConfig, jsonPluggableLibrary);
             endPoint.HereNow(channels, null, showUUIDList, includeUserState, userCallback, errorCallback);
 		}
-		public void HereNow(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, Action<HereNowAck> userCallback, Action<PubnubClientError> errorCallback)
+
+        public void HereNow(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, Action<HereNowAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
             EndPoint.HereNowOperation endPoint = new EndPoint.HereNowOperation(pubnubConfig, jsonPluggableLibrary);
             endPoint.HereNow(channels, channelGroups, showUUIDList, includeUserState, userCallback, errorCallback);
@@ -147,7 +149,7 @@ namespace PubnubApi
 
 		public void Time(Action<long> userCallback, Action<PubnubClientError> errorCallback)
 		{
-            EndPoint.TimeOperation endPoint = new EndPoint.TimeOperation(pubnubConfig);
+            EndPoint.TimeOperation endPoint = new EndPoint.TimeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
 			endPoint.Time(userCallback, errorCallback);
 		}
 
