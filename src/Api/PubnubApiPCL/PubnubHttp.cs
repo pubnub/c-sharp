@@ -518,8 +518,8 @@ namespace PubnubApi
                 {
                     if (!string.IsNullOrEmpty(jsonString))
                     {
-                        object deSerializedResult = jsonLib.DeserializeToObject(jsonString);
-                        List<object> result1 = ((IEnumerable)deSerializedResult).Cast<object>().ToList();
+                        object deserializedResult = jsonLib.DeserializeToObject(jsonString);
+                        List<object> result1 = ((IEnumerable)deserializedResult).Cast<object>().ToList();
 
                         if (result1 != null && result1.Count > 0)
                         {
@@ -528,6 +528,70 @@ namespace PubnubApi
 
                         switch (type)
                         {
+                            //case ResponseType.Subscribe:
+                            //case ResponseType.Presence:
+                            //    if (result.Count == 3 && result[0] is object[] && (result[0] as object[]).Length == 0 && result[2].ToString() == "")
+                            //    {
+                            //        result.RemoveAt(2);
+                            //    }
+                            //    if (result.Count == 4 && result[0] is object[] && (result[0] as object[]).Length == 0 && result[2].ToString() == "" && result[3].ToString() == "")
+                            //    {
+                            //        result.RemoveRange(2, 2);
+                            //    }
+                            //    result.Add(multiChannelGroup);
+                            //    result.Add(multiChannel);
+
+                            //    long receivedTimetoken = (result.Count > 1 && result[1].ToString() != "") ? Convert.ToInt64(result[1].ToString()) : 0;
+
+                            //    long minimumTimetoken1 = (multiChannelSubscribe.Count > 0) ? multiChannelSubscribe.Min(token => token.Value) : 0;
+                            //    long minimumTimetoken2 = (multiChannelGroupSubscribe.Count > 0) ? multiChannelGroupSubscribe.Min(token => token.Value) : 0;
+                            //    long minimumTimetoken = Math.Max(minimumTimetoken1, minimumTimetoken2);
+
+                            //    long maximumTimetoken1 = (multiChannelSubscribe.Count > 0) ? multiChannelSubscribe.Max(token => token.Value) : 0;
+                            //    long maximumTimetoken2 = (multiChannelGroupSubscribe.Count > 0) ? multiChannelGroupSubscribe.Max(token => token.Value) : 0;
+                            //    long maximumTimetoken = Math.Max(maximumTimetoken1, maximumTimetoken2);
+
+                            //    if (minimumTimetoken == 0 || lastTimetoken == 0)
+                            //    {
+                            //        if (maximumTimetoken == 0)
+                            //        {
+                            //            lastSubscribeTimetoken = receivedTimetoken;
+                            //        }
+                            //        else
+                            //        {
+                            //            if (!_enableResumeOnReconnect)
+                            //            {
+                            //                lastSubscribeTimetoken = receivedTimetoken;
+                            //            }
+                            //            else
+                            //            {
+                            //                //do nothing. keep last subscribe token
+                            //            }
+                            //        }
+                            //    }
+                            //    else
+                            //    {
+                            //        if (reconnect)
+                            //        {
+                            //            if (_enableResumeOnReconnect)
+                            //            {
+                            //                //do nothing. keep last subscribe token
+                            //            }
+                            //            else
+                            //            {
+                            //                lastSubscribeTimetoken = receivedTimetoken;
+                            //            }
+                            //        }
+                            //        else
+                            //        {
+                            //            lastSubscribeTimetoken = receivedTimetoken;
+                            //        }
+                            //    }
+                            //    break;
+                            case ResponseType.Leave:
+                                result.Add(multiChannel);
+                                break;
+
                             case ResponseType.Time:
                                 break;
                             case ResponseType.Publish:
@@ -714,8 +778,8 @@ namespace PubnubApi
                     {
                         if (asyncRequestState.Channels != null && asyncRequestState.Channels.Length > 0)
                         {
-                            List<string> chList = asyncRequestState.Channels.ToList();
-                            foreach (string ch in chList)
+                            List<string> channelList = asyncRequestState.Channels.ToList();
+                            foreach (string ch in channelList)
                             {
                                 PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
                                 callbackKey.Channel = ch;
@@ -730,8 +794,8 @@ namespace PubnubApi
                         }
                         if (!callbackAvailable && asyncRequestState.ChannelGroups != null && asyncRequestState.ChannelGroups.Length > 0)
                         {
-                            List<string> cgList = asyncRequestState.ChannelGroups.ToList();
-                            foreach (string cg in cgList)
+                            List<string> channelGroupList = asyncRequestState.ChannelGroups.ToList();
+                            foreach (string cg in channelGroupList)
                             {
                                 PubnubChannelGroupCallbackKey callbackKey = new PubnubChannelGroupCallbackKey();
                                 callbackKey.ChannelGroup = cg;
