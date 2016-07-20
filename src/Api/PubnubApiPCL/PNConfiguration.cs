@@ -7,9 +7,9 @@ namespace PubnubApi
 {
     public class PNConfiguration
     {
-        private int _presenceHeartbeatTimeout;
-        private int _presenceHeartbeatInterval;
-        private string _uuid = "";
+        private int presenceHeartbeatTimeout;
+        private int presenceHeartbeatInterval;
+        private string uuid = "";
 
         public string Origin { get; set; }
 
@@ -19,7 +19,7 @@ namespace PubnubApi
         {
             get
             {
-                return _presenceHeartbeatTimeout;
+                return presenceHeartbeatTimeout;
             }
         }
 
@@ -27,7 +27,7 @@ namespace PubnubApi
         {
             get
             {
-                return _presenceHeartbeatInterval;
+                return presenceHeartbeatInterval;
             }
         }
 
@@ -47,13 +47,13 @@ namespace PubnubApi
         {
             get
             {
-                return _uuid;
+                return uuid;
             }
             set
             {
                 if (value != null && value.Trim().Length > 0)
                 {
-                    _uuid = value;
+                    uuid = value;
                 }
                 else
                 {
@@ -94,8 +94,8 @@ namespace PubnubApi
         public PNConfiguration()
         {
             this.Origin = "pubsub.pubnub.com";
-            this._presenceHeartbeatTimeout = 300;
-            this._uuid = Guid.NewGuid().ToString();
+            this.presenceHeartbeatTimeout = 300;
+            this.uuid = Guid.NewGuid().ToString();
             this.NonSubscribeRequestTimeout = 10;
             this.SubscribeTimeout = 310;
             this.ConnectTimeout = 5;
@@ -105,15 +105,15 @@ namespace PubnubApi
 
         public PNConfiguration SetPresenceHeartbeatTimeoutWithCustomInterval(int timeout, int interval)
         {
-            this._presenceHeartbeatTimeout = timeout;
-            this._presenceHeartbeatInterval = interval;
+            this.presenceHeartbeatTimeout = timeout;
+            this.presenceHeartbeatInterval = interval;
 
             return this;
         }
 
         public PNConfiguration SetPresenceHeartbeatTimeout(int timeout)
         {
-            this._presenceHeartbeatTimeout = timeout;
+            this.presenceHeartbeatTimeout = timeout;
 
             return SetPresenceHeartbeatTimeoutWithCustomInterval(timeout, (timeout / 2) - 1);
         }

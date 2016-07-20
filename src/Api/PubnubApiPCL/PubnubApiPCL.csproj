@@ -40,6 +40,7 @@
     <Compile Include="EndPoint\Access\AuditOperation.cs" />
     <Compile Include="EndPoint\Access\GrantOperation.cs" />
     <Compile Include="EndPoint\ChannelGroup\AddChannelsToChannelGroupOperation.cs" />
+    <Compile Include="EndPoint\ChannelGroup\GetAllChannelGroupOperation.cs" />
     <Compile Include="EndPoint\ChannelGroup\GetChannelsForChannelGroupOperation.cs" />
     <Compile Include="EndPoint\ChannelGroup\RemoveChannelsFromChannelGroupOperation.cs" />
     <Compile Include="EndPoint\HistoryOperation.cs" />

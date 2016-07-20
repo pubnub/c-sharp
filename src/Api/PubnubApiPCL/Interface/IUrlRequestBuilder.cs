@@ -34,5 +34,8 @@ namespace PubnubApi.Interface
         Uri BuildRemoveChannelsFromChannelGroupRequest(string channelsCommaDelimited, string nameSpace, string groupName);
 
         Uri BuildGetChannelsForChannelGroupRequest(string nameSpace, string groupName, bool limitToChannelGroupScopeOnly);
+
+        Uri BuildGetAllChannelGroupRequest();
+
     }
 }

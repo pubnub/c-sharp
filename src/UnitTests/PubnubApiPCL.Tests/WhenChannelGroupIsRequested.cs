@@ -59,7 +59,14 @@ namespace PubNubMessaging.Tests
 
             receivedChannelGroupMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            //pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+            };
+
+            pubnub = new Pubnub(config);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenChannelGroupIsRequested";
@@ -88,7 +95,13 @@ namespace PubNubMessaging.Tests
 
             receivedChannelGroupMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+            };
+
+            pubnub = new Pubnub(config);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenChannelGroupIsRequested";
@@ -117,7 +130,13 @@ namespace PubNubMessaging.Tests
 
             receivedChannelGroupMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+            };
+
+            pubnub = new Pubnub(config);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenChannelGroupIsRequested";
@@ -138,6 +157,41 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedChannelGroupMessage, "WhenChannelGroupIsRequested -> ThenGetChannelListShouldReturnSuccess failed.");
 
         }
+
+        [Test]
+        public void ThenGetAllChannelGroupShouldReturnSuccess()
+        {
+            currentUnitTestCase = "ThenGetAllChannelGroupShouldReturnSuccess";
+
+            receivedChannelGroupMessage = false;
+
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+            };
+
+            pubnub = new Pubnub(config);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenChannelGroupIsRequested";
+            unitTest.TestCaseName = "ThenGetAllChannelGroupShouldReturnSuccess";
+            pubnub.PubnubUnitTest = unitTest;
+
+            channelGroupManualEvent = new ManualResetEvent(false);
+
+            pubnub.GetAllChannelGroups(GetAllChannelGroupCallback, DummyErrorCallback);
+            Thread.Sleep(1000);
+
+            channelGroupManualEvent.WaitOne();
+
+            pubnub.EndPendingRequests();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedChannelGroupMessage, "WhenChannelGroupIsRequested -> ThenGetChannelListShouldReturnSuccess failed.");
+
+        }
+
 
         void RemoveChannelGroupCallback(RemoveChannelFromChannelGroupAck receivedMessage)
         {
@@ -228,7 +282,34 @@ namespace PubNubMessaging.Tests
             }
 
         }
-        
+
+        void GetAllChannelGroupCallback(GetAllChannelGroupsAck receivedMessage)
+        {
+            try
+            {
+                if (receivedMessage != null)
+                {
+                    int statusCode = receivedMessage.StatusCode;
+                    string serviceType = receivedMessage.Service;
+                    bool errorStatus = receivedMessage.Error;
+                    string currentChannelGroup = "";
+                    GetAllChannelGroupsAck.Data payload = receivedMessage.Payload;
+                    if (payload != null)
+                    {
+                        string[] channelGroups = payload.ChannelGroupName;
+                        receivedChannelGroupMessage = true;
+                    }
+
+                }
+            }
+            catch { }
+            finally
+            {
+                channelGroupManualEvent.Set();
+            }
+
+        }
+
         void ThenChannelGroupInitializeShouldReturnGrantMessage(GrantAck receivedMessage)
         {
             try

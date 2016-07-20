@@ -561,6 +561,18 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, ResponseType.ChannelGroupGet);
         }
 
+        Uri IUrlRequestBuilder.BuildGetAllChannelGroupRequest()
+        {
+            // Build URL
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("channel-registration");
+            url.Add("sub-key");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("channel-group");
+            return BuildRestApiRequest<Uri>(url, ResponseType.ChannelGroupGet);
+        }
+
         private Uri BuildRestApiRequest<T>(List<string> urlComponents, ResponseType type)
         {
             return BuildRestApiRequest<T>(urlComponents, type, this.pubnubConfig.Uuid);

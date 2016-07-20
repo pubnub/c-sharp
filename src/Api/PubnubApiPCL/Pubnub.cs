@@ -326,7 +326,8 @@ namespace PubnubApi
 
 		public void GetAllChannelGroups(Action<GetAllChannelGroupsAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.GetAllChannelGroups(userCallback, errorCallback);
+            EndPoint.GetAllChannelGroupOperation endPoint = new EndPoint.GetAllChannelGroupOperation(pubnubConfig, jsonPluggableLibrary);
+            endPoint.GetAllChannelGroup(userCallback, errorCallback);
 		}
 
 		public void GetAllChannelGroupNamespaces(Action<GetAllNamespacesAck> userCallback, Action<PubnubClientError> errorCallback)
