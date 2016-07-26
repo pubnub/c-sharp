@@ -415,7 +415,41 @@ namespace PubnubApi.EndPoint
                 pubnubRequestState.Timetoken = Convert.ToInt64(timetoken.ToString());
 
                 // Wait for message
-                UrlProcessRequest<T>(request, pubnubRequestState, false);
+                string json = UrlProcessRequest<T>(request, pubnubRequestState, false);
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = base.ProcessJsonResponse<T>(pubnubRequestState, json);
+                    base.ProcessResponseCallbacks(result, pubnubRequestState);
+
+                    if ((pubnubRequestState.ResponseType == ResponseType.Subscribe || pubnubRequestState.ResponseType == ResponseType.Presence) && (result != null) && (result.Count > 0))
+                    {
+                        if (pubnubRequestState.Channels != null)
+                        {
+                            foreach (string currentChannel in pubnubRequestState.Channels)
+                            {
+                                multiChannelSubscribe.AddOrUpdate(currentChannel, Convert.ToInt64(result[1].ToString()), (key, oldValue) => Convert.ToInt64(result[1].ToString()));
+                            }
+                        }
+                        if (pubnubRequestState.ChannelGroups != null && pubnubRequestState.ChannelGroups.Length > 0)
+                        {
+                            foreach (string currentChannelGroup in pubnubRequestState.ChannelGroups)
+                            {
+                                multiChannelGroupSubscribe.AddOrUpdate(currentChannelGroup, Convert.ToInt64(result[1].ToString()), (key, oldValue) => Convert.ToInt64(result[1].ToString()));
+                            }
+                        }
+                    }
+
+                    switch (pubnubRequestState.ResponseType)
+                    {
+                        case ResponseType.Subscribe:
+                        case ResponseType.Presence:
+                            MultiplexInternalCallback<T>(pubnubRequestState.ResponseType, result, pubnubRequestState.SubscribeRegularCallback, pubnubRequestState.PresenceRegularCallback, pubnubRequestState.ConnectCallback, pubnubRequestState.WildcardPresenceCallback, pubnubRequestState.ErrorCallback);
+                            break;
+                        default:
+                            break;
+                    }
+
+                }
             }
             catch (Exception ex)
             {

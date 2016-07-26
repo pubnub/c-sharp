@@ -24,9 +24,10 @@ namespace PubnubApi.EndPoint
 
         internal void SetUserState(string[] channels, string[] channelGroups, string uuid, string jsonUserState, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
         {
-            if ((channels == null && channelGroups != null) || (channels.Length == 0 && channelGroups.Length == 0))
+            if ((channels == null && channelGroups == null)
+                            || (channels != null && channelGroups != null && channels.Length == 0 && channelGroups.Length == 0))
             {
-                throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
+                throw new ArgumentException("Either Channel Or Channel Group or Both should be provided");
             }
 
             if (string.IsNullOrEmpty(jsonUserState) || string.IsNullOrEmpty(jsonUserState.Trim()))
@@ -359,7 +360,12 @@ namespace PubnubApi.EndPoint
             requestState.Reconnect = false;
 
             //Set TerminateSubRequest to true to bounce the long-polling subscribe requests to update user state
-            UrlProcessRequest<SetUserStateAck>(request, requestState, true);
+            string json = UrlProcessRequest<SetUserStateAck>(request, requestState, true);
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> result = base.ProcessJsonResponse<SetUserStateAck>(requestState, json);
+                base.ProcessResponseCallbacks(result, requestState);
+            }
         }
 
         private string AddOrUpdateOrDeleteLocalUserState(string channel, string channelGroup, string userStateKey, object userStateValue)

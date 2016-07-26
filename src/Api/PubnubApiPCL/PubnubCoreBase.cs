@@ -18,6 +18,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using PubnubApi.Interface;
+using System.Threading.Tasks;
 #endregion
 
 
@@ -475,8 +476,7 @@ namespace PubnubApi
                     LoggingMethod.WriteToLog(string.Format("DateTime: {0}, OnPubnubLocalClientHeartBeatTimeoutCallback - Internet connection = {1}", DateTime.Now.ToString(), networkConnection), LoggingMethod.LevelVerbose);
                     if (!networkConnection)
                     {
-                        //REVISIT
-                        //TerminatePendingWebRequest(currentState);
+                        TerminatePendingWebRequest(currentState);
                     }
                 }
             }
@@ -603,6 +603,312 @@ namespace PubnubApi
                             break;
                     }
                 }
+            }
+        }
+
+        private void ResponseToUserCallback<T>(List<object> result, ResponseType type, string[] channels, string[] channelGroups, Action<T> userCallback)
+        {
+            string[] messageChannels = null;
+            string[] messageChannelGroups = null;
+            string[] messageWildcardPresenceChannels = null;
+            switch (type)
+            {
+                case ResponseType.Subscribe:
+                case ResponseType.Presence:
+                    var messages = (from item in result
+                                    select item as object).ToArray();
+                    if (messages != null && messages.Length > 0)
+                    {
+                        object[] messageList = messages[0] as object[];
+                        if (messageList != null && messageList.Length > 0)
+                        {
+                            if (messages.Length == 4 || messages.Length == 6)
+                            {
+                                messageChannelGroups = messages[2].ToString().Split(',');
+                                messageChannels = messages[3].ToString().Split(',');
+                            }
+                            else
+                            {
+                                messageChannels = messages[2].ToString().Split(',');
+                                messageChannelGroups = null;
+                            }
+                            for (int messageIndex = 0; messageIndex < messageList.Length; messageIndex++)
+                            {
+                                string currentChannel = (messageChannels.Length == 1) ? (string)messageChannels[0] : (string)messageChannels[messageIndex];
+                                string currentChannelGroup = "";
+                                if (messageChannelGroups != null && messageChannelGroups.Length > 0)
+                                {
+                                    currentChannelGroup = (messageChannelGroups.Length == 1) ? (string)messageChannelGroups[0] : (string)messageChannelGroups[messageIndex];
+                                }
+                                List<object> itemMessage = new List<object>();
+                                if (currentChannel.Contains(".*-pnpres"))
+                                {
+                                    itemMessage.Add(messageList[messageIndex]);
+                                }
+                                else if (currentChannel.Contains("-pnpres"))
+                                {
+                                    itemMessage.Add(messageList[messageIndex]);
+                                }
+                                else
+                                {
+                                    //decrypt the subscriber message if cipherkey is available
+                                    if (pubnubConfig.CiperKey.Length > 0)
+                                    {
+                                        PubnubCrypto aes = new PubnubCrypto(pubnubConfig.CiperKey);
+                                        string decryptMessage = aes.Decrypt(messageList[messageIndex].ToString());
+                                        object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : jsonLib.DeserializeToObject(decryptMessage);
+
+                                        itemMessage.Add(decodeMessage);
+                                    }
+                                    else
+                                    {
+                                        itemMessage.Add(messageList[messageIndex]);
+                                    }
+                                }
+                                itemMessage.Add(messages[1].ToString());
+
+                                //if (messageWildcardPresenceChannels != null)
+                                //{
+                                //    string wildPresenceChannel = (messageWildcardPresenceChannels.Length == 1) ? (string)messageWildcardPresenceChannels[0] : (string)messageWildcardPresenceChannels[messageIndex];
+                                //    itemMessage.Add(wildPresenceChannel);
+                                //}
+
+                                if (currentChannel == currentChannelGroup)
+                                {
+                                    itemMessage.Add(currentChannel.Replace("-pnpres", ""));
+                                }
+                                else
+                                {
+                                    if (currentChannelGroup != "")
+                                    {
+                                        itemMessage.Add(currentChannelGroup.Replace("-pnpres", ""));
+                                    }
+                                    if (currentChannel != "")
+                                    {
+                                        itemMessage.Add(currentChannel.Replace("-pnpres", ""));
+                                    }
+                                }
+
+                                PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
+
+                                if (!string.IsNullOrEmpty(currentChannelGroup) && currentChannelGroup.Contains(".*"))
+                                {
+                                    callbackKey.Channel = currentChannelGroup;
+                                    callbackKey.ResponseType = ResponseType.Subscribe;
+                                }
+                                else
+                                {
+                                    callbackKey.Channel = currentChannel;
+                                    callbackKey.ResponseType = (currentChannel.LastIndexOf("-pnpres") == -1) ? ResponseType.Subscribe : ResponseType.Presence;
+                                }
+
+                                if (channelCallbacks.Count > 0 && channelCallbacks.ContainsKey(callbackKey))
+                                {
+                                    //TODO: PANDU REFACTOR REPEAT LOGIC
+                                    if (callbackKey.ResponseType == ResponseType.Presence)
+                                    {
+                                        PubnubPresenceChannelCallback currentPubnubCallback = channelCallbacks[callbackKey] as PubnubPresenceChannelCallback;
+                                        if (currentPubnubCallback != null)
+                                        {
+                                            if (currentPubnubCallback.PresenceRegularCallback != null)
+                                            {
+                                                new PNCallbackService(pubnubConfig, jsonLib).GoToCallback(itemMessage, currentPubnubCallback.PresenceRegularCallback, true, type);
+                                            }
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        PubnubSubscribeChannelCallback<T> currentPubnubCallback = channelCallbacks[callbackKey] as PubnubSubscribeChannelCallback<T>;
+                                        //object pubnubSubscribeCallbackObject = channelCallbacks[callbackKey];
+                                        //if (pubnubSubscribeCallbackObject is PubnubSubscribeChannelCallback<string>)
+                                        //{
+                                        //    currentPubnubCallback = pubnubSubscribeCallbackObject as PubnubSubscribeChannelCallback<string>;
+                                        //}
+                                        //else if (pubnubSubscribeCallbackObject is PubnubSubscribeChannelCallback<object>)
+                                        //{
+                                        //    currentPubnubCallback = pubnubSubscribeCallbackObject as PubnubSubscribeChannelCallback<object>;
+                                        //}
+                                        //else
+                                        //{
+                                        //    Type targetType = _channelSubscribeObjectType[currentChannel];
+
+                                        //    if (_subscribeMessageType != null)
+                                        //    {
+                                        //        currentPubnubCallback = _subscribeMessageType.GetSubscribeMessageType(targetType, pubnubSubscribeCallbackObject, false);
+                                        //    }
+                                        //    else
+                                        //    {
+                                        //        currentPubnubCallback = null;
+                                        //    }
+                                        //}
+
+                                        if (currentPubnubCallback != null)
+                                        {
+                                            if (itemMessage.Count >= 4 && currentChannel.Contains(".*") && currentChannel.Contains("-pnpres"))
+                                            {
+                                                if (currentPubnubCallback.WildcardPresenceCallback != null)
+                                                {
+                                                    new PNCallbackService(pubnubConfig, jsonLib).GoToCallback(itemMessage, currentPubnubCallback.WildcardPresenceCallback, true, type);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (currentPubnubCallback.SubscribeRegularCallback != null)
+                                                {
+                                                    new PNCallbackService(pubnubConfig, jsonLib).GoToCallback<Message<T>>(itemMessage, currentPubnubCallback.SubscribeRegularCallback, false, type);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                PubnubChannelGroupCallbackKey callbackGroupKey = new PubnubChannelGroupCallbackKey();
+                                callbackGroupKey.ChannelGroup = currentChannelGroup;
+                                callbackGroupKey.ResponseType = (currentChannelGroup.LastIndexOf("-pnpres") == -1) ? ResponseType.Subscribe : ResponseType.Presence;
+
+                                if (channelGroupCallbacks.Count > 0 && channelGroupCallbacks.ContainsKey(callbackGroupKey))
+                                {
+                                    if (callbackGroupKey.ResponseType == ResponseType.Presence)
+                                    {
+                                        PubnubPresenceChannelGroupCallback currentPubnubCallback = channelGroupCallbacks[callbackGroupKey] as PubnubPresenceChannelGroupCallback;
+                                        if (currentPubnubCallback != null)
+                                        {
+                                            if (itemMessage.Count >= 4 && currentChannelGroup.Contains(".*") && currentChannel.Contains("-pnpres"))
+                                            {
+                                                //if (currentPubnubCallback.WildcardPresenceCallback != null)
+                                                //{
+                                                //    GoToCallback(itemMessage, currentPubnubCallback.WildcardPresenceCallback);
+                                                //}
+                                            }
+                                            else
+                                            {
+                                                if (currentPubnubCallback.PresenceRegularCallback != null)
+                                                {
+                                                    new PNCallbackService(pubnubConfig, jsonLib).GoToCallback(itemMessage, currentPubnubCallback.PresenceRegularCallback, true, type);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        PubnubSubscribeChannelGroupCallback<T> currentPubnubCallback = channelGroupCallbacks[callbackGroupKey] as PubnubSubscribeChannelGroupCallback<T>;
+                                        //dynamic currentPubnubCallback;
+                                        //object pubnubSubscribeCallbackObject = channelCallbacks[callbackKey];
+                                        //if (pubnubSubscribeCallbackObject is PubnubSubscribeChannelGroupCallback<string>)
+                                        //{
+                                        //    currentPubnubCallback = pubnubSubscribeCallbackObject as PubnubSubscribeChannelGroupCallback<string>;
+                                        //}
+                                        //else if (pubnubSubscribeCallbackObject is PubnubSubscribeChannelGroupCallback<object>)
+                                        //{
+                                        //    currentPubnubCallback = pubnubSubscribeCallbackObject as PubnubSubscribeChannelGroupCallback<object>;
+                                        //}
+                                        //else
+                                        //{
+                                        //    Type targetType = _channelGroupSubscribeObjectType[currentChannelGroup];
+
+                                        //    if (_subscribeMessageType != null)
+                                        //    {
+                                        //        currentPubnubCallback = _subscribeMessageType.GetSubscribeMessageType(targetType, pubnubSubscribeCallbackObject, true);
+                                        //    }
+                                        //    else
+                                        //    {
+                                        //        currentPubnubCallback = null;
+                                        //    }
+                                        //}
+
+                                        if (currentPubnubCallback != null)
+                                        {
+                                            if (itemMessage.Count >= 4 && currentChannelGroup.Contains(".*") && currentChannel.Contains("-pnpres"))
+                                            {
+                                                if (currentPubnubCallback.WildcardPresenceCallback != null)
+                                                {
+                                                    new PNCallbackService(pubnubConfig, jsonLib).GoToCallback(itemMessage, currentPubnubCallback.WildcardPresenceCallback, true, type);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (currentPubnubCallback.SubscribeRegularCallback != null)
+                                                {
+                                                    new PNCallbackService(pubnubConfig, jsonLib).GoToCallback(itemMessage, currentPubnubCallback.SubscribeRegularCallback, false, type);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                    break;
+                case ResponseType.Time:
+                    if (result != null && result.Count > 0)
+                    {
+                        new PNCallbackService(pubnubConfig, jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                    }
+                    break;
+                case ResponseType.Publish:
+                    if (result != null && result.Count > 0)
+                    {
+                        new PNCallbackService(pubnubConfig, jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                    }
+                    break;
+                case ResponseType.DetailedHistory:
+                    if (result != null && result.Count > 0)
+                    {
+                        new PNCallbackService(pubnubConfig, jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                    }
+                    break;
+                case ResponseType.Here_Now:
+                    if (result != null && result.Count > 0)
+                    {
+                        new PNCallbackService(pubnubConfig, jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                    }
+                    break;
+                case ResponseType.GlobalHere_Now:
+                    if (result != null && result.Count > 0)
+                    {
+                        new PNCallbackService(pubnubConfig, jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                    }
+                    break;
+                case ResponseType.Where_Now:
+                    if (result != null && result.Count > 0)
+                    {
+                        new PNCallbackService(pubnubConfig, jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                    }
+                    break;
+                case ResponseType.GrantAccess:
+                case ResponseType.AuditAccess:
+                case ResponseType.RevokeAccess:
+                case ResponseType.ChannelGroupGrantAccess:
+                case ResponseType.ChannelGroupAuditAccess:
+                case ResponseType.ChannelGroupRevokeAccess:
+                case ResponseType.GetUserState:
+                case ResponseType.SetUserState:
+                    if (result != null && result.Count > 0)
+                    {
+                        new PNCallbackService(pubnubConfig, jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                    }
+                    break;
+                case ResponseType.PushRegister:
+                case ResponseType.PushRemove:
+                case ResponseType.PushGet:
+                case ResponseType.PushUnregister:
+                    if (result != null && result.Count > 0)
+                    {
+                        new PNCallbackService(pubnubConfig, jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                    }
+                    break;
+                case ResponseType.ChannelGroupAdd:
+                case ResponseType.ChannelGroupRemove:
+                case ResponseType.ChannelGroupGet:
+                    if (result != null && result.Count > 0)
+                    {
+                        new PNCallbackService(pubnubConfig, jsonLib).GoToCallback<T>(result, userCallback, true, type);
+                    }
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -785,7 +1091,7 @@ namespace PubnubApi
 
         #region "Build, process and send request"
 
-        internal protected void UrlProcessRequest<T>(Uri requestUri, RequestState<T> pubnubRequestState, bool terminateCurrentSubRequest)
+        internal protected string UrlProcessRequest<T>(Uri requestUri, RequestState<T> pubnubRequestState, bool terminateCurrentSubRequest)
         {
             string channel = "";
             string channelGroup = "";
@@ -811,14 +1117,13 @@ namespace PubnubApi
             {
                 if (!ChannelRequest.ContainsKey(channel) && (pubnubRequestState.ResponseType == ResponseType.Subscribe || pubnubRequestState.ResponseType == ResponseType.Presence))
                 {
-                    return;
+                    return "";
                 }
 
                 // Create Request
                 PubnubWebRequestCreator requestCreator = new PubnubWebRequestCreator(pubnubUnitTest);
                 PubnubWebRequest request = (PubnubWebRequest)requestCreator.Create(requestUri);
 
-                //REVISIT
                 request = pubnubHttp.SetProxy<T>(request);
                 request = pubnubHttp.SetTimeout<T>(pubnubRequestState, request);
 
@@ -849,15 +1154,23 @@ namespace PubnubApi
                 }
                 else
                 {
-                    //REVISIT
                     request = pubnubHttp.SetServicePointSetTcpKeepAlive(request);
                 }
+
                 LoggingMethod.WriteToLog(string.Format("DateTime {0}, Request={1}", DateTime.Now.ToString(), requestUri.ToString()), LoggingMethod.LevelInfo);
 
                 //REVISIT
-                pubnubHttp.SendRequestAndGetResult(requestUri, pubnubRequestState, request);
+                //pubnubHttp.SendRequestAndGetResult(requestUri, pubnubRequestState, request);
+                System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, START Request {1}", DateTime.Now.ToString(), requestUri));
 
-                return;
+                Task<string> jsonResponse = pubnubHttp.SendRequestAndGetJsonResponse(requestUri, pubnubRequestState, request);
+                string jsonString = jsonResponse.Result;
+
+                System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Done Request", DateTime.Now.ToString()));
+
+                LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON= {1} for request={2}", DateTime.Now.ToString(), jsonString, requestUri), LoggingMethod.LevelInfo);
+                //ProcessJsonResponse(pubnubRequestState, jsonString);
+                return jsonString; ;
             }
             catch (System.Exception ex)
             {
@@ -875,7 +1188,384 @@ namespace PubnubApi
                     LoggingMethod.WriteToLog(string.Format("DateTime {0} Exception={1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelError);
                     UrlRequestCommonExceptionHandler<T>(pubnubRequestState.ResponseType, pubnubRequestState.Channels, pubnubRequestState.ChannelGroups, false, pubnubRequestState.SubscribeRegularCallback, pubnubRequestState.PresenceRegularCallback, pubnubRequestState.ConnectCallback, pubnubRequestState.WildcardPresenceCallback, pubnubRequestState.ErrorCallback, false);
                 }
-                return;
+                return "";
+            }
+        }
+
+        internal protected List<object> ProcessJsonResponse<T>(RequestState<T> asyncRequestState, string jsonString)
+        {
+            List<object> result = new List<object>();
+
+            string channel = "";
+            string channelGroup = "";
+            if (asyncRequestState != null)
+            {
+                if (asyncRequestState.Channels != null)
+                {
+                    channel = (asyncRequestState.Channels.Length > 0) ? string.Join(",", asyncRequestState.Channels) : ",";
+                }
+                if (asyncRequestState.ChannelGroups != null)
+                {
+                    channelGroup = string.Join(",", asyncRequestState.ChannelGroups);
+                }
+            }
+
+            bool errorCallbackRaised = false;
+            if (jsonLib.IsDictionaryCompatible(jsonString))
+            {
+                Dictionary<string, object> deserializeStatus = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                int statusCode = 0; //default. assuming all is ok 
+                if (deserializeStatus.ContainsKey("status") && deserializeStatus.ContainsKey("message"))
+                {
+                    Int32.TryParse(deserializeStatus["status"].ToString(), out statusCode);
+                    string statusMessage = deserializeStatus["message"].ToString();
+
+                    if (statusCode != 200)
+                    {
+                        PubnubErrorCode pubnubErrorType = PubnubErrorCodeHelper.GetErrorType(statusCode, statusMessage);
+                        int pubnubStatusCode = (int)pubnubErrorType;
+                        string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(pubnubErrorType);
+
+                        PubnubClientError error = new PubnubClientError(pubnubStatusCode, PubnubErrorSeverity.Critical, statusMessage, PubnubMessageSource.Server, asyncRequestState.Request, asyncRequestState.Response, errorDescription, channel, channelGroup);
+                        errorCallbackRaised = true;
+                        new PNCallbackService(pubnubConfig, jsonLib).GoToCallback(error, asyncRequestState.ErrorCallback);
+                    }
+                }
+            }
+            if (!errorCallbackRaised)
+            {
+                result = WrapResultBasedOnResponseType<T>(asyncRequestState.ResponseType, jsonString, asyncRequestState.Channels, asyncRequestState.ChannelGroups, asyncRequestState.Reconnect, asyncRequestState.Timetoken, asyncRequestState.Request, asyncRequestState.ErrorCallback);
+            }
+
+            return result;
+            //ProcessResponseCallbacks<T>(result, asyncRequestState);
+
+        }
+
+        protected List<object> WrapResultBasedOnResponseType<T>(ResponseType type, string jsonString, string[] channels, string[] channelGroups, bool reconnect, long lastTimetoken, PubnubWebRequest request, Action<PubnubClientError> errorCallback)
+        {
+            List<object> result = new List<object>();
+
+            try
+            {
+                string multiChannel = (channels != null) ? string.Join(",", channels) : "";
+                string multiChannelGroup = (channelGroups != null) ? string.Join(",", channelGroups) : "";
+
+                if (!string.IsNullOrEmpty(jsonString))
+                {
+                    if (!string.IsNullOrEmpty(jsonString))
+                    {
+                        object deserializedResult = jsonLib.DeserializeToObject(jsonString);
+                        List<object> result1 = ((IEnumerable)deserializedResult).Cast<object>().ToList();
+
+                        if (result1 != null && result1.Count > 0)
+                        {
+                            result = result1;
+                        }
+
+                        switch (type)
+                        {
+                            case ResponseType.Subscribe:
+                            case ResponseType.Presence:
+                                if (result.Count == 3 && result[0] is object[] && (result[0] as object[]).Length == 0 && result[2].ToString() == "")
+                                {
+                                    result.RemoveAt(2);
+                                }
+                                if (result.Count == 4 && result[0] is object[] && (result[0] as object[]).Length == 0 && result[2].ToString() == "" && result[3].ToString() == "")
+                                {
+                                    result.RemoveRange(2, 2);
+                                }
+                                result.Add(multiChannelGroup);
+                                result.Add(multiChannel);
+
+                                long receivedTimetoken = (result.Count > 1 && result[1].ToString() != "") ? Convert.ToInt64(result[1].ToString()) : 0;
+
+                                long minimumTimetoken1 = (multiChannelSubscribe.Count > 0) ? multiChannelSubscribe.Min(token => token.Value) : 0;
+                                long minimumTimetoken2 = (multiChannelGroupSubscribe.Count > 0) ? multiChannelGroupSubscribe.Min(token => token.Value) : 0;
+                                long minimumTimetoken = Math.Max(minimumTimetoken1, minimumTimetoken2);
+
+                                long maximumTimetoken1 = (multiChannelSubscribe.Count > 0) ? multiChannelSubscribe.Max(token => token.Value) : 0;
+                                long maximumTimetoken2 = (multiChannelGroupSubscribe.Count > 0) ? multiChannelGroupSubscribe.Max(token => token.Value) : 0;
+                                long maximumTimetoken = Math.Max(maximumTimetoken1, maximumTimetoken2);
+
+                                if (minimumTimetoken == 0 || lastTimetoken == 0)
+                                {
+                                    if (maximumTimetoken == 0)
+                                    {
+                                        LastSubscribeTimetoken = receivedTimetoken;
+                                    }
+                                    else
+                                    {
+                                        if (!_enableResumeOnReconnect)
+                                        {
+                                            LastSubscribeTimetoken = receivedTimetoken;
+                                        }
+                                        else
+                                        {
+                                            //do nothing. keep last subscribe token
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if (reconnect)
+                                    {
+                                        if (_enableResumeOnReconnect)
+                                        {
+                                            //do nothing. keep last subscribe token
+                                        }
+                                        else
+                                        {
+                                            LastSubscribeTimetoken = receivedTimetoken;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        LastSubscribeTimetoken = receivedTimetoken;
+                                    }
+                                }
+                                break;
+                            case ResponseType.Leave:
+                                result.Add(multiChannel);
+                                break;
+
+                            case ResponseType.Time:
+                                break;
+                            case ResponseType.Publish:
+                                #region "Publish"
+                                result.Add(multiChannel);
+                                if (pubnubConfig.AddPayloadToPublishResponse && request != null & request.RequestUri != null)
+                                {
+                                    Uri webUri = request.RequestUri;
+                                    string absolutePath = webUri.AbsolutePath.ToString();
+                                    int posLastSlash = absolutePath.LastIndexOf("/");
+                                    if (posLastSlash > 1)
+                                    {
+                                        bool stringType = false;
+                                        //object publishMsg = absolutePath.Substring(posLastSlash + 1);
+                                        string publishPayload = absolutePath.Substring(posLastSlash + 1);
+                                        int posOfStartDQ = publishPayload.IndexOf("%22");
+                                        int posOfEndDQ = publishPayload.LastIndexOf("%22");
+                                        if (posOfStartDQ == 0 && posOfEndDQ + 3 == publishPayload.Length)
+                                        {
+                                            publishPayload = publishPayload.Remove(posOfEndDQ).Remove(posOfStartDQ, 3);
+                                            stringType = true;
+                                        }
+                                        string publishMsg = System.Uri.UnescapeDataString(publishPayload);
+
+                                        double doubleData;
+                                        int intData;
+                                        if (!stringType && int.TryParse(publishMsg, out intData)) //capture numeric data
+                                        {
+                                            result.Add(intData);
+                                        }
+                                        else if (!stringType && double.TryParse(publishMsg, out doubleData)) //capture numeric data
+                                        {
+                                            result.Add(doubleData);
+                                        }
+                                        else
+                                        {
+                                            result.Add(publishMsg);
+                                        }
+                                    }
+                                }
+                                #endregion
+                                break;
+                            case ResponseType.DetailedHistory:
+                                result = DecodeDecryptLoop(result, channels, channelGroups, errorCallback);
+                                result.Add(multiChannel);
+                                break;
+                            case ResponseType.Here_Now:
+                                Dictionary<string, object> dictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                                result = new List<object>();
+                                result.Add(dictionary);
+                                result.Add(multiChannel);
+                                break;
+                            case ResponseType.GlobalHere_Now:
+                                Dictionary<string, object> globalHereNowDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                                result = new List<object>();
+                                result.Add(globalHereNowDictionary);
+                                break;
+                            case ResponseType.Where_Now:
+                                Dictionary<string, object> whereNowDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                                result = new List<object>();
+                                result.Add(whereNowDictionary);
+                                result.Add(multiChannel);
+                                break;
+                            case ResponseType.GrantAccess:
+                            case ResponseType.AuditAccess:
+                            case ResponseType.RevokeAccess:
+                                Dictionary<string, object> grantDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                                result = new List<object>();
+                                result.Add(grantDictionary);
+                                result.Add(multiChannel);
+                                break;
+                            case ResponseType.ChannelGroupGrantAccess:
+                            case ResponseType.ChannelGroupAuditAccess:
+                            case ResponseType.ChannelGroupRevokeAccess:
+                                Dictionary<string, object> channelGroupPAMDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                                result = new List<object>();
+                                result.Add(channelGroupPAMDictionary);
+                                result.Add(multiChannelGroup);
+                                break;
+                            case ResponseType.GetUserState:
+                            case ResponseType.SetUserState:
+                                Dictionary<string, object> userStateDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                                result = new List<object>();
+                                result.Add(userStateDictionary);
+                                result.Add(multiChannelGroup);
+                                result.Add(multiChannel);
+                                break;
+                            case ResponseType.PushRegister:
+                            case ResponseType.PushRemove:
+                            case ResponseType.PushGet:
+                            case ResponseType.PushUnregister:
+                                result.Add(multiChannel);
+                                break;
+                            case ResponseType.ChannelGroupAdd:
+                            case ResponseType.ChannelGroupRemove:
+                            case ResponseType.ChannelGroupGet:
+                                Dictionary<string, object> channelGroupDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                                result = new List<object>();
+                                result.Add(channelGroupDictionary);
+                                if (multiChannelGroup != "")
+                                {
+                                    result.Add(multiChannelGroup);
+                                }
+                                if (multiChannel != "")
+                                {
+                                    result.Add(multiChannel);
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                        //switch stmt end
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return result;
+        }
+
+        protected void ProcessResponseCallbacks<T>(List<object> result, RequestState<T> asyncRequestState)
+        {
+            bool callbackAvailable = false;
+            if (result != null && result.Count >= 1)
+            {
+                if (asyncRequestState.SubscribeRegularCallback != null || asyncRequestState.PresenceRegularCallback != null || asyncRequestState.NonSubscribeRegularCallback != null)
+                {
+                    callbackAvailable = true;
+                }
+                else
+                {
+                    if (asyncRequestState.ResponseType == ResponseType.Subscribe || asyncRequestState.ResponseType == ResponseType.Presence)
+                    {
+                        if (asyncRequestState.Channels != null && asyncRequestState.Channels.Length > 0)
+                        {
+                            List<string> channelList = asyncRequestState.Channels.ToList();
+                            foreach (string ch in channelList)
+                            {
+                                PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
+                                callbackKey.Channel = ch;
+                                callbackKey.ResponseType = asyncRequestState.ResponseType;
+
+                                if (channelCallbacks.Count > 0 && channelCallbacks.ContainsKey(callbackKey))
+                                {
+                                    callbackAvailable = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!callbackAvailable && asyncRequestState.ChannelGroups != null && asyncRequestState.ChannelGroups.Length > 0)
+                        {
+                            List<string> channelGroupList = asyncRequestState.ChannelGroups.ToList();
+                            foreach (string cg in channelGroupList)
+                            {
+                                PubnubChannelGroupCallbackKey callbackKey = new PubnubChannelGroupCallbackKey();
+                                callbackKey.ChannelGroup = cg;
+                                callbackKey.ResponseType = asyncRequestState.ResponseType;
+
+                                if (channelGroupCallbacks.Count > 0 && channelGroupCallbacks.ContainsKey(callbackKey))
+                                {
+                                    callbackAvailable = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (callbackAvailable)
+            {
+                ResponseToConnectCallback<T>(result, asyncRequestState.ResponseType, asyncRequestState.Channels, asyncRequestState.ChannelGroups, asyncRequestState.ConnectCallback);
+                ResponseToUserCallback<T>(result, asyncRequestState.ResponseType, asyncRequestState.Channels, asyncRequestState.ChannelGroups, asyncRequestState.NonSubscribeRegularCallback);
+            }
+        }
+
+        private List<object> DecodeDecryptLoop(List<object> message, string[] channels, string[] channelGroups, Action<PubnubClientError> errorCallback)
+        {
+            List<object> returnMessage = new List<object>();
+            if (pubnubConfig.CiperKey.Length > 0)
+            {
+                PubnubCrypto aes = new PubnubCrypto(pubnubConfig.CiperKey);
+                var myObjectArray = (from item in message
+                                     select item as object).ToArray();
+                IEnumerable enumerable = myObjectArray[0] as IEnumerable;
+                if (enumerable != null)
+                {
+                    List<object> receivedMsg = new List<object>();
+                    foreach (object element in enumerable)
+                    {
+                        string decryptMessage = "";
+                        try
+                        {
+                            decryptMessage = aes.Decrypt(element.ToString());
+                        }
+                        catch (Exception ex)
+                        {
+                            decryptMessage = "**DECRYPT ERROR**";
+
+                            string multiChannel = string.Join(",", channels);
+                            string multiChannelGroup = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups) : "";
+
+                            new PNCallbackService(pubnubConfig, jsonLib).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
+                                multiChannel, multiChannelGroup, errorCallback, ex, null, null);
+                        }
+                        object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : jsonLib.DeserializeToObject(decryptMessage);
+                        receivedMsg.Add(decodeMessage);
+                    }
+                    returnMessage.Add(receivedMsg);
+                }
+
+                for (int index = 1; index < myObjectArray.Length; index++)
+                {
+                    returnMessage.Add(myObjectArray[index]);
+                }
+                return returnMessage;
+            }
+            else
+            {
+                var myObjectArray = (from item in message
+                                     select item as object).ToArray();
+                IEnumerable enumerable = myObjectArray[0] as IEnumerable;
+                if (enumerable != null)
+                {
+                    List<object> receivedMessage = new List<object>();
+                    foreach (object element in enumerable)
+                    {
+                        receivedMessage.Add(element);
+                    }
+                    returnMessage.Add(receivedMessage);
+                }
+                for (int index = 1; index < myObjectArray.Length; index++)
+                {
+                    returnMessage.Add(myObjectArray[index]);
+                }
+                return returnMessage;
             }
         }
 

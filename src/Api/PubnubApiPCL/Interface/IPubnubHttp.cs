@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace PubnubApi
 {
@@ -13,7 +11,9 @@ namespace PubnubApi
 
         PubnubWebRequest SetServicePointSetTcpKeepAlive(PubnubWebRequest request);
 
-        void SendRequestAndGetResult<T>(Uri requestUri, RequestState<T> pubnubRequestState, PubnubWebRequest request);
+        //void SendRequestAndGetResult<T>(Uri requestUri, RequestState<T> pubnubRequestState, PubnubWebRequest request);
+
+        Task<string> SendRequestAndGetJsonResponse<T>(Uri requestUri, RequestState<T> pubnubRequestState, PubnubWebRequest request);
     }
 
 }

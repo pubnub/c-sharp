@@ -30,12 +30,14 @@ namespace PubnubApi.EndPoint
             }
 
             if ((channels == null && channelGroups == null) 
-                || (channels.Length == 0 && channelGroups.Length == 0))
+                || (channels != null && channelGroups != null && channels.Length == 0 && channelGroups.Length == 0))
             {
                 throw new MissingMemberException("Invalid Channels/ChannelGroups");
             }
+
             List<string> channelList = new List<string>();
             List<string> channelGroupList = new List<string>();
+            List<string> authList = new List<string>();
 
             if (channels != null && channels.Length > 0)
             {
@@ -49,9 +51,15 @@ namespace PubnubApi.EndPoint
                 channelGroupList = channelGroupList.Where(cg => !string.IsNullOrEmpty(cg) && cg.Trim().Length > 0).Distinct<string>().ToList();
             }
 
+            if (authKeys != null && authKeys.Length > 0)
+            {
+                authList = new List<string>(authKeys);
+                authList = channelGroupList.Where(auth => !string.IsNullOrEmpty(auth) && auth.Trim().Length > 0).Distinct<string>().ToList();
+            }
+
             string channelsCommaDelimited = string.Join(",", channelList.ToArray());
             string channelGroupsCommaDelimited = string.Join(",", channelGroupList.ToArray());
-            string authKeysCommaDelimited = string.Join(",", authKeys);
+            string authKeysCommaDelimited = string.Join(",", authList.ToArray());
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
             Uri request = urlBuilder.BuildGrantAccessRequest(channelsCommaDelimited, channelGroupsCommaDelimited, authKeysCommaDelimited, read, write, manage, ttl);
@@ -64,7 +72,12 @@ namespace PubnubApi.EndPoint
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            UrlProcessRequest<T>(request, requestState, false);
+            string json = UrlProcessRequest<T>(request, requestState, false);
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> result = base.ProcessJsonResponse<T>(requestState, json);
+                base.ProcessResponseCallbacks(result, requestState);
+            }
         }
     }
 }

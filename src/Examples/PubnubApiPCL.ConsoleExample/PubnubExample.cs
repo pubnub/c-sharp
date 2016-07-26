@@ -128,7 +128,7 @@ namespace PubnubApi
             Console.ResetColor();
             Console.WriteLine();
 
-            Console.WriteLine("Enable SSL? ENTER Y for Yes, else N. (Default Y)");
+            Console.WriteLine("Enable SSL? ENTER Y for Yes, else N. (Default N)");
             string enableSSL = Console.ReadLine();
             Console.ForegroundColor = ConsoleColor.Blue;
             if (enableSSL.Trim().ToLower() == "y")
@@ -141,8 +141,8 @@ namespace PubnubApi
             }
             else
             {
-                enableSSL = "Y";
-                Console.WriteLine("SSL Enabled (default)");
+                enableSSL = "N";
+                Console.WriteLine("SSL Disabled (default)");
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -309,6 +309,7 @@ namespace PubnubApi
             Console.WriteLine();
 
             config.Origin = origin;
+
             config.Secure = (enableSSL.Trim().ToLower() == "y") ? true : false;
             config.CiperKey = cipherKey;
             config.SubscribeKey = subscribeKey;

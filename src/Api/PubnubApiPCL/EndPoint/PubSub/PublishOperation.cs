@@ -74,7 +74,12 @@ namespace PubnubApi.EndPoint
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            UrlProcessRequest<PublishAck>(request, requestState, false);
+            string json = UrlProcessRequest<PublishAck>(request, requestState, false);
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> result = base.ProcessJsonResponse<PublishAck>(requestState, json);
+                base.ProcessResponseCallbacks(result, requestState);
+            }
         }
 
     }

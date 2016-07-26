@@ -24,6 +24,11 @@ namespace PubnubApi.EndPoint
 
         internal void GetUserState(string[] channels, string[] channelGroups, string uuid, Action<GetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
         {
+            if ((channels == null && channelGroups == null)
+                           || (channels != null && channelGroups != null && channels.Length == 0 && channelGroups.Length == 0))
+            {
+                throw new ArgumentException("Either Channel Or Channel Group or Both should be provided");
+            }
             if ((channels == null && channelGroups != null) || (channels.Length == 0  && channelGroups.Length == 0))
             {
                 throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
@@ -56,7 +61,12 @@ namespace PubnubApi.EndPoint
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            UrlProcessRequest<GetUserStateAck>(request, requestState, false);
+            string json = UrlProcessRequest<GetUserStateAck>(request, requestState, false);
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> result = base.ProcessJsonResponse<GetUserStateAck>(requestState, json);
+                base.ProcessResponseCallbacks(result, requestState);
+            }
         }
     }
 }

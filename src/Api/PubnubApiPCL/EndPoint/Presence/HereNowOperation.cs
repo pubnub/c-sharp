@@ -24,14 +24,17 @@ namespace PubnubApi.EndPoint
 
         internal void HereNow(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, Action<HereNowAck> userCallback, Action<PubnubClientError> errorCallback)
         {
-            if ((channels == null && channelGroups == null) || (channels.Length == 0 && channelGroups.Length == 0))
+            if ((channels == null && channelGroups == null)
+                            || (channels != null && channelGroups != null && channels.Length == 0 && channelGroups.Length == 0))
             {
                 throw new ArgumentException("Missing Channel/ChannelGroup");
             }
+
             if (userCallback == null)
             {
                 throw new ArgumentException("Missing userCallback");
             }
+
             if (errorCallback == null)
             {
                 throw new ArgumentException("Missing errorCallback");
@@ -48,7 +51,12 @@ namespace PubnubApi.EndPoint
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            UrlProcessRequest<HereNowAck>(request, requestState, false);
+            string json = UrlProcessRequest<HereNowAck>(request, requestState, false);
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> result = base.ProcessJsonResponse<HereNowAck>(requestState, json);
+                base.ProcessResponseCallbacks(result, requestState);
+            }
         }
 
         

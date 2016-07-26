@@ -48,7 +48,12 @@ namespace PubnubApi.EndPoint
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            UrlProcessRequest<T>(request, requestState, false);
+            string json = UrlProcessRequest<T>(request, requestState, false);
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> result = base.ProcessJsonResponse<T>(requestState, json);
+                base.ProcessResponseCallbacks(result, requestState);
+            }
         }
     }
 }
