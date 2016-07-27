@@ -15,19 +15,19 @@ namespace PubnubApi.EndPoint
 
         public SubscribeOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
         {
-            this.config = pubnubConfig;
+            config = pubnubConfig;
         }
 
         public SubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary):base(pubnubConfig, jsonPluggableLibrary)
         {
-            this.config = pubnubConfig;
-            this.jsonLibrary = jsonPluggableLibrary;
+            config = pubnubConfig;
+            jsonLibrary = jsonPluggableLibrary;
         }
 
         public SubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest)
         {
-            this.config = pubnubConfig;
-            this.jsonLibrary = jsonPluggableLibrary;
+            config = pubnubConfig;
+            jsonLibrary = jsonPluggableLibrary;
             this.pubnubUnitTest = pubnubUnitTest;
         }
 

@@ -25,6 +25,7 @@ namespace PubnubApi.EndPoint
         public HistoryOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
         {
             config = pubnubConfig;
+            jsonLibrary = jsonPluggableLibrary;
         }
 
 

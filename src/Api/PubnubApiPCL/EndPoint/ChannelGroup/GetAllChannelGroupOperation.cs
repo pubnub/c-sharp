@@ -6,23 +6,24 @@ namespace PubnubApi.EndPoint
 {
     internal class GetAllChannelGroupOperation : PubnubCoreBase
     {
-        private PNConfiguration pubnubConfig = null;
-        private IJsonPluggableLibrary jsonPluggableLibrary = null;
+        private PNConfiguration config = null;
+        private IJsonPluggableLibrary jsonLibrary = null;
 
         public GetAllChannelGroupOperation(PNConfiguration pubnubConfig) : base(pubnubConfig)
         {
-            this.pubnubConfig = pubnubConfig;
+            config = pubnubConfig;
         }
 
         public GetAllChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary) : base(pubnubConfig, jsonPluggableLibrary)
         {
-            this.pubnubConfig = pubnubConfig;
-            this.jsonPluggableLibrary = jsonPluggableLibrary;
+            config = pubnubConfig;
+            jsonLibrary = jsonPluggableLibrary;
         }
 
         public GetAllChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
         {
-            this.pubnubConfig = pubnubConfig;
+            config = pubnubConfig;
+            jsonLibrary = jsonPluggableLibrary;
         }
 
         internal void GetAllChannelGroup(Action<GetAllChannelGroupsAck> userCallback, Action<PubnubClientError> errorCallback)
@@ -36,7 +37,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing errorCallback");
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(pubnubConfig, jsonPluggableLibrary);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
 
             Uri request = urlBuilder.BuildGetAllChannelGroupRequest();
 

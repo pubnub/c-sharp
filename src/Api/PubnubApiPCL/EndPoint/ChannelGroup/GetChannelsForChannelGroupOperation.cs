@@ -6,23 +6,24 @@ namespace PubnubApi.EndPoint
 {
     internal class GetChannelsForChannelGroupOperation : PubnubCoreBase
     {
-        private PNConfiguration pubnubConfig = null;
-        private IJsonPluggableLibrary jsonPluggableLibrary = null;
+        private PNConfiguration config = null;
+        private IJsonPluggableLibrary jsonLibrary = null;
 
         public GetChannelsForChannelGroupOperation(PNConfiguration pubnubConfig) : base(pubnubConfig)
         {
-            this.pubnubConfig = pubnubConfig;
+            config = pubnubConfig;
         }
 
         public GetChannelsForChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary) : base(pubnubConfig, jsonPluggableLibrary)
         {
-            this.pubnubConfig = pubnubConfig;
-            this.jsonPluggableLibrary = jsonPluggableLibrary;
+            config = pubnubConfig;
+            jsonLibrary = jsonPluggableLibrary;
         }
 
         public GetChannelsForChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
         {
-            this.pubnubConfig = pubnubConfig;
+            config = pubnubConfig;
+            jsonLibrary = jsonPluggableLibrary;
         }
 
         internal void GetChannelsForChannelGroup(string groupName, Action<GetChannelGroupChannelsAck> userCallback, Action<PubnubClientError> errorCallback)
@@ -41,7 +42,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing errorCallback");
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(pubnubConfig, jsonPluggableLibrary);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
 
             Uri request = urlBuilder.BuildGetChannelsForChannelGroupRequest(null, groupName, false);
 
@@ -81,7 +82,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing errorCallback");
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(pubnubConfig, jsonPluggableLibrary);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
 
             Uri request = urlBuilder.BuildGetChannelsForChannelGroupRequest(nameSpace, groupName, false);
 
