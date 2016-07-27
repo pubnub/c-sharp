@@ -22,6 +22,11 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
+        public GetStateOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
+        {
+            config = pubnubConfig;
+        }
+
         internal void GetUserState(string[] channels, string[] channelGroups, string uuid, Action<GetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
         {
             if ((channels == null && channelGroups == null)

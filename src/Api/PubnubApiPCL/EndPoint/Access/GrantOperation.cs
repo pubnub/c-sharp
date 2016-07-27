@@ -22,6 +22,11 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
+        public GrantOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
+        {
+            config = pubnubConfig;
+        }
+
         public void GrantAccess<T>(string[] channels, string[] channelGroups, string[] authKeys, bool read, bool write, bool manage, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (string.IsNullOrEmpty(config.SecretKey) || string.IsNullOrEmpty(config.SecretKey.Trim()) || config.SecretKey.Length <= 0)

@@ -22,6 +22,11 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
+        public WhereNowOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
+        {
+            config = pubnubConfig;
+        }
+
         internal void WhereNow(string uuid, Action<WhereNowAck> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (userCallback == null)

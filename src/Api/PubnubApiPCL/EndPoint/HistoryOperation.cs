@@ -22,6 +22,12 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
+        public HistoryOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
+        {
+            config = pubnubConfig;
+        }
+
+
         internal void History(string channel, long start, long end, int count, bool reverse, bool includeToken, Action<DetailedHistoryAck> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()))
