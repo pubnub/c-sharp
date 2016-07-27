@@ -1,6 +1,6 @@
 ﻿using System;
 using PubnubApi.Interface;
-
+using System.Collections.Generic;
 
 namespace PubnubApi.EndPoint
 {
@@ -18,6 +18,11 @@ namespace PubnubApi.EndPoint
         {
             this.pubnubConfig = pubnubConfig;
             this.jsonPluggableLibrary = jsonPluggableLibrary;
+        }
+
+        public AddChannelsToChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
+        {
+            this.pubnubConfig = pubnubConfig;
         }
 
         internal void AddChannelsToChannelGroup(string[] channels, string nameSpace, string groupName, Action<AddChannelToChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
@@ -60,7 +65,12 @@ namespace PubnubApi.EndPoint
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            UrlProcessRequest<AddChannelToChannelGroupAck>(request, requestState, false);
+            string json = UrlProcessRequest<AddChannelToChannelGroupAck>(request, requestState, false);
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> result = base.ProcessJsonResponse<AddChannelToChannelGroupAck>(requestState, json);
+                base.ProcessResponseCallbacks(result, requestState);
+            }
         }
     }
 }

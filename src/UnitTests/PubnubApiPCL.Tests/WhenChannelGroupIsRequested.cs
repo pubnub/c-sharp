@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
-using System.ComponentModel;
+﻿using NUnit.Framework;
 using System.Threading;
-using System.Collections;
-//using Newtonsoft.Json;
-//using Newtonsoft.Json.Linq;
 using PubnubApi;
-
+using System;
 
 namespace PubNubMessaging.Tests
 {
@@ -24,6 +16,7 @@ namespace PubNubMessaging.Tests
         
         string currentUnitTestCase = "";
         string channelGroupName = "hello_my_group";
+        string authKey = "myAuth";
 
         Pubnub pubnub = null;
 
@@ -34,19 +27,30 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+                CiperKey = "",
+                Secure = false
+            };
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "GrantRequestUnitTest";
-            unitTest.TestCaseName = "Init3";
-            pubnub.PubnubUnitTest = unitTest;
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
+            unitTest.StubRequestResponse(new Uri(string.Format("http{0}://{1}/v1/auth/grant/sub-key/pam?signature=XVNGV2Z1QsRCusoEObp3Q6ytfEy6pK_SldphSbECbrg=&auth={2}&channel-group={3}&m=1&pnsdk={4}&r=1&timestamp=1469461667&ttl=20&uuid={5}", config.Secure ? "s" : "", config.Origin, authKey, channelGroupName, System.Net.WebUtility.UrlEncode(config.SdkVersion), config.Uuid)).ToString(),
+                    "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group+auth\",\"subscribe_key\":\"" + PubnubCommon.SubscribeKey + "\",\"ttl\":20,\"channel-groups\":\"" + channelGroupName + "\",\"auths\":{\"" + authKey + "\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}"
+                );
+            pubnub = new Pubnub(config, unitTest);
 
-            pubnub.GrantAccess(null, new string[] { channelGroupName }, true, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummyErrorCallback);
+
+            pubnub.GrantAccess(new string[] { }, new string[] { channelGroupName }, new string[] { authKey }, true, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummyErrorCallback);
             Thread.Sleep(1000);
 
             grantManualEvent.WaitOne();
 
-            pubnub.EndPendingRequests(); 
+            pubnub.EndPendingRequests();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "WhenChannelGroupIsRequested Grant access failed.");
@@ -56,25 +60,28 @@ namespace PubNubMessaging.Tests
         public void ThenAddChannelShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenAddChannelShouldReturnSuccess";
+            string channelName = "hello_my_channel";
 
             receivedChannelGroupMessage = false;
 
-            //pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
             PNConfiguration config = new PNConfiguration()
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+                CiperKey = "",
+                Secure = false
             };
 
-            pubnub = new Pubnub(config);
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenChannelGroupIsRequested";
-            unitTest.TestCaseName = "ThenAddChannelShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
+            unitTest.StubRequestResponse(new Uri(string.Format("http{0}://{1}/v1/channel-registration/sub-key/{2}/channel-group/{3}?add={4}", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channelGroupName, channelName)).ToString(),
+                    "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}"
+                );
+            pubnub = new Pubnub(config, unitTest);
 
             channelGroupManualEvent = new ManualResetEvent(false);
-            string channelName = "hello_my_channel";
 
             pubnub.AddChannelsToChannelGroup(new string[] { channelName }, channelGroupName, AddChannelGroupCallback, DummyErrorCallback);
             Thread.Sleep(1000);
@@ -92,6 +99,7 @@ namespace PubNubMessaging.Tests
         public void ThenRemoveChannelShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenRemoveChannelShouldReturnSuccess";
+            string channelName = "hello_my_channel";
 
             receivedChannelGroupMessage = false;
 
@@ -99,17 +107,21 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+                CiperKey = "",
+                Secure = false
             };
 
+            //IPubnubUnitTest unitTest = new PubnubUnitTest();
+            //unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
+            //unitTest.StubRequestResponse(new Uri(string.Format("http{0}://{1}/v1/auth/grant/sub-key/pam?signature=XVNGV2Z1QsRCusoEObp3Q6ytfEy6pK_SldphSbECbrg=&auth={2}&channel-group={3}&m=1&pnsdk={4}&r=1&timestamp=1469461667&ttl=20&uuid={5}", config.Secure ? "s" : "", config.Origin, authKey, channelGroupName, System.Net.WebUtility.UrlEncode(config.SdkVersion), config.Uuid)).ToString(),
+            //        "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group+auth\",\"subscribe_key\":\"" + PubnubCommon.SubscribeKey + "\",\"ttl\":20,\"channel-groups\":\"" + channelGroupName + "\",\"auths\":{\"" + authKey + "\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}"
+            //    );
+            //pubnub = new Pubnub(config, unitTest);
             pubnub = new Pubnub(config);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenChannelGroupIsRequested";
-            unitTest.TestCaseName = "ThenRemoveChannelShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-
             channelGroupManualEvent = new ManualResetEvent(false);
-            string channelName = "hello_my_channel";
 
             pubnub.RemoveChannelsFromChannelGroup(new string[] { channelName }, channelGroupName, RemoveChannelGroupCallback, DummyErrorCallback);
             Thread.Sleep(1000);
@@ -134,17 +146,21 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+                CiperKey = "",
+                Secure = false
             };
 
+            //IPubnubUnitTest unitTest = new PubnubUnitTest();
+            //unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
+            //unitTest.StubRequestResponse(new Uri(string.Format("http{0}://{1}/v1/auth/grant/sub-key/pam?signature=XVNGV2Z1QsRCusoEObp3Q6ytfEy6pK_SldphSbECbrg=&auth={2}&channel-group={3}&m=1&pnsdk={4}&r=1&timestamp=1469461667&ttl=20&uuid={5}", config.Secure ? "s" : "", config.Origin, authKey, channelGroupName, System.Net.WebUtility.UrlEncode(config.SdkVersion), config.Uuid)).ToString(),
+            //        "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group+auth\",\"subscribe_key\":\"" + PubnubCommon.SubscribeKey + "\",\"ttl\":20,\"channel-groups\":\"" + channelGroupName + "\",\"auths\":{\"" + authKey + "\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}"
+            //    );
+            //pubnub = new Pubnub(config, unitTest);
             pubnub = new Pubnub(config);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenChannelGroupIsRequested";
-            unitTest.TestCaseName = "ThenGetChannelListShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-
             channelGroupManualEvent = new ManualResetEvent(false);
-            //string channelName = "hello_my_channel";
 
             pubnub.GetChannelsForChannelGroup(channelGroupName, GetChannelGroupCallback, DummyErrorCallback);
             Thread.Sleep(1000);
@@ -169,14 +185,19 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+                CiperKey = "",
+                Secure = false
             };
 
+            //IPubnubUnitTest unitTest = new PubnubUnitTest();
+            //unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
+            //unitTest.StubRequestResponse(new Uri(string.Format("http{0}://{1}/v1/auth/grant/sub-key/pam?signature=XVNGV2Z1QsRCusoEObp3Q6ytfEy6pK_SldphSbECbrg=&auth={2}&channel-group={3}&m=1&pnsdk={4}&r=1&timestamp=1469461667&ttl=20&uuid={5}", config.Secure ? "s" : "", config.Origin, authKey, channelGroupName, System.Net.WebUtility.UrlEncode(config.SdkVersion), config.Uuid)).ToString(),
+            //        "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group+auth\",\"subscribe_key\":\"" + PubnubCommon.SubscribeKey + "\",\"ttl\":20,\"channel-groups\":\"" + channelGroupName + "\",\"auths\":{\"" + authKey + "\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}"
+            //    );
+            //pubnub = new Pubnub(config, unitTest);
             pubnub = new Pubnub(config);
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenChannelGroupIsRequested";
-            unitTest.TestCaseName = "ThenGetAllChannelGroupShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
 
             channelGroupManualEvent = new ManualResetEvent(false);
 

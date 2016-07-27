@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using NUnit.Framework;
-using System.ComponentModel;
 using System.Threading;
-using System.Collections;
-//using Newtonsoft.Json;
-//using Newtonsoft.Json.Linq;
 using PubnubApi;
 
 namespace PubNubMessaging.Tests
@@ -28,7 +22,15 @@ namespace PubNubMessaging.Tests
 
             receivedAuditMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                CiperKey = "",
+                Secure = false
+            };
+            pubnub = new Pubnub(config);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAuditIsRequested";
@@ -61,7 +63,15 @@ namespace PubNubMessaging.Tests
 
             receivedAuditMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                CiperKey = "",
+                Secure = false
+            };
+            pubnub = new Pubnub(config);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAuditIsRequested";
@@ -73,7 +83,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.AuditAccess(channel, "", AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.AuditAccess(channel, "", new string[] { }, AccessToChannelLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();
@@ -96,7 +106,15 @@ namespace PubNubMessaging.Tests
 
             receivedAuditMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                CiperKey = "",
+                Secure = false
+            };
+            pubnub = new Pubnub(config);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAuditIsRequested";
@@ -108,7 +126,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.AuditAccess("", channelgroup, AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.AuditAccess("", channelgroup, new string[] { }, AccessToChannelLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();
@@ -178,7 +196,7 @@ namespace PubNubMessaging.Tests
                                 {
                                     Console.WriteLine("{0} - AccessToChannelLevelCallback - Audit Channel Count = {1}", currentUnitTestCase, channels.Count);
                                 }
-                                if (level == "channel")
+                                if (level.Contains("channel"))
                                 {
                                     receivedAuditMessage = true;
                                 }
@@ -190,7 +208,7 @@ namespace PubNubMessaging.Tests
                                 {
                                     Console.WriteLine("{0} - AccessToChannelLevelCallback - Audit ChannelGroup Count = {1}", currentUnitTestCase, channelgroups.Count);
                                 }
-                                if (level == "channel-group")
+                                if (level.Contains("channel-group"))
                                 {
                                     receivedAuditMessage = true;
                                 }
@@ -208,7 +226,7 @@ namespace PubNubMessaging.Tests
 
         private void DummyErrorCallback(PubnubClientError result)
         {
-
+            Console.WriteLine(result.Description);
         }
     }
 }

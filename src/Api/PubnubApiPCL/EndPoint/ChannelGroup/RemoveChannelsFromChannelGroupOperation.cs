@@ -1,5 +1,6 @@
 ﻿using System;
 using PubnubApi.Interface;
+using System.Collections.Generic;
 
 namespace PubnubApi.EndPoint
 {
@@ -17,6 +18,11 @@ namespace PubnubApi.EndPoint
         {
             this.pubnubConfig = pubnubConfig;
             this.jsonPluggableLibrary = jsonPluggableLibrary;
+        }
+
+        public RemoveChannelsFromChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
+        {
+            this.pubnubConfig = pubnubConfig;
         }
 
         internal void RemoveChannelsFromChannelGroup(string[] channels, string nameSpace, string groupName, Action<RemoveChannelFromChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
@@ -60,7 +66,12 @@ namespace PubnubApi.EndPoint
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            UrlProcessRequest<RemoveChannelFromChannelGroupAck>(request, requestState, false);
+            string json = UrlProcessRequest<RemoveChannelFromChannelGroupAck>(request, requestState, false);
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> result = base.ProcessJsonResponse<RemoveChannelFromChannelGroupAck>(requestState, json);
+                base.ProcessResponseCallbacks(result, requestState);
+            }
         }
 
     }

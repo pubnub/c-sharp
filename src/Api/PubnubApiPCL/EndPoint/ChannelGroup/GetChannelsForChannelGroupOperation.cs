@@ -1,5 +1,6 @@
 ﻿using System;
 using PubnubApi.Interface;
+using System.Collections.Generic;
 
 namespace PubnubApi.EndPoint
 {
@@ -17,6 +18,11 @@ namespace PubnubApi.EndPoint
         {
             this.pubnubConfig = pubnubConfig;
             this.jsonPluggableLibrary = jsonPluggableLibrary;
+        }
+
+        public GetChannelsForChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
+        {
+            this.pubnubConfig = pubnubConfig;
         }
 
         internal void GetChannelsForChannelGroup(string groupName, Action<GetChannelGroupChannelsAck> userCallback, Action<PubnubClientError> errorCallback)
@@ -46,7 +52,12 @@ namespace PubnubApi.EndPoint
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            UrlProcessRequest<GetChannelGroupChannelsAck>(request, requestState, false);
+            string json = UrlProcessRequest<GetChannelGroupChannelsAck>(request, requestState, false);
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> result = base.ProcessJsonResponse<GetChannelGroupChannelsAck>(requestState, json);
+                base.ProcessResponseCallbacks(result, requestState);
+            }
         }
 
         internal void GetChannelsForChannelGroup<T>(string nameSpace, string groupName, Action<T> userCallback, Action<PubnubClientError> errorCallback)
@@ -81,7 +92,12 @@ namespace PubnubApi.EndPoint
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            UrlProcessRequest<T>(request, requestState, false);
+            string json = UrlProcessRequest<T>(request, requestState, false);
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> result = base.ProcessJsonResponse<T>(requestState, json);
+                base.ProcessResponseCallbacks(result, requestState);
+            }
         }
     }
 }
