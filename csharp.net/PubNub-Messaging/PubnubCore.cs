@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-﻿//Build Date: June 25, 2016
-=======
-﻿//Build Date: June 22, 2016
->>>>>>> 76abf2b321edaee7389ed460ba5494cd31d5db2d
+//Build Date: June 25, 2016
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
