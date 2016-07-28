@@ -73,6 +73,8 @@
 /NetPlatform/PubNub-Messaging.Tests/*.user
 /NetPlatform/PubNub-Messaging.Tests/bin/Debug/*
 /NetPlatform/PubNub-Messaging.Tests/obj/Debug/*
+/NetPlatform/PubNub-Messaging.Tests/bin/Release/*
+/NetPlatform/PubNub-Messaging.Tests/obj/Release/*
 /NetPlatform/PubnubConsole/*.log
 /NetPlatform/PubnubConsole/*.user
 /NetPlatform/PubnubConsole/obj/Debug/*

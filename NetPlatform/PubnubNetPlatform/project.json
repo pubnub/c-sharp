@@ -1,5 +1,5 @@
 ﻿{
-  "version": "3.7.6-rc1",
+  "version": "3.8.0",
   "title": "PubNub C# .NET Platform - Web Data Push API",
   "authors": [ "Pandu Masabathula" ],
   "packOptions": {
@@ -16,7 +16,7 @@
   "copyright": "PubNub 2012-2016",
 
   "dependencies": {
-    "Newtonsoft.Json": "9.0.1-beta1"
+    "Newtonsoft.Json": "9.0.1"
   },
   "frameworks": {
     "net3.5": {
@@ -36,6 +36,50 @@
         "System": "",
         "System.Core": "",
         "System.Net": ""
+      },
+
+      "dependencies": {
+        "Portable.BouncyCastle-Signed": "1.7.0.2"
+      },
+      "imports": [
+        "MonoAndroid10",
+        "xamarinios10",
+        "MonoTouch10",
+        "monomac"
+      ]
+    },
+
+    ".NETPortable,Version=v4.5,Profile=Profile111": {
+      "buildOptions": { "define": [ "PORTABLE111" ] },
+      "frameworkAssemblies": {
+        "mscorlib": "",
+        "System": "",
+        "System.Core": "",
+        "System.Net": "",
+        "System.Net.Primitives": "",
+        "System.Net.Requests": ""
+      },
+
+      "dependencies": {
+        "Portable.BouncyCastle-Signed": "1.7.0.2"
+      },
+      "imports": [
+        "MonoAndroid10",
+        "xamarinios10",
+        "MonoTouch10",
+        "monomac"
+      ]
+    },
+
+    ".NETPortable,Version=v4.5,Profile=Profile259": {
+      "buildOptions": { "define": [ "PORTABLE259" ] },
+      "frameworkAssemblies": {
+        "mscorlib": "",
+        "System": "",
+        "System.Core": "",
+        "System.Net": "",
+        "System.Net.Primitives": "",
+        "System.Net.Requests": ""
       },
 
       "dependencies": {
@@ -72,22 +116,21 @@
       }
     },
 
-    "netstandard1.5": {
+    "netstandard1.3": {
       "buildOptions": { "define": [ "NETSTANDARD" ] },
       "dependencies": {
-        "NETStandard.Library": "1.5.0-rc2-24027",
-        "System.Net.Requests": "4.0.11-rc2-24027",
-        "System.Reflection.Primitives": "4.0.1-rc2-24027",
-        "System.Reflection.TypeExtensions": "4.1.0-rc2-24027",
-        "System.Security.Cryptography.Algorithms": "4.1.0-rc2-24027",
-        "System.Security.Cryptography.Primitives": "4.0.0-rc2-24027",
-        "System.Threading.ThreadPool": "4.0.10-rc2-24027",
-        "System.Linq.Queryable": "4.0.1-rc2-24027",
-        "System.Text.Encoding": "4.0.11-rc2-24027",
-        "System.Text.Encoding.Extensions": "4.0.11-rc2-24027"
+        "NETStandard.Library": "1.6.0",
+        "System.Net.Requests": "4.0.11",
+        "System.Reflection.Primitives": "4.0.1",
+        "System.Reflection.TypeExtensions": "4.1.0",
+        "System.Security.Cryptography.Algorithms": "4.2.0",
+        "System.Security.Cryptography.Primitives": "4.0.0",
+        "System.Threading.ThreadPool": "4.0.10",
+        "System.Linq.Queryable": "4.0.1",
+        "System.Text.Encoding": "4.0.11",
+        "System.Text.Encoding.Extensions": "4.0.11"
       },
       "imports": [
-        "dnxcore50"
       ]
     }
 

@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Globalization;
-#if !PORTABLE259 && !PORTABLE151 && !PORTABLE136 && !WP81
+#if !PORTABLE259 && !PORTABLE151 && !PORTABLE136 && !PORTABLE111 && !WP81
 using System.Security.Cryptography;
 #else
 using Org.BouncyCastle.Crypto;
@@ -707,7 +707,7 @@ namespace PubNubMessaging.Core
             byte[] keyByte = encoding.GetBytes(secret);
             byte[] messageBytes = encoding.GetBytes(message);
 
-#if !PORTABLE259 && !PORTABLE151 && !PORTABLE136 && !WP81
+#if !PORTABLE259 && !PORTABLE151 && !PORTABLE136 && !PORTABLE111 && !WP81
             using (var hmacsha256 = new HMACSHA256(keyByte))
             {
                 byte[] hashmessage = hmacsha256.ComputeHash(messageBytes);

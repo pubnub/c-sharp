@@ -100,7 +100,7 @@ namespace PubNubMessaging.Core
 			state.Channels = channels;
             state.ChannelGroups = channelGroups;
 
-#if !PORTABLE151 && !PORTABLE259 && !WP81
+#if !PORTABLE151 && !PORTABLE259 && !PORTABLE111 && !WP81
             ThreadPool.QueueUserWorkItem(CheckSocketConnect<T>, state);
 #else
             CheckSocketConnect<T>(state);

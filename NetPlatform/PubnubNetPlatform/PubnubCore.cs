@@ -1,4 +1,4 @@
-﻿//Build Date: Apr 16, 2016
+﻿//Build Date: July 28, 2016
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -121,7 +121,7 @@ namespace PubNubMessaging.Core
         private string pushUnregisterDeviceParameters = "";
         private string channelGroupAddParameters = "";
         private string channelGroupRemoveParameters = "";
-        private string _pnsdkVersion = "PubNub-CSharp-.NET/3.7.1";
+        private string _pnsdkVersion = "PubNub-CSharp-.NET/3.8.0";
         private string _pushServiceName = "push.pubnub.com";
         private bool _addPayloadToPublishResponse = false;
 
@@ -129,7 +129,7 @@ namespace PubNubMessaging.Core
 
 		#region "Properties"
 
-        protected string Version
+        public string Version
         {
             get
             {
@@ -993,7 +993,7 @@ namespace PubNubMessaging.Core
 		{
 			if (state != null && state.Request != null) 
             {
-				if (state.Channels != null && state.Channels.Length > 0) 
+				if (state.Channels != null && state.Channels.Length > 0 && state.Channels[0] != null) 
                 {
 					string activeChannel = state.Channels [0].ToString (); //Assuming one channel exist, else will refactor later
 					PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey ();
@@ -6792,7 +6792,7 @@ namespace PubNubMessaging.Core
 				}
 
 				// Create Request
-				PubnubWebRequestCreator requestCreator = new PubnubWebRequestCreator (_pubnubUnitTest);
+				PubnubWebRequestCreator requestCreator = new PubnubWebRequestCreator (_pubnubUnitTest, _pnsdkVersion);
 				PubnubWebRequest request = (PubnubWebRequest)requestCreator.Create (requestUri);
 
 				request = SetProxy<T> (request);
@@ -7072,15 +7072,29 @@ namespace PubNubMessaging.Core
 	internal abstract class PubnubWebRequestCreatorBase : IWebRequestCreate
 	{
 		protected IPubnubUnitTest pubnubUnitTest = null;
+        private string pnsdkVersion = "";
 
-		public PubnubWebRequestCreatorBase ()
+        public PubnubWebRequestCreatorBase ()
 		{
 		}
 
-		public PubnubWebRequestCreatorBase (IPubnubUnitTest pubnubUnitTest)
+		public PubnubWebRequestCreatorBase (IPubnubUnitTest pubnubUnitTest, string pnSdk)
 		{
 			this.pubnubUnitTest = pubnubUnitTest;
-		}
+            this.pnsdkVersion = pnSdk;
+        }
+
+        protected string Version
+        {
+            get
+            {
+                return pnsdkVersion;
+            }
+            set
+            {
+                pnsdkVersion = value;
+            }
+        }
 
         protected abstract HttpWebRequest SetNoCache(HttpWebRequest req, bool nocache);
 

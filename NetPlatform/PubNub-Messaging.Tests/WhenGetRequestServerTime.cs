@@ -131,6 +131,25 @@ namespace PubNubMessaging.Tests
 
         }
 
+        [Test]
+        public void ThenSdkVersionIsVerified()
+        {
+            string expectedSdkVersion = "PubNub-CSharp-.NET/3.8.0";
+
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+
+            PubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.TestClassName = "WhenGetRequestServerTime";
+            unitTest.TestCaseName = "ThenSdkVersionIsVerified";
+
+            pubnub.PubnubUnitTest = unitTest;
+
+            string actualSdkVersion = pubnub.Version;
+
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.AreEqual(expectedSdkVersion, actualSdkVersion, "Verify SDK Version");
+        }
 
         private void ReturnTimeStampCallback(string result)
         {

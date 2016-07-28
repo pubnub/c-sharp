@@ -1,4 +1,4 @@
-﻿//Build Date: Mar 28, 2016
+﻿//Build Date: July 28, 2016
 using System;
 using System.Text;
 using System.IO;
@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Linq;
 
 using System.Threading.Tasks;
-#if !PORTABLE259 && !PORTABLE151 && !PORTABLE136 && !WP81
+#if !PORTABLE259 && !PORTABLE151 && !PORTABLE136 && !PORTABLE111 && !WP81
 using System.Security.Cryptography;
 #else
 using Org.BouncyCastle.Crypto;
@@ -231,7 +231,7 @@ namespace PubNubMessaging.Core
                     }
                 }
             }
-#elif !PORTABLE151 && !PORTABLE259 && !PORTABLE136 && !WP81
+#elif !PORTABLE151 && !PORTABLE259 && !PORTABLE136 && !PORTABLE111 && !WP81
             LoggingMethod.WriteToLog("Inside ForceCanonicalPathAndQuery = " + requestUri.ToString(), LoggingMethod.LevelInfo);
             FieldInfo flagsFieldInfo = typeof(Uri).GetField("m_Flags", BindingFlags.Instance | BindingFlags.NonPublic);
             if (flagsFieldInfo != null)
@@ -1476,15 +1476,15 @@ namespace PubNubMessaging.Core
         {
         }
 
-        public PubnubWebRequestCreator(IPubnubUnitTest pubnubUnitTest)
-            : base(pubnubUnitTest)
+        public PubnubWebRequestCreator(IPubnubUnitTest pubnubUnitTest, string pnSdk)
+            : base(pubnubUnitTest, pnSdk)
         {
         }
 
 		protected HttpWebRequest SetUserAgent(HttpWebRequest req, bool keepAliveRequest)
 		{
-			req.Headers["UserAgent"] = string.Format("ua_string=({0}) PubNub-csharp/3.7", "PCL"); 
-			return req;
+            req.Headers["UserAgent"] = string.Format("ua_string= {0}", base.Version);
+            return req;
 		}
 
         protected override HttpWebRequest SetNoCache(HttpWebRequest req, bool nocache)
@@ -1660,7 +1660,7 @@ namespace PubNubMessaging.Core
 
         protected override string ComputeHashRaw(string input)
         {
-#if !PORTABLE259 && !PORTABLE151 && !PORTABLE136 && !WP81
+#if !PORTABLE259 && !PORTABLE151 && !PORTABLE136 && !PORTABLE111 && !WP81
             HashAlgorithm algorithm = SHA256.Create();
             Byte[] inputBytes = System.Text.Encoding.UTF8.GetBytes(input);
             Byte[] hashedBytes = algorithm.ComputeHash(inputBytes);
@@ -1681,7 +1681,7 @@ namespace PubNubMessaging.Core
             byte[] cipherText = null;
 
             //Set up
-#if !PORTABLE259 && !PORTABLE151 && !PORTABLE136 && !WP81
+#if !PORTABLE259 && !PORTABLE151 && !PORTABLE136 && !PORTABLE111 && !WP81
             Aes aesAlg = Aes.Create();
             aesAlg.KeySize = 256;
             aesAlg.BlockSize = 128;
@@ -1708,7 +1708,7 @@ namespace PubNubMessaging.Core
             if (type)
             {
                 // Encrypt
-#if !PORTABLE259 && !PORTABLE151 && !PORTABLE136 && !WP81
+#if !PORTABLE259 && !PORTABLE151 && !PORTABLE136 && !PORTABLE111 && !WP81
                 plainStr = EncodeNonAsciiCharacters(plainStr);
                 ICryptoTransform crypto = aesAlg.CreateEncryptor();
                 byte[] plainText = Encoding.UTF8.GetBytes(plainStr);
@@ -1733,7 +1733,7 @@ namespace PubNubMessaging.Core
                 try
                 {
                     //decode
-#if !PORTABLE259 && !PORTABLE151 && !PORTABLE136 && !WP81
+#if !PORTABLE259 && !PORTABLE151 && !PORTABLE136 && !PORTABLE111 && !WP81
                     string decrypted = "";
                     byte[] decryptedBytes = Convert.FromBase64CharArray(plainStr.ToCharArray(), 0, plainStr.Length);
                     ICryptoTransform decrypto = aesAlg.CreateDecryptor();
