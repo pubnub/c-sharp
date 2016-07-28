@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "PubNub-Messaging.Tests": {
+      "commandName": "Project"
+    }
+  }
+}

@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-﻿//Build Date: June 25, 2016
-=======
-﻿//Build Date: June 22, 2016
->>>>>>> 76abf2b321edaee7389ed460ba5494cd31d5db2d
+﻿//Build Date: Apr 16, 2016
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -17,20 +13,10 @@ using System.Net;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-#if !NETFX_CORE
-using System.Security.Cryptography;
-#endif
 using System.ComponentModel;
 using System.Reflection;
 using System.Threading;
 using System.Diagnostics;
-#if WINDOWS_PHONE && WP7
-using System.Collections.Concurrent;
-#elif WINDOWS_PHONE
-using TvdP.Collections;
-#else
-using System.Collections.Concurrent;
-#endif
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -49,25 +35,26 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 #endif
 #endregion
+
 namespace PubNubMessaging.Core
 {
 	// INotifyPropertyChanged provides a standard event for objects to notify clients that one of its properties has changed
-	internal abstract class PubnubCore : INotifyPropertyChanged
+	internal abstract class PubnubCore
 	{
 
 		#region "Events"
 
 		// Common property changed event
-		public event PropertyChangedEventHandler PropertyChanged;
+		//public event PropertyChangedEventHandler PropertyChanged;
 
-		public void RaisePropertyChanged(string propertyName)
-		{
-			var handler = PropertyChanged;
-			if (handler != null) 
-            {
-				handler(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
+		//public void RaisePropertyChanged(string propertyName)
+		//{
+		//	var handler = PropertyChanged;
+		//	if (handler != null) 
+  //          {
+		//		handler(this, new PropertyChangedEventArgs(propertyName));
+		//	}
+		//}
 
 		#endregion
 
@@ -111,7 +98,7 @@ namespace PubNubMessaging.Core
         // History of Messages (Obsolete)
 		private List<object> _history = new List<object>();
 
-        public List<object> History { get { return _history; } set { _history = value; RaisePropertyChanged("History"); } }
+        //public List<object> History { get { return _history; } set { _history = value; RaisePropertyChanged("History"); } }
 
 		private static long lastSubscribeTimetoken = 0;
 		// Pubnub Core API implementation
@@ -134,7 +121,7 @@ namespace PubNubMessaging.Core
         private string pushUnregisterDeviceParameters = "";
         private string channelGroupAddParameters = "";
         private string channelGroupRemoveParameters = "";
-        private string _pnsdkVersion = "PubNub-CSharp-.NET/3.7.7";
+        private string _pnsdkVersion = "PubNub-CSharp-.NET/3.7.1";
         private string _pushServiceName = "push.pubnub.com";
         private bool _addPayloadToPublishResponse = false;
 
@@ -142,7 +129,7 @@ namespace PubNubMessaging.Core
 
 		#region "Properties"
 
-        public string Version
+        protected string Version
         {
             get
             {
@@ -308,6 +295,24 @@ namespace PubNubMessaging.Core
 			}
 		}
 
+		private IPubnubLog _pubnubLog = null;
+		public IPubnubLog PubnubLog
+		{
+			get{
+				return _pubnubLog;
+			}
+			set {
+				_pubnubLog = value;
+				if (_pubnubLog != null) {
+					LoggingMethod.PubnubLog = _pubnubLog;
+					this.PubnubLogLevel = _pubnubLog.LogLevel;
+				} else {
+					_pubnubLog = null;
+					throw new ArgumentException("Missing or Incorrect PubnubLog value");
+				}
+			}
+		}
+
 		public string Origin 
         {
 			get 
@@ -380,7 +385,7 @@ namespace PubNubMessaging.Core
 			}
 		}
 
-		internal LoggingMethod.Level PubnubLogLevel 
+        internal LoggingMethod.Level PubnubLogLevel 
         {
 			get 
             {
@@ -444,6 +449,7 @@ namespace PubNubMessaging.Core
                 _addPayloadToPublishResponse = value;
             }
         }
+
 		#endregion
 
 		#region "Init"
@@ -987,7 +993,7 @@ namespace PubNubMessaging.Core
 		{
 			if (state != null && state.Request != null) 
             {
-				if (state.Channels != null && state.Channels.Length > 0 && state.Channels[0] != null) 
+				if (state.Channels != null && state.Channels.Length > 0) 
                 {
 					string activeChannel = state.Channels [0].ToString (); //Assuming one channel exist, else will refactor later
 					PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey ();
@@ -1069,17 +1075,26 @@ namespace PubNubMessaging.Core
 				}
 			} else {
 				ICollection<string> keyCollection = _channelRequest.Keys;
-				foreach (string key in keyCollection) {
-					PubnubWebRequest currentRequest = _channelRequest [key];
-					if (currentRequest != null) {
-						bool removeKey = _channelRequest.TryRemove (key, out currentRequest);
-						if (removeKey) {
-							LoggingMethod.WriteToLog (string.Format ("DateTime {0} Remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString (), key), LoggingMethod.LevelInfo);
-						} else {
-							LoggingMethod.WriteToLog (string.Format ("DateTime {0} Unable to remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString (), key), LoggingMethod.LevelError);
-						}
-					}
-				}
+                if (keyCollection != null && keyCollection.Count > 0)
+                {
+                    List<string> keysList = keyCollection.ToList();
+                    foreach (string key in keysList)
+                    {
+                        PubnubWebRequest currentRequest = _channelRequest[key];
+                        if (currentRequest != null)
+                        {
+                            bool removeKey = _channelRequest.TryRemove(key, out currentRequest);
+                            if (removeKey)
+                            {
+                                LoggingMethod.WriteToLog(string.Format("DateTime {0} Remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString(), key), LoggingMethod.LevelInfo);
+                            }
+                            else
+                            {
+                                LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString(), key), LoggingMethod.LevelError);
+                            }
+                        }
+                    }
+                }
 			}
 		}
 
@@ -1123,17 +1138,26 @@ namespace PubNubMessaging.Core
 		private void RemoveChannelCallback()
 		{
 			ICollection<PubnubChannelCallbackKey> channelCollection = channelCallbacks.Keys;
-			foreach (PubnubChannelCallbackKey keyChannel in channelCollection) {
-				if (channelCallbacks.ContainsKey (keyChannel)) {
-					object tempChannelCallback;
-					bool removeKey = channelCallbacks.TryRemove (keyChannel, out tempChannelCallback);
-					if (removeKey) {
-						LoggingMethod.WriteToLog (string.Format ("DateTime {0} RemoveChannelCallback from dictionary in RemoveChannelCallback for channel= {1}", DateTime.Now.ToString (), removeKey), LoggingMethod.LevelInfo);
-					} else {
-						LoggingMethod.WriteToLog (string.Format ("DateTime {0} Unable to RemoveChannelCallback from dictionary in RemoveChannelCallback for channel= {1}", DateTime.Now.ToString (), removeKey), LoggingMethod.LevelError);
-					}
-				}
-			}
+            if (channelCollection != null && channelCollection.Count > 0)
+            {
+                List<PubnubChannelCallbackKey> channelList = channelCollection.ToList();
+                foreach (PubnubChannelCallbackKey keyChannel in channelList)
+                {
+                    if (channelCallbacks.ContainsKey(keyChannel))
+                    {
+                        object tempChannelCallback;
+                        bool removeKey = channelCallbacks.TryRemove(keyChannel, out tempChannelCallback);
+                        if (removeKey)
+                        {
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveChannelCallback from dictionary in RemoveChannelCallback for channel= {1}", DateTime.Now.ToString(), removeKey), LoggingMethod.LevelInfo);
+                        }
+                        else
+                        {
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveChannelCallback from dictionary in RemoveChannelCallback for channel= {1}", DateTime.Now.ToString(), removeKey), LoggingMethod.LevelError);
+                        }
+                    }
+                }
+            }
 		}
 
         private void RemoveChannelGroupCallback<T>(string channelGroup, ResponseType type)
@@ -1176,19 +1200,23 @@ namespace PubNubMessaging.Core
         private void RemoveChannelGroupCallback()
         {
             ICollection<PubnubChannelGroupCallbackKey> channelGroupCollection = channelGroupCallbacks.Keys;
-            foreach (PubnubChannelGroupCallbackKey keyChannelGroup in channelGroupCollection)
+            if (channelGroupCollection != null && channelGroupCollection.Count > 0)
             {
-                if (channelGroupCallbacks.ContainsKey(keyChannelGroup))
+                List<PubnubChannelGroupCallbackKey> channelGroupCallbackList = channelGroupCollection.ToList();
+                foreach (PubnubChannelGroupCallbackKey keyChannelGroup in channelGroupCallbackList)
                 {
-                    object tempChannelGroupCallback;
-                    bool removeKey = channelGroupCallbacks.TryRemove(keyChannelGroup, out tempChannelGroupCallback);
-                    if (removeKey)
+                    if (channelGroupCallbacks.ContainsKey(keyChannelGroup))
                     {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveChannelGroupCallback from dictionary in RemoveChannelGroupCallback for channelgroup= {1}", DateTime.Now.ToString(), keyChannelGroup), LoggingMethod.LevelInfo);
-                    }
-                    else
-                    {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveChannelGroupCallback from dictionary in RemoveChannelGroupCallback for channelgroup= {1}", DateTime.Now.ToString(), keyChannelGroup), LoggingMethod.LevelError);
+                        object tempChannelGroupCallback;
+                        bool removeKey = channelGroupCallbacks.TryRemove(keyChannelGroup, out tempChannelGroupCallback);
+                        if (removeKey)
+                        {
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveChannelGroupCallback from dictionary in RemoveChannelGroupCallback for channelgroup= {1}", DateTime.Now.ToString(), keyChannelGroup), LoggingMethod.LevelInfo);
+                        }
+                        else
+                        {
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveChannelGroupCallback from dictionary in RemoveChannelGroupCallback for channelgroup= {1}", DateTime.Now.ToString(), keyChannelGroup), LoggingMethod.LevelError);
+                        }
                     }
                 }
             }
@@ -1202,73 +1230,92 @@ namespace PubNubMessaging.Core
             ICollection<string> channelGroupLocalUserStateCollection = _channelGroupLocalUserState.Keys;
             ICollection<string> channelGroupUserStateCollection = _channelGroupUserState.Keys;
 
-            foreach (string key in channelLocalUserStateCollection)
+            if (channelLocalUserStateCollection != null && channelLocalUserStateCollection.Count > 0)
             {
-                if (_channelLocalUserState.ContainsKey(key))
+                List<string> channelLocalStateList = channelLocalUserStateCollection.ToList();
+                foreach (string key in channelLocalStateList)
                 {
-                    Dictionary<string, object> tempUserState;
-                    bool removeKey = _channelLocalUserState.TryRemove(key, out tempUserState);
-                    if (removeKey)
+                    if (_channelLocalUserState.ContainsKey(key))
                     {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveUserState from local user state dictionary for channel= {1}", DateTime.Now.ToString(), key), LoggingMethod.LevelInfo);
-                    }
-                    else
-                    {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveUserState from local user state dictionary for channel= {1}", DateTime.Now.ToString(), key), LoggingMethod.LevelError);
+                        Dictionary<string, object> tempUserState;
+                        bool removeKey = _channelLocalUserState.TryRemove(key, out tempUserState);
+                        if (removeKey)
+                        {
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveUserState from local user state dictionary for channel= {1}", DateTime.Now.ToString(), key), LoggingMethod.LevelInfo);
+                        }
+                        else
+                        {
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveUserState from local user state dictionary for channel= {1}", DateTime.Now.ToString(), key), LoggingMethod.LevelError);
+                        }
                     }
                 }
             }
 
-            foreach (string key in channelUserStateCollection)
+            if (channelUserStateCollection != null && channelUserStateCollection.Count > 0)
             {
-                if (_channelUserState.ContainsKey(key))
+                List<string> channelStateList = channelUserStateCollection.ToList();
+                foreach (string key in channelStateList)
                 {
-                    Dictionary<string, object> tempUserState;
-                    bool removeKey = _channelUserState.TryRemove(key, out tempUserState);
-                    if (removeKey)
+                    if (_channelUserState.ContainsKey(key))
                     {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveUserState from user state dictionary for channel= {1}", DateTime.Now.ToString(), key), LoggingMethod.LevelInfo);
-                    }
-                    else
-                    {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveUserState from user state dictionary for channel= {1}", DateTime.Now.ToString(), key), LoggingMethod.LevelError);
+                        Dictionary<string, object> tempUserState;
+                        bool removeKey = _channelUserState.TryRemove(key, out tempUserState);
+                        if (removeKey)
+                        {
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveUserState from user state dictionary for channel= {1}", DateTime.Now.ToString(), key), LoggingMethod.LevelInfo);
+                        }
+                        else
+                        {
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveUserState from user state dictionary for channel= {1}", DateTime.Now.ToString(), key), LoggingMethod.LevelError);
+                        }
                     }
                 }
             }
 
-            foreach (string key in channelGroupLocalUserStateCollection)
+            if (channelGroupLocalUserStateCollection != null && channelGroupLocalUserStateCollection.Count > 0)
             {
-                if (_channelGroupLocalUserState.ContainsKey(key))
+                List<string> channelGroupLocalStateList = channelGroupLocalUserStateCollection.ToList();
+                foreach (string key in channelGroupLocalStateList)
                 {
-                    Dictionary<string, object> tempUserState;
-                    bool removeKey = _channelGroupLocalUserState.TryRemove(key, out tempUserState);
-                    if (removeKey)
+                    if (_channelGroupLocalUserState.ContainsKey(key))
                     {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveUserState from local user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), LoggingMethod.LevelInfo);
-                    }
-                    else
-                    {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveUserState from local user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), LoggingMethod.LevelError);
+                        Dictionary<string, object> tempUserState;
+                        bool removeKey = _channelGroupLocalUserState.TryRemove(key, out tempUserState);
+                        if (removeKey)
+                        {
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveUserState from local user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), LoggingMethod.LevelInfo);
+                        }
+                        else
+                        {
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveUserState from local user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), LoggingMethod.LevelError);
+                        }
                     }
                 }
             }
 
-            foreach (string key in channelGroupUserStateCollection)
+
+            if (channelGroupUserStateCollection != null && channelGroupUserStateCollection.Count > 0)
             {
-                if (_channelGroupUserState.ContainsKey(key))
+                List<string> channelGroupStateList = channelGroupUserStateCollection.ToList();
+
+                foreach (string key in channelGroupStateList)
                 {
-                    Dictionary<string, object> tempUserState;
-                    bool removeKey = _channelGroupUserState.TryRemove(key, out tempUserState);
-                    if (removeKey)
+                    if (_channelGroupUserState.ContainsKey(key))
                     {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveUserState from user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), LoggingMethod.LevelInfo);
-                    }
-                    else
-                    {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveUserState from user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), LoggingMethod.LevelError);
+                        Dictionary<string, object> tempUserState;
+                        bool removeKey = _channelGroupUserState.TryRemove(key, out tempUserState);
+                        if (removeKey)
+                        {
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveUserState from user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), LoggingMethod.LevelInfo);
+                        }
+                        else
+                        {
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveUserState from user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), LoggingMethod.LevelError);
+                        }
                     }
                 }
             }
+
         }
 
         protected virtual void TerminatePresenceHeartbeatTimer()
@@ -1314,21 +1361,27 @@ namespace PubNubMessaging.Core
 			} else {
 				ConcurrentDictionary<Uri, Timer> timerCollection = channelLocalClientHeartbeatTimer;
 				ICollection<Uri> keyCollection = timerCollection.Keys;
-				foreach (Uri key in keyCollection) {
-					if (channelLocalClientHeartbeatTimer.ContainsKey (key)) {
-						Timer currentTimer = null;
-                        if (channelLocalClientHeartbeatTimer.TryGetValue(key, out currentTimer) && currentTimer != null)
+                if (keyCollection != null && keyCollection.Count > 0)
+                {
+                    List<Uri> keyList = keyCollection.ToList();
+                    foreach (Uri key in keyList)
+                    {
+                        if (channelLocalClientHeartbeatTimer.ContainsKey(key))
                         {
-                            currentTimer.Dispose();
-                            Timer removedTimer = null;
-                            bool removed = channelLocalClientHeartbeatTimer.TryRemove(key, out removedTimer);
-                            if (!removed)
+                            Timer currentTimer = null;
+                            if (channelLocalClientHeartbeatTimer.TryGetValue(key, out currentTimer) && currentTimer != null)
                             {
-                                LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateLocalClientHeartbeatTimer(null) - Unable to remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString(), key.ToString()), LoggingMethod.LevelInfo);
+                                currentTimer.Dispose();
+                                Timer removedTimer = null;
+                                bool removed = channelLocalClientHeartbeatTimer.TryRemove(key, out removedTimer);
+                                if (!removed)
+                                {
+                                    LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateLocalClientHeartbeatTimer(null) - Unable to remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString(), key.ToString()), LoggingMethod.LevelInfo);
+                                }
                             }
                         }
-					}
-				}
+                    }
+                }
 			}
 		}
 
@@ -1336,37 +1389,41 @@ namespace PubNubMessaging.Core
 		{
             ConcurrentDictionary<string, Timer> channelReconnectCollection = _channelReconnectTimer;
             ICollection<string> keyCollection = channelReconnectCollection.Keys;
-            foreach (string key in keyCollection)
-            {
-                if (_channelReconnectTimer.ContainsKey(key))
-                {
-                    Timer currentTimer = _channelReconnectTimer[key];
-                    currentTimer.Dispose();
-                    Timer removedTimer = null;
-                    bool removed = _channelReconnectTimer.TryRemove(key, out removedTimer);
-                    if (!removed)
-                    {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channel reconnect timer reference from collection for {1}", DateTime.Now.ToString(), key.ToString()), LoggingMethod.LevelInfo);
-                    }
-                }
-            }
+			if (keyCollection != null && keyCollection.Count > 0) {
+				List<string> keyList = keyCollection.ToList ();
+				foreach (string key in keyList)
+				{
+					if (_channelReconnectTimer.ContainsKey(key))
+					{
+						Timer currentTimer = _channelReconnectTimer[key];
+						currentTimer.Dispose();
+						Timer removedTimer = null;
+						bool removed = _channelReconnectTimer.TryRemove(key, out removedTimer);
+						if (!removed)
+						{
+							LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channel reconnect timer reference from collection for {1}", DateTime.Now.ToString(), key.ToString()), LoggingMethod.LevelInfo);
+						}
+					}
+				}
+			}
+            
 
             ConcurrentDictionary<string, Timer> channelGroupReconnectCollection = _channelGroupReconnectTimer;
             ICollection<string> groupKeyCollection = channelGroupReconnectCollection.Keys;
-            foreach (string key in groupKeyCollection)
-            {
-                if (_channelGroupReconnectTimer.ContainsKey(key))
-                {
-                    Timer currentTimer = _channelGroupReconnectTimer[key];
-                    currentTimer.Dispose();
-                    Timer removedTimer = null;
-                    bool removed = _channelGroupReconnectTimer.TryRemove(key, out removedTimer);
-                    if (!removed)
-                    {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channelgroup reconnect timer reference from collection for {1}", DateTime.Now.ToString(), key.ToString()), LoggingMethod.LevelInfo);
-                    }
-                }
-            }
+			if (groupKeyCollection != null && groupKeyCollection.Count > 0) {
+				List<string> groupKeyList = groupKeyCollection.ToList ();
+				foreach (string groupKey in groupKeyList) {
+					if (_channelGroupReconnectTimer.ContainsKey (groupKey)) {
+						Timer currentTimer = _channelGroupReconnectTimer [groupKey];
+						currentTimer.Dispose ();
+						Timer removedTimer = null;
+						bool removed = _channelGroupReconnectTimer.TryRemove (groupKey, out removedTimer);
+						if (!removed) {
+							LoggingMethod.WriteToLog (string.Format ("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channelgroup reconnect timer reference from collection for {1}", DateTime.Now.ToString (), groupKey.ToString ()), LoggingMethod.LevelInfo);
+						}
+					}
+				}
+			}
         }
 
 		public void EndPendingRequests()
@@ -1474,7 +1531,7 @@ namespace PubNubMessaging.Core
             if (IsNullOrWhiteSpace(publishKey)) { publishKey = ""; }
             if (IsNullOrWhiteSpace(subscribeKey)) { subscribeKey = ""; }
             
-            this.Init(publishKey, subscribeKey, "", "", true);
+			this.Init(publishKey, subscribeKey, "", "", true);
 		}
 
 		/// <summary>
@@ -1490,7 +1547,7 @@ namespace PubNubMessaging.Core
             if (IsNullOrWhiteSpace(subscribeKey)) { subscribeKey = ""; }
             if (IsNullOrWhiteSpace(secretKey)) { secretKey = ""; }
             
-            this.Init(publishKey, subscribeKey, secretKey, "", true);
+			this.Init(publishKey, subscribeKey, secretKey, "", true);
 		}
 
         public static bool IsNullOrWhiteSpace(string value)
@@ -1593,10 +1650,10 @@ namespace PubNubMessaging.Core
          * Detailed History
          */
         public bool DetailedHistory(string channel, long start, long end, int count, bool reverse, bool includeToken, Action<object> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			return DetailedHistory<object> (channel, start, end, count, reverse, includeToken, userCallback, errorCallback);
-		}
-        
+        {
+            return DetailedHistory<object>(channel, start, end, count, reverse, includeToken, userCallback, errorCallback);
+        }
+
         public bool DetailedHistory(string channel, long start, long end, int count, bool reverse, Action<object> userCallback, Action<PubnubClientError> errorCallback)
         {
             return DetailedHistory<object>(channel, start, end, count, reverse, false, userCallback, errorCallback);
@@ -1607,7 +1664,7 @@ namespace PubNubMessaging.Core
             return DetailedHistory<T>(channel, start, end, count, reverse, false, userCallback, errorCallback);
         }
 
-		public bool DetailedHistory<T> (string channel, long start, long end, int count, bool reverse, bool includeToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        public bool DetailedHistory<T>(string channel, long start, long end, int count, bool reverse, bool includeToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
 			if (string.IsNullOrEmpty (channel) || string.IsNullOrEmpty (channel.Trim ())) {
 				throw new ArgumentException ("Missing Channel");
@@ -1635,27 +1692,27 @@ namespace PubNubMessaging.Core
 			return UrlProcessRequest<T> (request, requestState);
 		}
 
-		public bool DetailedHistory (string channel, long start, Action<object> userCallback, Action<PubnubClientError> errorCallback, bool reverse)
-		{
-			return DetailedHistory<object> (channel, start, -1, -1, reverse, false, userCallback, errorCallback);
-		}
+        public bool DetailedHistory(string channel, long start, Action<object> userCallback, Action<PubnubClientError> errorCallback, bool reverse)
+        {
+            return DetailedHistory<object>(channel, start, -1, -1, reverse, false, userCallback, errorCallback);
+        }
 
-		public bool DetailedHistory<T> (string channel, long start, Action<T> userCallback, Action<PubnubClientError> errorCallback, bool reverse)
-		{
+        public bool DetailedHistory<T>(string channel, long start, Action<T> userCallback, Action<PubnubClientError> errorCallback, bool reverse)
+        {
             return DetailedHistory<T>(channel, start, -1, -1, reverse, false, userCallback, errorCallback);
-		}
+        }
 
-		public bool DetailedHistory (string channel, int count, Action<object> userCallback, Action<PubnubClientError> errorCallback)
-		{
+        public bool DetailedHistory(string channel, int count, Action<object> userCallback, Action<PubnubClientError> errorCallback)
+        {
             return DetailedHistory<object>(channel, -1, -1, count, false, false, userCallback, errorCallback);
-		}
+        }
 
-		public bool DetailedHistory<T> (string channel, int count, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-		{
+        public bool DetailedHistory<T>(string channel, int count, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        {
             return DetailedHistory<T>(channel, -1, -1, count, false, false, userCallback, errorCallback);
-		}
+        }
 
-		private Uri BuildDetailedHistoryRequest (string channel, long start, long end, int count, bool reverse, bool includeToken)
+        private Uri BuildDetailedHistoryRequest(string channel, long start, long end, int count, bool reverse, bool includeToken)
 		{
             StringBuilder parameterBuilder = new StringBuilder();
 			parameters = "";
@@ -2453,14 +2510,14 @@ namespace PubNubMessaging.Core
 
         #region "Publish"
 
-        /// <summary>
-        /// Publish
-        /// Send a message to a channel
-        /// </summary>
-        /// <param name="channel"></param>
-        /// <param name="message"></param>
-        /// <param name="userCallback"></param>
-        /// <returns></returns>
+		/// <summary>
+		/// Publish
+		/// Send a message to a channel
+		/// </summary>
+		/// <param name="channel"></param>
+		/// <param name="message"></param>
+		/// <param name="userCallback"></param>
+		/// <returns></returns>
         public bool Publish<T>(string channel, object message, bool storeInHistory, string jsonUserMetaData, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
@@ -2487,7 +2544,7 @@ namespace PubNubMessaging.Core
 
             if (_enableDebugForPushPublish)
             {
-                if (message is Dictionary<string,object>)
+                if (message is Dictionary<string, object>)
                 {
                     Dictionary<string, object> dicMessage = message as Dictionary<string, object>;
                     dicMessage.Add("pn_debug", true);
@@ -2512,8 +2569,8 @@ namespace PubNubMessaging.Core
         }
 
         private Uri BuildPublishRequest(string channel, object originalMessage, bool storeInHistory, string jsonUserMetaData)
-		{
-			string message = (_enableJsonEncodingForPublish) ? JsonEncodePublishMsg (originalMessage) : originalMessage.ToString ();
+        {
+            string message = (_enableJsonEncodingForPublish) ? JsonEncodePublishMsg(originalMessage) : originalMessage.ToString();
 
             StringBuilder publishParamBuilder = new StringBuilder();
             if (!storeInHistory)
@@ -2533,37 +2590,38 @@ namespace PubNubMessaging.Core
             }
             parameters = publishParamBuilder.ToString();
 
-			// Generate String to Sign
-			string signature = "0";
-			if (this.secretKey.Length > 0) {
-				StringBuilder string_to_sign = new StringBuilder ();
-				string_to_sign
-					.Append (this.publishKey)
-						.Append ('/')
-						.Append (this.subscribeKey)
-						.Append ('/')
-						.Append (this.secretKey)
-						.Append ('/')
-						.Append (channel)
-						.Append ('/')
-						.Append (message); // 1
+            // Generate String to Sign
+            string signature = "0";
+            if (this.secretKey.Length > 0)
+            {
+                StringBuilder string_to_sign = new StringBuilder();
+                string_to_sign
+                    .Append(this.publishKey)
+                        .Append('/')
+                        .Append(this.subscribeKey)
+                        .Append('/')
+                        .Append(this.secretKey)
+                        .Append('/')
+                        .Append(channel)
+                        .Append('/')
+                        .Append(message); // 1
 
-				// Sign Message
-				signature = Md5 (string_to_sign.ToString ());
-			}
+                // Sign Message
+                signature = Md5(string_to_sign.ToString());
+            }
 
-			// Build URL
-			List<string> url = new List<string> ();
-			url.Add ("publish");
-			url.Add (this.publishKey);
-			url.Add (this.subscribeKey);
-			url.Add (signature);
-			url.Add (channel);
-			url.Add ("0");
-			url.Add (message);
+            // Build URL
+            List<string> url = new List<string>();
+            url.Add("publish");
+            url.Add(this.publishKey);
+            url.Add(this.subscribeKey);
+            url.Add(signature);
+            url.Add(channel);
+            url.Add("0");
+            url.Add(message);
 
-			return BuildRestApiRequest<Uri> (url, ResponseType.Publish);
-		}
+            return BuildRestApiRequest<Uri>(url, ResponseType.Publish);
+        }
 
 		#endregion
 
@@ -2648,17 +2706,66 @@ namespace PubNubMessaging.Core
 		protected virtual string EncodeUricomponent (string s, ResponseType type, bool ignoreComma, bool ignorePercent2fEncode)
 		{
 			string encodedUri = "";
+			bool prevSurroagePair = false;
 			StringBuilder o = new StringBuilder ();
 			foreach (char ch in s) {
+				if (prevSurroagePair) {
+					prevSurroagePair = false;
+					continue;
+				}
 				if (IsUnsafe (ch, ignoreComma)) {
 					o.Append ('%');
 					o.Append (ToHex (ch / 16));
 					o.Append (ToHex (ch % 16));
 				} else {
+					int positionOfChar = s.IndexOf (ch);
 					if (ch == ',' && ignoreComma) {
 						o.Append (ch.ToString ());
-					} else if (Char.IsSurrogate (ch)) {
-						o.Append (ch);
+					} 
+					else if (Char.IsSurrogatePair(s,positionOfChar)){
+						string codepoint = ConvertToUtf32(s, positionOfChar).ToString("X4");
+						//string codepoint = get_char_code(ch).ToString("X4");
+						//string codepoint = "U+" + ((int)ch).ToString("X4");
+
+						int cpValue = int.Parse (codepoint, NumberStyles.HexNumber);
+						if (cpValue <= 0x7F)
+						{
+							System.Diagnostics.Debug.WriteLine("0x7F");
+							string utf8HexValue = string.Format("%{0}", cpValue);
+							o.Append(utf8HexValue);
+						}
+						else if (cpValue <= 0x7FF)
+						{
+							string one   = (0xC0 | ((cpValue >> 6) & 0x1F)).ToString("X");
+							string two   = (0x80 | ((cpValue) & 0x3F)).ToString("X");
+							string utf8HexValue = string.Format("%{0}%{1}", one, two);
+							o.Append(utf8HexValue);
+						}
+						else if (cpValue <= 0xFFFF)
+						{
+							string one   = (0xE0 | ((cpValue >> 12) & 0x0F)).ToString("X");
+							string two   = (0x80 | ((cpValue >> 6) & 0x3F)).ToString("X");
+							string three  = (0x80 | ((cpValue) & 0x3F)).ToString("X");
+							string utf8HexValue = string.Format("%{0}%{1}%{2}", one, two, three);
+							o.Append(utf8HexValue);
+						}
+						else if (cpValue <= 0x10FFFF)
+						{
+							string one    = (0xF0 | ((cpValue >> 18) & 0x07)).ToString("X");
+							string two    = (0x80 | ((cpValue >> 12) & 0x3F)).ToString("X");
+							string three  = (0x80 | ((cpValue >> 6) & 0x3F)).ToString("X");
+							string four   = (0x80 | ((cpValue) & 0x3F)).ToString("X");
+							string utf8HexValue = string.Format("%{0}%{1}%{2}%{3}", one, two, three, four);
+							o.Append(utf8HexValue);
+						}
+
+//						string charTarget = char.ConvertFromUtf32 (int.Parse (codepoint, NumberStyles.HexNumber));
+//						o.Append(charTarget);
+
+						prevSurroagePair = true;
+//					}
+//					else if (Char.IsSurrogate (ch)) {
+//						o.Append (ch);
 					} else {
 						string escapeChar = System.Uri.EscapeDataString (ch.ToString ());
 						o.Append (escapeChar);
@@ -2675,6 +2782,57 @@ namespace PubNubMessaging.Core
 			}
 
 			return encodedUri;
+		}
+
+//		public int get_char_code(char character){ 
+//			System.Text.UTF8Encoding encoding = new System.Text.UnicodeEncoding(); 
+//			byte[] bytes = encoding.GetBytes(character.ToString().ToCharArray()); 
+//			return BitConverter.ToInt32(bytes, 0); 
+//		}
+		internal const int HIGH_SURROGATE_START  = 0x00d800;
+		internal const int LOW_SURROGATE_END     = 0x00dfff;
+		internal const int LOW_SURROGATE_START   = 0x00dc00;
+		internal const int UNICODE_PLANE01_START = 0x10000;
+
+//		internal const char  HIGH_SURROGATE_START  = '\ud800';
+//		internal const char  HIGH_SURROGATE_END    = '\udbff';
+//		internal const char  LOW_SURROGATE_START   = '\udc00';
+//		internal const char  LOW_SURROGATE_END     = '\udfff';
+
+		public static int ConvertToUtf32(String s, int index) {
+			if (s == null) {
+				throw new ArgumentNullException("s");
+			}
+
+			if (index < 0 || index >= s.Length) {
+				throw new ArgumentOutOfRangeException("index");
+			}
+			//Contract.EndContractBlock();
+			// Check if the character at index is a high surrogate.
+			int temp1 = (int)s[index] - HIGH_SURROGATE_START;
+			if (temp1 >= 0 && temp1 <= 0x7ff) {
+				// Found a surrogate char.
+				if (temp1 <= 0x3ff) {
+					// Found a high surrogate.
+					if (index < s.Length - 1) {
+						int temp2 = (int)s[index+1] - LOW_SURROGATE_START;
+						if (temp2 >= 0 && temp2 <= 0x3ff) {
+							// Found a low surrogate.
+							return ((temp1 * 0x400) + temp2 + UNICODE_PLANE01_START);
+						} else {
+							throw new ArgumentException("index"); 
+						}
+					} else {
+						// Found a high surrogate at the end of the string.
+						throw new ArgumentException("index"); 
+					}
+				} else {
+					// Find a low surrogate at the character pointed by index.
+					throw new ArgumentException("index"); 
+				}
+			}
+			// Not a high-surrogate or low-surrogate. Genereate the UTF32 value for the BMP characters.
+			return ((int)s[index]);
 		}
 
 		protected char ToHex (int ch)
@@ -2976,8 +3134,11 @@ namespace PubNubMessaging.Core
 					if (_channelRequest.ContainsKey(multiChannelName)) 
                     {
                         LoggingMethod.WriteToLog(string.Format("DateTime {0}, Aborting previous subscribe/presence requests having channel(s)={1}; channelgroup(s)={2}", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
-						PubnubWebRequest webRequest = _channelRequest [multiChannelName];
-						_channelRequest [multiChannelName] = null;
+						PubnubWebRequest webRequest = null; 
+						if (_channelRequest.TryGetValue(multiChannelName, out webRequest) && webRequest != null)
+						{
+							_channelRequest.TryUpdate(multiChannelName, null, webRequest);
+						}
 
 						if (webRequest != null)
 							TerminateLocalClientHeartbeatTimer (webRequest.RequestUri);
@@ -3376,62 +3537,60 @@ namespace PubNubMessaging.Core
                     string multiChannelGroupName = (currentChannelGroups.Length > 0) ? string.Join(",", currentChannelGroups) : "";
 
                     System.Threading.Tasks.Task.Factory.StartNew(() =>
-                    {
-                        if (_channelRequest.ContainsKey(multiChannelName))
                         {
-                            string[] arrValidChannels = validChannels.ToArray();
-                            RemoveChannelCallback<T>(string.Join(",", arrValidChannels), type);
-
-                            string[] arrValidChannelGroups = validChannels.ToArray();
-                            RemoveChannelGroupCallback<T>(string.Join(",", arrValidChannelGroups), type);
-
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0}, Aborting previous subscribe/presence requests having channel(s)={1}; channelgroup(s)={2}", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
-
-                            PubnubWebRequest webRequest = _channelRequest[multiChannelName];
-                            _channelRequest[multiChannelName] = null;
-
-                            if (webRequest != null)
+                            if (_channelRequest.ContainsKey(multiChannelName))
                             {
-                                TerminateLocalClientHeartbeatTimer(webRequest.RequestUri);
-                            }
+                                string[] arrValidChannels = validChannels.ToArray();
+                                RemoveChannelCallback<T>(string.Join(",", arrValidChannels), type);
 
-                            PubnubWebRequest removedRequest;
-                            bool removedChannel = _channelRequest.TryRemove(multiChannelName, out removedRequest);
-                            if (removedChannel)
-                            {
-                                LoggingMethod.WriteToLog(string.Format("DateTime {0}, Success to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelUnSubscribeInit).", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
+                                string[] arrValidChannelGroups = validChannels.ToArray();
+                                RemoveChannelGroupCallback<T>(string.Join(",", arrValidChannelGroups), type);
+
+                                LoggingMethod.WriteToLog(string.Format("DateTime {0}, Aborting previous subscribe/presence requests having channel(s)={1}; channelgroup(s)={2}", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
+
+                                PubnubWebRequest webRequest = _channelRequest[multiChannelName];
+                                _channelRequest[multiChannelName] = null;
+
+                                if (webRequest != null)
+                                {
+                                    TerminateLocalClientHeartbeatTimer(webRequest.RequestUri);
+                                }
+
+                                PubnubWebRequest removedRequest;
+                                bool removedChannel = _channelRequest.TryRemove(multiChannelName, out removedRequest);
+                                if (removedChannel)
+                                {
+                                    LoggingMethod.WriteToLog(string.Format("DateTime {0}, Success to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelUnSubscribeInit).", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
+                                }
+                                else
+                                {
+                                    LoggingMethod.WriteToLog(string.Format("DateTime {0}, Unable to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelUnSubscribeInit).", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
+                                }
+                                if (webRequest != null)
+                                    TerminatePendingWebRequest(webRequest, errorCallback);
                             }
                             else
                             {
-                                LoggingMethod.WriteToLog(string.Format("DateTime {0}, Unable to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelUnSubscribeInit).", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
+                                LoggingMethod.WriteToLog(string.Format("DateTime {0}, Unable to capture channel(s)={1}; channelgroup(s)={2} from _channelRequest to abort request.", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
                             }
-                            if (webRequest != null)
-                                TerminatePendingWebRequest(webRequest, errorCallback);
-                        }
-                        else
-                        {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0}, Unable to capture channel(s)={1}; channelgroup(s)={2} from _channelRequest to abort request.", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), LoggingMethod.LevelInfo);
-                        }
+                        });
 
-                    });
-					
-                    if (type == ResponseType.Unsubscribe)
-                    {
-                        //just fire leave() event to REST API for safeguard
-                        Uri request = BuildMultiChannelLeaveRequest(validChannels.ToArray(), validChannelGroups.ToArray());
+					if (type == ResponseType.Unsubscribe) {
+						//just fire leave() event to REST API for safeguard
+						Uri request = BuildMultiChannelLeaveRequest (validChannels.ToArray(), validChannelGroups.ToArray());
 
-                        RequestState<T> requestState = new RequestState<T>();
-                        requestState.Channels = new string[] { channel };
+						RequestState<T> requestState = new RequestState<T> ();
+						requestState.Channels = new string[] { channel };
                         requestState.ChannelGroups = new string[] { channelGroup };
-                        requestState.Type = ResponseType.Leave;
-                        requestState.SubscribeOrPresenceOrRegularCallback = null;
+						requestState.Type = ResponseType.Leave;
+						requestState.SubscribeOrPresenceOrRegularCallback = null;
                         requestState.WildcardPresenceCallback = null;
-                        requestState.ErrorCallback = null;
-                        requestState.ConnectCallback = null;
-                        requestState.Reconnect = false;
+						requestState.ErrorCallback = null;
+						requestState.ConnectCallback = null;
+						requestState.Reconnect = false;
 
-                        UrlProcessRequest<T>(request, requestState); // connectCallback = null
-                    }
+						UrlProcessRequest<T> (request, requestState); // connectCallback = null
+					}
 				}
 
                 Dictionary<string, long> originalMultiChannelSubscribe = multiChannelSubscribe.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
@@ -6326,7 +6485,7 @@ namespace PubNubMessaging.Core
 		/// <param name="lastTimetoken"></param>
 		/// <param name="errorCallback"></param>
 		/// <returns></returns>
-        protected List<object> WrapResultBasedOnResponseType<T>(ResponseType type, string jsonString, string[] channels, string[] channelGroups, bool reconnect, long lastTimetoken, PubnubWebRequest request, Action<PubnubClientError> errorCallback)
+		protected List<object> WrapResultBasedOnResponseType<T> (ResponseType type, string jsonString, string[] channels, string[] channelGroups, bool reconnect, long lastTimetoken, PubnubWebRequest request, Action<PubnubClientError> errorCallback)
 		{
 			List<object> result = new List<object> ();
 
@@ -6384,18 +6543,18 @@ namespace PubNubMessaging.Core
                                 }
                             }
 							break;
-						case ResponseType.History:
-							if (this.cipherKey.Length > 0) {
-								List<object> historyDecrypted = new List<object> ();
-								PubnubCrypto aes = new PubnubCrypto (this.cipherKey);
-								foreach (object message in result) {
-									historyDecrypted.Add (aes.Decrypt (message.ToString ()));
-								}
-								History = historyDecrypted;
-							} else {
-								History = result;
-							}
-							break;
+						//case ResponseType.History:
+						//	if (this.cipherKey.Length > 0) {
+						//		List<object> historyDecrypted = new List<object> ();
+						//		PubnubCrypto aes = new PubnubCrypto (this.cipherKey);
+						//		foreach (object message in result) {
+						//			historyDecrypted.Add (aes.Decrypt (message.ToString ()));
+						//		}
+						//		History = historyDecrypted;
+						//	} else {
+						//		History = result;
+						//	}
+						//	break;
 						case ResponseType.DetailedHistory:
 							result = DecodeDecryptLoop (result, channels, channelGroups, errorCallback);
 							result.Add (multiChannel);
@@ -6633,7 +6792,7 @@ namespace PubNubMessaging.Core
 				}
 
 				// Create Request
-				PubnubWebRequestCreator requestCreator = new PubnubWebRequestCreator (_pubnubUnitTest, _pnsdkVersion);
+				PubnubWebRequestCreator requestCreator = new PubnubWebRequestCreator (_pubnubUnitTest);
 				PubnubWebRequest request = (PubnubWebRequest)requestCreator.Create (requestUri);
 
 				request = SetProxy<T> (request);
@@ -6646,7 +6805,8 @@ namespace PubNubMessaging.Core
 				}
 
 
-				if (overrideTcpKeepAlive) {
+                //overrideTcpKeepAlive must be true
+                if (overrideTcpKeepAlive) {
 					TimerWhenOverrideTcpKeepAlive (requestUri, pubnubRequestState);
 				} else {
 					request = SetServicePointSetTcpKeepAlive (request);
@@ -6912,29 +7072,15 @@ namespace PubNubMessaging.Core
 	internal abstract class PubnubWebRequestCreatorBase : IWebRequestCreate
 	{
 		protected IPubnubUnitTest pubnubUnitTest = null;
-        private string pnsdkVersion = "";
 
-        public PubnubWebRequestCreatorBase ()
+		public PubnubWebRequestCreatorBase ()
 		{
 		}
 
-		public PubnubWebRequestCreatorBase (IPubnubUnitTest pubnubUnitTest, string pnSdk)
+		public PubnubWebRequestCreatorBase (IPubnubUnitTest pubnubUnitTest)
 		{
 			this.pubnubUnitTest = pubnubUnitTest;
-            this.pnsdkVersion = pnSdk;
 		}
-
-        protected string Version
-        {
-            get
-            {
-                return pnsdkVersion;
-            }
-            set
-            {
-                pnsdkVersion = value;
-            }
-        }
 
         protected abstract HttpWebRequest SetNoCache(HttpWebRequest req, bool nocache);
 

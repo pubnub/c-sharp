@@ -1,0 +1,96 @@
+﻿{
+  "version": "3.7.6-rc1",
+  "title": "PubNub C# .NET Platform - Web Data Push API",
+  "authors": [ "Pandu Masabathula" ],
+  "packOptions": {
+    "owners": [ "PubNub" ],
+    "licenseUrl": "http://www.pubnub.com/terms",
+    "iconUrl": "http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png",
+    "requireLicenseAcceptance": true,
+    "repository": { "url": "https://github.com/pubnub/c-sharp/" },
+    "releaseNotes": "",
+    "tags": [ "Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing" ],
+    "summary": "PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously"
+  },
+  "description": "PubNub allows you to securely connect mobile phones, tablets, laptops, desktops and other clients outside of your cloud. PubNub provides the connectivity from your cloud to push data to end clients (phones, tablets, laptops and servers). This is called Real-time Data Push, or Push Notifications. PubNub removes the need for your client apps to constantly poll your cloud for new updates. So you can push data from a Server to a Client. And also you may push data from one Server to another Server, just like Azure ServiceBus ESB. Another option is available for a Mobile Phone to Push Data to another Mobile Phone or any endpoint. With PubNub this becomes easy using the two basic Publish/Subscribe APIs. Additionally PubNub provides automatic Broadcasting. When multiple clients/servers/phones are subscribed to a single channel, each endpoint receives a published message simultaneously.",
+  "copyright": "PubNub 2012-2016",
+
+  "dependencies": {
+    "Newtonsoft.Json": "9.0.1-beta1"
+  },
+  "frameworks": {
+    "net3.5": {
+      "dependencies": {
+        "System.Threading.dll": "1.0.2856"
+      }
+    },
+    "net4.0": {
+      "dependencies": {
+      }
+    },
+
+    ".NETPortable,Version=v4.0,Profile=Profile136": {
+      "buildOptions": { "define": [ "PORTABLE136" ] },
+      "frameworkAssemblies": {
+        "mscorlib": "",
+        "System": "",
+        "System.Core": "",
+        "System.Net": ""
+      },
+
+      "dependencies": {
+        "Portable.BouncyCastle-Signed": "1.7.0.2"
+      },
+      "imports": [
+        "MonoAndroid10",
+        "xamarinios10",
+        "MonoTouch10",
+        "monomac"
+      ]
+    },
+
+    "wpa8.1": {
+      "buildOptions": { "define": [ "WP81" ] },
+      "frameworkAssemblies": {
+        "Microsoft.CSharp": "",
+        "System": "",
+        "System.Core": "",
+        "mscorlib": ""
+      },
+      "dependencies": {
+        "System.ComponentModel": "4.0.0",
+        "System.Collections": "4.0.0",
+        "System.Reflection.Primitives": "4.0.0",
+        "System.Reflection.Extensions": "4.0.0",
+        "Microsoft.Net.Http": "2.2.29",
+        "System.Runtime": "4.0.10",
+        "System.Net.Primitives": "4.0.0",
+        "System.Net.Requests": "4.0.0",
+        "Portable.BouncyCastle-Signed": "1.7.0.2",
+        "System.Threading": "4.0.0",
+        "System.Threading.Timer": "4.0.0"
+      }
+    },
+
+    "netstandard1.5": {
+      "buildOptions": { "define": [ "NETSTANDARD" ] },
+      "dependencies": {
+        "NETStandard.Library": "1.5.0-rc2-24027",
+        "System.Net.Requests": "4.0.11-rc2-24027",
+        "System.Reflection.Primitives": "4.0.1-rc2-24027",
+        "System.Reflection.TypeExtensions": "4.1.0-rc2-24027",
+        "System.Security.Cryptography.Algorithms": "4.1.0-rc2-24027",
+        "System.Security.Cryptography.Primitives": "4.0.0-rc2-24027",
+        "System.Threading.ThreadPool": "4.0.10-rc2-24027",
+        "System.Linq.Queryable": "4.0.1-rc2-24027",
+        "System.Text.Encoding": "4.0.11-rc2-24027",
+        "System.Text.Encoding.Extensions": "4.0.11-rc2-24027"
+      },
+      "imports": [
+        "dnxcore50"
+      ]
+    }
+
+  }
+}
+
