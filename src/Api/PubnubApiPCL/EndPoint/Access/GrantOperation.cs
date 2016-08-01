@@ -10,6 +10,7 @@ namespace PubnubApi.EndPoint
     {
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
+        private IPubnubUnitTest unit;
 
         public GrantOperation(PNConfiguration pubnubConfig):base(pubnubConfig)
         {
@@ -26,6 +27,7 @@ namespace PubnubApi.EndPoint
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
+            unit = pubnubUnit;
         }
 
         public void GrantAccess<T>(string[] channels, string[] channelGroups, string[] authKeys, bool read, bool write, bool manage, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)
@@ -67,7 +69,7 @@ namespace PubnubApi.EndPoint
             string channelGroupsCommaDelimited = string.Join(",", channelGroupList.ToArray());
             string authKeysCommaDelimited = string.Join(",", authList.ToArray());
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
             Uri request = urlBuilder.BuildGrantAccessRequest(channelsCommaDelimited, channelGroupsCommaDelimited, authKeysCommaDelimited, read, write, manage, ttl);
 
             RequestState<T> requestState = new RequestState<T>();

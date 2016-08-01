@@ -259,7 +259,12 @@ namespace PubnubApi
         Uri IUrlRequestBuilder.BuildGrantAccessRequest(string channelsCommaDelimited, string channelGroupsCommaDelimited, string authKeysCommaDelimited, bool read, bool write, bool manage, int ttl)
         {
             string signature = "0";
-            long timeStamp = TranslateDateTimeToSeconds(DateTime.UtcNow);
+            //long timeStamp = TranslateDateTimeToSeconds(DateTime.UtcNow);
+
+            long timeStamp = ((pubnubUnitTest == null) || (pubnubUnitTest is IPubnubUnitTest && !pubnubUnitTest.EnableStubTest))
+                ? TranslateDateTimeToSeconds(DateTime.UtcNow)
+                    : TranslateDateTimeToSeconds(new DateTime(2013, 01, 01));
+
             string queryString = "";
             StringBuilder queryStringBuilder = new StringBuilder();
 
