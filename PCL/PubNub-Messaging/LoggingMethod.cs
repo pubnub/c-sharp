@@ -384,7 +384,10 @@ namespace PubNubMessaging.Core
 					ret = PubnubErrorCode.PubnubClientMachineSleep;
 				}
 				break;
-				default:
+                case WebExceptionStatus.Success:
+                    ret = PubnubErrorCode.ConnectFailure;
+                break;
+                default:
 #if NETFX_CORE
                 if (webExceptionStatus.ToString() == "NameResolutionFailure")
                 {
@@ -395,9 +398,16 @@ namespace PubNubMessaging.Core
                     Debug.WriteLine("ATTENTION: webExceptionStatus = " + webExceptionStatus.ToString());
                     ret = PubnubErrorCode.None;
                 }
-#else             
-				Debug.WriteLine("ATTENTION: webExceptionStatus = " + webExceptionStatus.ToString());
-                ret = PubnubErrorCode.None;
+#else
+                if (webExceptionStatus.ToString() == "SecureChannelFailure")
+                {
+                    ret = PubnubErrorCode.ConnectFailure;
+                }
+                else
+                {
+                    Debug.WriteLine("ATTENTION: webExceptionStatus = " + webExceptionStatus.ToString());
+                    ret = PubnubErrorCode.None;
+                }
 #endif
 				break;
 			}
@@ -446,6 +456,10 @@ namespace PubNubMessaging.Core
             else if (errorType == "System.Net.WebException" && errorMessage.Contains("Unable to connect to the remote server"))
             {
                 ret = PubnubErrorCode.NameResolutionFailure;
+            }
+            else if (errorType == "System.Net.WebException" && errorMessage.Contains("Unable to read data from the transport connection"))
+            {
+                ret = PubnubErrorCode.ConnectFailure;
             }
             else
             {
