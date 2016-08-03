@@ -461,7 +461,15 @@ namespace PubNubMessaging.Core
             {
                 ret = PubnubErrorCode.ConnectFailure;
             }
-            else
+			else if (errorType == "System.Net.WebException" && errorMessage.Contains("SecureChannelFailure"))
+			{
+				ret = PubnubErrorCode.ConnectFailure;
+			}
+			else if (errorType == "System.Net.WebException" && errorMessage.Contains("ConnectFailure"))
+			{
+				ret = PubnubErrorCode.ConnectFailure;
+			}
+			else
             {
                 //Console.WriteLine("ATTENTION: Error Type = " + errorType);
                 //Console.WriteLine("ATTENTION: Error Message = " + errorMessage);
