@@ -3,11 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using System.ComponentModel;
 using System.Threading;
-using System.Collections;
-//using Newtonsoft.Json;
-//using Newtonsoft.Json.Linq;
 using PubnubApi;
 
 namespace PubNubMessaging.Tests
@@ -125,18 +121,29 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenChannelLevelWithReadWriteShouldReturnSuccess()
         {
+            string channel = "hello_my_channel";
+
             currentUnitTestCase = "ThenChannelLevelWithReadWriteShouldReturnSuccess";
 
             receivedGrantMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+                CiperKey = "",
+                Secure = false
+            };
 
             IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenChannelLevelWithReadWriteShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
+            unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/grant/sub-key/{2}?signature=d5Pt7JMC5yEcRKTVeVU99JiFaeWTgmH-VLpgw7vv7p4=&channel={3}&pnsdk={4}&r=1&timestamp=1356998400&ttl=5&uuid={5}&w=1", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channel, config.SdkVersion, config.Uuid),
+                    "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"pam\",\"ttl\":5,\"channels\":{\"hello_my_channel\":{\"r\":1,\"w\":1,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}"
+                );
+            pubnub = new Pubnub(config, unitTest);
 
-            string channel = "hello_my_channel";
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
@@ -159,18 +166,29 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenChannelLevelWithReadShouldReturnSuccess()
         {
+            string channel = "hello_my_channel";
+
             currentUnitTestCase = "ThenChannelLevelWithReadShouldReturnSuccess";
 
             receivedGrantMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+                CiperKey = "",
+                Secure = false
+            };
 
             IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenChannelLevelWithReadShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
+            unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/grant/sub-key/{2}?signature=fh2CWqssGhYP0GU4e1-_zKdw9OIZ7cm_-4nQAnefhE4=&channel={3}&pnsdk={4}&r=1&timestamp=1356998400&ttl=5&uuid={5}&w=0", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channel, config.SdkVersion, config.Uuid),
+                    "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"pam\",\"ttl\":5,\"channels\":{\"hello_my_channel\":{\"r\":1,\"w\":0,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}"
+                );
+            pubnub = new Pubnub(config, unitTest);
 
-            string channel = "hello_my_channel";
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
@@ -193,18 +211,29 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenChannelLevelWithWriteShouldReturnSuccess()
         {
+            string channel = "hello_my_channel";
+
             currentUnitTestCase = "ThenChannelLevelWithWriteShouldReturnSuccess";
 
             receivedGrantMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+                CiperKey = "",
+                Secure = false
+            };
 
             IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenChannelLevelWithWriteShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
+            unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/grant/sub-key/{2}?signature=_51ym4mwmZxp4crPwWjF-MFQwSybNFJFsmswrdahVDs=&channel={3}&pnsdk={4}&r=0&timestamp=1356998400&ttl=5&uuid={5}&w=1", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channel, config.SdkVersion, config.Uuid),
+                    "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"pam\",\"ttl\":5,\"channels\":{\"hello_my_channel\":{\"r\":0,\"w\":1,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}"
+                );
+            pubnub = new Pubnub(config, unitTest);
 
-            string channel = "hello_my_channel";
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
@@ -387,16 +416,28 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenMultipleAuthGrantShouldReturnSuccess()
         {
+            string channel = "hello_my_channel";
+
             currentUnitTestCase = "ThenMultipleAuthGrantShouldReturnSuccess";
 
             receivedGrantMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+                CiperKey = "",
+                Secure = false
+            };
 
             IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenMultipleAuthGrantShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
+            unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/grant/sub-key/{2}?signature=d5Pt7JMC5yEcRKTVeVU99JiFaeWTgmH-VLpgw7vv7p4=&channel={3}&pnsdk={4}&r=1&timestamp=1356998400&ttl=5&uuid={5}&w=1", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channel, config.SdkVersion, config.Uuid),
+                    "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"pam\",\"ttl\":5,\"channels\":{\"hello_my_channel\":{\"r\":1,\"w\":1,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}"
+                );
+            pubnub = new Pubnub(config, unitTest);
 
             StringBuilder authKeyBuilder = new StringBuilder();
             for (int index = 0; index < multipleAuthGrantCount; index++)
@@ -410,7 +451,6 @@ namespace PubNubMessaging.Tests
                     authKeyBuilder.AppendFormat("csharp-auth_key-{0},", index);
                 }
             }
-            string channel = "hello_my_channel";
             string auth = "";
             
             if (!unitTest.EnableStubTest)
@@ -605,18 +645,29 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenChannelGroupLevelWithReadManageShouldReturnSuccess()
         {
+            string channelgroup = "hello_my_group";
+
             currentUnitTestCase = "ThenChannelGroupLevelWithReadManageShouldReturnSuccess";
 
             receivedGrantMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+                CiperKey = "",
+                Secure = false
+            };
 
             IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenChannelGroupLevelWithReadManageShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
+            unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/grant/sub-key/{2}?signature=rf_RVAZE2vf4kHhmRFuZw0Di1Z0bEXNwjjXg8AoFXqo=&channel-group={3}&m=1&pnsdk={4}&r=1&timestamp=1356998400&ttl=5&uuid={5}", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channelgroup, config.SdkVersion, config.Uuid),
+                    "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"ttl\":5,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}"
+                );
+            pubnub = new Pubnub(config, unitTest);
 
-            string channelgroup = "hello_my_group";
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
@@ -639,22 +690,33 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenChannelGroupLevelWithReadShouldReturnSuccess()
         {
+            string channelgroup = "hello_my_group";
+
             currentUnitTestCase = "ThenChannelGroupLevelWithReadShouldReturnSuccess";
 
             receivedGrantMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+                CiperKey = "",
+                Secure = false
+            };
 
             IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenChannelGroupLevelWithReadShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
+            unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/grant/sub-key/{2}?signature=lXzuy743zRu4LESs5xt1jZ-myQtp1JriUecgP2n_49g=&channel-group={3}&m=0&pnsdk={4}&r=1&timestamp=1356998400&ttl=5&uuid={5}", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channelgroup, config.SdkVersion, config.Uuid),
+                    "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"ttl\":5,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}"
+                );
+            pubnub = new Pubnub(config, unitTest);
 
-            string channelgroup = "hello_my_group";
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess(null, new string[] { channelgroup }, true, false, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.GrantAccess(null, new string[] { channelgroup }, true, false, false, 5, AccessToChannelLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -719,7 +781,6 @@ namespace PubNubMessaging.Tests
         {
             try
             {
-                
                 if (receivedMessage != null)
                 {
                     int statusCode = receivedMessage.StatusCode;

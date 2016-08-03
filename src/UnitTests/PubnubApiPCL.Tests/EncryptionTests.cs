@@ -1,18 +1,11 @@
 ﻿using System;
 using System.Text;
 using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
-using System.ComponentModel;
-using System.Threading;
-using System.Collections;
 using PubnubApi;
 using System.Text.RegularExpressions;
 using System.Globalization;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
-using System.Xml;
 
 namespace PubNubMessaging.Tests
 {

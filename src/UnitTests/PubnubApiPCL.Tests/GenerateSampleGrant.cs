@@ -32,9 +32,11 @@ namespace PubNubMessaging.Tests
                     PublishKey = PubnubCommon.PublishKey,
                     SubscribeKey = PubnubCommon.SubscribeKey,
                     SecretKey = PubnubCommon.SecretKey,
+                    Uuid = "mytestuuid",
                     CiperKey = "",
                     Secure = false
                 };
+
                 pubnub = new Pubnub(config);
 
                 for (int index = 0; index < sampleCount; index++)
@@ -74,17 +76,18 @@ namespace PubNubMessaging.Tests
                     PublishKey = PubnubCommon.PublishKey,
                     SubscribeKey = PubnubCommon.SubscribeKey,
                     SecretKey = PubnubCommon.SecretKey,
+                    Uuid = "mytestuuid",
                     CiperKey = "",
                     Secure = false
                 };
+
                 pubnub = new Pubnub(config);
 
                 for (int index = 0; index < sampleCount; index++)
                 {
                     grantManualEvent = new ManualResetEvent(false);
                     string channelName = string.Format("csharp-pam-cl-channel-{0}", index);
-                    //pubnub.GrantAccess(new string[] { channelName }, null, new string[] { channelName + "-AuthKey" }, true, true, false, UserCallbackForSampleGrantAtChannelLevel, ErrorCallbackForSampleGrantAtChannelLevel);
-                    pubnub.GrantAccess(new string[] { channelName }, null, new string[] { }, true, true, false, UserCallbackForSampleGrantAtChannelLevel, ErrorCallbackForSampleGrantAtChannelLevel);
+                    pubnub.GrantAccess(new string[] { channelName }, null, null, true, true, false, UserCallbackForSampleGrantAtChannelLevel, ErrorCallbackForSampleGrantAtChannelLevel);
                     grantManualEvent.WaitOne();
                 }
 

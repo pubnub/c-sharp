@@ -35,9 +35,11 @@ namespace PubNubMessaging.Tests
                     PublishKey = PubnubCommon.PublishKey,
                     SubscribeKey = PubnubCommon.SubscribeKey,
                     SecretKey = PubnubCommon.SecretKey,
+                    Uuid = "mytestuuid",
                     CiperKey = "",
                     Secure = false
                 };
+
                 pubnub = new Pubnub(config);
 
                 pubnub.AuditAccess(UserCallbackForCleanUpAccessAtUserLevel, ErrorCallbackForCleanUpAccessAtUserLevel);
@@ -72,10 +74,13 @@ namespace PubNubMessaging.Tests
                     PublishKey = PubnubCommon.PublishKey,
                     SubscribeKey = PubnubCommon.SubscribeKey,
                     SecretKey = PubnubCommon.SecretKey,
+                    Uuid = "mytestuuid",
                     CiperKey = "",
                     Secure = false
                 };
+
                 pubnub = new Pubnub(config);
+
                 pubnub.AuditAccess(UserCallbackForCleanUpAccessAtChannelLevel, ErrorCallbackForCleanUpAccessAtChannelLevel);
                 auditManualEvent.WaitOne();
 

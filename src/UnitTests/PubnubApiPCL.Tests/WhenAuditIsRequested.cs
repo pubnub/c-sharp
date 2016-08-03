@@ -27,15 +27,18 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
                 CiperKey = "",
                 Secure = false
             };
-            pubnub = new Pubnub(config);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAuditIsRequested";
-            unitTest.TestCaseName = "ThenSubKeyLevelShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
+            unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/audit/sub-key/{2}?signature=oAd8oWxgsIx7DEpHu8aa6I874sdjD5U_vI8wxGWhV0E=&pnsdk={3}&timestamp=1356998400&uuid={4}", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, config.SdkVersion, config.Uuid),
+                    "{\"message\":\"Success\",\"payload\":{\"level\":\"subkey\",\"subscribe_key\":\"pam\",\"channels\":{\"csharp-pam-cl-channel-38\":{\"r\":1,\"m\":0,\"w\":1,\"ttl\":453},\"csharp-pam-cl-channel-39\":{\"r\":1,\"m\":0,\"w\":1,\"ttl\":453}}},\"service\":\"Access Manager\",\"status\":200}"
+                );
+            pubnub = new Pubnub(config, unitTest);
+
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
@@ -59,6 +62,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenChannelLevelShouldReturnSuccess()
         {
+            string channel = "hello_my_channel";
+
             currentUnitTestCase = "ThenChannelLevelShouldReturnSuccess";
 
             receivedAuditMessage = false;
@@ -68,17 +73,17 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
                 CiperKey = "",
                 Secure = false
             };
-            pubnub = new Pubnub(config);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAuditIsRequested";
-            unitTest.TestCaseName = "ThenChannelLevelShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-
-            string channel = "hello_my_channel";
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
+            unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/audit/sub-key/{2}?signature=H1FkVTgGZap7-jqXnJQ77PLLIx86RD0Pk3HzDgOFvoA=&channel={3}&pnsdk={4}&timestamp=1356998400&uuid={5}", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channel, config.SdkVersion, config.Uuid),
+                    "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"pam\",\"channels\":{}},\"service\":\"Access Manager\",\"status\":200}"
+                );
+            pubnub = new Pubnub(config, unitTest);
 
             if (PubnubCommon.PAMEnabled)
             {
@@ -102,6 +107,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenChannelGroupLevelShouldReturnSuccess()
         {
+            string channelgroup = "hello_my_group";
+
             currentUnitTestCase = "ThenChannelGroupLevelShouldReturnSuccess";
 
             receivedAuditMessage = false;
@@ -111,17 +118,17 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
                 CiperKey = "",
                 Secure = false
             };
-            pubnub = new Pubnub(config);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAuditIsRequested";
-            unitTest.TestCaseName = "ThenChannelGroupLevelShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-
-            string channelgroup = "hello_my_group";
+            IPubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
+            unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/audit/sub-key/{2}?signature=bqQC8-ovOMVy1OrBKtvVipUOuDJUa35rj_HSm6VZ6pw=&channel-group={3}&pnsdk={4}&timestamp=1356998400&uuid={5}", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channelgroup, System.Net.WebUtility.HtmlEncode(config.SdkVersion), config.Uuid),
+                    "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"channel-groups\":{}},\"service\":\"Access Manager\",\"status\":200}"
+                );
+            pubnub = new Pubnub(config, unitTest);
 
             if (PubnubCommon.PAMEnabled)
             {
