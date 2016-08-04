@@ -378,6 +378,9 @@ namespace PubNubMessaging.Core
 				case WebExceptionStatus.ConnectFailure:
                     ret = PubnubErrorCode.ConnectFailure;
 				break;
+				case WebExceptionStatus.SendFailure:
+					ret = PubnubErrorCode.ConnectFailure;
+					break;
 				case WebExceptionStatus.Pending:
 				if (webExceptionMessage == "Machine suspend mode enabled. No request will be processed.")
 				{
