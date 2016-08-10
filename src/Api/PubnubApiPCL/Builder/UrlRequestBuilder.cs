@@ -80,6 +80,35 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, ResponseType.Subscribe);
         }
 
+        Uri IUrlRequestBuilder.BuildMultiChannelLeaveRequest(string[] channels, string[] channelGroups, string uuid, string jsonUserState)
+        {
+            StringBuilder unsubscribeParamBuilder = new StringBuilder();
+            subscribeParameters = "";
+            //string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
+            string channelsJsonState = jsonUserState;
+            if (channelsJsonState != "{}" && channelsJsonState != "")
+            {
+                unsubscribeParamBuilder.AppendFormat("&state={0}", EncodeUricomponent(channelsJsonState, ResponseType.Leave, false, false));
+            }
+            if (channelGroups != null && channelGroups.Length > 0)
+            {
+                unsubscribeParamBuilder.AppendFormat("&channel-group={0}", string.Join(",", channelGroups));
+            }
+            subscribeParameters = unsubscribeParamBuilder.ToString();
+
+            string multiChannel = (channels != null && channels.Length > 0) ? string.Join(",", channels) : ",";
+            List<string> url = new List<string>();
+
+            url.Add("v2");
+            url.Add("presence");
+            url.Add("sub_key");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("channel");
+            url.Add(multiChannel);
+            url.Add("leave");
+
+            return BuildRestApiRequest<Uri>(url, ResponseType.Leave, uuid);
+        }
 
         Uri IUrlRequestBuilder.BuildPublishRequest(string channel, object originalMessage, bool storeInHistory, string jsonUserMetaData)
         {

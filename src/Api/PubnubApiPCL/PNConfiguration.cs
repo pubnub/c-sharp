@@ -70,7 +70,9 @@ namespace PubnubApi
             }
         }
 
-        public LoggingMethod.Level LogVerbosity { get; set; }
+        //public LoggingMethod.Level LogVerbosity { get; set; }
+
+        public IPubnubLog PubnubLog { get; set; }
 
         public PubnubErrorFilter.Level ErrorLevel { get; set; }
 
@@ -99,7 +101,7 @@ namespace PubnubApi
             this.NonSubscribeRequestTimeout = 10;
             this.SubscribeTimeout = 310;
             this.ConnectTimeout = 5;
-            this.LogVerbosity = LoggingMethod.Level.Off;
+            //this.LogVerbosity = LoggingMethod.Level.Off;
             this.Secure = true;
         }
 

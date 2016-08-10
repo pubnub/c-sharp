@@ -70,8 +70,8 @@ namespace PubnubApi.EndPoint
             string json = UrlProcessRequest<RemoveChannelFromChannelGroupAck>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = base.ProcessJsonResponse<RemoveChannelFromChannelGroupAck>(requestState, json);
-                base.ProcessResponseCallbacks(result, requestState);
+                List<object> result = ProcessJsonResponse<RemoveChannelFromChannelGroupAck>(requestState, json);
+                ProcessResponseCallbacks(result, requestState);
             }
         }
 

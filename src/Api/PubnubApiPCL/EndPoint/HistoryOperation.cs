@@ -57,9 +57,24 @@ namespace PubnubApi.EndPoint
             string json = UrlProcessRequest< DetailedHistoryAck>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = base.ProcessJsonResponse<DetailedHistoryAck>(requestState, json);
-                base.ProcessResponseCallbacks(result, requestState);
+                List<object> result = ProcessJsonResponse<DetailedHistoryAck>(requestState, json);
+                ProcessResponseCallbacks(result, requestState);
             }
+            else
+            {
+                HistoryExceptionHandler(channel, errorCallback);
+            }
+        }
+
+        private void HistoryExceptionHandler(string channelName, Action<PubnubClientError> errorCallback)
+        {
+            string message = "Operation Timeout or Network connnect error";
+
+            LoggingMethod.WriteToLog(string.Format("DateTime {0}, HistoryExceptionHandler response={1}", DateTime.Now.ToString(), message), LoggingMethod.LevelInfo);
+
+            new PNCallbackService(config, jsonLibrary).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
+                channelName, "", errorCallback, message,
+                PubnubErrorCode.DetailedHistoryOperationTimeout, null, null);
         }
 
     }

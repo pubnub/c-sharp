@@ -56,8 +56,8 @@ namespace PubnubApi.EndPoint
             string json = UrlProcessRequest<GetChannelGroupChannelsAck>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = base.ProcessJsonResponse<GetChannelGroupChannelsAck>(requestState, json);
-                base.ProcessResponseCallbacks(result, requestState);
+                List<object> result = ProcessJsonResponse<GetChannelGroupChannelsAck>(requestState, json);
+                ProcessResponseCallbacks(result, requestState);
             }
         }
 
@@ -96,8 +96,8 @@ namespace PubnubApi.EndPoint
             string json = UrlProcessRequest<T>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = base.ProcessJsonResponse<T>(requestState, json);
-                base.ProcessResponseCallbacks(result, requestState);
+                List<object> result = ProcessJsonResponse<T>(requestState, json);
+                ProcessResponseCallbacks(result, requestState);
             }
         }
     }

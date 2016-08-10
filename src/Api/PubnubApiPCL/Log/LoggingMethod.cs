@@ -80,7 +80,7 @@ namespace PubnubApi
 		{
 			if (writeToLog)
             {
-				System.Diagnostics.Debug.WriteLine(logText);
+				//System.Diagnostics.Debug.WriteLine(logText);
 				try
 				{
 					if (_pubnubLog != null)

@@ -51,6 +51,7 @@
     <Compile Include="EndPoint\Presence\WhereNowOperation.cs" />
     <Compile Include="EndPoint\PubSub\PublishOperation.cs" />
     <Compile Include="EndPoint\PubSub\SubscribeOperation.cs" />
+    <Compile Include="EndPoint\OtherOperation.cs" />
     <Compile Include="EndPoint\TimeOperation.cs" />
     <Compile Include="Enum\PNHeartbeatNotificationOption.cs" />
     <Compile Include="Interface\IPubnubHttp.cs" />

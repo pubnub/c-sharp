@@ -295,16 +295,16 @@ namespace PubnubApi.EndPoint
             {
                 string currentChannel = channelList[channelIndex];
 
-                base.ChannelUserState.AddOrUpdate(currentChannel.Trim(), deserializeChannelUserState, (oldState, newState) => deserializeChannelUserState);
-                base.ChannelLocalUserState.AddOrUpdate(currentChannel.Trim(), deserializeChannelUserState, (oldState, newState) => deserializeChannelUserState);
+                ChannelUserState.AddOrUpdate(currentChannel.Trim(), deserializeChannelUserState, (oldState, newState) => deserializeChannelUserState);
+                ChannelLocalUserState.AddOrUpdate(currentChannel.Trim(), deserializeChannelUserState, (oldState, newState) => deserializeChannelUserState);
             }
 
             for (int channelGroupIndex=0; channelGroupIndex < channelGroupList.Count; channelGroupIndex++)
             {
                 string currentChannelGroup = channelGroupList[channelGroupIndex];
 
-                base.ChannelGroupUserState.AddOrUpdate(currentChannelGroup.Trim(), deserializeChannelGroupUserState, (oldState, newState) => deserializeChannelGroupUserState);
-                base.ChannelGroupLocalUserState.AddOrUpdate(currentChannelGroup.Trim(), deserializeChannelGroupUserState, (oldState, newState) => deserializeChannelGroupUserState);
+                ChannelGroupUserState.AddOrUpdate(currentChannelGroup.Trim(), deserializeChannelGroupUserState, (oldState, newState) => deserializeChannelGroupUserState);
+                ChannelGroupLocalUserState.AddOrUpdate(currentChannelGroup.Trim(), deserializeChannelGroupUserState, (oldState, newState) => deserializeChannelGroupUserState);
             }
 
             string jsonUserState = "{}";
@@ -369,8 +369,8 @@ namespace PubnubApi.EndPoint
             string json = UrlProcessRequest<SetUserStateAck>(request, requestState, true);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = base.ProcessJsonResponse<SetUserStateAck>(requestState, json);
-                base.ProcessResponseCallbacks(result, requestState);
+                List<object> result = ProcessJsonResponse<SetUserStateAck>(requestState, json);
+                ProcessResponseCallbacks(result, requestState);
             }
         }
 
@@ -383,9 +383,9 @@ namespace PubnubApi.EndPoint
 
             if (!string.IsNullOrEmpty(channel) && channel.Trim().Length > 0)
             {
-                if (base.ChannelLocalUserState.ContainsKey(channel))
+                if (ChannelLocalUserState.ContainsKey(channel))
                 {
-                    channelUserStateDictionary = base.ChannelLocalUserState[channel];
+                    channelUserStateDictionary = ChannelLocalUserState[channel];
                     if (channelUserStateDictionary != null)
                     {
                         if (channelUserStateDictionary.ContainsKey(userStateKey))
@@ -413,7 +413,7 @@ namespace PubnubApi.EndPoint
                         channelUserStateDictionary.Add(userStateKey, userStateValue);
                     }
 
-                    base.ChannelLocalUserState.AddOrUpdate(channel, channelUserStateDictionary, (oldData, newData) => channelUserStateDictionary);
+                    ChannelLocalUserState.AddOrUpdate(channel, channelUserStateDictionary, (oldData, newData) => channelUserStateDictionary);
                 }
                 else
                 {
@@ -422,16 +422,16 @@ namespace PubnubApi.EndPoint
                         channelUserStateDictionary = new Dictionary<string, object>();
                         channelUserStateDictionary.Add(userStateKey, userStateValue);
 
-                        base.ChannelLocalUserState.AddOrUpdate(channel, channelUserStateDictionary, (oldData, newData) => channelUserStateDictionary);
+                        ChannelLocalUserState.AddOrUpdate(channel, channelUserStateDictionary, (oldData, newData) => channelUserStateDictionary);
                     }
                 }
             }
             //
             if (!string.IsNullOrEmpty(channelGroup) && channelGroup.Trim().Length > 0)
             {
-                if (base.ChannelGroupLocalUserState.ContainsKey(channelGroup))
+                if (ChannelGroupLocalUserState.ContainsKey(channelGroup))
                 {
-                    channelGroupUserStateDictionary = base.ChannelGroupLocalUserState[channelGroup];
+                    channelGroupUserStateDictionary = ChannelGroupLocalUserState[channelGroup];
                     if (channelGroupUserStateDictionary != null)
                     {
                         if (channelGroupUserStateDictionary.ContainsKey(userStateKey))
@@ -459,7 +459,7 @@ namespace PubnubApi.EndPoint
                         channelGroupUserStateDictionary.Add(userStateKey, userStateValue);
                     }
 
-                    base.ChannelGroupLocalUserState.AddOrUpdate(channelGroup, channelGroupUserStateDictionary, (oldData, newData) => channelGroupUserStateDictionary);
+                    ChannelGroupLocalUserState.AddOrUpdate(channelGroup, channelGroupUserStateDictionary, (oldData, newData) => channelGroupUserStateDictionary);
                 }
                 else
                 {
@@ -468,13 +468,13 @@ namespace PubnubApi.EndPoint
                         channelGroupUserStateDictionary = new Dictionary<string, object>();
                         channelGroupUserStateDictionary.Add(userStateKey, userStateValue);
 
-                        base.ChannelGroupLocalUserState.AddOrUpdate(channelGroup, channelGroupUserStateDictionary, (oldData, newData) => channelGroupUserStateDictionary);
+                        ChannelGroupLocalUserState.AddOrUpdate(channelGroup, channelGroupUserStateDictionary, (oldData, newData) => channelGroupUserStateDictionary);
                     }
                 }
             }
 
-            string jsonChannelUserState = base.BuildJsonUserState(channel, "", true);
-            string jsonChannelGroupUserState = base.BuildJsonUserState("", channelGroup, true);
+            string jsonChannelUserState = BuildJsonUserState(channel, "", true);
+            string jsonChannelGroupUserState = BuildJsonUserState("", channelGroup, true);
             if (jsonChannelUserState != "" && jsonChannelGroupUserState != "")
             {
                 retJsonUserState = string.Format("{{\"{0}\":{{{1}}},\"{2}\":{{{3}}}}}", channel, jsonChannelUserState, channelGroup, jsonChannelGroupUserState);
@@ -490,31 +490,31 @@ namespace PubnubApi.EndPoint
             return retJsonUserState;
         }
 
-        private bool DeleteLocalChannelUserState(string channel)
-        {
-            bool userStateDeleted = false;
+        //private bool DeleteLocalChannelUserState(string channel)
+        //{
+        //    bool userStateDeleted = false;
 
-            if (base.ChannelLocalUserState.ContainsKey(channel))
-            {
-                Dictionary<string, object> returnedUserState = null;
-                userStateDeleted = base.ChannelLocalUserState.TryRemove(channel, out returnedUserState);
-            }
+        //    if (ChannelLocalUserState.ContainsKey(channel))
+        //    {
+        //        Dictionary<string, object> returnedUserState = null;
+        //        userStateDeleted = ChannelLocalUserState.TryRemove(channel, out returnedUserState);
+        //    }
 
-            return userStateDeleted;
-        }
+        //    return userStateDeleted;
+        //}
 
-        private bool DeleteLocalChannelGroupUserState(string channelGroup)
-        {
-            bool userStateDeleted = false;
+        //private bool DeleteLocalChannelGroupUserState(string channelGroup)
+        //{
+        //    bool userStateDeleted = false;
 
-            if (base.ChannelGroupLocalUserState.ContainsKey(channelGroup))
-            {
-                Dictionary<string, object> returnedUserState = null;
-                userStateDeleted = base.ChannelGroupLocalUserState.TryRemove(channelGroup, out returnedUserState);
-            }
+        //    if (base.ChannelGroupLocalUserState.ContainsKey(channelGroup))
+        //    {
+        //        Dictionary<string, object> returnedUserState = null;
+        //        userStateDeleted = base.ChannelGroupLocalUserState.TryRemove(channelGroup, out returnedUserState);
+        //    }
 
-            return userStateDeleted;
-        }
+        //    return userStateDeleted;
+        //}
 
         //private string BuildJsonUserState(string channel, string channelGroup, bool local)
         //{
@@ -652,8 +652,8 @@ namespace PubnubApi.EndPoint
             string retJsonUserState = "";
             StringBuilder jsonStateBuilder = new StringBuilder();
 
-            string channelJsonUserState = base.BuildJsonUserState(channel, "", false);
-            string channelGroupJsonUserState = base.BuildJsonUserState("", channelGroup, false);
+            string channelJsonUserState = BuildJsonUserState(channel, "", false);
+            string channelGroupJsonUserState = BuildJsonUserState("", channelGroup, false);
 
             if (channelJsonUserState.Trim().Length > 0 && channelGroupJsonUserState.Trim().Length <= 0)
             {

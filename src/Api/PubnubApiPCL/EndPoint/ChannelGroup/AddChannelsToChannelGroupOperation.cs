@@ -69,8 +69,8 @@ namespace PubnubApi.EndPoint
             string json = UrlProcessRequest<AddChannelToChannelGroupAck>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = base.ProcessJsonResponse<AddChannelToChannelGroupAck>(requestState, json);
-                base.ProcessResponseCallbacks(result, requestState);
+                List<object> result = ProcessJsonResponse<AddChannelToChannelGroupAck>(requestState, json);
+                ProcessResponseCallbacks(result, requestState);
             }
         }
     }

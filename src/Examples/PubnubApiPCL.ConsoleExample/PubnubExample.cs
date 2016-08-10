@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Runtime.Serialization;
 using System.Globalization;
+using System.Diagnostics;
 
 namespace PubnubApi
 {
@@ -30,6 +31,17 @@ namespace PubnubApi
         {
             private LoggingMethod.Level _logLevel = LoggingMethod.Level.Info;
             //LoggingMethod.Level.Info => To  capture verbose info
+            private string logFilePath = "";
+
+            public PlatformPubnubLog()
+            {
+                // Get folder path may vary based on environment
+                string folder = System.IO.Directory.GetCurrentDirectory(); //For console
+                //string folder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments); // For iOS
+                System.Diagnostics.Debug.WriteLine(folder);
+                logFilePath = System.IO.Path.Combine(folder, "pubnubmessaging.log");
+                Trace.Listeners.Add(new TextWriterTraceListener(logFilePath));
+            }
 
             public LoggingMethod.Level LogLevel
             {
@@ -45,17 +57,8 @@ namespace PubnubApi
 
             public void WriteToLog(string log)
             {
-                // This method implementation varies baed on the target environment and platform
-                string folder = System.IO.Directory.GetCurrentDirectory(); //For console
-                //string folder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments); // For iOS
-                System.Diagnostics.Debug.WriteLine(folder);
-                string path = System.IO.Path.Combine(folder, "pubnubmessaging.log");
-                using (System.IO.TextWriter writer = new System.IO.StreamWriter(path, true))
-                {
-                    writer.WriteLine(log);
-                    writer.Flush();
-                    writer.Close();
-                }
+                Trace.WriteLine(log);
+                Trace.Flush();
             }
         }
 
@@ -263,13 +266,16 @@ namespace PubnubApi
             Console.ForegroundColor = ConsoleColor.Blue;
             if (enableLoggingString.Trim().ToLower() == "n")
             {
-                config.LogVerbosity = LoggingMethod.Level.Off;
+                config.PubnubLog = null;
+                //config.LogVerbosity = LoggingMethod.Level.Off;
                 Console.WriteLine("Disabled internal logging");
             }
             else
             {
-                config.LogVerbosity = LoggingMethod.Level.Info;
+                //config.LogVerbosity = LoggingMethod.Level.Info;
+                config.PubnubLog = new PlatformPubnubLog();
                 Console.WriteLine("Enabled internal logging");
+
             }
             Console.ResetColor();
             Console.WriteLine();
