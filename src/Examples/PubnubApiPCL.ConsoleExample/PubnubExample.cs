@@ -1487,7 +1487,7 @@ namespace PubnubApi
                         toast.text1 = text1;
                         Dictionary<string, object> dicToast = new Dictionary<string, object>();
                         dicToast.Add("pn_mpns", toast);
-                        pubnub.EnableDebugForPushPublish = true;
+                        config.EnableDebugForPushPublish = true;
 
                         Console.WriteLine("Running Publish for Toast");
                         pubnub.Publish(toastChannel, dicToast, DisplayPublishReturnMessage, DisplayErrorMessage);
@@ -1542,7 +1542,7 @@ namespace PubnubApi
                         Console.WriteLine(string.Format("Small Background Image = {0}", imageBackBackground));
                         Console.ResetColor();
 
-                        pubnub.PushRemoteImageDomainUri.Add(new Uri("http://cdn.flaticon.com"));
+                        config.PushRemoteImageDomainUri.Add(new Uri("http://cdn.flaticon.com"));
 
                         MpnsFlipTileNotification flipTile = new MpnsFlipTileNotification();
                         flipTile.title = flipFrontTitle;
@@ -1554,7 +1554,7 @@ namespace PubnubApi
                         Dictionary<string, object> dicFlipTile = new Dictionary<string, object>();
                         dicFlipTile.Add("pn_mpns", flipTile);
 
-                        pubnub.EnableDebugForPushPublish = true;
+                        config.EnableDebugForPushPublish = true;
                         pubnub.Publish(flipTileChannel, dicFlipTile, DisplayPublishReturnMessage, DisplayErrorMessage);
                         break;
                     case "36":
@@ -1597,7 +1597,7 @@ namespace PubnubApi
                         Dictionary<string, object> dicCycleTile = new Dictionary<string, object>();
                         dicCycleTile.Add("pn_mpns", cycleTile);
 
-                        pubnub.EnableDebugForPushPublish = true;
+                        config.EnableDebugForPushPublish = true;
                         pubnub.Publish(cycleTileChannel, dicCycleTile, DisplayPublishReturnMessage, DisplayErrorMessage);
                         break;
                     case "37":
@@ -1639,7 +1639,7 @@ namespace PubnubApi
                         Dictionary<string, object> dicIconicTile = new Dictionary<string, object>();
                         dicIconicTile.Add("pn_mpns", iconicTile);
 
-                        pubnub.EnableDebugForPushPublish = true;
+                        config.EnableDebugForPushPublish = true;
                         pubnub.Publish(iconicTileChannel, dicIconicTile, DisplayPublishReturnMessage, DisplayErrorMessage);
                         break;
                     case "38":

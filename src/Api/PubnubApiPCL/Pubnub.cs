@@ -11,7 +11,7 @@ namespace PubnubApi
         private IJsonPluggableLibrary jsonPluggableLibrary = null;
         private IPubnubUnitTest pubnubUnitTest = null;
 
-        PubnubWin pubnub;
+        //PubnubWin pubnub;
 
 		#region "PubNub API Channel Methods"
 
@@ -264,26 +264,26 @@ namespace PubnubApi
 
 		public void RegisterDeviceForPush<T>(string channel, PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.RegisterDeviceForPush<T>(channel, pushType, pushToken, userCallback, errorCallback);
+            EndPoint.PushOperation endPoint = new EndPoint.PushOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endPoint.RegisterDevice<T>(channel, pushType, pushToken, userCallback, errorCallback);
 		}
 
 		public void UnregisterDeviceForPush<T>(PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.UnregisterDeviceForPush<T>(pushType, pushToken, userCallback, errorCallback);
+            EndPoint.PushOperation endPoint = new EndPoint.PushOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endPoint.UnregisterDevice<T>(pushType, pushToken, userCallback, errorCallback);
 		}
 
 		public void RemoveChannelForDevicePush<T>(string channel, PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.RemoveChannelForDevicePush<T>(channel, pushType, pushToken, userCallback, errorCallback);
-		}
-		public void RemoveChannelForDevicePush(string channel, PushTypeService pushType, string pushToken, Action<object> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			pubnub.RemoveChannelForDevicePush<object>(channel, pushType, pushToken, userCallback, errorCallback);
+            EndPoint.PushOperation endPoint = new EndPoint.PushOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endPoint.RemoveChannelForDevice<T>(channel, pushType, pushToken, userCallback, errorCallback);
 		}
 
 		public void GetChannelsForDevicePush<T>(PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.GetChannelsForDevicePush<T>(pushType, pushToken, userCallback, errorCallback);
+            EndPoint.PushOperation endPoint = new EndPoint.PushOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endPoint.GetChannelsForDevice<T>(pushType, pushToken, userCallback, errorCallback);
 		}
 		#endregion
 
@@ -314,12 +314,14 @@ namespace PubnubApi
 
 		public void RemoveChannelGroup(string nameSpace, string groupName, Action<RemoveChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.RemoveChannelGroup(nameSpace, groupName, userCallback, errorCallback);
+            //TO BE CONVERTED
+			//pubnub.RemoveChannelGroup(nameSpace, groupName, userCallback, errorCallback);
 		}
 
 		public void RemoveChannelGroupNameSpace(string nameSpace, Action<RemoveNamespaceAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.RemoveChannelGroupNameSpace(nameSpace, userCallback, errorCallback);
+            //TO BE CONVERTED
+            //pubnub.RemoveChannelGroupNameSpace(nameSpace, userCallback, errorCallback);
 		}
 
 		public void GetChannelsForChannelGroup(string nameSpace, string groupName, Action<GetChannelGroupChannelsAck> userCallback, Action<PubnubClientError> errorCallback)
@@ -336,10 +338,11 @@ namespace PubnubApi
 
 		public void GetAllChannelGroups(string nameSpace, Action<GetAllChannelGroupsAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.GetAllChannelGroups(nameSpace, userCallback, errorCallback);
-		}
+            //TO BE CONVERTED
+            //pubnub.GetAllChannelGroups(nameSpace, userCallback, errorCallback);
+        }
 
-		public void GetAllChannelGroups(Action<GetAllChannelGroupsAck> userCallback, Action<PubnubClientError> errorCallback)
+        public void GetAllChannelGroups(Action<GetAllChannelGroupsAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
             EndPoint.GetAllChannelGroupOperation endPoint = new EndPoint.GetAllChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
             endPoint.GetAllChannelGroup(userCallback, errorCallback);
@@ -347,13 +350,14 @@ namespace PubnubApi
 
 		public void GetAllChannelGroupNamespaces(Action<GetAllNamespacesAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.GetAllChannelGroupNamespaces(userCallback, errorCallback);
-		}
+            //TO BE CONVERTED
+            //pubnub.GetAllChannelGroupNamespaces(userCallback, errorCallback);
+        }
 
-		#endregion
+        #endregion
 
-		#region "PubNub API Other Methods"
-		public void TerminateCurrentSubscriberRequest()
+        #region "PubNub API Other Methods"
+        public void TerminateCurrentSubscriberRequest()
 		{
             EndPoint.OtherOperation.TerminateCurrentSubscriberRequest();
 		}
@@ -391,7 +395,8 @@ namespace PubnubApi
 
 		public void ChangeUUID(string newUUID)
 		{
-			pubnub.ChangeUUID(newUUID);
+            EndPoint.OtherOperation endPoint = new EndPoint.OtherOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endPoint.ChangeUUID(newUUID);
 		}
 
 		public static long TranslateDateTimeToPubnubUnixNanoSeconds(DateTime dotNetUTCDateTime)
@@ -409,10 +414,10 @@ namespace PubnubApi
 			return EndPoint.OtherOperation.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
 		}
 
-        public void SetErrorFilterLevel(PubnubErrorFilter.Level errorLevel)
-        {
-            pubnub.PubnubErrorLevel = errorLevel;
-        }  
+        //public void SetErrorFilterLevel(PubnubErrorFilter.Level errorLevel)
+        //{
+        //    pubnub.PubnubErrorLevel = errorLevel;
+        //}  
 
 		#endregion
 
@@ -440,27 +445,29 @@ namespace PubnubApi
             }
         }
 
+        //TO BE REMOVED
         public bool EnableJsonEncodingForPublish
-		{
-			get
-			{
-				return pubnub.EnableJsonEncodingForPublish;
-			}
-			set
-			{
-				pubnub.EnableJsonEncodingForPublish = value;
-			}
-		}
-
-        public PubnubProxy Proxy
         {
             get
             {
-                return pubnub.Proxy;
+                throw new Exception("No support");
             }
             set
             {
-                pubnub.Proxy = value;
+                throw new Exception("No support");
+            }
+        }
+
+        //TO BE REMOVED
+        public bool EnableDebugForPushPublish
+        {
+            get
+            {
+                throw new Exception("No support");
+            }
+            set
+            {
+                throw new Exception("No support");
             }
         }
 
@@ -480,55 +487,6 @@ namespace PubnubApi
 			}
 		}
 
-		public bool EnableDebugForPushPublish
-		{
-			get
-			{
-				return pubnub.EnableDebugForPushPublish;
-			}
-			set
-			{
-				pubnub.EnableDebugForPushPublish = value;
-			}
-		}
-
-		public Collection<Uri> PushRemoteImageDomainUri
-		{
-			get
-			{
-				return pubnub.PushRemoteImageDomainUri;
-			}
-
-			set
-			{
-				pubnub.PushRemoteImageDomainUri = value;
-			}
-		}
-
-		public string PushServiceName
-		{
-			get
-			{
-				return pubnub.PushServiceName;
-			}
-
-			set
-			{
-				pubnub.PushServiceName = value;
-			}
-		}
-
-        public bool AddPayloadToPublishResponse
-        {
-            get
-            {
-                return pubnub.AddPayloadToPublishResponse;
-            }
-            set
-            {
-                pubnub.AddPayloadToPublishResponse = value;
-            }
-        }
         #endregion
 
         #region "Constructors"
@@ -556,20 +514,23 @@ namespace PubnubApi
             this.pubnubUnitTest = pubnubUnitTest;
         }
 
+        //TO BE REMOVED
         public Pubnub(string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
 		{
-			pubnub = new PubnubWin (publishKey, subscribeKey, secretKey, cipherKey, sslOn);
-		}
+            throw new Exception("No support");
+        }
 
-		public Pubnub(string publishKey, string subscribeKey, string secretKey)
+        //TO BE REMOVED
+        public Pubnub(string publishKey, string subscribeKey, string secretKey)
 		{
-			pubnub = new PubnubWin (publishKey, subscribeKey, secretKey);
-		}
+            throw new Exception("No support");
+        }
 
-		public Pubnub(string publishKey, string subscribeKey)
+        //TO BE REMOVED
+        public Pubnub(string publishKey, string subscribeKey)
 		{
-			pubnub = new PubnubWin (publishKey, subscribeKey);
-		}
+            throw new Exception("No support");
+        }
 		#endregion
 	}
 }

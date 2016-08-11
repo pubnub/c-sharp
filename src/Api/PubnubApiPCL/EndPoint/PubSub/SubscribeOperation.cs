@@ -840,6 +840,7 @@ namespace PubnubApi.EndPoint
                 LoggingMethod.WriteToLog(string.Format("DateTime {0}, Building request for channel(s)={1}, channelgroup(s)={2} with timetoken={3}", DateTime.Now.ToString(), multiChannel, multiChannelGroup, lastTimetoken), LoggingMethod.LevelInfo);
                 // Build URL
                 string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
+                config.Uuid = Uuid; // to make sure we capture if UUID is changed
                 IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
                 Uri request = urlBuilder.BuildMultiChannelSubscribeRequest(channels, channelGroups, (Convert.ToInt64(timetoken.ToString()) == 0) ? Convert.ToInt64(timetoken.ToString()) : lastTimetoken, channelsJsonState);
 

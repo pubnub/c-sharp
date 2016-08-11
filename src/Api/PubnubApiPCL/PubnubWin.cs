@@ -60,11 +60,11 @@ namespace PubnubApi
 				{
 					throw new ArgumentException("Missing Proxy Details");
 				}
-				if (string.IsNullOrEmpty(_pubnubProxy.ProxyServer) || (_pubnubProxy.ProxyPort <= 0) || string.IsNullOrEmpty(_pubnubProxy.ProxyUserName) || string.IsNullOrEmpty(_pubnubProxy.ProxyPassword))
-				{
-					_pubnubProxy = null;
-					throw new MissingMemberException("Insufficient Proxy Details");
-				}
+				//if (string.IsNullOrEmpty(_pubnubProxy.ProxyServer) || (_pubnubProxy.ProxyPort <= 0) || string.IsNullOrEmpty(_pubnubProxy.ProxyUserName) || string.IsNullOrEmpty(_pubnubProxy.ProxyPassword))
+				//{
+				//	_pubnubProxy = null;
+				//	throw new MissingMemberException("Insufficient Proxy Details");
+				//}
                 #else
                 throw new NotSupportedException("Proxy is not supported");
                 #endif

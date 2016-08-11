@@ -28,7 +28,6 @@ namespace PubnubApi
     internal abstract class PubnubCoreBase
     {
         #region "Class variables"
-
         private static bool _enableResumeOnReconnect = true;
         protected static bool overrideTcpKeepAlive = true;
         private LoggingMethod.Level _pubnubLogLevel = LoggingMethod.Level.Off;
@@ -41,8 +40,6 @@ namespace PubnubApi
         protected System.Threading.Timer presenceHeartbeatTimer = null;
         protected static bool pubnetSystemActive = true;
         protected Collection<Uri> pushRemoteImageDomainUri = new Collection<Uri>();
-
-        // Pubnub Core API implementation
         #endregion
 
         private static IPubnubHttp pubnubHttp = null;
@@ -55,6 +52,12 @@ namespace PubnubApi
         private static int pubnubNetworkCheckRetries = 50;
 
         protected static bool UuidChanged
+        {
+            get;
+            set;
+        }
+
+        protected static string Uuid
         {
             get;
             set;
@@ -550,8 +553,7 @@ namespace PubnubApi
                                 }
                                 else
                                 {
-                                    //decrypt the subscriber message if cipherkey is available
-                                    if (pubnubConfig.CiperKey.Length > 0)
+                                    if (pubnubConfig.CiperKey.Length > 0) //decrypt the subscriber message if cipherkey is available
                                     {
                                         PubnubCrypto aes = new PubnubCrypto(pubnubConfig.CiperKey);
                                         string decryptMessage = aes.Decrypt(messageList[messageIndex].ToString());
@@ -835,13 +837,11 @@ namespace PubnubApi
 
         public static void EnableMachineSleepModeForTestingOnly()
         {
-            //GeneratePowerSuspendEvent();
             pubnetSystemActive = false;
         }
 
         public static void DisableMachineSleepModeForTestingOnly()
         {
-            //GeneratePowerResumeEvent();
             pubnetSystemActive = true;
         }
 
@@ -933,7 +933,7 @@ namespace PubnubApi
             return channels;
         }
 
-        private string[] GetCurrentSubscriberChannelGroups()
+        protected string[] GetCurrentSubscriberChannelGroups()
         {
             string[] channelGroups = null;
             if (MultiChannelGroupSubscribe != null && MultiChannelGroupSubscribe.Keys.Count > 0)
@@ -943,45 +943,6 @@ namespace PubnubApi
 
             return channelGroups;
         }
-
-        /// <summary>
-        /// Retrieves the channel name from the url components
-        /// </summary>
-        /// <param name="urlComponents"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        private string GetChannelName(List<string> urlComponents, ResponseType type)
-        {
-            //This method is not in use
-            string channelName = "";
-            switch (type)
-            {
-                case ResponseType.Subscribe:
-                case ResponseType.Presence:
-                    channelName = urlComponents[2];
-                    break;
-                case ResponseType.Publish:
-                    channelName = urlComponents[4];
-                    break;
-                case ResponseType.DetailedHistory:
-                    channelName = urlComponents[5];
-                    break;
-                case ResponseType.Here_Now:
-                    channelName = urlComponents[5];
-                    break;
-                case ResponseType.Leave:
-                    channelName = urlComponents[5];
-                    break;
-                case ResponseType.Where_Now:
-                    channelName = urlComponents[5];
-                    break;
-                default:
-                    break;
-            }
-            ;
-            return channelName;
-        }
-
         #endregion
 
         #region "Build, process and send request"
@@ -1029,9 +990,7 @@ namespace PubnubApi
                     ChannelRequest.AddOrUpdate(channel, pubnubRequestState.Request, (key, oldState) => pubnubRequestState.Request);
                 }
 
-
-                //overrideTcpKeepAlive must be true
-                if (overrideTcpKeepAlive)
+                if (overrideTcpKeepAlive) //overrideTcpKeepAlive must be true
                 {
                     //Eventhough heart-beat is disabled, run one time to check internet connection by setting dueTime=0
                     if (localClientHeartBeatTimer != null)
@@ -1097,7 +1056,6 @@ namespace PubnubApi
                             multiChannel, multiChannelGroup, pubnubRequestState.ErrorCallback, (webEx != null) ? webEx : innerEx, pubnubRequestState.Request, pubnubRequestState.Response);
                     }
                     LoggingMethod.WriteToLog(string.Format("DateTime {0} PubnubBaseCore UrlProcessRequest Exception={1}", DateTime.Now.ToString(), webEx.ToString()), LoggingMethod.LevelError);
-                    //UrlRequestCommonExceptionHandler<T>(pubnubRequestState.ResponseType, pubnubRequestState.Channels, pubnubRequestState.ChannelGroups, false, pubnubRequestState.SubscribeRegularCallback, pubnubRequestState.PresenceRegularCallback, pubnubRequestState.ConnectCallback, pubnubRequestState.WildcardPresenceCallback, pubnubRequestState.ErrorCallback, false);
                 }
 
                 return "";
@@ -1238,7 +1196,6 @@ namespace PubnubApi
                             case ResponseType.Leave:
                                 result.Add(multiChannel);
                                 break;
-
                             case ResponseType.Time:
                                 break;
                             case ResponseType.Publish:
@@ -1252,7 +1209,6 @@ namespace PubnubApi
                                     if (posLastSlash > 1)
                                     {
                                         bool stringType = false;
-                                        //object publishMsg = absolutePath.Substring(posLastSlash + 1);
                                         string publishPayload = absolutePath.Substring(posLastSlash + 1);
                                         int posOfStartDQ = publishPayload.IndexOf("%22");
                                         int posOfEndDQ = publishPayload.LastIndexOf("%22");
@@ -2005,7 +1961,7 @@ namespace PubnubApi
 
         }
 
-        protected virtual void TerminatePresenceHeartbeatTimer()
+        protected void TerminatePresenceHeartbeatTimer()
         {
             if (presenceHeartbeatTimer != null)
             {
@@ -2039,7 +1995,6 @@ namespace PubnubApi
                         catch (ObjectDisposedException ex)
                         {
                             //Known exception to be ignored
-                            //LoggingMethod.WriteToLog (string.Format ("DateTime {0} Error while accessing requestHeatbeatTimer object in TerminateLocalClientHeartbeatTimer {1}", DateTime.Now.ToString (), ex.ToString ()), LoggingMethod.LevelInfo);
                         }
 
                         Timer removedTimer = null;
@@ -2177,7 +2132,6 @@ namespace PubnubApi
                 if (request != null)
                 {
                     request.Abort(null, _errorLevel);
-
                     LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateCurrentSubsciberRequest {1}", DateTime.Now.ToString(), request.RequestUri.ToString()), LoggingMethod.LevelInfo);
                 }
             }

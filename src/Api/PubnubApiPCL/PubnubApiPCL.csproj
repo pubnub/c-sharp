@@ -52,9 +52,11 @@
     <Compile Include="EndPoint\PubSub\PublishOperation.cs" />
     <Compile Include="EndPoint\PubSub\SubscribeOperation.cs" />
     <Compile Include="EndPoint\OtherOperation.cs" />
+    <Compile Include="EndPoint\Push\PushOperation.cs" />
     <Compile Include="EndPoint\TimeOperation.cs" />
     <Compile Include="Enum\PNHeartbeatNotificationOption.cs" />
     <Compile Include="Interface\IPubnubHttp.cs" />
+    <Compile Include="Interface\IPubnubProxy.cs" />
     <Compile Include="Interface\IUrlRequestBuilder.cs" />
     <Compile Include="Model\Consumer\Ack\AddChannelToChannelGroupAck.cs" />
     <Compile Include="Model\Consumer\Ack\AuditAck.cs" />
@@ -128,9 +130,7 @@
     <Compile Include="Model\Consumer\Ack\SetUserStateAck.cs" />
     <Compile Include="Model\Consumer\Ack\WhereNowAck.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="EndPoint\Push\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />

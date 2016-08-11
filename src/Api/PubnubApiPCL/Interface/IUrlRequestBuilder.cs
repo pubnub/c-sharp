@@ -39,5 +39,12 @@ namespace PubnubApi.Interface
 
         Uri BuildGetAllChannelGroupRequest();
 
+        Uri BuildRegisterDevicePushRequest(string channel, PushTypeService pushType, string pushToken);
+
+        Uri BuildUnregisterDevicePushRequest(PushTypeService pushType, string pushToken);
+
+        Uri BuildRemoveChannelPushRequest(string channel, PushTypeService pushType, string pushToken);
+
+        Uri BuildGetChannelsPushRequest(PushTypeService pushType, string pushToken);
     }
 }
