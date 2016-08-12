@@ -1238,7 +1238,7 @@ namespace PubnubApi
                                 #endregion
                                 break;
                             case ResponseType.DetailedHistory:
-                                result = DecodeDecryptLoop(result, channels, channelGroups, errorCallback);
+                                result = SecureMessage.Instance(pubnubConfig, jsonLib).DecodeDecryptLoop(result, channels, channelGroups, errorCallback);
                                 result.Add(multiChannel);
                                 break;
                             case ResponseType.Here_Now:
@@ -1369,69 +1369,6 @@ namespace PubnubApi
             {
                 ResponseToConnectCallback<T>(result, asyncRequestState.ResponseType, asyncRequestState.Channels, asyncRequestState.ChannelGroups, asyncRequestState.ConnectCallback);
                 ResponseToUserCallback<T>(result, asyncRequestState.ResponseType, asyncRequestState.Channels, asyncRequestState.ChannelGroups, asyncRequestState.NonSubscribeRegularCallback);
-            }
-        }
-
-        private static List<object> DecodeDecryptLoop(List<object> message, string[] channels, string[] channelGroups, Action<PubnubClientError> errorCallback)
-        {
-            List<object> returnMessage = new List<object>();
-            if (pubnubConfig.CiperKey.Length > 0)
-            {
-                PubnubCrypto aes = new PubnubCrypto(pubnubConfig.CiperKey);
-                var myObjectArray = (from item in message
-                                     select item as object).ToArray();
-                IEnumerable enumerable = myObjectArray[0] as IEnumerable;
-                if (enumerable != null)
-                {
-                    List<object> receivedMsg = new List<object>();
-                    foreach (object element in enumerable)
-                    {
-                        string decryptMessage = "";
-                        try
-                        {
-                            decryptMessage = aes.Decrypt(element.ToString());
-                        }
-                        catch (Exception ex)
-                        {
-                            decryptMessage = "**DECRYPT ERROR**";
-
-                            string multiChannel = string.Join(",", channels);
-                            string multiChannelGroup = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups) : "";
-
-                            new PNCallbackService(pubnubConfig, jsonLib).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
-                                multiChannel, multiChannelGroup, errorCallback, ex, null, null);
-                        }
-                        object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : jsonLib.DeserializeToObject(decryptMessage);
-                        receivedMsg.Add(decodeMessage);
-                    }
-                    returnMessage.Add(receivedMsg);
-                }
-
-                for (int index = 1; index < myObjectArray.Length; index++)
-                {
-                    returnMessage.Add(myObjectArray[index]);
-                }
-                return returnMessage;
-            }
-            else
-            {
-                var myObjectArray = (from item in message
-                                     select item as object).ToArray();
-                IEnumerable enumerable = myObjectArray[0] as IEnumerable;
-                if (enumerable != null)
-                {
-                    List<object> receivedMessage = new List<object>();
-                    foreach (object element in enumerable)
-                    {
-                        receivedMessage.Add(element);
-                    }
-                    returnMessage.Add(receivedMessage);
-                }
-                for (int index = 1; index < myObjectArray.Length; index++)
-                {
-                    returnMessage.Add(myObjectArray[index]);
-                }
-                return returnMessage;
             }
         }
 

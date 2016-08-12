@@ -129,6 +129,7 @@
     <Compile Include="Enum\ResponseType.cs" />
     <Compile Include="Model\Consumer\Ack\SetUserStateAck.cs" />
     <Compile Include="Model\Consumer\Ack\WhereNowAck.cs" />
+    <Compile Include="Security\SecureMessage.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
