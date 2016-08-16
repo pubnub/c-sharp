@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
@@ -70,7 +70,11 @@ namespace PubnubApi
             }
         }
 
-        public LoggingMethod.Level LogVerbosity { get; set; }
+        //public LoggingMethod.Level LogVerbosity { get; set; }
+
+        public IPubnubLog PubnubLog { get; set; }
+
+        public IPubnubProxy PNProxy { get; set; }
 
         public PubnubErrorFilter.Level ErrorLevel { get; set; }
 
@@ -80,9 +84,11 @@ namespace PubnubApi
 
         public PNHeartbeatNotificationOption HeartbeatNotificationOption { get; set; }
 
-        public bool EnableProxy { get; set; }
+        public string PushServiceName { get; set; }
 
         public bool EnableDebugForPushPublish { get; set; }
+
+        public Collection<Uri> PushRemoteImageDomainUri { get; set; }
 
         //For publishing direct JSON string
         public bool EnableJsonEncodingForPublish { get; set; }
@@ -99,7 +105,7 @@ namespace PubnubApi
             this.NonSubscribeRequestTimeout = 10;
             this.SubscribeTimeout = 310;
             this.ConnectTimeout = 5;
-            this.LogVerbosity = LoggingMethod.Level.Off;
+            //this.LogVerbosity = LoggingMethod.Level.Off;
             this.Secure = true;
         }
 

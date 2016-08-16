@@ -130,11 +130,11 @@ namespace PubNubMessaging.Tests
         {
             bool proxyConfigured = false;
 
-            PubnubProxy proxy = new PubnubProxy();
-            proxy.ProxyServer = "test.pandu.com";
-            proxy.ProxyPort = 808;
-            proxy.ProxyUserName = "tuvpnfreeproxy";
-            proxy.ProxyPassword = "Rx8zW78k";
+            IPubnubProxy proxy = new PubnubProxy();
+            proxy.Server = "test.pandu.com";
+            proxy.Port = 808;
+            proxy.UserName = "tuvpnfreeproxy";
+            proxy.Password = "Rx8zW78k";
 
             timeReceivedWhenProxy = false;
             mreProxy = new ManualResetEvent(false);
@@ -144,7 +144,7 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
-                EnableProxy = true
+                PNProxy = proxy
             };
 
             IPubnubUnitTest unitTest = new PubnubUnitTest();
@@ -157,7 +157,6 @@ namespace PubNubMessaging.Tests
             if (proxyConfigured)
             {
                 pubnub = new Pubnub(config, unitTest);
-                pubnub.Proxy = proxy;
 
                 pubnub.Time(
                     (actual) =>
@@ -200,11 +199,11 @@ namespace PubNubMessaging.Tests
         {
             bool proxyConfigured = false;
 
-            PubnubProxy proxy = new PubnubProxy();
-            proxy.ProxyServer = "test.pandu.com";
-            proxy.ProxyPort = 808;
-            proxy.ProxyUserName = "tuvpnfreeproxy";
-            proxy.ProxyPassword = "Rx8zW78k";
+            IPubnubProxy proxy = new PubnubProxy();
+            proxy.Server = "test.pandu.com";
+            proxy.Port = 808;
+            proxy.UserName = "tuvpnfreeproxy";
+            proxy.Password = "Rx8zW78k";
 
             timeReceivedWhenProxy = false;
             mreProxy = new ManualResetEvent(false);
@@ -214,7 +213,7 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
-                EnableProxy = true
+                PNProxy = proxy
             };
 
             IPubnubUnitTest unitTest = new PubnubUnitTest();
@@ -226,7 +225,6 @@ namespace PubNubMessaging.Tests
             if (proxyConfigured)
             {
                 pubnub = new Pubnub(config, unitTest);
-                pubnub.Proxy = proxy;
 
                 pubnub.Time(
                     (actual) =>

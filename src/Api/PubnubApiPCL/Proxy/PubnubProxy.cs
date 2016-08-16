@@ -1,54 +1,60 @@
-﻿namespace PubnubApi
-{
-    public class PubnubProxy
-    {
-        string proxyServer;
-        int proxyPort;
-        string proxyUserName;
-        string proxyPassword;
+﻿using System;
 
-        public string ProxyServer
+namespace PubnubApi
+{
+    public class PubnubProxy: IPubnubProxy
+    {
+        string proxyServer = "";
+        int proxyPort;
+        string proxyUserName = "";
+        string proxyPassword = "";
+
+        string IPubnubProxy.Server
         {
             get
             {
                 return proxyServer;
             }
+
             set
             {
                 proxyServer = value;
             }
         }
 
-        public int ProxyPort
+        int IPubnubProxy.Port
         {
             get
             {
                 return proxyPort;
             }
+
             set
             {
                 proxyPort = value;
             }
         }
 
-        public string ProxyUserName
+        string IPubnubProxy.UserName
         {
             get
             {
                 return proxyUserName;
             }
+
             set
             {
                 proxyUserName = value;
             }
         }
 
-        public string ProxyPassword
+        string IPubnubProxy.Password
         {
             get
             {
                 return proxyPassword;
             }
+
             set
             {
                 proxyPassword = value;

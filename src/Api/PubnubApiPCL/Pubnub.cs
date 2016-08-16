@@ -11,7 +11,7 @@ namespace PubnubApi
         private IJsonPluggableLibrary jsonPluggableLibrary = null;
         private IPubnubUnitTest pubnubUnitTest = null;
 
-        PubnubWin pubnub;
+        //PubnubWin pubnub;
 
 		#region "PubNub API Channel Methods"
 
@@ -21,46 +21,35 @@ namespace PubnubApi
 			{
 				throw new ArgumentException("Channel should be provided.");
 			}
-            System.Threading.Tasks.Task.Factory.StartNew(() => 
-                {
-                    EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-                    endPoint.Subscribe<T>(channel, "", subscribeCallback, connectCallback, disconnectCallback, null, errorCallback);
-                });
-		}
 
-		public void Subscribe<T>(string channel, Action<Message<T>> subscribeCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PresenceAck> wildcardPresenceCallback, Action<PubnubClientError> errorCallback)
+            EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endPoint.Subscribe<T>(channel, "", subscribeCallback, connectCallback, disconnectCallback, null, errorCallback);
+        }
+
+        public void Subscribe<T>(string channel, Action<Message<T>> subscribeCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PresenceAck> wildcardPresenceCallback, Action<PubnubClientError> errorCallback)
 		{
 			if (string.IsNullOrEmpty(channel) || channel.Trim().Length <= 0)
 			{
 				throw new ArgumentException("Channel should be provided.");
 			}
 
-            System.Threading.Tasks.Task.Factory.StartNew(() =>
-            {
-                EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-                endPoint.Subscribe<T>(channel, "", subscribeCallback, connectCallback, disconnectCallback, wildcardPresenceCallback, errorCallback);
-            });
-		}
+            EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endPoint.Subscribe<T>(channel, "", subscribeCallback, connectCallback, disconnectCallback, wildcardPresenceCallback, errorCallback);
+        }
 
-		public void Subscribe<T>(string channel, string channelGroup, Action<Message<T>> subscribeCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PubnubClientError> errorCallback)
+        public void Subscribe<T>(string channel, string channelGroup, Action<Message<T>> subscribeCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PubnubClientError> errorCallback)
 		{
-            System.Threading.Tasks.Task.Factory.StartNew(() =>
-            {
-                EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-                endPoint.Subscribe<T>(channel, channelGroup, subscribeCallback, connectCallback, disconnectCallback, null, errorCallback);
-            });
-		}
+            EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endPoint.Subscribe<T>(channel, channelGroup, subscribeCallback, connectCallback, disconnectCallback, null, errorCallback);
+        }
 
-		public void Subscribe<T>(string channel, string channelGroup, Action<Message<T>> subscribeCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PresenceAck> wildcardPresenceCallback, Action<PubnubClientError> errorCallback)
+        public void Subscribe<T>(string channel, string channelGroup, Action<Message<T>> subscribeCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PresenceAck> wildcardPresenceCallback, Action<PubnubClientError> errorCallback)
 		{
-            System.Threading.Tasks.Task.Factory.StartNew(() =>
-            {
-                EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-                endPoint.Subscribe<T>(channel, channelGroup, subscribeCallback, connectCallback, disconnectCallback, wildcardPresenceCallback, errorCallback);
-            });
-		}
+            EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endPoint.Subscribe<T>(channel, channelGroup, subscribeCallback, connectCallback, disconnectCallback, wildcardPresenceCallback, errorCallback);
+        }
 
-		public void Publish(string channel, object message, Action<PublishAck> userCallback, Action<PubnubClientError> errorCallback)
+        public void Publish(string channel, object message, Action<PublishAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
             EndPoint.PublishOperation endPoint = new EndPoint.PublishOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
             endPoint.Publish(channel, message, true, "", userCallback, errorCallback);
@@ -78,13 +67,14 @@ namespace PubnubApi
 			{
 				throw new ArgumentException("Channel should be provided.");
 			}
-
-			pubnub.Presence(channel, "", presenceCallback, connectCallback, disconnectCallback, errorCallback);
+            EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endPoint.Presence(channel, "", presenceCallback, connectCallback, disconnectCallback, errorCallback);
 		}
 
 		public void Presence(string channel, string channelGroup, Action<PresenceAck> presenceCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.Presence(channel, channelGroup, presenceCallback, connectCallback, disconnectCallback, errorCallback);
+            EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endPoint.Presence(channel, channelGroup, presenceCallback, connectCallback, disconnectCallback, errorCallback);
 		}
 
 		public void DetailedHistory(string channel, long start, long end, int count, bool reverse, bool includeToken, Action<DetailedHistoryAck> userCallback, Action<PubnubClientError> errorCallback)
@@ -143,8 +133,12 @@ namespace PubnubApi
 
 		public void Unsubscribe<T>(string channel, string channelGroup, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.Unsubscribe<T>(channel, channelGroup, errorCallback);
-		}
+            System.Threading.Tasks.Task.Factory.StartNew(() =>
+            {
+                EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+                endPoint.Unsubscribe<T>(channel, channelGroup, errorCallback);
+            });
+        }
 
 		public void Unsubscribe<T>(string channel, Action<PubnubClientError> errorCallback)
 		{
@@ -152,17 +146,24 @@ namespace PubnubApi
 			{
 				throw new ArgumentException("Channel should be provided.");
 			}
-			pubnub.Unsubscribe<T>(channel, null, errorCallback);
-		}
+
+            System.Threading.Tasks.Task.Factory.StartNew(() =>
+            {
+                EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+                endPoint.Unsubscribe<T>(channel, null, errorCallback);
+            });
+        }
 
 		public void PresenceUnsubscribe(string channel, string channelGroup, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.PresenceUnsubscribe(channel, channelGroup, disconnectCallback, errorCallback);
+            EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endPoint.PresenceUnsubscribe(channel, channelGroup, disconnectCallback, errorCallback);
 		}
 
 		public void PresenceUnsubscribe(string channel, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.PresenceUnsubscribe(channel, "", disconnectCallback, errorCallback);
+            EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endPoint.PresenceUnsubscribe(channel, "", disconnectCallback, errorCallback);
 		}
 
 		public void Time(Action<long> userCallback, Action<PubnubClientError> errorCallback)
@@ -263,26 +264,26 @@ namespace PubnubApi
 
 		public void RegisterDeviceForPush<T>(string channel, PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.RegisterDeviceForPush<T>(channel, pushType, pushToken, userCallback, errorCallback);
+            EndPoint.PushOperation endPoint = new EndPoint.PushOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endPoint.RegisterDevice<T>(channel, pushType, pushToken, userCallback, errorCallback);
 		}
 
 		public void UnregisterDeviceForPush<T>(PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.UnregisterDeviceForPush<T>(pushType, pushToken, userCallback, errorCallback);
+            EndPoint.PushOperation endPoint = new EndPoint.PushOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endPoint.UnregisterDevice<T>(pushType, pushToken, userCallback, errorCallback);
 		}
 
 		public void RemoveChannelForDevicePush<T>(string channel, PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.RemoveChannelForDevicePush<T>(channel, pushType, pushToken, userCallback, errorCallback);
-		}
-		public void RemoveChannelForDevicePush(string channel, PushTypeService pushType, string pushToken, Action<object> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			pubnub.RemoveChannelForDevicePush<object>(channel, pushType, pushToken, userCallback, errorCallback);
+            EndPoint.PushOperation endPoint = new EndPoint.PushOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endPoint.RemoveChannelForDevice<T>(channel, pushType, pushToken, userCallback, errorCallback);
 		}
 
 		public void GetChannelsForDevicePush<T>(PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.GetChannelsForDevicePush<T>(pushType, pushToken, userCallback, errorCallback);
+            EndPoint.PushOperation endPoint = new EndPoint.PushOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endPoint.GetChannelsForDevice<T>(pushType, pushToken, userCallback, errorCallback);
 		}
 		#endregion
 
@@ -313,12 +314,14 @@ namespace PubnubApi
 
 		public void RemoveChannelGroup(string nameSpace, string groupName, Action<RemoveChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.RemoveChannelGroup(nameSpace, groupName, userCallback, errorCallback);
+            //TO BE CONVERTED
+			//pubnub.RemoveChannelGroup(nameSpace, groupName, userCallback, errorCallback);
 		}
 
 		public void RemoveChannelGroupNameSpace(string nameSpace, Action<RemoveNamespaceAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.RemoveChannelGroupNameSpace(nameSpace, userCallback, errorCallback);
+            //TO BE CONVERTED
+            //pubnub.RemoveChannelGroupNameSpace(nameSpace, userCallback, errorCallback);
 		}
 
 		public void GetChannelsForChannelGroup(string nameSpace, string groupName, Action<GetChannelGroupChannelsAck> userCallback, Action<PubnubClientError> errorCallback)
@@ -335,10 +338,11 @@ namespace PubnubApi
 
 		public void GetAllChannelGroups(string nameSpace, Action<GetAllChannelGroupsAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.GetAllChannelGroups(nameSpace, userCallback, errorCallback);
-		}
+            //TO BE CONVERTED
+            //pubnub.GetAllChannelGroups(nameSpace, userCallback, errorCallback);
+        }
 
-		public void GetAllChannelGroups(Action<GetAllChannelGroupsAck> userCallback, Action<PubnubClientError> errorCallback)
+        public void GetAllChannelGroups(Action<GetAllChannelGroupsAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
             EndPoint.GetAllChannelGroupOperation endPoint = new EndPoint.GetAllChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
             endPoint.GetAllChannelGroup(userCallback, errorCallback);
@@ -346,81 +350,74 @@ namespace PubnubApi
 
 		public void GetAllChannelGroupNamespaces(Action<GetAllNamespacesAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
-			pubnub.GetAllChannelGroupNamespaces(userCallback, errorCallback);
-		}
+            //TO BE CONVERTED
+            //pubnub.GetAllChannelGroupNamespaces(userCallback, errorCallback);
+        }
 
-		#endregion
+        #endregion
 
-		#region "PubNub API Other Methods"
-		public void TerminateCurrentSubscriberRequest()
+        #region "PubNub API Other Methods"
+        public void TerminateCurrentSubscriberRequest()
 		{
-			pubnub.TerminateCurrentSubscriberRequest();
+            EndPoint.OtherOperation.TerminateCurrentSubscriberRequest();
 		}
 
 		public void EnableSimulateNetworkFailForTestingOnly()
 		{
-			pubnub.EnableSimulateNetworkFailForTestingOnly();
-		}
+            EndPoint.OtherOperation.EnableSimulateNetworkFailForTestingOnly();
+        }
 
 		public void DisableSimulateNetworkFailForTestingOnly()
 		{
-			pubnub.DisableSimulateNetworkFailForTestingOnly();
+            EndPoint.OtherOperation.DisableSimulateNetworkFailForTestingOnly();
 		}
 
 		public void EnableMachineSleepModeForTestingOnly()
 		{
-			pubnub.EnableMachineSleepModeForTestingOnly();
+            EndPoint.OtherOperation.EnableMachineSleepModeForTestingOnly();
 		}
 
 		public void DisableMachineSleepModeForTestingOnly()
 		{
-			pubnub.DisableMachineSleepModeForTestingOnly();
+            EndPoint.OtherOperation.DisableMachineSleepModeForTestingOnly();
 		}
 
 		public void EndPendingRequests()
 		{
-			//pubnub.EndPendingRequests();
-		}
+            EndPoint.OtherOperation endPoint = new EndPoint.OtherOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endPoint.EndPendingRequests();
+        }
 
-		public Guid GenerateGuid()
+        public Guid GenerateGuid()
 		{
-			return pubnub.GenerateGuid();
+			return Guid.NewGuid();
 		}
 
 		public void ChangeUUID(string newUUID)
 		{
-			pubnub.ChangeUUID(newUUID);
+            EndPoint.OtherOperation endPoint = new EndPoint.OtherOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endPoint.ChangeUUID(newUUID);
 		}
 
 		public static long TranslateDateTimeToPubnubUnixNanoSeconds(DateTime dotNetUTCDateTime)
 		{
-			return PubnubWin.TranslateDateTimeToPubnubUnixNanoSeconds(dotNetUTCDateTime);
+			return EndPoint.OtherOperation.TranslateDateTimeToPubnubUnixNanoSeconds(dotNetUTCDateTime);
 		}
 
 		public static DateTime TranslatePubnubUnixNanoSecondsToDateTime(long unixNanoSecondTime)
 		{
-			return PubnubWin.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
+			return EndPoint.OtherOperation.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
 		}
 
 		public static DateTime TranslatePubnubUnixNanoSecondsToDateTime(string unixNanoSecondTime)
 		{
-			return PubnubWin.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
+			return EndPoint.OtherOperation.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
 		}
 
-        public void SetPubnubLog(IPubnubLog pubnubLog) 
-         { 
-             pubnub.PubnubLog = pubnubLog; 
-         } 
-
-        public void SetInternalLogLevel(LoggingMethod.Level logLevel)
-        {
-            pubnub.PubnubLogLevel = logLevel;
-        }
-
-        public void SetErrorFilterLevel(PubnubErrorFilter.Level errorLevel)
-        {
-            pubnub.PubnubErrorLevel = errorLevel;
-        }  
+        //public void SetErrorFilterLevel(PubnubErrorFilter.Level errorLevel)
+        //{
+        //    pubnub.PubnubErrorLevel = errorLevel;
+        //}  
 
 		#endregion
 
@@ -430,60 +427,11 @@ namespace PubnubApi
 			set { pubnubConfig.AuthKey = value;}
 		}
 
-        //public int LocalClientHeartbeatInterval {
-        //	get {return pubnub.LocalClientHeartbeatInterval;}
-        //	set {pubnub.LocalClientHeartbeatInterval = value;}
-        //}
-
-        //public int NetworkCheckRetryInterval {
-        //	get {return pubnub.NetworkCheckRetryInterval;}
-        //	set {pubnub.NetworkCheckRetryInterval = value;}
-        //}
-
-        //public int NetworkCheckMaxRetries {
-        //	get {return pubnub.NetworkCheckMaxRetries;}
-        //	set {pubnub.NetworkCheckMaxRetries = value;}
-        //}
-
-        //public bool EnableResumeOnReconnect {
-        //	get {return pubnub.EnableResumeOnReconnect;}
-        //	set {pubnub.EnableResumeOnReconnect = value;}
-        //}
-
         public string SessionUUID
         {
             get { return pubnubConfig.Uuid; }
             set { pubnubConfig.Uuid = value; }
         }
-
-        //public string Origin {
-        //	get {return pubnub.Origin;}
-        //	set {pubnub.Origin = value;}
-        //}
-
-        //public int PresenceHeartbeat
-        //{
-        //	get
-        //	{
-        //		return pubnub.PresenceHeartbeat;
-        //	}
-        //	set
-        //	{
-        //		pubnub.PresenceHeartbeat = value;
-        //	}
-        //}
-
-        //public int PresenceHeartbeatInterval
-        //{
-        //	get
-        //	{
-        //		return pubnub.PresenceHeartbeatInterval;
-        //	}
-        //	set
-        //	{
-        //		pubnub.PresenceHeartbeatInterval = value;
-        //	}
-        //}
 
         public IPubnubUnitTest PubnubUnitTest
         {
@@ -497,27 +445,29 @@ namespace PubnubApi
             }
         }
 
+        //TO BE REMOVED
         public bool EnableJsonEncodingForPublish
-		{
-			get
-			{
-				return pubnub.EnableJsonEncodingForPublish;
-			}
-			set
-			{
-				pubnub.EnableJsonEncodingForPublish = value;
-			}
-		}
-
-        public PubnubProxy Proxy
         {
             get
             {
-                return pubnub.Proxy;
+                throw new Exception("No support");
             }
             set
             {
-                pubnub.Proxy = value;
+                throw new Exception("No support");
+            }
+        }
+
+        //TO BE REMOVED
+        public bool EnableDebugForPushPublish
+        {
+            get
+            {
+                throw new Exception("No support");
+            }
+            set
+            {
+                throw new Exception("No support");
             }
         }
 
@@ -537,67 +487,6 @@ namespace PubnubApi
 			}
 		}
 
-		public IPubnubSubscribeMessageType SubscribeMessageType
-		{
-			get
-			{
-				return pubnub.SubscribeMessageType;
-			}
-			set
-			{
-				pubnub.SubscribeMessageType = value;
-			}
-		}
-
-		public bool EnableDebugForPushPublish
-		{
-			get
-			{
-				return pubnub.EnableDebugForPushPublish;
-			}
-			set
-			{
-				pubnub.EnableDebugForPushPublish = value;
-			}
-		}
-
-		public Collection<Uri> PushRemoteImageDomainUri
-		{
-			get
-			{
-				return pubnub.PushRemoteImageDomainUri;
-			}
-
-			set
-			{
-				pubnub.PushRemoteImageDomainUri = value;
-			}
-		}
-
-		public string PushServiceName
-		{
-			get
-			{
-				return pubnub.PushServiceName;
-			}
-
-			set
-			{
-				pubnub.PushServiceName = value;
-			}
-		}
-
-        public bool AddPayloadToPublishResponse
-        {
-            get
-            {
-                return pubnub.AddPayloadToPublishResponse;
-            }
-            set
-            {
-                pubnub.AddPayloadToPublishResponse = value;
-            }
-        }
         #endregion
 
         #region "Constructors"
@@ -625,20 +514,23 @@ namespace PubnubApi
             this.pubnubUnitTest = pubnubUnitTest;
         }
 
+        //TO BE REMOVED
         public Pubnub(string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
 		{
-			pubnub = new PubnubWin (publishKey, subscribeKey, secretKey, cipherKey, sslOn);
-		}
+            throw new Exception("No support");
+        }
 
-		public Pubnub(string publishKey, string subscribeKey, string secretKey)
+        //TO BE REMOVED
+        public Pubnub(string publishKey, string subscribeKey, string secretKey)
 		{
-			pubnub = new PubnubWin (publishKey, subscribeKey, secretKey);
-		}
+            throw new Exception("No support");
+        }
 
-		public Pubnub(string publishKey, string subscribeKey)
+        //TO BE REMOVED
+        public Pubnub(string publishKey, string subscribeKey)
 		{
-			pubnub = new PubnubWin (publishKey, subscribeKey);
-		}
+            throw new Exception("No support");
+        }
 		#endregion
 	}
 }

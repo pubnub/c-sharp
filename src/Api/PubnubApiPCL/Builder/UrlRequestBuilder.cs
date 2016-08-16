@@ -27,6 +27,10 @@ namespace PubnubApi
         private string setUserStateParameters = "";
         private string channelGroupAddParameters = "";
         private string channelGroupRemoveParameters = "";
+        private string pushRegisterDeviceParameters = "";
+        private string pushUnregisterDeviceParameters = "";
+        private string pushRemoveChannelParameters = "";
+        private string pushGetChannelsParameters = "";
 
         public UrlRequestBuilder(PNConfiguration config)
         {
@@ -80,6 +84,35 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, ResponseType.Subscribe);
         }
 
+        Uri IUrlRequestBuilder.BuildMultiChannelLeaveRequest(string[] channels, string[] channelGroups, string uuid, string jsonUserState)
+        {
+            StringBuilder unsubscribeParamBuilder = new StringBuilder();
+            subscribeParameters = "";
+            //string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
+            string channelsJsonState = jsonUserState;
+            if (channelsJsonState != "{}" && channelsJsonState != "")
+            {
+                unsubscribeParamBuilder.AppendFormat("&state={0}", EncodeUricomponent(channelsJsonState, ResponseType.Leave, false, false));
+            }
+            if (channelGroups != null && channelGroups.Length > 0)
+            {
+                unsubscribeParamBuilder.AppendFormat("&channel-group={0}", string.Join(",", channelGroups));
+            }
+            subscribeParameters = unsubscribeParamBuilder.ToString();
+
+            string multiChannel = (channels != null && channels.Length > 0) ? string.Join(",", channels) : ",";
+            List<string> url = new List<string>();
+
+            url.Add("v2");
+            url.Add("presence");
+            url.Add("sub_key");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("channel");
+            url.Add(multiChannel);
+            url.Add("leave");
+
+            return BuildRestApiRequest<Uri>(url, ResponseType.Leave, uuid);
+        }
 
         Uri IUrlRequestBuilder.BuildPublishRequest(string channel, object originalMessage, bool storeInHistory, string jsonUserMetaData)
         {
@@ -578,6 +611,94 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, ResponseType.ChannelGroupGet);
         }
 
+        Uri IUrlRequestBuilder.BuildRegisterDevicePushRequest(string channel, PushTypeService pushType, string pushToken)
+        {
+            StringBuilder parameterBuilder = new StringBuilder();
+            pushRegisterDeviceParameters = "";
+
+            parameterBuilder.AppendFormat("?add={0}", EncodeUricomponent(channel, ResponseType.PushRegister, true, false));
+            parameterBuilder.AppendFormat("&type={0}", pushType.ToString().ToLower());
+
+            pushRegisterDeviceParameters = parameterBuilder.ToString();
+
+            // Build URL
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("push");
+            url.Add("sub-key");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("devices");
+            url.Add(pushToken.ToString());
+
+            return BuildRestApiRequest<Uri>(url, ResponseType.PushRegister);
+        }
+
+        Uri IUrlRequestBuilder.BuildUnregisterDevicePushRequest(PushTypeService pushType, string pushToken)
+        {
+            StringBuilder parameterBuilder = new StringBuilder();
+            pushUnregisterDeviceParameters = "";
+
+            parameterBuilder.AppendFormat("?type={0}", pushType.ToString().ToLower());
+
+            pushUnregisterDeviceParameters = parameterBuilder.ToString();
+
+            // Build URL
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("push");
+            url.Add("sub-key");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("devices");
+            url.Add(pushToken.ToString());
+            url.Add("remove");
+
+            return BuildRestApiRequest<Uri>(url, ResponseType.PushUnregister);
+        }
+
+        Uri IUrlRequestBuilder.BuildRemoveChannelPushRequest(string channel, PushTypeService pushType, string pushToken)
+        {
+            StringBuilder parameterBuilder = new StringBuilder();
+            pushRemoveChannelParameters = "";
+
+            parameterBuilder.AppendFormat("?remove={0}", EncodeUricomponent(channel, ResponseType.PushRemove, true, false));
+            parameterBuilder.AppendFormat("&type={0}", pushType.ToString().ToLower());
+
+            pushRemoveChannelParameters = parameterBuilder.ToString();
+
+            // Build URL
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("push");
+            url.Add("sub-key");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("devices");
+            url.Add(pushToken.ToString());
+
+            return BuildRestApiRequest<Uri>(url, ResponseType.PushRemove);
+        }
+
+        Uri IUrlRequestBuilder.BuildGetChannelsPushRequest(PushTypeService pushType, string pushToken)
+        {
+            StringBuilder parameterBuilder = new StringBuilder();
+            pushGetChannelsParameters = "";
+
+            parameterBuilder.AppendFormat("?type={0}", pushType.ToString().ToLower());
+
+            pushGetChannelsParameters = parameterBuilder.ToString();
+
+            // Build URL
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("push");
+            url.Add("sub-key");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("devices");
+            url.Add(pushToken.ToString());
+
+            return BuildRestApiRequest<Uri>(url, ResponseType.PushGet);
+        }
+
+
         private Uri BuildRestApiRequest<T>(List<string> urlComponents, ResponseType type)
         {
             return BuildRestApiRequest<T>(urlComponents, type, this.pubnubConfig.Uuid);
@@ -1013,5 +1134,6 @@ namespace PubnubApi
             long timeStamp = Convert.ToInt64(timeSpan.TotalSeconds);
             return timeStamp;
         }
+
     }
 }

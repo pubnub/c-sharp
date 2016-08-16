@@ -60,8 +60,8 @@ namespace PubnubApi.EndPoint
             string json = UrlProcessRequest<HereNowAck>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = base.ProcessJsonResponse<HereNowAck>(requestState, json);
-                base.ProcessResponseCallbacks(result, requestState);
+                List<object> result = ProcessJsonResponse<HereNowAck>(requestState, json);
+                ProcessResponseCallbacks(result, requestState);
             }
         }
 
