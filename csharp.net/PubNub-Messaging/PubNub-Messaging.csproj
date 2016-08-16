@@ -90,7 +90,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>pubnub.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>pubnub.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <Choose>
     <When Condition=" '$(TargetFrameworkVersion.Replace(&quot;v&quot;,&quot;&quot;))' == '4.0' Or '$(TargetFrameworkVersion.Replace(&quot;v&quot;,&quot;&quot;))' == '4.5' ">
@@ -186,7 +186,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="pubnub.pfx" />
+    <None Include="pubnub.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
