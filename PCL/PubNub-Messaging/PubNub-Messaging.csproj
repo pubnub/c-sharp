@@ -33,7 +33,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>pubnub.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>pubnub.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ConcurrentDictionary.cs">
@@ -59,6 +59,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="pubnub.pfx" />
+    <None Include="pubnub.snk" />
   </ItemGroup>
 </Project>
