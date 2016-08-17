@@ -1,13 +1,15 @@
 ﻿using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
-using System;
+using HttpMock;
 
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
-    public class WhenChannelGroupIsRequested
+    public class WhenChannelGroupIsRequested : TestHarness
     {
+        IHttpServer stubHttp;
+
         ManualResetEvent channelGroupManualEvent = new ManualResetEvent(false);
         ManualResetEvent grantManualEvent = new ManualResetEvent(false);
 
@@ -24,6 +26,8 @@ namespace PubNubMessaging.Tests
         [TestFixtureSetUp]
         public void Init()
         {
+            stubHttp = HttpMockRepository.At("http://" + PubnubCommon.StubOrign);
+
             if (!PubnubCommon.PAMEnabled) return;
 
             receivedGrantMessage = false;
@@ -38,15 +42,26 @@ namespace PubNubMessaging.Tests
                 Secure = false
             };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
-            unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/grant/sub-key/{2}?signature=TlSJMKtLCnVJ8pE8tAQb4i208BwJkYuCxU4jHyX3ovs=&channel-group={3}&m=1&pnsdk={4}&r=1&timestamp=1356998400&ttl=20&uuid={5}", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channelGroupName, config.SdkVersion, config.Uuid),
-                    "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"ttl\":20,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}"
-                );
-            pubnub = new Pubnub(config, unitTest);
+            if (PubnubCommon.EnableStubTest)
+            {
+                pubnub = this.createPubNubInstance(config);
+            }
+            else
+            {
+                pubnub = new Pubnub(config);
+            }
 
+            //var t = pubnub.GetTimeStamp();
+
+            string url = string.Format("/v1/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey);
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"ttl\":20,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
+            stubHttp.WithNewContext()
+                .Stub(x => x.Get(url))
+                .Return(expected)
+                .OK();
 
             pubnub.GrantAccess(null, new string[] { channelGroupName }, null, true, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummyErrorCallback);
+
             Thread.Sleep(1000);
 
             grantManualEvent.WaitOne();
@@ -74,12 +89,25 @@ namespace PubNubMessaging.Tests
                 Secure = false
             };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
-            unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/channel-registration/sub-key/{2}/channel-group/{3}?add={4}", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channelGroupName, channelName),
-                    "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}"
-                );
-            pubnub = new Pubnub(config, unitTest);
+            if (PubnubCommon.EnableStubTest)
+            {
+                pubnub = this.createPubNubInstance(config);
+            }
+            else
+            {
+                pubnub = new Pubnub(config);
+            }
+
+
+            string url = string.Format("/v1/channel-registration/sub-key/{0}/channel-group/{1}", PubnubCommon.SubscribeKey, channelGroupName);
+            string expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}";
+            ConcurrentDictionary<string, string> parameters = new ConcurrentDictionary<string, string>();
+            parameters.Add("add", channelName);
+            stubHttp.WithNewContext()
+                .Stub(x => x.Get(url))
+                .WithParams(parameters)
+                .Return(expected)
+                .OK();
 
             channelGroupManualEvent = new ManualResetEvent(false);
 
@@ -113,12 +141,25 @@ namespace PubNubMessaging.Tests
                 Secure = false
             };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
-            unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/channel-registration/sub-key/{2}/channel-group/{3}?remove={4}", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channelGroupName, channelName),
-                    "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}"
-                );
-            pubnub = new Pubnub(config, unitTest);
+            if (PubnubCommon.EnableStubTest)
+            {
+                pubnub = this.createPubNubInstance(config);
+            }
+            else
+            {
+                pubnub = new Pubnub(config);
+            }
+
+            string url = string.Format("/v1/channel-registration/sub-key/{0}/channel-group/{1}", PubnubCommon.SubscribeKey, channelGroupName);
+            string expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}";
+            ConcurrentDictionary<string, string> parameters = new ConcurrentDictionary<string, string>();
+            parameters.Add("remove", channelName);
+
+            stubHttp.WithNewContext()
+                .Stub(x => x.Get(url))
+                .WithParams(parameters)
+                .Return(expected)
+                .OK();
 
             channelGroupManualEvent = new ManualResetEvent(false);
 
@@ -127,7 +168,8 @@ namespace PubNubMessaging.Tests
 
             channelGroupManualEvent.WaitOne();
 
-            pubnub.EndPendingRequests(); 
+            pubnub.EndPendingRequests();
+
             pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedChannelGroupMessage, "WhenChannelGroupIsRequested -> ThenRemoveChannelShouldReturnSuccess failed.");
@@ -137,6 +179,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenGetChannelListShouldReturnSuccess()
         {
+            stubHttp = HttpMockRepository.At("http://" + PubnubCommon.StubOrign);
+
             currentUnitTestCase = "ThenGetChannelListShouldReturnSuccess";
 
             receivedChannelGroupMessage = false;
@@ -151,12 +195,22 @@ namespace PubNubMessaging.Tests
                 Secure = false
             };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
-            unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/channel-registration/sub-key/{2}/channel-group/{3}", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channelGroupName),
-                    "{\"status\": 200, \"payload\": {\"channels\": [\"" + channelName + "\"], \"group\": \"" + channelGroupName + "\"}, \"service\": \"channel-registry\", \"error\": false}"
-                );
-            pubnub = new Pubnub(config, unitTest);
+            if (PubnubCommon.EnableStubTest)
+            {
+                pubnub = this.createPubNubInstance(config);
+            }
+            else
+            {
+                pubnub = new Pubnub(config);
+            }
+
+            string url = string.Format("/v1/channel-registration/sub-key/{0}/channel-group/{1}", PubnubCommon.SubscribeKey, channelGroupName);
+            string expected = "{\"status\": 200, \"payload\": {\"channels\": [\"" + channelName + "\"], \"group\": \"" + channelGroupName + "\"}, \"service\": \"channel-registry\", \"error\": false}";
+
+            stubHttp.WithNewContext()
+                .Stub(x => x.Get(url))
+                .Return(expected)
+                .OK();
 
             channelGroupManualEvent = new ManualResetEvent(false);
 
@@ -177,6 +231,12 @@ namespace PubNubMessaging.Tests
         {
             currentUnitTestCase = "ThenGetAllChannelGroupShouldReturnSuccess";
 
+            if (PubnubCommon.PAMEnabled)
+            {
+                Assert.Ignore("PAM is enabled; WhenChannelGroupIsRequested -> ThenGetAllChannelGroupShouldReturnSuccess.");
+                return;
+            }
+
             receivedChannelGroupMessage = false;
 
             PNConfiguration config = new PNConfiguration()
@@ -189,12 +249,21 @@ namespace PubNubMessaging.Tests
                 Secure = false
             };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
-            unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/channel-registration/sub-key/{2}/channel-group", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey),
-                    "{\"status\": 200, \"payload\": {\"namespace\": \"\", \"groups\": [\"" + channelGroupName + "\", \"hello_my_group1\"]}, \"service\": \"channel-registry\", \"error\": false}"
-                );
-            pubnub = new Pubnub(config, unitTest);
+            if (PubnubCommon.EnableStubTest)
+            {
+                pubnub = this.createPubNubInstance(config);
+            }
+            else
+            {
+                pubnub = new Pubnub(config);
+            }
+
+            string url = string.Format("/v1/channel-registration/sub-key/{0}/channel-group", PubnubCommon.SubscribeKey);
+            string expected = "{\"status\": 200, \"payload\": {\"namespace\": \"\", \"groups\": [\"" + channelGroupName + "\", \"hello_my_group1\"]}, \"service\": \"channel-registry\", \"error\": false}";
+            stubHttp.WithNewContext()
+                .Stub(x => x.Get(url))
+                .Return(expected)
+                .OK();
 
             channelGroupManualEvent = new ManualResetEvent(false);
 
@@ -209,7 +278,6 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedChannelGroupMessage, "WhenChannelGroupIsRequested -> ThenGetChannelListShouldReturnSuccess failed.");
 
         }
-
 
         void RemoveChannelGroupCallback(RemoveChannelFromChannelGroupAck receivedMessage)
         {

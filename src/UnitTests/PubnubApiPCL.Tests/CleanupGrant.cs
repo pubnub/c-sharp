@@ -3,18 +3,27 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
+using HttpMock;
 
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
     public class CleanupGrant
     {
+        IHttpServer stubHttp;
         ManualResetEvent auditManualEvent = new ManualResetEvent(false);
         ManualResetEvent revokeManualEvent = new ManualResetEvent(false);
         bool receivedAuditMessage = false;
         bool receivedRevokeMessage = false;
 
         Pubnub pubnub = null;
+
+        [TestFixtureSetUp]
+        public void Init()
+        {
+            stubHttp = HttpMockRepository.At("http://" + PubnubCommon.StubOrign);
+        }
+
 
         [Test]
         public void AtUserLevel()

@@ -1,20 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using NUnit.Framework;
-using System.ComponentModel;
 using System.Threading;
-using System.Collections;
-//using Newtonsoft.Json;
-//using Newtonsoft.Json.Linq;
 using PubnubApi;
+using HttpMock;
 
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
-    public class WhenAMessageIsPublished
+    public class WhenAMessageIsPublished : TestHarness
     {
+        IHttpServer stubHttp;
+
         ManualResetEvent mreUnencryptedPublish = new ManualResetEvent(false);
         ManualResetEvent mreOptionalSecretKeyPublish = new ManualResetEvent(false);
         ManualResetEvent mreNoSslPublish = new ManualResetEvent(false);
@@ -80,6 +76,8 @@ namespace PubNubMessaging.Tests
         [TestFixtureSetUp]
         public void Init()
         {
+            stubHttp = HttpMockRepository.At("http://" + PubnubCommon.StubOrign);
+
             if (!PubnubCommon.PAMEnabled) return;
 
             receivedGrantMessage = false;
@@ -433,18 +431,52 @@ namespace PubNubMessaging.Tests
         public void ThenLargeMessageShoudFailWithMessageTooLargeInfo()
         {
             isLargeMessagePublished = false;
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
-
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenLargeMessageShoudFailWithMessageTooLargeInfo";
-            pubnub.PubnubUnitTest = unitTest;
 
             string channel = "hello_my_channel";
             string message = messageLarge32K;
 
-            pubnub.Publish(channel, message, DummyPublishMessageTooLargeInfoCallback, ReturnPublishMessageTooLargeErrorCallback);
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 310 * 1000 : 310 * 1000;
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = "",
+                CiperKey = "",
+                Uuid = "mytestuuid",
+                EnableJsonEncodingForPublish=true,
+                Secure = false
+            };
+
+            if (PubnubCommon.EnableStubTest)
+            {
+                pubnub = this.createPubNubInstance(config);
+            }
+            else
+            {
+                pubnub = new Pubnub(config);
+            }
+
+            string url = string.Format("/v1/channel-registration/sub-key/{0}/channel-group/", PubnubCommon.SubscribeKey);
+            string expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}";
+            ConcurrentDictionary<string, string> parameters = new ConcurrentDictionary<string, string>();
+            //parameters.Add("remove", channelName);
+
+            stubHttp.WithNewContext()
+                .Stub(x => x.Get(url))
+                .WithParams(parameters)
+                .Return(expected)
+                .OK();
+
+            //pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+
+            //IPubnubUnitTest unitTest = new PubnubUnitTest();
+            //unitTest.TestClassName = "WhenAMessageIsPublished";
+            //unitTest.TestCaseName = "ThenLargeMessageShoudFailWithMessageTooLargeInfo";
+            //pubnub.PubnubUnitTest = unitTest;
+
+
+            pubnub.Publish(channel, new String('A', 32000), DummyPublishMessageTooLargeInfoCallback, ReturnPublishMessageTooLargeErrorCallback);
+            //pubnub.Publish(channel, "test", DummyPublishMessageTooLargeInfoCallback, ReturnPublishMessageTooLargeErrorCallback);
+            manualResetEventsWaitTimeout = 310 * 1000;
             mreLaregMessagePublish.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests(); 
