@@ -1,5 +1,5 @@
-name: unity
-version: 3.7.0
+name: c-sharp
+version: 3.7.6
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog:
