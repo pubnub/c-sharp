@@ -78,6 +78,19 @@ namespace PubnubApi
             }
             catch (WebException ex)
             {
+                if (ex.Response != null)
+                {
+                    using (StreamReader streamReader = new StreamReader(ex.Response.GetResponseStream()))
+                    {
+                        //Need to return this response 
+                        string jsonString = streamReader.ReadToEnd();
+                        System.Diagnostics.Debug.WriteLine(jsonString);
+                        System.Diagnostics.Debug.WriteLine("");
+                        System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON from WebException response", DateTime.Now.ToString()));
+                        return jsonString;
+                    }
+                }
+
                 if (ex.Message.IndexOf("The request was aborted: The request was canceled") == -1
                                 && ex.Message.IndexOf("Machine suspend mode enabled. No request will be processed.") == -1)
                 {

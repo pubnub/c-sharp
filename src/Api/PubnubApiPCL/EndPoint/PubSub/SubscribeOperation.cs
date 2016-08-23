@@ -758,7 +758,7 @@ namespace PubnubApi.EndPoint
             //Exit if the channel is unsubscribed
             if (MultiChannelSubscribe != null && MultiChannelSubscribe.Count <= 0 && MultiChannelGroupSubscribe != null && MultiChannelGroupSubscribe.Count <= 0)
             {
-                LoggingMethod.WriteToLog(string.Format("DateTime {0}, All channels are Unsubscribed. Further subscription was stopped", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
+                LoggingMethod.WriteToLog(string.Format("DateTime {0}, Zero channels/channelGroups. Further subscription was stopped", DateTime.Now.ToString()), LoggingMethod.LevelInfo);
                 return;
             }
 
@@ -788,19 +788,6 @@ namespace PubnubApi.EndPoint
                 || (multiChannelGroup != "" && ChannelGroupInternetStatus.ContainsKey(multiChannelGroup) && !ChannelGroupInternetStatus[multiChannelGroup]))
                 && pubnetSystemActive)
             {
-                if (ChannelInternetRetry.ContainsKey(multiChannel) && (ChannelInternetRetry[multiChannel] >= PubnubNetworkCheckRetries))
-                {
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0}, Subscribe channel={1} - No internet connection. MAXed retries for internet ", DateTime.Now.ToString(), multiChannel), LoggingMethod.LevelInfo);
-                    MultiplexExceptionHandler<T>(type, channels, channelGroups, subscribeRegularCallback, presenceRegularCallback, connectCallback, wildcardPresenceCallback, errorCallback, true, false);
-                    return;
-                }
-                else if (ChannelGroupInternetRetry.ContainsKey(multiChannelGroup) && (ChannelGroupInternetRetry[multiChannelGroup] >= PubnubNetworkCheckRetries))
-                {
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0}, Subscribe channelgroup={1} - No internet connection. MAXed retries for internet ", DateTime.Now.ToString(), multiChannelGroup), LoggingMethod.LevelInfo);
-                    MultiplexExceptionHandler<T>(type, channels, channelGroups, subscribeRegularCallback, presenceRegularCallback, connectCallback, wildcardPresenceCallback, errorCallback, true, false);
-                    return;
-                }
-
                 if (ReconnectNetworkIfOverrideTcpKeepAlive<T>(type, channels, channelGroups, timetoken, subscribeRegularCallback, presenceRegularCallback, connectCallback, wildcardPresenceCallback, errorCallback))
                 {
                     return;
@@ -811,6 +798,8 @@ namespace PubnubApi.EndPoint
             // Begin recursive subscribe
             try
             {
+                RegisterPresenceHeartbeatTimer<T>(channels, channelGroups, errorCallback);
+
                 long lastTimetoken = 0;
                 long minimumTimetoken1 = (MultiChannelSubscribe.Count > 0) ? MultiChannelSubscribe.Min(token => token.Value) : 0;
                 long minimumTimetoken2 = (MultiChannelGroupSubscribe.Count > 0) ? MultiChannelGroupSubscribe.Min(token => token.Value) : 0;
@@ -1078,15 +1067,15 @@ namespace PubnubApi.EndPoint
                             if (ChannelInternetStatus[channel])
                             {
                                 //Reset Retry if previous state is true
-                                ChannelInternetRetry.AddOrUpdate(channel, 0, (key, oldValue) => 0);
+                                //ChannelInternetRetry.AddOrUpdate(channel, 0, (key, oldValue) => 0);
                             }
                             else
                             {
                                 ChannelInternetStatus.AddOrUpdate(channel, networkConnection, (key, oldValue) => networkConnection);
 
-                                ChannelInternetRetry.AddOrUpdate(channel, 1, (key, oldValue) => oldValue + 1);
+                                //ChannelInternetRetry.AddOrUpdate(channel, 1, (key, oldValue) => oldValue + 1);
 
-                                LoggingMethod.WriteToLog(string.Format("DateTime {0}, channel={1} {2} reconnectNetworkCallback. Retry {3} of {4}", DateTime.Now.ToString(), channel, netState.ResponseType, ChannelInternetRetry[channel], PubnubNetworkCheckRetries), LoggingMethod.LevelInfo);
+                                LoggingMethod.WriteToLog(string.Format("DateTime {0}, channel={1} {2} reconnectNetworkCallback. Retry", DateTime.Now.ToString(), channel, netState.ResponseType), LoggingMethod.LevelInfo);
 
                                 if (netState.Channels != null && netState.Channels.Length > 0)
                                 {
@@ -1095,7 +1084,7 @@ namespace PubnubApi.EndPoint
                                         string activeChannel = (netState.Channels != null && netState.Channels.Length > 0) ? netState.Channels[index].ToString() : "";
                                         string activeChannelGroup = (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0) ? netState.ChannelGroups[index].ToString() : "";
 
-                                        string message = string.Format("Detected internet connection problem. Retrying connection attempt {0} of {1}", ChannelInternetRetry[channel], PubnubNetworkCheckRetries);
+                                        string message = "Detected internet connection problem.Retrying connection";
 
                                         PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
                                         callbackKey.Channel = activeChannel;
@@ -1159,27 +1148,6 @@ namespace PubnubApi.EndPoint
                                     break;
                             }
                         }
-                        else if (ChannelInternetRetry.ContainsKey(channel) && ChannelInternetRetry[channel] >= PubnubNetworkCheckRetries)
-                        {
-                            if (ChannelReconnectTimer.ContainsKey(channel))
-                            {
-                                try
-                                {
-                                    ChannelReconnectTimer[channel].Change(Timeout.Infinite, Timeout.Infinite);
-                                    ChannelReconnectTimer[channel].Dispose();
-                                }
-                                catch { }
-                            }
-                            switch (netState.ResponseType)
-                            {
-                                case ResponseType.Subscribe:
-                                case ResponseType.Presence:
-                                    MultiplexExceptionHandler<T>(netState.ResponseType, netState.Channels, netState.ChannelGroups, netState.SubscribeRegularCallback, netState.PresenceRegularCallback, netState.ConnectCallback, netState.WildcardPresenceCallback, netState.ErrorCallback, true, false);
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
                     }
                     else if (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)
                     {
@@ -1201,14 +1169,14 @@ namespace PubnubApi.EndPoint
                             if (ChannelGroupInternetStatus[channelGroup])
                             {
                                 //Reset Retry if previous state is true
-                                ChannelGroupInternetRetry.AddOrUpdate(channelGroup, 0, (key, oldValue) => 0);
+                                //ChannelGroupInternetRetry.AddOrUpdate(channelGroup, 0, (key, oldValue) => 0);
                             }
                             else
                             {
                                 ChannelGroupInternetStatus.AddOrUpdate(channelGroup, networkConnection, (key, oldValue) => networkConnection);
 
-                                ChannelGroupInternetRetry.AddOrUpdate(channelGroup, 1, (key, oldValue) => oldValue + 1);
-                                LoggingMethod.WriteToLog(string.Format("DateTime {0}, channelgroup={1} {2} reconnectNetworkCallback. Retry {3} of {4}", DateTime.Now.ToString(), channelGroup, netState.ResponseType, ChannelGroupInternetRetry[channelGroup], PubnubNetworkCheckRetries), LoggingMethod.LevelInfo);
+                                //ChannelGroupInternetRetry.AddOrUpdate(channelGroup, 1, (key, oldValue) => oldValue + 1);
+                                LoggingMethod.WriteToLog(string.Format("DateTime {0}, channelgroup={1} {2} reconnectNetworkCallback. Retrying", DateTime.Now.ToString(), channelGroup, netState.ResponseType), LoggingMethod.LevelInfo);
 
                                 if (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)
                                 {
@@ -1217,7 +1185,7 @@ namespace PubnubApi.EndPoint
                                         string activeChannel = (netState.Channels != null && netState.Channels.Length > 0) ? netState.Channels[index].ToString() : "";
                                         string activeChannelGroup = (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0) ? netState.ChannelGroups[index].ToString() : "";
 
-                                        string message = string.Format("Detected internet connection problem. Retrying connection attempt {0} of {1}", ChannelGroupInternetRetry[channelGroup], PubnubNetworkCheckRetries);
+                                        string message = "Detected internet connection problem. Retrying connection";
 
                                         PubnubChannelGroupCallbackKey callbackKey = new PubnubChannelGroupCallbackKey();
                                         callbackKey.ChannelGroup = activeChannelGroup;
@@ -1269,33 +1237,12 @@ namespace PubnubApi.EndPoint
                             new PNCallbackService(config, jsonLibrary).CallErrorCallback(PubnubErrorSeverity.Warn, PubnubMessageSource.Client,
                                 multiChannel, multiChannelGroup, netState.ErrorCallback, message, PubnubErrorCode.YesInternet, null, null);
 
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0}, channelgroup={1} {2} reconnectNetworkCallback. Internet Available : {3}", DateTime.Now.ToString(), channelGroup, netState.ResponseType, ChannelGroupInternetRetry[channelGroup]), LoggingMethod.LevelInfo);
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0}, channelgroup={1} {2} reconnectNetworkCallback. Internet Available", DateTime.Now.ToString(), channelGroup, netState.ResponseType), LoggingMethod.LevelInfo);
                             switch (netState.ResponseType)
                             {
                                 case ResponseType.Subscribe:
                                 case ResponseType.Presence:
                                     MultiChannelSubscribeRequest<T>(netState.ResponseType, netState.Channels, netState.ChannelGroups, netState.Timetoken, netState.SubscribeRegularCallback, netState.PresenceRegularCallback, netState.ConnectCallback, netState.WildcardPresenceCallback, netState.ErrorCallback, true);
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                        else if (ChannelGroupInternetRetry[channelGroup] >= PubnubNetworkCheckRetries)
-                        {
-                            if (ChannelGroupReconnectTimer.ContainsKey(channelGroup))
-                            {
-                                try
-                                {
-                                    ChannelGroupReconnectTimer[channelGroup].Change(Timeout.Infinite, Timeout.Infinite);
-                                    ChannelGroupReconnectTimer[channelGroup].Dispose();
-                                }
-                                catch { }
-                            }
-                            switch (netState.ResponseType)
-                            {
-                                case ResponseType.Subscribe:
-                                case ResponseType.Presence:
-                                    MultiplexExceptionHandler<T>(netState.ResponseType, netState.Channels, netState.ChannelGroups, netState.SubscribeRegularCallback, netState.PresenceRegularCallback, netState.ConnectCallback, netState.WildcardPresenceCallback, netState.ErrorCallback, true, false);
                                     break;
                                 default:
                                     break;
@@ -1323,5 +1270,72 @@ namespace PubnubApi.EndPoint
             }
         }
 
+        private static void RegisterPresenceHeartbeatTimer<T>(string[] channels, string[] channelGroups, Action<PubnubClientError> errorCallback)
+        {
+            if (presenceHeartbeatTimer != null)
+            {
+                presenceHeartbeatTimer.Dispose();
+                presenceHeartbeatTimer = null;
+            }
+            if ((channels != null && channels.Length > 0 && channels.Where(s => s.Contains("-pnpres") == false).ToArray().Length > 0)
+                || (channelGroups != null && channelGroups.Length > 0 && channelGroups.Where(s => s.Contains("-pnpres") == false).ToArray().Length > 0))
+            {
+                RequestState<T> presenceHeartbeatState = new RequestState<T>();
+                presenceHeartbeatState.Channels = channels;
+                presenceHeartbeatState.ChannelGroups = channelGroups;
+                presenceHeartbeatState.ResponseType = ResponseType.PresenceHeartbeat;
+                presenceHeartbeatState.ErrorCallback = errorCallback;
+                presenceHeartbeatState.Request = null;
+                presenceHeartbeatState.Response = null;
+
+                if (config.PresenceHeartbeatInterval > 0)
+                {
+                    presenceHeartbeatTimer = new Timer(OnPresenceHeartbeatIntervalTimeout<T>, presenceHeartbeatState, config.PresenceHeartbeatInterval * 1000, config.PresenceHeartbeatInterval * 1000);
+                }
+            }
+        }
+
+        private static void OnPresenceHeartbeatIntervalTimeout<T>(System.Object presenceHeartbeatState)
+        {
+            //Make presence heartbeat call
+            RequestState<T> currentState = presenceHeartbeatState as RequestState<T>;
+            if (currentState != null)
+            {
+                bool networkConnection;
+                if (unitTest is IPubnubUnitTest && unitTest.EnableStubTest)
+                {
+                    networkConnection = true;
+                }
+                else
+                {
+                    networkConnection = CheckInternetConnectionStatus(pubnetSystemActive, currentState.ErrorCallback, currentState.Channels, currentState.ChannelGroups);
+                    if (networkConnection)
+                    {
+                        string[] subscriberChannels = (currentState.Channels != null) ? currentState.Channels.Where(s => s.Contains("-pnpres") == false).ToArray() : null;
+                        string[] subscriberChannelGroups = (currentState.ChannelGroups != null) ? currentState.ChannelGroups.Where(s => s.Contains("-pnpres") == false).ToArray() : null;
+
+                        if ((subscriberChannels != null && subscriberChannels.Length > 0) || (subscriberChannelGroups != null && subscriberChannelGroups.Length > 0))
+                        {
+                            string channelsJsonState = BuildJsonUserState(subscriberChannels, subscriberChannelGroups, false);
+                            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
+                            Uri request = urlBuilder.BuildPresenceHeartbeatRequest(subscriberChannels, subscriberChannelGroups, channelsJsonState);
+
+                            RequestState<T> requestState = new RequestState<T>();
+                            requestState.Channels = currentState.Channels;
+                            requestState.ChannelGroups = currentState.ChannelGroups;
+                            requestState.ResponseType = ResponseType.PresenceHeartbeat;
+                            requestState.SubscribeRegularCallback = null;
+                            requestState.ErrorCallback = currentState.ErrorCallback;
+                            requestState.Reconnect = false;
+                            requestState.Response = null;
+
+                            string json = UrlProcessRequest<T>(request, requestState, false);
+                        }
+                    }
+                }
+
+            }
+
+        }
     }
 }

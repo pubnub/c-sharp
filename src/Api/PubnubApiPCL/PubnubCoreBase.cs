@@ -37,7 +37,7 @@ namespace PubnubApi
         protected static ConcurrentDictionary<PubnubChannelGroupCallbackKey, object> channelGroupCallbacks = new ConcurrentDictionary<PubnubChannelGroupCallbackKey, object>();
         private static ConcurrentDictionary<string, List<string>> _channelSubscribedAuthKeys = new ConcurrentDictionary<string, List<string>>();
         protected static System.Threading.Timer localClientHeartBeatTimer;
-        protected System.Threading.Timer presenceHeartbeatTimer = null;
+        protected static System.Threading.Timer presenceHeartbeatTimer = null;
         protected static bool pubnetSystemActive = true;
         protected Collection<Uri> pushRemoteImageDomainUri = new Collection<Uri>();
         #endregion
@@ -49,7 +49,6 @@ namespace PubnubApi
         private static IPubnubUnitTest unitTest = null;
 
         private static int pubnubNetworkTcpCheckIntervalInSeconds = 15;
-        private static int pubnubNetworkCheckRetries = 50;
 
         protected static bool UuidChanged
         {
@@ -78,18 +77,6 @@ namespace PubnubApi
             set
             {
                 pubnubNetworkTcpCheckIntervalInSeconds = value;
-            }
-        }
-
-        protected static int PubnubNetworkCheckRetries
-        {
-            get
-            {
-                return pubnubNetworkCheckRetries;
-            }
-            set
-            {
-                pubnubNetworkCheckRetries = value;
             }
         }
 
@@ -146,18 +133,6 @@ namespace PubnubApi
             get;
             set;
         } = new ConcurrentDictionary<string, bool>();
-
-        protected static ConcurrentDictionary<string, int> ChannelInternetRetry
-        {
-            get;
-            set;
-        } = new ConcurrentDictionary<string, int>();
-
-        protected static ConcurrentDictionary<string, int> ChannelGroupInternetRetry
-        {
-            get;
-            set;
-        } = new ConcurrentDictionary<string, int>();
 
         protected static ConcurrentDictionary<string, Dictionary<string, object>> ChannelLocalUserState
         {
@@ -231,6 +206,8 @@ namespace PubnubApi
             pubnubConfig = pubnubConfiguation;
             jsonLib = jsonPluggableLibrary;
             unitTest = pubnubUnitTest;
+
+            Uuid = pubnubConfig.Uuid;
 
             pubnubHttp = new PubnubHttp(pubnubConfiguation, jsonLib);
 
@@ -308,14 +285,6 @@ namespace PubnubApi
                 {
                     ChannelInternetStatus.GetOrAdd(multiChannel, true); //Set to true for internet connection
                 }
-                if (ChannelInternetRetry.ContainsKey(multiChannel))
-                {
-                    ChannelInternetRetry.AddOrUpdate(multiChannel, 0, (key, oldValue) => 0);
-                }
-                else
-                {
-                    ChannelInternetRetry.GetOrAdd(multiChannel, 0); //Initialize the internet retry count
-                }
             }
 
             if (multiChannelGroup != "")
@@ -327,15 +296,6 @@ namespace PubnubApi
                 else
                 {
                     ChannelGroupInternetStatus.GetOrAdd(multiChannelGroup, true); //Set to true for internet connection
-                }
-
-                if (ChannelGroupInternetRetry.ContainsKey(multiChannelGroup))
-                {
-                    ChannelGroupInternetRetry.AddOrUpdate(multiChannelGroup, 0, (key, oldValue) => 0);
-                }
-                else
-                {
-                    ChannelGroupInternetRetry.GetOrAdd(multiChannelGroup, 0); //Initialize the internet retry count
                 }
             }
         }
@@ -1014,6 +974,7 @@ namespace PubnubApi
                 LoggingMethod.WriteToLog(string.Format("DateTime {0}, Request={1}", DateTime.Now.ToString(), requestUri.ToString()), LoggingMethod.LevelInfo);
 
                 Task<string> jsonResponse = pubnubHttp.SendRequestAndGetJsonResponse(requestUri, pubnubRequestState, request);
+
                 string jsonString = jsonResponse.Result;
 
                 LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON= {1} for request={2}", DateTime.Now.ToString(), jsonString, requestUri), LoggingMethod.LevelInfo);
@@ -1516,7 +1477,7 @@ namespace PubnubApi
         {
             if (state != null && state.Request != null)
             {
-                if (state.Channels != null && state.Channels.Length > 0)
+                if (state.Channels != null && state.Channels.Length > 0 && state.Channels[0] != null)
                 {
                     string activeChannel = state.Channels[0].ToString(); //Assuming one channel exist, else will refactor later
                     PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();

@@ -106,7 +106,12 @@ namespace PubnubApi
             this.SubscribeTimeout = 310;
             this.ConnectTimeout = 5;
             //this.LogVerbosity = LoggingMethod.Level.Off;
+            this.CiperKey = "";
+            this.PublishKey = "";
+            this.SubscribeKey = "";
+            this.SecretKey = "";
             this.Secure = true;
+            this.EnableJsonEncodingForPublish = true;
         }
 
         public PNConfiguration SetPresenceHeartbeatTimeoutWithCustomInterval(int timeout, int interval)

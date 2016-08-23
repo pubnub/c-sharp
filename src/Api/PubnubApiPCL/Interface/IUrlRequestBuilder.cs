@@ -46,5 +46,7 @@ namespace PubnubApi.Interface
         Uri BuildRemoveChannelPushRequest(string channel, PushTypeService pushType, string pushToken);
 
         Uri BuildGetChannelsPushRequest(PushTypeService pushType, string pushToken);
+
+        Uri BuildPresenceHeartbeatRequest(string[] channels, string[] channelGroups, string jsonUserState);
     }
 }

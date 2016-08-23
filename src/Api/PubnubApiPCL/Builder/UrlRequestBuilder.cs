@@ -31,6 +31,7 @@ namespace PubnubApi
         private string pushUnregisterDeviceParameters = "";
         private string pushRemoveChannelParameters = "";
         private string pushGetChannelsParameters = "";
+        private string presenceHeartbeatParameters = "";
 
         public UrlRequestBuilder(PNConfiguration config)
         {
@@ -698,6 +699,35 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, ResponseType.PushGet);
         }
 
+        Uri IUrlRequestBuilder.BuildPresenceHeartbeatRequest(string[] channels, string[] channelGroups, string jsonUserState)
+        {
+            StringBuilder presenceHeartbeatBuilder = new StringBuilder();
+            presenceHeartbeatParameters = "";
+            //string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
+            string channelsJsonState = jsonUserState;
+            if (channelsJsonState != "{}" && channelsJsonState != "")
+            {
+                presenceHeartbeatBuilder.AppendFormat("&state={0}", EncodeUricomponent(channelsJsonState, ResponseType.PresenceHeartbeat, false, false));
+            }
+            if (channelGroups != null && channelGroups.Length > 0)
+            {
+                presenceHeartbeatBuilder.AppendFormat("&channel-group={0}", string.Join(",", channelGroups));
+            }
+            presenceHeartbeatParameters = presenceHeartbeatBuilder.ToString();
+
+            string multiChannel = (channels != null && channels.Length > 0) ? string.Join(",", channels) : ",";
+            List<string> url = new List<string>();
+
+            url.Add("v2");
+            url.Add("presence");
+            url.Add("sub_key");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("channel");
+            url.Add(multiChannel);
+            url.Add("heartbeat");
+
+            return BuildRestApiRequest<Uri>(url, ResponseType.PresenceHeartbeat);
+        }
 
         private Uri BuildRestApiRequest<T>(List<string> urlComponents, ResponseType type)
         {
@@ -741,33 +771,33 @@ namespace PubnubApi
 
             if (type == ResponseType.Presence || type == ResponseType.Subscribe || type == ResponseType.Leave)
             {
-                //queryParamExist = true;
-                //url.AppendFormat("?uuid={0}", uuid);
-                //url.Append(subscribeParameters);
-                //if (!string.IsNullOrEmpty(_authenticationKey))
-                //{
-                //    url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
-                //}
-                //if (_pubnubPresenceHeartbeatInSeconds != 0)
-                //{
-                //    url.AppendFormat("&heartbeat={0}", _pubnubPresenceHeartbeatInSeconds);
-                //}
-                //url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
+                queryParamExist = true;
+                url.AppendFormat("?uuid={0}", uuid);
+                url.Append(subscribeParameters);
+                if (!string.IsNullOrEmpty(pubnubConfig.AuthKey))
+                {
+                    url.AppendFormat("&auth={0}", EncodeUricomponent(pubnubConfig.AuthKey, type, false, false));
+                }
+                if (pubnubConfig.PresenceHeartbeatTimeout != 0)
+                {
+                    url.AppendFormat("&heartbeat={0}", pubnubConfig.PresenceHeartbeatTimeout);
+                }
+                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(pubnubConfig.SdkVersion, type, false, true));
             }
             else if (type == ResponseType.PresenceHeartbeat)
             {
-                //queryParamExist = true;
-                //url.AppendFormat("?uuid={0}", uuid);
-                //url.Append(presenceHeartbeatParameters);
-                //if (_pubnubPresenceHeartbeatInSeconds != 0)
-                //{
-                //    url.AppendFormat("&heartbeat={0}", _pubnubPresenceHeartbeatInSeconds);
-                //}
-                //if (!string.IsNullOrEmpty(_authenticationKey))
-                //{
-                //    url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
-                //}
-                //url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
+                queryParamExist = true;
+                url.AppendFormat("?uuid={0}", uuid);
+                url.Append(presenceHeartbeatParameters);
+                if (pubnubConfig.PresenceHeartbeatTimeout != 0)
+                {
+                    url.AppendFormat("&heartbeat={0}", pubnubConfig.PresenceHeartbeatTimeout);
+                }
+                if (!string.IsNullOrEmpty(pubnubConfig.AuthKey))
+                {
+                    url.AppendFormat("&auth={0}", EncodeUricomponent(pubnubConfig.AuthKey, type, false, false));
+                }
+                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(pubnubConfig.SdkVersion, type, false, true));
             }
             else if (type == ResponseType.SetUserState)
             {
@@ -847,28 +877,28 @@ namespace PubnubApi
             }
             else if (type == ResponseType.PushRegister || type == ResponseType.PushRemove || type == ResponseType.PushGet || type == ResponseType.PushUnregister)
             {
-                //queryParamExist = true;
-                //switch (type)
-                //{
-                //    case ResponseType.PushRegister:
-                //        url.Append(pushRegisterDeviceParameters);
-                //        break;
-                //    case ResponseType.PushRemove:
-                //        url.Append(pushRemoveChannelParameters);
-                //        break;
-                //    case ResponseType.PushUnregister:
-                //        url.Append(pushUnregisterDeviceParameters);
-                //        break;
-                //    default:
-                //        url.Append(pushGetChannelsParameters);
-                //        break;
-                //}
-                //url.AppendFormat("&uuid={0}", uuid);
-                //if (!string.IsNullOrEmpty(_authenticationKey))
-                //{
-                //    url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
-                //}
-                //url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
+                queryParamExist = true;
+                switch (type)
+                {
+                    case ResponseType.PushRegister:
+                        url.Append(pushRegisterDeviceParameters);
+                        break;
+                    case ResponseType.PushRemove:
+                        url.Append(pushRemoveChannelParameters);
+                        break;
+                    case ResponseType.PushUnregister:
+                        url.Append(pushUnregisterDeviceParameters);
+                        break;
+                    default:
+                        url.Append(pushGetChannelsParameters);
+                        break;
+                }
+                url.AppendFormat("&uuid={0}", uuid);
+                if (!string.IsNullOrEmpty(pubnubConfig.AuthKey))
+                {
+                    url.AppendFormat("&auth={0}", EncodeUricomponent(pubnubConfig.AuthKey, type, false, false));
+                }
+                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(pubnubConfig.SdkVersion, type, false, true));
             }
             else if (type == ResponseType.ChannelGroupAdd || type == ResponseType.ChannelGroupRemove || type == ResponseType.ChannelGroupGet)
             {

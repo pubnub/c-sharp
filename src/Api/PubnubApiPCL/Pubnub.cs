@@ -495,6 +495,7 @@ namespace PubnubApi
         {
             pubnubConfig = pnConfig;
             jsonPluggableLibrary = new NewtonsoftJsonDotNet();
+            CheckRequiredConfigValues();
         }
 
         public Pubnub(PNConfiguration pnConfig, IJsonPluggableLibrary jsonPluggableLibrary)
@@ -505,6 +506,7 @@ namespace PubnubApi
             {
                 this.jsonPluggableLibrary = new NewtonsoftJsonDotNet();
             }
+            CheckRequiredConfigValues();
         }
 
         public Pubnub(PNConfiguration pnConfig, IPubnubUnitTest pubnubUnitTest)
@@ -512,6 +514,33 @@ namespace PubnubApi
             this.pubnubConfig = pnConfig;
             this.jsonPluggableLibrary = new NewtonsoftJsonDotNet();
             this.pubnubUnitTest = pubnubUnitTest;
+            CheckRequiredConfigValues();
+        }
+
+        private void CheckRequiredConfigValues()
+        {
+            if (pubnubConfig != null)
+            {
+                if (string.IsNullOrEmpty(pubnubConfig.SubscribeKey))
+                {
+                    pubnubConfig.SubscribeKey = "";
+                }
+
+                if (string.IsNullOrEmpty(pubnubConfig.PublishKey))
+                {
+                    pubnubConfig.PublishKey = "";
+                }
+
+                if (string.IsNullOrEmpty(pubnubConfig.SecretKey))
+                {
+                    pubnubConfig.SecretKey = "";
+                }
+
+                if (string.IsNullOrEmpty(pubnubConfig.CiperKey))
+                {
+                    pubnubConfig.CiperKey = "";
+                }
+            }
         }
 
         //TO BE REMOVED
