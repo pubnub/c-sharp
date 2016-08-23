@@ -378,13 +378,19 @@ namespace PubNubMessaging.Core
 				case WebExceptionStatus.ConnectFailure:
                     ret = PubnubErrorCode.ConnectFailure;
 				break;
+				case WebExceptionStatus.SendFailure:
+					ret = PubnubErrorCode.ConnectFailure;
+					break;
 				case WebExceptionStatus.Pending:
 				if (webExceptionMessage == "Machine suspend mode enabled. No request will be processed.")
 				{
 					ret = PubnubErrorCode.PubnubClientMachineSleep;
 				}
 				break;
-				default:
+                case WebExceptionStatus.Success:
+                    ret = PubnubErrorCode.ConnectFailure;
+                break;
+                default:
 #if NETFX_CORE
                 if (webExceptionStatus.ToString() == "NameResolutionFailure")
                 {
@@ -395,9 +401,16 @@ namespace PubNubMessaging.Core
                     Debug.WriteLine("ATTENTION: webExceptionStatus = " + webExceptionStatus.ToString());
                     ret = PubnubErrorCode.None;
                 }
-#else             
-				Debug.WriteLine("ATTENTION: webExceptionStatus = " + webExceptionStatus.ToString());
-                ret = PubnubErrorCode.None;
+#else
+                if (webExceptionStatus.ToString() == "SecureChannelFailure")
+                {
+                    ret = PubnubErrorCode.ConnectFailure;
+                }
+                else
+                {
+                    Debug.WriteLine("ATTENTION: webExceptionStatus = " + webExceptionStatus.ToString());
+                    ret = PubnubErrorCode.None;
+                }
 #endif
 				break;
 			}
@@ -447,7 +460,27 @@ namespace PubNubMessaging.Core
             {
                 ret = PubnubErrorCode.NameResolutionFailure;
             }
-            else
+            else if (errorType == "System.Net.WebException" && errorMessage.Contains("Unable to read data from the transport connection"))
+            {
+                ret = PubnubErrorCode.ConnectFailure;
+            }
+			else if (errorType == "System.Net.WebException" && errorMessage.Contains("SecureChannelFailure"))
+			{
+				ret = PubnubErrorCode.ConnectFailure;
+			}
+			else if (errorType == "System.Net.WebException" && errorMessage.Contains("ConnectFailure"))
+			{
+				ret = PubnubErrorCode.ConnectFailure;
+			}
+			else if (errorType == "System.Net.WebException" && errorMessage.Contains("ReceiveFailure"))
+			{
+				ret = PubnubErrorCode.ConnectFailure;
+			}
+			else if (errorType == "System.Net.WebException" && errorMessage.Contains("SendFailure"))
+			{
+				ret = PubnubErrorCode.ConnectFailure;
+			}
+			else
             {
                 //Console.WriteLine("ATTENTION: Error Type = " + errorType);
                 //Console.WriteLine("ATTENTION: Error Message = " + errorMessage);
