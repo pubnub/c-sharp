@@ -74,6 +74,7 @@
     <Compile Include="Model\Consumer\Ack\GrantAckPayload.cs" />
     <Compile Include="Model\Consumer\Ack\HereNowAck.cs" />
     <Compile Include="Interface\IJsonPluggableLibrary.cs" />
+    <Compile Include="Model\Fluent\Publish.cs" />
     <Compile Include="Model\InternetState.cs" />
     <Compile Include="Interface\IPubnubLog.cs" />
     <Compile Include="Interface\IPubnubSubscribeMessageType.cs" />

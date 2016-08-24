@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
+using PubnubApi;
 
 namespace PubnubApi
 {
@@ -49,17 +50,10 @@ namespace PubnubApi
             endPoint.Subscribe<T>(channel, channelGroup, subscribeCallback, connectCallback, disconnectCallback, wildcardPresenceCallback, errorCallback);
         }
 
-        public void Publish(string channel, object message, Action<PublishAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.PublishOperation endPoint = new EndPoint.PublishOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.Publish(channel, message, true, "", userCallback, errorCallback);
-		}
-
-        public void Publish(string channel, object message, bool storeInHistory, string jsonUserMetaData, Action<PublishAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.PublishOperation endPoint = new EndPoint.PublishOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.Publish(channel, message, storeInHistory, jsonUserMetaData, userCallback, errorCallback);
-		}
+        public Publish publish()
+        {
+            return new Publish(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
 
 		public void Presence(string channel, Action<PresenceAck> presenceCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PubnubClientError> errorCallback)
 		{
