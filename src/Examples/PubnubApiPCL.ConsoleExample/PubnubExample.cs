@@ -648,11 +648,11 @@ namespace PubnubApi
                         int intData;
                         if (int.TryParse(publishMsg, out intData)) //capture numeric data
                         {
-                            pubnub.publish().channel(channel).message(intData).meta(jsonUserMetaData).shouldStore(store).async(new Publish.PNCallback() { result = DisplayPublishReturnMessage, error = DisplayErrorMessage });
+                            pubnub.publish().channel(channel).message(intData).meta(jsonUserMetaData).shouldStore(store).async(new PNCallback<PublishAck>() { result = DisplayPublishReturnMessage, error = DisplayErrorMessage });
                         }
                         else if (double.TryParse(publishMsg, out doubleData)) //capture numeric data
                         {
-                            pubnub.publish().channel(channel).message(doubleData).meta(jsonUserMetaData).shouldStore(store).async(new Publish.PNCallback() { result = DisplayPublishReturnMessage, error = DisplayErrorMessage });
+                            pubnub.publish().channel(channel).message(doubleData).meta(jsonUserMetaData).shouldStore(store).async(new PNCallback<PublishAck>() { result = DisplayPublishReturnMessage, error = DisplayErrorMessage });
                         }
                         else
                         {
@@ -662,20 +662,20 @@ namespace PubnubApi
                                 string strMsg = publishMsg.Substring(1, publishMsg.Length - 2);
                                 if (int.TryParse(strMsg, out intData))
                                 {
-                                    pubnub.publish().channel(channel).message(strMsg).meta(jsonUserMetaData).shouldStore(store).async(new Publish.PNCallback() { result = DisplayPublishReturnMessage, error = DisplayErrorMessage });
+                                    pubnub.publish().channel(channel).message(strMsg).meta(jsonUserMetaData).shouldStore(store).async(new PNCallback<PublishAck>() { result = DisplayPublishReturnMessage, error = DisplayErrorMessage });
                                 }
                                 else if (double.TryParse(strMsg, out doubleData))
                                 {
-                                    pubnub.publish().channel(channel).message(strMsg).meta(jsonUserMetaData).shouldStore(store).async(new Publish.PNCallback() { result = DisplayPublishReturnMessage, error = DisplayErrorMessage });
+                                    pubnub.publish().channel(channel).message(strMsg).meta(jsonUserMetaData).shouldStore(store).async(new PNCallback<PublishAck>() { result = DisplayPublishReturnMessage, error = DisplayErrorMessage });
                                 }
                                 else
                                 {
-                                    pubnub.publish().channel(channel).message(publishMsg).meta(jsonUserMetaData).shouldStore(store).async(new Publish.PNCallback() { result = DisplayPublishReturnMessage, error = DisplayErrorMessage });
+                                    pubnub.publish().channel(channel).message(publishMsg).meta(jsonUserMetaData).shouldStore(store).async(new PNCallback<PublishAck>() { result = DisplayPublishReturnMessage, error = DisplayErrorMessage });
                                 }
                             }
                             else
                             {
-                                pubnub.publish().channel(channel).message(publishMsg).meta(jsonUserMetaData).shouldStore(store).async(new Publish.PNCallback() { result = DisplayPublishReturnMessage, error = DisplayErrorMessage } );
+                                pubnub.publish().channel(channel).message(publishMsg).meta(jsonUserMetaData).shouldStore(store).async(new PNCallback<PublishAck>() { result = DisplayPublishReturnMessage, error = DisplayErrorMessage } );
                             }
                         }
                         break;
@@ -1490,7 +1490,7 @@ namespace PubnubApi
                         config.EnableDebugForPushPublish = true;
 
                         Console.WriteLine("Running Publish for Toast");
-                        pubnub.publish().channel(toastChannel).message(dicToast).async(new Publish.PNCallback() { result = DisplayPublishReturnMessage, error = DisplayErrorMessage });
+                        pubnub.publish().channel(toastChannel).message(dicToast).async(new PNCallback<PublishAck>() { result = DisplayPublishReturnMessage, error = DisplayErrorMessage });
                         break;
                     case "35":
                         //Flip Tile message publish
@@ -1555,7 +1555,7 @@ namespace PubnubApi
                         dicFlipTile.Add("pn_mpns", flipTile);
 
                         config.EnableDebugForPushPublish = true;
-                        pubnub.publish().channel(flipTileChannel).message(dicFlipTile).async(new Publish.PNCallback() { result = DisplayPublishReturnMessage, error = DisplayErrorMessage });
+                        pubnub.publish().channel(flipTileChannel).message(dicFlipTile).async(new PNCallback<PublishAck>() { result = DisplayPublishReturnMessage, error = DisplayErrorMessage });
                         break;
                     case "36":
                         //Cycle Tile message publish
@@ -1598,7 +1598,7 @@ namespace PubnubApi
                         dicCycleTile.Add("pn_mpns", cycleTile);
 
                         config.EnableDebugForPushPublish = true;
-                        pubnub.publish().channel(cycleTileChannel).message(dicCycleTile).async(new Publish.PNCallback() { result = DisplayPublishReturnMessage, error = DisplayErrorMessage });
+                        pubnub.publish().channel(cycleTileChannel).message(dicCycleTile).async(new PNCallback<PublishAck>() { result = DisplayPublishReturnMessage, error = DisplayErrorMessage });
                         break;
                     case "37":
                         //Iconic Tile message publish
@@ -1640,7 +1640,7 @@ namespace PubnubApi
                         dicIconicTile.Add("pn_mpns", iconicTile);
 
                         config.EnableDebugForPushPublish = true;
-                        pubnub.publish().channel(iconicTileChannel).message(dicIconicTile).async(new Publish.PNCallback() { result = DisplayPublishReturnMessage, error = DisplayErrorMessage });
+                        pubnub.publish().channel(iconicTileChannel).message(dicIconicTile).async(new PNCallback<PublishAck>() { result = DisplayPublishReturnMessage, error = DisplayErrorMessage });
                         break;
                     case "38":
                         Console.WriteLine("Enter namespace");

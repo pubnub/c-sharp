@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 
 namespace PubnubApi
 {
-    internal abstract class PubnubCoreBase
+    public abstract class PubnubCoreBase
     {
         #region "Class variables"
         private static bool _enableResumeOnReconnect = true;
@@ -33,8 +33,6 @@ namespace PubnubApi
         private LoggingMethod.Level _pubnubLogLevel = LoggingMethod.Level.Off;
         private static PubnubErrorFilter.Level _errorLevel = PubnubErrorFilter.Level.Info;
         protected static ConcurrentDictionary<Uri, Timer> channelLocalClientHeartbeatTimer = new ConcurrentDictionary<Uri, Timer>();
-        protected static ConcurrentDictionary<PubnubChannelCallbackKey, object> channelCallbacks = new ConcurrentDictionary<PubnubChannelCallbackKey, object>();
-        protected static ConcurrentDictionary<PubnubChannelGroupCallbackKey, object> channelGroupCallbacks = new ConcurrentDictionary<PubnubChannelGroupCallbackKey, object>();
         private static ConcurrentDictionary<string, List<string>> _channelSubscribedAuthKeys = new ConcurrentDictionary<string, List<string>>();
         protected static System.Threading.Timer localClientHeartBeatTimer;
         protected static System.Threading.Timer presenceHeartbeatTimer = null;
@@ -79,6 +77,18 @@ namespace PubnubApi
                 pubnubNetworkTcpCheckIntervalInSeconds = value;
             }
         }
+
+        public static ConcurrentDictionary<PubnubChannelCallbackKey, object> ChannelCallbacks
+        {
+            get;
+            set;
+        } = new ConcurrentDictionary<PubnubChannelCallbackKey, object>();
+
+        public static ConcurrentDictionary<PubnubChannelGroupCallbackKey, object> ChannelGroupCallbacks
+        {
+            get;
+            set;
+        } = new ConcurrentDictionary<PubnubChannelGroupCallbackKey, object>();
 
         protected static ConcurrentDictionary<string, long> MultiChannelSubscribe
         {
@@ -369,9 +379,9 @@ namespace PubnubApi
                             callbackKey.Channel = channel;
                             callbackKey.ResponseType = type;
 
-                            if (channelCallbacks.Count > 0 && channelCallbacks.ContainsKey(callbackKey))
+                            if (ChannelCallbacks.Count > 0 && ChannelCallbacks.ContainsKey(callbackKey))
                             {
-                                PubnubSubscribeChannelCallback<T> currentPubnubCallback = channelCallbacks[callbackKey] as PubnubSubscribeChannelCallback<T>;
+                                PubnubSubscribeChannelCallback<T> currentPubnubCallback = ChannelCallbacks[callbackKey] as PubnubSubscribeChannelCallback<T>;
                                 if (currentPubnubCallback != null && currentPubnubCallback.ConnectCallback != null)
                                 {
                                     Action<ConnectOrDisconnectAck> targetCallback = currentPubnubCallback.ConnectCallback;
@@ -390,9 +400,9 @@ namespace PubnubApi
                             presenceCallbackKey.Channel = channel;
                             presenceCallbackKey.ResponseType = type;
 
-                            if (channelCallbacks.Count > 0 && channelCallbacks.ContainsKey(presenceCallbackKey))
+                            if (ChannelCallbacks.Count > 0 && ChannelCallbacks.ContainsKey(presenceCallbackKey))
                             {
-                                PubnubPresenceChannelCallback currentPubnubCallback = channelCallbacks[presenceCallbackKey] as PubnubPresenceChannelCallback;
+                                PubnubPresenceChannelCallback currentPubnubCallback = ChannelCallbacks[presenceCallbackKey] as PubnubPresenceChannelCallback;
                                 if (currentPubnubCallback != null && currentPubnubCallback.ConnectCallback != null)
                                 {
                                     Action<ConnectOrDisconnectAck> targetCallback = currentPubnubCallback.ConnectCallback;
@@ -428,9 +438,9 @@ namespace PubnubApi
                             callbackKey.ChannelGroup = channelGroup;
                             callbackKey.ResponseType = type;
 
-                            if (channelGroupCallbacks.Count > 0 && channelGroupCallbacks.ContainsKey(callbackKey))
+                            if (ChannelGroupCallbacks.Count > 0 && ChannelGroupCallbacks.ContainsKey(callbackKey))
                             {
-                                PubnubSubscribeChannelGroupCallback<T> currentPubnubCallback = channelGroupCallbacks[callbackKey] as PubnubSubscribeChannelGroupCallback<T>;
+                                PubnubSubscribeChannelGroupCallback<T> currentPubnubCallback = ChannelGroupCallbacks[callbackKey] as PubnubSubscribeChannelGroupCallback<T>;
                                 if (currentPubnubCallback != null && currentPubnubCallback.ConnectCallback != null)
                                 {
                                     Action<ConnectOrDisconnectAck> targetCallback = currentPubnubCallback.ConnectCallback;
@@ -450,9 +460,9 @@ namespace PubnubApi
                             presenceCallbackKey.ChannelGroup = channelGroup;
                             presenceCallbackKey.ResponseType = type;
 
-                            if (channelGroupCallbacks.Count > 0 && channelGroupCallbacks.ContainsKey(presenceCallbackKey))
+                            if (ChannelGroupCallbacks.Count > 0 && ChannelGroupCallbacks.ContainsKey(presenceCallbackKey))
                             {
-                                PubnubPresenceChannelGroupCallback currentPubnubCallback = channelGroupCallbacks[presenceCallbackKey] as PubnubPresenceChannelGroupCallback;
+                                PubnubPresenceChannelGroupCallback currentPubnubCallback = ChannelGroupCallbacks[presenceCallbackKey] as PubnubPresenceChannelGroupCallback;
                                 if (currentPubnubCallback != null && currentPubnubCallback.ConnectCallback != null)
                                 {
                                     Action<ConnectOrDisconnectAck> targetCallback = currentPubnubCallback.ConnectCallback;
@@ -563,12 +573,12 @@ namespace PubnubApi
                                     callbackKey.ResponseType = (currentChannel.LastIndexOf("-pnpres") == -1) ? ResponseType.Subscribe : ResponseType.Presence;
                                 }
 
-                                if (channelCallbacks.Count > 0 && channelCallbacks.ContainsKey(callbackKey))
+                                if (ChannelCallbacks.Count > 0 && ChannelCallbacks.ContainsKey(callbackKey))
                                 {
                                     //TODO: PANDU REFACTOR REPEAT LOGIC
                                     if (callbackKey.ResponseType == ResponseType.Presence)
                                     {
-                                        PubnubPresenceChannelCallback currentPubnubCallback = channelCallbacks[callbackKey] as PubnubPresenceChannelCallback;
+                                        PubnubPresenceChannelCallback currentPubnubCallback = ChannelCallbacks[callbackKey] as PubnubPresenceChannelCallback;
                                         if (currentPubnubCallback != null)
                                         {
                                             if (currentPubnubCallback.PresenceRegularCallback != null)
@@ -580,7 +590,7 @@ namespace PubnubApi
                                     }
                                     else
                                     {
-                                        PubnubSubscribeChannelCallback<T> currentPubnubCallback = channelCallbacks[callbackKey] as PubnubSubscribeChannelCallback<T>;
+                                        PubnubSubscribeChannelCallback<T> currentPubnubCallback = ChannelCallbacks[callbackKey] as PubnubSubscribeChannelCallback<T>;
                                         //object pubnubSubscribeCallbackObject = channelCallbacks[callbackKey];
                                         //if (pubnubSubscribeCallbackObject is PubnubSubscribeChannelCallback<string>)
                                         //{
@@ -628,11 +638,11 @@ namespace PubnubApi
                                 callbackGroupKey.ChannelGroup = currentChannelGroup;
                                 callbackGroupKey.ResponseType = (currentChannelGroup.LastIndexOf("-pnpres") == -1) ? ResponseType.Subscribe : ResponseType.Presence;
 
-                                if (channelGroupCallbacks.Count > 0 && channelGroupCallbacks.ContainsKey(callbackGroupKey))
+                                if (ChannelGroupCallbacks.Count > 0 && ChannelGroupCallbacks.ContainsKey(callbackGroupKey))
                                 {
                                     if (callbackGroupKey.ResponseType == ResponseType.Presence)
                                     {
-                                        PubnubPresenceChannelGroupCallback currentPubnubCallback = channelGroupCallbacks[callbackGroupKey] as PubnubPresenceChannelGroupCallback;
+                                        PubnubPresenceChannelGroupCallback currentPubnubCallback = ChannelGroupCallbacks[callbackGroupKey] as PubnubPresenceChannelGroupCallback;
                                         if (currentPubnubCallback != null)
                                         {
                                             if (itemMessage.Count >= 4 && currentChannelGroup.Contains(".*") && currentChannel.Contains("-pnpres"))
@@ -653,7 +663,7 @@ namespace PubnubApi
                                     }
                                     else
                                     {
-                                        PubnubSubscribeChannelGroupCallback<T> currentPubnubCallback = channelGroupCallbacks[callbackGroupKey] as PubnubSubscribeChannelGroupCallback<T>;
+                                        PubnubSubscribeChannelGroupCallback<T> currentPubnubCallback = ChannelGroupCallbacks[callbackGroupKey] as PubnubSubscribeChannelGroupCallback<T>;
                                         //dynamic currentPubnubCallback;
                                         //object pubnubSubscribeCallbackObject = channelCallbacks[callbackKey];
                                         //if (pubnubSubscribeCallbackObject is PubnubSubscribeChannelGroupCallback<string>)
@@ -1300,7 +1310,7 @@ namespace PubnubApi
                                 callbackKey.Channel = ch;
                                 callbackKey.ResponseType = asyncRequestState.ResponseType;
 
-                                if (channelCallbacks.Count > 0 && channelCallbacks.ContainsKey(callbackKey))
+                                if (ChannelCallbacks.Count > 0 && ChannelCallbacks.ContainsKey(callbackKey))
                                 {
                                     callbackAvailable = true;
                                     break;
@@ -1316,7 +1326,7 @@ namespace PubnubApi
                                 callbackKey.ChannelGroup = cg;
                                 callbackKey.ResponseType = asyncRequestState.ResponseType;
 
-                                if (channelGroupCallbacks.Count > 0 && channelGroupCallbacks.ContainsKey(callbackKey))
+                                if (ChannelGroupCallbacks.Count > 0 && ChannelGroupCallbacks.ContainsKey(callbackKey))
                                 {
                                     callbackAvailable = true;
                                     break;
@@ -1484,10 +1494,10 @@ namespace PubnubApi
                     callbackKey.Channel = (state.ResponseType == ResponseType.Subscribe) ? activeChannel.Replace("-pnpres", "") : activeChannel;
                     callbackKey.ResponseType = state.ResponseType;
 
-                    if (channelCallbacks.Count > 0 && channelCallbacks.ContainsKey(callbackKey))
+                    if (ChannelCallbacks.Count > 0 && ChannelCallbacks.ContainsKey(callbackKey))
                     {
                         object callbackObject;
-                        bool channelAvailable = channelCallbacks.TryGetValue(callbackKey, out callbackObject);
+                        bool channelAvailable = ChannelCallbacks.TryGetValue(callbackKey, out callbackObject);
                         if (channelAvailable)
                         {
                             if (state.ResponseType == ResponseType.Presence)
@@ -1516,10 +1526,10 @@ namespace PubnubApi
                     callbackKey.ChannelGroup = (state.ResponseType == ResponseType.Subscribe) ? activeChannelGroup.Replace("-pnpres", "") : activeChannelGroup;
                     callbackKey.ResponseType = state.ResponseType;
 
-                    if (channelGroupCallbacks.Count > 0 && channelGroupCallbacks.ContainsKey(callbackKey))
+                    if (ChannelGroupCallbacks.Count > 0 && ChannelGroupCallbacks.ContainsKey(callbackKey))
                     {
                         object callbackObject;
-                        bool channelAvailable = channelGroupCallbacks.TryGetValue(callbackKey, out callbackObject);
+                        bool channelAvailable = ChannelGroupCallbacks.TryGetValue(callbackKey, out callbackObject);
                         if (channelAvailable)
                         {
                             if (state.ResponseType == ResponseType.Presence)
@@ -1637,11 +1647,11 @@ namespace PubnubApi
                             break;
                     }
 
-                    if (channelCallbacks.Count > 0 && channelCallbacks.ContainsKey(callbackKey))
+                    if (ChannelCallbacks.Count > 0 && ChannelCallbacks.ContainsKey(callbackKey))
                     {
                         if (type == ResponseType.Presence)
                         {
-                            PubnubPresenceChannelCallback currentPubnubCallback = channelCallbacks[callbackKey] as PubnubPresenceChannelCallback;
+                            PubnubPresenceChannelCallback currentPubnubCallback = ChannelCallbacks[callbackKey] as PubnubPresenceChannelCallback;
                             if (currentPubnubCallback != null)
                             {
                                 currentPubnubCallback.PresenceRegularCallback = null;
@@ -1650,7 +1660,7 @@ namespace PubnubApi
                         }
                         else
                         {
-                            PubnubSubscribeChannelCallback<T> currentPubnubCallback = channelCallbacks[callbackKey] as PubnubSubscribeChannelCallback<T>;
+                            PubnubSubscribeChannelCallback<T> currentPubnubCallback = ChannelCallbacks[callbackKey] as PubnubSubscribeChannelCallback<T>;
                             if (currentPubnubCallback != null)
                             {
                                 currentPubnubCallback.SubscribeRegularCallback = null;
@@ -1666,16 +1676,16 @@ namespace PubnubApi
 
         protected void RemoveChannelCallback()
         {
-            ICollection<PubnubChannelCallbackKey> channelCollection = channelCallbacks.Keys;
+            ICollection<PubnubChannelCallbackKey> channelCollection = ChannelCallbacks.Keys;
             if (channelCollection != null && channelCollection.Count > 0)
             {
                 List<PubnubChannelCallbackKey> channelList = channelCollection.ToList();
                 foreach (PubnubChannelCallbackKey keyChannel in channelList)
                 {
-                    if (channelCallbacks.ContainsKey(keyChannel))
+                    if (ChannelCallbacks.ContainsKey(keyChannel))
                     {
                         object tempChannelCallback;
-                        bool removeKey = channelCallbacks.TryRemove(keyChannel, out tempChannelCallback);
+                        bool removeKey = ChannelCallbacks.TryRemove(keyChannel, out tempChannelCallback);
                         if (removeKey)
                         {
                             LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveChannelCallback from dictionary in RemoveChannelCallback for channel= {1}", DateTime.Now.ToString(), removeKey), LoggingMethod.LevelInfo);
@@ -1711,11 +1721,11 @@ namespace PubnubApi
                             break;
                     }
 
-                    if (channelGroupCallbacks.Count > 0 && channelGroupCallbacks.ContainsKey(callbackKey))
+                    if (ChannelGroupCallbacks.Count > 0 && ChannelGroupCallbacks.ContainsKey(callbackKey))
                     {
                         if (type == ResponseType.Presence)
                         {
-                            PubnubPresenceChannelGroupCallback currentPubnubCallback = channelGroupCallbacks[callbackKey] as PubnubPresenceChannelGroupCallback;
+                            PubnubPresenceChannelGroupCallback currentPubnubCallback = ChannelGroupCallbacks[callbackKey] as PubnubPresenceChannelGroupCallback;
                             if (currentPubnubCallback != null)
                             {
                                 currentPubnubCallback.PresenceRegularCallback = null;
@@ -1724,7 +1734,7 @@ namespace PubnubApi
                         }
                         else
                         {
-                            PubnubSubscribeChannelGroupCallback<T> currentPubnubCallback = channelGroupCallbacks[callbackKey] as PubnubSubscribeChannelGroupCallback<T>;
+                            PubnubSubscribeChannelGroupCallback<T> currentPubnubCallback = ChannelGroupCallbacks[callbackKey] as PubnubSubscribeChannelGroupCallback<T>;
                             if (currentPubnubCallback != null)
                             {
                                 currentPubnubCallback.SubscribeRegularCallback = null;
@@ -1740,16 +1750,16 @@ namespace PubnubApi
 
         protected void RemoveChannelGroupCallback()
         {
-            ICollection<PubnubChannelGroupCallbackKey> channelGroupCollection = channelGroupCallbacks.Keys;
+            ICollection<PubnubChannelGroupCallbackKey> channelGroupCollection = ChannelGroupCallbacks.Keys;
             if (channelGroupCollection != null && channelGroupCollection.Count > 0)
             {
                 List<PubnubChannelGroupCallbackKey> channelGroupCallbackList = channelGroupCollection.ToList();
                 foreach (PubnubChannelGroupCallbackKey keyChannelGroup in channelGroupCallbackList)
                 {
-                    if (channelGroupCallbacks.ContainsKey(keyChannelGroup))
+                    if (ChannelGroupCallbacks.ContainsKey(keyChannelGroup))
                     {
                         object tempChannelGroupCallback;
-                        bool removeKey = channelGroupCallbacks.TryRemove(keyChannelGroup, out tempChannelGroupCallback);
+                        bool removeKey = ChannelGroupCallbacks.TryRemove(keyChannelGroup, out tempChannelGroupCallback);
                         if (removeKey)
                         {
                             LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveChannelGroupCallback from dictionary in RemoveChannelGroupCallback for channelgroup= {1}", DateTime.Now.ToString(), keyChannelGroup), LoggingMethod.LevelInfo);

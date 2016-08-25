@@ -12,8 +12,6 @@ namespace PubnubApi
         private IJsonPluggableLibrary jsonPluggableLibrary = null;
         private IPubnubUnitTest pubnubUnitTest = null;
 
-        //PubnubWin pubnub;
-
 		#region "PubNub API Channel Methods"
 
 		public void Subscribe<T>(string channel, Action<Message<T>> subscribeCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PubnubClientError> errorCallback)
@@ -50,9 +48,9 @@ namespace PubnubApi
             endPoint.Subscribe<T>(channel, channelGroup, subscribeCallback, connectCallback, disconnectCallback, wildcardPresenceCallback, errorCallback);
         }
 
-        public Publish publish()
+        public EndPoint.PublishOperation publish()
         {
-            return new Publish(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            return new EndPoint.PublishOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
 		public void Presence(string channel, Action<PresenceAck> presenceCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PubnubClientError> errorCallback)
@@ -279,10 +277,10 @@ namespace PubnubApi
             EndPoint.PushOperation endPoint = new EndPoint.PushOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
             endPoint.GetChannelsForDevice<T>(pushType, pushToken, userCallback, errorCallback);
 		}
-		#endregion
+        #endregion
 
-		#region "PubNub API Channel Group Methods"
-		public void AddChannelsToChannelGroup(string[] channels, string groupName, Action<AddChannelToChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
+        #region "PubNub API Channel Group Methods"
+        public void AddChannelsToChannelGroup(string[] channels, string groupName, Action<AddChannelToChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
 		{
             EndPoint.AddChannelsToChannelGroupOperation endPoint = new EndPoint.AddChannelsToChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
             endPoint.AddChannelsToChannelGroup(channels, "", groupName, userCallback, errorCallback);

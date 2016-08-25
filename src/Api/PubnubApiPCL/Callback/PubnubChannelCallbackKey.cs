@@ -1,7 +1,7 @@
 ﻿
 namespace PubnubApi
 {
-    internal struct PubnubChannelCallbackKey
+    public struct PubnubChannelCallbackKey
     {
         public string Channel;
         public ResponseType ResponseType;

@@ -6,10 +6,16 @@ using PubnubApi.Interface;
 
 namespace PubnubApi.EndPoint
 {
-    internal class PublishOperation : PubnubCoreBase
+    public class PublishOperation : PubnubCoreBase
     {
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
+
+        private object msg = null;
+        private string channelName = "";
+        private bool storeInHistory = true;
+        private bool httpPost = false;
+        private string userMetadata = "";
 
         public PublishOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
         {
@@ -28,7 +34,42 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        internal void Publish(string channel, object message, bool storeInHistory, string jsonUserMetaData, Action<PublishAck> userCallback, Action<PubnubClientError> errorCallback)
+        public PublishOperation message(object message)
+        {
+            this.msg = message;
+            return this;
+        }
+
+        public PublishOperation channel(string channelName)
+        {
+            this.channelName = channelName;
+            return this;
+        }
+
+        public PublishOperation shouldStore(bool store)
+        {
+            this.storeInHistory = store;
+            return this;
+        }
+
+        public PublishOperation meta(string jsonMetadata)
+        {
+            this.userMetadata = jsonMetadata;
+            return this;
+        }
+
+        public PublishOperation usePOST(bool post)
+        {
+            this.httpPost = post;
+            return this;
+        }
+
+        public void async(PNCallback<PublishAck> callback)
+        {
+            Publish(this.channelName, this.msg, this.storeInHistory, this.userMetadata, callback.result, callback.error);
+        }
+
+        private void Publish(string channel, object message, bool storeInHistory, string jsonUserMetaData, Action<PublishAck> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
             {

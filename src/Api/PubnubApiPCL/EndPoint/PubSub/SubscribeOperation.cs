@@ -353,9 +353,9 @@ namespace PubnubApi.EndPoint
                         if (type == ResponseType.Unsubscribe)
                         {
                             callbackKey.ResponseType = ResponseType.Subscribe;
-                            if (channelCallbacks.Count > 0 && channelCallbacks.ContainsKey(callbackKey))
+                            if (ChannelCallbacks.Count > 0 && ChannelCallbacks.ContainsKey(callbackKey))
                             {
-                                PubnubSubscribeChannelCallback<T> currentPubnubCallback = channelCallbacks[callbackKey] as PubnubSubscribeChannelCallback<T>;
+                                PubnubSubscribeChannelCallback<T> currentPubnubCallback = ChannelCallbacks[callbackKey] as PubnubSubscribeChannelCallback<T>;
                                 if (currentPubnubCallback != null && currentPubnubCallback.DisconnectCallback != null)
                                 {
                                     Action<ConnectOrDisconnectAck> targetCallback = currentPubnubCallback.DisconnectCallback;
@@ -367,9 +367,9 @@ namespace PubnubApi.EndPoint
                         else if (type == ResponseType.PresenceUnsubscribe)
                         {
                             callbackKey.ResponseType = ResponseType.Presence;
-                            if (channelCallbacks.Count > 0 && channelCallbacks.ContainsKey(callbackKey))
+                            if (ChannelCallbacks.Count > 0 && ChannelCallbacks.ContainsKey(callbackKey))
                             {
-                                PubnubPresenceChannelCallback currentPubnubCallback = channelCallbacks[callbackKey] as PubnubPresenceChannelCallback;
+                                PubnubPresenceChannelCallback currentPubnubCallback = ChannelCallbacks[callbackKey] as PubnubPresenceChannelCallback;
                                 if (currentPubnubCallback != null && currentPubnubCallback.DisconnectCallback != null)
                                 {
                                     Action<ConnectOrDisconnectAck> targetCallback = currentPubnubCallback.DisconnectCallback;
@@ -417,9 +417,9 @@ namespace PubnubApi.EndPoint
                         if (type == ResponseType.Unsubscribe)
                         {
                             callbackKey.ResponseType = ResponseType.Subscribe;
-                            if (channelGroupCallbacks.Count > 0 && channelGroupCallbacks.ContainsKey(callbackKey))
+                            if (ChannelGroupCallbacks.Count > 0 && ChannelGroupCallbacks.ContainsKey(callbackKey))
                             {
-                                PubnubSubscribeChannelGroupCallback<T> currentPubnubCallback = channelGroupCallbacks[callbackKey] as PubnubSubscribeChannelGroupCallback<T>;
+                                PubnubSubscribeChannelGroupCallback<T> currentPubnubCallback = ChannelGroupCallbacks[callbackKey] as PubnubSubscribeChannelGroupCallback<T>;
                                 if (currentPubnubCallback != null && currentPubnubCallback.DisconnectCallback != null)
                                 {
                                     Action<ConnectOrDisconnectAck> targetCallback = currentPubnubCallback.DisconnectCallback;
@@ -431,9 +431,9 @@ namespace PubnubApi.EndPoint
                         else if (type == ResponseType.PresenceUnsubscribe)
                         {
                             callbackKey.ResponseType = ResponseType.Presence;
-                            if (channelGroupCallbacks.Count > 0 && channelGroupCallbacks.ContainsKey(callbackKey))
+                            if (ChannelGroupCallbacks.Count > 0 && ChannelGroupCallbacks.ContainsKey(callbackKey))
                             {
-                                PubnubPresenceChannelGroupCallback currentPubnubCallback = channelGroupCallbacks[callbackKey] as PubnubPresenceChannelGroupCallback;
+                                PubnubPresenceChannelGroupCallback currentPubnubCallback = ChannelGroupCallbacks[callbackKey] as PubnubPresenceChannelGroupCallback;
                                 if (currentPubnubCallback != null && currentPubnubCallback.DisconnectCallback != null)
                                 {
                                     Action<ConnectOrDisconnectAck> targetCallback = currentPubnubCallback.DisconnectCallback;
@@ -669,7 +669,7 @@ namespace PubnubApi.EndPoint
                         pubnubChannelCallbacks.DisconnectCallback = disconnectCallback;
                         pubnubChannelCallbacks.ErrorCallback = errorCallback;
 
-                        channelCallbacks.AddOrUpdate(callbackPresenceKey, pubnubChannelCallbacks, (key, oldValue) => pubnubChannelCallbacks);
+                        ChannelCallbacks.AddOrUpdate(callbackPresenceKey, pubnubChannelCallbacks, (key, oldValue) => pubnubChannelCallbacks);
                     }
                     else
                     {
@@ -684,7 +684,7 @@ namespace PubnubApi.EndPoint
                         pubnubChannelCallbacks.WildcardPresenceCallback = wildcardPresenceCallback;
                         pubnubChannelCallbacks.ErrorCallback = errorCallback;
 
-                        channelCallbacks.AddOrUpdate(callbackSubscribeKey, pubnubChannelCallbacks, (key, oldValue) => pubnubChannelCallbacks);
+                        ChannelCallbacks.AddOrUpdate(callbackSubscribeKey, pubnubChannelCallbacks, (key, oldValue) => pubnubChannelCallbacks);
 
                         ChannelSubscribeObjectType.AddOrUpdate(currentLoopChannel, typeof(T), (key, oldValue) => typeof(T));
                     }
@@ -708,7 +708,7 @@ namespace PubnubApi.EndPoint
                         pubnubChannelGroupCallbacks.DisconnectCallback = disconnectCallback;
                         pubnubChannelGroupCallbacks.ErrorCallback = errorCallback;
 
-                        channelGroupCallbacks.AddOrUpdate(callbackKey, pubnubChannelGroupCallbacks, (key, oldValue) => pubnubChannelGroupCallbacks);
+                        ChannelGroupCallbacks.AddOrUpdate(callbackKey, pubnubChannelGroupCallbacks, (key, oldValue) => pubnubChannelGroupCallbacks);
                     }
                     else
                     {
@@ -719,7 +719,7 @@ namespace PubnubApi.EndPoint
                         pubnubChannelGroupCallbacks.DisconnectCallback = disconnectCallback;
                         pubnubChannelGroupCallbacks.ErrorCallback = errorCallback;
 
-                        channelGroupCallbacks.AddOrUpdate(callbackKey, pubnubChannelGroupCallbacks, (key, oldValue) => pubnubChannelGroupCallbacks);
+                        ChannelGroupCallbacks.AddOrUpdate(callbackKey, pubnubChannelGroupCallbacks, (key, oldValue) => pubnubChannelGroupCallbacks);
 
                         ChannelGroupSubscribeObjectType.AddOrUpdate(currentLoopChannelGroup, typeof(T), (key, oldValue) => typeof(T));
                     }
@@ -1090,11 +1090,11 @@ namespace PubnubApi.EndPoint
                                         callbackKey.Channel = activeChannel;
                                         callbackKey.ResponseType = netState.ResponseType;
 
-                                        if (channelCallbacks.Count > 0 && channelCallbacks.ContainsKey(callbackKey))
+                                        if (ChannelCallbacks.Count > 0 && ChannelCallbacks.ContainsKey(callbackKey))
                                         {
                                             if (netState.ResponseType == ResponseType.Presence)
                                             {
-                                                PubnubPresenceChannelCallback currentPubnubCallback = channelCallbacks[callbackKey] as PubnubPresenceChannelCallback;
+                                                PubnubPresenceChannelCallback currentPubnubCallback = ChannelCallbacks[callbackKey] as PubnubPresenceChannelCallback;
                                                 if (currentPubnubCallback != null && currentPubnubCallback.ErrorCallback != null)
                                                 {
                                                     new PNCallbackService(config, jsonLibrary).CallErrorCallback(PubnubErrorSeverity.Warn, PubnubMessageSource.Client,
@@ -1104,7 +1104,7 @@ namespace PubnubApi.EndPoint
                                             }
                                             else
                                             {
-                                                PubnubSubscribeChannelCallback<T> currentPubnubCallback = channelCallbacks[callbackKey] as PubnubSubscribeChannelCallback<T>;
+                                                PubnubSubscribeChannelCallback<T> currentPubnubCallback = ChannelCallbacks[callbackKey] as PubnubSubscribeChannelCallback<T>;
                                                 if (currentPubnubCallback != null && currentPubnubCallback.ErrorCallback != null)
                                                 {
                                                     new PNCallbackService(config, jsonLibrary).CallErrorCallback(PubnubErrorSeverity.Warn, PubnubMessageSource.Client,
@@ -1191,11 +1191,11 @@ namespace PubnubApi.EndPoint
                                         callbackKey.ChannelGroup = activeChannelGroup;
                                         callbackKey.ResponseType = netState.ResponseType;
 
-                                        if (channelGroupCallbacks.Count > 0 && channelGroupCallbacks.ContainsKey(callbackKey))
+                                        if (ChannelGroupCallbacks.Count > 0 && ChannelGroupCallbacks.ContainsKey(callbackKey))
                                         {
                                             if (netState.ResponseType == ResponseType.Presence)
                                             {
-                                                PubnubPresenceChannelGroupCallback currentPubnubCallback = channelGroupCallbacks[callbackKey] as PubnubPresenceChannelGroupCallback;
+                                                PubnubPresenceChannelGroupCallback currentPubnubCallback = ChannelGroupCallbacks[callbackKey] as PubnubPresenceChannelGroupCallback;
                                                 if (currentPubnubCallback != null && currentPubnubCallback.ErrorCallback != null)
                                                 {
                                                     new PNCallbackService(config, jsonLibrary).CallErrorCallback(PubnubErrorSeverity.Warn, PubnubMessageSource.Client,
@@ -1205,7 +1205,7 @@ namespace PubnubApi.EndPoint
                                             }
                                             else
                                             {
-                                                PubnubSubscribeChannelGroupCallback<T> currentPubnubCallback = channelGroupCallbacks[callbackKey] as PubnubSubscribeChannelGroupCallback<T>;
+                                                PubnubSubscribeChannelGroupCallback<T> currentPubnubCallback = ChannelGroupCallbacks[callbackKey] as PubnubSubscribeChannelGroupCallback<T>;
                                                 if (currentPubnubCallback != null && currentPubnubCallback.ErrorCallback != null)
                                                 {
                                                     new PNCallbackService(config, jsonLibrary).CallErrorCallback(PubnubErrorSeverity.Warn, PubnubMessageSource.Client,
