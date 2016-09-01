@@ -3,18 +3,36 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
+using MockServer;
 
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
-    public class WhenAuditIsRequested
+    public class WhenAuditIsRequested : TestHarness
     {
-        ManualResetEvent auditManualEvent = new ManualResetEvent(false);
-        bool receivedAuditMessage = false;
+        private ManualResetEvent auditManualEvent = new ManualResetEvent(false);
+        private bool receivedAuditMessage = false;
         string currentUnitTestCase = "";
+        private Pubnub pubnub = null;
+        private Server server;
+        private UnitTestLog unitLog;
 
-        Pubnub pubnub = null;
+        [TestFixtureSetUp]
+        public void Init()
+        {
+            unitLog = new Tests.UnitTestLog();
+            unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
+            server = new Server(new Uri("https://" + PubnubCommon.StubOrign));
+            MockServer.LoggingMethod.MockServerLog = unitLog;
+            server.Start();
+        }
 
+        [TestFixtureTearDown]
+        public void Exit()
+        {
+            server.Stop();
+        }
+    
         [Test]
         public void ThenSubKeyLevelShouldReturnSuccess()
         {
@@ -28,16 +46,28 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 Uuid = "mytestuuid",
-                CiperKey = "",
-                Secure = false
             };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
-            unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/audit/sub-key/{2}?signature=oAd8oWxgsIx7DEpHu8aa6I874sdjD5U_vI8wxGWhV0E=&pnsdk={3}&timestamp=1356998400&uuid={4}", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, config.SdkVersion, config.Uuid),
-                    "{\"message\":\"Success\",\"payload\":{\"level\":\"subkey\",\"subscribe_key\":\"pam\",\"channels\":{\"csharp-pam-cl-channel-38\":{\"r\":1,\"m\":0,\"w\":1,\"ttl\":453},\"csharp-pam-cl-channel-39\":{\"r\":1,\"m\":0,\"w\":1,\"ttl\":453}}},\"service\":\"Access Manager\",\"status\":200}"
-                );
-            pubnub = new Pubnub(config, unitTest);
+            if (PubnubCommon.EnableStubTest)
+            {
+                pubnub = this.createPubNubInstance(config);
+            }
+            else
+            {
+                pubnub = new Pubnub(config);
+            }
+
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"subkey\",\"subscribe_key\":\"sub-c-25bce39a-6ead-11e6-b9ce-02ee2ddab7fe\",\"channels\":{},\"objects\":{},\"channel-groups\":{}},\"service\":\"Access Manager\",\"status\":200}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v1/auth/audit/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithParameter("signature", "8OajzzQLuMQvNuc9deWo2_LFVy4FbyGZLjV5TuhybW4=")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             if (PubnubCommon.PAMEnabled)
             {
@@ -74,21 +104,34 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 Uuid = "mytestuuid",
-                CiperKey = "",
-                Secure = false
             };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
-            unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/audit/sub-key/{2}?signature=H1FkVTgGZap7-jqXnJQ77PLLIx86RD0Pk3HzDgOFvoA=&channel={3}&pnsdk={4}&timestamp=1356998400&uuid={5}", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channel, config.SdkVersion, config.Uuid),
-                    "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"pam\",\"channels\":{}},\"service\":\"Access Manager\",\"status\":200}"
-                );
-            pubnub = new Pubnub(config, unitTest);
+            if (PubnubCommon.EnableStubTest)
+            {
+                pubnub = this.createPubNubInstance(config);
+            }
+            else
+            {
+                pubnub = new Pubnub(config);
+            }
+
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"sub-c-25bce39a-6ead-11e6-b9ce-02ee2ddab7fe\",\"channels\":{}},\"service\":\"Access Manager\",\"status\":200}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v1/auth/audit/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithParameter("signature", "kVcEpy88jSLs9YTfAGqqAuA-7HYvH6HtJFla8yNQJCg=")
+                    .WithParameter("channel", channel)
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.AuditAccess(channel, "", new string[] { }, AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.AuditAccess(channel, null, new string[] { }, AccessToChannelLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();
@@ -119,16 +162,29 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 Uuid = "mytestuuid",
-                CiperKey = "",
-                Secure = false
             };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
-            unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/audit/sub-key/{2}?signature=bqQC8-ovOMVy1OrBKtvVipUOuDJUa35rj_HSm6VZ6pw=&channel-group={3}&pnsdk={4}&timestamp=1356998400&uuid={5}", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channelgroup, System.Net.WebUtility.HtmlEncode(config.SdkVersion), config.Uuid),
-                    "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"channel-groups\":{}},\"service\":\"Access Manager\",\"status\":200}"
-                );
-            pubnub = new Pubnub(config, unitTest);
+            if (PubnubCommon.EnableStubTest)
+            {
+                pubnub = this.createPubNubInstance(config);
+            }
+            else
+            {
+                pubnub = new Pubnub(config);
+            }
+
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"channel-groups\":{}},\"service\":\"Access Manager\",\"status\":200}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v1/auth/audit/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithParameter("signature", "Yxvw2lCm7HL0tB9kj8qFA0YCC3KbxyTKkUcrwti9PKQ=")
+                    .WithParameter("channel-group", channelgroup)
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             if (PubnubCommon.PAMEnabled)
             {

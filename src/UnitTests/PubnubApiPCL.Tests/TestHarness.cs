@@ -17,9 +17,9 @@ namespace PubNubMessaging.Tests
             {
             }
 
-            //override public TimeSpan GetTimeStamp()
+            //override public DateTime GetTimeStamp()
             //{
-            //    return new TimeSpan(new DateTime(2013, 01, 01).Ticks);
+            //    return new DateTime(2013, 01, 01);
             //}
         }
     }

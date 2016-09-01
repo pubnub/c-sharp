@@ -4,24 +4,36 @@ using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
 using HttpMock;
+using MockServer;
 
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
-    public class CleanupGrant
+    public class CleanupGrant : TestHarness
     {
-        IHttpServer stubHttp;
-        ManualResetEvent auditManualEvent = new ManualResetEvent(false);
-        ManualResetEvent revokeManualEvent = new ManualResetEvent(false);
-        bool receivedAuditMessage = false;
-        bool receivedRevokeMessage = false;
+        private ManualResetEvent auditManualEvent = new ManualResetEvent(false);
+        private ManualResetEvent revokeManualEvent = new ManualResetEvent(false);
+        private bool receivedAuditMessage = false;
+        private bool receivedRevokeMessage = false;
 
-        Pubnub pubnub = null;
+        private Pubnub pubnub = null;
+        private Server server;
+        private UnitTestLog unitLog;
 
         [TestFixtureSetUp]
         public void Init()
         {
-            stubHttp = HttpMockRepository.At("http://" + PubnubCommon.StubOrign);
+            unitLog = new Tests.UnitTestLog();
+            unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
+            server = new Server(new Uri("https://" + PubnubCommon.StubOrign));
+            MockServer.LoggingMethod.MockServerLog = unitLog;
+            server.Start();
+        }
+
+        [TestFixtureTearDown]
+        public void Exit()
+        {
+            server.Stop();
         }
 
 
@@ -45,15 +57,31 @@ namespace PubNubMessaging.Tests
                     SubscribeKey = PubnubCommon.SubscribeKey,
                     SecretKey = PubnubCommon.SecretKey,
                     Uuid = "mytestuuid",
-                    CiperKey = "",
-                    Secure = false
                 };
 
-                pubnub = new Pubnub(config);
+                if (PubnubCommon.EnableStubTest)
+                {
+                    pubnub = this.createPubNubInstance(config);
+                }
+                else
+                {
+                    pubnub = new Pubnub(config);
+                }
+
+                string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"ttl\":20,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
+
+                server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v1/auth/audit/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithParameter("signature", "Yxvw2lCm7HL0tB9kj8qFA0YCC3KbxyTKkUcrwti9PKQ=")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
                 pubnub.AuditAccess(UserCallbackForCleanUpAccessAtUserLevel, ErrorCallbackForCleanUpAccessAtUserLevel);
                 auditManualEvent.WaitOne();
-
                 pubnub.EndPendingRequests();
                 pubnub = null;
                 Assert.IsTrue(receivedAuditMessage, "CleanupGrant -> AtUserLevel failed.");
@@ -84,11 +112,15 @@ namespace PubNubMessaging.Tests
                     SubscribeKey = PubnubCommon.SubscribeKey,
                     SecretKey = PubnubCommon.SecretKey,
                     Uuid = "mytestuuid",
-                    CiperKey = "",
-                    Secure = false
                 };
 
-                pubnub = new Pubnub(config);
+                string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"ttl\":20,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(string.Format("/v1/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
 
                 pubnub.AuditAccess(UserCallbackForCleanUpAccessAtChannelLevel, ErrorCallbackForCleanUpAccessAtChannelLevel);
                 auditManualEvent.WaitOne();
