@@ -1,26 +1,38 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using NUnit.Framework;
-using System.ComponentModel;
 using System.Threading;
-using System.Collections;
-//using Newtonsoft.Json;
-//using Newtonsoft.Json.Linq;
 using PubnubApi;
+using MockServer;
 
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
-    public class WhenGetRequestServerTime
+    public class WhenGetRequestServerTime : TestHarness
     {
-        ManualResetEvent mreTime = new ManualResetEvent(false);
-        ManualResetEvent mreProxy = new ManualResetEvent(false);
-        bool timeReceived = false;
-        bool timeReceivedWhenProxy = false;
+        private ManualResetEvent mreTime = new ManualResetEvent(false);
+        private ManualResetEvent mreProxy = new ManualResetEvent(false);
+        private bool timeReceived = false;
+        private bool timeReceivedWhenProxy = false;
 
-        Pubnub pubnub = null;
+        private Pubnub pubnub = null;
+        private Server server;
+        private UnitTestLog unitLog;
+
+        [TestFixtureSetUp]
+        public void Init()
+        {
+            unitLog = new Tests.UnitTestLog();
+            unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
+            server = new Server(new Uri("https://" + PubnubCommon.StubOrign));
+            MockServer.LoggingMethod.MockServerLog = unitLog;
+            server.Start();
+        }
+
+        [TestFixtureTearDown]
+        public void Exit()
+        {
+            server.Stop();
+        }
 
         [Test]
         public void ThenItShouldReturnTimeStamp()
@@ -32,23 +44,36 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid"
+                Uuid = "mytestuuid",
             };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
-            unitTest.StubRequestResponse(new Uri(string.Format("http{0}://{1}/time/0?uuid={2}&pnsdk={3}", (config.Secure) ? "s" : "", config.Origin, config.Uuid, config.SdkVersion)).ToString(), "[14271224264234400]");
+            if (PubnubCommon.EnableStubTest)
+            {
+                pubnub = this.createPubNubInstance(config);
+            }
+            else
+            {
+                pubnub = new Pubnub(config);
+            }
 
-            long expected = 14271224264234400;
+            string expected = "[14725889985315301]";
 
-            pubnub = new Pubnub(config, unitTest);
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            long expectedTime = 14271224264234400;
 
             pubnub.Time(
                 (actual) => 
                 {
-                    if (unitTest.EnableStubTest)
+                    if (PubnubCommon.EnableStubTest)
                     {
-                        if (expected == actual)
+                        if (expectedTime == actual)
                         {
                             timeReceived = true;
                         }
@@ -64,8 +89,6 @@ namespace PubNubMessaging.Tests
             );
 
             mreTime.WaitOne(310 * 1000);
-
-            unitTest = null;
 
             pubnub.EndPendingRequests(); 
             pubnub = null;
@@ -84,23 +107,35 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
-                Secure = true
             };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
-            unitTest.StubRequestResponse(new Uri(string.Format("http{0}://{1}/time/0?uuid={2}&pnsdk={3}", (config.Secure) ? "s" : "", config.Origin, config.Uuid, config.SdkVersion)).ToString(), "[14271224264234400]");
+            if (PubnubCommon.EnableStubTest)
+            {
+                pubnub = this.createPubNubInstance(config);
+            }
+            else
+            {
+                pubnub = new Pubnub(config);
+            }
 
-            long expected = 14271224264234400;
+            string expected = "[14725889985315301]";
 
-            pubnub = new Pubnub(config, unitTest);
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            long expectedTime = 14271224264234400;
 
             pubnub.Time(
                 (actual) =>
                 {
-                    if (unitTest.EnableStubTest)
+                    if (PubnubCommon.EnableStubTest)
                     {
-                        if (expected == actual)
+                        if (expectedTime == actual)
                         {
                             timeReceived = true;
                         }
@@ -117,8 +152,6 @@ namespace PubNubMessaging.Tests
 
             mreTime.WaitOne(310 * 1000);
 
-            unitTest = null;
-
             pubnub.EndPendingRequests(); 
             pubnub = null;
 
@@ -128,7 +161,7 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenWithProxyItShouldReturnTimeStamp()
         {
-            bool proxyConfigured = false;
+            bool proxyConfigured = true;
 
             IPubnubProxy proxy = new PubnubProxy();
             proxy.Server = "test.pandu.com";
@@ -147,21 +180,24 @@ namespace PubNubMessaging.Tests
                 PNProxy = proxy
             };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
-            unitTest.StubRequestResponse(new Uri(string.Format("http{0}://{1}/time/0?uuid={2}&pnsdk={3}", (config.Secure) ? "s" : "", config.Origin, config.Uuid, config.SdkVersion)).ToString(), "[14271224264234400]");
+            if (PubnubCommon.EnableStubTest)
+            {
+                pubnub = this.createPubNubInstance(config);
+            }
+            else
+            {
+                pubnub = new Pubnub(config);
+            }
 
             long expected = 14271224264234400;
 
 
             if (proxyConfigured)
             {
-                pubnub = new Pubnub(config, unitTest);
-
                 pubnub.Time(
                     (actual) =>
                     {
-                        if (unitTest.EnableStubTest)
+                        if (PubnubCommon.EnableStubTest)
                         {
                             if (expected == actual)
                             {
@@ -191,7 +227,6 @@ namespace PubNubMessaging.Tests
             {
                 Assert.Ignore("Proxy setup not configured. After setup Set proxyConfigured to true");
             }
-
         }
 
         [Test]
