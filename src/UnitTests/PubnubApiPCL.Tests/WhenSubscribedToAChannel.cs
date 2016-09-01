@@ -95,7 +95,7 @@ namespace PubNubMessaging.Tests
 
             mrePublish = new ManualResetEvent(false);
             publishedMessage = new CustomClass();
-            pubnub.Publish(channel, publishedMessage, dummyPublishCallback, DummyErrorCallback);
+            pubnub.publish().channel(channel).message(publishedMessage).async(new PNCallback<PublishAck>() { result = dummyPublishCallback, error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -312,7 +312,7 @@ namespace PubNubMessaging.Tests
                 for (int index = 0; index < 10; index++)
                 {
                     //Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Publishing " + index.ToString());
-                    pubnub.Publish(channel, index.ToString(), dummyPublishCallback, DummyErrorCallback);
+                    pubnub.publish().channel(channel).message(index.ToString()).async(new PNCallback<PublishAck>() { result = dummyPublishCallback, error = DummyErrorCallback });
                     //Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Publishing..waiting for confirmation " + index.ToString());
                     //mePublish.WaitOne(10*1000);
                 }

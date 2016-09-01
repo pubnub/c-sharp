@@ -86,7 +86,7 @@ namespace PubNubMessaging.Tests
             string message = messageForNoStorePublish;
 
             mrePublish = new ManualResetEvent(false);
-            pubnub.Publish(channel, message, false, "", ReturnRegularPublishCodeCallback, DummyErrorCallback);
+            pubnub.publish().channel(channel).message(message).shouldStore(false).async(new PNCallback<PublishAck>() { result = ReturnRegularPublishCodeCallback, error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -124,7 +124,7 @@ namespace PubNubMessaging.Tests
             string message = messageForPublish;
 
             mrePublish = new ManualResetEvent(false);
-            pubnub.Publish(channel, message, true, "", ReturnRegularPublishCodeCallback, DummyErrorCallback);
+            pubnub.publish().channel(channel).message(message).shouldStore(true).async(new PNCallback<PublishAck>() { result = ReturnRegularPublishCodeCallback, error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -216,9 +216,9 @@ namespace PubNubMessaging.Tests
             for (int index = 0; index < 10; index++)
             {
                 mrePublish = new ManualResetEvent(false);
-                pubnub.Publish(channel, 
-                    string.Format("DetailedHistoryStartTimeWithReverseTrue {0}", index),
-                    DetailedHistorySamplePublishCallback, DummyErrorCallback);
+                pubnub.publish().channel(channel)
+                    .message(string.Format("DetailedHistoryStartTimeWithReverseTrue {0}", index))
+                    .async(new PNCallback<PublishAck>() { result = DetailedHistorySamplePublishCallback, error = DummyErrorCallback });
                 mrePublish.WaitOne();
             }
 
@@ -360,7 +360,7 @@ namespace PubNubMessaging.Tests
                 firstPublishSet[index] = index;
                 mrePublish = new ManualResetEvent(false);
                 Thread.Sleep(1000);
-                pubnub.Publish(channel, message, true, "", ReturnRegularPublishCodeCallback, DummyErrorCallback);
+                pubnub.publish().channel(channel).message(message).shouldStore(true).async(new PNCallback<PublishAck>() { result = ReturnRegularPublishCodeCallback, error = DummyErrorCallback });
                 manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
                 mrePublish.WaitOne(manualResetEventsWaitTimeout);
                 Console.WriteLine(string.Format("Message #{0} publish {1}", index, (isPublished) ? "SUCCESS" : "FAILED"));
@@ -390,7 +390,7 @@ namespace PubNubMessaging.Tests
                 arrayIndex++;
                 mrePublish = new ManualResetEvent(false);
                 Thread.Sleep(1000);
-                pubnub.Publish(channel, message, true, "", ReturnRegularPublishCodeCallback, DummyErrorCallback);
+                pubnub.publish().channel(channel).message(message).shouldStore(true).async(new PNCallback<PublishAck>() { result = ReturnRegularPublishCodeCallback, error = DummyErrorCallback });
                 manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
                 mrePublish.WaitOne(manualResetEventsWaitTimeout);
                 Console.WriteLine(string.Format("Message #{0} publish {1}", index, (isPublished) ? "SUCCESS" : "FAILED"));
@@ -468,7 +468,7 @@ namespace PubNubMessaging.Tests
                 firstPublishSet[index] = index;
                 mrePublish = new ManualResetEvent(false);
                 Thread.Sleep(1000);
-                pubnub.Publish(channel, message, true, "", ReturnRegularPublishCodeCallback, DummyErrorCallback);
+                pubnub.publish().channel(channel).message(message).shouldStore(true).async(new PNCallback<PublishAck>() { result = ReturnRegularPublishCodeCallback, error = DummyErrorCallback });
                 manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
                 mrePublish.WaitOne(manualResetEventsWaitTimeout);
                 Console.WriteLine(string.Format("Message #{0} publish {1}", index, (isPublished) ? "SUCCESS" : "FAILED"));
@@ -497,7 +497,7 @@ namespace PubNubMessaging.Tests
                 arrayIndex++;
                 mrePublish = new ManualResetEvent(false);
                 Thread.Sleep(1000);
-                pubnub.Publish(channel, message, true, "", ReturnRegularPublishCodeCallback, DummyErrorCallback);
+                pubnub.publish().channel(channel).message(message).shouldStore(true).async(new PNCallback<PublishAck>() { result = ReturnRegularPublishCodeCallback, error = DummyErrorCallback });
                 manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
                 mrePublish.WaitOne(manualResetEventsWaitTimeout);
                 Console.WriteLine(string.Format("Message #{0} publish {1}", index, (isPublished) ? "SUCCESS" : "FAILED"));

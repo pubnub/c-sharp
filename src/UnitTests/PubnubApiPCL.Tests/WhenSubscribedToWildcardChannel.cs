@@ -125,7 +125,7 @@ namespace PubNubMessaging.Tests
 
             mrePublish = new ManualResetEvent(false);
             publishedMessage = "Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage";
-            pubnub.Publish(channel:publishChannel, message:publishedMessage, userCallback:dummyPublishCallback, errorCallback:DummyErrorCallback);
+            pubnub.publish().channel(publishChannel).message(publishedMessage).async(new PNCallback<PublishAck>() { result = dummyPublishCallback, error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -229,7 +229,7 @@ namespace PubNubMessaging.Tests
 
             mrePublish = new ManualResetEvent(false);
             publishedMessage = "Text with 😜 emoji 🎉.";
-            pubnub.Publish(publishChannel, publishedMessage, dummyPublishCallback, DummyErrorCallback);
+            pubnub.publish().channel(publishChannel).message(publishedMessage).async(new PNCallback<PublishAck>() { result = dummyPublishCallback, error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -321,7 +321,7 @@ namespace PubNubMessaging.Tests
 
             mrePublish = new ManualResetEvent(false);
             publishedMessage = "Test for cg";
-            pubnub.Publish(channel: channelAddForGroup, message: publishedMessage, userCallback: dummyPublishCallback, errorCallback: DummyErrorCallback);
+            pubnub.publish().channel(channelAddForGroup).message(publishedMessage).async(new PNCallback<PublishAck>() { result = dummyPublishCallback, error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -330,7 +330,7 @@ namespace PubNubMessaging.Tests
                 Thread.Sleep(1000);
                 mrePublish = new ManualResetEvent(false);
                 publishedMessage = "Test for wc";
-                pubnub.Publish(channel: pubWildChannelName, message: publishedMessage, userCallback: dummyPublishCallback, errorCallback: DummyErrorCallback);
+                pubnub.publish().channel(pubWildChannelName).message(publishedMessage).async(new PNCallback<PublishAck>() { result = dummyPublishCallback, error = DummyErrorCallback });
                 manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
                 mrePublish.WaitOne(manualResetEventsWaitTimeout);
             }
@@ -340,7 +340,7 @@ namespace PubNubMessaging.Tests
                 Thread.Sleep(1000);
                 mrePublish = new ManualResetEvent(false);
                 publishedMessage = "Test for normal ch";
-                pubnub.Publish(channel: subChannelName, message: publishedMessage, userCallback: dummyPublishCallback, errorCallback: DummyErrorCallback);
+                pubnub.publish().channel(subChannelName).message(publishedMessage).async(new PNCallback<PublishAck>() { result = dummyPublishCallback, error = DummyErrorCallback });
                 manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
                 mrePublish.WaitOne(manualResetEventsWaitTimeout);
             }

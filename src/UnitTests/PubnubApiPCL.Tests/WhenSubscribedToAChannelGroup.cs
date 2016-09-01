@@ -101,7 +101,7 @@ namespace PubNubMessaging.Tests
                 subscribeManualEvent = new ManualResetEvent(false);
                 pubnub.Subscribe<string>("", channelGroupName, ReceivedMessageCallbackWhenSubscribed, SubscribeConnectCallback, SubscribeDisconnectCallback, DummySubscribeErrorCallback);
                 Thread.Sleep(1000);
-                pubnub.Publish(channelName, "Test for WhenSubscribedToAChannelGroup ThenItShouldReturnReceivedMessage", dummyPublishCallback, DummyPublishErrorCallback);
+                pubnub.publish().channel(channelName).message("Test for WhenSubscribedToAChannelGroup ThenItShouldReturnReceivedMessage").async(new PNCallback<PublishAck>() { result = dummyPublishCallback, error = DummyPublishErrorCallback });
                 manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
                 mePublish.WaitOne(manualResetEventsWaitTimeout);
 

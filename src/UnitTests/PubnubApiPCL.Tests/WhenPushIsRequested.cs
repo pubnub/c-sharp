@@ -73,7 +73,7 @@ namespace PubNubMessaging.Tests
             dicToast.Add("pn_mpns", toast);
 
             pubnub.EnableDebugForPushPublish = true;
-            pubnub.Publish(channel, dicToast, PublishCallbackResult, DummyErrorCallback);
+            pubnub.publish().channel(channel).message(dicToast).async(new PNCallback<PublishAck>() { result = PublishCallbackResult, error = DummyErrorCallback });
             mrePublish.WaitOne(60 * 1000);
 
             pubnub.EndPendingRequests(); 
@@ -107,7 +107,7 @@ namespace PubNubMessaging.Tests
             dicTile.Add("pn_mpns", tile);
 
             pubnub.EnableDebugForPushPublish = true;
-            pubnub.Publish(channel, dicTile, PublishCallbackResult, DummyErrorCallback);
+            pubnub.publish().channel(channel).message(dicTile).async(new PNCallback<PublishAck>() { result = PublishCallbackResult, error = DummyErrorCallback });
             mrePublish.WaitOne(60 * 1000);
 
             pubnub.EndPendingRequests(); 
@@ -139,7 +139,7 @@ namespace PubNubMessaging.Tests
             dicTile.Add("pn_mpns", tile);
 
             pubnub.EnableDebugForPushPublish = true;
-            pubnub.Publish(channel, dicTile, PublishCallbackResult, DummyErrorCallback);
+            pubnub.publish().channel(channel).message(dicTile).async(new PNCallback<PublishAck>() { result = PublishCallbackResult, error = DummyErrorCallback });
             mrePublish.WaitOne(60 * 1000);
 
             pubnub.EndPendingRequests(); 
@@ -171,7 +171,7 @@ namespace PubNubMessaging.Tests
             dicTile.Add("pn_mpns", tile);
 
             pubnub.EnableDebugForPushPublish = true;
-            pubnub.Publish(channel, dicTile, PublishCallbackResult, DummyErrorCallback);
+            pubnub.publish().channel(channel).message(dicTile).async(new PNCallback<PublishAck>() { result = PublishCallbackResult, error = DummyErrorCallback });
             mrePublish.WaitOne(60 * 1000);
 
             pubnub.EndPendingRequests(); 

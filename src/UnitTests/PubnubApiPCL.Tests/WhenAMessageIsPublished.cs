@@ -172,7 +172,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Publish(channel, message, (m) => { }, (e) => { });
+            pubnub.publish().channel(channel).message(message).async(new PNCallback<PublishAck>() { result = { }, error = { } });
 
             pubnub.EndPendingRequests(); 
             pubnub.PubnubUnitTest = null;
@@ -213,7 +213,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Publish(channel, message, ReturnSuccessUnencryptPublishCodeCallback, DummyErrorCallback);
+            pubnub.publish().channel(channel).message(message).async(new PNCallback<PublishAck>() { result = ReturnSuccessUnencryptPublishCodeCallback, error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             mreUnencryptedPublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -283,7 +283,7 @@ namespace PubNubMessaging.Tests
 
             messageObjectForUnencryptPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
 
-            pubnub.Publish(channel, message, ReturnSuccessUnencryptObjectPublishCodeCallback, DummyErrorCallback);
+            pubnub.publish().channel(channel).message(message).async(new PNCallback<PublishAck>() { result = ReturnSuccessUnencryptObjectPublishCodeCallback, error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             mreUnencryptObjectPublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -356,7 +356,7 @@ namespace PubNubMessaging.Tests
             messageObjectForEncryptPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
 
             mreEncryptObjectPublish = new ManualResetEvent(false);
-            pubnub.Publish(channel, message, ReturnSuccessEncryptObjectPublishCodeCallback, DummyErrorCallback);
+            pubnub.publish().channel(channel).message(message).async(new PNCallback<PublishAck>() { result = ReturnSuccessEncryptObjectPublishCodeCallback, error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             mreEncryptObjectPublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -432,7 +432,7 @@ namespace PubNubMessaging.Tests
             messageObjectForEncryptPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
 
             mreEncryptObjectPublish = new ManualResetEvent(false);
-            pubnub.Publish(channel, message, ReturnSuccessEncryptObjectPublishCodeCallback, DummyErrorCallback);
+            pubnub.publish().channel(channel).message(message).async(new PNCallback<PublishAck>() { result = ReturnSuccessEncryptObjectPublishCodeCallback, error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             mreEncryptObjectPublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -501,7 +501,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Publish(channel, message, ReturnSuccessEncryptPublishCodeCallback, DummyErrorCallback);
+            pubnub.publish().channel(channel).message(message).async(new PNCallback<PublishAck>() { result = ReturnSuccessEncryptPublishCodeCallback, error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             mreEncryptPublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -573,7 +573,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Publish(channel, message, ReturnSuccessSecretEncryptPublishCodeCallback, DummyErrorCallback);
+            pubnub.publish().channel(channel).message(message).async(new PNCallback<PublishAck>() { result = ReturnSuccessSecretEncryptPublishCodeCallback, error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             mreSecretEncryptPublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -645,7 +645,7 @@ namespace PubNubMessaging.Tests
 
             messageComplexObjectForPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
 
-            pubnub.Publish(channel, message, ReturnSuccessComplexObjectPublishCodeCallback, DummyErrorCallback);
+            pubnub.publish().channel(channel).message(message).async(new PNCallback<PublishAck>() { result = ReturnSuccessComplexObjectPublishCodeCallback, error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 310 * 1000 : 310 * 1000;
             mreComplexObjectPublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -717,7 +717,7 @@ namespace PubNubMessaging.Tests
 
             serializedObjectMessageForPublish = message.ToString();
 
-            pubnub.Publish(channel, message, ReturnSuccessSerializedObjectMessageForPublishCallback, DummyErrorCallback);
+            pubnub.publish().channel(channel).message(message).async(new PNCallback<PublishAck>() { result = ReturnSuccessSerializedObjectMessageForPublishCallback, error = DummyErrorCallback });
 
             manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             mreSerializedObjectMessageForPublish.WaitOne(manualResetEventsWaitTimeout);
@@ -785,7 +785,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.BadRequest));
 
-            pubnub.Publish(channel, message, DummyPublishMessageTooLargeInfoCallback, ReturnPublishMessageTooLargeErrorCallback);
+            pubnub.publish().channel(channel).message(message).async(new PNCallback<PublishAck>() { result = DummyPublishMessageTooLargeInfoCallback, error = ReturnPublishMessageTooLargeErrorCallback });
             manualResetEventsWaitTimeout = 310 * 1000;
             mreLaregMessagePublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -839,7 +839,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
 
-            pubnub.Publish(channel, message, null, DummyErrorCallback);
+            pubnub.publish().channel(channel).message(message).async(new PNCallback<PublishAck>() { result = null, error = DummyErrorCallback });
             pubnub = null;
 
         }
@@ -875,7 +875,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Publish(channel, message, ReturnSecretKeyPublishCallback, DummyErrorCallback);
+            pubnub.publish().channel(channel).message(message).async(new PNCallback<PublishAck>() { result = ReturnSecretKeyPublishCallback, error = DummyErrorCallback });
 
             mreOptionalSecretKeyPublish.WaitOne(310 * 1000);
 
@@ -918,7 +918,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Publish(channel, message, ReturnNoSSLDefaultTrueCallback, DummyErrorCallback);
+            pubnub.publish().channel(channel).message(message).async(new PNCallback<PublishAck>() { result = ReturnNoSSLDefaultTrueCallback, error = DummyErrorCallback });
             mreNoSslPublish.WaitOne(310 * 1000);
 
             pubnub.EndPendingRequests();

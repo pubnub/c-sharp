@@ -84,7 +84,7 @@ namespace PubNubMessaging.Tests
 
             mrePublish = new ManualResetEvent(false);
             publishedMessage = "Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage";
-            pubnub.Publish(channel, publishedMessage, dummyPublishCallback, DummyErrorCallback);
+            pubnub.publish().channel(channel).message(publishedMessage).async(new PNCallback<PublishAck>() { result = dummyPublishCallback, error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -187,7 +187,7 @@ namespace PubNubMessaging.Tests
 
             mrePublish = new ManualResetEvent(false);
             publishedMessage = "Text with 😜 emoji 🎉.";
-            pubnub.Publish(channel, publishedMessage, dummyPublishCallback, DummyErrorCallback);
+            pubnub.publish().channel(channel).message(publishedMessage).async(new PNCallback<PublishAck>() { result = dummyPublishCallback, error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
