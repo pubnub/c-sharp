@@ -6,10 +6,17 @@ using PubnubApi.Interface;
 
 namespace PubnubApi.EndPoint
 {
-    internal class HistoryOperation : PubnubCoreBase
+    public class HistoryOperation : PubnubCoreBase
     {
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
+        private bool reverseOption = false;
+        private bool includeTimetokenOption = false;
+        private long startTimetoken = -1;
+        private long endTimetoken = -1;
+        private int historyCount = -1;
+
+        private string channelName = "";
 
         public HistoryOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
         {
@@ -26,6 +33,47 @@ namespace PubnubApi.EndPoint
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
+        }
+
+        public HistoryOperation channel(string channel)
+        {
+            this.channelName = channel;
+            return this;
+        }
+
+        public HistoryOperation reverse(bool reverse)
+        {
+            this.reverseOption = reverse;
+            return this;
+        }
+
+        public HistoryOperation includeTimetoken(bool includeTimetoken)
+        {
+            this.includeTimetokenOption = includeTimetoken;
+            return this;
+        }
+
+        public HistoryOperation start(long start)
+        {
+            this.startTimetoken = start;
+            return this;
+        }
+
+        public HistoryOperation end(long end)
+        {
+            this.endTimetoken = end;
+            return this;
+        }
+
+        public HistoryOperation count(int count)
+        {
+            this.historyCount = count;
+            return this;
+        }
+
+        public void async(PNCallback<DetailedHistoryAck> callback)
+        {
+            History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, callback.result, callback.error);
         }
 
 

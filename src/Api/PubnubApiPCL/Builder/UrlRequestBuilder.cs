@@ -175,11 +175,7 @@ namespace PubnubApi
 
         Uri IUrlRequestBuilder.BuildHereNowRequest(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState)
         {
-            string channel = (channels != null && channels.Length > 0) ? string.Join(",", channels) : ",";
-            if (channel.Trim() == "")
-            {
-                channel = ",";
-            }
+            string channel = (channels != null && channels.Length > 0) ? string.Join(",", channels) : "";
 
             string channelGroup = (channelGroups != null) ? string.Join(",", channelGroups) : "";
 
@@ -201,8 +197,11 @@ namespace PubnubApi
             url.Add("presence");
             url.Add("sub_key");
             url.Add(pubnubConfig.SubscribeKey);
-            url.Add("channel");
-            url.Add(channel);
+            if (!string.IsNullOrEmpty(channel))
+            {
+                url.Add("channel");
+                url.Add(channel);
+            }
 
             return BuildRestApiRequest<Uri>(url, ResponseType.Here_Now);
         }
@@ -260,22 +259,6 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, ResponseType.DetailedHistory);
         }
 
-        Uri IUrlRequestBuilder.BuildGlobalHereNowRequest(bool showUUIDList, bool includeUserState)
-        {
-            int disableUUID = showUUIDList ? 0 : 1;
-            int userState = includeUserState ? 1 : 0;
-            globalHereNowParameters = string.Format("?disable_uuids={0}&state={1}", disableUUID, userState);
-
-            List<string> url = new List<string>();
-
-            url.Add("v2");
-            url.Add("presence");
-            url.Add("sub_key");
-            url.Add(pubnubConfig.SubscribeKey);
-
-            return BuildRestApiRequest<Uri>(url, ResponseType.GlobalHere_Now);
-        }
-
         Uri IUrlRequestBuilder.BuildWhereNowRequest(string uuid)
         {
             List<string> url = new List<string>();
@@ -290,7 +273,7 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, ResponseType.Where_Now);
         }
 
-        Uri IUrlRequestBuilder.BuildGrantAccessRequest(string channelsCommaDelimited, string channelGroupsCommaDelimited, string authKeysCommaDelimited, bool read, bool write, bool manage, int ttl)
+        Uri IUrlRequestBuilder.BuildGrantAccessRequest(string channelsCommaDelimited, string channelGroupsCommaDelimited, string authKeysCommaDelimited, bool read, bool write, bool manage, long ttl)
         {
             string signature = "0";
             //long timeStamp = TranslateDateTimeToSeconds(DateTime.UtcNow);

@@ -19,11 +19,9 @@ namespace PubnubApi.Interface
 
         Uri BuildHistoryRequest(string channel, long start, long end, int count, bool reverse, bool includeToken);
 
-        Uri BuildGlobalHereNowRequest(bool showUUIDList, bool includeUserState);
-
         Uri BuildWhereNowRequest(string uuid);
 
-        Uri BuildGrantAccessRequest(string channelsCommaDelimited, string channelGroupsCommaDelimited, string authKeysCommaDelimited, bool read, bool write, bool manage, int ttl);
+        Uri BuildGrantAccessRequest(string channelsCommaDelimited, string channelGroupsCommaDelimited, string authKeysCommaDelimited, bool read, bool write, bool manage, long ttl);
 
         Uri BuildAuditAccessRequest(string channel, string channelGroup, string authKeysCommaDelimited);
 

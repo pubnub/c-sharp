@@ -45,7 +45,6 @@
     <Compile Include="EndPoint\ChannelGroup\RemoveChannelsFromChannelGroupOperation.cs" />
     <Compile Include="EndPoint\HistoryOperation.cs" />
     <Compile Include="EndPoint\Presence\GetStateOperation.cs" />
-    <Compile Include="EndPoint\Presence\GlobalHereNowOperation.cs" />
     <Compile Include="EndPoint\Presence\HereNowOperation.cs" />
     <Compile Include="EndPoint\Presence\SetStateOperation.cs" />
     <Compile Include="EndPoint\Presence\WhereNowOperation.cs" />
@@ -75,6 +74,7 @@
     <Compile Include="Model\Consumer\Ack\HereNowAck.cs" />
     <Compile Include="Interface\IJsonPluggableLibrary.cs" />
     <Compile Include="Model\Consumer\PNCallback.cs" />
+    <Compile Include="Model\Consumer\PNTimeResult.cs" />
     <Compile Include="Model\InternetState.cs" />
     <Compile Include="Interface\IPubnubLog.cs" />
     <Compile Include="Interface\IPubnubSubscribeMessageType.cs" />

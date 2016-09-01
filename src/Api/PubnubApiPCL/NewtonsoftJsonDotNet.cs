@@ -1261,6 +1261,22 @@ namespace PubnubApi
                 ret = (T)Convert.ChangeType(ack, typeof(RemoveNamespaceAck), CultureInfo.InvariantCulture);
                 #endregion
             }
+            else if (typeof(T) == typeof(PNTimeResult))
+            {
+                #region "PNTimeResult"
+
+                Int64 timetoken = 0;
+
+                Int64.TryParse(listObject[0].ToString(), out timetoken);
+
+                PNTimeResult result = new PNTimeResult()
+                {
+                    Timetoken = timetoken
+                };
+
+                ret = (T)Convert.ChangeType(result, typeof(PNTimeResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
             else
             {
                 ret = (T)(object)listObject;

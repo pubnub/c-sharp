@@ -6,10 +6,11 @@ using PubnubApi.Interface;
 
 namespace PubnubApi.EndPoint
 {
-    internal class WhereNowOperation : PubnubCoreBase
+    public class WhereNowOperation : PubnubCoreBase
     {
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
+        private string whereNowUUID = "";
 
         public WhereNowOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
         {
@@ -26,6 +27,17 @@ namespace PubnubApi.EndPoint
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
+        }
+
+        public WhereNowOperation uuid(string uuid)
+        {
+            this.whereNowUUID = uuid;
+            return this;
+        }
+
+        public void async(PNCallback<WhereNowAck> callback)
+        {
+            WhereNow(this.whereNowUUID, callback.result, callback.error);
         }
 
         internal void WhereNow(string uuid, Action<WhereNowAck> userCallback, Action<PubnubClientError> errorCallback)

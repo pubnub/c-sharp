@@ -6,10 +6,15 @@ using PubnubApi.Interface;
 
 namespace PubnubApi.EndPoint
 {
-    internal class HereNowOperation : PubnubCoreBase
+    public class HereNowOperation : PubnubCoreBase
     {
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
+
+        private string[] channelNames = null;
+        private string[] channelGroupNames = null;
+        private bool includeUserState = false;
+        private bool includeChannelUUIDs = true;
 
         public HereNowOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
         {
@@ -28,13 +33,42 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
+        public HereNowOperation channels(string[] channels)
+        {
+            this.channelNames = channels;
+            return this;
+        }
+
+        public HereNowOperation channelGroups(string[] channelGroups)
+        {
+            this.channelGroupNames = channelGroups;
+            return this;
+        }
+
+        public HereNowOperation includeState(bool includeState)
+        {
+            this.includeUserState = includeState;
+            return this;
+        }
+
+        public HereNowOperation includeUUIDs(bool includeUUIDs)
+        {
+            this.includeChannelUUIDs = includeUUIDs;
+            return this;
+        }
+
+        public void async(PNCallback<HereNowAck> callback)
+        {
+            HereNow(this.channelNames, this.channelGroupNames, this.includeChannelUUIDs, this.includeUserState, callback.result, callback.error);
+        }
+
         internal void HereNow(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, Action<HereNowAck> userCallback, Action<PubnubClientError> errorCallback)
         {
-            if ((channels == null && channelGroups == null)
-                            || (channels != null && channelGroups != null && channels.Length == 0 && channelGroups.Length == 0))
-            {
-                throw new ArgumentException("Missing Channel/ChannelGroup");
-            }
+            //if ((channels == null && channelGroups == null)
+            //                || (channels != null && channelGroups != null && channels.Length == 0 && channelGroups.Length == 0))
+            //{
+            //    throw new ArgumentException("Missing Channel/ChannelGroup");
+            //}
 
             if (userCallback == null)
             {
