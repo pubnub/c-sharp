@@ -38,7 +38,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess(null,null, true, true, false, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
+                pubnub.grant().read(true).write(true).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToSubKeyLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -70,7 +70,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess(null, null, true, false, false, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
+                pubnub.grant().read(true).write(false).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToSubKeyLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -102,7 +102,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess(null, null, false, true, false, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
+                pubnub.grant().read(false).write(true).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToSubKeyLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -147,7 +147,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess(new string[] { channel }, null, true, true, false, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.grant().channels(new string[] { channel }).read(true).write(true).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -192,7 +192,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess(new string[] { channel }, null, true, false, false, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.grant().channels(new string[] { channel }).read(true).write(false).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -237,7 +237,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess(new string[] { channel }, null, false, true, false, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.grant().channels(new string[] { channel }).read(false).write(true).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -272,7 +272,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess(new string[] { channel }, null, new string[] { authKey }, true, true, false, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                pubnub.grant().channels(new string[] { channel }).authKeys(new string[] { authKey }).read(true).write(true).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToUserLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -307,7 +307,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess(new string[] { channel }, null, new string[] { authKey }, true, false, false, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                pubnub.grant().channels(new string[] { channel }).authKeys(new string[] { authKey }).read(true).write(false).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToUserLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -342,7 +342,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess(new string[] { channel }, null, new string[] { authKey }, false, true, false, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                pubnub.grant().channels(new string[] { channel }).authKeys(new string[] { authKey }).read(false).write(true).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToUserLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -412,7 +412,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess(new string[] { channel }, null, true, true, false, 5, AccessToMultiChannelGrantCallback, DummyErrorCallback);
+                pubnub.grant().channels(new string[] { channel }).read(true).write(true).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToMultiChannelGrantCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -482,7 +482,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess(authArray, null, authArray, true, true, false, 5, AccessToMultiAuthGrantCallback, DummyErrorCallback);
+                pubnub.grant().channels(authArray).authKeys(authArray).read(true).write(true).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToMultiAuthGrantCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -517,7 +517,7 @@ namespace PubNubMessaging.Tests
                 if (!unitTest.EnableStubTest)
                 {
                     grantManualEvent = new ManualResetEvent(false);
-                    pubnub.GrantAccess(null, null, true, true, false, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
+                    pubnub.grant().read(true).write(true).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToSubKeyLevelCallback, error = DummyErrorCallback });
                     Thread.Sleep(1000);
                     grantManualEvent.WaitOne();
                 }
@@ -529,7 +529,7 @@ namespace PubNubMessaging.Tests
                 {
                     revokeManualEvent = new ManualResetEvent(false);
                     Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess -> Grant ok..Now trying Revoke");
-                    pubnub.GrantAccess(null, null, false, false, false, 5, RevokeToSubKeyLevelCallback, DummyErrorCallback);
+                    pubnub.grant().read(false).write(false).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = RevokeToSubKeyLevelCallback, error = DummyErrorCallback });
                     Thread.Sleep(1000);
                     revokeManualEvent.WaitOne();
                     
@@ -578,7 +578,7 @@ namespace PubNubMessaging.Tests
                 if (!unitTest.EnableStubTest)
                 {
                     grantManualEvent = new ManualResetEvent(false);
-                    pubnub.GrantAccess(new string[] { channel }, null, null, true, true, false, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                    pubnub.grant().channels(new string[] { channel }).read(true).write(true).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
                     Thread.Sleep(1000);
                     grantManualEvent.WaitOne(310*1000);
                 }
@@ -595,7 +595,7 @@ namespace PubNubMessaging.Tests
 
                     revokeManualEvent = new ManualResetEvent(false);
                     Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess -> Grant ok..Now trying Revoke");
-                    pubnub.GrantAccess(new string[] { channel }, null, null, false, false, false, RevokeToChannelLevelCallback, DummyErrorCallback);
+                    pubnub.grant().channels(new string[] { channel }).read(false).write(false).manage(false).async(new PNCallback<GrantAck>() { result = RevokeToChannelLevelCallback, error = DummyErrorCallback });
                     Thread.Sleep(1000);
                     revokeManualEvent.WaitOne();
 
@@ -637,7 +637,7 @@ namespace PubNubMessaging.Tests
                 if (!unitTest.EnableStubTest)
                 {
                     grantManualEvent = new ManualResetEvent(false);
-                    pubnub.GrantAccess(new string[] { channel }, null, new string[] { authKey }, true, true, false, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                    pubnub.grant().channels(new string[] { channel }).authKeys(new string[] { authKey }).read(true).write(true).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToUserLevelCallback, error = DummyErrorCallback });
                     Thread.Sleep(1000);
                     grantManualEvent.WaitOne();
                 }
@@ -649,7 +649,7 @@ namespace PubNubMessaging.Tests
                 {
                     revokeManualEvent = new ManualResetEvent(false);
                     Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant ok..Now trying Revoke");
-                    pubnub.GrantAccess(new string[] { channel }, null, new string[] { authKey }, false, false, false, 5, RevokeToUserLevelCallback, DummyErrorCallback);
+                    pubnub.grant().channels(new string[] { channel }).authKeys(new string[] { authKey }).read(false).write(false).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = RevokeToUserLevelCallback, error = DummyErrorCallback });
                     Thread.Sleep(1000);
                     revokeManualEvent.WaitOne();
 
@@ -698,7 +698,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess(null, new string[] { channelgroup }, true, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.grant().channelGroups(new string[] { channelgroup }).read(true).write(true).manage(true).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -743,7 +743,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess(null, new string[] { channelgroup }, true, false, false, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.grant().channelGroups(new string[] { channelgroup }).read(true).write(false).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();

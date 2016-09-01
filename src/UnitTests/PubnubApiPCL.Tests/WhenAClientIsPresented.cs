@@ -62,7 +62,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel,hello_my_channel-pnpres";
 
-            pubnub.GrantAccess(new string[] { channel }, null, true, true, false, 20, ThenPresenceInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            pubnub.grant().channels(new string[] { channel }).read(true).write(true).manage(false).ttl(20).async(new PNCallback<GrantAck>() { result = ThenPresenceInitializeShouldReturnGrantMessage, error = DummyErrorCallback });
             Thread.Sleep(1000);
 
             grantManualEvent.WaitOne();
@@ -258,7 +258,7 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(2000);
 
             hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow(new string[] { channel }, ThenHereNowShouldReturnMessage, DummyErrorCallback);
+            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<HereNowAck>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             unsubscribeManualEvent = new ManualResetEvent(false);
@@ -293,7 +293,7 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(2000);
 
             hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow(new string[] { channel }, ThenHereNowShouldReturnMessage, DummyErrorCallback);
+            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<HereNowAck>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             unsubscribeManualEvent = new ManualResetEvent(false);
@@ -328,7 +328,7 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(2000);
 
             hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow(new string[] { channel }, ThenHereNowShouldReturnMessage, DummyErrorCallback);
+            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<HereNowAck>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             unsubscribeManualEvent = new ManualResetEvent(false);
@@ -363,7 +363,7 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(2000);
 
             hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow(new string[] { channel }, ThenHereNowShouldReturnMessage, DummyErrorCallback);
+            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<HereNowAck>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             unsubscribeManualEvent = new ManualResetEvent(false);
@@ -398,7 +398,7 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(2000);
 
             hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow(new string[] { channel }, ThenHereNowShouldReturnMessage, DummyErrorCallback);
+            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<HereNowAck>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             unsubscribeManualEvent = new ManualResetEvent(false);
@@ -432,7 +432,7 @@ namespace PubNubMessaging.Tests
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow(new string[] { channel }, ThenHereNowShouldReturnMessage, DummyErrorCallback);
+            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<HereNowAck>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             unsubscribeManualEvent = new ManualResetEvent(false);
@@ -466,7 +466,7 @@ namespace PubNubMessaging.Tests
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow(new string[] { channel }, ThenHereNowShouldReturnMessage, DummyErrorCallback);
+            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<HereNowAck>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             unsubscribeManualEvent = new ManualResetEvent(false);
@@ -500,7 +500,7 @@ namespace PubNubMessaging.Tests
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow(new string[] { channel }, ThenHereNowShouldReturnMessage, DummyErrorCallback);
+            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<HereNowAck>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             unsubscribeManualEvent = new ManualResetEvent(false);
@@ -541,7 +541,7 @@ namespace PubNubMessaging.Tests
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow(new string[] { channel }, true, true, ThenHereNowShouldReturnMessage, DummyErrorCallback);
+            pubnub.hereNow().channels(new string[] { channel }).includeState(true).includeUUIDs(true).async(new PNCallback<HereNowAck>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             unsubscribeManualEvent = new ManualResetEvent(false);
@@ -569,7 +569,7 @@ namespace PubNubMessaging.Tests
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
 
             globalHereNowManualEvent = new ManualResetEvent(false);
-            pubnub.GlobalHereNow(true, true, ThenGlobalHereNowShouldReturnMessage, DummyErrorCallback);
+            pubnub.hereNow().includeUUIDs(true).includeState(true).async(new PNCallback<HereNowAck>() { result = ThenGlobalHereNowShouldReturnMessage, error = DummyErrorCallback });
             globalHereNowManualEvent.WaitOne();
 
             pubnub.EndPendingRequests(); 
@@ -607,7 +607,7 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(1000);
 
             globalHereNowManualEvent = new ManualResetEvent(false);
-            pubnub.GlobalHereNow(true, true, ThenGlobalHereNowShouldReturnMessage, DummyErrorCallback);
+            pubnub.hereNow().includeState(true).includeUUIDs(true).async(new PNCallback<HereNowAck>() { result = ThenGlobalHereNowShouldReturnMessage, error = DummyErrorCallback });
             globalHereNowManualEvent.WaitOne();
 
             unsubscribeManualEvent = new ManualResetEvent(false);
@@ -642,7 +642,7 @@ namespace PubNubMessaging.Tests
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             whereNowManualEvent = new ManualResetEvent(false);
-            pubnub.WhereNow(customUUID, ThenWhereNowShouldReturnMessage, DummyErrorCallback);
+            pubnub.whereNow().uuid(customUUID).async(new PNCallback<WhereNowAck>() { result = ThenWhereNowShouldReturnMessage, error = DummyErrorCallback });
             whereNowManualEvent.WaitOne();
 
             if (!pubnub.PubnubUnitTest.EnableStubTest)
@@ -921,7 +921,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void ThenGlobalHereNowShouldReturnMessage(GlobalHereNowAck receivedMessage)
+        void ThenGlobalHereNowShouldReturnMessage(HereNowAck receivedMessage)
         {
             try
             {
@@ -930,7 +930,7 @@ namespace PubNubMessaging.Tests
                 {
                     if (receivedMessage.Payload != null)
                     {
-                        Dictionary<string, GlobalHereNowAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
+                        Dictionary<string, HereNowAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
                         if (channels != null && channels.Count >= 0)
                         {
                             if (channels.Count == 0)
@@ -939,10 +939,10 @@ namespace PubNubMessaging.Tests
                             }
                             else
                             {
-                                foreach (KeyValuePair<string, GlobalHereNowAck.Data.ChannelData> channelUUID in channels)
+                                foreach (KeyValuePair<string, HereNowAck.Data.ChannelData> channelUUID in channels)
                                 {
                                     var channelName = channelUUID.Key;
-                                    GlobalHereNowAck.Data.ChannelData channelUuidListDictionary = channelUUID.Value;
+                                    HereNowAck.Data.ChannelData channelUuidListDictionary = channelUUID.Value;
                                     if (channelUuidListDictionary != null && channelUuidListDictionary.uuids != null)
                                     {
                                         if (pubnub.PubnubUnitTest != null && pubnub.PubnubUnitTest.EnableStubTest)
@@ -951,10 +951,10 @@ namespace PubNubMessaging.Tests
                                             break;
                                         }
 
-                                        GlobalHereNowAck.Data.ChannelData.UuidData[] uuidDataList = channelUuidListDictionary.uuids;
+                                        HereNowAck.Data.ChannelData.UuidData[] uuidDataList = channelUuidListDictionary.uuids;
                                         if (currentTestCase == "IfGlobalHereNowIsCalledThenItShouldReturnInfoWithUserState")
                                         {
-                                            foreach (GlobalHereNowAck.Data.ChannelData.UuidData uuidData in uuidDataList)
+                                            foreach (HereNowAck.Data.ChannelData.UuidData uuidData in uuidDataList)
                                             {
                                                 if (uuidData.uuid != null && uuidData.state != null)
                                                 {

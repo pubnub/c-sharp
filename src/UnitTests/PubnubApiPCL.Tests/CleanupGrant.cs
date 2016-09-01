@@ -80,7 +80,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.AuditAccess(UserCallbackForCleanUpAccessAtUserLevel, ErrorCallbackForCleanUpAccessAtUserLevel);
+                pubnub.audit().async(new PNCallback<AuditAck>() { result = UserCallbackForCleanUpAccessAtUserLevel, error = ErrorCallbackForCleanUpAccessAtUserLevel });
                 auditManualEvent.WaitOne();
                 pubnub.EndPendingRequests();
                 pubnub = null;
@@ -122,7 +122,7 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.AuditAccess(UserCallbackForCleanUpAccessAtChannelLevel, ErrorCallbackForCleanUpAccessAtChannelLevel);
+                pubnub.audit().async(new PNCallback<AuditAck>() { result = UserCallbackForCleanUpAccessAtChannelLevel, error = ErrorCallbackForCleanUpAccessAtChannelLevel });
                 auditManualEvent.WaitOne();
 
                 pubnub.EndPendingRequests();
@@ -164,7 +164,7 @@ namespace PubNubMessaging.Tests
                                             {
                                                 receivedRevokeMessage = false;
                                                 Console.WriteLine("Auth Key = " + authKey);
-                                                pubnub.GrantAccess(new string[] { channelName }, null, new string[] { authKey }, false, false, false, UserCallbackForRevokeAccess, ErrorCallbackForRevokeAccess);
+                                                pubnub.grant().channels(new string[] { channelName }).authKeys(new string[] { authKey }).read(false).write(false).manage(false).async(new PNCallback<GrantAck>() { result = UserCallbackForRevokeAccess, error = ErrorCallbackForRevokeAccess });
                                                 revokeManualEvent.WaitOne();
 
                                             }
@@ -237,7 +237,7 @@ namespace PubNubMessaging.Tests
                                 {
                                     //Dictionary<string, object> channelContainer = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(channels[channelName]);
                                     Console.WriteLine(channelName);
-                                    pubnub.GrantAccess(new string[] { channelName }, null, new string[] { }, false, false, false, UserCallbackForRevokeAccess, ErrorCallbackForRevokeAccess);
+                                    pubnub.grant().channels(new string[] { channelName }).read(false).write(false).manage(false).async(new PNCallback<GrantAck>() { result = UserCallbackForRevokeAccess, error = ErrorCallbackForRevokeAccess });
                                     revokeManualEvent.WaitOne();
 
                                 }

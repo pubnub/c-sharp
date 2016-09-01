@@ -68,24 +68,27 @@ namespace PubNubMessaging.Tests
 
             long expectedTime = 14271224264234400;
 
-            pubnub.Time(
-                (actual) => 
+            pubnub.time()
+                .async(new PNCallback<PNTimeResult>()
                 {
-                    if (PubnubCommon.EnableStubTest)
-                    {
-                        if (expectedTime == actual)
-                        {
-                            timeReceived = true;
-                        }
-                    }
-                    else if (actual > 0)
-                    {
-                        timeReceived = true;
-                    }
+                    result = (actual) =>
+                                {
+                                    if (PubnubCommon.EnableStubTest)
+                                    {
+                                        if (expectedTime == actual.Timetoken)
+                                        {
+                                            timeReceived = true;
+                                        }
+                                    }
+                                    else if (actual.Timetoken > 0)
+                                    {
+                                        timeReceived = true;
+                                    }
 
-                    mreTime.Set();
-                }, 
-                (error) => { }
+                                    mreTime.Set();
+                                },
+                    error = (error) => { }
+                }
             );
 
             mreTime.WaitOne(310 * 1000);
@@ -130,24 +133,27 @@ namespace PubNubMessaging.Tests
 
             long expectedTime = 14271224264234400;
 
-            pubnub.Time(
-                (actual) =>
+            pubnub.time()
+                .async(new PNCallback<PNTimeResult>()
                 {
-                    if (PubnubCommon.EnableStubTest)
-                    {
-                        if (expectedTime == actual)
-                        {
-                            timeReceived = true;
-                        }
-                    }
-                    else if (actual > 0)
-                    {
-                        timeReceived = true;
-                    }
+                    result = (actual) =>
+                            {
+                                if (PubnubCommon.EnableStubTest)
+                                {
+                                    if (expectedTime == actual.Timetoken)
+                                    {
+                                        timeReceived = true;
+                                    }
+                                }
+                                else if (actual.Timetoken > 0)
+                                {
+                                    timeReceived = true;
+                                }
 
-                    mreTime.Set();
-                },
-                (error) => { }
+                                mreTime.Set();
+                            },
+                    error = (error) => { }
+                }
             );
 
             mreTime.WaitOne(310 * 1000);
@@ -194,24 +200,28 @@ namespace PubNubMessaging.Tests
 
             if (proxyConfigured)
             {
-                pubnub.Time(
-                    (actual) =>
+                pubnub.time()
+                    .async(
+                    new PNCallback<PNTimeResult>()
                     {
-                        if (PubnubCommon.EnableStubTest)
-                        {
-                            if (expected == actual)
-                            {
-                                timeReceivedWhenProxy = true;
-                            }
-                        }
-                        else if (actual > 0)
-                        {
-                            timeReceivedWhenProxy = true;
-                        }
+                        result = (actual) =>
+                                    {
+                                        if (PubnubCommon.EnableStubTest)
+                                        {
+                                            if (expected == actual.Timetoken)
+                                            {
+                                                timeReceivedWhenProxy = true;
+                                            }
+                                        }
+                                        else if (actual.Timetoken > 0)
+                                        {
+                                            timeReceivedWhenProxy = true;
+                                        }
 
-                        mreProxy.Set();
-                    },
-                    (error) => { }
+                                        mreProxy.Set();
+                                    },
+                        error = (error) => { }
+                    }
                 );
 
                 mreProxy.WaitOne(310 * 1000);
@@ -261,24 +271,28 @@ namespace PubNubMessaging.Tests
             {
                 pubnub = new Pubnub(config, unitTest);
 
-                pubnub.Time(
-                    (actual) =>
+                pubnub.time()
+                    .async(
+                    new PNCallback<PNTimeResult>()
                     {
-                        if (unitTest.EnableStubTest)
-                        {
-                            if (expected == actual)
-                            {
-                                timeReceivedWhenProxy = true;
-                            }
-                        }
-                        else if (actual > 0)
-                        {
-                            timeReceivedWhenProxy = true;
-                        }
+                        result = (actual) =>
+                                    {
+                                        if (unitTest.EnableStubTest)
+                                        {
+                                            if (expected == actual.Timetoken)
+                                            {
+                                                timeReceivedWhenProxy = true;
+                                            }
+                                        }
+                                        else if (actual.Timetoken > 0)
+                                        {
+                                            timeReceivedWhenProxy = true;
+                                        }
 
-                        mreProxy.Set();
-                    },
-                    (error) => { }
+                                        mreProxy.Set();
+                                    },
+                        error = (error) => { }
+                    }
                 );
 
                 mreProxy.WaitOne(310 * 1000);

@@ -42,7 +42,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
 
-            pubnub.GrantAccess(new string[] { channel }, null, true, true, false, 20, ThenPublishInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            pubnub.grant().channels(new string[] { channel }).read(true).write(true).manage(false).ttl(20).async(new PNCallback<GrantAck>() { result = ThenPublishInitializeShouldReturnGrantMessage, error = DummyErrorCallback });
             Thread.Sleep(1000);
 
             mreGrant.WaitOne();

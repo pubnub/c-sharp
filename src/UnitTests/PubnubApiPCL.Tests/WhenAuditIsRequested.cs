@@ -72,7 +72,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.AuditAccess(AccessToSubKeyLevelCallback, DummyErrorCallback);
+                pubnub.audit().async(new PNCallback<AuditAck>() { result = AccessToSubKeyLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();
@@ -131,7 +131,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.AuditAccess(channel, null, new string[] { }, AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.audit().channel(channel).async(new PNCallback<AuditAck>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();
@@ -189,7 +189,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.AuditAccess("", channelgroup, new string[] { }, AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.audit().channelGroup(channelgroup).async(new PNCallback<AuditAck>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();

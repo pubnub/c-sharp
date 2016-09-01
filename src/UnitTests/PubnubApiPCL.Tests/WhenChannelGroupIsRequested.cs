@@ -74,7 +74,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.GrantAccess(null, new string[] { channelGroupName }, null, true, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            pubnub.grant().channelGroups(new string[] { channelGroupName }).read(true).write(true).manage(true).ttl(20).async(new PNCallback<GrantAck>() { result = ThenChannelGroupInitializeShouldReturnGrantMessage, error = DummyErrorCallback });
 
             Thread.Sleep(1000);
 

@@ -56,17 +56,17 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
 
             grantManualEvent = new ManualResetEvent(false);
-            pubnub.GrantAccess(null, new string[] { channelGroupName }, true, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummySubscribeErrorCallback);
+            pubnub.grant().channelGroups(new string[] { channelGroupName }).read(true).write(true).manage(true).ttl(20).async(new PNCallback<GrantAck>() { result = ThenChannelGroupInitializeShouldReturnGrantMessage, error = DummySubscribeErrorCallback });
             Thread.Sleep(1000);
             grantManualEvent.WaitOne(310*1000);
 
             grantManualEvent = new ManualResetEvent(false);
-            pubnub.GrantAccess(null, new string[] { channelGroupName1 }, true, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummySubscribeErrorCallback);
+            pubnub.grant().channelGroups(new string[] { channelGroupName1 }).read(true).write(true).manage(true).ttl(20).async(new PNCallback<GrantAck>() { result = ThenChannelGroupInitializeShouldReturnGrantMessage, error = DummySubscribeErrorCallback });
             Thread.Sleep(1000);
             grantManualEvent.WaitOne(310 * 1000);
 
             grantManualEvent = new ManualResetEvent(false);
-            pubnub.GrantAccess(null, new string[] { channelGroupName2 }, true, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummySubscribeErrorCallback);
+            pubnub.grant().channelGroups(new string[] { channelGroupName2 }).read(true).write(true).manage(true).ttl(20).async(new PNCallback<GrantAck>() { result = ThenChannelGroupInitializeShouldReturnGrantMessage, error = DummySubscribeErrorCallback });
             Thread.Sleep(1000);
             grantManualEvent.WaitOne(310 * 1000);
 

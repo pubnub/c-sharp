@@ -43,7 +43,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "Init3";
             pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.GrantAccess(null, new string[] { channelGroupName }, true, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummyUnsubscribeErrorCallback);
+            pubnub.grant().channelGroups(new string[] { channelGroupName }).read(true).write(true).manage(true).ttl(20).async(new PNCallback<GrantAck>() { result = ThenChannelGroupInitializeShouldReturnGrantMessage, error = DummyUnsubscribeErrorCallback });
             Thread.Sleep(1000);
 
             grantManualEvent.WaitOne();

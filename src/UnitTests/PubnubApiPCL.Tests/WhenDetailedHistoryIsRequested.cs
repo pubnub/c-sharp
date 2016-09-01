@@ -59,7 +59,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
 
-            pubnub.GrantAccess(new string[] { channel }, null, true, true, false, 20, ThenDetailedHistoryInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            pubnub.grant().channels(new string[] { channel }).read(true).write(true).manage(false).ttl(20).async(new PNCallback<GrantAck>() { result = ThenDetailedHistoryInitializeShouldReturnGrantMessage, error = DummyErrorCallback });
             Thread.Sleep(1000);
 
             grantManualEvent.WaitOne();
@@ -98,7 +98,7 @@ namespace PubNubMessaging.Tests
             {
                 Thread.Sleep(1000);
                 mreDetailedHistory = new ManualResetEvent(false);
-                pubnub.DetailedHistory(channel, -1, publishTimetokenForHistory, -1, false, false, CaptureNoStoreDetailedHistoryCallback, DummyErrorCallback);
+                pubnub.history().channel(channel).start(publishTimetokenForHistory).reverse(false).includeTimetoken(false).async(new PNCallback<DetailedHistoryAck>() { result = CaptureNoStoreDetailedHistoryCallback, error = DummyErrorCallback });
                 mreDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
 
                 Assert.IsTrue(!messageReceived, "Message stored for Publish when no store is expected");
@@ -136,7 +136,14 @@ namespace PubNubMessaging.Tests
             {
                 Thread.Sleep(1000);
                 mreDetailedHistory = new ManualResetEvent(false);
-                pubnub.DetailedHistory(channel, publishTimetokenForHistory - 1, publishTimetokenForHistory, 1, false, false, CaptureRegularDetailedHistoryCallback, DummyErrorCallback);
+                pubnub.history()
+                    .channel(channel)
+                    .start(publishTimetokenForHistory)
+                    .end(publishTimetokenForHistory)
+                    .count(1)
+                    .reverse(false)
+                    .includeTimetoken(false)
+                    .async(new PNCallback<DetailedHistoryAck>() { result = CaptureRegularDetailedHistoryCallback, error = DummyErrorCallback });
                 mreDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
 
                 Assert.IsTrue(messageReceived, "Encrypted message not showed up in history");
@@ -161,7 +168,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
 
-            pubnub.DetailedHistory(channel, 10, false, DetailedHistoryCount10Callback, DummyErrorCallback);
+            pubnub.history().channel(channel).count(10).includeTimetoken(false).async(new PNCallback<DetailedHistoryAck>() { result = DetailedHistoryCount10Callback, error = DummyErrorCallback });
             mreDetailedHistory.WaitOne(310 * 1000);
 
             pubnub.EndPendingRequests(); 
@@ -185,7 +192,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
 
-            pubnub.DetailedHistory(channel, -1, -1, 10, true, false, DetailedHistoryCount10ReverseTrueCallback, DummyErrorCallback);
+            pubnub.history().channel(channel).count(10).reverse(true).includeTimetoken(false).async(new PNCallback<DetailedHistoryAck>() { result = DetailedHistoryCount10ReverseTrueCallback, error = DummyErrorCallback });
             mreMessageCount10ReverseTrue.WaitOne(310 * 1000);
 
             pubnub.EndPendingRequests(); 
@@ -211,7 +218,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             //startTimeWithReverseTrue = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(new DateTime(2012, 12, 1));
             startTimeWithReverseTrue = 0;
-            pubnub.Time((s) => { startTimeWithReverseTrue = s; }, (e) => { });
+            pubnub.time().async(new PNCallback<PNTimeResult>() { result = (s) => { startTimeWithReverseTrue = s.Timetoken; }, error = (e) => { } });
             Thread.Sleep(2000);
             for (int index = 0; index < 10; index++)
             {
@@ -225,7 +232,7 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(2000);
 
             mreMessageStartReverseTrue = new ManualResetEvent(false);
-            pubnub.DetailedHistory(channel, startTimeWithReverseTrue, false, DetailedHistoryStartWithReverseTrueCallback, DummyErrorCallback, true);
+            pubnub.history().channel(channel).start(startTimeWithReverseTrue).reverse(false).async(new PNCallback<DetailedHistoryAck>() { result = DetailedHistoryStartWithReverseTrueCallback, error = DummyErrorCallback });
             Thread.Sleep(2000);
             mreMessageStartReverseTrue.WaitOne(310 * 1000);
 
@@ -252,7 +259,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
             mreDetailedHistory = new ManualResetEvent(false);
-            pubnub.DetailedHistory(channel, -1, -1, 10, true, false, DetailHistoryWithNullKeyseDummyCallback, DummyErrorCallback);
+            pubnub.history().channel(channel).count(10).reverse(true).includeTimetoken(false).async(new PNCallback<DetailedHistoryAck>() { result = DetailHistoryWithNullKeyseDummyCallback, error = DummyErrorCallback });
             mreDetailedHistory.WaitOne(310 * 1000);
 
             pubnub.EndPendingRequests(); 
@@ -344,7 +351,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "DetailHistoryShouldReturnServerTime1";
             pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.Time((s) => { starttime = s; }, (e) => { });
+            pubnub.time().async(new PNCallback<PNTimeResult>() { result = (s) => { starttime = s.Timetoken; }, error = (e) => { } });
             Thread.Sleep(1000);
             Console.WriteLine(string.Format("Start Time = {0}", starttime));
             firstPublishSet = new int[totalMessages / 2];
@@ -372,7 +379,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
 
 
-            pubnub.Time((s) => { midtime = s; }, (e) => { });
+            pubnub.time().async(new PNCallback<PNTimeResult>() { result = (s) => { midtime = s.Timetoken; }, error = (e) => { } });
             Thread.Sleep(1000);
             Console.WriteLine(string.Format("Mid Time = {0}", midtime));
             secondPublishSet = new double[totalMessages / 2];
@@ -401,7 +408,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "DetailHistoryShouldReturnServerTime3";
             pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.Time((s) => { endtime = s; }, (e) => { });
+            pubnub.time().async(new PNCallback<PNTimeResult>() { result = (s) => { endtime = s.Timetoken; }, error = (e) => { } });
             Thread.Sleep(1000);
             Console.WriteLine(string.Format("End Time = {0}", endtime));
 
@@ -412,21 +419,21 @@ namespace PubNubMessaging.Tests
 
             Console.WriteLine("Detailed History with Start & End");
             mreDetailedHistory = new ManualResetEvent(false);
-            pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, false, CaptureFirstPublishSetRegularDetailedHistoryCallback, DummyErrorCallback);
+            pubnub.history().channel(channel).start(starttime).end(midtime).count(totalMessages / 2).reverse(true).includeTimetoken(false).async(new PNCallback<DetailedHistoryAck>() { result = CaptureFirstPublishSetRegularDetailedHistoryCallback, error = DummyErrorCallback });
             mreDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
 
             if (messageReceived)
             {
                 Console.WriteLine("DetailedHistory with start & reverse = true");
                 mreDetailedHistory = new ManualResetEvent(false);
-                pubnub.DetailedHistory(channel, midtime - 1, -1, totalMessages / 2, true, false, CaptureSecondPublishSetRegularDetailedHistoryCallback, DummyErrorCallback);
+                pubnub.history().channel(channel).start(midtime).count(totalMessages / 2).reverse(true).includeTimetoken(false).async(new PNCallback<DetailedHistoryAck>() { result = CaptureSecondPublishSetRegularDetailedHistoryCallback, error = DummyErrorCallback });
                 mreDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
             }
             if (messageReceived)
             {
                 Console.WriteLine("DetailedHistory with start & reverse = false");
                 mreDetailedHistory = new ManualResetEvent(false);
-                pubnub.DetailedHistory(channel, midtime - 1, -1, totalMessages / 2, false, false, CaptureFirstPublishSetRegularDetailedHistoryCallback, DummyErrorCallback);
+                pubnub.history().channel(channel).start(midtime - 1).count(totalMessages / 2).reverse(false).includeTimetoken(false).async(new PNCallback<DetailedHistoryAck>() { result = CaptureFirstPublishSetRegularDetailedHistoryCallback, error = DummyErrorCallback });
                 mreDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
             }
             pubnub.EndPendingRequests(); 
@@ -453,7 +460,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "DetailHistoryShouldReturnServerTime1";
             pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.Time((s) => { starttime = s; }, (e) => { });
+            pubnub.time().async(new PNCallback<PNTimeResult>() { result = (s) => { starttime = s.Timetoken; }, error = (e) => { } });
             Console.WriteLine(string.Format("Start Time = {0}", starttime));
             firstPublishSet = new int[totalMessages / 2];
 
@@ -480,7 +487,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
 
 
-            pubnub.Time((s) => { midtime = s; }, (e) => { });
+            pubnub.time().async(new PNCallback<PNTimeResult>() { result = (s) => { midtime = s.Timetoken; }, error = (e) => { } });
             Console.WriteLine(string.Format("Mid Time = {0}", midtime));
             secondPublishSet = new double[totalMessages / 2];
             int arrayIndex = 0;
@@ -508,7 +515,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "DetailHistoryShouldReturnServerTime3";
             pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.Time((s) => { endtime = s; }, (e) => { });
+            pubnub.time().async(new PNCallback<PNTimeResult>() { result = (s) => { endtime = s.Timetoken; }, error = (e) => { } });
             Console.WriteLine(string.Format("End Time = {0}", endtime));
 
             Thread.Sleep(1000);
@@ -520,17 +527,17 @@ namespace PubNubMessaging.Tests
 
             Console.WriteLine("Detailed History with Start & End");
             mreDetailedHistory = new ManualResetEvent(false);
-            pubnub.DetailedHistory(channel, starttime, midtime, totalMessages / 2, true, false, CaptureFirstPublishSetRegularDetailedHistoryCallback, DummyErrorCallback);
+            pubnub.history().channel(channel).start(starttime).end(midtime).count(totalMessages / 2).reverse(true).includeTimetoken(false).async(new PNCallback<DetailedHistoryAck>() { result = CaptureFirstPublishSetRegularDetailedHistoryCallback, error = DummyErrorCallback });
             mreDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
 
             Console.WriteLine("DetailedHistory with start & reverse = true");
             mreDetailedHistory = new ManualResetEvent(false);
-            pubnub.DetailedHistory(channel, midtime - 1, -1, totalMessages / 2, true, false, CaptureSecondPublishSetRegularDetailedHistoryCallback, DummyErrorCallback);
+            pubnub.history().channel(channel).start(midtime - 1).count(totalMessages / 2).reverse(true).includeTimetoken(false).async(new PNCallback<DetailedHistoryAck>() { result = CaptureSecondPublishSetRegularDetailedHistoryCallback, error = DummyErrorCallback });
             mreDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
 
             Console.WriteLine("DetailedHistory with start & reverse = false");
             mreDetailedHistory = new ManualResetEvent(false);
-            pubnub.DetailedHistory(channel, midtime - 1, -1, totalMessages / 2, false, false, CaptureFirstPublishSetRegularDetailedHistoryCallback, DummyErrorCallback);
+            pubnub.history().channel(channel).start(midtime - 1).count(totalMessages / 2).reverse(false).includeTimetoken(false).async(new PNCallback<DetailedHistoryAck>() { result = CaptureFirstPublishSetRegularDetailedHistoryCallback, error = DummyErrorCallback });
             mreDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests(); 
