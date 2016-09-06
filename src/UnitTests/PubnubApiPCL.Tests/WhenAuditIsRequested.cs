@@ -72,7 +72,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.audit().async(new PNCallback<PNAccessManagerAuditResult>() { result = AccessToSubKeyLevelCallback, error = DummyErrorCallback });
+                pubnub.Audit().Async(new PNCallback<PNAccessManagerAuditResult>() { Result = AccessToSubKeyLevelCallback, Error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();
@@ -131,7 +131,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.audit().channel(channel).async(new PNCallback<PNAccessManagerAuditResult>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
+                pubnub.Audit().Channel(channel).Async(new PNCallback<PNAccessManagerAuditResult>() { Result = AccessToChannelLevelCallback, Error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();
@@ -189,7 +189,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.audit().channelGroup(channelgroup).async(new PNCallback<PNAccessManagerAuditResult>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
+                pubnub.Audit().ChannelGroup(channelgroup).Async(new PNCallback<PNAccessManagerAuditResult>() { Result = AccessToChannelLevelCallback, Error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();
@@ -217,7 +217,7 @@ namespace PubNubMessaging.Tests
                     {
                         if (receivedMessage.Payload != null)
                         {
-                            Dictionary<string, PNAccessManagerAuditResult.Data.ChannelData> channels = receivedMessage.Payload.channels;
+                            Dictionary<string, PNAccessManagerAuditResult.Data.ChannelData> channels = receivedMessage.Payload.Channels;
                             if (channels != null && channels.Count >= 0)
                             {
                                 Console.WriteLine("{0} - AccessToSubKeyLevelCallback - Audit Count = {1}", currentUnitTestCase, channels.Count);
@@ -254,7 +254,7 @@ namespace PubNubMessaging.Tests
                             string level = receivedMessage.Payload.Level;
                             if (currentUnitTestCase == "ThenChannelLevelShouldReturnSuccess")
                             {
-                                Dictionary<string, PNAccessManagerAuditResult.Data.ChannelData> channels = receivedMessage.Payload.channels;
+                                Dictionary<string, PNAccessManagerAuditResult.Data.ChannelData> channels = receivedMessage.Payload.Channels;
                                 if (channels != null && channels.Count >= 0)
                                 {
                                     Console.WriteLine("{0} - AccessToChannelLevelCallback - Audit Channel Count = {1}", currentUnitTestCase, channels.Count);
@@ -266,7 +266,7 @@ namespace PubNubMessaging.Tests
                             }
                             else if (currentUnitTestCase == "ThenChannelGroupLevelShouldReturnSuccess")
                             {
-                                Dictionary<string, PNAccessManagerAuditResult.Data.ChannelGroupData> channelgroups = receivedMessage.Payload.channelgroups;
+                                Dictionary<string, PNAccessManagerAuditResult.Data.ChannelGroupData> channelgroups = receivedMessage.Payload.Channelgroups;
                                 if (channelgroups != null && channelgroups.Count >= 0)
                                 {
                                     Console.WriteLine("{0} - AccessToChannelLevelCallback - Audit ChannelGroup Count = {1}", currentUnitTestCase, channelgroups.Count);

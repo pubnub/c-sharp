@@ -80,7 +80,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.audit().async(new PNCallback<PNAccessManagerAuditResult>() { result = UserCallbackForCleanUpAccessAtUserLevel, error = ErrorCallbackForCleanUpAccessAtUserLevel });
+                pubnub.Audit().Async(new PNCallback<PNAccessManagerAuditResult>() { Result = UserCallbackForCleanUpAccessAtUserLevel, Error = ErrorCallbackForCleanUpAccessAtUserLevel });
                 auditManualEvent.WaitOne();
                 pubnub.EndPendingRequests();
                 pubnub = null;
@@ -122,7 +122,7 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.audit().async(new PNCallback<PNAccessManagerAuditResult>() { result = UserCallbackForCleanUpAccessAtChannelLevel, error = ErrorCallbackForCleanUpAccessAtChannelLevel });
+                pubnub.Audit().Async(new PNCallback<PNAccessManagerAuditResult>() { Result = UserCallbackForCleanUpAccessAtChannelLevel, Error = ErrorCallbackForCleanUpAccessAtChannelLevel });
                 auditManualEvent.WaitOne();
 
                 pubnub.EndPendingRequests();
@@ -148,23 +148,23 @@ namespace PubNubMessaging.Tests
                     {
                         if (receivedMessage.Payload != null)
                         {
-                            Dictionary<string, PNAccessManagerAuditResult.Data.ChannelData> channels = receivedMessage.Payload.channels;
+                            Dictionary<string, PNAccessManagerAuditResult.Data.ChannelData> channels = receivedMessage.Payload.Channels;
                             if (channels != null && channels.Count > 0)
                             {
                                 Console.WriteLine("CleanupGrant / AtUserLevel / UserCallbackForCleanUpAccess - Channel Count = {0}", channels.Count);
                                 foreach (string channelName in channels.Keys)
                                 {
                                     PNAccessManagerAuditResult.Data.ChannelData channelContainer = channels[channelName];
-                                    if (channelContainer != null && channelContainer.auths != null)
+                                    if (channelContainer != null && channelContainer.Auths != null)
                                     {
-                                        Dictionary<string, PNAccessManagerAuditResult.Data.ChannelData.AuthData> auths = channelContainer.auths;
+                                        Dictionary<string, PNAccessManagerAuditResult.Data.ChannelData.AuthData> auths = channelContainer.Auths;
                                         if (auths != null && auths.Count > 0)
                                         {
                                             foreach (string authKey in auths.Keys)
                                             {
                                                 receivedRevokeMessage = false;
                                                 Console.WriteLine("Auth Key = " + authKey);
-                                                pubnub.grant().channels(new string[] { channelName }).authKeys(new string[] { authKey }).read(false).write(false).manage(false).async(new PNCallback<PNAccessManagerGrantResult>() { result = UserCallbackForRevokeAccess, error = ErrorCallbackForRevokeAccess });
+                                                pubnub.Grant().Channels(new string[] { channelName }).AuthKeys(new string[] { authKey }).Read(false).Write(false).Manage(false).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = UserCallbackForRevokeAccess, Error = ErrorCallbackForRevokeAccess });
                                                 revokeManualEvent.WaitOne();
 
                                             }
@@ -229,7 +229,7 @@ namespace PubNubMessaging.Tests
                     {
                         if (receivedMessage.Payload != null)
                         {
-                            Dictionary<string, PNAccessManagerAuditResult.Data.ChannelData> channels = receivedMessage.Payload.channels;
+                            Dictionary<string, PNAccessManagerAuditResult.Data.ChannelData> channels = receivedMessage.Payload.Channels;
                             if (channels != null && channels.Count > 0)
                             {
                                 Console.WriteLine("CleanupGrant / AtUserLevel / UserCallbackForCleanUpAccess - Channel Count = {0}", channels.Count);
@@ -237,7 +237,7 @@ namespace PubNubMessaging.Tests
                                 {
                                     //Dictionary<string, object> channelContainer = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(channels[channelName]);
                                     Console.WriteLine(channelName);
-                                    pubnub.grant().channels(new string[] { channelName }).read(false).write(false).manage(false).async(new PNCallback<PNAccessManagerGrantResult>() { result = UserCallbackForRevokeAccess, error = ErrorCallbackForRevokeAccess });
+                                    pubnub.Grant().Channels(new string[] { channelName }).Read(false).Write(false).Manage(false).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = UserCallbackForRevokeAccess, Error = ErrorCallbackForRevokeAccess });
                                     revokeManualEvent.WaitOne();
 
                                 }

@@ -29,21 +29,21 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public AddChannelsToChannelGroupOperation channelGroup(string channelGroup)
+        public AddChannelsToChannelGroupOperation ChannelGroup(string channelGroup)
         {
             this.channelGroupName = channelGroup;
             return this;
         }
 
-        public AddChannelsToChannelGroupOperation channels(string[] channels)
+        public AddChannelsToChannelGroupOperation Channels(string[] channels)
         {
             this.channelNames = channels;
             return this;
         }
 
-        public void async(PNCallback<PNChannelGroupsAddChannelResult> callback)
+        public void Async(PNCallback<PNChannelGroupsAddChannelResult> callback)
         {
-            AddChannelsToChannelGroup(this.channelNames, "", this.channelGroupName, callback.result, callback.error);
+            AddChannelsToChannelGroup(this.channelNames, "", this.channelGroupName, callback.Result, callback.Error);
         }
 
         internal void AddChannelsToChannelGroup(string[] channels, string nameSpace, string groupName, Action<PNChannelGroupsAddChannelResult> userCallback, Action<PubnubClientError> errorCallback)

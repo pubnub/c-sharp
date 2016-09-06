@@ -29,15 +29,15 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public WhereNowOperation uuid(string uuid)
+        public WhereNowOperation Uuid(string uuid)
         {
             this.whereNowUUID = uuid;
             return this;
         }
 
-        public void async(PNCallback<PNWhereNowResult> callback)
+        public void Async(PNCallback<PNWhereNowResult> callback)
         {
-            WhereNow(this.whereNowUUID, callback.result, callback.error);
+            WhereNow(this.whereNowUUID, callback.Result, callback.Error);
         }
 
         internal void WhereNow(string uuid, Action<PNWhereNowResult> userCallback, Action<PubnubClientError> errorCallback)

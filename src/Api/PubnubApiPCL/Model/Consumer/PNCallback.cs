@@ -7,7 +7,7 @@ namespace PubnubApi
 {
     public class PNCallback<T>
     {
-        public Action<T> result { get; set; }
-        public Action<PubnubClientError> error { get; set; }
+        public Action<T> Result { get; set; }
+        public Action<PubnubClientError> Error { get; set; }
     }
 }

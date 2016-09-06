@@ -44,7 +44,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel,hello_my_channel1,hello_my_channel2";
 
-            pubnub.grant().channels(new string[] { channel }).read(true).write(true).manage(false).ttl(20).async(new PNCallback<PNAccessManagerGrantResult>() { result = ThenSubscribeInitializeShouldReturnGrantMessage, error = DummyErrorCallback });
+            pubnub.Grant().Channels(new string[] { channel }).Read(true).Write(true).Manage(false).TTL(20).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = ThenSubscribeInitializeShouldReturnGrantMessage, Error = DummyErrorCallback });
             Thread.Sleep(1000);
 
             mreGrant.WaitOne();
@@ -84,7 +84,7 @@ namespace PubNubMessaging.Tests
 
             mrePublish = new ManualResetEvent(false);
             publishedMessage = "Text with ÜÖ漢語";
-            pubnub.publish().channel(channel).message(publishedMessage).async(new PNCallback<PNPublishResult>() { result = dummyPublishCallback, error = DummyErrorCallback });
+            pubnub.Publish().Channel(channel).Message(publishedMessage).Async(new PNCallback<PNPublishResult>() { Result = dummyPublishCallback, Error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -138,7 +138,7 @@ namespace PubNubMessaging.Tests
 
             mrePublish = new ManualResetEvent(false);
             publishedMessage = "Text with /";
-            pubnub.publish().channel(channel).message(publishedMessage).async(new PNCallback<PNPublishResult>() { result = dummyPublishCallback, error = DummyErrorCallback });
+            pubnub.Publish().Channel(channel).Message(publishedMessage).Async(new PNCallback<PNPublishResult>() { Result = dummyPublishCallback, Error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -241,7 +241,7 @@ namespace PubNubMessaging.Tests
 
             mrePublish = new ManualResetEvent(false);
             publishedMessage = "Text with '\"";
-            pubnub.publish().channel(channel).message(publishedMessage).async(new PNCallback<PNPublishResult>() { result = dummyPublishCallback, error = DummyErrorCallback });
+            pubnub.Publish().Channel(channel).Message(publishedMessage).Async(new PNCallback<PNPublishResult>() { Result = dummyPublishCallback, Error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 

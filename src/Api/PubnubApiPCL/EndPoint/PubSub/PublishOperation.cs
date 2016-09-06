@@ -34,39 +34,39 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public PublishOperation message(object message)
+        public PublishOperation Message(object message)
         {
             this.msg = message;
             return this;
         }
 
-        public PublishOperation channel(string channelName)
+        public PublishOperation Channel(string channelName)
         {
             this.channelName = channelName;
             return this;
         }
 
-        public PublishOperation shouldStore(bool store)
+        public PublishOperation ShouldStore(bool store)
         {
             this.storeInHistory = store;
             return this;
         }
 
-        public PublishOperation meta(string jsonMetadata)
+        public PublishOperation Meta(string jsonMetadata)
         {
             this.userMetadata = jsonMetadata;
             return this;
         }
 
-        public PublishOperation usePOST(bool post)
+        public PublishOperation UsePOST(bool post)
         {
             this.httpPost = post;
             return this;
         }
 
-        public void async(PNCallback<PNPublishResult> callback)
+        public void Async(PNCallback<PNPublishResult> callback)
         {
-            Publish(this.channelName, this.msg, this.storeInHistory, this.userMetadata, callback.result, callback.error);
+            Publish(this.channelName, this.msg, this.storeInHistory, this.userMetadata, callback.Result, callback.Error);
         }
 
         private void Publish(string channel, object message, bool storeInHistory, string jsonUserMetaData, Action<PNPublishResult> userCallback, Action<PubnubClientError> errorCallback)

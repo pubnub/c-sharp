@@ -30,9 +30,9 @@ namespace PubnubApi.EndPoint
             unitTest = pubnubUnitTest;
         }
 
-        public void async(PNCallback<PNTimeResult> callback)
+        public void Async(PNCallback<PNTimeResult> callback)
         {
-            Time(callback.result, callback.error);
+            Time(callback.Result, callback.Error);
         }
 
         internal void Time(Action<PNTimeResult> userCallback, Action<PubnubClientError> errorCallback)

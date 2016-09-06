@@ -35,45 +35,45 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public HistoryOperation channel(string channel)
+        public HistoryOperation Channel(string channel)
         {
             this.channelName = channel;
             return this;
         }
 
-        public HistoryOperation reverse(bool reverse)
+        public HistoryOperation Reverse(bool reverse)
         {
             this.reverseOption = reverse;
             return this;
         }
 
-        public HistoryOperation includeTimetoken(bool includeTimetoken)
+        public HistoryOperation IncludeTimetoken(bool includeTimetoken)
         {
             this.includeTimetokenOption = includeTimetoken;
             return this;
         }
 
-        public HistoryOperation start(long start)
+        public HistoryOperation Start(long start)
         {
             this.startTimetoken = start;
             return this;
         }
 
-        public HistoryOperation end(long end)
+        public HistoryOperation End(long end)
         {
             this.endTimetoken = end;
             return this;
         }
 
-        public HistoryOperation count(int count)
+        public HistoryOperation Count(int count)
         {
             this.historyCount = count;
             return this;
         }
 
-        public void async(PNCallback<PNHistoryResult> callback)
+        public void Async(PNCallback<PNHistoryResult> callback)
         {
-            History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, callback.result, callback.error);
+            History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, callback.Result, callback.Error);
         }
 
 

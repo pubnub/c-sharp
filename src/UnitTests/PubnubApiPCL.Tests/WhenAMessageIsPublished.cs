@@ -122,7 +122,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.grant().channels(new string[] { channel }).read(true).write(true).manage(false).ttl(20).async(new PNCallback<PNAccessManagerGrantResult>() { result = ThenPublishInitializeShouldReturnGrantMessage, error = DummyErrorCallback });
+            pubnub.Grant().Channels(new string[] { channel }).Read(true).Write(true).Manage(false).TTL(20).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = ThenPublishInitializeShouldReturnGrantMessage, Error = DummyErrorCallback });
             Thread.Sleep(1000);
 
             grantManualEvent.WaitOne();
@@ -172,7 +172,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.publish().channel(channel).message(message).async(new PNCallback<PNPublishResult>() { result = { }, error = { } });
+            pubnub.Publish().Channel(channel).Message(message).Async(new PNCallback<PNPublishResult>() { Result = { }, Error = { } });
 
             pubnub.EndPendingRequests(); 
             pubnub.PubnubUnitTest = null;
@@ -213,7 +213,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.publish().channel(channel).message(message).async(new PNCallback<PNPublishResult>() { result = ReturnSuccessUnencryptPublishCodeCallback, error = DummyErrorCallback });
+            pubnub.Publish().Channel(channel).Message(message).Async(new PNCallback<PNPublishResult>() { Result = ReturnSuccessUnencryptPublishCodeCallback, Error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             mreUnencryptedPublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -237,11 +237,11 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.history().channel(channel)
-                    .end(PubnubCommon.EnableStubTest ? 14715278266153304 : unEncryptPublishTimetoken)
-                    .reverse(false)
-                    .includeTimetoken(false)
-                    .async(new PNCallback<PNHistoryResult>() { result = CaptureUnencryptDetailedHistoryCallback, error = DummyErrorCallback });
+                pubnub.History().Channel(channel)
+                    .End(PubnubCommon.EnableStubTest ? 14715278266153304 : unEncryptPublishTimetoken)
+                    .Reverse(false)
+                    .IncludeTimetoken(false)
+                    .Async(new PNCallback<PNHistoryResult>() { Result = CaptureUnencryptDetailedHistoryCallback, Error = DummyErrorCallback });
                 mreUnencryptDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
 
                 Assert.IsTrue(isUnencryptDetailedHistory, "Unable to match the successful unencrypt Publish");
@@ -287,7 +287,7 @@ namespace PubNubMessaging.Tests
 
             messageObjectForUnencryptPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
 
-            pubnub.publish().channel(channel).message(message).async(new PNCallback<PNPublishResult>() { result = ReturnSuccessUnencryptObjectPublishCodeCallback, error = DummyErrorCallback });
+            pubnub.Publish().Channel(channel).Message(message).Async(new PNCallback<PNPublishResult>() { Result = ReturnSuccessUnencryptObjectPublishCodeCallback, Error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             mreUnencryptObjectPublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -311,10 +311,10 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.history().channel(channel).end(PubnubCommon.EnableStubTest ? 14715286132003364 : unEncryptObjectPublishTimetoken)
-                    .reverse(false)
-                    .includeTimetoken(false)
-                    .async(new PNCallback<PNHistoryResult>() { result = CaptureUnencryptObjectDetailedHistoryCallback, error = DummyErrorCallback });
+                pubnub.History().Channel(channel).End(PubnubCommon.EnableStubTest ? 14715286132003364 : unEncryptObjectPublishTimetoken)
+                    .Reverse(false)
+                    .IncludeTimetoken(false)
+                    .Async(new PNCallback<PNHistoryResult>() { Result = CaptureUnencryptObjectDetailedHistoryCallback, Error = DummyErrorCallback });
                 mreUnencryptObjectDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
 
                 Assert.IsTrue(isUnencryptObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
@@ -363,7 +363,7 @@ namespace PubNubMessaging.Tests
             messageObjectForEncryptPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
 
             mreEncryptObjectPublish = new ManualResetEvent(false);
-            pubnub.publish().channel(channel).message(message).async(new PNCallback<PNPublishResult>() { result = ReturnSuccessEncryptObjectPublishCodeCallback, error = DummyErrorCallback });
+            pubnub.Publish().Channel(channel).Message(message).Async(new PNCallback<PNPublishResult>() { Result = ReturnSuccessEncryptObjectPublishCodeCallback, Error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             mreEncryptObjectPublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -388,12 +388,12 @@ namespace PubNubMessaging.Tests
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
                 mreEncryptObjectDetailedHistory = new ManualResetEvent(false);
-                pubnub.history().channel(channel)
-                    .end(PubnubCommon.EnableStubTest ? 14715325228931129 : encryptObjectPublishTimetoken)
-                    .count(100)
-                    .reverse(false)
-                    .includeTimetoken(false)
-                    .async(new PNCallback<PNHistoryResult>() { result = CaptureEncryptObjectDetailedHistoryCallback, error = DummyErrorCallback });
+                pubnub.History().Channel(channel)
+                    .End(PubnubCommon.EnableStubTest ? 14715325228931129 : encryptObjectPublishTimetoken)
+                    .Count(100)
+                    .Reverse(false)
+                    .IncludeTimetoken(false)
+                    .Async(new PNCallback<PNHistoryResult>() { Result = CaptureEncryptObjectDetailedHistoryCallback, Error = DummyErrorCallback });
                 mreEncryptObjectDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
 
                 Assert.IsTrue(isEncryptObjectDetailedHistory, "Unable to match the successful encrypt object Publish");
@@ -444,7 +444,7 @@ namespace PubNubMessaging.Tests
             messageObjectForEncryptPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
 
             mreEncryptObjectPublish = new ManualResetEvent(false);
-            pubnub.publish().channel(channel).message(message).async(new PNCallback<PNPublishResult>() { result = ReturnSuccessEncryptObjectPublishCodeCallback, error = DummyErrorCallback });
+            pubnub.Publish().Channel(channel).Message(message).Async(new PNCallback<PNPublishResult>() { Result = ReturnSuccessEncryptObjectPublishCodeCallback, Error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             mreEncryptObjectPublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -469,11 +469,11 @@ namespace PubNubMessaging.Tests
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
                 mreEncryptObjectDetailedHistory = new ManualResetEvent(false);
-                pubnub.history().channel(channel)
-                    .end(PubnubCommon.EnableStubTest ? 14715335320075032 : encryptObjectPublishTimetoken)
-                    .reverse(false)
-                    .includeTimetoken(false)
-                    .async(new PNCallback<PNHistoryResult>() { result = CaptureEncryptObjectDetailedHistoryCallback, error = DummyErrorCallback });
+                pubnub.History().Channel(channel)
+                    .End(PubnubCommon.EnableStubTest ? 14715335320075032 : encryptObjectPublishTimetoken)
+                    .Reverse(false)
+                    .IncludeTimetoken(false)
+                    .Async(new PNCallback<PNHistoryResult>() { Result = CaptureEncryptObjectDetailedHistoryCallback, Error = DummyErrorCallback });
                 mreEncryptObjectDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
 
                 Assert.IsTrue(isEncryptObjectDetailedHistory, "Unable to match the successful encrypt object Publish with SSL");
@@ -517,7 +517,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.publish().channel(channel).message(message).async(new PNCallback<PNPublishResult>() { result = ReturnSuccessEncryptPublishCodeCallback, error = DummyErrorCallback });
+            pubnub.Publish().Channel(channel).Message(message).Async(new PNCallback<PNPublishResult>() { Result = ReturnSuccessEncryptPublishCodeCallback, Error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             mreEncryptPublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -541,11 +541,11 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.history().channel(channel)
-                    .end(PubnubCommon.EnableStubTest ? 14715426119520817 : encryptPublishTimetoken)
-                    .reverse(false)
-                    .includeTimetoken(false)
-                    .async(new PNCallback<PNHistoryResult>() { result = CaptureEncryptDetailedHistoryCallback, error = DummyErrorCallback });
+                pubnub.History().Channel(channel)
+                    .End(PubnubCommon.EnableStubTest ? 14715426119520817 : encryptPublishTimetoken)
+                    .Reverse(false)
+                    .IncludeTimetoken(false)
+                    .Async(new PNCallback<PNHistoryResult>() { Result = CaptureEncryptDetailedHistoryCallback, Error = DummyErrorCallback });
                 mreEncryptDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
 
                 Assert.IsTrue(isEncryptDetailedHistory, "Unable to decrypt the successful Publish");
@@ -593,7 +593,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.publish().channel(channel).message(message).async(new PNCallback<PNPublishResult>() { result = ReturnSuccessSecretEncryptPublishCodeCallback, error = DummyErrorCallback });
+            pubnub.Publish().Channel(channel).Message(message).Async(new PNCallback<PNPublishResult>() { Result = ReturnSuccessSecretEncryptPublishCodeCallback, Error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             mreSecretEncryptPublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -619,11 +619,11 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.history().channel(channel)
-                    .end(PubnubCommon.EnableStubTest ? 14715438956854374 : secretEncryptPublishTimetoken)
-                    .reverse(false)
-                    .includeTimetoken(false)
-                    .async(new PNCallback<PNHistoryResult>() { result = CaptureSecretEncryptDetailedHistoryCallback, error = DummyErrorCallback });
+                pubnub.History().Channel(channel)
+                    .End(PubnubCommon.EnableStubTest ? 14715438956854374 : secretEncryptPublishTimetoken)
+                    .Reverse(false)
+                    .IncludeTimetoken(false)
+                    .Async(new PNCallback<PNHistoryResult>() { Result = CaptureSecretEncryptDetailedHistoryCallback, Error = DummyErrorCallback });
                 mreSecretEncryptDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
 
                 Assert.IsTrue(isSecretEncryptDetailedHistory, "Unable to decrypt the successful Secret key Publish");
@@ -669,7 +669,7 @@ namespace PubNubMessaging.Tests
 
             messageComplexObjectForPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
 
-            pubnub.publish().channel(channel).message(message).async(new PNCallback<PNPublishResult>() { result = ReturnSuccessComplexObjectPublishCodeCallback, error = DummyErrorCallback });
+            pubnub.Publish().Channel(channel).Message(message).Async(new PNCallback<PNPublishResult>() { Result = ReturnSuccessComplexObjectPublishCodeCallback, Error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 310 * 1000 : 310 * 1000;
             mreComplexObjectPublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -694,11 +694,11 @@ namespace PubNubMessaging.Tests
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
                 Console.WriteLine("WhenAMessageIsPublished-ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo - Publish OK. Now checking detailed history");
-                pubnub.history().channel(channel)
-                    .end(PubnubCommon.EnableStubTest ? 14715459088445832 : complexObjectPublishTimetoken)
-                    .reverse(false)
-                    .includeTimetoken(false)
-                    .async(new PNCallback<PNHistoryResult>() { result = CaptureComplexObjectDetailedHistoryCallback, error = DummyErrorCallback });
+                pubnub.History().Channel(channel)
+                    .End(PubnubCommon.EnableStubTest ? 14715459088445832 : complexObjectPublishTimetoken)
+                    .Reverse(false)
+                    .IncludeTimetoken(false)
+                    .Async(new PNCallback<PNHistoryResult>() { Result = CaptureComplexObjectDetailedHistoryCallback, Error = DummyErrorCallback });
                 mreComplexObjectDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
 
                 Assert.IsTrue(isComplexObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
@@ -745,7 +745,7 @@ namespace PubNubMessaging.Tests
 
             serializedObjectMessageForPublish = message.ToString();
 
-            pubnub.publish().channel(channel).message(message).async(new PNCallback<PNPublishResult>() { result = ReturnSuccessSerializedObjectMessageForPublishCallback, error = DummyErrorCallback });
+            pubnub.Publish().Channel(channel).Message(message).Async(new PNCallback<PNPublishResult>() { Result = ReturnSuccessSerializedObjectMessageForPublishCallback, Error = DummyErrorCallback });
 
             manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             mreSerializedObjectMessageForPublish.WaitOne(manualResetEventsWaitTimeout);
@@ -770,11 +770,11 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.history().channel(channel)
-                    .end(PubnubCommon.EnableStubTest ? 14721411498132384 : serializedMessagePublishTimetoken)
-                    .reverse(false)
-                    .includeTimetoken(false)
-                    .async(new PNCallback<PNHistoryResult>() { result = CaptureSerializedMessagePublishDetailedHistoryCallback, error = DummyErrorCallback });
+                pubnub.History().Channel(channel)
+                    .End(PubnubCommon.EnableStubTest ? 14721411498132384 : serializedMessagePublishTimetoken)
+                    .Reverse(false)
+                    .IncludeTimetoken(false)
+                    .Async(new PNCallback<PNHistoryResult>() { Result = CaptureSerializedMessagePublishDetailedHistoryCallback, Error = DummyErrorCallback });
                 mreSerializedMessagePublishDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
                 Assert.IsTrue(isSerializedObjectMessageDetailedHistory, "Unable to match the successful serialized object message Publish");
             }
@@ -817,7 +817,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.BadRequest));
 
-            pubnub.publish().channel(channel).message(message).async(new PNCallback<PNPublishResult>() { result = DummyPublishMessageTooLargeInfoCallback, error = ReturnPublishMessageTooLargeErrorCallback });
+            pubnub.Publish().Channel(channel).Message(message).Async(new PNCallback<PNPublishResult>() { Result = DummyPublishMessageTooLargeInfoCallback, Error = ReturnPublishMessageTooLargeErrorCallback });
             manualResetEventsWaitTimeout = 310 * 1000;
             mreLaregMessagePublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -871,7 +871,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
 
-            pubnub.publish().channel(channel).message(message).async(new PNCallback<PNPublishResult>() { result = null, error = DummyErrorCallback });
+            pubnub.Publish().Channel(channel).Message(message).Async(new PNCallback<PNPublishResult>() { Result = null, Error = DummyErrorCallback });
             pubnub = null;
 
         }
@@ -907,7 +907,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.publish().channel(channel).message(message).async(new PNCallback<PNPublishResult>() { result = ReturnSecretKeyPublishCallback, error = DummyErrorCallback });
+            pubnub.Publish().Channel(channel).Message(message).Async(new PNCallback<PNPublishResult>() { Result = ReturnSecretKeyPublishCallback, Error = DummyErrorCallback });
 
             mreOptionalSecretKeyPublish.WaitOne(310 * 1000);
 
@@ -950,7 +950,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.publish().channel(channel).message(message).async(new PNCallback<PNPublishResult>() { result = ReturnNoSSLDefaultTrueCallback, error = DummyErrorCallback });
+            pubnub.Publish().Channel(channel).Message(message).Async(new PNCallback<PNPublishResult>() { Result = ReturnNoSSLDefaultTrueCallback, Error = DummyErrorCallback });
             mreNoSslPublish.WaitOne(310 * 1000);
 
             pubnub.EndPendingRequests();

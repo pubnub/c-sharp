@@ -27,15 +27,15 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public ListChannelsForChannelGroupOperation channelGroup(string channelGroup)
+        public ListChannelsForChannelGroupOperation ChannelGroup(string channelGroup)
         {
             this.channelGroupName = channelGroup;
             return this;
         }
 
-        public void async(PNCallback<PNChannelGroupsAllChannelsResult> callback)
+        public void Async(PNCallback<PNChannelGroupsAllChannelsResult> callback)
         {
-            GetChannelsForChannelGroup(this.channelGroupName, callback.result, callback.error);
+            GetChannelsForChannelGroup(this.channelGroupName, callback.Result, callback.Error);
         }
 
         internal void GetChannelsForChannelGroup(string groupName, Action<PNChannelGroupsAllChannelsResult> userCallback, Action<PubnubClientError> errorCallback)

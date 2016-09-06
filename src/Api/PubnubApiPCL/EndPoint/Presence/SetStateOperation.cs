@@ -32,19 +32,19 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public SetStateOperation channels(string[] channels)
+        public SetStateOperation Channels(string[] channels)
         {
             this.channelNames = channels;
             return this;
         }
 
-        public SetStateOperation channelGroups(string[] channelGroups)
+        public SetStateOperation ChannelGroups(string[] channelGroups)
         {
             this.channelGroupNames = channelGroups;
             return this;
         }
 
-        public SetStateOperation state(Dictionary<string, object> state)
+        public SetStateOperation State(Dictionary<string, object> state)
         {
             this.userState = state;
             return this;
@@ -56,10 +56,10 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
-        public void async(PNCallback<PNSetStateResult> callback)
+        public void Async(PNCallback<PNSetStateResult> callback)
         {
             string serializedState = jsonLibrary.SerializeToJsonString(this.userState);
-            SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, callback.result, callback.error);
+            SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, callback.Result, callback.Error);
         }
 
         internal void SetUserState(string[] channels, string[] channelGroups, string uuid, string jsonUserState, Action<PNSetStateResult> userCallback, Action<PubnubClientError> errorCallback)

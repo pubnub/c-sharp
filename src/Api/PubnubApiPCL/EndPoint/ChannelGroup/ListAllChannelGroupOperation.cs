@@ -26,9 +26,9 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public void async(PNCallback<PNChannelGroupsAllResult> callback)
+        public void Async(PNCallback<PNChannelGroupsAllResult> callback)
         {
-            GetAllChannelGroup(callback.result, callback.error);
+            GetAllChannelGroup(callback.Result, callback.Error);
         }
 
         internal void GetAllChannelGroup(Action<PNChannelGroupsAllResult> userCallback, Action<PubnubClientError> errorCallback)

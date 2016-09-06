@@ -68,10 +68,10 @@ namespace PubNubMessaging.Tests
 
             long expectedTime = 14271224264234400;
 
-            pubnub.time()
-                .async(new PNCallback<PNTimeResult>()
+            pubnub.Time()
+                .Async(new PNCallback<PNTimeResult>()
                 {
-                    result = (actual) =>
+                    Result = (actual) =>
                                 {
                                     if (PubnubCommon.EnableStubTest)
                                     {
@@ -87,7 +87,7 @@ namespace PubNubMessaging.Tests
 
                                     mreTime.Set();
                                 },
-                    error = (error) => { }
+                    Error = (error) => { }
                 }
             );
 
@@ -133,10 +133,10 @@ namespace PubNubMessaging.Tests
 
             long expectedTime = 14271224264234400;
 
-            pubnub.time()
-                .async(new PNCallback<PNTimeResult>()
+            pubnub.Time()
+                .Async(new PNCallback<PNTimeResult>()
                 {
-                    result = (actual) =>
+                    Result = (actual) =>
                             {
                                 if (PubnubCommon.EnableStubTest)
                                 {
@@ -152,7 +152,7 @@ namespace PubNubMessaging.Tests
 
                                 mreTime.Set();
                             },
-                    error = (error) => { }
+                    Error = (error) => { }
                 }
             );
 
@@ -200,11 +200,11 @@ namespace PubNubMessaging.Tests
 
             if (proxyConfigured)
             {
-                pubnub.time()
-                    .async(
+                pubnub.Time()
+                    .Async(
                     new PNCallback<PNTimeResult>()
                     {
-                        result = (actual) =>
+                        Result = (actual) =>
                                     {
                                         if (PubnubCommon.EnableStubTest)
                                         {
@@ -220,7 +220,7 @@ namespace PubNubMessaging.Tests
 
                                         mreProxy.Set();
                                     },
-                        error = (error) => { }
+                        Error = (error) => { }
                     }
                 );
 
@@ -271,11 +271,11 @@ namespace PubNubMessaging.Tests
             {
                 pubnub = new Pubnub(config, unitTest);
 
-                pubnub.time()
-                    .async(
+                pubnub.Time()
+                    .Async(
                     new PNCallback<PNTimeResult>()
                     {
-                        result = (actual) =>
+                        Result = (actual) =>
                                     {
                                         if (unitTest.EnableStubTest)
                                         {
@@ -291,7 +291,7 @@ namespace PubNubMessaging.Tests
 
                                         mreProxy.Set();
                                     },
-                        error = (error) => { }
+                        Error = (error) => { }
                     }
                 );
 

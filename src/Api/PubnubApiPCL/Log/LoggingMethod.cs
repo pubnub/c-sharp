@@ -11,16 +11,16 @@ namespace PubnubApi
 	public class LoggingMethod
 	{
 		private static int logLevel = 0;
-		private static IPubnubLog _pubnubLog = null;
+		private static IPubnubLog pubnubLog = null;
 
 		public static IPubnubLog PubnubLog
 		{
 			get{
-				return _pubnubLog;
+				return pubnubLog;
 			}
 			set {
-				_pubnubLog = value;
-				logLevel = (int)_pubnubLog.LogLevel;
+				pubnubLog = value;
+				logLevel = (int)pubnubLog.LogLevel;
 
 			}
 		}
@@ -83,9 +83,9 @@ namespace PubnubApi
 				//System.Diagnostics.Debug.WriteLine(logText);
 				try
 				{
-					if (_pubnubLog != null)
+					if (pubnubLog != null)
 					{
-						_pubnubLog.WriteToLog(logText);
+						pubnubLog.WriteToLog(logText);
 					}
 				}
 				catch(Exception ex) {

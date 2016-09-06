@@ -11,7 +11,7 @@ namespace PubnubApi
 
         public class Data
         {
-            public string[] channels { get; set; }
+            public string[] Channels { get; set; }
         }
         public int StatusCode { get; set; }
         public string StatusMessage { get; set; }

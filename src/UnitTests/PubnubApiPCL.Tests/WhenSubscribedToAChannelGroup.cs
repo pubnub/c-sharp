@@ -56,17 +56,17 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
 
             grantManualEvent = new ManualResetEvent(false);
-            pubnub.grant().channelGroups(new string[] { channelGroupName }).read(true).write(true).manage(true).ttl(20).async(new PNCallback<PNAccessManagerGrantResult>() { result = ThenChannelGroupInitializeShouldReturnGrantMessage, error = DummySubscribeErrorCallback });
+            pubnub.Grant().ChannelGroups(new string[] { channelGroupName }).Read(true).Write(true).Manage(true).TTL(20).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = ThenChannelGroupInitializeShouldReturnGrantMessage, Error = DummySubscribeErrorCallback });
             Thread.Sleep(1000);
             grantManualEvent.WaitOne(310*1000);
 
             grantManualEvent = new ManualResetEvent(false);
-            pubnub.grant().channelGroups(new string[] { channelGroupName1 }).read(true).write(true).manage(true).ttl(20).async(new PNCallback<PNAccessManagerGrantResult>() { result = ThenChannelGroupInitializeShouldReturnGrantMessage, error = DummySubscribeErrorCallback });
+            pubnub.Grant().ChannelGroups(new string[] { channelGroupName1 }).Read(true).Write(true).Manage(true).TTL(20).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = ThenChannelGroupInitializeShouldReturnGrantMessage, Error = DummySubscribeErrorCallback });
             Thread.Sleep(1000);
             grantManualEvent.WaitOne(310 * 1000);
 
             grantManualEvent = new ManualResetEvent(false);
-            pubnub.grant().channelGroups(new string[] { channelGroupName2 }).read(true).write(true).manage(true).ttl(20).async(new PNCallback<PNAccessManagerGrantResult>() { result = ThenChannelGroupInitializeShouldReturnGrantMessage, error = DummySubscribeErrorCallback });
+            pubnub.Grant().ChannelGroups(new string[] { channelGroupName2 }).Read(true).Write(true).Manage(true).TTL(20).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = ThenChannelGroupInitializeShouldReturnGrantMessage, Error = DummySubscribeErrorCallback });
             Thread.Sleep(1000);
             grantManualEvent.WaitOne(310 * 1000);
 
@@ -94,14 +94,14 @@ namespace PubNubMessaging.Tests
             string channelName = "hello_my_channel";
 
             subscribeManualEvent = new ManualResetEvent(false);
-            pubnub.addChannelsToChannelGroup().channels(new string[] { channelName }).channelGroup(channelGroupName).async(new PNCallback<PNChannelGroupsAddChannelResult>() { result = ChannelGroupAddCallback, error = DummySubscribeErrorCallback });
+            pubnub.AddChannelsToChannelGroup().Channels(new string[] { channelName }).ChannelGroup(channelGroupName).Async(new PNCallback<PNChannelGroupsAddChannelResult>() { Result = ChannelGroupAddCallback, Error = DummySubscribeErrorCallback });
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
             if (receivedChannelGroupMessage)
             {
                 subscribeManualEvent = new ManualResetEvent(false);
                 pubnub.Subscribe<string>("", channelGroupName, ReceivedMessageCallbackWhenSubscribed, SubscribeConnectCallback, SubscribeDisconnectCallback, DummySubscribeErrorCallback);
                 Thread.Sleep(1000);
-                pubnub.publish().channel(channelName).message("Test for WhenSubscribedToAChannelGroup ThenItShouldReturnReceivedMessage").async(new PNCallback<PNPublishResult>() { result = dummyPublishCallback, error = DummyPublishErrorCallback });
+                pubnub.Publish().Channel(channelName).Message("Test for WhenSubscribedToAChannelGroup ThenItShouldReturnReceivedMessage").Async(new PNCallback<PNPublishResult>() { Result = dummyPublishCallback, Error = DummyPublishErrorCallback });
                 manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
                 mePublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -143,7 +143,7 @@ namespace PubNubMessaging.Tests
             string channelName = "hello_my_channel";
 
             subscribeManualEvent = new ManualResetEvent(false);
-            pubnub.addChannelsToChannelGroup().channels(new string[] { channelName }).channelGroup(channelGroupName).async(new PNCallback<PNChannelGroupsAddChannelResult>() { result = ChannelGroupAddCallback, error = DummySubscribeErrorCallback });
+            pubnub.AddChannelsToChannelGroup().Channels(new string[] { channelName }).ChannelGroup(channelGroupName).Async(new PNCallback<PNChannelGroupsAddChannelResult>() { Result = ChannelGroupAddCallback, Error = DummySubscribeErrorCallback });
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             if (receivedChannelGroupMessage)
@@ -195,12 +195,12 @@ namespace PubNubMessaging.Tests
             string channel1 = "hello_my_channel1";
 
             subscribeManualEvent = new ManualResetEvent(false);
-            pubnub.addChannelsToChannelGroup().channels(new string[] { channelName1 }).channelGroup(channelGroupName1).async(new PNCallback<PNChannelGroupsAddChannelResult>() { result = ChannelGroupAddCallback, error = DummySubscribeErrorCallback });
+            pubnub.AddChannelsToChannelGroup().Channels(new string[] { channelName1 }).ChannelGroup(channelGroupName1).Async(new PNCallback<PNChannelGroupsAddChannelResult>() { Result = ChannelGroupAddCallback, Error = DummySubscribeErrorCallback });
             Thread.Sleep(1000);
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             subscribeManualEvent = new ManualResetEvent(false);
-            pubnub.addChannelsToChannelGroup().channels(new string[] { channelName2 }).channelGroup(channelGroupName2).async(new PNCallback<PNChannelGroupsAddChannelResult>() { result = ChannelGroupAddCallback, error = DummySubscribeErrorCallback });
+            pubnub.AddChannelsToChannelGroup().Channels(new string[] { channelName2 }).ChannelGroup(channelGroupName2).Async(new PNCallback<PNChannelGroupsAddChannelResult>() { Result = ChannelGroupAddCallback, Error = DummySubscribeErrorCallback });
             Thread.Sleep(1000);
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 

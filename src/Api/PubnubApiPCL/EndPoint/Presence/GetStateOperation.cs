@@ -31,27 +31,27 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public GetStateOperation channels(string[] channels)
+        public GetStateOperation Channels(string[] channels)
         {
             this.channelNames = channels;
             return this;
         }
 
-        public GetStateOperation channelGroups(string[] channelGroups)
+        public GetStateOperation ChannelGroups(string[] channelGroups)
         {
             this.channelGroupNames = channelGroups;
             return this;
         }
 
-        public GetStateOperation uuid(string uuid)
+        public GetStateOperation Uuid(string uuid)
         {
             this.channelUUID = uuid;
             return this;
         }
 
-        public void async(PNCallback<PNGetStateResult> callback)
+        public void Async(PNCallback<PNGetStateResult> callback)
         {
-            GetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, callback.result, callback.error);
+            GetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, callback.Result, callback.Error);
         }
 
         internal void GetUserState(string[] channels, string[] channelGroups, string uuid, Action<PNGetStateResult> userCallback, Action<PubnubClientError> errorCallback)

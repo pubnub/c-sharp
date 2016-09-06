@@ -28,15 +28,15 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public DeleteChannelGroupOperation channelGroup(string channelGroup)
+        public DeleteChannelGroupOperation ChannelGroup(string channelGroup)
         {
             this.channelGroupName = channelGroup;
             return this;
         }
 
-        public void async(PNCallback<PNChannelGroupsDeleteGroupResult> callback)
+        public void Async(PNCallback<PNChannelGroupsDeleteGroupResult> callback)
         {
-            DeleteChannelGroup(this.channelGroupName, callback.result, callback.error);
+            DeleteChannelGroup(this.channelGroupName, callback.Result, callback.Error);
         }
 
         internal void DeleteChannelGroup(string groupName, Action<PNChannelGroupsDeleteGroupResult> userCallback, Action<PubnubClientError> errorCallback)

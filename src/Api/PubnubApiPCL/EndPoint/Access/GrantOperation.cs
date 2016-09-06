@@ -38,51 +38,51 @@ namespace PubnubApi.EndPoint
             unit = pubnubUnit;
         }
 
-        public GrantOperation channels(string[] channels)
+        public GrantOperation Channels(string[] channels)
         {
             this.channelNames = channels;
             return this;
         }
 
-        public GrantOperation channelGroups(string[] channelGroups)
+        public GrantOperation ChannelGroups(string[] channelGroups)
         {
             this.channelGroupNames = channelGroups;
             return this;
         }
 
-        public GrantOperation authKeys(string[] authKeys)
+        public GrantOperation AuthKeys(string[] authKeys)
         {
             this.authenticationKeys = authKeys;
             return this;
         }
 
-        public GrantOperation write(bool write)
+        public GrantOperation Write(bool write)
         {
             this.grantWrite = write;
             return this;
         }
 
-        public GrantOperation read(bool read)
+        public GrantOperation Read(bool read)
         {
             this.grantRead = read;
             return this;
         }
 
-        public GrantOperation manage(bool manage)
+        public GrantOperation Manage(bool manage)
         {
             this.grantManage = manage;
             return this;
         }
 
-        public GrantOperation ttl(long ttl)
+        public GrantOperation TTL(long ttl)
         {
             this.grantTTL = ttl;
             return this;
         }
 
-        public void async(PNCallback<PNAccessManagerGrantResult> callback)
+        public void Async(PNCallback<PNAccessManagerGrantResult> callback)
         {
-            GrantAccess(this.channelNames, this.channelGroupNames, this.authenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, callback.result, callback.error);
+            GrantAccess(this.channelNames, this.channelGroupNames, this.authenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, callback.Result, callback.Error);
         }
 
         internal void GrantAccess(string[] channels, string[] channelGroups, string[] authKeys, bool read, bool write, bool manage, long ttl, Action<PNAccessManagerGrantResult> userCallback, Action<PubnubClientError> errorCallback)

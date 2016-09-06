@@ -252,15 +252,15 @@ namespace PubnubApi
                             if (ack.Payload != null && ack.Payload.Level != null && ack.Payload.Level == "subkey")
                             {
                                 ack.Payload.Access = new PNAccessManagerGrantResult.Data.SubkeyAccess();
-                                ack.Payload.Access.read = grantAckPayloadDic["r"].ToString() == "1";
-                                ack.Payload.Access.write = grantAckPayloadDic["w"].ToString() == "1";
-                                ack.Payload.Access.manage = grantAckPayloadDic["m"].ToString() == "1";
+                                ack.Payload.Access.Read = grantAckPayloadDic["r"].ToString() == "1";
+                                ack.Payload.Access.Write = grantAckPayloadDic["w"].ToString() == "1";
+                                ack.Payload.Access.Manage = grantAckPayloadDic["m"].ToString() == "1";
                             }
                             else
                             {
                                 if (grantAckPayloadDic.ContainsKey("channels"))
                                 {
-                                    ack.Payload.channels = new Dictionary<string, PNAccessManagerGrantResult.Data.ChannelData>();
+                                    ack.Payload.Channels = new Dictionary<string, PNAccessManagerGrantResult.Data.ChannelData>();
 
                                     Dictionary<string, object> grantAckChannelListDic = ConvertToDictionaryObject(grantAckPayloadDic["channels"]);
                                     if (grantAckChannelListDic != null && grantAckChannelListDic.Count > 0)
@@ -273,7 +273,7 @@ namespace PubnubApi
                                                 PNAccessManagerGrantResult.Data.ChannelData grantAckChannelData = new PNAccessManagerGrantResult.Data.ChannelData();
                                                 if (grantAckChannelDataDic.ContainsKey("auths"))
                                                 {
-                                                    grantAckChannelData.auths = new Dictionary<string, PNAccessManagerGrantResult.Data.ChannelData.AuthData>();
+                                                    grantAckChannelData.Auths = new Dictionary<string, PNAccessManagerGrantResult.Data.ChannelData.AuthData>();
 
                                                     Dictionary<string, object> grantAckChannelAuthListDic = ConvertToDictionaryObject(grantAckChannelDataDic["auths"]);
                                                     if (grantAckChannelAuthListDic != null && grantAckChannelAuthListDic.Count > 0)
@@ -285,11 +285,11 @@ namespace PubnubApi
                                                             {
                                                                 PNAccessManagerGrantResult.Data.ChannelData.AuthData authData = new PNAccessManagerGrantResult.Data.ChannelData.AuthData();
                                                                 authData.Access = new PNAccessManagerGrantResult.Data.ChannelData.AuthData.AuthAccess();
-                                                                authData.Access.read = grantAckChannelAuthDataDic["r"].ToString() == "1";
-                                                                authData.Access.write = grantAckChannelAuthDataDic["w"].ToString() == "1";
-                                                                authData.Access.manage = grantAckChannelAuthDataDic["m"].ToString() == "1";
+                                                                authData.Access.Read = grantAckChannelAuthDataDic["r"].ToString() == "1";
+                                                                authData.Access.Write = grantAckChannelAuthDataDic["w"].ToString() == "1";
+                                                                authData.Access.Manage = grantAckChannelAuthDataDic["m"].ToString() == "1";
 
-                                                                grantAckChannelData.auths.Add(authKey, authData);
+                                                                grantAckChannelData.Auths.Add(authKey, authData);
                                                             }
 
                                                         }
@@ -298,26 +298,26 @@ namespace PubnubApi
                                                 else
                                                 {
                                                     grantAckChannelData.Access = new PNAccessManagerGrantResult.Data.ChannelData.ChannelAccess();
-                                                    grantAckChannelData.Access.read = grantAckChannelDataDic["r"].ToString() == "1";
-                                                    grantAckChannelData.Access.write = grantAckChannelDataDic["w"].ToString() == "1";
-                                                    grantAckChannelData.Access.manage = grantAckChannelDataDic["m"].ToString() == "1";
+                                                    grantAckChannelData.Access.Read = grantAckChannelDataDic["r"].ToString() == "1";
+                                                    grantAckChannelData.Access.Write = grantAckChannelDataDic["w"].ToString() == "1";
+                                                    grantAckChannelData.Access.Manage = grantAckChannelDataDic["m"].ToString() == "1";
                                                 }
 
-                                                ack.Payload.channels.Add(channel, grantAckChannelData);
+                                                ack.Payload.Channels.Add(channel, grantAckChannelData);
                                             }
                                         }
                                     }
                                 }//end of if channels
                                 else if (grantAckPayloadDic.ContainsKey("channel"))
                                 {
-                                    ack.Payload.channels = new Dictionary<string, PNAccessManagerGrantResult.Data.ChannelData>();
+                                    ack.Payload.Channels = new Dictionary<string, PNAccessManagerGrantResult.Data.ChannelData>();
 
                                     string channelName = grantAckPayloadDic["channel"].ToString();
                                     if (grantAckPayloadDic.ContainsKey("auths"))
                                     {
                                         PNAccessManagerGrantResult.Data.ChannelData grantAckChannelData = new PNAccessManagerGrantResult.Data.ChannelData();
 
-                                        grantAckChannelData.auths = new Dictionary<string, PNAccessManagerGrantResult.Data.ChannelData.AuthData>();
+                                        grantAckChannelData.Auths = new Dictionary<string, PNAccessManagerGrantResult.Data.ChannelData.AuthData>();
 
                                         Dictionary<string, object> grantAckChannelAuthListDic = ConvertToDictionaryObject(grantAckPayloadDic["auths"]);
                                         if (grantAckChannelAuthListDic != null && grantAckChannelAuthListDic.Count > 0)
@@ -329,22 +329,22 @@ namespace PubnubApi
                                                 {
                                                     PNAccessManagerGrantResult.Data.ChannelData.AuthData authData = new PNAccessManagerGrantResult.Data.ChannelData.AuthData();
                                                     authData.Access = new PNAccessManagerGrantResult.Data.ChannelData.AuthData.AuthAccess();
-                                                    authData.Access.read = grantAckChannelAuthDataDic["r"].ToString() == "1";
-                                                    authData.Access.write = grantAckChannelAuthDataDic["w"].ToString() == "1";
-                                                    authData.Access.manage = grantAckChannelAuthDataDic["m"].ToString() == "1";
+                                                    authData.Access.Read = grantAckChannelAuthDataDic["r"].ToString() == "1";
+                                                    authData.Access.Write = grantAckChannelAuthDataDic["w"].ToString() == "1";
+                                                    authData.Access.Manage = grantAckChannelAuthDataDic["m"].ToString() == "1";
 
-                                                    grantAckChannelData.auths.Add(authKey, authData);
+                                                    grantAckChannelData.Auths.Add(authKey, authData);
                                                 }
 
                                             }
-                                            ack.Payload.channels.Add(channelName, grantAckChannelData);
+                                            ack.Payload.Channels.Add(channelName, grantAckChannelData);
                                         }
                                     }
                                 }
 
                                 if (grantAckPayloadDic.ContainsKey("channel-groups"))
                                 {
-                                    ack.Payload.channelgroups = new Dictionary<string, PNAccessManagerGrantResult.Data.ChannelGroupData>();
+                                    ack.Payload.Channelgroups = new Dictionary<string, PNAccessManagerGrantResult.Data.ChannelGroupData>();
 
                                     Dictionary<string, object> grantAckCgListDic = ConvertToDictionaryObject(grantAckPayloadDic["channel-groups"]);
                                     if (grantAckCgListDic != null && grantAckCgListDic.Count > 0)
@@ -357,7 +357,7 @@ namespace PubnubApi
                                                 PNAccessManagerGrantResult.Data.ChannelGroupData grantAckCgData = new PNAccessManagerGrantResult.Data.ChannelGroupData();
                                                 if (grantAckCgDataDic.ContainsKey("auths"))
                                                 {
-                                                    grantAckCgData.auths = new Dictionary<string, PNAccessManagerGrantResult.Data.ChannelGroupData.AuthData>();
+                                                    grantAckCgData.Auths = new Dictionary<string, PNAccessManagerGrantResult.Data.ChannelGroupData.AuthData>();
 
                                                     Dictionary<string, object> grantAckCgAuthListDic = ConvertToDictionaryObject(grantAckCgDataDic["auths"]);
                                                     if (grantAckCgAuthListDic != null && grantAckCgAuthListDic.Count > 0)
@@ -369,11 +369,11 @@ namespace PubnubApi
                                                             {
                                                                 PNAccessManagerGrantResult.Data.ChannelGroupData.AuthData authData = new PNAccessManagerGrantResult.Data.ChannelGroupData.AuthData();
                                                                 authData.Access = new PNAccessManagerGrantResult.Data.ChannelGroupData.AuthData.AuthAccess();
-                                                                authData.Access.read = grantAckCgAuthDataDic["r"].ToString() == "1";
-                                                                authData.Access.write = grantAckCgAuthDataDic["w"].ToString() == "1";
-                                                                authData.Access.manage = grantAckCgAuthDataDic["m"].ToString() == "1";
+                                                                authData.Access.Read = grantAckCgAuthDataDic["r"].ToString() == "1";
+                                                                authData.Access.Write = grantAckCgAuthDataDic["w"].ToString() == "1";
+                                                                authData.Access.Manage = grantAckCgAuthDataDic["m"].ToString() == "1";
 
-                                                                grantAckCgData.auths.Add(authKey, authData);
+                                                                grantAckCgData.Auths.Add(authKey, authData);
                                                             }
 
                                                         }
@@ -382,12 +382,12 @@ namespace PubnubApi
                                                 else
                                                 {
                                                     grantAckCgData.Access = new PNAccessManagerGrantResult.Data.ChannelGroupData.ChannelGroupAccess();
-                                                    grantAckCgData.Access.read = grantAckCgDataDic["r"].ToString() == "1";
-                                                    grantAckCgData.Access.write = grantAckCgDataDic["w"].ToString() == "1";
-                                                    grantAckCgData.Access.manage = grantAckCgDataDic["m"].ToString() == "1";
+                                                    grantAckCgData.Access.Read = grantAckCgDataDic["r"].ToString() == "1";
+                                                    grantAckCgData.Access.Write = grantAckCgDataDic["w"].ToString() == "1";
+                                                    grantAckCgData.Access.Manage = grantAckCgDataDic["m"].ToString() == "1";
                                                 }
 
-                                                ack.Payload.channelgroups.Add(channelgroup, grantAckCgData);
+                                                ack.Payload.Channelgroups.Add(channelgroup, grantAckCgData);
                                             }
                                         }
                                     }
@@ -447,7 +447,7 @@ namespace PubnubApi
 
                             if (auditAckPayloadDic.ContainsKey("channels"))
                             {
-                                ack.Payload.channels = new Dictionary<string, PNAccessManagerAuditResult.Data.ChannelData>();
+                                ack.Payload.Channels = new Dictionary<string, PNAccessManagerAuditResult.Data.ChannelData>();
 
                                 Dictionary<string, object> auditAckChannelListDic = ConvertToDictionaryObject(auditAckPayloadDic["channels"]);
                                 if (auditAckChannelListDic != null && auditAckChannelListDic.Count > 0)
@@ -460,7 +460,7 @@ namespace PubnubApi
                                             PNAccessManagerAuditResult.Data.ChannelData auditAckChannelData = new PNAccessManagerAuditResult.Data.ChannelData();
                                             if (auditAckChannelDataDic.ContainsKey("auths"))
                                             {
-                                                auditAckChannelData.auths = new Dictionary<string, PNAccessManagerAuditResult.Data.ChannelData.AuthData>();
+                                                auditAckChannelData.Auths = new Dictionary<string, PNAccessManagerAuditResult.Data.ChannelData.AuthData>();
 
                                                 Dictionary<string, object> auditAckChannelAuthListDic = ConvertToDictionaryObject(auditAckChannelDataDic["auths"]);
                                                 if (auditAckChannelAuthListDic != null && auditAckChannelAuthListDic.Count > 0)
@@ -472,15 +472,15 @@ namespace PubnubApi
                                                         {
                                                             PNAccessManagerAuditResult.Data.ChannelData.AuthData authData = new PNAccessManagerAuditResult.Data.ChannelData.AuthData();
                                                             authData.Access = new PNAccessManagerAuditResult.Data.ChannelData.AuthData.AuthAccess();
-                                                            authData.Access.read = auditAckChannelAuthDataDic["r"].ToString() == "1";
-                                                            authData.Access.write = auditAckChannelAuthDataDic["w"].ToString() == "1";
-                                                            authData.Access.manage = auditAckChannelAuthDataDic.ContainsKey("m") ? auditAckChannelAuthDataDic["m"].ToString() == "1" : false;
+                                                            authData.Access.Read = auditAckChannelAuthDataDic["r"].ToString() == "1";
+                                                            authData.Access.Write = auditAckChannelAuthDataDic["w"].ToString() == "1";
+                                                            authData.Access.Manage = auditAckChannelAuthDataDic.ContainsKey("m") ? auditAckChannelAuthDataDic["m"].ToString() == "1" : false;
                                                             if (auditAckChannelAuthDataDic.ContainsKey("ttl"))
                                                             {
                                                                 authData.Access.TTL = Int32.Parse(auditAckChannelAuthDataDic["ttl"].ToString());
                                                             }
 
-                                                            auditAckChannelData.auths.Add(authKey, authData);
+                                                            auditAckChannelData.Auths.Add(authKey, authData);
                                                         }
 
                                                     }
@@ -489,23 +489,23 @@ namespace PubnubApi
                                             else
                                             {
                                                 auditAckChannelData.Access = new PNAccessManagerAuditResult.Data.ChannelData.ChannelAccess();
-                                                auditAckChannelData.Access.read = auditAckChannelDataDic["r"].ToString() == "1";
-                                                auditAckChannelData.Access.write = auditAckChannelDataDic["w"].ToString() == "1";
-                                                auditAckChannelData.Access.manage = auditAckChannelDataDic.ContainsKey("m") ? auditAckChannelDataDic["m"].ToString() == "1" : false;
+                                                auditAckChannelData.Access.Read = auditAckChannelDataDic["r"].ToString() == "1";
+                                                auditAckChannelData.Access.Write = auditAckChannelDataDic["w"].ToString() == "1";
+                                                auditAckChannelData.Access.Manage = auditAckChannelDataDic.ContainsKey("m") ? auditAckChannelDataDic["m"].ToString() == "1" : false;
                                                 if (auditAckChannelDataDic.ContainsKey("ttl"))
                                                 {
                                                     auditAckChannelData.Access.TTL = Int32.Parse(auditAckChannelDataDic["ttl"].ToString());
                                                 }
                                             }
 
-                                            ack.Payload.channels.Add(channel, auditAckChannelData);
+                                            ack.Payload.Channels.Add(channel, auditAckChannelData);
                                         }
                                     }
                                 }
                             }//end of if channels
                             if (auditAckPayloadDic.ContainsKey("channel-groups"))
                             {
-                                ack.Payload.channelgroups = new Dictionary<string, PNAccessManagerAuditResult.Data.ChannelGroupData>();
+                                ack.Payload.Channelgroups = new Dictionary<string, PNAccessManagerAuditResult.Data.ChannelGroupData>();
 
                                 Dictionary<string, object> auditAckCgListDic = ConvertToDictionaryObject(auditAckPayloadDic["channel-groups"]);
                                 if (auditAckCgListDic != null && auditAckCgListDic.Count > 0)
@@ -518,7 +518,7 @@ namespace PubnubApi
                                             PNAccessManagerAuditResult.Data.ChannelGroupData auditAckCgData = new PNAccessManagerAuditResult.Data.ChannelGroupData();
                                             if (auditAckCgDataDic.ContainsKey("auths"))
                                             {
-                                                auditAckCgData.auths = new Dictionary<string, PNAccessManagerAuditResult.Data.ChannelGroupData.AuthData>();
+                                                auditAckCgData.Auths = new Dictionary<string, PNAccessManagerAuditResult.Data.ChannelGroupData.AuthData>();
 
                                                 Dictionary<string, object> auditAckCgAuthListDic = ConvertToDictionaryObject(auditAckCgDataDic["auths"]);
                                                 if (auditAckCgAuthListDic != null && auditAckCgAuthListDic.Count > 0)
@@ -530,15 +530,15 @@ namespace PubnubApi
                                                         {
                                                             PNAccessManagerAuditResult.Data.ChannelGroupData.AuthData authData = new PNAccessManagerAuditResult.Data.ChannelGroupData.AuthData();
                                                             authData.Access = new PNAccessManagerAuditResult.Data.ChannelGroupData.AuthData.AuthAccess();
-                                                            authData.Access.read = auditAckCgAuthDataDic["r"].ToString() == "1";
-                                                            authData.Access.write = auditAckCgAuthDataDic["w"].ToString() == "1";
-                                                            authData.Access.manage = auditAckCgAuthDataDic.ContainsKey("m") ? auditAckCgAuthDataDic["m"].ToString() == "1" : false;
+                                                            authData.Access.Read = auditAckCgAuthDataDic["r"].ToString() == "1";
+                                                            authData.Access.Write = auditAckCgAuthDataDic["w"].ToString() == "1";
+                                                            authData.Access.Manage = auditAckCgAuthDataDic.ContainsKey("m") ? auditAckCgAuthDataDic["m"].ToString() == "1" : false;
                                                             if (auditAckCgAuthDataDic.ContainsKey("ttl"))
                                                             {
                                                                 authData.Access.TTL = Int32.Parse(auditAckCgAuthDataDic["ttl"].ToString());
                                                             }
 
-                                                            auditAckCgData.auths.Add(authKey, authData);
+                                                            auditAckCgData.Auths.Add(authKey, authData);
                                                         }
 
                                                     }
@@ -547,16 +547,16 @@ namespace PubnubApi
                                             else
                                             {
                                                 auditAckCgData.Access = new PNAccessManagerAuditResult.Data.ChannelGroupData.ChannelGroupAccess();
-                                                auditAckCgData.Access.read = auditAckCgDataDic["r"].ToString() == "1";
-                                                auditAckCgData.Access.write = auditAckCgDataDic["w"].ToString() == "1";
-                                                auditAckCgData.Access.manage = auditAckCgDataDic.ContainsKey("m") ? auditAckCgDataDic["m"].ToString() == "1" : false;
+                                                auditAckCgData.Access.Read = auditAckCgDataDic["r"].ToString() == "1";
+                                                auditAckCgData.Access.Write = auditAckCgDataDic["w"].ToString() == "1";
+                                                auditAckCgData.Access.Manage = auditAckCgDataDic.ContainsKey("m") ? auditAckCgDataDic["m"].ToString() == "1" : false;
                                                 if (auditAckCgDataDic.ContainsKey("ttl"))
                                                 {
                                                     auditAckCgData.Access.TTL = Int32.Parse(auditAckCgDataDic["ttl"].ToString());
                                                 }
                                             }
 
-                                            ack.Payload.channelgroups.Add(channelgroup, auditAckCgData);
+                                            ack.Payload.Channelgroups.Add(channelgroup, auditAckCgData);
                                         }
                                     }
                                 }
@@ -666,11 +666,11 @@ namespace PubnubApi
                         Dictionary<string, object> hereNowPayloadDic = ConvertToDictionaryObject(herenowDicObj["payload"]);
                         if (hereNowPayloadDic != null && hereNowPayloadDic.Count > 0)
                         {
-                            ack.Payload.total_occupancy = Int32.Parse(hereNowPayloadDic["total_occupancy"].ToString());
-                            ack.Payload.total_channels = Int32.Parse(hereNowPayloadDic["total_channels"].ToString());
+                            ack.Payload.Total_occupancy = Int32.Parse(hereNowPayloadDic["total_occupancy"].ToString());
+                            ack.Payload.Total_channels = Int32.Parse(hereNowPayloadDic["total_channels"].ToString());
                             if (hereNowPayloadDic.ContainsKey("channels"))
                             {
-                                ack.Payload.channels = new Dictionary<string, PNHereNowResult.Data.ChannelData>();
+                                ack.Payload.Channels = new Dictionary<string, PNHereNowResult.Data.ChannelData>();
 
                                 Dictionary<string, object> hereNowChannelListDic = ConvertToDictionaryObject(hereNowPayloadDic["channels"]);
                                 if (hereNowChannelListDic != null && hereNowChannelListDic.Count > 0)
@@ -681,7 +681,7 @@ namespace PubnubApi
                                         if (hereNowChannelItemDic != null && hereNowChannelItemDic.Count > 0)
                                         {
                                             PNHereNowResult.Data.ChannelData channelData = new PNHereNowResult.Data.ChannelData();
-                                            channelData.occupancy = Convert.ToInt32(hereNowChannelItemDic["occupancy"].ToString());
+                                            channelData.Occupancy = Convert.ToInt32(hereNowChannelItemDic["occupancy"].ToString());
                                             if (hereNowChannelItemDic.ContainsKey("uuids"))
                                             {
                                                 object[] hereNowChannelUuidList = ConvertToObjectArray(hereNowChannelItemDic["uuids"]);
@@ -694,7 +694,7 @@ namespace PubnubApi
                                                         if (hereNowChannelUuidList[index].GetType() == typeof(string))
                                                         {
                                                             PNHereNowResult.Data.ChannelData.UuidData uuidData = new PNHereNowResult.Data.ChannelData.UuidData();
-                                                            uuidData.uuid = hereNowChannelUuidList[index].ToString();
+                                                            uuidData.Uuid = hereNowChannelUuidList[index].ToString();
                                                             uuidDataList.Add(uuidData);
                                                         }
                                                         else
@@ -703,19 +703,19 @@ namespace PubnubApi
                                                             if (hereNowChannelItemUuidsDic != null && hereNowChannelItemUuidsDic.Count > 0)
                                                             {
                                                                 PNHereNowResult.Data.ChannelData.UuidData uuidData = new PNHereNowResult.Data.ChannelData.UuidData();
-                                                                uuidData.uuid = hereNowChannelItemUuidsDic["uuid"].ToString();
+                                                                uuidData.Uuid = hereNowChannelItemUuidsDic["uuid"].ToString();
                                                                 if (hereNowChannelItemUuidsDic.ContainsKey("state"))
                                                                 {
-                                                                    uuidData.state = ConvertToDictionaryObject(hereNowChannelItemUuidsDic["state"]);
+                                                                    uuidData.State = ConvertToDictionaryObject(hereNowChannelItemUuidsDic["state"]);
                                                                 }
                                                                 uuidDataList.Add(uuidData);
                                                             }
                                                         }
                                                     }
-                                                    channelData.uuids = uuidDataList.ToArray();
+                                                    channelData.Uuids = uuidDataList.ToArray();
                                                 }
                                             }
-                                            ack.Payload.channels.Add(channel, channelData);
+                                            ack.Payload.Channels.Add(channel, channelData);
                                         }
                                     }
                                 }
@@ -724,8 +724,8 @@ namespace PubnubApi
                     }
                     else if (herenowDicObj.ContainsKey("occupancy"))
                     {
-                        ack.Payload.total_occupancy = Int32.Parse(herenowDicObj["occupancy"].ToString());
-                        ack.Payload.channels = new Dictionary<string, PNHereNowResult.Data.ChannelData>();
+                        ack.Payload.Total_occupancy = Int32.Parse(herenowDicObj["occupancy"].ToString());
+                        ack.Payload.Channels = new Dictionary<string, PNHereNowResult.Data.ChannelData>();
                         if (herenowDicObj.ContainsKey("uuids"))
                         {
                             object[] uuidArray = ConvertToObjectArray(herenowDicObj["uuids"]);
@@ -738,26 +738,26 @@ namespace PubnubApi
                                     if (hereNowChannelItemUuidsDic != null && hereNowChannelItemUuidsDic.Count > 0)
                                     {
                                         PNHereNowResult.Data.ChannelData.UuidData uuidData = new PNHereNowResult.Data.ChannelData.UuidData();
-                                        uuidData.uuid = hereNowChannelItemUuidsDic["uuid"].ToString();
+                                        uuidData.Uuid = hereNowChannelItemUuidsDic["uuid"].ToString();
                                         if (hereNowChannelItemUuidsDic.ContainsKey("state"))
                                         {
-                                            uuidData.state = ConvertToDictionaryObject(hereNowChannelItemUuidsDic["state"]);
+                                            uuidData.State = ConvertToDictionaryObject(hereNowChannelItemUuidsDic["state"]);
                                         }
                                         uuidDataList.Add(uuidData);
                                     }
                                     else
                                     {
                                         PNHereNowResult.Data.ChannelData.UuidData uuidData = new PNHereNowResult.Data.ChannelData.UuidData();
-                                        uuidData.uuid = uuidArray[index].ToString();
+                                        uuidData.Uuid = uuidArray[index].ToString();
                                         uuidDataList.Add(uuidData);
                                     }
                                 }
                                 PNHereNowResult.Data.ChannelData channelData = new PNHereNowResult.Data.ChannelData();
-                                channelData.uuids = uuidDataList.ToArray();
-                                channelData.occupancy = ack.Payload.total_occupancy;
+                                channelData.Uuids = uuidDataList.ToArray();
+                                channelData.Occupancy = ack.Payload.Total_occupancy;
 
-                                ack.Payload.channels.Add(ack.ChannelName, channelData);
-                                ack.Payload.total_channels = ack.Payload.channels.Count;
+                                ack.Payload.Channels.Add(ack.ChannelName, channelData);
+                                ack.Payload.Total_channels = ack.Payload.Channels.Count;
                             }
                         }
                         else
@@ -768,11 +768,11 @@ namespace PubnubApi
                             foreach (string channel in arrChannel)
                             {
                                 PNHereNowResult.Data.ChannelData channelData = new PNHereNowResult.Data.ChannelData();
-                                channelData.occupancy = 1;
-                                ack.Payload.channels.Add(channel, channelData);
+                                channelData.Occupancy = 1;
+                                ack.Payload.Channels.Add(channel, channelData);
                                 totalChannels++;
                             }
-                            ack.Payload.total_channels = totalChannels;
+                            ack.Payload.Total_channels = totalChannels;
 
 
                         }
@@ -907,7 +907,7 @@ namespace PubnubApi
                                     {
                                         channelList.Add(channel);
                                     }
-                                    ack.Payload.channels = channelList.ToArray();
+                                    ack.Payload.Channels = channelList.ToArray();
                                 }
 
                             }

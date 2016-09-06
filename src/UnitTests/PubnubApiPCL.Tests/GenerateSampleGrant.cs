@@ -76,7 +76,7 @@ namespace PubNubMessaging.Tests
                     grantManualEvent = new ManualResetEvent(false);
                     string channelName = string.Format("csharp-pam-ul-channel-{0}", index);
                     string authKey = string.Format("csharp-pam-authkey-0-{0},csharp-pam-authkey-1-{1}", index, index);
-                    pubnub.grant().channels(new string[] { channelName }).authKeys(new string[] { authKey }).read(true).write(true).manage(false).async(new PNCallback<PNAccessManagerGrantResult>() { result = UserCallbackForSampleGrantAtUserLevel, error = ErrorCallbackForSampleGrantAtUserLevel });
+                    pubnub.Grant().Channels(new string[] { channelName }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(false).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = UserCallbackForSampleGrantAtUserLevel, Error = ErrorCallbackForSampleGrantAtUserLevel });
                     grantManualEvent.WaitOne();
                 }
 
@@ -132,7 +132,7 @@ namespace PubNubMessaging.Tests
                 {
                     grantManualEvent = new ManualResetEvent(false);
                     string channelName = string.Format("csharp-pam-cl-channel-{0}", index);
-                    pubnub.grant().channels(new string[] { channelName }).read(true).write(true).manage(false).async(new PNCallback<PNAccessManagerGrantResult>() { result = UserCallbackForSampleGrantAtChannelLevel, error = ErrorCallbackForSampleGrantAtChannelLevel });
+                    pubnub.Grant().Channels(new string[] { channelName }).Read(true).Write(true).Manage(false).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = UserCallbackForSampleGrantAtChannelLevel, Error = ErrorCallbackForSampleGrantAtChannelLevel });
                     grantManualEvent.WaitOne();
                 }
 

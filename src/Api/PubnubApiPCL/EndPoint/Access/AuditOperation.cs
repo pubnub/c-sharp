@@ -33,27 +33,27 @@ namespace PubnubApi.EndPoint
             unit = pubnubUnit;
         }
 
-        public AuditOperation channel(string channel)
+        public AuditOperation Channel(string channel)
         {
             this.channelName = channel;
             return this;
         }
 
-        public AuditOperation channelGroup(string channelGroup)
+        public AuditOperation ChannelGroup(string channelGroup)
         {
             this.channelGroupName = channelGroup;
             return this;
         }
 
-        public AuditOperation authKeys(string[] authKeys)
+        public AuditOperation AuthKeys(string[] authKeys)
         {
             this.authenticationKeys = authKeys;
             return this;
         }
 
-        public void async(PNCallback<PNAccessManagerAuditResult> callback)
+        public void Async(PNCallback<PNAccessManagerAuditResult> callback)
         {
-            AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, callback.result, callback.error);
+            AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, callback.Result, callback.Error);
         }
 
         internal void AuditAccess<T>(string channel, string channelGroup, string[] authKeys, Action<T> userCallback, Action<PubnubClientError> errorCallback)

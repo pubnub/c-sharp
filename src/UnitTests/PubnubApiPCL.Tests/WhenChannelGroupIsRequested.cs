@@ -74,7 +74,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.grant().channelGroups(new string[] { channelGroupName }).read(true).write(true).manage(true).ttl(20).async(new PNCallback<PNAccessManagerGrantResult>() { result = ThenChannelGroupInitializeShouldReturnGrantMessage, error = DummyErrorCallback });
+            pubnub.Grant().ChannelGroups(new string[] { channelGroupName }).Read(true).Write(true).Manage(true).TTL(20).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = ThenChannelGroupInitializeShouldReturnGrantMessage, Error = DummyErrorCallback });
 
             Thread.Sleep(1000);
 
@@ -128,7 +128,7 @@ namespace PubNubMessaging.Tests
 
             channelGroupManualEvent = new ManualResetEvent(false);
 
-            pubnub.addChannelsToChannelGroup().channels(new string[] { channelName }).channelGroup(channelGroupName).async(new PNCallback<PNChannelGroupsAddChannelResult>() { result = AddChannelGroupCallback, error = DummyErrorCallback });
+            pubnub.AddChannelsToChannelGroup().Channels(new string[] { channelName }).ChannelGroup(channelGroupName).Async(new PNCallback<PNChannelGroupsAddChannelResult>() { Result = AddChannelGroupCallback, Error = DummyErrorCallback });
             Thread.Sleep(1000);
 
             channelGroupManualEvent.WaitOne();
@@ -176,7 +176,7 @@ namespace PubNubMessaging.Tests
 
             channelGroupManualEvent = new ManualResetEvent(false);
 
-            pubnub.removeChannelsFromChannelGroup().channels(new string[] { channelName }).channelGroup(channelGroupName).async(new PNCallback<PNChannelGroupsRemoveChannelResult>() { result = RemoveChannelGroupCallback, error = DummyErrorCallback });
+            pubnub.RemoveChannelsFromChannelGroup().Channels(new string[] { channelName }).ChannelGroup(channelGroupName).Async(new PNCallback<PNChannelGroupsRemoveChannelResult>() { Result = RemoveChannelGroupCallback, Error = DummyErrorCallback });
             Thread.Sleep(1000);
 
             channelGroupManualEvent.WaitOne();
@@ -223,7 +223,7 @@ namespace PubNubMessaging.Tests
 
             channelGroupManualEvent = new ManualResetEvent(false);
 
-            pubnub.listChannelsForChannelGroup().channelGroup(channelGroupName).async(new PNCallback<PNChannelGroupsAllChannelsResult>() { result = GetChannelGroupCallback, error = DummyErrorCallback });
+            pubnub.ListChannelsForChannelGroup().ChannelGroup(channelGroupName).Async(new PNCallback<PNChannelGroupsAllChannelsResult>() { Result = GetChannelGroupCallback, Error = DummyErrorCallback });
             Thread.Sleep(1000);
 
             channelGroupManualEvent.WaitOne();
@@ -275,7 +275,7 @@ namespace PubNubMessaging.Tests
 
             channelGroupManualEvent = new ManualResetEvent(false);
 
-            pubnub.listChannelGroups().async(new PNCallback<PNChannelGroupsAllResult>() { result = GetAllChannelGroupCallback, error = DummyErrorCallback });
+            pubnub.ListChannelGroups().Async(new PNCallback<PNChannelGroupsAllResult>() { Result = GetAllChannelGroupCallback, Error = DummyErrorCallback });
             Thread.Sleep(1000);
 
             channelGroupManualEvent.WaitOne();

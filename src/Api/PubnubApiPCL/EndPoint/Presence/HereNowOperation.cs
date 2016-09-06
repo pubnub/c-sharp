@@ -33,33 +33,33 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public HereNowOperation channels(string[] channels)
+        public HereNowOperation Channels(string[] channels)
         {
             this.channelNames = channels;
             return this;
         }
 
-        public HereNowOperation channelGroups(string[] channelGroups)
+        public HereNowOperation ChannelGroups(string[] channelGroups)
         {
             this.channelGroupNames = channelGroups;
             return this;
         }
 
-        public HereNowOperation includeState(bool includeState)
+        public HereNowOperation IncludeState(bool includeState)
         {
             this.includeUserState = includeState;
             return this;
         }
 
-        public HereNowOperation includeUUIDs(bool includeUUIDs)
+        public HereNowOperation IncludeUUIDs(bool includeUUIDs)
         {
             this.includeChannelUUIDs = includeUUIDs;
             return this;
         }
 
-        public void async(PNCallback<PNHereNowResult> callback)
+        public void Async(PNCallback<PNHereNowResult> callback)
         {
-            HereNow(this.channelNames, this.channelGroupNames, this.includeChannelUUIDs, this.includeUserState, callback.result, callback.error);
+            HereNow(this.channelNames, this.channelGroupNames, this.includeChannelUUIDs, this.includeUserState, callback.Result, callback.Error);
         }
 
         internal void HereNow(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, Action<PNHereNowResult> userCallback, Action<PubnubClientError> errorCallback)
