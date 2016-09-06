@@ -51,7 +51,7 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
-        public void async(PNCallback<AuditAck> callback)
+        public void async(PNCallback<PNAccessManagerAuditResult> callback)
         {
             AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, callback.result, callback.error);
         }

@@ -64,12 +64,12 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
-        public void async(PNCallback<PublishAck> callback)
+        public void async(PNCallback<PNPublishResult> callback)
         {
             Publish(this.channelName, this.msg, this.storeInHistory, this.userMetadata, callback.result, callback.error);
         }
 
-        private void Publish(string channel, object message, bool storeInHistory, string jsonUserMetaData, Action<PublishAck> userCallback, Action<PubnubClientError> errorCallback)
+        private void Publish(string channel, object message, bool storeInHistory, string jsonUserMetaData, Action<PNPublishResult> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
             {
@@ -108,17 +108,17 @@ namespace PubnubApi.EndPoint
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
             Uri request = urlBuilder.BuildPublishRequest(channel, message, storeInHistory, jsonUserMetaData);
 
-            RequestState<PublishAck> requestState = new RequestState<PublishAck>();
+            RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
             requestState.Channels = new string[] { channel };
             requestState.ResponseType = ResponseType.Publish;
             requestState.NonSubscribeRegularCallback = userCallback;
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            string json = UrlProcessRequest<PublishAck>(request, requestState, false);
+            string json = UrlProcessRequest<PNPublishResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<PublishAck>(requestState, json);
+                List<object> result = ProcessJsonResponse<PNPublishResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
             }
         }

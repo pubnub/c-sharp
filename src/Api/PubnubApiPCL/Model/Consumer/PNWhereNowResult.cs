@@ -1,19 +1,21 @@
 ﻿
 namespace PubnubApi
 {
-    public class AddChannelToChannelGroupAck
+    public class PNWhereNowResult
     {
-        public AddChannelToChannelGroupAck()
+        public PNWhereNowResult()
         {
-            this.ChannelGroupName = "";
             this.StatusMessage = "";
             this.Service = "";
         }
 
-        public string ChannelGroupName { get; set; }
+        public class Data
+        {
+            public string[] channels { get; set; }
+        }
         public int StatusCode { get; set; }
         public string StatusMessage { get; set; }
         public string Service { get; set; }
-        public bool Error { get; set; }
+        public Data Payload { get; set; }
     }
 }

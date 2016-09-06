@@ -4,11 +4,11 @@ namespace PubnubApi
 {
     public class PubnubSubscribeChannelCallback<T>
     {
-        public Action<Message<T>> SubscribeRegularCallback;
-        public Action<ConnectOrDisconnectAck> ConnectCallback;
-        public Action<ConnectOrDisconnectAck> DisconnectCallback;
-        public Action<PresenceAck> WildcardPresenceCallback;
-        public Action<PubnubClientError> ErrorCallback;
+        public Action<Message<T>> SubscribeRegularCallback { get; set; }
+        public Action<ConnectOrDisconnectAck> ConnectCallback { get; set; }
+        public Action<ConnectOrDisconnectAck> DisconnectCallback { get; set; }
+        public Action<PresenceAck> WildcardPresenceCallback { get; set; }
+        public Action<PubnubClientError> ErrorCallback { get; set; }
 
         public PubnubSubscribeChannelCallback()
         {

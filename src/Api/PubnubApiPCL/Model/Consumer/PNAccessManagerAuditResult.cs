@@ -2,9 +2,9 @@
 
 namespace PubnubApi
 {
-    public class GrantAck
+    public class PNAccessManagerAuditResult
     {
-        public GrantAck()
+        public PNAccessManagerAuditResult()
         {
             this.StatusMessage = "";
             this.Service = "";
@@ -22,10 +22,10 @@ namespace PubnubApi
                 public bool read { get; set; }
                 public bool write { get; set; }
                 public bool manage { get; set; }
+                public int TTL { get; set; }
             }
             public string Level { get; set; }
             public string SubscribeKey { get; set; }
-            public int TTL { get; set; }
             public Dictionary<string, ChannelData> channels { get; set; }
             public Dictionary<string, ChannelGroupData> channelgroups { get; set; }
             public SubkeyAccess Access { get; set; }
@@ -39,6 +39,7 @@ namespace PubnubApi
                     public bool read { get; set; }
                     public bool write { get; set; }
                     public bool manage { get; set; }
+                    public int TTL { get; set; }
                 }
 
                 public class AuthData
@@ -48,6 +49,7 @@ namespace PubnubApi
                         public bool read { get; set; }
                         public bool write { get; set; }
                         public bool manage { get; set; }
+                        public int TTL { get; set; }
                     }
 
                     public AuthAccess Access { get; set; }
@@ -65,6 +67,7 @@ namespace PubnubApi
                     public bool read { get; set; }
                     public bool write { get; set; }
                     public bool manage { get; set; }
+                    public int TTL { get; set; }
                 }
 
                 public class AuthData
@@ -74,14 +77,13 @@ namespace PubnubApi
                         public bool read { get; set; }
                         public bool write { get; set; }
                         public bool manage { get; set; }
+                        public int TTL { get; set; }
                     }
                     public AuthAccess Access { get; set; }
                 }
 
                 public ChannelGroupAccess Access { get; set; }
             }
-
-
         }
 
         public int StatusCode { get; set; }

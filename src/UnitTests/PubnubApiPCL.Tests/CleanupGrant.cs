@@ -80,7 +80,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.audit().async(new PNCallback<AuditAck>() { result = UserCallbackForCleanUpAccessAtUserLevel, error = ErrorCallbackForCleanUpAccessAtUserLevel });
+                pubnub.audit().async(new PNCallback<PNAccessManagerAuditResult>() { result = UserCallbackForCleanUpAccessAtUserLevel, error = ErrorCallbackForCleanUpAccessAtUserLevel });
                 auditManualEvent.WaitOne();
                 pubnub.EndPendingRequests();
                 pubnub = null;
@@ -122,7 +122,7 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.audit().async(new PNCallback<AuditAck>() { result = UserCallbackForCleanUpAccessAtChannelLevel, error = ErrorCallbackForCleanUpAccessAtChannelLevel });
+                pubnub.audit().async(new PNCallback<PNAccessManagerAuditResult>() { result = UserCallbackForCleanUpAccessAtChannelLevel, error = ErrorCallbackForCleanUpAccessAtChannelLevel });
                 auditManualEvent.WaitOne();
 
                 pubnub.EndPendingRequests();
@@ -135,7 +135,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void UserCallbackForCleanUpAccessAtUserLevel(AuditAck receivedMessage)
+        void UserCallbackForCleanUpAccessAtUserLevel(PNAccessManagerAuditResult receivedMessage)
         {
             try
             {
@@ -148,23 +148,23 @@ namespace PubNubMessaging.Tests
                     {
                         if (receivedMessage.Payload != null)
                         {
-                            Dictionary<string, AuditAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
+                            Dictionary<string, PNAccessManagerAuditResult.Data.ChannelData> channels = receivedMessage.Payload.channels;
                             if (channels != null && channels.Count > 0)
                             {
                                 Console.WriteLine("CleanupGrant / AtUserLevel / UserCallbackForCleanUpAccess - Channel Count = {0}", channels.Count);
                                 foreach (string channelName in channels.Keys)
                                 {
-                                    AuditAck.Data.ChannelData channelContainer = channels[channelName];
+                                    PNAccessManagerAuditResult.Data.ChannelData channelContainer = channels[channelName];
                                     if (channelContainer != null && channelContainer.auths != null)
                                     {
-                                        Dictionary<string, AuditAck.Data.ChannelData.AuthData> auths = channelContainer.auths;
+                                        Dictionary<string, PNAccessManagerAuditResult.Data.ChannelData.AuthData> auths = channelContainer.auths;
                                         if (auths != null && auths.Count > 0)
                                         {
                                             foreach (string authKey in auths.Keys)
                                             {
                                                 receivedRevokeMessage = false;
                                                 Console.WriteLine("Auth Key = " + authKey);
-                                                pubnub.grant().channels(new string[] { channelName }).authKeys(new string[] { authKey }).read(false).write(false).manage(false).async(new PNCallback<GrantAck>() { result = UserCallbackForRevokeAccess, error = ErrorCallbackForRevokeAccess });
+                                                pubnub.grant().channels(new string[] { channelName }).authKeys(new string[] { authKey }).read(false).write(false).manage(false).async(new PNCallback<PNAccessManagerGrantResult>() { result = UserCallbackForRevokeAccess, error = ErrorCallbackForRevokeAccess });
                                                 revokeManualEvent.WaitOne();
 
                                             }
@@ -197,7 +197,7 @@ namespace PubNubMessaging.Tests
             auditManualEvent.Set();
         }
 
-        void UserCallbackForRevokeAccess(GrantAck receivedMessage)
+        void UserCallbackForRevokeAccess(PNAccessManagerGrantResult receivedMessage)
         {
             if (receivedMessage != null)
             {
@@ -216,7 +216,7 @@ namespace PubNubMessaging.Tests
             revokeManualEvent.Set();
         }
 
-        void UserCallbackForCleanUpAccessAtChannelLevel(AuditAck receivedMessage)
+        void UserCallbackForCleanUpAccessAtChannelLevel(PNAccessManagerAuditResult receivedMessage)
         {
             try
             {
@@ -229,7 +229,7 @@ namespace PubNubMessaging.Tests
                     {
                         if (receivedMessage.Payload != null)
                         {
-                            Dictionary<string, AuditAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
+                            Dictionary<string, PNAccessManagerAuditResult.Data.ChannelData> channels = receivedMessage.Payload.channels;
                             if (channels != null && channels.Count > 0)
                             {
                                 Console.WriteLine("CleanupGrant / AtUserLevel / UserCallbackForCleanUpAccess - Channel Count = {0}", channels.Count);
@@ -237,7 +237,7 @@ namespace PubNubMessaging.Tests
                                 {
                                     //Dictionary<string, object> channelContainer = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(channels[channelName]);
                                     Console.WriteLine(channelName);
-                                    pubnub.grant().channels(new string[] { channelName }).read(false).write(false).manage(false).async(new PNCallback<GrantAck>() { result = UserCallbackForRevokeAccess, error = ErrorCallbackForRevokeAccess });
+                                    pubnub.grant().channels(new string[] { channelName }).read(false).write(false).manage(false).async(new PNCallback<PNAccessManagerGrantResult>() { result = UserCallbackForRevokeAccess, error = ErrorCallbackForRevokeAccess });
                                     revokeManualEvent.WaitOne();
 
                                 }

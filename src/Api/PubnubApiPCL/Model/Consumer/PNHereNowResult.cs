@@ -2,9 +2,9 @@
 
 namespace PubnubApi
 {
-    public class HereNowAck
+    public class PNHereNowResult
     {
-        public HereNowAck()
+        public PNHereNowResult()
         {
             this.StatusMessage = "";
             this.Service = "";
@@ -29,7 +29,7 @@ namespace PubnubApi
                 public int occupancy { get; set; }
                 public UuidData[] uuids { get; set; }
             }
-            public Dictionary<string, ChannelData> channels;
+            public Dictionary<string, ChannelData> channels { get; set; }
             public int total_channels { get; set; }
             public int total_occupancy { get; set; }
         }

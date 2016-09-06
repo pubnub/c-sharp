@@ -1,20 +1,20 @@
 ﻿
 namespace PubnubApi
 {
-    public class GetAllChannelGroupsAck
+    public class PNChannelGroupsAllChannelsResult
     {
         public class Data
         {
             public Data()
             {
-                this.Namespace = "";
+                this.ChannelGroupName = "";
             }
 
-            public string[] ChannelGroupName;
-            public string Namespace;
+            public string[] ChannelName { get; set; }
+            public string ChannelGroupName { get; set; }
         }
 
-        public GetAllChannelGroupsAck()
+        public PNChannelGroupsAllChannelsResult()
         {
             this.Service = "";
         }

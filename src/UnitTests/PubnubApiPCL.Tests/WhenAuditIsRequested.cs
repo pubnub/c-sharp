@@ -72,7 +72,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.audit().async(new PNCallback<AuditAck>() { result = AccessToSubKeyLevelCallback, error = DummyErrorCallback });
+                pubnub.audit().async(new PNCallback<PNAccessManagerAuditResult>() { result = AccessToSubKeyLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();
@@ -131,7 +131,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.audit().channel(channel).async(new PNCallback<AuditAck>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
+                pubnub.audit().channel(channel).async(new PNCallback<PNAccessManagerAuditResult>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();
@@ -189,7 +189,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.audit().channelGroup(channelgroup).async(new PNCallback<AuditAck>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
+                pubnub.audit().channelGroup(channelgroup).async(new PNCallback<PNAccessManagerAuditResult>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();
@@ -205,7 +205,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void AccessToSubKeyLevelCallback(AuditAck receivedMessage)
+        void AccessToSubKeyLevelCallback(PNAccessManagerAuditResult receivedMessage)
         {
             try
             {
@@ -217,7 +217,7 @@ namespace PubNubMessaging.Tests
                     {
                         if (receivedMessage.Payload != null)
                         {
-                            Dictionary<string, AuditAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
+                            Dictionary<string, PNAccessManagerAuditResult.Data.ChannelData> channels = receivedMessage.Payload.channels;
                             if (channels != null && channels.Count >= 0)
                             {
                                 Console.WriteLine("{0} - AccessToSubKeyLevelCallback - Audit Count = {1}", currentUnitTestCase, channels.Count);
@@ -239,7 +239,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void AccessToChannelLevelCallback(AuditAck receivedMessage)
+        void AccessToChannelLevelCallback(PNAccessManagerAuditResult receivedMessage)
         {
             try
             {
@@ -254,7 +254,7 @@ namespace PubNubMessaging.Tests
                             string level = receivedMessage.Payload.Level;
                             if (currentUnitTestCase == "ThenChannelLevelShouldReturnSuccess")
                             {
-                                Dictionary<string, AuditAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
+                                Dictionary<string, PNAccessManagerAuditResult.Data.ChannelData> channels = receivedMessage.Payload.channels;
                                 if (channels != null && channels.Count >= 0)
                                 {
                                     Console.WriteLine("{0} - AccessToChannelLevelCallback - Audit Channel Count = {1}", currentUnitTestCase, channels.Count);
@@ -266,7 +266,7 @@ namespace PubNubMessaging.Tests
                             }
                             else if (currentUnitTestCase == "ThenChannelGroupLevelShouldReturnSuccess")
                             {
-                                Dictionary<string, AuditAck.Data.ChannelGroupData> channelgroups = receivedMessage.Payload.channelgroups;
+                                Dictionary<string, PNAccessManagerAuditResult.Data.ChannelGroupData> channelgroups = receivedMessage.Payload.channelgroups;
                                 if (channelgroups != null && channelgroups.Count >= 0)
                                 {
                                     Console.WriteLine("{0} - AccessToChannelLevelCallback - Audit ChannelGroup Count = {1}", currentUnitTestCase, channelgroups.Count);

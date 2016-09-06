@@ -55,7 +55,7 @@ namespace PubNubMessaging.Tests
             string channelList = "hello_my_channel,hello_my_channel1,hello_my_channel2";
             string[] channel = channelList.Split(',');
 
-            pubnub.grant().channels(channel).read(true).write(true).manage(false).ttl(20).async(new PNCallback<GrantAck>() { result = ThenSubscribeInitializeShouldReturnGrantMessage, error = DummyErrorCallback });
+            pubnub.grant().channels(channel).read(true).write(true).manage(false).ttl(20).async(new PNCallback<PNAccessManagerGrantResult>() { result = ThenSubscribeInitializeShouldReturnGrantMessage, error = DummyErrorCallback });
             Thread.Sleep(1000);
 
             mreGrant.WaitOne();
@@ -95,7 +95,7 @@ namespace PubNubMessaging.Tests
 
             mrePublish = new ManualResetEvent(false);
             publishedMessage = new CustomClass();
-            pubnub.publish().channel(channel).message(publishedMessage).async(new PNCallback<PublishAck>() { result = dummyPublishCallback, error = DummyErrorCallback });
+            pubnub.publish().channel(channel).message(publishedMessage).async(new PNCallback<PNPublishResult>() { result = dummyPublishCallback, error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -312,7 +312,7 @@ namespace PubNubMessaging.Tests
                 for (int index = 0; index < 10; index++)
                 {
                     //Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Publishing " + index.ToString());
-                    pubnub.publish().channel(channel).message(index.ToString()).async(new PNCallback<PublishAck>() { result = dummyPublishCallback, error = DummyErrorCallback });
+                    pubnub.publish().channel(channel).message(index.ToString()).async(new PNCallback<PNPublishResult>() { result = dummyPublishCallback, error = DummyErrorCallback });
                     //Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Publishing..waiting for confirmation " + index.ToString());
                     //mePublish.WaitOne(10*1000);
                 }
@@ -326,7 +326,7 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedManyMessages, "WhenSubscribedToAChannel --> ThenSubscriberShouldBeAbleToReceiveManyMessages Failed");
         }
 
-        void ThenSubscribeInitializeShouldReturnGrantMessage(GrantAck receivedMessage)
+        void ThenSubscribeInitializeShouldReturnGrantMessage(PNAccessManagerGrantResult receivedMessage)
         {
             try
             {
@@ -448,7 +448,7 @@ namespace PubNubMessaging.Tests
             mreSubscribeConnect.Set();
         }
 
-        private void dummyPublishCallback(PublishAck result)
+        private void dummyPublishCallback(PNPublishResult result)
         {
             //Console.WriteLine("dummyPublishCallback -> result = " + result);
             if (result != null)

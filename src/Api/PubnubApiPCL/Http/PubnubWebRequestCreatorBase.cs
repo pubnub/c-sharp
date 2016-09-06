@@ -5,7 +5,7 @@ namespace PubnubApi
 {
     internal abstract class PubnubWebRequestCreatorBase : IWebRequestCreate
     {
-        protected IPubnubUnitTest pubnubUnitTest = null;
+        protected IPubnubUnitTest pubnubUnitTest { get; set; }
 
         public PubnubWebRequestCreatorBase()
         {

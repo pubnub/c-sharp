@@ -6,7 +6,7 @@ namespace PubnubApi
 {
     public abstract class PubnubWebResponseBase : WebResponse
     {
-        protected WebResponse response;
+        protected WebResponse response { get; set; }
         readonly Stream _responseStream;
         HttpStatusCode httpStatusCode;
 

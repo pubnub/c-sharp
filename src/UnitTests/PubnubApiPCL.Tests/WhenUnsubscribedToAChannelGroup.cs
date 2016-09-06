@@ -43,7 +43,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "Init3";
             pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.grant().channelGroups(new string[] { channelGroupName }).read(true).write(true).manage(true).ttl(20).async(new PNCallback<GrantAck>() { result = ThenChannelGroupInitializeShouldReturnGrantMessage, error = DummyUnsubscribeErrorCallback });
+            pubnub.grant().channelGroups(new string[] { channelGroupName }).read(true).write(true).manage(true).ttl(20).async(new PNCallback<PNAccessManagerGrantResult>() { result = ThenChannelGroupInitializeShouldReturnGrantMessage, error = DummyUnsubscribeErrorCallback });
             Thread.Sleep(1000);
 
             grantManualEvent.WaitOne();
@@ -74,7 +74,7 @@ namespace PubNubMessaging.Tests
             string channelName = "hello_my_channel";
 
             unsubscribeManualEvent = new ManualResetEvent(false);
-            pubnub.AddChannelsToChannelGroup(new string[] { channelName }, channelGroupName, ChannelGroupAddCallback, DummySubscribeErrorCallback);
+            pubnub.addChannelsToChannelGroup().channels(new string[] { channelName }).channelGroup(channelGroupName).async(new PNCallback<PNChannelGroupsAddChannelResult>() { result = ChannelGroupAddCallback, error = DummyErrorCallback });
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
             if (receivedChannelGroupMessage)
             {
@@ -140,7 +140,7 @@ namespace PubNubMessaging.Tests
         //    unsubscribeManualEvent.Set();
         //}
 
-        void ChannelGroupAddCallback(AddChannelToChannelGroupAck receivedMessage)
+        void ChannelGroupAddCallback(PNChannelGroupsAddChannelResult receivedMessage)
         {
             try
             {
@@ -168,7 +168,7 @@ namespace PubNubMessaging.Tests
 
         }
 
-        void ThenChannelGroupInitializeShouldReturnGrantMessage(GrantAck receivedMessage)
+        void ThenChannelGroupInitializeShouldReturnGrantMessage(PNAccessManagerGrantResult receivedMessage)
         {
             try
             {

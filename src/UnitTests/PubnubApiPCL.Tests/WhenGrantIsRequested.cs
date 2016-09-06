@@ -38,7 +38,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.grant().read(true).write(true).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToSubKeyLevelCallback, error = DummyErrorCallback });
+                pubnub.grant().read(true).write(true).manage(false).ttl(5).async(new PNCallback<PNAccessManagerGrantResult>() { result = AccessToSubKeyLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -70,7 +70,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.grant().read(true).write(false).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToSubKeyLevelCallback, error = DummyErrorCallback });
+                pubnub.grant().read(true).write(false).manage(false).ttl(5).async(new PNCallback<PNAccessManagerGrantResult>() { result = AccessToSubKeyLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -102,7 +102,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.grant().read(false).write(true).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToSubKeyLevelCallback, error = DummyErrorCallback });
+                pubnub.grant().read(false).write(true).manage(false).ttl(5).async(new PNCallback<PNAccessManagerGrantResult>() { result = AccessToSubKeyLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -147,7 +147,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.grant().channels(new string[] { channel }).read(true).write(true).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
+                pubnub.grant().channels(new string[] { channel }).read(true).write(true).manage(false).ttl(5).async(new PNCallback<PNAccessManagerGrantResult>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -192,7 +192,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.grant().channels(new string[] { channel }).read(true).write(false).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
+                pubnub.grant().channels(new string[] { channel }).read(true).write(false).manage(false).ttl(5).async(new PNCallback<PNAccessManagerGrantResult>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -237,7 +237,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.grant().channels(new string[] { channel }).read(false).write(true).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
+                pubnub.grant().channels(new string[] { channel }).read(false).write(true).manage(false).ttl(5).async(new PNCallback<PNAccessManagerGrantResult>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -272,7 +272,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.grant().channels(new string[] { channel }).authKeys(new string[] { authKey }).read(true).write(true).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToUserLevelCallback, error = DummyErrorCallback });
+                pubnub.grant().channels(new string[] { channel }).authKeys(new string[] { authKey }).read(true).write(true).manage(false).ttl(5).async(new PNCallback<PNAccessManagerGrantResult>() { result = AccessToUserLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -307,7 +307,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.grant().channels(new string[] { channel }).authKeys(new string[] { authKey }).read(true).write(false).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToUserLevelCallback, error = DummyErrorCallback });
+                pubnub.grant().channels(new string[] { channel }).authKeys(new string[] { authKey }).read(true).write(false).manage(false).ttl(5).async(new PNCallback<PNAccessManagerGrantResult>() { result = AccessToUserLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -342,7 +342,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.grant().channels(new string[] { channel }).authKeys(new string[] { authKey }).read(false).write(true).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToUserLevelCallback, error = DummyErrorCallback });
+                pubnub.grant().channels(new string[] { channel }).authKeys(new string[] { authKey }).read(false).write(true).manage(false).ttl(5).async(new PNCallback<PNAccessManagerGrantResult>() { result = AccessToUserLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -412,7 +412,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.grant().channels(new string[] { channel }).read(true).write(true).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToMultiChannelGrantCallback, error = DummyErrorCallback });
+                pubnub.grant().channels(new string[] { channel }).read(true).write(true).manage(false).ttl(5).async(new PNCallback<PNAccessManagerGrantResult>() { result = AccessToMultiChannelGrantCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -482,7 +482,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.grant().channels(authArray).authKeys(authArray).read(true).write(true).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToMultiAuthGrantCallback, error = DummyErrorCallback });
+                pubnub.grant().channels(authArray).authKeys(authArray).read(true).write(true).manage(false).ttl(5).async(new PNCallback<PNAccessManagerGrantResult>() { result = AccessToMultiAuthGrantCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -517,7 +517,7 @@ namespace PubNubMessaging.Tests
                 if (!unitTest.EnableStubTest)
                 {
                     grantManualEvent = new ManualResetEvent(false);
-                    pubnub.grant().read(true).write(true).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToSubKeyLevelCallback, error = DummyErrorCallback });
+                    pubnub.grant().read(true).write(true).manage(false).ttl(5).async(new PNCallback<PNAccessManagerGrantResult>() { result = AccessToSubKeyLevelCallback, error = DummyErrorCallback });
                     Thread.Sleep(1000);
                     grantManualEvent.WaitOne();
                 }
@@ -529,7 +529,7 @@ namespace PubNubMessaging.Tests
                 {
                     revokeManualEvent = new ManualResetEvent(false);
                     Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess -> Grant ok..Now trying Revoke");
-                    pubnub.grant().read(false).write(false).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = RevokeToSubKeyLevelCallback, error = DummyErrorCallback });
+                    pubnub.grant().read(false).write(false).manage(false).ttl(5).async(new PNCallback<PNAccessManagerGrantResult>() { result = RevokeToSubKeyLevelCallback, error = DummyErrorCallback });
                     Thread.Sleep(1000);
                     revokeManualEvent.WaitOne();
                     
@@ -578,7 +578,7 @@ namespace PubNubMessaging.Tests
                 if (!unitTest.EnableStubTest)
                 {
                     grantManualEvent = new ManualResetEvent(false);
-                    pubnub.grant().channels(new string[] { channel }).read(true).write(true).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
+                    pubnub.grant().channels(new string[] { channel }).read(true).write(true).manage(false).ttl(5).async(new PNCallback<PNAccessManagerGrantResult>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
                     Thread.Sleep(1000);
                     grantManualEvent.WaitOne(310*1000);
                 }
@@ -595,7 +595,7 @@ namespace PubNubMessaging.Tests
 
                     revokeManualEvent = new ManualResetEvent(false);
                     Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess -> Grant ok..Now trying Revoke");
-                    pubnub.grant().channels(new string[] { channel }).read(false).write(false).manage(false).async(new PNCallback<GrantAck>() { result = RevokeToChannelLevelCallback, error = DummyErrorCallback });
+                    pubnub.grant().channels(new string[] { channel }).read(false).write(false).manage(false).async(new PNCallback<PNAccessManagerGrantResult>() { result = RevokeToChannelLevelCallback, error = DummyErrorCallback });
                     Thread.Sleep(1000);
                     revokeManualEvent.WaitOne();
 
@@ -637,7 +637,7 @@ namespace PubNubMessaging.Tests
                 if (!unitTest.EnableStubTest)
                 {
                     grantManualEvent = new ManualResetEvent(false);
-                    pubnub.grant().channels(new string[] { channel }).authKeys(new string[] { authKey }).read(true).write(true).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToUserLevelCallback, error = DummyErrorCallback });
+                    pubnub.grant().channels(new string[] { channel }).authKeys(new string[] { authKey }).read(true).write(true).manage(false).ttl(5).async(new PNCallback<PNAccessManagerGrantResult>() { result = AccessToUserLevelCallback, error = DummyErrorCallback });
                     Thread.Sleep(1000);
                     grantManualEvent.WaitOne();
                 }
@@ -649,7 +649,7 @@ namespace PubNubMessaging.Tests
                 {
                     revokeManualEvent = new ManualResetEvent(false);
                     Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant ok..Now trying Revoke");
-                    pubnub.grant().channels(new string[] { channel }).authKeys(new string[] { authKey }).read(false).write(false).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = RevokeToUserLevelCallback, error = DummyErrorCallback });
+                    pubnub.grant().channels(new string[] { channel }).authKeys(new string[] { authKey }).read(false).write(false).manage(false).ttl(5).async(new PNCallback<PNAccessManagerGrantResult>() { result = RevokeToUserLevelCallback, error = DummyErrorCallback });
                     Thread.Sleep(1000);
                     revokeManualEvent.WaitOne();
 
@@ -698,7 +698,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.grant().channelGroups(new string[] { channelgroup }).read(true).write(true).manage(true).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
+                pubnub.grant().channelGroups(new string[] { channelgroup }).read(true).write(true).manage(true).ttl(5).async(new PNCallback<PNAccessManagerGrantResult>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -743,7 +743,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.grant().channelGroups(new string[] { channelgroup }).read(true).write(false).manage(false).ttl(5).async(new PNCallback<GrantAck>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
+                pubnub.grant().channelGroups(new string[] { channelgroup }).read(true).write(false).manage(false).ttl(5).async(new PNCallback<PNAccessManagerGrantResult>() { result = AccessToChannelLevelCallback, error = DummyErrorCallback });
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -760,7 +760,7 @@ namespace PubNubMessaging.Tests
         }
 
 
-        void AccessToSubKeyLevelCallback(GrantAck receivedMessage)
+        void AccessToSubKeyLevelCallback(PNAccessManagerGrantResult receivedMessage)
         {
             try
             {
@@ -804,7 +804,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void AccessToChannelLevelCallback(GrantAck receivedMessage)
+        void AccessToChannelLevelCallback(PNAccessManagerGrantResult receivedMessage)
         {
             try
             {
@@ -819,7 +819,7 @@ namespace PubNubMessaging.Tests
                             string level = receivedMessage.Payload.Level;
                             if (level == "channel")
                             {
-                                Dictionary<string, GrantAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
+                                Dictionary<string, PNAccessManagerGrantResult.Data.ChannelData> channels = receivedMessage.Payload.channels;
                                 if (channels != null && channels.Count > 0)
                                 {
                                     string currentChannel = channels.Keys.ToList()[0];
@@ -847,7 +847,7 @@ namespace PubNubMessaging.Tests
                             }
                             else if (level == "channel-group")
                             {
-                                Dictionary<string, GrantAck.Data.ChannelGroupData> channelgroups = receivedMessage.Payload.channelgroups;
+                                Dictionary<string, PNAccessManagerGrantResult.Data.ChannelGroupData> channelgroups = receivedMessage.Payload.channelgroups;
                                 if (channelgroups != null && channelgroups.Count > 0)
                                 {
                                     string currentChannelGroup = channelgroups.Keys.ToList()[0];
@@ -880,7 +880,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void AccessToUserLevelCallback(GrantAck receivedMessage)
+        void AccessToUserLevelCallback(PNAccessManagerGrantResult receivedMessage)
         {
             try
             {
@@ -893,18 +893,18 @@ namespace PubNubMessaging.Tests
                         if (receivedMessage.Payload != null)
                         {
                             string level = receivedMessage.Payload.Level;
-                            Dictionary<string, GrantAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
+                            Dictionary<string, PNAccessManagerGrantResult.Data.ChannelData> channels = receivedMessage.Payload.channels;
                             foreach (string channel in channels.Keys)
                             {
-                                GrantAck.Data.ChannelData channelData = channels[channel];
+                                PNAccessManagerGrantResult.Data.ChannelData channelData = channels[channel];
                                 if (channelData.auths != null)
                                 {
-                                    Dictionary<string, GrantAck.Data.ChannelData.AuthData> authDataDic = channelData.auths;
+                                    Dictionary<string, PNAccessManagerGrantResult.Data.ChannelData.AuthData> authDataDic = channelData.auths;
                                     if (authDataDic != null)
                                     {
                                         foreach (string key in authDataDic.Keys)
                                         {
-                                            GrantAck.Data.ChannelData.AuthData authData = authDataDic[key];
+                                            PNAccessManagerGrantResult.Data.ChannelData.AuthData authData = authDataDic[key];
                                             if (authData != null && authData.Access != null)
                                             {
                                                 bool read = authData.Access.read;
@@ -944,7 +944,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void AccessToMultiChannelGrantCallback(GrantAck receivedMessage)
+        void AccessToMultiChannelGrantCallback(PNAccessManagerGrantResult receivedMessage)
         {
             try
             {
@@ -957,7 +957,7 @@ namespace PubNubMessaging.Tests
                         if (receivedMessage.Payload != null)
                         {
                             string level = receivedMessage.Payload.Level;
-                            Dictionary<string, GrantAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
+                            Dictionary<string, PNAccessManagerGrantResult.Data.ChannelData> channels = receivedMessage.Payload.channels;
                             if (channels != null && channels.Count >= 0)
                             {
                                 Console.WriteLine("{0} - AccessToMultiChannelGrantCallback - Grant MultiChannel Count (Received/Sent) = {1}/{2}", currentUnitTestCase, channels.Count, multipleChannelGrantCount);
@@ -977,7 +977,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void AccessToMultiAuthGrantCallback(GrantAck receivedMessage)
+        void AccessToMultiAuthGrantCallback(PNAccessManagerGrantResult receivedMessage)
         {
             try
             {
@@ -990,13 +990,13 @@ namespace PubNubMessaging.Tests
                         if (receivedMessage.Payload != null)
                         {
                             string level = receivedMessage.Payload.Level;
-                            Dictionary<string, GrantAck.Data.ChannelData> channelsData = receivedMessage.Payload.channels;
+                            Dictionary<string, PNAccessManagerGrantResult.Data.ChannelData> channelsData = receivedMessage.Payload.channels;
                             if (channelsData != null && channelsData.Count > 0)
                             {
                                 List<string> channels = channelsData.Keys.ToList();
                                 string channel = channels[0];
                                 //string channel = 
-                                GrantAck.Data.ChannelData channelData = channelsData[channel];
+                                PNAccessManagerGrantResult.Data.ChannelData channelData = channelsData[channel];
                                 if (channelData != null && channelData.auths != null)
                                 {
                                     Console.WriteLine("{0} - AccessToMultiAuthGrantCallback - Grant Auth Count (Received/Sent) = {1}/{2}", currentUnitTestCase, channelData.auths.Count, multipleAuthGrantCount);
@@ -1017,7 +1017,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void RevokeToSubKeyLevelCallback(GrantAck receivedMessage)
+        void RevokeToSubKeyLevelCallback(PNAccessManagerGrantResult receivedMessage)
         {
             try
             {
@@ -1057,7 +1057,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void RevokeToChannelLevelCallback(GrantAck receivedMessage)
+        void RevokeToChannelLevelCallback(PNAccessManagerGrantResult receivedMessage)
         {
             try
             {
@@ -1070,7 +1070,7 @@ namespace PubNubMessaging.Tests
                         if (receivedMessage.Payload != null)
                         {
                             string level = receivedMessage.Payload.Level;
-                            Dictionary<string, GrantAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
+                            Dictionary<string, PNAccessManagerGrantResult.Data.ChannelData> channels = receivedMessage.Payload.channels;
                             if (channels != null && channels.Count > 0)
                             {
                                 receivedRevokeMessage = true;
@@ -1107,7 +1107,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void RevokeToUserLevelCallback(GrantAck receivedMessage)
+        void RevokeToUserLevelCallback(PNAccessManagerGrantResult receivedMessage)
         {
             try
             {
@@ -1120,22 +1120,22 @@ namespace PubNubMessaging.Tests
                         if (receivedMessage.Payload != null)
                         {
                             string level = receivedMessage.Payload.Level;
-                            Dictionary<string, GrantAck.Data.ChannelData> channelsDataDic = receivedMessage.Payload.channels;
+                            Dictionary<string, PNAccessManagerGrantResult.Data.ChannelData> channelsDataDic = receivedMessage.Payload.channels;
                             if (channelsDataDic != null && channelsDataDic.Count > 0)
                             {
                                 List<string> channelKeyList = channelsDataDic.Keys.ToList();
                                 string channel = channelKeyList[0];
 
-                                GrantAck.Data.ChannelData channelData = channelsDataDic[channel];
+                                PNAccessManagerGrantResult.Data.ChannelData channelData = channelsDataDic[channel];
                                 if (channelData != null)
                                 {
-                                    Dictionary<string, GrantAck.Data.ChannelData.AuthData> authDataDic = channelData.auths;
+                                    Dictionary<string, PNAccessManagerGrantResult.Data.ChannelData.AuthData> authDataDic = channelData.auths;
                                     if (authDataDic != null && authDataDic.Count > 0)
                                     {
                                         receivedRevokeMessage = true;
                                         foreach (string key in authDataDic.Keys)
                                         {
-                                            GrantAck.Data.ChannelData.AuthData authData = authDataDic[key];
+                                            PNAccessManagerGrantResult.Data.ChannelData.AuthData authData = authDataDic[key];
                                             if (authData != null && authData.Access != null)
                                             {
                                                 receivedRevokeMessage = true;

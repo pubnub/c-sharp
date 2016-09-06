@@ -57,12 +57,12 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
-        public void async(PNCallback<HereNowAck> callback)
+        public void async(PNCallback<PNHereNowResult> callback)
         {
             HereNow(this.channelNames, this.channelGroupNames, this.includeChannelUUIDs, this.includeUserState, callback.result, callback.error);
         }
 
-        internal void HereNow(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, Action<HereNowAck> userCallback, Action<PubnubClientError> errorCallback)
+        internal void HereNow(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, Action<PNHereNowResult> userCallback, Action<PubnubClientError> errorCallback)
         {
             //if ((channels == null && channelGroups == null)
             //                || (channels != null && channelGroups != null && channels.Length == 0 && channelGroups.Length == 0))
@@ -83,7 +83,7 @@ namespace PubnubApi.EndPoint
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
             Uri request = urlBuilder.BuildHereNowRequest(channels, channelGroups, showUUIDList, includeUserState);
 
-            RequestState<HereNowAck> requestState = new RequestState<HereNowAck>();
+            RequestState<PNHereNowResult> requestState = new RequestState<PNHereNowResult>();
             requestState.Channels = channels;
             requestState.ChannelGroups = channelGroups;
             requestState.ResponseType = ResponseType.Here_Now;
@@ -91,10 +91,10 @@ namespace PubnubApi.EndPoint
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            string json = UrlProcessRequest<HereNowAck>(request, requestState, false);
+            string json = UrlProcessRequest<PNHereNowResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<HereNowAck>(requestState, json);
+                List<object> result = ProcessJsonResponse<PNHereNowResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
             }
         }

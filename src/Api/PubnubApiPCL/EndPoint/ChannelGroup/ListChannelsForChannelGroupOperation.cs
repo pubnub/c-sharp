@@ -4,29 +4,41 @@ using System.Collections.Generic;
 
 namespace PubnubApi.EndPoint
 {
-    internal class GetChannelsForChannelGroupOperation : PubnubCoreBase
+    public class ListChannelsForChannelGroupOperation : PubnubCoreBase
     {
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
+        private string channelGroupName = "";
 
-        public GetChannelsForChannelGroupOperation(PNConfiguration pubnubConfig) : base(pubnubConfig)
+        public ListChannelsForChannelGroupOperation(PNConfiguration pubnubConfig) : base(pubnubConfig)
         {
             config = pubnubConfig;
         }
 
-        public GetChannelsForChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary) : base(pubnubConfig, jsonPluggableLibrary)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-        }
-
-        public GetChannelsForChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
+        public ListChannelsForChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary) : base(pubnubConfig, jsonPluggableLibrary)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        internal void GetChannelsForChannelGroup(string groupName, Action<GetChannelGroupChannelsAck> userCallback, Action<PubnubClientError> errorCallback)
+        public ListChannelsForChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
+        {
+            config = pubnubConfig;
+            jsonLibrary = jsonPluggableLibrary;
+        }
+
+        public ListChannelsForChannelGroupOperation channelGroup(string channelGroup)
+        {
+            this.channelGroupName = channelGroup;
+            return this;
+        }
+
+        public void async(PNCallback<PNChannelGroupsAllChannelsResult> callback)
+        {
+            GetChannelsForChannelGroup(this.channelGroupName, callback.result, callback.error);
+        }
+
+        internal void GetChannelsForChannelGroup(string groupName, Action<PNChannelGroupsAllChannelsResult> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (string.IsNullOrEmpty(groupName) || groupName.Trim().Length == 0)
             {
@@ -46,17 +58,17 @@ namespace PubnubApi.EndPoint
 
             Uri request = urlBuilder.BuildGetChannelsForChannelGroupRequest(null, groupName, false);
 
-            RequestState<GetChannelGroupChannelsAck> requestState = new RequestState<GetChannelGroupChannelsAck>();
+            RequestState<PNChannelGroupsAllChannelsResult> requestState = new RequestState<PNChannelGroupsAllChannelsResult>();
             requestState.ResponseType = ResponseType.ChannelGroupGet;
             requestState.ChannelGroups = new string[] { groupName };
             requestState.NonSubscribeRegularCallback = userCallback;
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            string json = UrlProcessRequest<GetChannelGroupChannelsAck>(request, requestState, false);
+            string json = UrlProcessRequest<PNChannelGroupsAllChannelsResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<GetChannelGroupChannelsAck>(requestState, json);
+                List<object> result = ProcessJsonResponse<PNChannelGroupsAllChannelsResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
             }
         }

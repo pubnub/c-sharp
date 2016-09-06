@@ -6,10 +6,14 @@ using PubnubApi.Interface;
 
 namespace PubnubApi.EndPoint
 {
-    internal class SetStateOperation : PubnubCoreBase
+    public class SetStateOperation : PubnubCoreBase
     {
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
+        private string[] channelNames = null;
+        private string[] channelGroupNames = null;
+        private Dictionary<string, object> userState = null;
+        private string channelUUID = "";
 
         public SetStateOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
         {
@@ -28,7 +32,37 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        internal void SetUserState(string[] channels, string[] channelGroups, string uuid, string jsonUserState, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
+        public SetStateOperation channels(string[] channels)
+        {
+            this.channelNames = channels;
+            return this;
+        }
+
+        public SetStateOperation channelGroups(string[] channelGroups)
+        {
+            this.channelGroupNames = channelGroups;
+            return this;
+        }
+
+        public SetStateOperation state(Dictionary<string, object> state)
+        {
+            this.userState = state;
+            return this;
+        }
+
+        public SetStateOperation uuid(string uuid)
+        {
+            this.channelUUID = uuid;
+            return this;
+        }
+
+        public void async(PNCallback<PNSetStateResult> callback)
+        {
+            string serializedState = jsonLibrary.SerializeToJsonString(this.userState);
+            SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, callback.result, callback.error);
+        }
+
+        internal void SetUserState(string[] channels, string[] channelGroups, string uuid, string jsonUserState, Action<PNSetStateResult> userCallback, Action<PubnubClientError> errorCallback)
         {
             if ((channels == null && channelGroups == null)
                             || (channels != null && channelGroups != null && channels.Length == 0 && channelGroups.Length == 0))
@@ -130,7 +164,7 @@ namespace PubnubApi.EndPoint
             SharedSetUserState(channels, channelGroups, uuid, jsonUserState, jsonUserState, userCallback, errorCallback);
         }
 
-        internal void SetUserState(string[] channels, string[] channelGroups, string uuid, KeyValuePair<string, object> keyValuePair, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
+        internal void SetUserState(string[] channels, string[] channelGroups, string uuid, KeyValuePair<string, object> keyValuePair, Action<PNSetStateResult> userCallback, Action<PubnubClientError> errorCallback)
         {
             if ((channels == null && channelGroups != null) || (channels.Length == 0 && channelGroups.Length == 0))
             {
@@ -261,7 +295,7 @@ namespace PubnubApi.EndPoint
             SharedSetUserState(channels, channelGroups, uuid, currentChannelUserState, currentChannelGroupUserState, userCallback, errorCallback);
         }
 
-        private void SharedSetUserState(string[] channels, string[] channelGroups, string uuid, string jsonChannelUserState, string jsonChannelGroupUserState, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
+        private void SharedSetUserState(string[] channels, string[] channelGroups, string uuid, string jsonChannelUserState, string jsonChannelGroupUserState, Action<PNSetStateResult> userCallback, Action<PubnubClientError> errorCallback)
         {
             List<string> channelList = new List<string>();
             List<string> channelGroupList = new List<string>();
@@ -357,7 +391,7 @@ namespace PubnubApi.EndPoint
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
             Uri request = urlBuilder.BuildSetUserStateRequest(commaDelimitedChannels, commaDelimitedChannelGroups, uuid, jsonUserState);
 
-            RequestState<SetUserStateAck> requestState = new RequestState<SetUserStateAck>();
+            RequestState<PNSetStateResult> requestState = new RequestState<PNSetStateResult>();
             requestState.Channels = channels;
             requestState.ChannelGroups = channelGroups;
             requestState.ResponseType = ResponseType.SetUserState;
@@ -366,10 +400,10 @@ namespace PubnubApi.EndPoint
             requestState.Reconnect = false;
 
             //Set TerminateSubRequest to true to bounce the long-polling subscribe requests to update user state
-            string json = UrlProcessRequest<SetUserStateAck>(request, requestState, true);
+            string json = UrlProcessRequest<PNSetStateResult>(request, requestState, true);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<SetUserStateAck>(requestState, json);
+                List<object> result = ProcessJsonResponse<PNSetStateResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
             }
         }

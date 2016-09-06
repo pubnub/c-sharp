@@ -40,6 +40,7 @@ namespace PubNubMessaging.Tests
 
         string customUUID = "mylocalmachine.mydomain.com";
         string jsonUserState = "";
+        Dictionary<string, object> dicState = null;
         string currentTestCase = "";
         string whereNowChannel = "";
         int manualResetEventsWaitTimeout = 310 * 1000;
@@ -62,7 +63,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel,hello_my_channel-pnpres";
 
-            pubnub.grant().channels(new string[] { channel }).read(true).write(true).manage(false).ttl(20).async(new PNCallback<GrantAck>() { result = ThenPresenceInitializeShouldReturnGrantMessage, error = DummyErrorCallback });
+            pubnub.grant().channels(new string[] { channel }).read(true).write(true).manage(false).ttl(20).async(new PNCallback<PNAccessManagerGrantResult>() { result = ThenPresenceInitializeShouldReturnGrantMessage, error = DummyErrorCallback });
             Thread.Sleep(1000);
 
             grantManualEvent.WaitOne();
@@ -258,7 +259,7 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(2000);
 
             hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<HereNowAck>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
+            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<PNHereNowResult>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             unsubscribeManualEvent = new ManualResetEvent(false);
@@ -293,7 +294,7 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(2000);
 
             hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<HereNowAck>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
+            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<PNHereNowResult>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             unsubscribeManualEvent = new ManualResetEvent(false);
@@ -328,7 +329,7 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(2000);
 
             hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<HereNowAck>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
+            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<PNHereNowResult>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             unsubscribeManualEvent = new ManualResetEvent(false);
@@ -363,7 +364,7 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(2000);
 
             hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<HereNowAck>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
+            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<PNHereNowResult>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             unsubscribeManualEvent = new ManualResetEvent(false);
@@ -398,7 +399,7 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(2000);
 
             hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<HereNowAck>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
+            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<PNHereNowResult>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             unsubscribeManualEvent = new ManualResetEvent(false);
@@ -432,7 +433,7 @@ namespace PubNubMessaging.Tests
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<HereNowAck>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
+            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<PNHereNowResult>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             unsubscribeManualEvent = new ManualResetEvent(false);
@@ -466,7 +467,7 @@ namespace PubNubMessaging.Tests
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<HereNowAck>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
+            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<PNHereNowResult>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             unsubscribeManualEvent = new ManualResetEvent(false);
@@ -500,7 +501,7 @@ namespace PubNubMessaging.Tests
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<HereNowAck>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
+            pubnub.hereNow().channels(new string[] { channel }).async(new PNCallback<PNHereNowResult>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             unsubscribeManualEvent = new ManualResetEvent(false);
@@ -536,12 +537,18 @@ namespace PubNubMessaging.Tests
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             userStateManualEvent = new ManualResetEvent(false);
-            jsonUserState = "{\"testkey\":\"testval\"}";
-            pubnub.SetUserState(new string[] { channel }, jsonUserState, SetUserStateDummyMethodCallback, DummyErrorCallback);
+            //jsonUserState = "{\"testkey\":\"testval\"}";
+            dicState = new Dictionary<string, object>();
+            dicState.Add("testkey", "testval");
+
+            pubnub.setPresenceState()
+                            .channels(new string[] { channel })
+                            .state(dicState)
+                            .async(new PNCallback<PNSetStateResult>() { result = SetUserStateDummyMethodCallback, error = DummyErrorCallback });
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.hereNow().channels(new string[] { channel }).includeState(true).includeUUIDs(true).async(new PNCallback<HereNowAck>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
+            pubnub.hereNow().channels(new string[] { channel }).includeState(true).includeUUIDs(true).async(new PNCallback<PNHereNowResult>() { result = ThenHereNowShouldReturnMessage, error = DummyErrorCallback });
             hereNowManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             unsubscribeManualEvent = new ManualResetEvent(false);
@@ -569,7 +576,7 @@ namespace PubNubMessaging.Tests
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
 
             globalHereNowManualEvent = new ManualResetEvent(false);
-            pubnub.hereNow().includeUUIDs(true).includeState(true).async(new PNCallback<HereNowAck>() { result = ThenGlobalHereNowShouldReturnMessage, error = DummyErrorCallback });
+            pubnub.hereNow().includeUUIDs(true).includeState(true).async(new PNCallback<PNHereNowResult>() { result = ThenGlobalHereNowShouldReturnMessage, error = DummyErrorCallback });
             globalHereNowManualEvent.WaitOne();
 
             pubnub.EndPendingRequests(); 
@@ -600,14 +607,20 @@ namespace PubNubMessaging.Tests
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             userStateManualEvent = new ManualResetEvent(false);
-            jsonUserState = "{\"testkey\":\"testval\"}";
-            pubnub.SetUserState(new string[] { channel }, jsonUserState, SetUserStateDummyMethodCallback, DummyErrorCallback);
+
+            dicState = new Dictionary<string, object>();
+            dicState.Add("testkey", "testval");
+            pubnub.setPresenceState()
+                            .channels(new string[] { channel })
+                            .state(dicState)
+                            .async(new PNCallback<PNSetStateResult>() { result = SetUserStateDummyMethodCallback, error = DummyErrorCallback });
+
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             Thread.Sleep(1000);
 
             globalHereNowManualEvent = new ManualResetEvent(false);
-            pubnub.hereNow().includeState(true).includeUUIDs(true).async(new PNCallback<HereNowAck>() { result = ThenGlobalHereNowShouldReturnMessage, error = DummyErrorCallback });
+            pubnub.hereNow().includeState(true).includeUUIDs(true).async(new PNCallback<PNHereNowResult>() { result = ThenGlobalHereNowShouldReturnMessage, error = DummyErrorCallback });
             globalHereNowManualEvent.WaitOne();
 
             unsubscribeManualEvent = new ManualResetEvent(false);
@@ -642,7 +655,7 @@ namespace PubNubMessaging.Tests
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             whereNowManualEvent = new ManualResetEvent(false);
-            pubnub.whereNow().uuid(customUUID).async(new PNCallback<WhereNowAck>() { result = ThenWhereNowShouldReturnMessage, error = DummyErrorCallback });
+            pubnub.whereNow().uuid(customUUID).async(new PNCallback<PNWhereNowResult>() { result = ThenWhereNowShouldReturnMessage, error = DummyErrorCallback });
             whereNowManualEvent.WaitOne();
 
             if (!pubnub.PubnubUnitTest.EnableStubTest)
@@ -675,9 +688,15 @@ namespace PubNubMessaging.Tests
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             string channel = "hello_my_channel";
 
-            jsonUserState = "{\"testkey\":\"testval\"}";
             userStateManualEvent = new ManualResetEvent(false);
-            pubnub.SetUserState(new string[] { channel }, jsonUserState, SetUserStateDummyMethodCallback, DummyErrorCallback);
+
+            dicState = new Dictionary<string, object>();
+            dicState.Add("testkey", "testval");
+            pubnub.setPresenceState()
+                            .channels(new string[] { channel })
+                            .state(dicState)
+                            .async(new PNCallback<PNSetStateResult>() { result = SetUserStateDummyMethodCallback, error = DummyErrorCallback });
+
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             if (receivedUserStateMessage)
@@ -685,7 +704,9 @@ namespace PubNubMessaging.Tests
                 Thread.Sleep(2000);
                 receivedUserStateMessage = false;
                 userStateManualEvent = new ManualResetEvent(false);
-                pubnub.GetUserState(new string[] { channel }, null, GetUserStateRegularCallback, DummyErrorCallback);
+                pubnub.getPresenceState()
+                                .channels(new string[] { channel })
+                                .async(new PNCallback<PNGetStateResult>() { result = GetUserStateRegularCallback, error = DummyErrorCallback });
                 userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
             }
             pubnub.EndPendingRequests(); 
@@ -711,36 +732,62 @@ namespace PubNubMessaging.Tests
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             string channel = "hello_my_channel";
 
-            jsonUserState = "{\"k\":\"v\"}";
-            KeyValuePair<string, object> kvp = new KeyValuePair<string, object>("k", "v");
+            //jsonUserState = "{\"k\":\"v\"}";
+            //KeyValuePair<string, object> kvp = new KeyValuePair<string, object>("k", "v");
             userStateManualEvent = new ManualResetEvent(false);
-            pubnub.SetUserState(new string[] { channel }, kvp, SetUserStateDummyMethodCallback, DummyErrorCallback);
+            //pubnub.SetUserState(new string[] { channel }, kvp, SetUserStateDummyMethodCallback, DummyErrorCallback);
+            dicState = new Dictionary<string, object>();
+            dicState.Add("k", "v");
+            pubnub.setPresenceState()
+                            .channels(new string[] { channel })
+                            .state(dicState)
+                            .async(new PNCallback<PNSetStateResult>() { result = SetUserStateDummyMethodCallback, error = DummyErrorCallback });
+
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             Thread.Sleep(2000);
             receivedUserStateMessage = false;
-            KeyValuePair<string, object> kvp2 = new KeyValuePair<string, object>("k2", "v2");
+            //KeyValuePair<string, object> kvp2 = new KeyValuePair<string, object>("k2", "v2");
             userStateManualEvent = new ManualResetEvent(false);
-            pubnub.SetUserState(new string[] { channel }, kvp2, SetUserStateDummyMethodCallback, DummyErrorCallback);
+            //pubnub.SetUserState(new string[] { channel }, kvp2, SetUserStateDummyMethodCallback, DummyErrorCallback);
+            dicState = new Dictionary<string, object>();
+            dicState.Add("k2", "v2");
+            pubnub.setPresenceState()
+                            .channels(new string[] { channel })
+                            .state(dicState)
+                            .async(new PNCallback<PNSetStateResult>() { result = SetUserStateDummyMethodCallback, error = DummyErrorCallback });
+
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             Thread.Sleep(2000);
             receivedUserStateMessage = false;
             userStateManualEvent = new ManualResetEvent(false);
-            pubnub.GetUserState(new string[] { channel }, null, GetUserStateRegularCallback, DummyErrorCallback);
+            pubnub.getPresenceState()
+                            .channels(new string[] { channel })
+                            .async(new PNCallback<PNGetStateResult>() { result = GetUserStateRegularCallback, error = DummyErrorCallback });
+
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             Thread.Sleep(2000);
             receivedUserStateMessage = false;
-            KeyValuePair<string, object> kvp22 = new KeyValuePair<string, object>("k2", null);
+            //KeyValuePair<string, object> kvp22 = new KeyValuePair<string, object>("k2", null);
             userStateManualEvent = new ManualResetEvent(false);
-            pubnub.SetUserState(new string[] { channel }, kvp22, SetUserStateDummyMethodCallback, DummyErrorCallback);
+            //pubnub.SetUserState(new string[] { channel }, kvp22, SetUserStateDummyMethodCallback, DummyErrorCallback);
+            dicState = new Dictionary<string, object>();
+            dicState.Add("k2", null);
+            pubnub.setPresenceState()
+                            .channels(new string[] { channel })
+                            .state(dicState)
+                            .async(new PNCallback<PNSetStateResult>() { result = SetUserStateDummyMethodCallback, error = DummyErrorCallback });
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             Thread.Sleep(2000);
             receivedUserStateMessage = false;
             userStateManualEvent = new ManualResetEvent(false);
-            pubnub.GetUserState(new string[] { channel }, null, GetUserStateRegularCallback, DummyErrorCallback);
+            pubnub.getPresenceState()
+                            .channels(new string[] { channel })
+                            .async(new PNCallback<PNGetStateResult>() { result = GetUserStateRegularCallback, error = DummyErrorCallback });
+
             userStateManualEvent.WaitOne(manualResetEventsWaitTimeout);
             
             pubnub.EndPendingRequests(); 
@@ -795,7 +842,7 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedPresenceMessage, "ThenPresenceHeartbeatShouldReturnMessage not received");
         }
 
-        void ThenPresenceInitializeShouldReturnGrantMessage(GrantAck receivedMessage)
+        void ThenPresenceInitializeShouldReturnGrantMessage(PNAccessManagerGrantResult receivedMessage)
         {
             try
             {
@@ -862,7 +909,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void ThenHereNowShouldReturnMessage(HereNowAck receivedMessage)
+        void ThenHereNowShouldReturnMessage(PNHereNowResult receivedMessage)
         {
             try
             {
@@ -871,15 +918,15 @@ namespace PubNubMessaging.Tests
                     string channelName = receivedMessage.ChannelName;
 
                     Console.WriteLine("ThenHereNowShouldReturnMessage -> result = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(receivedMessage));
-                    Dictionary<string,HereNowAck.Data.ChannelData> channelDataDic = receivedMessage.Payload.channels;
+                    Dictionary<string,PNHereNowResult.Data.ChannelData> channelDataDic = receivedMessage.Payload.channels;
                     if (channelDataDic != null && channelDataDic.Count > 0)
                     {
-                        HereNowAck.Data.ChannelData.UuidData[] uuidDataArray = channelDataDic["hello_my_channel"].uuids;
+                        PNHereNowResult.Data.ChannelData.UuidData[] uuidDataArray = channelDataDic["hello_my_channel"].uuids;
                         if (uuidDataArray != null && uuidDataArray.Length > 0)
                         {
                             if (currentTestCase == "IfHereNowIsCalledThenItShouldReturnInfoWithUserState")
                             {
-                                foreach (HereNowAck.Data.ChannelData.UuidData uuidData in uuidDataArray)
+                                foreach (PNHereNowResult.Data.ChannelData.UuidData uuidData in uuidDataArray)
                                 {
                                     if (uuidData.uuid != null && uuidData.state != null)
                                     {
@@ -896,7 +943,7 @@ namespace PubNubMessaging.Tests
                             }
                             else
                             {
-                                foreach (HereNowAck.Data.ChannelData.UuidData uuidData in uuidDataArray)
+                                foreach (PNHereNowResult.Data.ChannelData.UuidData uuidData in uuidDataArray)
                                 {
                                     if (pubnub.PubnubUnitTest != null && pubnub.PubnubUnitTest.EnableStubTest)
                                     {
@@ -921,7 +968,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void ThenGlobalHereNowShouldReturnMessage(HereNowAck receivedMessage)
+        void ThenGlobalHereNowShouldReturnMessage(PNHereNowResult receivedMessage)
         {
             try
             {
@@ -930,7 +977,7 @@ namespace PubNubMessaging.Tests
                 {
                     if (receivedMessage.Payload != null)
                     {
-                        Dictionary<string, HereNowAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
+                        Dictionary<string, PNHereNowResult.Data.ChannelData> channels = receivedMessage.Payload.channels;
                         if (channels != null && channels.Count >= 0)
                         {
                             if (channels.Count == 0)
@@ -939,10 +986,10 @@ namespace PubNubMessaging.Tests
                             }
                             else
                             {
-                                foreach (KeyValuePair<string, HereNowAck.Data.ChannelData> channelUUID in channels)
+                                foreach (KeyValuePair<string, PNHereNowResult.Data.ChannelData> channelUUID in channels)
                                 {
                                     var channelName = channelUUID.Key;
-                                    HereNowAck.Data.ChannelData channelUuidListDictionary = channelUUID.Value;
+                                    PNHereNowResult.Data.ChannelData channelUuidListDictionary = channelUUID.Value;
                                     if (channelUuidListDictionary != null && channelUuidListDictionary.uuids != null)
                                     {
                                         if (pubnub.PubnubUnitTest != null && pubnub.PubnubUnitTest.EnableStubTest)
@@ -951,10 +998,10 @@ namespace PubNubMessaging.Tests
                                             break;
                                         }
 
-                                        HereNowAck.Data.ChannelData.UuidData[] uuidDataList = channelUuidListDictionary.uuids;
+                                        PNHereNowResult.Data.ChannelData.UuidData[] uuidDataList = channelUuidListDictionary.uuids;
                                         if (currentTestCase == "IfGlobalHereNowIsCalledThenItShouldReturnInfoWithUserState")
                                         {
-                                            foreach (HereNowAck.Data.ChannelData.UuidData uuidData in uuidDataList)
+                                            foreach (PNHereNowResult.Data.ChannelData.UuidData uuidData in uuidDataList)
                                             {
                                                 if (uuidData.uuid != null && uuidData.state != null)
                                                 {
@@ -991,7 +1038,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void ThenWhereNowShouldReturnMessage(WhereNowAck receivedMessage)
+        void ThenWhereNowShouldReturnMessage(PNWhereNowResult receivedMessage)
         {
             try
             {
@@ -1136,14 +1183,14 @@ namespace PubNubMessaging.Tests
             unsubscribeUUIDManualEvent.Set();
         }
 
-        void SetUserStateDummyMethodCallback(SetUserStateAck receivedMessage)
+        void SetUserStateDummyMethodCallback(PNSetStateResult receivedMessage)
         {
             Console.WriteLine(string.Format("SetUserStateDummyMethodCallback result = {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(receivedMessage)));
             receivedUserStateMessage = true;
             userStateManualEvent.Set();
         }
 
-        void GetUserStateRegularCallback(GetUserStateAck receivedMessage)
+        void GetUserStateRegularCallback(PNGetStateResult receivedMessage)
         {
             try
             {

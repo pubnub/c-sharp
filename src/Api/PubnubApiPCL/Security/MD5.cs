@@ -401,9 +401,9 @@ namespace PubnubApi
 
 		#region expose the same interface as the regular MD5 object
 
-		protected byte[] HashValue;
-		protected int State;
-		public virtual bool CanReuseTransform
+		protected byte[] HashValue { get; set; }
+        protected int State { get; set; }
+        public virtual bool CanReuseTransform
 		{
 			get
 			{

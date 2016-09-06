@@ -2036,7 +2036,7 @@ namespace PubnubApi
             if (channels != null)
             {
                 string multiChannel = (channels.Length > 0) ? string.Join(",", channels) : ",";
-                PubnubWebRequest request = (ChannelRequest.ContainsKey(multiChannel)) ? ChannelRequest[multiChannel] : null;
+                PubnubWebRequest request = ChannelRequest.ContainsKey(multiChannel) ? ChannelRequest[multiChannel] : null;
                 if (request != null)
                 {
                     request.Abort(null, _errorLevel);

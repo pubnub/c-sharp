@@ -80,12 +80,12 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
-        public void async(PNCallback<GrantAck> callback)
+        public void async(PNCallback<PNAccessManagerGrantResult> callback)
         {
             GrantAccess(this.channelNames, this.channelGroupNames, this.authenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, callback.result, callback.error);
         }
 
-        internal void GrantAccess(string[] channels, string[] channelGroups, string[] authKeys, bool read, bool write, bool manage, long ttl, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
+        internal void GrantAccess(string[] channels, string[] channelGroups, string[] authKeys, bool read, bool write, bool manage, long ttl, Action<PNAccessManagerGrantResult> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (string.IsNullOrEmpty(config.SecretKey) || string.IsNullOrEmpty(config.SecretKey.Trim()) || config.SecretKey.Length <= 0)
             {
@@ -127,7 +127,7 @@ namespace PubnubApi.EndPoint
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
             Uri request = urlBuilder.BuildGrantAccessRequest(channelsCommaDelimited, channelGroupsCommaDelimited, authKeysCommaDelimited, read, write, manage, ttl);
 
-            RequestState<GrantAck> requestState = new RequestState<GrantAck>();
+            RequestState<PNAccessManagerGrantResult> requestState = new RequestState<PNAccessManagerGrantResult>();
             requestState.Channels = channels;
             requestState.ChannelGroups = channelGroups;
             requestState.ResponseType = ResponseType.GrantAccess;
@@ -135,10 +135,10 @@ namespace PubnubApi.EndPoint
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            string json = UrlProcessRequest<GrantAck>(request, requestState, false);
+            string json = UrlProcessRequest<PNAccessManagerGrantResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<GrantAck>(requestState, json);
+                List<object> result = ProcessJsonResponse<PNAccessManagerGrantResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
             }
         }

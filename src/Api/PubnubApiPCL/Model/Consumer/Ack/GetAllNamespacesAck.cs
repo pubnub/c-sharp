@@ -10,8 +10,8 @@ namespace PubnubApi
                 this.SubKey = "";
             }
 
-            public string[] NamespaceName;
-            public string SubKey;
+            public string[] NamespaceName { get; set; }
+            public string SubKey { get; set; }
         }
 
         public GetAllNamespacesAck()

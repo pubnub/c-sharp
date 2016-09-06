@@ -71,13 +71,13 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
-        public void async(PNCallback<DetailedHistoryAck> callback)
+        public void async(PNCallback<PNHistoryResult> callback)
         {
             History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, callback.result, callback.error);
         }
 
 
-        internal void History(string channel, long start, long end, int count, bool reverse, bool includeToken, Action<DetailedHistoryAck> userCallback, Action<PubnubClientError> errorCallback)
+        internal void History(string channel, long start, long end, int count, bool reverse, bool includeToken, Action<PNHistoryResult> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()))
             {
@@ -95,17 +95,17 @@ namespace PubnubApi.EndPoint
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
             Uri request = urlBuilder.BuildHistoryRequest(channel, start, end, count, reverse, includeToken);
 
-            RequestState<DetailedHistoryAck> requestState = new RequestState<DetailedHistoryAck>();
+            RequestState<PNHistoryResult> requestState = new RequestState<PNHistoryResult>();
             requestState.Channels = new string[] { channel };
             requestState.ResponseType = ResponseType.DetailedHistory;
             requestState.NonSubscribeRegularCallback = userCallback;
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            string json = UrlProcessRequest< DetailedHistoryAck>(request, requestState, false);
+            string json = UrlProcessRequest< PNHistoryResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<DetailedHistoryAck>(requestState, json);
+                List<object> result = ProcessJsonResponse<PNHistoryResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
             }
             else
