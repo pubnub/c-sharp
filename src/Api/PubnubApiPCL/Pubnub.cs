@@ -144,32 +144,25 @@ namespace PubnubApi
             return new EndPoint.GetStateOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
-		public void RegisterDeviceForPush<T>(string channel, PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		public EndPoint.AddPushChannelOperation AddPushNotificationsOnChannels()
 		{
-            EndPoint.PushOperation endPoint = new EndPoint.PushOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.RegisterDevice<T>(channel, pushType, pushToken, userCallback, errorCallback);
-		}
+            return new EndPoint.AddPushChannelOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
 
-		public void UnregisterDeviceForPush<T>(PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		public EndPoint.RemovePushChannelOperation RemovePushNotificationsFromChannels()
 		{
-            EndPoint.PushOperation endPoint = new EndPoint.PushOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.UnregisterDevice<T>(pushType, pushToken, userCallback, errorCallback);
-		}
+            return new EndPoint.RemovePushChannelOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
 
-		public void RemoveChannelForDevicePush<T>(string channel, PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+		public EndPoint.AuditPushChannelOperation AuditPushChannelProvisions()
 		{
-            EndPoint.PushOperation endPoint = new EndPoint.PushOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.RemoveChannelForDevice<T>(channel, pushType, pushToken, userCallback, errorCallback);
-		}
+            return new EndPoint.AuditPushChannelOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
 
-		public void GetChannelsForDevicePush<T>(PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.PushOperation endPoint = new EndPoint.PushOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.GetChannelsForDevice<T>(pushType, pushToken, userCallback, errorCallback);
-		}
         #endregion
 
         #region "PubNub API Channel Group Methods"
+
         public EndPoint.AddChannelsToChannelGroupOperation AddChannelsToChannelGroup()
 		{
             return new EndPoint.AddChannelsToChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
@@ -194,6 +187,7 @@ namespace PubnubApi
 		{
             return new EndPoint.ListAllChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
+        
         #endregion
 
         #region "PubNub API Other Methods"

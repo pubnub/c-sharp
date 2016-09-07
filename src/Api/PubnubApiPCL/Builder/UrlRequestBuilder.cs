@@ -595,7 +595,7 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, ResponseType.ChannelGroupGet);
         }
 
-        Uri IUrlRequestBuilder.BuildRegisterDevicePushRequest(string channel, PushTypeService pushType, string pushToken)
+        Uri IUrlRequestBuilder.BuildRegisterDevicePushRequest(string channel, PNPushType pushType, string pushToken)
         {
             StringBuilder parameterBuilder = new StringBuilder();
             pushRegisterDeviceParameters = "";
@@ -617,7 +617,7 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, ResponseType.PushRegister);
         }
 
-        Uri IUrlRequestBuilder.BuildUnregisterDevicePushRequest(PushTypeService pushType, string pushToken)
+        Uri IUrlRequestBuilder.BuildUnregisterDevicePushRequest(PNPushType pushType, string pushToken)
         {
             StringBuilder parameterBuilder = new StringBuilder();
             pushUnregisterDeviceParameters = "";
@@ -639,7 +639,7 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, ResponseType.PushUnregister);
         }
 
-        Uri IUrlRequestBuilder.BuildRemoveChannelPushRequest(string channel, PushTypeService pushType, string pushToken)
+        Uri IUrlRequestBuilder.BuildRemoveChannelPushRequest(string channel, PNPushType pushType, string pushToken)
         {
             StringBuilder parameterBuilder = new StringBuilder();
             pushRemoveChannelParameters = "";
@@ -661,7 +661,7 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, ResponseType.PushRemove);
         }
 
-        Uri IUrlRequestBuilder.BuildGetChannelsPushRequest(PushTypeService pushType, string pushToken)
+        Uri IUrlRequestBuilder.BuildGetChannelsPushRequest(PNPushType pushType, string pushToken)
         {
             StringBuilder parameterBuilder = new StringBuilder();
             pushGetChannelsParameters = "";

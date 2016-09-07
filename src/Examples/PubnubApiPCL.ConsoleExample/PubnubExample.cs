@@ -1239,18 +1239,11 @@ namespace PubnubApi
                         Console.WriteLine(string.Format("Push Token = {0}", pushToken));
                         Console.ResetColor();
 
-                        Console.WriteLine("Running RegisterDeviceForPush()");
-                        pubnub.RegisterDeviceForPush<string>(pushRegisterChannel, PushTypeService.MPNS, pushToken, DisplayReturnMessage, DisplayErrorMessage);
-                        break;
-                    case "31":
-                        Console.WriteLine("Enter Push Token for MPNS");
-                        string unRegisterPushToken = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Push Token = {0}", unRegisterPushToken));
-                        Console.ResetColor();
-
-                        Console.WriteLine("Running UnregisterDeviceForPush()");
-                        pubnub.UnregisterDeviceForPush<string>(PushTypeService.MPNS, unRegisterPushToken, DisplayReturnMessage, DisplayErrorMessage);
+                        Console.WriteLine("Running AddPushNotificationsOnChannels()");
+                        pubnub.AddPushNotificationsOnChannels().Channels( new string[] { pushRegisterChannel })
+                            .PushType(PNPushType.MPNS)
+                            .DeviceId(pushToken)
+                            .Async(new PNCallback<PNPushAddChannelResult>() { Result = DisplayAddPushNotificationStatusMessage, Error = DisplayErrorMessage });
                         break;
                     case "32":
                         Console.WriteLine("Enter channel name");
@@ -1265,8 +1258,12 @@ namespace PubnubApi
                         Console.WriteLine(string.Format("Push Token = {0}", pushTokenRemove));
                         Console.ResetColor();
 
-                        Console.WriteLine("Running RegisterDeviceForPush()");
-                        pubnub.RemoveChannelForDevicePush<string>(pushRemoveChannel, PushTypeService.MPNS, pushTokenRemove, DisplayReturnMessage, DisplayErrorMessage);
+                        Console.WriteLine("Running RemovePushNotificationsFromChannels()");
+                        pubnub.RemovePushNotificationsFromChannels()
+                            .Channels(new string[] { pushRemoveChannel })
+                            .PushType(PNPushType.MPNS)
+                            .DeviceId(pushTokenRemove)
+                            .Async(new PNCallback<PNPushRemoveChannelResult>() { Result = DisplayRemovePushNotificationStatusMessage, Error = DisplayErrorMessage });
                         break;
                     case "33":
                         Console.WriteLine("Enter Push Token for MPNS");
@@ -1275,8 +1272,11 @@ namespace PubnubApi
                         Console.WriteLine(string.Format("Push Token = {0}", pushTokenGetChannel));
                         Console.ResetColor();
 
-                        Console.WriteLine("Running RegisterDeviceForPush()");
-                        pubnub.GetChannelsForDevicePush<string>(PushTypeService.MPNS, pushTokenGetChannel, DisplayReturnMessage, DisplayErrorMessage);
+                        Console.WriteLine("Running AuditPushChannelProvisions()");
+                        pubnub.AuditPushChannelProvisions()
+                            .PushType(PNPushType.MPNS)
+                            .DeviceId(pushTokenGetChannel)
+                            .Async(new PNCallback<PNPushListProvisionsResult>() { Result = DisplayAuditPushNotificationStatusMessage, Error = DisplayErrorMessage });
                         break;
                     case "34":
                         //Toast message publish
@@ -1541,13 +1541,6 @@ namespace PubnubApi
             Console.WriteLine();
         }
 
-        static void DisplayRemoveChannelGroupNamespaceReturnMessage(RemoveNamespaceAck result)
-        {
-            Console.WriteLine("RemoveNamespaceAck CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
-        }
-
         static void DisplayRemoveChannelGroupReturnMessage(PNChannelGroupsDeleteGroupResult result)
         {
             Console.WriteLine("RemoveChannelFromChannelGroupAck CALLBACK:");
@@ -1565,13 +1558,6 @@ namespace PubnubApi
         static void DisplayAddChannelToChannelGroupReturnMessage(PNChannelGroupsAddChannelResult result)
         {
             Console.WriteLine("AddChannelToChannelGroupAck CALLBACK:");
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            Console.WriteLine();
-        }
-
-        static void DisplayAllNamespacesReturnMessage(GetAllNamespacesAck result)
-        {
-            Console.WriteLine("GetAllNamespacesAck CALLBACK:");
             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
             Console.WriteLine();
         }
@@ -1764,6 +1750,27 @@ namespace PubnubApi
         static void DisplayPresenceDisconnectStatusMessage(ConnectOrDisconnectAck result)
         {
             Console.WriteLine("PRESENCE DISCONNECT CALLBACK:");
+            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            Console.WriteLine();
+        }
+
+        static void DisplayAddPushNotificationStatusMessage(PNPushAddChannelResult result)
+        {
+            Console.WriteLine("ADD PUSH CALLBACK:");
+            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            Console.WriteLine();
+        }
+
+        static void DisplayRemovePushNotificationStatusMessage(PNPushRemoveChannelResult result)
+        {
+            Console.WriteLine("REMOVE PUSH CALLBACK:");
+            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+            Console.WriteLine();
+        }
+
+        static void DisplayAuditPushNotificationStatusMessage(PNPushListProvisionsResult result)
+        {
+            Console.WriteLine("AUDIT PUSH CALLBACK:");
             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
             Console.WriteLine();
         }

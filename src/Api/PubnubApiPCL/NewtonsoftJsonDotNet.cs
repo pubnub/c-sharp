@@ -1096,48 +1096,6 @@ namespace PubnubApi
                 ret = (T)Convert.ChangeType(ack, typeof(PNChannelGroupsAllResult), CultureInfo.InvariantCulture);
                 #endregion
             }
-            else if (typeof(T) == typeof(GetAllNamespacesAck))
-            {
-                #region "GetAllNamespacesAck"
-                Dictionary<string, object> getAllNamespaceDicObj = ConvertToDictionaryObject(listObject[0]);
-
-                GetAllNamespacesAck ack = null;
-
-                int statusCode = 0;
-
-                if (getAllNamespaceDicObj != null)
-                {
-                    ack = new GetAllNamespacesAck();
-
-                    if (int.TryParse(getAllNamespaceDicObj["status"].ToString(), out statusCode))
-                        ack.StatusCode = statusCode;
-
-                    ack.Service = getAllNamespaceDicObj["service"].ToString();
-
-                    Dictionary<string, object> getAllNsPayloadDic = ConvertToDictionaryObject(getAllNamespaceDicObj["payload"]);
-                    if (getAllNsPayloadDic != null && getAllNsPayloadDic.Count > 0)
-                    {
-                        ack.Payload = new GetAllNamespacesAck.Data();
-                        ack.Payload.SubKey = getAllNsPayloadDic["sub_key"].ToString();
-
-                        object[] cgAllNsPayloadNamespaces = ConvertToObjectArray(getAllNsPayloadDic["namespaces"]);
-                        if (cgAllNsPayloadNamespaces != null && cgAllNsPayloadNamespaces.Length > 0)
-                        {
-                            List<string> allCgList = new List<string>();
-                            for (int index = 0; index < cgAllNsPayloadNamespaces.Length; index++)
-                            {
-                                allCgList.Add(cgAllNsPayloadNamespaces[index].ToString());
-                            }
-                            ack.Payload.NamespaceName = allCgList.ToArray();
-                        }
-                    }
-
-                    ack.Error = Convert.ToBoolean(getAllNamespaceDicObj["error"].ToString());
-                }
-
-                ret = (T)Convert.ChangeType(ack, typeof(GetAllNamespacesAck), CultureInfo.InvariantCulture);
-                #endregion
-            }
             else if (typeof(T) == typeof(PNChannelGroupsAddChannelResult))
             {
                 #region "AddChannelToChannelGroupAck"
@@ -1233,32 +1191,6 @@ namespace PubnubApi
                 }
 
                 ret = (T)Convert.ChangeType(ack, typeof(PNChannelGroupsDeleteGroupResult), CultureInfo.InvariantCulture);
-                #endregion
-            }
-            else if (typeof(T) == typeof(RemoveNamespaceAck))
-            {
-                #region "RemoveNamespaceAck"
-                Dictionary<string, object> removeNsDicObj = ConvertToDictionaryObject(listObject[0]);
-
-                RemoveNamespaceAck ack = null;
-
-                int statusCode = 0;
-
-                if (removeNsDicObj != null)
-                {
-                    ack = new RemoveNamespaceAck();
-
-                    if (int.TryParse(removeNsDicObj["status"].ToString(), out statusCode))
-                        ack.StatusCode = statusCode;
-
-                    ack.StatusMessage = removeNsDicObj["message"].ToString();
-
-                    ack.Service = removeNsDicObj["service"].ToString();
-
-                    ack.Error = Convert.ToBoolean(removeNsDicObj["error"].ToString());
-                }
-
-                ret = (T)Convert.ChangeType(ack, typeof(RemoveNamespaceAck), CultureInfo.InvariantCulture);
                 #endregion
             }
             else if (typeof(T) == typeof(PNTimeResult))

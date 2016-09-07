@@ -1,12 +1,10 @@
 ﻿
 namespace PubnubApi
 {
-    public enum PushTypeService
+    public enum PNPushType
     {
-        None,
-        MPNS, //MicrosoftPushNotificationService
-        WNS, //WindowsNotificationService,
         GCM,
-        APNS
+        APNS,
+        MPNS, //MicrosoftPushNotificationService
     }
 }
