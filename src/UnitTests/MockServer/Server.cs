@@ -21,7 +21,7 @@ namespace MockServer
         private readonly Uri uri;
         private Thread trf = null;
         private SortedList<string, Request> requests = new SortedList<string, Request>();
-        private int read = 0;
+        private int read;
         private bool secure = false;
 
         /// <summary>
@@ -31,11 +31,13 @@ namespace MockServer
         /// <param name="uri">Uri for server</param>
         public Server(Uri uri)
         {
+            this.read = 0;
             this.uri = uri;
             if (this.uri.OriginalString.Contains("https:"))
             {
                 secure = true;
             }
+
             certificate = new X509Certificate2(Resource.localhostPFX, "pubnub");
         }
 
@@ -52,11 +54,22 @@ namespace MockServer
             {
                 sb.Append(String.Format("&{0}", item));
             }
+
             if (sb.Length>0)
             {
                 parameters = String.Format("?{0}", sb.ToString().Substring(1));
             }
-            requests.Add(String.Format("{0} {1}{2}", request.Method, request.Path, parameters == null ? "" : parameters), request);
+
+            string requestUri = String.Format("{0} {1}{2}", request.Method, request.Path, parameters == null ? "" : parameters);
+            if (!requests.ContainsKey(requestUri))
+            {
+                requests.Add(String.Format("{0} {1}{2}", request.Method, request.Path, parameters == null ? "" : parameters), request);
+            }
+            else
+            {
+                requests[requestUri] = request;
+            }
+
             return this;
         }
 
@@ -85,13 +98,18 @@ namespace MockServer
             {
                 listener.Stop();
             }
-            catch { }
+            catch
+            {
+            }
 
             try
             {
                 trf.Abort();
             }
-            catch { }
+            catch
+            {
+            }
+
             trf = null;
 
             LoggingMethod.WriteToLog("Server was stoped.", LoggingMethod.LevelInfo);
@@ -111,7 +129,6 @@ namespace MockServer
 
             try
             {
-
                 var ipEndPoint = new IPEndPoint(IPAddress.Any, uri.Port);
                 listener = new TcpListener(ipEndPoint);
 
@@ -119,7 +136,6 @@ namespace MockServer
 
                 while (true)
                 {
-
                     data = new byte[MAXBUFFER];
 
                     var clientSocket = listener.AcceptTcpClient();
@@ -148,7 +164,6 @@ namespace MockServer
                         LoggingMethod.WriteToLog(String.Format("Error: {0}", error.Message), LoggingMethod.LevelError);
                         throw error;
                     }
-
 
                     string[] lines = strData.Split(new string[] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
                     string path = lines[0].Substring(0, lines[0].LastIndexOf(" "));
@@ -179,6 +194,7 @@ namespace MockServer
                                     Thread.Sleep(10);
                                     break;
                                 }
+
                             case HttpStatusCode.BadRequest:
                             default:
                                 {
@@ -190,6 +206,7 @@ namespace MockServer
                                     Thread.Sleep(10);
                                     break;
                                 }
+
                             case HttpStatusCode.Unauthorized:
                                 break;
                             case HttpStatusCode.Forbidden:
@@ -249,7 +266,7 @@ namespace MockServer
         /// </summary>
         /// <param name="stream">Stream</param>
         /// <returns>Message String</returns>
-        static string ReadMessage(Stream stream)
+        private static string ReadMessage(Stream stream)
         {
             byte[] buffer = new byte[2048];
             StringBuilder messageData = new StringBuilder();
@@ -268,7 +285,8 @@ namespace MockServer
                 {
                     break;
                 }
-            } while (bytes != 0);
+            }
+            while (bytes != 0);
 
             return messageData.ToString();
         }

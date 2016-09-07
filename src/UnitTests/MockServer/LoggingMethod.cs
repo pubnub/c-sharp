@@ -18,10 +18,13 @@ namespace MockServer
         /// </summary>
 		public static IMockServerLog MockServerLog
 		{
-			get{
+			get
+            {
 				return mockServerLog;
 			}
-			set {
+
+			set
+            {
 				mockServerLog = value;
 				logLevel = (int)mockServerLog.LogLevel;
 			}
@@ -36,6 +39,7 @@ namespace MockServer
 			{
 				return (Level)logLevel;
 			}
+
 			set
 			{
 				logLevel = (int)value;
@@ -103,7 +107,8 @@ namespace MockServer
 						mockServerLog.WriteToLog(logText);
 					}
 				}
-				catch(Exception ex) {
+				catch(Exception ex)
+                {
 					System.Diagnostics.Debug.WriteLine(ex.ToString());
 				}
 			}
@@ -111,4 +116,3 @@ namespace MockServer
 	}
 	#endregion
 }
-

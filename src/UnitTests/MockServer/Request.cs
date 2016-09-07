@@ -9,9 +9,13 @@ namespace MockServer
     public class Request
     {
         internal string Path { get; set; }
+
         internal string Response { get; set; }
+
         internal HttpStatusCode StatusCode { get; set; }
+
         internal string Method { get; set; }
+
         internal List<string> Parameters { get; set; }
 
         public Request()
