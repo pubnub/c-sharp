@@ -1,4 +1,4 @@
-//Build Date: June 25, 2016
+//Build Date: Sept 08, 2016
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -130,7 +130,7 @@ namespace PubNubMessaging.Core
         private string pushUnregisterDeviceParameters = "";
         private string channelGroupAddParameters = "";
         private string channelGroupRemoveParameters = "";
-        private string _pnsdkVersion = "PubNub-CSharp-.NET/3.7.7";
+        private string _pnsdkVersion = "PubNub-CSharp-.NET/3.8.2";
         private string _pushServiceName = "push.pubnub.com";
         private bool _addPayloadToPublishResponse = false;
 
@@ -1682,6 +1682,7 @@ namespace PubNubMessaging.Core
                 parameterBuilder.AppendFormat("&include_token={0}", includeToken.ToString().ToLower());
             }
             parameterBuilder.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, ResponseType.DetailedHistory, false, true));
+            parameterBuilder.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
 
             parameters = parameterBuilder.ToString();
 
@@ -5842,6 +5843,7 @@ namespace PubNubMessaging.Core
 			queryStringBuilder.AppendFormat ("{0}", (queryStringBuilder.Length > 0) ? "&" : "");
             queryStringBuilder.AppendFormat("pnsdk={0}", EncodeUricomponent(_pnsdkVersion, ResponseType.GrantAccess, false, true));
             queryStringBuilder.AppendFormat("&r={0}", Convert.ToInt32(read));
+            queryStringBuilder.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
             queryStringBuilder.AppendFormat("&timestamp={0}", timeStamp.ToString());
             if (ttl > -1)
             {
@@ -5895,6 +5897,7 @@ namespace PubNubMessaging.Core
 				queryStringBuilder.AppendFormat ("{0}channel={1}", (queryStringBuilder.Length > 0) ? "&" : "", EncodeUricomponent (channel, ResponseType.AuditAccess, false, false));
 			}
             queryStringBuilder.AppendFormat("{0}pnsdk={1}", (queryStringBuilder.Length > 0) ? "&" : "", EncodeUricomponent(_pnsdkVersion, ResponseType.AuditAccess, false, true));
+            queryStringBuilder.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
             queryStringBuilder.AppendFormat("{0}timestamp={1}", (queryStringBuilder.Length > 0) ? "&" : "", timeStamp.ToString());
             queryStringBuilder.AppendFormat("{0}uuid={1}", (queryStringBuilder.Length > 0) ? "&" : "", EncodeUricomponent(sessionUUID, ResponseType.AuditAccess, false, false));
 
@@ -6065,6 +6068,7 @@ namespace PubNubMessaging.Core
             queryStringBuilder.AppendFormat("m={0}", Convert.ToInt32(manage));
             queryStringBuilder.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, ResponseType.ChannelGroupGrantAccess, false, true));
             queryStringBuilder.AppendFormat("&r={0}", Convert.ToInt32(read));
+            queryStringBuilder.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
             queryStringBuilder.AppendFormat("&timestamp={0}", timeStamp.ToString()  );
             if (ttl > -1)
             {
@@ -6119,6 +6123,7 @@ namespace PubNubMessaging.Core
                 queryStringBuilder.AppendFormat("{0}channel-group={1}", (queryStringBuilder.Length > 0) ? "&" : "", EncodeUricomponent(channelGroup, ResponseType.ChannelGroupAuditAccess, false, false));
             }
             queryStringBuilder.AppendFormat("{0}pnsdk={1}", (queryStringBuilder.Length > 0) ? "&" : "", EncodeUricomponent(_pnsdkVersion, ResponseType.ChannelGroupAuditAccess, false, true));
+            queryStringBuilder.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
             queryStringBuilder.AppendFormat("{0}timestamp={1}", (queryStringBuilder.Length > 0) ? "&" : "", timeStamp.ToString());
             queryStringBuilder.AppendFormat("{0}uuid={1}", (queryStringBuilder.Length > 0) ? "&" : "", EncodeUricomponent(sessionUUID, ResponseType.ChannelGroupAuditAccess, false, false));
 
@@ -6727,7 +6732,8 @@ namespace PubNubMessaging.Core
 					url.AppendFormat("&heartbeat={0}", _pubnubPresenceHeartbeatInSeconds);
 				}
                 url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
-			}
+                url.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
+            }
 			else if (type == ResponseType.PresenceHeartbeat) 
             {
 				queryParamExist = true;
@@ -6742,7 +6748,8 @@ namespace PubNubMessaging.Core
 					url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
 				}
                 url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
-			}
+                url.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
+            }
 			else if (type == ResponseType.SetUserState) 
             {
 				queryParamExist = true;
@@ -6753,7 +6760,8 @@ namespace PubNubMessaging.Core
 					url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
 				}
                 url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
-			}
+                url.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
+            }
 			else if (type == ResponseType.GetUserState) 
             {
                 queryParamExist = true;
@@ -6764,8 +6772,8 @@ namespace PubNubMessaging.Core
                     url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
                 }
                 url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
-
-			}
+                url.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
+            }
             else if (type == ResponseType.Here_Now) 
             {
                 queryParamExist = true;
@@ -6776,7 +6784,8 @@ namespace PubNubMessaging.Core
 					url.AppendFormat ("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
 				}
                 url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
-			}
+                url.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
+            }
 			else if (type == ResponseType.GlobalHere_Now) 
             {
                 queryParamExist = true;
@@ -6787,7 +6796,8 @@ namespace PubNubMessaging.Core
 					url.AppendFormat ("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
 				}
                 url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
-			}
+                url.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
+            }
 			else if (type == ResponseType.Where_Now) 
             {
                 queryParamExist = true;
@@ -6797,6 +6807,7 @@ namespace PubNubMessaging.Core
                     url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
                 }
                 url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
+                url.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
             }
             else if (type == ResponseType.Publish) 
             {
@@ -6811,6 +6822,7 @@ namespace PubNubMessaging.Core
                     url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
                 }
                 url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
+                url.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
             }
             else if (type == ResponseType.PushRegister || type == ResponseType.PushRemove || type == ResponseType.PushGet || type == ResponseType.PushUnregister)
             {
@@ -6836,6 +6848,7 @@ namespace PubNubMessaging.Core
                     url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
                 }
                 url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
+                url.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
             }
             else if (type == ResponseType.ChannelGroupAdd || type == ResponseType.ChannelGroupRemove || type == ResponseType.ChannelGroupGet)
             {
@@ -6866,6 +6879,7 @@ namespace PubNubMessaging.Core
             {
                 url.AppendFormat("?uuid={0}", uuid);
                 url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
+                url.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
             }
 
 
