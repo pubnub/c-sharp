@@ -8,7 +8,7 @@ namespace PubnubApi
 {
 	public class Pubnub
 	{
-        PNConfiguration pubnubConfig = null;
+        private PNConfiguration pubnubConfig = null;
         private IJsonPluggableLibrary jsonPluggableLibrary = null;
         private IPubnubUnitTest pubnubUnitTest = null;
 
@@ -48,7 +48,7 @@ namespace PubnubApi
             endPoint.Subscribe<T>(channel, channelGroup, subscribeCallback, connectCallback, disconnectCallback, wildcardPresenceCallback, errorCallback);
         }
 
-        public EndPoint.PublishOperation publish()
+        public EndPoint.PublishOperation Publish()
         {
             return new EndPoint.PublishOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
@@ -69,59 +69,20 @@ namespace PubnubApi
             endPoint.Presence(channel, channelGroup, presenceCallback, connectCallback, disconnectCallback, errorCallback);
 		}
 
-		public void DetailedHistory(string channel, long start, long end, int count, bool reverse, bool includeToken, Action<DetailedHistoryAck> userCallback, Action<PubnubClientError> errorCallback)
+		public EndPoint.HistoryOperation History()
 		{
-            EndPoint.HistoryOperation endPoint = new EndPoint.HistoryOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.History(channel, start, end, count, reverse, includeToken, userCallback, errorCallback);
-		}
+            return new EndPoint.HistoryOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
 
-		public void DetailedHistory(string channel, long start, bool includeToken, Action<DetailedHistoryAck> userCallback, Action<PubnubClientError> errorCallback, bool reverse)
+		public EndPoint.HereNowOperation HereNow()
 		{
-            EndPoint.HistoryOperation endPoint = new EndPoint.HistoryOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.History(channel, start, -1, -1, reverse, includeToken, userCallback, errorCallback);
-		}
+            return new EndPoint.HereNowOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
 
-		public void DetailedHistory(string channel, int count, bool includeToken, Action<DetailedHistoryAck> userCallback, Action<PubnubClientError> errorCallback)
+		public EndPoint.WhereNowOperation WhereNow()
 		{
-            EndPoint.HistoryOperation endPoint = new EndPoint.HistoryOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.History(channel, -1, -1, count, false, includeToken, userCallback, errorCallback);
-		}
-
-		public void HereNow(string[] channels, Action<HereNowAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.HereNowOperation endPoint = new EndPoint.HereNowOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.HereNow(channels, null, true, false, userCallback, errorCallback);
-		}
-
-        public void HereNow(string[] channels, string[] channelGroups, Action<HereNowAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.HereNowOperation endPoint = new EndPoint.HereNowOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.HereNow(channels, channelGroups, true, false, userCallback, errorCallback);
-		}
-
-		public void HereNow(string[] channels, bool showUUIDList, bool includeUserState, Action<HereNowAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.HereNowOperation endPoint = new EndPoint.HereNowOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.HereNow(channels, null, showUUIDList, includeUserState, userCallback, errorCallback);
-		}
-
-        public void HereNow(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, Action<HereNowAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.HereNowOperation endPoint = new EndPoint.HereNowOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.HereNow(channels, channelGroups, showUUIDList, includeUserState, userCallback, errorCallback);
-		}
-
-		public void GlobalHereNow(bool showUUIDList, bool includeUserState, Action<GlobalHereNowAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.GlobalHereNowOperation endPoint = new EndPoint.GlobalHereNowOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.GlobalHereNow(showUUIDList, includeUserState, userCallback, errorCallback);
-		}
-
-		public void WhereNow(string uuid, Action<WhereNowAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.WhereNowOperation endPoint = new EndPoint.WhereNowOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.WhereNow(uuid, userCallback, errorCallback);
-		}
+            return new EndPoint.WhereNowOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
 
 		public void Unsubscribe<T>(string channel, string channelGroup, Action<PubnubClientError> errorCallback)
 		{
@@ -158,194 +119,75 @@ namespace PubnubApi
             endPoint.PresenceUnsubscribe(channel, "", disconnectCallback, errorCallback);
 		}
 
-		public void Time(Action<long> userCallback, Action<PubnubClientError> errorCallback)
+		public EndPoint.TimeOperation Time()
 		{
-            EndPoint.TimeOperation endPoint = new EndPoint.TimeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-			endPoint.Time(userCallback, errorCallback);
-		}
+            return new EndPoint.TimeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
 
-		public void AuditAccess(string channel, string channelGroup, string[] authKeys, Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
+		public EndPoint.AuditOperation Audit()
 		{
-            EndPoint.AuditOperation endPoint = new EndPoint.AuditOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.AuditAccess<AuditAck>(channel, channelGroup, authKeys, userCallback, errorCallback);
-		}
+            return new EndPoint.AuditOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
 
-		public void AuditAccess(string channel, string channelGroup, Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
+		public EndPoint.GrantOperation Grant()
 		{
-            EndPoint.AuditOperation endPoint = new EndPoint.AuditOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.AuditAccess<AuditAck>(channel, channelGroup, null, userCallback, errorCallback);
-		}
+            return new EndPoint.GrantOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
 
-		public void AuditAccess(Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
+		public EndPoint.SetStateOperation SetPresenceState()
 		{
-            EndPoint.AuditOperation endPoint = new EndPoint.AuditOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.AuditAccess<AuditAck>("", "", null, userCallback, errorCallback);
-		}
+            return new EndPoint.SetStateOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
 
-		public void GrantAccess(string[] channels, string[] channelGroups, bool read, bool write, bool manage, int ttl, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
+		public EndPoint.GetStateOperation GetPresenceState()
 		{
-            EndPoint.GrantOperation endPoint = new EndPoint.GrantOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.GrantAccess<GrantAck>(channels, channelGroups, null, read, write, manage, ttl, userCallback, errorCallback);
-		}
+            return new EndPoint.GetStateOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
 
-		public void GrantAccess(string[] channels, string[] channelGroups, bool read, bool write, bool manage, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
+		public EndPoint.AddPushChannelOperation AddPushNotificationsOnChannels()
 		{
-            EndPoint.GrantOperation endPoint = new EndPoint.GrantOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.GrantAccess<GrantAck>(channels, channelGroups, null, read, write, manage, -1, userCallback, errorCallback);
-		}
+            return new EndPoint.AddPushChannelOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
 
-		public void GrantAccess(string[] channels, string[] channelGroups, string[] authenticationKeys, bool read, bool write, bool manage, int ttl, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
+		public EndPoint.RemovePushChannelOperation RemovePushNotificationsFromChannels()
 		{
-            EndPoint.GrantOperation endPoint = new EndPoint.GrantOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.GrantAccess<GrantAck>(channels, channelGroups, authenticationKeys, read, write, manage, ttl, userCallback, errorCallback);
-		}
+            return new EndPoint.RemovePushChannelOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
 
-		public void GrantAccess(string[] channels, string[] channelGroups, string[] authenticationKeys, bool read, bool write, bool manage, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
+		public EndPoint.AuditPushChannelOperation AuditPushChannelProvisions()
 		{
-            EndPoint.GrantOperation endPoint = new EndPoint.GrantOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.GrantAccess<GrantAck>(channels, channelGroups, authenticationKeys, read, write, manage, -1, userCallback, errorCallback);
-		}
+            return new EndPoint.AuditPushChannelOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
 
-		public void SetUserState(string[] channels, string[] channelGroups, string uuid, string jsonUserState, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.SetStateOperation endPoint = new EndPoint.SetStateOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.SetUserState(channels, channelGroups, uuid, jsonUserState, userCallback, errorCallback);
-		}
-
-		public void SetUserState(string[] channels, string[] channelGroups, string jsonUserState, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.SetStateOperation endPoint = new EndPoint.SetStateOperation(pubnubConfig, jsonPluggableLibrary), pubnubUnitTest;
-            endPoint.SetUserState(channels, channelGroups, "", jsonUserState, userCallback, errorCallback);
-		}
-
-		public void SetUserState(string[] channels, string jsonUserState, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.SetStateOperation endPoint = new EndPoint.SetStateOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.SetUserState(channels, null, "", jsonUserState, userCallback, errorCallback);
-		}
-
-		public void SetUserState(string[] channels, string[] channelGroups, string uuid, System.Collections.Generic.KeyValuePair<string, object> keyValuePair, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.SetStateOperation endPoint = new EndPoint.SetStateOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.SetUserState(channels, channelGroups, uuid, keyValuePair, userCallback, errorCallback);
-		}
-
-		public void SetUserState(string[] channels, string[] channelGroups, System.Collections.Generic.KeyValuePair<string, object> keyValuePair, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.SetStateOperation endPoint = new EndPoint.SetStateOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.SetUserState(channels, channelGroups, "", keyValuePair, userCallback, errorCallback);
-		}
-
-		public void SetUserState(string[] channels, System.Collections.Generic.KeyValuePair<string, object> keyValuePair, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.SetStateOperation endPoint = new EndPoint.SetStateOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.SetUserState(channels, null, "", keyValuePair, userCallback, errorCallback);
-		}
-
-		public void GetUserState(string[] channels, string[] channelGroups, Action<GetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.GetStateOperation endPoint = new EndPoint.GetStateOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.GetUserState(channels, channelGroups, "", userCallback, errorCallback);
-		}
-
-		public void GetUserState(string[] channels, string[] channelGroups, string uuid, Action<GetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.GetStateOperation endPoint = new EndPoint.GetStateOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.GetUserState(channels, channelGroups, uuid, userCallback, errorCallback);
-		}
-
-		public void RegisterDeviceForPush<T>(string channel, PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.PushOperation endPoint = new EndPoint.PushOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.RegisterDevice<T>(channel, pushType, pushToken, userCallback, errorCallback);
-		}
-
-		public void UnregisterDeviceForPush<T>(PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.PushOperation endPoint = new EndPoint.PushOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.UnregisterDevice<T>(pushType, pushToken, userCallback, errorCallback);
-		}
-
-		public void RemoveChannelForDevicePush<T>(string channel, PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.PushOperation endPoint = new EndPoint.PushOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.RemoveChannelForDevice<T>(channel, pushType, pushToken, userCallback, errorCallback);
-		}
-
-		public void GetChannelsForDevicePush<T>(PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.PushOperation endPoint = new EndPoint.PushOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.GetChannelsForDevice<T>(pushType, pushToken, userCallback, errorCallback);
-		}
         #endregion
 
         #region "PubNub API Channel Group Methods"
-        public void AddChannelsToChannelGroup(string[] channels, string groupName, Action<AddChannelToChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.AddChannelsToChannelGroupOperation endPoint = new EndPoint.AddChannelsToChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.AddChannelsToChannelGroup(channels, "", groupName, userCallback, errorCallback);
-		}
 
-		public void AddChannelsToChannelGroup(string[] channels, string nameSpace, string groupName, Action<AddChannelToChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
+        public EndPoint.AddChannelsToChannelGroupOperation AddChannelsToChannelGroup()
 		{
-            EndPoint.AddChannelsToChannelGroupOperation endPoint = new EndPoint.AddChannelsToChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.AddChannelsToChannelGroup(channels, nameSpace, groupName, userCallback, errorCallback);
+            return new EndPoint.AddChannelsToChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
-        public void RemoveChannelsFromChannelGroup(string[] channels, string nameSpace, string groupName, Action<RemoveChannelFromChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
+		public EndPoint.RemoveChannelsFromChannelGroupOperation RemoveChannelsFromChannelGroup()
 		{
-            EndPoint.RemoveChannelsFromChannelGroupOperation endPoint = new EndPoint.RemoveChannelsFromChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.RemoveChannelsFromChannelGroup(channels, nameSpace, groupName, userCallback, errorCallback);
-		}
-
-		public void RemoveChannelsFromChannelGroup(string[] channels, string groupName, Action<RemoveChannelFromChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.RemoveChannelsFromChannelGroupOperation endPoint = new EndPoint.RemoveChannelsFromChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.RemoveChannelsFromChannelGroup(channels, "", groupName, userCallback, errorCallback);
-		}
-
-		public void RemoveChannelGroup(string nameSpace, string groupName, Action<RemoveChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            //TO BE CONVERTED
-			//pubnub.RemoveChannelGroup(nameSpace, groupName, userCallback, errorCallback);
-		}
-
-		public void RemoveChannelGroupNameSpace(string nameSpace, Action<RemoveNamespaceAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            //TO BE CONVERTED
-            //pubnub.RemoveChannelGroupNameSpace(nameSpace, userCallback, errorCallback);
-		}
-
-		public void GetChannelsForChannelGroup(string nameSpace, string groupName, Action<GetChannelGroupChannelsAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.GetChannelsForChannelGroupOperation endPoint = new EndPoint.GetChannelsForChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.GetChannelsForChannelGroup(nameSpace, groupName, userCallback, errorCallback);
-		}
-
-		public void GetChannelsForChannelGroup(string groupName, Action<GetChannelGroupChannelsAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.GetChannelsForChannelGroupOperation endPoint = new EndPoint.GetChannelsForChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.GetChannelsForChannelGroup(groupName, userCallback, errorCallback);
-		}
-
-		public void GetAllChannelGroups(string nameSpace, Action<GetAllChannelGroupsAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            //TO BE CONVERTED
-            //pubnub.GetAllChannelGroups(nameSpace, userCallback, errorCallback);
+            return new EndPoint.RemoveChannelsFromChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
-        public void GetAllChannelGroups(Action<GetAllChannelGroupsAck> userCallback, Action<PubnubClientError> errorCallback)
+		public EndPoint.DeleteChannelGroupOperation DeleteChannelGroup()
 		{
-            EndPoint.GetAllChannelGroupOperation endPoint = new EndPoint.GetAllChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.GetAllChannelGroup(userCallback, errorCallback);
-		}
-
-		public void GetAllChannelGroupNamespaces(Action<GetAllNamespacesAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            //TO BE CONVERTED
-            //pubnub.GetAllChannelGroupNamespaces(userCallback, errorCallback);
+            return new EndPoint.DeleteChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
+		public EndPoint.ListChannelsForChannelGroupOperation ListChannelsForChannelGroup()
+		{
+            return new EndPoint.ListChannelsForChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
+
+        public EndPoint.ListAllChannelGroupOperation ListChannelGroups()
+		{
+            return new EndPoint.ListAllChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
+        
         #endregion
 
         #region "PubNub API Other Methods"
@@ -483,16 +325,16 @@ namespace PubnubApi
 
         #region "Constructors"
 
-        public Pubnub(PNConfiguration pnConfig)
+        public Pubnub(PNConfiguration config)
         {
-            pubnubConfig = pnConfig;
+            pubnubConfig = config;
             jsonPluggableLibrary = new NewtonsoftJsonDotNet();
             CheckRequiredConfigValues();
         }
 
-        public Pubnub(PNConfiguration pnConfig, IJsonPluggableLibrary jsonPluggableLibrary)
+        public Pubnub(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary)
         {
-            pubnubConfig = pnConfig;
+            pubnubConfig = config;
             this.jsonPluggableLibrary = jsonPluggableLibrary;
             if (jsonPluggableLibrary == null)
             {
@@ -501,9 +343,9 @@ namespace PubnubApi
             CheckRequiredConfigValues();
         }
 
-        public Pubnub(PNConfiguration pnConfig, IPubnubUnitTest pubnubUnitTest)
+        public Pubnub(PNConfiguration config, IPubnubUnitTest pubnubUnitTest)
         {
-            this.pubnubConfig = pnConfig;
+            this.pubnubConfig = config;
             this.jsonPluggableLibrary = new NewtonsoftJsonDotNet();
             this.pubnubUnitTest = pubnubUnitTest;
             CheckRequiredConfigValues();

@@ -1,9 +1,9 @@
 ﻿
 namespace PubnubApi
 {
-    public class AddChannelToChannelGroupAck
+    public class PNChannelGroupsAddChannelResult
     {
-        public AddChannelToChannelGroupAck()
+        public PNChannelGroupsAddChannelResult()
         {
             this.ChannelGroupName = "";
             this.StatusMessage = "";

@@ -1,9 +1,9 @@
 ﻿
 namespace PubnubApi
 {
-    public class WhereNowAck
+    public class PNWhereNowResult
     {
-        public WhereNowAck()
+        public PNWhereNowResult()
         {
             this.StatusMessage = "";
             this.Service = "";
@@ -11,7 +11,7 @@ namespace PubnubApi
 
         public class Data
         {
-            public string[] channels;
+            public string[] Channels { get; set; }
         }
         public int StatusCode { get; set; }
         public string StatusMessage { get; set; }

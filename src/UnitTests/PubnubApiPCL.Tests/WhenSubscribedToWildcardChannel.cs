@@ -54,13 +54,13 @@ namespace PubNubMessaging.Tests
 
             string channel = "foo.*";
             mreGrant = new ManualResetEvent(false);
-            pubnub.GrantAccess(new string[] { channel }, null, true, true, false, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            pubnub.Grant().Channels(new string[] { channel }).Read(true).Write(true).Manage(false).TTL(20).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = ThenSubscribeInitializeShouldReturnGrantMessage, Error = DummyErrorCallback });
             Thread.Sleep(1000);
             mreGrant.WaitOne();
 
             channel = "foo.bar";
             mreGrant = new ManualResetEvent(false);
-            pubnub.GrantAccess(new string[] { channel }, null, true, true, false, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            pubnub.Grant().Channels(new string[] { channel }).Read(true).Write(true).Manage(false).TTL(20).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = ThenSubscribeInitializeShouldReturnGrantMessage, Error = DummyErrorCallback });
             Thread.Sleep(1000);
             mreGrant.WaitOne();
 
@@ -68,7 +68,7 @@ namespace PubNubMessaging.Tests
             {
                 channel = "hello_my_channel";
                 mreGrant = new ManualResetEvent(false);
-                pubnub.GrantAccess(new string[] { channel }, null, true, true, false, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
+                pubnub.Grant().Channels(new string[] { channel }).Read(true).Write(true).Manage(false).TTL(20).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = ThenSubscribeInitializeShouldReturnGrantMessage, Error = DummyErrorCallback });
                 Thread.Sleep(1000);
                 mreGrant.WaitOne();
             }
@@ -77,7 +77,7 @@ namespace PubNubMessaging.Tests
             {
                 channel = "hello_my_channel1";
                 mreGrant = new ManualResetEvent(false);
-                pubnub.GrantAccess(new string[] { channel }, null, true, true, false, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
+                pubnub.Grant().Channels(new string[] { channel }).Read(true).Write(true).Manage(false).TTL(20).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = ThenSubscribeInitializeShouldReturnGrantMessage, Error = DummyErrorCallback });
                 Thread.Sleep(1000);
                 mreGrant.WaitOne();
             }
@@ -86,7 +86,7 @@ namespace PubNubMessaging.Tests
             {
                 channelGroupName = "hello_my_group";
                 mreGrant = new ManualResetEvent(false);
-                pubnub.GrantAccess(null, new string[] { channelGroupName }, true, true, true, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
+                pubnub.Grant().ChannelGroups(new string[] { channelGroupName }).Read(true).Write(true).Manage(true).TTL(20).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = ThenSubscribeInitializeShouldReturnGrantMessage, Error = DummyErrorCallback });
                 Thread.Sleep(1000);
                 mreGrant.WaitOne();
             }
@@ -125,7 +125,7 @@ namespace PubNubMessaging.Tests
 
             mrePublish = new ManualResetEvent(false);
             publishedMessage = "Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage";
-            pubnub.Publish(channel:publishChannel, message:publishedMessage, userCallback:dummyPublishCallback, errorCallback:DummyErrorCallback);
+            pubnub.Publish().Channel(publishChannel).Message(publishedMessage).Async(new PNCallback<PNPublishResult>() { Result = dummyPublishCallback, Error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -229,7 +229,7 @@ namespace PubNubMessaging.Tests
 
             mrePublish = new ManualResetEvent(false);
             publishedMessage = "Text with 😜 emoji 🎉.";
-            pubnub.Publish(publishChannel, publishedMessage, dummyPublishCallback, DummyErrorCallback);
+            pubnub.Publish().Channel(publishChannel).Message(publishedMessage).Async(new PNCallback<PNPublishResult>() { Result = dummyPublishCallback, Error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -310,7 +310,7 @@ namespace PubNubMessaging.Tests
             string pubWildChannelName = "foo.a";
 
             mreSubscribe = new ManualResetEvent(false);
-            pubnub.AddChannelsToChannelGroup(new string[] { channelAddForGroup }, channelGroupName, ChannelGroupAddCallback, DummyErrorCallback);
+            pubnub.AddChannelsToChannelGroup().Channels(new string[] { channelAddForGroup }).ChannelGroup(channelGroupName).Async(new PNCallback<PNChannelGroupsAddChannelResult>() { Result = ChannelGroupAddCallback, Error = DummyErrorCallback });
             mreSubscribe.WaitOne(manualResetEventsWaitTimeout);
 
             mreSubscribe = new ManualResetEvent(false);
@@ -321,7 +321,7 @@ namespace PubNubMessaging.Tests
 
             mrePublish = new ManualResetEvent(false);
             publishedMessage = "Test for cg";
-            pubnub.Publish(channel: channelAddForGroup, message: publishedMessage, userCallback: dummyPublishCallback, errorCallback: DummyErrorCallback);
+            pubnub.Publish().Channel(channelAddForGroup).Message(publishedMessage).Async(new PNCallback<PNPublishResult>() { Result = dummyPublishCallback, Error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -330,7 +330,7 @@ namespace PubNubMessaging.Tests
                 Thread.Sleep(1000);
                 mrePublish = new ManualResetEvent(false);
                 publishedMessage = "Test for wc";
-                pubnub.Publish(channel: pubWildChannelName, message: publishedMessage, userCallback: dummyPublishCallback, errorCallback: DummyErrorCallback);
+                pubnub.Publish().Channel(pubWildChannelName).Message(publishedMessage).Async(new PNCallback<PNPublishResult>() { Result = dummyPublishCallback, Error = DummyErrorCallback });
                 manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
                 mrePublish.WaitOne(manualResetEventsWaitTimeout);
             }
@@ -340,7 +340,7 @@ namespace PubNubMessaging.Tests
                 Thread.Sleep(1000);
                 mrePublish = new ManualResetEvent(false);
                 publishedMessage = "Test for normal ch";
-                pubnub.Publish(channel: subChannelName, message: publishedMessage, userCallback: dummyPublishCallback, errorCallback: DummyErrorCallback);
+                pubnub.Publish().Channel(subChannelName).Message(publishedMessage).Async(new PNCallback<PNPublishResult>() { Result = dummyPublishCallback, Error = DummyErrorCallback });
                 manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
                 mrePublish.WaitOne(manualResetEventsWaitTimeout);
             }
@@ -427,7 +427,7 @@ namespace PubNubMessaging.Tests
 
         }
 
-        void ThenSubscribeInitializeShouldReturnGrantMessage(GrantAck receivedMessage)
+        void ThenSubscribeInitializeShouldReturnGrantMessage(PNAccessManagerGrantResult receivedMessage)
         {
             try
             {
@@ -481,7 +481,7 @@ namespace PubNubMessaging.Tests
             mreSubscribe.Set();
         }
 
-        private void dummyPublishCallback(PublishAck result)
+        private void dummyPublishCallback(PNPublishResult result)
         {
             //Console.WriteLine("dummyPublishCallback -> result = " + result);
             if (result != null)
@@ -524,7 +524,7 @@ namespace PubNubMessaging.Tests
             mreUnsubscribe.Set();
         }
 
-        void ChannelGroupAddCallback(AddChannelToChannelGroupAck receivedMessage)
+        void ChannelGroupAddCallback(PNChannelGroupsAddChannelResult receivedMessage)
         {
             Console.WriteLine(string.Format("ChannelGroupAddCallback = {0}", receivedMessage));
             try

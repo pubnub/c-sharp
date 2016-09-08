@@ -6,11 +6,14 @@ using PubnubApi.Interface;
 
 namespace PubnubApi.EndPoint
 {
-    internal class AuditOperation : PubnubCoreBase
+    public class AuditOperation : PubnubCoreBase
     {
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
         private IPubnubUnitTest unit;
+        private string channelName = null;
+        private string channelGroupName = null;
+        private string[] authenticationKeys = null;
 
         public AuditOperation(PNConfiguration pubnubConfig):base(pubnubConfig)
         {
@@ -30,7 +33,30 @@ namespace PubnubApi.EndPoint
             unit = pubnubUnit;
         }
 
-        public void AuditAccess<T>(string channel, string channelGroup, string[] authKeys, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        public AuditOperation Channel(string channel)
+        {
+            this.channelName = channel;
+            return this;
+        }
+
+        public AuditOperation ChannelGroup(string channelGroup)
+        {
+            this.channelGroupName = channelGroup;
+            return this;
+        }
+
+        public AuditOperation AuthKeys(string[] authKeys)
+        {
+            this.authenticationKeys = authKeys;
+            return this;
+        }
+
+        public void Async(PNCallback<PNAccessManagerAuditResult> callback)
+        {
+            AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, callback.Result, callback.Error);
+        }
+
+        internal void AuditAccess<T>(string channel, string channelGroup, string[] authKeys, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (string.IsNullOrEmpty(config.SecretKey) || string.IsNullOrEmpty(config.SecretKey.Trim()) || config.SecretKey.Length <= 0)
             {

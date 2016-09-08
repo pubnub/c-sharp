@@ -2,9 +2,9 @@
 
 namespace PubnubApi
 {
-    public class SetUserStateAck
+    public class PNSetStateResult
     {
-        public SetUserStateAck()
+        public PNSetStateResult()
         {
             this.StatusMessage = "";
             this.Service = "";

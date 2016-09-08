@@ -2,9 +2,9 @@
 
 namespace PubnubApi
 {
-    public class AuditAck
+    public class PNAccessManagerAuditResult
     {
-        public AuditAck()
+        public PNAccessManagerAuditResult()
         {
             this.StatusMessage = "";
             this.Service = "";
@@ -19,26 +19,26 @@ namespace PubnubApi
 
             public class SubkeyAccess
             {
-                public bool read { get; set; }
-                public bool write { get; set; }
-                public bool manage { get; set; }
+                public bool Read { get; set; }
+                public bool Write { get; set; }
+                public bool Manage { get; set; }
                 public int TTL { get; set; }
             }
             public string Level { get; set; }
             public string SubscribeKey { get; set; }
-            public Dictionary<string, ChannelData> channels { get; set; }
-            public Dictionary<string, ChannelGroupData> channelgroups { get; set; }
+            public Dictionary<string, ChannelData> Channels { get; set; }
+            public Dictionary<string, ChannelGroupData> Channelgroups { get; set; }
             public SubkeyAccess Access { get; set; }
 
             public class ChannelData
             {
-                public Dictionary<string, AuthData> auths { get; set; }
+                public Dictionary<string, AuthData> Auths { get; set; }
 
                 public class ChannelAccess
                 {
-                    public bool read { get; set; }
-                    public bool write { get; set; }
-                    public bool manage { get; set; }
+                    public bool Read { get; set; }
+                    public bool Write { get; set; }
+                    public bool Manage { get; set; }
                     public int TTL { get; set; }
                 }
 
@@ -46,9 +46,9 @@ namespace PubnubApi
                 {
                     public class AuthAccess
                     {
-                        public bool read { get; set; }
-                        public bool write { get; set; }
-                        public bool manage { get; set; }
+                        public bool Read { get; set; }
+                        public bool Write { get; set; }
+                        public bool Manage { get; set; }
                         public int TTL { get; set; }
                     }
 
@@ -60,13 +60,13 @@ namespace PubnubApi
 
             public class ChannelGroupData
             {
-                public Dictionary<string, AuthData> auths { get; set; }
+                public Dictionary<string, AuthData> Auths { get; set; }
 
                 public class ChannelGroupAccess
                 {
-                    public bool read { get; set; }
-                    public bool write { get; set; }
-                    public bool manage { get; set; }
+                    public bool Read { get; set; }
+                    public bool Write { get; set; }
+                    public bool Manage { get; set; }
                     public int TTL { get; set; }
                 }
 
@@ -74,9 +74,9 @@ namespace PubnubApi
                 {
                     public class AuthAccess
                     {
-                        public bool read { get; set; }
-                        public bool write { get; set; }
-                        public bool manage { get; set; }
+                        public bool Read { get; set; }
+                        public bool Write { get; set; }
+                        public bool Manage { get; set; }
                         public int TTL { get; set; }
                     }
                     public AuthAccess Access { get; set; }

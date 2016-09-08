@@ -43,7 +43,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "Init3";
             pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.GrantAccess(null, new string[] { channelGroupName }, true, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummyUnsubscribeErrorCallback);
+            pubnub.Grant().ChannelGroups(new string[] { channelGroupName }).Read(true).Write(true).Manage(true).TTL(20).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = ThenChannelGroupInitializeShouldReturnGrantMessage, Error = DummyUnsubscribeErrorCallback });
             Thread.Sleep(1000);
 
             grantManualEvent.WaitOne();
@@ -74,7 +74,7 @@ namespace PubNubMessaging.Tests
             string channelName = "hello_my_channel";
 
             unsubscribeManualEvent = new ManualResetEvent(false);
-            pubnub.AddChannelsToChannelGroup(new string[] { channelName }, channelGroupName, ChannelGroupAddCallback, DummySubscribeErrorCallback);
+            pubnub.AddChannelsToChannelGroup().Channels(new string[] { channelName }).ChannelGroup(channelGroupName).Async(new PNCallback<PNChannelGroupsAddChannelResult>() { Result = ChannelGroupAddCallback, Error = DummyErrorCallback });
             unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
             if (receivedChannelGroupMessage)
             {
@@ -140,7 +140,7 @@ namespace PubNubMessaging.Tests
         //    unsubscribeManualEvent.Set();
         //}
 
-        void ChannelGroupAddCallback(AddChannelToChannelGroupAck receivedMessage)
+        void ChannelGroupAddCallback(PNChannelGroupsAddChannelResult receivedMessage)
         {
             try
             {
@@ -168,7 +168,7 @@ namespace PubNubMessaging.Tests
 
         }
 
-        void ThenChannelGroupInitializeShouldReturnGrantMessage(GrantAck receivedMessage)
+        void ThenChannelGroupInitializeShouldReturnGrantMessage(PNAccessManagerGrantResult receivedMessage)
         {
             try
             {

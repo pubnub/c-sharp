@@ -6,11 +6,19 @@ using PubnubApi.Interface;
 
 namespace PubnubApi.EndPoint
 {
-    internal class GrantOperation : PubnubCoreBase
+    public class GrantOperation : PubnubCoreBase
     {
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
         private IPubnubUnitTest unit;
+        private string[] channelNames = null;
+        private string[] channelGroupNames = null;
+        private string[] authenticationKeys = null;
+        private bool grantWrite = false;
+        private bool grantRead = false;
+        private bool grantManage = false;
+        private long grantTTL = -1;
+
 
         public GrantOperation(PNConfiguration pubnubConfig):base(pubnubConfig)
         {
@@ -30,7 +38,54 @@ namespace PubnubApi.EndPoint
             unit = pubnubUnit;
         }
 
-        public void GrantAccess<T>(string[] channels, string[] channelGroups, string[] authKeys, bool read, bool write, bool manage, int ttl, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        public GrantOperation Channels(string[] channels)
+        {
+            this.channelNames = channels;
+            return this;
+        }
+
+        public GrantOperation ChannelGroups(string[] channelGroups)
+        {
+            this.channelGroupNames = channelGroups;
+            return this;
+        }
+
+        public GrantOperation AuthKeys(string[] authKeys)
+        {
+            this.authenticationKeys = authKeys;
+            return this;
+        }
+
+        public GrantOperation Write(bool write)
+        {
+            this.grantWrite = write;
+            return this;
+        }
+
+        public GrantOperation Read(bool read)
+        {
+            this.grantRead = read;
+            return this;
+        }
+
+        public GrantOperation Manage(bool manage)
+        {
+            this.grantManage = manage;
+            return this;
+        }
+
+        public GrantOperation TTL(long ttl)
+        {
+            this.grantTTL = ttl;
+            return this;
+        }
+
+        public void Async(PNCallback<PNAccessManagerGrantResult> callback)
+        {
+            GrantAccess(this.channelNames, this.channelGroupNames, this.authenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, callback.Result, callback.Error);
+        }
+
+        internal void GrantAccess(string[] channels, string[] channelGroups, string[] authKeys, bool read, bool write, bool manage, long ttl, Action<PNAccessManagerGrantResult> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (string.IsNullOrEmpty(config.SecretKey) || string.IsNullOrEmpty(config.SecretKey.Trim()) || config.SecretKey.Length <= 0)
             {
@@ -72,7 +127,7 @@ namespace PubnubApi.EndPoint
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
             Uri request = urlBuilder.BuildGrantAccessRequest(channelsCommaDelimited, channelGroupsCommaDelimited, authKeysCommaDelimited, read, write, manage, ttl);
 
-            RequestState<T> requestState = new RequestState<T>();
+            RequestState<PNAccessManagerGrantResult> requestState = new RequestState<PNAccessManagerGrantResult>();
             requestState.Channels = channels;
             requestState.ChannelGroups = channelGroups;
             requestState.ResponseType = ResponseType.GrantAccess;
@@ -80,10 +135,10 @@ namespace PubnubApi.EndPoint
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            string json = UrlProcessRequest<T>(request, requestState, false);
+            string json = UrlProcessRequest<PNAccessManagerGrantResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<T>(requestState, json);
+                List<object> result = ProcessJsonResponse<PNAccessManagerGrantResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
             }
         }

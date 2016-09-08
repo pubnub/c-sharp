@@ -6,7 +6,7 @@ using PubnubApi.Interface;
 
 namespace PubnubApi.EndPoint
 {
-    internal class TimeOperation: PubnubCoreBase
+    public class TimeOperation: PubnubCoreBase
     {
         private static PNConfiguration config = null;
         private static IJsonPluggableLibrary jsonLibrary = null;
@@ -30,7 +30,12 @@ namespace PubnubApi.EndPoint
             unitTest = pubnubUnitTest;
         }
 
-        internal void Time(Action<long> userCallback, Action<PubnubClientError> errorCallback)
+        public void Async(PNCallback<PNTimeResult> callback)
+        {
+            Time(callback.Result, callback.Error);
+        }
+
+        internal void Time(Action<PNTimeResult> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (userCallback == null)
             {
@@ -44,17 +49,17 @@ namespace PubnubApi.EndPoint
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config);
             Uri request = urlBuilder.BuildTimeRequest();
 
-            RequestState<long> requestState = new RequestState<long>();
+            RequestState<PNTimeResult> requestState = new RequestState<PNTimeResult>();
             requestState.Channels = null;
             requestState.ResponseType = ResponseType.Time;
             requestState.NonSubscribeRegularCallback = userCallback;
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            string json = UrlProcessRequest<long>(request, requestState, false);
+            string json = UrlProcessRequest<PNTimeResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<long>(requestState, json);
+                List<object> result = ProcessJsonResponse<PNTimeResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
             }
             else

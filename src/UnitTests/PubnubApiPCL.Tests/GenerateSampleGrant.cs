@@ -76,7 +76,7 @@ namespace PubNubMessaging.Tests
                     grantManualEvent = new ManualResetEvent(false);
                     string channelName = string.Format("csharp-pam-ul-channel-{0}", index);
                     string authKey = string.Format("csharp-pam-authkey-0-{0},csharp-pam-authkey-1-{1}", index, index);
-                    pubnub.GrantAccess(new string[] { channelName }, null, new string[] { authKey }, true, true, false, UserCallbackForSampleGrantAtUserLevel, ErrorCallbackForSampleGrantAtUserLevel);
+                    pubnub.Grant().Channels(new string[] { channelName }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(false).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = UserCallbackForSampleGrantAtUserLevel, Error = ErrorCallbackForSampleGrantAtUserLevel });
                     grantManualEvent.WaitOne();
                 }
 
@@ -132,7 +132,7 @@ namespace PubNubMessaging.Tests
                 {
                     grantManualEvent = new ManualResetEvent(false);
                     string channelName = string.Format("csharp-pam-cl-channel-{0}", index);
-                    pubnub.GrantAccess(new string[] { channelName }, null, null, true, true, false, UserCallbackForSampleGrantAtChannelLevel, ErrorCallbackForSampleGrantAtChannelLevel);
+                    pubnub.Grant().Channels(new string[] { channelName }).Read(true).Write(true).Manage(false).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = UserCallbackForSampleGrantAtChannelLevel, Error = ErrorCallbackForSampleGrantAtChannelLevel });
                     grantManualEvent.WaitOne();
                 }
 
@@ -146,7 +146,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void UserCallbackForSampleGrantAtUserLevel(GrantAck receivedMessage)
+        void UserCallbackForSampleGrantAtUserLevel(PNAccessManagerGrantResult receivedMessage)
         {
             receivedGrantMessage = true;
             Console.WriteLine(receivedMessage);
@@ -162,7 +162,7 @@ namespace PubNubMessaging.Tests
             grantManualEvent.Set();
         }
 
-        void UserCallbackForSampleGrantAtChannelLevel(GrantAck receivedMessage)
+        void UserCallbackForSampleGrantAtChannelLevel(PNAccessManagerGrantResult receivedMessage)
         {
             receivedGrantMessage = true;
             Console.WriteLine(receivedMessage);

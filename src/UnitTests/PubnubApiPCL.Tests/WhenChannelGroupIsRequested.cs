@@ -74,7 +74,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.GrantAccess(null, new string[] { channelGroupName }, null, true, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            pubnub.Grant().ChannelGroups(new string[] { channelGroupName }).Read(true).Write(true).Manage(true).TTL(20).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = ThenChannelGroupInitializeShouldReturnGrantMessage, Error = DummyErrorCallback });
 
             Thread.Sleep(1000);
 
@@ -128,7 +128,7 @@ namespace PubNubMessaging.Tests
 
             channelGroupManualEvent = new ManualResetEvent(false);
 
-            pubnub.AddChannelsToChannelGroup(new string[] { channelName }, channelGroupName, AddChannelGroupCallback, DummyErrorCallback);
+            pubnub.AddChannelsToChannelGroup().Channels(new string[] { channelName }).ChannelGroup(channelGroupName).Async(new PNCallback<PNChannelGroupsAddChannelResult>() { Result = AddChannelGroupCallback, Error = DummyErrorCallback });
             Thread.Sleep(1000);
 
             channelGroupManualEvent.WaitOne();
@@ -176,7 +176,7 @@ namespace PubNubMessaging.Tests
 
             channelGroupManualEvent = new ManualResetEvent(false);
 
-            pubnub.RemoveChannelsFromChannelGroup(new string[] { channelName }, channelGroupName, RemoveChannelGroupCallback, DummyErrorCallback);
+            pubnub.RemoveChannelsFromChannelGroup().Channels(new string[] { channelName }).ChannelGroup(channelGroupName).Async(new PNCallback<PNChannelGroupsRemoveChannelResult>() { Result = RemoveChannelGroupCallback, Error = DummyErrorCallback });
             Thread.Sleep(1000);
 
             channelGroupManualEvent.WaitOne();
@@ -223,7 +223,7 @@ namespace PubNubMessaging.Tests
 
             channelGroupManualEvent = new ManualResetEvent(false);
 
-            pubnub.GetChannelsForChannelGroup(channelGroupName, GetChannelGroupCallback, DummyErrorCallback);
+            pubnub.ListChannelsForChannelGroup().ChannelGroup(channelGroupName).Async(new PNCallback<PNChannelGroupsAllChannelsResult>() { Result = GetChannelGroupCallback, Error = DummyErrorCallback });
             Thread.Sleep(1000);
 
             channelGroupManualEvent.WaitOne();
@@ -275,7 +275,7 @@ namespace PubNubMessaging.Tests
 
             channelGroupManualEvent = new ManualResetEvent(false);
 
-            pubnub.GetAllChannelGroups(GetAllChannelGroupCallback, DummyErrorCallback);
+            pubnub.ListChannelGroups().Async(new PNCallback<PNChannelGroupsAllResult>() { Result = GetAllChannelGroupCallback, Error = DummyErrorCallback });
             Thread.Sleep(1000);
 
             channelGroupManualEvent.WaitOne();
@@ -287,7 +287,7 @@ namespace PubNubMessaging.Tests
 
         }
 
-        void RemoveChannelGroupCallback(RemoveChannelFromChannelGroupAck receivedMessage)
+        void RemoveChannelGroupCallback(PNChannelGroupsRemoveChannelResult receivedMessage)
         {
             try
             {
@@ -317,7 +317,7 @@ namespace PubNubMessaging.Tests
 
         }
 
-        void AddChannelGroupCallback(AddChannelToChannelGroupAck receivedMessage)
+        void AddChannelGroupCallback(PNChannelGroupsAddChannelResult receivedMessage)
         {
             try
             {
@@ -346,7 +346,7 @@ namespace PubNubMessaging.Tests
 
         }
 
-        void GetChannelGroupCallback(GetChannelGroupChannelsAck receivedMessage)
+        void GetChannelGroupCallback(PNChannelGroupsAllChannelsResult receivedMessage)
         {
             try
             {
@@ -356,7 +356,7 @@ namespace PubNubMessaging.Tests
                     string serviceType = receivedMessage.Service;
                     bool errorStatus = receivedMessage.Error;
                     string currentChannelGroup = "";
-                    GetChannelGroupChannelsAck.Data payload = receivedMessage.Payload;
+                    PNChannelGroupsAllChannelsResult.Data payload = receivedMessage.Payload;
                     if (payload != null)
                     {
                         currentChannelGroup = payload.ChannelGroupName;
@@ -377,7 +377,7 @@ namespace PubNubMessaging.Tests
 
         }
 
-        void GetAllChannelGroupCallback(GetAllChannelGroupsAck receivedMessage)
+        void GetAllChannelGroupCallback(PNChannelGroupsAllResult receivedMessage)
         {
             try
             {
@@ -387,7 +387,7 @@ namespace PubNubMessaging.Tests
                     string serviceType = receivedMessage.Service;
                     bool errorStatus = receivedMessage.Error;
                     string currentChannelGroup = "";
-                    GetAllChannelGroupsAck.Data payload = receivedMessage.Payload;
+                    PNChannelGroupsAllResult.Data payload = receivedMessage.Payload;
                     if (payload != null)
                     {
                         string[] channelGroups = payload.ChannelGroupName;
@@ -404,7 +404,7 @@ namespace PubNubMessaging.Tests
 
         }
 
-        void ThenChannelGroupInitializeShouldReturnGrantMessage(GrantAck receivedMessage)
+        void ThenChannelGroupInitializeShouldReturnGrantMessage(PNAccessManagerGrantResult receivedMessage)
         {
             try
             {

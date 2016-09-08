@@ -175,11 +175,7 @@ namespace PubnubApi
 
         Uri IUrlRequestBuilder.BuildHereNowRequest(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState)
         {
-            string channel = (channels != null && channels.Length > 0) ? string.Join(",", channels) : ",";
-            if (channel.Trim() == "")
-            {
-                channel = ",";
-            }
+            string channel = (channels != null && channels.Length > 0) ? string.Join(",", channels) : "";
 
             string channelGroup = (channelGroups != null) ? string.Join(",", channelGroups) : "";
 
@@ -201,8 +197,11 @@ namespace PubnubApi
             url.Add("presence");
             url.Add("sub_key");
             url.Add(pubnubConfig.SubscribeKey);
-            url.Add("channel");
-            url.Add(channel);
+            if (!string.IsNullOrEmpty(channel))
+            {
+                url.Add("channel");
+                url.Add(channel);
+            }
 
             return BuildRestApiRequest<Uri>(url, ResponseType.Here_Now);
         }
@@ -260,22 +259,6 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, ResponseType.DetailedHistory);
         }
 
-        Uri IUrlRequestBuilder.BuildGlobalHereNowRequest(bool showUUIDList, bool includeUserState)
-        {
-            int disableUUID = showUUIDList ? 0 : 1;
-            int userState = includeUserState ? 1 : 0;
-            globalHereNowParameters = string.Format("?disable_uuids={0}&state={1}", disableUUID, userState);
-
-            List<string> url = new List<string>();
-
-            url.Add("v2");
-            url.Add("presence");
-            url.Add("sub_key");
-            url.Add(pubnubConfig.SubscribeKey);
-
-            return BuildRestApiRequest<Uri>(url, ResponseType.GlobalHere_Now);
-        }
-
         Uri IUrlRequestBuilder.BuildWhereNowRequest(string uuid)
         {
             List<string> url = new List<string>();
@@ -290,7 +273,7 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, ResponseType.Where_Now);
         }
 
-        Uri IUrlRequestBuilder.BuildGrantAccessRequest(string channelsCommaDelimited, string channelGroupsCommaDelimited, string authKeysCommaDelimited, bool read, bool write, bool manage, int ttl)
+        Uri IUrlRequestBuilder.BuildGrantAccessRequest(string channelsCommaDelimited, string channelGroupsCommaDelimited, string authKeysCommaDelimited, bool read, bool write, bool manage, long ttl)
         {
             string signature = "0";
             //long timeStamp = TranslateDateTimeToSeconds(DateTime.UtcNow);
@@ -612,7 +595,7 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, ResponseType.ChannelGroupGet);
         }
 
-        Uri IUrlRequestBuilder.BuildRegisterDevicePushRequest(string channel, PushTypeService pushType, string pushToken)
+        Uri IUrlRequestBuilder.BuildRegisterDevicePushRequest(string channel, PNPushType pushType, string pushToken)
         {
             StringBuilder parameterBuilder = new StringBuilder();
             pushRegisterDeviceParameters = "";
@@ -634,7 +617,7 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, ResponseType.PushRegister);
         }
 
-        Uri IUrlRequestBuilder.BuildUnregisterDevicePushRequest(PushTypeService pushType, string pushToken)
+        Uri IUrlRequestBuilder.BuildUnregisterDevicePushRequest(PNPushType pushType, string pushToken)
         {
             StringBuilder parameterBuilder = new StringBuilder();
             pushUnregisterDeviceParameters = "";
@@ -656,7 +639,7 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, ResponseType.PushUnregister);
         }
 
-        Uri IUrlRequestBuilder.BuildRemoveChannelPushRequest(string channel, PushTypeService pushType, string pushToken)
+        Uri IUrlRequestBuilder.BuildRemoveChannelPushRequest(string channel, PNPushType pushType, string pushToken)
         {
             StringBuilder parameterBuilder = new StringBuilder();
             pushRemoveChannelParameters = "";
@@ -678,7 +661,7 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, ResponseType.PushRemove);
         }
 
-        Uri IUrlRequestBuilder.BuildGetChannelsPushRequest(PushTypeService pushType, string pushToken)
+        Uri IUrlRequestBuilder.BuildGetChannelsPushRequest(PNPushType pushType, string pushToken)
         {
             StringBuilder parameterBuilder = new StringBuilder();
             pushGetChannelsParameters = "";
@@ -1069,10 +1052,10 @@ namespace PubnubApi
             return (char)(ch < 10 ? '0' + ch : 'A' + ch - 10);
         }
 
-        internal const int HIGH_SURROGATE_START = 0x00d800;
-        internal const int LOW_SURROGATE_END = 0x00dfff;
-        internal const int LOW_SURROGATE_START = 0x00dc00;
-        internal const int UNICODE_PLANE01_START = 0x10000;
+        internal const int HighSurrogateStart = 0x00d800;
+        internal const int LowSurrogateEnd = 0x00dfff;
+        internal const int LowSurrogateStart = 0x00dc00;
+        internal const int UnicodePlane01Start = 0x10000;
 
         private static int ConvertToUtf32(String s, int index)
         {
@@ -1088,7 +1071,7 @@ namespace PubnubApi
 
             //Contract.EndContractBlock();
             // Check if the character at index is a high surrogate.
-            int temp1 = (int)s[index] - HIGH_SURROGATE_START;
+            int temp1 = (int)s[index] - HighSurrogateStart;
             if (temp1 >= 0 && temp1 <= 0x7ff)
             {
                 // Found a surrogate char.
@@ -1097,11 +1080,11 @@ namespace PubnubApi
                     // Found a high surrogate.
                     if (index < s.Length - 1)
                     {
-                        int temp2 = (int)s[index + 1] - LOW_SURROGATE_START;
+                        int temp2 = (int)s[index + 1] - LowSurrogateStart;
                         if (temp2 >= 0 && temp2 <= 0x3ff)
                         {
                             // Found a low surrogate.
-                            return (temp1 * 0x400) + temp2 + UNICODE_PLANE01_START;
+                            return (temp1 * 0x400) + temp2 + UnicodePlane01Start;
                         }
                         else
                         {

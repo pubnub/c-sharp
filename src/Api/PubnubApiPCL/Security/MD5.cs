@@ -72,7 +72,7 @@ namespace PubnubApi
 		private const byte S42 = 10;
 		private const byte S43 = 15;
 		private const byte S44 = 21;
-		static private byte[] PADDING = new byte[] {
+		static private byte[] padding = new byte[] {
 			0x80, 0, 0, 0, 0, 0, 
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 
@@ -244,7 +244,7 @@ namespace PubnubApi
 			// Pad out to 56 mod 64.
 			index = (int)((uint)(this.count[0] >> 3) & 0x3f);
 			padLen = (index < 56) ? (56 - index) : (120 - index);
-			HashCore(PADDING, 0, padLen);
+			HashCore(padding, 0, padLen);
 
 			// Append length (before padding)
 			HashCore(bits, 0, 8);
@@ -401,9 +401,9 @@ namespace PubnubApi
 
 		#region expose the same interface as the regular MD5 object
 
-		protected byte[] HashValue;
-		protected int State;
-		public virtual bool CanReuseTransform
+		protected byte[] HashValue { get; set; }
+        protected int State { get; set; }
+        public virtual bool CanReuseTransform
 		{
 			get
 			{
@@ -434,7 +434,7 @@ namespace PubnubApi
 				return HashSizeValue;
 			}
 		}
-		protected int HashSizeValue = 128;
+		protected int HashSizeValue { get; set; } = 128;
 
 		public virtual int InputBlockSize
 		{

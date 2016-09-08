@@ -19,11 +19,9 @@ namespace PubnubApi.Interface
 
         Uri BuildHistoryRequest(string channel, long start, long end, int count, bool reverse, bool includeToken);
 
-        Uri BuildGlobalHereNowRequest(bool showUUIDList, bool includeUserState);
-
         Uri BuildWhereNowRequest(string uuid);
 
-        Uri BuildGrantAccessRequest(string channelsCommaDelimited, string channelGroupsCommaDelimited, string authKeysCommaDelimited, bool read, bool write, bool manage, int ttl);
+        Uri BuildGrantAccessRequest(string channelsCommaDelimited, string channelGroupsCommaDelimited, string authKeysCommaDelimited, bool read, bool write, bool manage, long ttl);
 
         Uri BuildAuditAccessRequest(string channel, string channelGroup, string authKeysCommaDelimited);
 
@@ -39,13 +37,13 @@ namespace PubnubApi.Interface
 
         Uri BuildGetAllChannelGroupRequest();
 
-        Uri BuildRegisterDevicePushRequest(string channel, PushTypeService pushType, string pushToken);
+        Uri BuildRegisterDevicePushRequest(string channel, PNPushType pushType, string pushToken);
 
-        Uri BuildUnregisterDevicePushRequest(PushTypeService pushType, string pushToken);
+        Uri BuildUnregisterDevicePushRequest(PNPushType pushType, string pushToken);
 
-        Uri BuildRemoveChannelPushRequest(string channel, PushTypeService pushType, string pushToken);
+        Uri BuildRemoveChannelPushRequest(string channel, PNPushType pushType, string pushToken);
 
-        Uri BuildGetChannelsPushRequest(PushTypeService pushType, string pushToken);
+        Uri BuildGetChannelsPushRequest(PNPushType pushType, string pushToken);
 
         Uri BuildPresenceHeartbeatRequest(string[] channels, string[] channelGroups, string jsonUserState);
     }

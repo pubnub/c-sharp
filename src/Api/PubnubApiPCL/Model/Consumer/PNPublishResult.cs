@@ -1,9 +1,9 @@
 ﻿
 namespace PubnubApi
 {
-    public class PublishAck
+    public class PNPublishResult
     {
-        public PublishAck()
+        public PNPublishResult()
         {
             this.StatusMessage = "";
             this.ChannelName = "";

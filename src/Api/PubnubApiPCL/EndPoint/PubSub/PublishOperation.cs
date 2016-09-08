@@ -34,42 +34,42 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public PublishOperation message(object message)
+        public PublishOperation Message(object message)
         {
             this.msg = message;
             return this;
         }
 
-        public PublishOperation channel(string channelName)
+        public PublishOperation Channel(string channelName)
         {
             this.channelName = channelName;
             return this;
         }
 
-        public PublishOperation shouldStore(bool store)
+        public PublishOperation ShouldStore(bool store)
         {
             this.storeInHistory = store;
             return this;
         }
 
-        public PublishOperation meta(string jsonMetadata)
+        public PublishOperation Meta(string jsonMetadata)
         {
             this.userMetadata = jsonMetadata;
             return this;
         }
 
-        public PublishOperation usePOST(bool post)
+        public PublishOperation UsePOST(bool post)
         {
             this.httpPost = post;
             return this;
         }
 
-        public void async(PNCallback<PublishAck> callback)
+        public void Async(PNCallback<PNPublishResult> callback)
         {
-            Publish(this.channelName, this.msg, this.storeInHistory, this.userMetadata, callback.result, callback.error);
+            Publish(this.channelName, this.msg, this.storeInHistory, this.userMetadata, callback.Result, callback.Error);
         }
 
-        private void Publish(string channel, object message, bool storeInHistory, string jsonUserMetaData, Action<PublishAck> userCallback, Action<PubnubClientError> errorCallback)
+        private void Publish(string channel, object message, bool storeInHistory, string jsonUserMetaData, Action<PNPublishResult> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
             {
@@ -108,17 +108,17 @@ namespace PubnubApi.EndPoint
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
             Uri request = urlBuilder.BuildPublishRequest(channel, message, storeInHistory, jsonUserMetaData);
 
-            RequestState<PublishAck> requestState = new RequestState<PublishAck>();
+            RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
             requestState.Channels = new string[] { channel };
             requestState.ResponseType = ResponseType.Publish;
             requestState.NonSubscribeRegularCallback = userCallback;
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            string json = UrlProcessRequest<PublishAck>(request, requestState, false);
+            string json = UrlProcessRequest<PNPublishResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<PublishAck>(requestState, json);
+                List<object> result = ProcessJsonResponse<PNPublishResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
             }
         }

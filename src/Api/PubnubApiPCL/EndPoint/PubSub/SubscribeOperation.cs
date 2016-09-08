@@ -192,9 +192,9 @@ namespace PubnubApi.EndPoint
                         }
                         if (!MultiChannelSubscribe.ContainsKey(channelName))
                         {
-                            string message = string.Format("{0}Channel Not Subscribed", (IsPresenceChannel(channelName)) ? "Presence " : "");
+                            string message = string.Format("{0}Channel Not Subscribed", IsPresenceChannel(channelName) ? "Presence " : "");
 
-                            PubnubErrorCode errorType = (IsPresenceChannel(channelName)) ? PubnubErrorCode.NotPresenceSubscribed : PubnubErrorCode.NotSubscribed;
+                            PubnubErrorCode errorType = IsPresenceChannel(channelName) ? PubnubErrorCode.NotPresenceSubscribed : PubnubErrorCode.NotSubscribed;
 
                             LoggingMethod.WriteToLog(string.Format("DateTime {0}, channel={1} unsubscribe response={2}", DateTime.Now.ToString(), channelName, message), LoggingMethod.LevelInfo);
 
@@ -232,9 +232,9 @@ namespace PubnubApi.EndPoint
                         }
                         if (!MultiChannelGroupSubscribe.ContainsKey(channelGroupName))
                         {
-                            string message = string.Format("{0}ChannelGroup Not Subscribed", (IsPresenceChannel(channelGroupName)) ? "Presence " : "");
+                            string message = string.Format("{0}ChannelGroup Not Subscribed", IsPresenceChannel(channelGroupName) ? "Presence " : "");
 
-                            PubnubErrorCode errorType = (IsPresenceChannel(channelGroupName)) ? PubnubErrorCode.NotPresenceSubscribed : PubnubErrorCode.NotSubscribed;
+                            PubnubErrorCode errorType = IsPresenceChannel(channelGroupName) ? PubnubErrorCode.NotPresenceSubscribed : PubnubErrorCode.NotSubscribed;
 
                             LoggingMethod.WriteToLog(string.Format("DateTime {0}, channelgroup={1} unsubscribe response={2}", DateTime.Now.ToString(), channelGroupName, message), LoggingMethod.LevelInfo);
 
@@ -343,7 +343,7 @@ namespace PubnubApi.EndPoint
                     if (unsubscribeStatus)
                     {
                         List<object> result = new List<object>();
-                        string jsonString = string.Format("[1, \"Channel {0}Unsubscribed from {1}\"]", (IsPresenceChannel(channelToBeRemoved)) ? "Presence " : "", channelToBeRemoved.Replace("-pnpres", ""));
+                        string jsonString = string.Format("[1, \"Channel {0}Unsubscribed from {1}\"]", IsPresenceChannel(channelToBeRemoved) ? "Presence " : "", channelToBeRemoved.Replace("-pnpres", ""));
                         result = jsonLibrary.DeserializeToListOfObject(jsonString);
                         result.Add(channelToBeRemoved.Replace("-pnpres", ""));
                         LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
@@ -389,7 +389,7 @@ namespace PubnubApi.EndPoint
                     {
                         string message = "Unsubscribe Error. Please retry the channel unsubscribe operation.";
 
-                        PubnubErrorCode errorType = (IsPresenceChannel(channelToBeRemoved)) ? PubnubErrorCode.PresenceUnsubscribeFailed : PubnubErrorCode.UnsubscribeFailed;
+                        PubnubErrorCode errorType = IsPresenceChannel(channelToBeRemoved) ? PubnubErrorCode.PresenceUnsubscribeFailed : PubnubErrorCode.UnsubscribeFailed;
 
                         LoggingMethod.WriteToLog(string.Format("DateTime {0}, channel={1} unsubscribe error", DateTime.Now.ToString(), channelToBeRemoved), LoggingMethod.LevelInfo);
 
@@ -406,7 +406,7 @@ namespace PubnubApi.EndPoint
                     if (unsubscribeStatus)
                     {
                         List<object> result = new List<object>();
-                        string jsonString = string.Format("[1, \"ChannelGroup {0}Unsubscribed from {1}\"]", (IsPresenceChannel(channelGroupToBeRemoved)) ? "Presence " : "", channelGroupToBeRemoved.Replace("-pnpres", ""));
+                        string jsonString = string.Format("[1, \"ChannelGroup {0}Unsubscribed from {1}\"]", IsPresenceChannel(channelGroupToBeRemoved) ? "Presence " : "", channelGroupToBeRemoved.Replace("-pnpres", ""));
                         result = jsonLibrary.DeserializeToListOfObject(jsonString);
                         result.Add(channelGroupToBeRemoved.Replace("-pnpres", ""));
                         result.Add("");
@@ -449,7 +449,7 @@ namespace PubnubApi.EndPoint
                     {
                         string message = "Unsubscribe Error. Please retry the channelgroup unsubscribe operation.";
 
-                        PubnubErrorCode errorType = (IsPresenceChannel(channelGroupToBeRemoved)) ? PubnubErrorCode.PresenceUnsubscribeFailed : PubnubErrorCode.UnsubscribeFailed;
+                        PubnubErrorCode errorType = IsPresenceChannel(channelGroupToBeRemoved) ? PubnubErrorCode.PresenceUnsubscribeFailed : PubnubErrorCode.UnsubscribeFailed;
 
                         LoggingMethod.WriteToLog(string.Format("DateTime {0}, channelgroup={1} unsubscribe error", DateTime.Now.ToString(), channelGroupToBeRemoved), LoggingMethod.LevelInfo);
 
@@ -556,9 +556,9 @@ namespace PubnubApi.EndPoint
                         }
                         if (MultiChannelSubscribe.ContainsKey(channelName))
                         {
-                            string message = string.Format("{0}Already subscribed", (base.IsPresenceChannel(channelName)) ? "Presence " : "");
+                            string message = string.Format("{0}Already subscribed", base.IsPresenceChannel(channelName) ? "Presence " : "");
 
-                            PubnubErrorCode errorType = (base.IsPresenceChannel(channelName)) ? PubnubErrorCode.AlreadyPresenceSubscribed : PubnubErrorCode.AlreadySubscribed;
+                            PubnubErrorCode errorType = base.IsPresenceChannel(channelName) ? PubnubErrorCode.AlreadyPresenceSubscribed : PubnubErrorCode.AlreadySubscribed;
 
                             new PNCallbackService(config, jsonLibrary).CallErrorCallback(PubnubErrorSeverity.Info, PubnubMessageSource.Client,
                                 channelName.Replace("-pnpres", ""), "", errorCallback, message, errorType, null, null);
@@ -594,9 +594,9 @@ namespace PubnubApi.EndPoint
                         }
                         if (MultiChannelGroupSubscribe.ContainsKey(channelGroupName))
                         {
-                            string message = string.Format("{0}Already subscribed", (base.IsPresenceChannel(channelGroupName)) ? "Presence " : "");
+                            string message = string.Format("{0}Already subscribed", base.IsPresenceChannel(channelGroupName) ? "Presence " : "");
 
-                            PubnubErrorCode errorType = (base.IsPresenceChannel(channelGroupName)) ? PubnubErrorCode.AlreadyPresenceSubscribed : PubnubErrorCode.AlreadySubscribed;
+                            PubnubErrorCode errorType = base.IsPresenceChannel(channelGroupName) ? PubnubErrorCode.AlreadyPresenceSubscribed : PubnubErrorCode.AlreadySubscribed;
 
                             new PNCallbackService(config, jsonLibrary).CallErrorCallback(PubnubErrorSeverity.Info, PubnubMessageSource.Client,
                                 "", channelGroupName.Replace("-pnpres", ""), errorCallback, message, errorType, null, null);
@@ -999,7 +999,7 @@ namespace PubnubApi.EndPoint
         {
             if (overrideTcpKeepAlive)
             {
-                LoggingMethod.WriteToLog(string.Format("DateTime {0}, Subscribe - No internet connection for channel={1} and channelgroup={2}", DateTime.Now.ToString(), string.Join(",", channels), ((channelGroups != null) ? string.Join(",", channelGroups) : "")), LoggingMethod.LevelInfo);
+                LoggingMethod.WriteToLog(string.Format("DateTime {0}, Subscribe - No internet connection for channel={1} and channelgroup={2}", DateTime.Now.ToString(), string.Join(",", channels), channelGroups != null ? string.Join(",", channelGroups) : ""), LoggingMethod.LevelInfo);
                 ReconnectState<T> netState = new ReconnectState<T>();
                 netState.Channels = channels;
                 netState.ChannelGroups = channelGroups;

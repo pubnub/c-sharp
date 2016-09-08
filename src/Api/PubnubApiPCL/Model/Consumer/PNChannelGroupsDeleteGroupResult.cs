@@ -1,7 +1,7 @@
 ﻿
 namespace PubnubApi
 {
-    public class RemoveChannelGroupAck
+    public class PNChannelGroupsDeleteGroupResult
     {
         //public class Data
         //{
@@ -14,7 +14,7 @@ namespace PubnubApi
         //    public string ChannelGroupName;
         //}
 
-        public RemoveChannelGroupAck()
+        public PNChannelGroupsDeleteGroupResult()
         {
             this.StatusMessage = "";
             this.Service = "";

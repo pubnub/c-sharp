@@ -6,10 +6,11 @@ using PubnubApi.Interface;
 
 namespace PubnubApi.EndPoint
 {
-    internal class WhereNowOperation : PubnubCoreBase
+    public class WhereNowOperation : PubnubCoreBase
     {
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
+        private string whereNowUUID = "";
 
         public WhereNowOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
         {
@@ -28,7 +29,18 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        internal void WhereNow(string uuid, Action<WhereNowAck> userCallback, Action<PubnubClientError> errorCallback)
+        public WhereNowOperation Uuid(string uuid)
+        {
+            this.whereNowUUID = uuid;
+            return this;
+        }
+
+        public void Async(PNCallback<PNWhereNowResult> callback)
+        {
+            WhereNow(this.whereNowUUID, callback.Result, callback.Error);
+        }
+
+        internal void WhereNow(string uuid, Action<PNWhereNowResult> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (userCallback == null)
             {
@@ -51,17 +63,17 @@ namespace PubnubApi.EndPoint
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
             Uri request = urlBuilder.BuildWhereNowRequest(uuid);
 
-            RequestState<WhereNowAck> requestState = new RequestState<WhereNowAck>();
+            RequestState<PNWhereNowResult> requestState = new RequestState<PNWhereNowResult>();
             requestState.Channels = new string[] { uuid };
             requestState.ResponseType = ResponseType.Where_Now;
             requestState.NonSubscribeRegularCallback = userCallback;
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            string json = UrlProcessRequest<WhereNowAck>(request, requestState, false);
+            string json = UrlProcessRequest<PNWhereNowResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<WhereNowAck>(requestState, json);
+                List<object> result = ProcessJsonResponse<PNWhereNowResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
             }
         }

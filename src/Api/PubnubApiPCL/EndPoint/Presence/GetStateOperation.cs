@@ -6,10 +6,13 @@ using PubnubApi.Interface;
 
 namespace PubnubApi.EndPoint
 {
-    internal class GetStateOperation : PubnubCoreBase
+    public class GetStateOperation : PubnubCoreBase
     {
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
+        private string[] channelNames = null;
+        private string[] channelGroupNames = null;
+        private string channelUUID = "";
 
         public GetStateOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
         {
@@ -28,7 +31,30 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        internal void GetUserState(string[] channels, string[] channelGroups, string uuid, Action<GetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
+        public GetStateOperation Channels(string[] channels)
+        {
+            this.channelNames = channels;
+            return this;
+        }
+
+        public GetStateOperation ChannelGroups(string[] channelGroups)
+        {
+            this.channelGroupNames = channelGroups;
+            return this;
+        }
+
+        public GetStateOperation Uuid(string uuid)
+        {
+            this.channelUUID = uuid;
+            return this;
+        }
+
+        public void Async(PNCallback<PNGetStateResult> callback)
+        {
+            GetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, callback.Result, callback.Error);
+        }
+
+        internal void GetUserState(string[] channels, string[] channelGroups, string uuid, Action<PNGetStateResult> userCallback, Action<PubnubClientError> errorCallback)
         {
             if ((channels == null && channelGroups == null)
                            || (channels != null && channelGroups != null && channels.Length == 0 && channelGroups.Length == 0))
@@ -48,7 +74,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing errorCallback");
             }
 
-            if (string.IsNullOrEmpty(uuid))
+            if (string.IsNullOrEmpty(uuid) || uuid.Trim().Length == 0)
             {
                 uuid = config.Uuid;
             }
@@ -59,7 +85,7 @@ namespace PubnubApi.EndPoint
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
             Uri request = urlBuilder.BuildGetUserStateRequest(channelsCommaDelimited, channelGroupsCommaDelimited, uuid);
 
-            RequestState<GetUserStateAck> requestState = new RequestState<GetUserStateAck>();
+            RequestState<PNGetStateResult> requestState = new RequestState<PNGetStateResult>();
             requestState.Channels = channels;
             requestState.ChannelGroups = channelGroups;
             requestState.ResponseType = ResponseType.GetUserState;
@@ -67,10 +93,10 @@ namespace PubnubApi.EndPoint
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            string json = UrlProcessRequest<GetUserStateAck>(request, requestState, false);
+            string json = UrlProcessRequest<PNGetStateResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<GetUserStateAck>(requestState, json);
+                List<object> result = ProcessJsonResponse<PNGetStateResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
             }
         }

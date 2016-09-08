@@ -44,7 +44,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel,hello_my_channel1,hello_my_channel2";
 
-            pubnub.GrantAccess(new string[] { channel }, null, true, true, false, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            pubnub.Grant().Channels(new string[] { channel }).Read(true).Write(true).Manage(false).TTL(20).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = ThenSubscribeInitializeShouldReturnGrantMessage, Error = DummyErrorCallback });
             Thread.Sleep(1000);
 
             mreGrant.WaitOne();
@@ -84,7 +84,7 @@ namespace PubNubMessaging.Tests
 
             mrePublish = new ManualResetEvent(false);
             publishedMessage = "Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage";
-            pubnub.Publish(channel, publishedMessage, dummyPublishCallback, DummyErrorCallback);
+            pubnub.Publish().Channel(channel).Message(publishedMessage).Async(new PNCallback<PNPublishResult>() { Result = dummyPublishCallback, Error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -187,7 +187,7 @@ namespace PubNubMessaging.Tests
 
             mrePublish = new ManualResetEvent(false);
             publishedMessage = "Text with 😜 emoji 🎉.";
-            pubnub.Publish(channel, publishedMessage, dummyPublishCallback, DummyErrorCallback);
+            pubnub.Publish().Channel(channel).Message(publishedMessage).Async(new PNCallback<PNPublishResult>() { Result = dummyPublishCallback, Error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -245,7 +245,7 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnEmojiMessageSecretSSL Failed");
         }
         
-        void ThenSubscribeInitializeShouldReturnGrantMessage(GrantAck receivedMessage)
+        void ThenSubscribeInitializeShouldReturnGrantMessage(PNAccessManagerGrantResult receivedMessage)
         {
             try
             {
@@ -280,7 +280,7 @@ namespace PubNubMessaging.Tests
             mreSubscribe.Set();
         }
 
-        private void dummyPublishCallback(PublishAck result)
+        private void dummyPublishCallback(PNPublishResult result)
         {
             //Console.WriteLine("dummyPublishCallback -> result = " + result);
             if (result != null)

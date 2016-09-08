@@ -4,10 +4,13 @@ using System.Collections.Generic;
 
 namespace PubnubApi.EndPoint
 {
-    internal class AddChannelsToChannelGroupOperation : PubnubCoreBase
+    public class AddChannelsToChannelGroupOperation : PubnubCoreBase
     {
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
+
+        private string channelGroupName = "";
+        private string[] channelNames = null;
 
         public AddChannelsToChannelGroupOperation(PNConfiguration pubnubConfig) : base(pubnubConfig)
         {
@@ -26,7 +29,24 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        internal void AddChannelsToChannelGroup(string[] channels, string nameSpace, string groupName, Action<AddChannelToChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
+        public AddChannelsToChannelGroupOperation ChannelGroup(string channelGroup)
+        {
+            this.channelGroupName = channelGroup;
+            return this;
+        }
+
+        public AddChannelsToChannelGroupOperation Channels(string[] channels)
+        {
+            this.channelNames = channels;
+            return this;
+        }
+
+        public void Async(PNCallback<PNChannelGroupsAddChannelResult> callback)
+        {
+            AddChannelsToChannelGroup(this.channelNames, "", this.channelGroupName, callback.Result, callback.Error);
+        }
+
+        internal void AddChannelsToChannelGroup(string[] channels, string nameSpace, string groupName, Action<PNChannelGroupsAddChannelResult> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (channels == null || channels.Length == 0)
             {
@@ -58,7 +78,7 @@ namespace PubnubApi.EndPoint
 
             Uri request = urlBuilder.BuildAddChannelsToChannelGroupRequest(channelsCommaDelimited, nameSpace, groupName);
 
-            RequestState<AddChannelToChannelGroupAck> requestState = new RequestState<AddChannelToChannelGroupAck>();
+            RequestState<PNChannelGroupsAddChannelResult> requestState = new RequestState<PNChannelGroupsAddChannelResult>();
             requestState.ResponseType = ResponseType.ChannelGroupAdd;
             requestState.Channels = new string[] { };
             requestState.ChannelGroups = new string[] { string.Format("{0}:{1}", nameSpace, groupName) };
@@ -66,10 +86,10 @@ namespace PubnubApi.EndPoint
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            string json = UrlProcessRequest<AddChannelToChannelGroupAck>(request, requestState, false);
+            string json = UrlProcessRequest<PNChannelGroupsAddChannelResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<AddChannelToChannelGroupAck>(requestState, json);
+                List<object> result = ProcessJsonResponse<PNChannelGroupsAddChannelResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
             }
         }

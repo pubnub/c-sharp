@@ -55,7 +55,7 @@ namespace PubNubMessaging.Tests
             string channelList = "hello_my_channel,hello_my_channel1,hello_my_channel2";
             string[] channel = channelList.Split(',');
 
-            pubnub.GrantAccess(channel, null, true, true, false, 20, ThenSubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            pubnub.Grant().Channels(channel).Read(true).Write(true).Manage(false).TTL(20).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = ThenSubscribeInitializeShouldReturnGrantMessage, Error = DummyErrorCallback });
             Thread.Sleep(1000);
 
             mreGrant.WaitOne();
@@ -95,7 +95,7 @@ namespace PubNubMessaging.Tests
 
             mrePublish = new ManualResetEvent(false);
             publishedMessage = new CustomClass();
-            pubnub.Publish(channel, publishedMessage, dummyPublishCallback, DummyErrorCallback);
+            pubnub.Publish().Channel(channel).Message(publishedMessage).Async(new PNCallback<PNPublishResult>() { Result = dummyPublishCallback, Error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
@@ -312,7 +312,7 @@ namespace PubNubMessaging.Tests
                 for (int index = 0; index < 10; index++)
                 {
                     //Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Publishing " + index.ToString());
-                    pubnub.Publish(channel, index.ToString(), dummyPublishCallback, DummyErrorCallback);
+                    pubnub.Publish().Channel(channel).Message(index.ToString()).Async(new PNCallback<PNPublishResult>() { Result = dummyPublishCallback, Error = DummyErrorCallback });
                     //Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Publishing..waiting for confirmation " + index.ToString());
                     //mePublish.WaitOne(10*1000);
                 }
@@ -326,7 +326,7 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedManyMessages, "WhenSubscribedToAChannel --> ThenSubscriberShouldBeAbleToReceiveManyMessages Failed");
         }
 
-        void ThenSubscribeInitializeShouldReturnGrantMessage(GrantAck receivedMessage)
+        void ThenSubscribeInitializeShouldReturnGrantMessage(PNAccessManagerGrantResult receivedMessage)
         {
             try
             {
@@ -448,7 +448,7 @@ namespace PubNubMessaging.Tests
             mreSubscribeConnect.Set();
         }
 
-        private void dummyPublishCallback(PublishAck result)
+        private void dummyPublishCallback(PNPublishResult result)
         {
             //Console.WriteLine("dummyPublishCallback -> result = " + result);
             if (result != null)

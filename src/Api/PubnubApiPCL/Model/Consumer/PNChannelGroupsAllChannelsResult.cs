@@ -1,7 +1,7 @@
 ﻿
 namespace PubnubApi
 {
-    public class GetChannelGroupChannelsAck
+    public class PNChannelGroupsAllChannelsResult
     {
         public class Data
         {
@@ -10,11 +10,11 @@ namespace PubnubApi
                 this.ChannelGroupName = "";
             }
 
-            public string[] ChannelName;
-            public string ChannelGroupName;
+            public string[] ChannelName { get; set; }
+            public string ChannelGroupName { get; set; }
         }
 
-        public GetChannelGroupChannelsAck()
+        public PNChannelGroupsAllChannelsResult()
         {
             this.Service = "";
         }

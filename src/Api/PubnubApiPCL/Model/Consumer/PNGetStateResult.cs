@@ -2,9 +2,9 @@
 
 namespace PubnubApi
 {
-    public class GetUserStateAck
+    public class PNGetStateResult
     {
-        public GetUserStateAck()
+        public PNGetStateResult()
         {
             this.StatusMessage = "";
             this.Service = "";

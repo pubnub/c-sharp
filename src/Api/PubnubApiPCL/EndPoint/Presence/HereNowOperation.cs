@@ -6,10 +6,15 @@ using PubnubApi.Interface;
 
 namespace PubnubApi.EndPoint
 {
-    internal class HereNowOperation : PubnubCoreBase
+    public class HereNowOperation : PubnubCoreBase
     {
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
+
+        private string[] channelNames = null;
+        private string[] channelGroupNames = null;
+        private bool includeUserState = false;
+        private bool includeChannelUUIDs = true;
 
         public HereNowOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
         {
@@ -28,13 +33,42 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        internal void HereNow(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, Action<HereNowAck> userCallback, Action<PubnubClientError> errorCallback)
+        public HereNowOperation Channels(string[] channels)
         {
-            if ((channels == null && channelGroups == null)
-                            || (channels != null && channelGroups != null && channels.Length == 0 && channelGroups.Length == 0))
-            {
-                throw new ArgumentException("Missing Channel/ChannelGroup");
-            }
+            this.channelNames = channels;
+            return this;
+        }
+
+        public HereNowOperation ChannelGroups(string[] channelGroups)
+        {
+            this.channelGroupNames = channelGroups;
+            return this;
+        }
+
+        public HereNowOperation IncludeState(bool includeState)
+        {
+            this.includeUserState = includeState;
+            return this;
+        }
+
+        public HereNowOperation IncludeUUIDs(bool includeUUIDs)
+        {
+            this.includeChannelUUIDs = includeUUIDs;
+            return this;
+        }
+
+        public void Async(PNCallback<PNHereNowResult> callback)
+        {
+            HereNow(this.channelNames, this.channelGroupNames, this.includeChannelUUIDs, this.includeUserState, callback.Result, callback.Error);
+        }
+
+        internal void HereNow(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, Action<PNHereNowResult> userCallback, Action<PubnubClientError> errorCallback)
+        {
+            //if ((channels == null && channelGroups == null)
+            //                || (channels != null && channelGroups != null && channels.Length == 0 && channelGroups.Length == 0))
+            //{
+            //    throw new ArgumentException("Missing Channel/ChannelGroup");
+            //}
 
             if (userCallback == null)
             {
@@ -49,7 +83,7 @@ namespace PubnubApi.EndPoint
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
             Uri request = urlBuilder.BuildHereNowRequest(channels, channelGroups, showUUIDList, includeUserState);
 
-            RequestState<HereNowAck> requestState = new RequestState<HereNowAck>();
+            RequestState<PNHereNowResult> requestState = new RequestState<PNHereNowResult>();
             requestState.Channels = channels;
             requestState.ChannelGroups = channelGroups;
             requestState.ResponseType = ResponseType.Here_Now;
@@ -57,10 +91,10 @@ namespace PubnubApi.EndPoint
             requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
 
-            string json = UrlProcessRequest<HereNowAck>(request, requestState, false);
+            string json = UrlProcessRequest<PNHereNowResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<HereNowAck>(requestState, json);
+                List<object> result = ProcessJsonResponse<PNHereNowResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
             }
         }

@@ -108,3 +108,5 @@ src/Examples/PubnubApiPCL.XamariniMacExample/obj/*
 .DS_Store
 *.cache
 *.suo
+src/UnitTests/MockServer/bin/*
+src/UnitTests/MockServer/obj/*

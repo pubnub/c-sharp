@@ -4,20 +4,20 @@ namespace PubnubApi
 {
     public sealed class RequestState<T>
     {
-        public Action<T> NonSubscribeRegularCallback;
-        public Action<Message<T>> SubscribeRegularCallback;
-        public Action<PresenceAck> PresenceRegularCallback;
-        public Action<ConnectOrDisconnectAck> ConnectCallback;
-        public Action<PresenceAck> WildcardPresenceCallback;
-        public Action<PubnubClientError> ErrorCallback;
-        public PubnubWebRequest Request;
-        public PubnubWebResponse Response;
-        public ResponseType ResponseType;
-        public string[] Channels;
-        public string[] ChannelGroups;
-        public bool Timeout;
-        public bool Reconnect;
-        public long Timetoken;
+        public Action<T> NonSubscribeRegularCallback { get; set; }
+        public Action<Message<T>> SubscribeRegularCallback { get; set; }
+        public Action<PresenceAck> PresenceRegularCallback { get; set; }
+        public Action<ConnectOrDisconnectAck> ConnectCallback { get; set; }
+        public Action<PresenceAck> WildcardPresenceCallback { get; set; }
+        public Action<PubnubClientError> ErrorCallback { get; set; }
+        public PubnubWebRequest Request { get; set; }
+        public PubnubWebResponse Response { get; set; }
+        public ResponseType ResponseType { get; set; }
+        public string[] Channels { get; set; }
+        public string[] ChannelGroups { get; set; }
+        public bool Timeout { get; set; }
+        public bool Reconnect { get; set; }
+        public long Timetoken { get; set; }
 
         public RequestState()
         {
