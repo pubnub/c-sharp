@@ -2,7 +2,6 @@
 using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
-using HttpMock;
 using System.Collections.Generic;
 using MockServer;
 
@@ -95,14 +94,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
 
@@ -153,14 +145,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             string expected = "";
 
@@ -194,14 +179,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             string expected = "[1,\"Sent\",\"14715278266153304\"]";
 
@@ -266,14 +244,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             string expected = "[1,\"Sent\",\"14715286132003364\"]";
 
@@ -341,14 +312,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             string expected = "[1,\"Sent\",\"14715322883933786\"]";
 
@@ -421,15 +385,7 @@ namespace PubNubMessaging.Tests
                 Secure = true
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-                config.Secure = true;
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             string expected = "[1,\"Sent\",\"14722490854460542\"]";
 
@@ -498,14 +454,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid3",
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             string expected = "[1,\"Sent\",\"14715426119520817\"]";
 
@@ -572,14 +521,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             string url = String.Format("/publish/{0}/{1}/{2}/{3}/0/{4}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "e462eda69685ce9ddfd5be20c7e13cab", channel, "%22f42pIQcWZ9zbTbH8cyLwB%2FtdvRxjFLOYcBNMVKeHS54%3D%22");
 
@@ -648,14 +590,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid4",
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             string expected = "[1, \"Sent\", \"14715459088445832\"]";
 
@@ -724,14 +659,7 @@ namespace PubNubMessaging.Tests
                 EnableJsonEncodingForPublish = false
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             string expected = "[1,\"Sent\",\"14721410674316172\"]";
 
@@ -798,14 +726,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             string expected = "[0,\"Message Too Large\",\"14714489901553535\"]";
 
@@ -836,14 +757,7 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             Assert.IsNotNull(pubnub.GenerateGuid());
             pubnub = null;
@@ -859,14 +773,7 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
@@ -887,14 +794,7 @@ namespace PubNubMessaging.Tests
                 SecretKey = "key"
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
@@ -931,14 +831,7 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             string expected = "[1,\"Sent\",\"14722484585147754\"]";
 

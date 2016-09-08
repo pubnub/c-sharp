@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
-using HttpMock;
 using MockServer;
 
 namespace PubNubMessaging.Tests
@@ -36,7 +35,6 @@ namespace PubNubMessaging.Tests
             server.Stop();
         }
 
-
         [Test]
         public void AtUserLevel()
         {
@@ -59,14 +57,7 @@ namespace PubNubMessaging.Tests
                     Uuid = "mytestuuid",
                 };
 
-                if (PubnubCommon.EnableStubTest)
-                {
-                    pubnub = this.createPubNubInstance(config);
-                }
-                else
-                {
-                    pubnub = new Pubnub(config);
-                }
+                pubnub = this.createPubNubInstance(config);
 
                 string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"ttl\":20,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
 
@@ -113,6 +104,8 @@ namespace PubNubMessaging.Tests
                     SecretKey = PubnubCommon.SecretKey,
                     Uuid = "mytestuuid",
                 };
+
+                pubnub = this.createPubNubInstance(config);
 
                 string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"ttl\":20,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
 

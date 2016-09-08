@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
-using HttpMock;
 using System.Collections.Generic;
 using MockServer;
 using System;

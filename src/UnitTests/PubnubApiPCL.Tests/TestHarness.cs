@@ -1,5 +1,4 @@
 ﻿using PubnubApi;
-using System;
 
 namespace PubNubMessaging.Tests
 {
@@ -7,20 +6,21 @@ namespace PubNubMessaging.Tests
     {
         protected Pubnub createPubNubInstance(PNConfiguration pnConfiguration)
         {
-            pnConfiguration.Origin = PubnubCommon.StubOrign;
-            return new MockedTimePubNub(pnConfiguration);
-        }
-
-        class MockedTimePubNub : Pubnub
-        {
-            public MockedTimePubNub(PNConfiguration initialConfig) : base(initialConfig)
+            Pubnub pubnub = null;
+            if (PubnubCommon.EnableStubTest)
             {
+                #pragma warning disable CS0162 // Unreachable code detected
+                pnConfiguration.Origin = PubnubCommon.StubOrign;
+                #pragma warning restore CS0162 // Unreachable code detected
+                IPubnubUnitTest unitTest = new PubnubUnitTest();
+                pubnub = new Pubnub(pnConfiguration);
+                pubnub.PubnubUnitTest = unitTest;
             }
-
-            //override public DateTime GetTimeStamp()
-            //{
-            //    return new DateTime(2013, 01, 01);
-            //}
+            else
+            {
+                pubnub = new Pubnub(pnConfiguration);
+            }
+            return pubnub;
         }
     }
 }
