@@ -1,96 +1,117 @@
-name: c-sharp
-version: 3.7.6
-schema: 1
-scm: github.com/pubnub/c-sharp
-changelog:
-  - version: v3.7.6
-    date: 
-    changes:
-      - type: feature
-        text: Implemented Channel Groups for mono clients (mono-for-mac, monotouch, mono-for-android, mono-for-linux).
-      - type: improvement
-        text: Refactored unit tests for mono clients to support offline testing in addition to online.
-      - type: improvement
-        text: Migrated monotouch from Xamarin.iOS Classic to Xamarin.iOS Unified API.
-      - type: improvement
-        text: Improved unit tests to avoid unwanted web requests.
-      - type: improvement
-        text: Improved Pubnub Core file to cleanup callback variable when unsubscribed channel.
-      - type: improvement
-        text: Used target android API 22 for mono-for-android client to test latest API.
-  - version: v3.7.0
-    date: 
-    changes:
-      - type: feature
-        text: Added pnsdk and UUID params.
-      - type: feature
-        text: Provided option to store published message or not in history.
-      - type: feature
-        text: Implemented Push notification feature supporting MPNS for windows phone 8 client..
-      - type: feature
-        text: Implemented Channel Groups.
-      - type: bug
-        text: Fixed issue where null keys were not handled properly.
-      - type: improvement
-        text: Improved unit tests for Mono clients on friendly messages.        
-      - type: bug
-        text: Fixed corner case issue where Xamarin.iOS UI could hang on complex object publish.        
-  - version: v3.6.0
-    date: 
-    changes:
-      - type: feature
-        text: Full support for new Presence features! Heartbeat, State, Where Now, Global Here Now.
-      - type: feature
-        text: Windows Phone 8.1, Windows 8, and 8.1 Store Client Support (Surface).
-      - type: bug
-        text: Fixed potential for memory leak during device sleep.
-      - type: improvement
-        text: Use explicitly provided PAM keys when performing PAM calls, not consumer key.
-      - type: bug
-        text: Fixed an issue of delayed reconnect on Mono Touch.
-      - type: bug
-        text: Only perform presence heartbeats when user sets heartbeat timeout.
-      - type: improvement
-        text: Clarify PAM TTLs are in minutes, not seconds, in variable names and comments.
-      - type: bug
-        text: Fixed subscribe callback issue on JSONFX.
-      - type: bug
-        text: Better handling of non-200 responses.
-      - type: improvement
-        text: Added a new demo - ePoll.
-features:
-  access:
+--- 
+changelog: 
+  - 
+    changes: 
+      - 
+        text: "Implemented Channel Groups for mono clients (mono-for-mac, monotouch, mono-for-android, mono-for-linux)."
+        type: feature
+      - 
+        text: "Refactored unit tests for mono clients to support offline testing in addition to online."
+        type: improvement
+      - 
+        text: "Migrated monotouch from Xamarin.iOS Classic to Xamarin.iOS Unified API."
+        type: improvement
+      - 
+        text: "Improved unit tests to avoid unwanted web requests."
+        type: improvement
+      - 
+        text: "Improved Pubnub Core file to cleanup callback variable when unsubscribed channel."
+        type: improvement
+      - 
+        text: "Used target android API 22 for mono-for-android client to test latest API."
+        type: improvement
+    date: ~
+    version: v3.7.6
+  - 
+    changes: 
+      - 
+        text: "Added pnsdk and UUID params."
+        type: feature
+      - 
+        text: "Provided option to store published message or not in history."
+        type: feature
+      - 
+        text: "Implemented Push notification feature supporting MPNS for windows phone 8 client.."
+        type: feature
+      - 
+        text: "Implemented Channel Groups."
+        type: feature
+      - 
+        text: "Fixed issue where null keys were not handled properly."
+        type: bug
+      - 
+        text: "Improved unit tests for Mono clients on friendly messages."
+        type: improvement
+      - 
+        text: "Fixed corner case issue where Xamarin.iOS UI could hang on complex object publish."
+        type: bug
+    date: ~
+    version: v3.7.0
+  - 
+    changes: 
+      - 
+        text: "Full support for new Presence features! Heartbeat, State, Where Now, Global Here Now."
+        type: feature
+      - 
+        text: "Windows Phone 8.1, Windows 8, and 8.1 Store Client Support (Surface)."
+        type: feature
+      - 
+        text: "Fixed potential for memory leak during device sleep."
+        type: bug
+      - 
+        text: "Use explicitly provided PAM keys when performing PAM calls, not consumer key."
+        type: improvement
+      - 
+        text: "Fixed an issue of delayed reconnect on Mono Touch."
+        type: bug
+      - 
+        text: "Only perform presence heartbeats when user sets heartbeat timeout."
+        type: bug
+      - 
+        text: "Clarify PAM TTLs are in minutes, not seconds, in variable names and comments."
+        type: improvement
+      - 
+        text: "Fixed subscribe callback issue on JSONFX."
+        type: bug
+      - 
+        text: "Better handling of non-200 responses."
+        type: bug
+      - 
+        text: "Added a new demo - ePoll."
+        type: improvement
+    date: ~
+    version: v3.6.0
+features: 
+  access: 
     - ACCESS-GRANT
-  channel-groups:
+  channel-groups: 
     - CHANNEL-GROUPS-ADD-CHANNELS
     - CHANNEL-GROUPS-REMOVE-CHANNELS
     - CHANNEL-GROUPS-LIST-GROUPS
     - CHANNEL-GROUPS-LIST-CHANNELS-IN-GROUP
-  push:
-    - PUSH-ADD-DEVICE-TO-CHANNELS
-    - PUSH-REMOVE-DEVICE-FROM-CHANNELS
-    - PUSH-LIST-CHANNELS-FROM-DEVICE
-    - PUSH-REMOVE-DEVICE
-  presence:
+  presence: 
     - PRESENCE-HERE-NOW
     - PRESENCE-WHERE-NOW
     - PRESENCE-SET-STATE
     - PRESENCE-GET-STATE
     - PRESENCE-HEARTBEAT
-  publish:
+  publish: 
     - PUBLISH-STORE-FLAG
     - PUBLISH-RAW-JSON
     - PUBLISH-WITH-METADATA
     - PUBLISH-GET
     - PUBLISH-ASYNC
-  storage:
+  push: 
+    - PUSH-ADD-DEVICE-TO-CHANNELS
+    - PUSH-REMOVE-DEVICE-FROM-CHANNELS
+    - PUSH-LIST-CHANNELS-FROM-DEVICE
+    - PUSH-REMOVE-DEVICE
+  storage: 
     - STORAGE-REVERSE
     - STORAGE-INCLUDE-TIMETOKEN
     - STORAGE-START-END
     - STORAGE-COUNT
-  time:
-    - TIME-TIME
-  subscribe:
+  subscribe: 
     - SUBSCRIBE-CHANNELS
     - SUBSCRIBE-CHANNEL-GROUPS
     - SUBSCRIBE-PRESENCE-CHANNELS
@@ -98,4 +119,9 @@ features:
     - SUBSCRIBE-WITH-TIMETOKEN
     - SUBSCRIBE-WILDCARD
     - SUBSCRIBE-FILTER-EXPRESSION
-  
+  time: 
+    - TIME-TIME
+name: c-sharp
+schema: 1
+scm: github.com/pubnub/c-sharp
+version: "3.7.6"
