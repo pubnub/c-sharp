@@ -59,7 +59,7 @@ changelog:
       - type: improvement
         text: Added a new demo - ePoll.
 features:
-access:
+  access:
     - ACCESS-GRANT
   channel-groups:
     - CHANNEL-GROUPS-ADD-CHANNELS
