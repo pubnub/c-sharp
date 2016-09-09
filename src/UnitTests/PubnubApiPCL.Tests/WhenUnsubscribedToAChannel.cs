@@ -13,7 +13,7 @@ using PubnubApi;
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
-    public class WhenUnsubscribedToAChannel
+    public class WhenUnsubscribedToAChannel : TestHarness
     {
         ManualResetEvent meNotSubscribed = new ManualResetEvent(false);
         ManualResetEvent meChannelSubscribed = new ManualResetEvent(false);
@@ -34,12 +34,15 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "GrantRequestUnitTest";
-            unitTest.TestCaseName = "Init";
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
 
@@ -58,13 +61,15 @@ namespace PubNubMessaging.Tests
         public void ThenNoExistChannelShouldReturnNotSubscribed()
         {
             receivedNotSubscribedMessage = false;
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenUnsubscribedToAChannel";
-            unitTest.TestCaseName = "ThenNoExistChannelShouldReturnNotSubscribed";
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
 
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
 
@@ -85,13 +90,14 @@ namespace PubNubMessaging.Tests
             receivedChannelConnectedMessage = false;
             receivedUnsubscribedMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenUnsubscribedToAChannel";
-            unitTest.TestCaseName = "ThenShouldReturnUnsubscribedMessage";
-
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
 

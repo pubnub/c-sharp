@@ -11,7 +11,7 @@ using PubnubApi;
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
-    public class WhenSubscribedToAChannel
+    public class WhenSubscribedToAChannel : TestHarness
     {
         ManualResetEvent mreSubscribeConnect = new ManualResetEvent(false);
         ManualResetEvent mrePublish = new ManualResetEvent(false);
@@ -45,12 +45,15 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "GrantRequestUnitTest";
-            unitTest.TestCaseName = "Init";
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
 
             string channelList = "hello_my_channel,hello_my_channel1,hello_my_channel2";
             string[] channel = channelList.Split(',');
@@ -77,13 +80,16 @@ namespace PubNubMessaging.Tests
         private void CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
         {
             receivedMessage = false;
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, secretKey, cipherKey, ssl);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = secretKey,
+                CiperKey = cipherKey,
+                Uuid = "mytestuuid",
+            };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenSubscribedToAChannel";
-            unitTest.TestCaseName = (string.IsNullOrEmpty(cipherKey)) ? "ThenSubscribeShouldReturnReceivedComplexMessage" : "ThenSubscribeShouldReturnReceivedCipherComplexMessage";
-
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
 
@@ -96,7 +102,7 @@ namespace PubNubMessaging.Tests
             mrePublish = new ManualResetEvent(false);
             publishedMessage = new CustomClass();
             pubnub.Publish().Channel(channel).Message(publishedMessage).Async(new PNCallback<PNPublishResult>() { Result = dummyPublishCallback, Error = DummyErrorCallback });
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
             if (isPublished)
@@ -173,20 +179,20 @@ namespace PubNubMessaging.Tests
         public void ThenSubscribeShouldReturnConnectStatus()
         {
             receivedConnectMessage = false;
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenSubscribedToAChannel";
-            unitTest.TestCaseName = "ThenSubscribeShouldReturnConnectStatus";
-
-            pubnub.PubnubUnitTest = unitTest;
-
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
 
             mreSubscribeConnect = new ManualResetEvent(false);
             pubnub.Subscribe<string>(channel, ReceivedMessageCallbackYesConnect, ConnectStatusCallback, ConnectStatusCallback, DummyErrorCallback);
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             mreSubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests(); 
@@ -201,14 +207,17 @@ namespace PubNubMessaging.Tests
         {
             receivedChannel1ConnectMessage = false;
             receivedChannel2ConnectMessage = false;
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenSubscribedToAChannel";
-            unitTest.TestCaseName = "ThenMultiSubscribeShouldReturnConnectStatus";
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
 
-            pubnub.PubnubUnitTest = unitTest;
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            pubnub = this.createPubNubInstance(config);
+
+            manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
             string channel1 = "hello_my_channel1";
             mreChannel1SubscribeConnect = new ManualResetEvent(false);
@@ -232,14 +241,17 @@ namespace PubNubMessaging.Tests
         {
             receivedChannel1ConnectMessage = false;
             receivedChannel2ConnectMessage = false;
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", true);
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenSubscribedToAChannel";
-            unitTest.TestCaseName = "ThenMultiSubscribeShouldReturnConnectStatus";
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
 
-            pubnub.PubnubUnitTest = unitTest;
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            pubnub = this.createPubNubInstance(config);
+
+            manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
             string channel1 = "hello_my_channel1";
             mreChannel1SubscribeConnect = new ManualResetEvent(false);
@@ -262,14 +274,17 @@ namespace PubNubMessaging.Tests
         public void ThenDuplicateChannelShouldReturnAlreadySubscribed()
         {
             receivedAlreadySubscribedMessage = false;
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenSubscribedToAChannel";
-            unitTest.TestCaseName = "ThenDuplicateChannelShouldReturnAlreadySubscribed";
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
 
-            pubnub.PubnubUnitTest = unitTest;
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            pubnub = this.createPubNubInstance(config);
+
+            manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
             string channel = "hello_my_channel";
 
@@ -290,16 +305,18 @@ namespace PubNubMessaging.Tests
         public void ThenSubscriberShouldBeAbleToReceiveManyMessages()
         {
             receivedManyMessages = false;
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenSubscribedToAChannel";
-            unitTest.TestCaseName = "ThenSubscriberShouldBeAbleToReceiveManyMessages";
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
             
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             //Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Iniatiating Subscribe");
             mreSubscribe = new ManualResetEvent(false);
             pubnub.Subscribe<string>(channel, SubscriberDummyMethodForManyMessagesUserCallback, SubscribeDummyMethodForManyMessagesConnectCallback, SubscribeDummyMethodForManyMessagesDisconnectCallback, DummyErrorCallback);
@@ -307,7 +324,7 @@ namespace PubNubMessaging.Tests
             
             mreSubscribe.WaitOne(manualResetEventsWaitTimeout);
 
-            if (!unitTest.EnableStubTest)
+            if (!PubnubCommon.EnableStubTest)
             {
                 for (int index = 0; index < 10; index++)
                 {

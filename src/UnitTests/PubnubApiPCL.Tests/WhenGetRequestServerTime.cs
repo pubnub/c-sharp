@@ -47,14 +47,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             string expected = "[14725889985315301]";
 
@@ -112,14 +105,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             string expected = "[14725889985315301]";
 
@@ -186,14 +172,7 @@ namespace PubNubMessaging.Tests
                 PNProxy = proxy
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             long expected = 14271224264234400;
 
@@ -261,15 +240,13 @@ namespace PubNubMessaging.Tests
                 PNProxy = proxy
             };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
-            unitTest.StubRequestResponse(new Uri(string.Format("http{0}://{1}/time/0?uuid={2}&pnsdk={3}", (config.Secure) ? "s" : "", config.Origin, config.Uuid, config.SdkVersion)).ToString(), "[14271224264234400]");
+            //unitTest.StubRequestResponse(new Uri(string.Format("http{0}://{1}/time/0?uuid={2}&pnsdk={3}", (config.Secure) ? "s" : "", config.Origin, config.Uuid, config.SdkVersion)).ToString(), "[14271224264234400]");
 
             long expected = 14271224264234400;
 
             if (proxyConfigured)
             {
-                pubnub = new Pubnub(config, unitTest);
+                pubnub = this.createPubNubInstance(config);
 
                 pubnub.Time()
                     .Async(
@@ -277,7 +254,7 @@ namespace PubNubMessaging.Tests
                     {
                         Result = (actual) =>
                                     {
-                                        if (unitTest.EnableStubTest)
+                                        if (PubnubCommon.EnableStubTest)
                                         {
                                             if (expected == actual.Timetoken)
                                             {
@@ -328,6 +305,5 @@ namespace PubNubMessaging.Tests
             DateTime actualDate = Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(13406688000000000);
             Assert.True(expectedDate == actualDate);
         }
-
     }
 }

@@ -14,7 +14,7 @@ using PubnubApi;
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
-    public class WhenPushIsRequested
+    public class WhenPushIsRequested : TestHarness
     {
         //string currentUnitTestCase = "";
         bool receivedSuccessMessage = false;
@@ -33,12 +33,15 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "GrantRequestUnitTest";
-            unitTest.TestCaseName = "Init";
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
 
@@ -57,13 +60,15 @@ namespace PubNubMessaging.Tests
         public void ThenPublishMpnsToastShouldReturnSuccess()
         {
             receivedSuccessMessage = false;
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
-            string channel = "hello_my_channel";
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenPushIsRequested";
-            unitTest.TestCaseName = "ThenPublishMpnsToastShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
+            string channel = "hello_my_channel";
 
             mrePublish = new ManualResetEvent(false);
 
@@ -86,13 +91,16 @@ namespace PubNubMessaging.Tests
         public void ThenPublishMpnsFlipTileShouldReturnSuccess()
         {
             receivedSuccessMessage = false;
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
-            string channel = "hello_my_channel";
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenPushIsRequested";
-            unitTest.TestCaseName = "ThenPublishMpnsFlipTileShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
+
+            string channel = "hello_my_channel";
 
             mrePublish = new ManualResetEvent(false);
 
@@ -120,13 +128,17 @@ namespace PubNubMessaging.Tests
         public void ThenPublishMpnsCycleTileShouldReturnSuccess()
         {
             receivedSuccessMessage = false;
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
-            string channel = "hello_my_channel";
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenPushIsRequested";
-            unitTest.TestCaseName = "ThenPublishMpnsCycleTileShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = this.createPubNubInstance(config);
+
+            string channel = "hello_my_channel";
 
             mrePublish = new ManualResetEvent(false);
 
@@ -152,13 +164,17 @@ namespace PubNubMessaging.Tests
         public void ThenPublishMpnsIconicTileShouldReturnSuccess()
         {
             receivedSuccessMessage = false;
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
-            string channel = "hello_my_channel";
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenPushIsRequested";
-            unitTest.TestCaseName = "ThenPublishMpnsIconicTileShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = this.createPubNubInstance(config);
+
+            string channel = "hello_my_channel";
 
             mrePublish = new ManualResetEvent(false);
 

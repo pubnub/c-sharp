@@ -11,7 +11,7 @@ using PubnubApi;
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
-    public class WhenSubscribedToWildcardChannel
+    public class WhenSubscribedToWildcardChannel : TestHarness
     {
         ManualResetEvent mreSubscribeConnect = new ManualResetEvent(false);
         ManualResetEvent mrePublish = new ManualResetEvent(false);
@@ -45,12 +45,15 @@ namespace PubNubMessaging.Tests
             receivedGrantMessage = false;
             currentTestCase = "Init";
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "GrantRequestUnitTest";
-            unitTest.TestCaseName = "Init";
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "foo.*";
             mreGrant = new ManualResetEvent(false);
@@ -106,13 +109,17 @@ namespace PubNubMessaging.Tests
         private void CommonSubscribeShouldReturnReceivedMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
         {
             receivedMessage = false;
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, secretKey, cipherKey, ssl);
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenSubscribedToWildcardChannel";
-            unitTest.TestCaseName = (string.IsNullOrEmpty(cipherKey)) ? "ThenSubscribeShouldReturnReceivedMessage" : "ThenSubscribeShouldReturnReceivedCipherMessage";
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = secretKey,
+                CiperKey = cipherKey,
+                Uuid = "mytestuuid",
+            };
 
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
 
             string wildCardSubscribeChannel = "foo.*";
             string publishChannel = "foo.bar";
@@ -126,7 +133,7 @@ namespace PubNubMessaging.Tests
             mrePublish = new ManualResetEvent(false);
             publishedMessage = "Test for WhenSubscribedToAChannel ThenItShouldReturnReceivedMessage";
             pubnub.Publish().Channel(publishChannel).Message(publishedMessage).Async(new PNCallback<PNPublishResult>() { Result = dummyPublishCallback, Error = DummyErrorCallback });
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
             if (isPublished)
@@ -210,13 +217,17 @@ namespace PubNubMessaging.Tests
         private void CommonSubscribeShouldReturnEmojiMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
         {
             receivedMessage = false;
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, secretKey, cipherKey, ssl);
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenSubscribedToWildcardChannel";
-            unitTest.TestCaseName = (string.IsNullOrEmpty(cipherKey)) ? "ThenSubscribeShouldReturnReceivedEmojiMessage" : "ThenSubscribeShouldReturnReceivedCipherEmojiMessage";
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = secretKey,
+                CiperKey = cipherKey,
+                Uuid = "mytestuuid",
+            };
 
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
 
             string wildCardSubscribeChannel = "foo.*";
             string publishChannel = "foo.bar";
@@ -230,7 +241,7 @@ namespace PubNubMessaging.Tests
             mrePublish = new ManualResetEvent(false);
             publishedMessage = "Text with 😜 emoji 🎉.";
             pubnub.Publish().Channel(publishChannel).Message(publishedMessage).Async(new PNCallback<PNPublishResult>() { Result = dummyPublishCallback, Error = DummyErrorCallback });
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
             if (isPublished)
@@ -293,14 +304,15 @@ namespace PubNubMessaging.Tests
             receivedMessage = false;
             currentTestCase = "ChannelAndChannelGroupAndWildcardChannelSubscribeShouldReturnReceivedMessage";
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = this.createPubNubInstance(config);
             pubnub.SessionUUID = "myuuid";
-
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenSubscribedToWildcardChannel";
-            unitTest.TestCaseName = "ChannelAndChannelGroupAndWildcardChannelSubscribeShouldReturnReceivedMessage";
-
-            pubnub.PubnubUnitTest = unitTest;
 
             string wildCardSubscribeChannel = "foo.*";
             string subChannelName = "hello_my_channel";
@@ -322,7 +334,7 @@ namespace PubNubMessaging.Tests
             mrePublish = new ManualResetEvent(false);
             publishedMessage = "Test for cg";
             pubnub.Publish().Channel(channelAddForGroup).Message(publishedMessage).Async(new PNCallback<PNPublishResult>() { Result = dummyPublishCallback, Error = DummyErrorCallback });
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
             if (isPublished)
@@ -331,7 +343,7 @@ namespace PubNubMessaging.Tests
                 mrePublish = new ManualResetEvent(false);
                 publishedMessage = "Test for wc";
                 pubnub.Publish().Channel(pubWildChannelName).Message(publishedMessage).Async(new PNCallback<PNPublishResult>() { Result = dummyPublishCallback, Error = DummyErrorCallback });
-                manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+                manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
                 mrePublish.WaitOne(manualResetEventsWaitTimeout);
             }
 
@@ -341,7 +353,7 @@ namespace PubNubMessaging.Tests
                 mrePublish = new ManualResetEvent(false);
                 publishedMessage = "Test for normal ch";
                 pubnub.Publish().Channel(subChannelName).Message(publishedMessage).Async(new PNCallback<PNPublishResult>() { Result = dummyPublishCallback, Error = DummyErrorCallback });
-                manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+                manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
                 mrePublish.WaitOne(manualResetEventsWaitTimeout);
             }
 
@@ -368,14 +380,15 @@ namespace PubNubMessaging.Tests
             receivedMessage = false;
             currentTestCase = "ThenSubscribeShouldReturnWildCardPresenceEventInWildcardPresenceCallback";
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = this.createPubNubInstance(config);
             pubnub.SessionUUID = "myuuid";
-
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenSubscribedToWildcardChannel";
-            unitTest.TestCaseName = "ThenSubscribeShouldReturnWildCardPresenceEventInWildcardPresenceCallback";
-
-            pubnub.PubnubUnitTest = unitTest;
 
             string wildCardSubscribeChannel = "foo.*";
 
@@ -391,7 +404,6 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = null;
             pubnub.EndPendingRequests();
             pubnub = null;
-
         }
 
         [Test]
@@ -400,14 +412,15 @@ namespace PubNubMessaging.Tests
             receivedMessage = false;
             currentTestCase = "ThenSubscribeShouldNotReturnWildCardPresenceEventWhenNoCallback";
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = this.createPubNubInstance(config);
             pubnub.SessionUUID = "myuuid";
-
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenSubscribedToWildcardChannel";
-            unitTest.TestCaseName = "ThenSubscribeShouldReturnWildCardPresenceEventInWildcardPresenceCallback";
-
-            pubnub.PubnubUnitTest = unitTest;
 
             string wildCardSubscribeChannel = "foo.*";
 
@@ -415,7 +428,7 @@ namespace PubNubMessaging.Tests
             mreSubscribeConnect = new ManualResetEvent(false);
 
             pubnub.Subscribe<string>(channel: wildCardSubscribeChannel, channelGroup: channelGroupName, subscribeCallback: ReceivedMessageCallbackWhenSubscribed, connectCallback: SubscribeDummyMethodForConnectCallback,  disconnectCallback:SubscribeDummyMethodForDisconnectCallback, wildcardPresenceCallback: null, errorCallback: DummyErrorCallback);
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 10 * 1000;
+            manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 10 * 1000;
             mreSubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
             mreSubscribe.WaitOne(manualResetEventsWaitTimeout);

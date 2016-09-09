@@ -13,7 +13,7 @@ using PubnubApi;
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
-    public class WhenSubscribedToAChannelGroup
+    public class WhenSubscribedToAChannelGroup : TestHarness
     {
         ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
         ManualResetEvent grantManualEvent = new ManualResetEvent(false);
@@ -48,12 +48,15 @@ namespace PubNubMessaging.Tests
             currentUnitTestCase = "Init";
             receivedGrantMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "GrantRequestUnitTest";
-            unitTest.TestCaseName = "Init3";
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
 
             grantManualEvent = new ManualResetEvent(false);
             pubnub.Grant().ChannelGroups(new string[] { channelGroupName }).Read(true).Write(true).Manage(true).TTL(20).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = ThenChannelGroupInitializeShouldReturnGrantMessage, Error = DummySubscribeErrorCallback });
@@ -81,14 +84,16 @@ namespace PubNubMessaging.Tests
         {
             currentUnitTestCase = "ThenSubscribeShouldReturnReceivedMessage";
             receivedMessage = false;
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = this.createPubNubInstance(config);
             pubnub.SessionUUID = "myuuid";
-
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenSubscribedToAChannelGroup";
-            unitTest.TestCaseName = "ThenSubscribeShouldReturnReceivedMessage";
-
-            pubnub.PubnubUnitTest = unitTest;
 
             channelGroupName = "hello_my_group";
             string channelName = "hello_my_channel";
@@ -102,7 +107,7 @@ namespace PubNubMessaging.Tests
                 pubnub.Subscribe<string>("", channelGroupName, ReceivedMessageCallbackWhenSubscribed, SubscribeConnectCallback, SubscribeDisconnectCallback, DummySubscribeErrorCallback);
                 Thread.Sleep(1000);
                 pubnub.Publish().Channel(channelName).Message("Test for WhenSubscribedToAChannelGroup ThenItShouldReturnReceivedMessage").Async(new PNCallback<PNPublishResult>() { Result = dummyPublishCallback, Error = DummyPublishErrorCallback });
-                manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+                manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
                 mePublish.WaitOne(manualResetEventsWaitTimeout);
 
                 subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
@@ -129,15 +134,16 @@ namespace PubNubMessaging.Tests
         {
             currentUnitTestCase = "ThenSubscribeShouldReturnConnectStatus";
             receivedMessage = false;
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = this.createPubNubInstance(config);
             pubnub.SessionUUID = "myuuid";
-
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenSubscribedToAChannelGroup";
-            unitTest.TestCaseName = "ThenSubscribeShouldReturnConnectStatus";
-
-            pubnub.PubnubUnitTest = unitTest;
-
 
             channelGroupName = "hello_my_group";
             string channelName = "hello_my_channel";
@@ -152,7 +158,7 @@ namespace PubNubMessaging.Tests
                 pubnub.Subscribe<string>("", channelGroupName, ReceivedMessageCallbackWhenSubscribed, SubscribeConnectCallback, SubscribeDisconnectCallback, DummySubscribeErrorCallback);
                 Thread.Sleep(1000);
 
-                manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+                manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
                 subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
                 pubnub.EndPendingRequests(); 
@@ -177,15 +183,17 @@ namespace PubNubMessaging.Tests
             expectedCallbackResponses = 2;
             currentCallbackResponses = 0;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = this.createPubNubInstance(config);
             pubnub.SessionUUID = "myuuid";
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenSubscribedToAChannelGroup";
-            unitTest.TestCaseName = "ThenMultiSubscribeShouldReturnConnectStatus";
-
-            pubnub.PubnubUnitTest = unitTest;
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 6000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 6000 : 310 * 1000;
 
             channelGroupName1 = "hello_my_group1";
             channelGroupName2 = "hello_my_group2";

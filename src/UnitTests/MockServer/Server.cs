@@ -20,7 +20,7 @@ namespace MockServer
         private string notFoundContent = "<html><head><title>Not Found</title></head><body>Sorry, the object you requested was not found.</body><html>";
         private readonly Uri uri;
         private Thread trf = null;
-        private SortedList<string, Request> requests = new SortedList<string, Request>();
+        private Dictionary<string, Request> requests = new Dictionary<string, Request>();
         private int read;
         private bool secure = false;
 

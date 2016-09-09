@@ -46,14 +46,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             //var t = pubnub.GetTimeStamp();
 
@@ -106,15 +99,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
-
+            pubnub = this.createPubNubInstance(config);
 
             string expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}";
 
@@ -155,14 +140,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             string expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}";
 
@@ -203,14 +181,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             string expected = "{\"status\": 200, \"payload\": {\"channels\": [\"" + channelName + "\"], \"group\": \"" + channelGroupName + "\"}, \"service\": \"channel-registry\", \"error\": false}";
 
@@ -255,14 +226,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             string expected = "{\"status\": 200, \"payload\": {\"namespace\": \"\", \"groups\": [\"" + channelGroupName + "\", \"hello_my_group1\"]}, \"service\": \"channel-registry\", \"error\": false}";
 

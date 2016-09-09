@@ -11,7 +11,7 @@ using PubnubApi;
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
-    public class WhenDetailedHistoryIsRequested
+    public class WhenDetailedHistoryIsRequested : TestHarness
     {
         ManualResetEvent mreDetailedHistory = new ManualResetEvent(false);
         ManualResetEvent mreMessageCount10ReverseTrue = new ManualResetEvent(false);
@@ -50,12 +50,15 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "GrantRequestUnitTest";
-            unitTest.TestCaseName = "Init";
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
 
@@ -76,18 +79,21 @@ namespace PubNubMessaging.Tests
             messageReceived = true;
             isPublished = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailHistoryNoStoreShouldNotGetMessage";
-            pubnub.PubnubUnitTest = unitTest;
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
             string message = messageForNoStorePublish;
 
             mrePublish = new ManualResetEvent(false);
             pubnub.Publish().Channel(channel).Message(message).ShouldStore(false).Async(new PNCallback<PNPublishResult>() { Result = ReturnRegularPublishCodeCallback, Error = DummyErrorCallback });
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
             if (!isPublished)
@@ -114,18 +120,22 @@ namespace PubNubMessaging.Tests
             messageReceived = false;
             isPublished = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "enigma", false);
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailHistoryShouldReturnDecryptMessage";
-            pubnub.PubnubUnitTest = unitTest;
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                CiperKey = "enigma",
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
             string message = messageForPublish;
 
             mrePublish = new ManualResetEvent(false);
             pubnub.Publish().Channel(channel).Message(message).ShouldStore(true).Async(new PNCallback<PNPublishResult>() { Result = ReturnRegularPublishCodeCallback, Error = DummyErrorCallback });
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             mrePublish.WaitOne(manualResetEventsWaitTimeout);
 
             if (!isPublished)
@@ -158,13 +168,14 @@ namespace PubNubMessaging.Tests
         {
             messageReceived = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailHistoryCount10ReturnsRecords";
-
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
 
@@ -182,13 +193,14 @@ namespace PubNubMessaging.Tests
         {
             message10ReverseTrueReceived = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailHistoryCount10ReverseTrueReturnsRecords";
-
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
 
@@ -206,14 +218,15 @@ namespace PubNubMessaging.Tests
         {
             expectedCountAtStartTimeWithReverseTrue = 0;
             messageStartReverseTrue = false;
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailedHistoryStartWithReverseTrue";
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
 
-            pubnub.PubnubUnitTest = unitTest;
-
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
             //startTimeWithReverseTrue = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(new DateTime(2012, 12, 1));
@@ -249,13 +262,16 @@ namespace PubNubMessaging.Tests
 
             messageReceived = false;
 
-            pubnub = new Pubnub(null, null, null, null, false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = null,
+                SubscribeKey = null,
+                SecretKey  = null,
+                CiperKey = null,
+                Uuid = "mytestuuid",
+            };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailHistoryWithNullKeysReturnsError";
-
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
             mreDetailedHistory = new ManualResetEvent(false);
@@ -341,25 +357,24 @@ namespace PubNubMessaging.Tests
             midtime = 0;
             endtime = 0;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, secretKey, cipherKey, ssl);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = secretKey,
+                CiperKey = cipherKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = this.createPubNubInstance(config);
             pubnub.SessionUUID = "myuuid";
 
             string channel = "hello_my_channel";
-
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailHistoryShouldReturnServerTime1";
-            pubnub.PubnubUnitTest = unitTest;
 
             pubnub.Time().Async(new PNCallback<PNTimeResult>() { Result = (s) => { starttime = s.Timetoken; }, Error = (e) => { } });
             Thread.Sleep(1000);
             Console.WriteLine(string.Format("Start Time = {0}", starttime));
             firstPublishSet = new int[totalMessages / 2];
-
-            unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailedHistoryShouldReturnEncryptedMessageBasedOnParams";
-            pubnub.PubnubUnitTest = unitTest;
 
             for (int index = 0; index < totalMessages / 2; index++)
             {
@@ -368,27 +383,16 @@ namespace PubNubMessaging.Tests
                 mrePublish = new ManualResetEvent(false);
                 Thread.Sleep(1000);
                 pubnub.Publish().Channel(channel).Message(message).ShouldStore(true).Async(new PNCallback<PNPublishResult>() { Result = ReturnRegularPublishCodeCallback, Error = DummyErrorCallback });
-                manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+                manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
                 mrePublish.WaitOne(manualResetEventsWaitTimeout);
                 Console.WriteLine(string.Format("Message #{0} publish {1}", index, (isPublished) ? "SUCCESS" : "FAILED"));
             }
-
-            unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailHistoryShouldReturnServerTime2";
-            pubnub.PubnubUnitTest = unitTest;
-
 
             pubnub.Time().Async(new PNCallback<PNTimeResult>() { Result = (s) => { midtime = s.Timetoken; }, Error = (e) => { } });
             Thread.Sleep(1000);
             Console.WriteLine(string.Format("Mid Time = {0}", midtime));
             secondPublishSet = new double[totalMessages / 2];
             int arrayIndex = 0;
-
-            unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailedHistoryShouldReturnEncryptedMessageBasedOnParams";
-            pubnub.PubnubUnitTest = unitTest;
 
             for (int index = totalMessages / 2; index < totalMessages; index++)
             {
@@ -398,24 +402,14 @@ namespace PubNubMessaging.Tests
                 mrePublish = new ManualResetEvent(false);
                 Thread.Sleep(1000);
                 pubnub.Publish().Channel(channel).Message(message).ShouldStore(true).Async(new PNCallback<PNPublishResult>() { Result = ReturnRegularPublishCodeCallback, Error = DummyErrorCallback });
-                manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+                manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
                 mrePublish.WaitOne(manualResetEventsWaitTimeout);
                 Console.WriteLine(string.Format("Message #{0} publish {1}", index, (isPublished) ? "SUCCESS" : "FAILED"));
             }
 
-            unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailHistoryShouldReturnServerTime3";
-            pubnub.PubnubUnitTest = unitTest;
-
             pubnub.Time().Async(new PNCallback<PNTimeResult>() { Result = (s) => { endtime = s.Timetoken; }, Error = (e) => { } });
             Thread.Sleep(1000);
             Console.WriteLine(string.Format("End Time = {0}", endtime));
-
-            unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailedHistoryShouldReturnEncryptedMessageBasedOnParams";
-            pubnub.PubnubUnitTest = unitTest;
 
             Console.WriteLine("Detailed History with Start & End");
             mreDetailedHistory = new ManualResetEvent(false);
@@ -450,24 +444,23 @@ namespace PubNubMessaging.Tests
             midtime = 0;
             endtime = 0;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, secretKey, cipherKey, ssl);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = secretKey,
+                CiperKey = cipherKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = this.createPubNubInstance(config);
             pubnub.SessionUUID = "myuuid";
 
             string channel = "hello_my_channel";
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailHistoryShouldReturnServerTime1";
-            pubnub.PubnubUnitTest = unitTest;
-
             pubnub.Time().Async(new PNCallback<PNTimeResult>() { Result = (s) => { starttime = s.Timetoken; }, Error = (e) => { } });
             Console.WriteLine(string.Format("Start Time = {0}", starttime));
             firstPublishSet = new int[totalMessages / 2];
-
-            unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailedHistoryShouldReturnUnencryptedMessageBasedOnParams";
-            pubnub.PubnubUnitTest = unitTest;
 
             for (int index = 0; index < totalMessages / 2; index++)
             {
@@ -476,26 +469,15 @@ namespace PubNubMessaging.Tests
                 mrePublish = new ManualResetEvent(false);
                 Thread.Sleep(1000);
                 pubnub.Publish().Channel(channel).Message(message).ShouldStore(true).Async(new PNCallback<PNPublishResult>() { Result = ReturnRegularPublishCodeCallback, Error = DummyErrorCallback });
-                manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+                manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
                 mrePublish.WaitOne(manualResetEventsWaitTimeout);
                 Console.WriteLine(string.Format("Message #{0} publish {1}", index, (isPublished) ? "SUCCESS" : "FAILED"));
             }
-
-            unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailHistoryShouldReturnServerTime2";
-            pubnub.PubnubUnitTest = unitTest;
-
 
             pubnub.Time().Async(new PNCallback<PNTimeResult>() { Result = (s) => { midtime = s.Timetoken; }, Error = (e) => { } });
             Console.WriteLine(string.Format("Mid Time = {0}", midtime));
             secondPublishSet = new double[totalMessages / 2];
             int arrayIndex = 0;
-
-            unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailedHistoryShouldReturnUnencryptedMessageBasedOnParams";
-            pubnub.PubnubUnitTest = unitTest;
 
             for (int index = totalMessages / 2; index < totalMessages; index++)
             {
@@ -505,25 +487,15 @@ namespace PubNubMessaging.Tests
                 mrePublish = new ManualResetEvent(false);
                 Thread.Sleep(1000);
                 pubnub.Publish().Channel(channel).Message(message).ShouldStore(true).Async(new PNCallback<PNPublishResult>() { Result = ReturnRegularPublishCodeCallback, Error = DummyErrorCallback });
-                manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
+                manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
                 mrePublish.WaitOne(manualResetEventsWaitTimeout);
                 Console.WriteLine(string.Format("Message #{0} publish {1}", index, (isPublished) ? "SUCCESS" : "FAILED"));
             }
-
-            unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailHistoryShouldReturnServerTime3";
-            pubnub.PubnubUnitTest = unitTest;
 
             pubnub.Time().Async(new PNCallback<PNTimeResult>() { Result = (s) => { endtime = s.Timetoken; }, Error = (e) => { } });
             Console.WriteLine(string.Format("End Time = {0}", endtime));
 
             Thread.Sleep(1000);
-
-            unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenDetailedHistoryIsRequested";
-            unitTest.TestCaseName = "DetailedHistoryShouldReturnUnencryptedMessageBasedOnParams";
-            pubnub.PubnubUnitTest = unitTest;
 
             Console.WriteLine("Detailed History with Start & End");
             mreDetailedHistory = new ManualResetEvent(false);

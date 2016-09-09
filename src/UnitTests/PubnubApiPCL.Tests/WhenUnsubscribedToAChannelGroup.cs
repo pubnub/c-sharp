@@ -12,7 +12,7 @@ using PubnubApi;
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
-    public class WhenUnsubscribedToAChannelGroup
+    public class WhenUnsubscribedToAChannelGroup : TestHarness
     {
         ManualResetEvent unsubscribeManualEvent = new ManualResetEvent(false);
         ManualResetEvent grantManualEvent = new ManualResetEvent(false);
@@ -36,12 +36,15 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "GrantRequestUnitTest";
-            unitTest.TestCaseName = "Init3";
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
 
             pubnub.Grant().ChannelGroups(new string[] { channelGroupName }).Read(true).Write(true).Manage(true).TTL(20).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = ThenChannelGroupInitializeShouldReturnGrantMessage, Error = DummyUnsubscribeErrorCallback });
             Thread.Sleep(1000);
@@ -61,14 +64,15 @@ namespace PubNubMessaging.Tests
             receivedChannelGroupMessage = false;
             receivedChannelGroupConnectedMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = this.createPubNubInstance(config);
             pubnub.SessionUUID = "myuuid";
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenUnsubscribedToAChannelGroup";
-            unitTest.TestCaseName = "ThenShouldReturnUnsubscribedMessage";
-
-            pubnub.PubnubUnitTest = unitTest;
 
             channelGroupName = "hello_my_group";
             string channelName = "hello_my_channel";

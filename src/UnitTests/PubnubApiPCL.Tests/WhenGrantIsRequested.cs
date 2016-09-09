@@ -9,9 +9,8 @@ using PubnubApi;
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
-    public class WhenGrantIsRequested
+    public class WhenGrantIsRequested : TestHarness
     {
-
         ManualResetEvent grantManualEvent = new ManualResetEvent(false);
         ManualResetEvent revokeManualEvent = new ManualResetEvent(false);
         bool receivedGrantMessage = false;
@@ -29,12 +28,16 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenSubKeyLevelWithReadWriteShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
+
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
@@ -61,12 +64,16 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenSubKeyLevelWithReadShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
+
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
@@ -93,12 +100,16 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenSubKeyLevelWithWriteShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
+
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
@@ -133,16 +144,13 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 Uuid = "mytestuuid",
-                CiperKey = "",
-                Secure = false
             };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
-            unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/grant/sub-key/{2}?signature=d5Pt7JMC5yEcRKTVeVU99JiFaeWTgmH-VLpgw7vv7p4=&channel={3}&pnsdk={4}&r=1&timestamp=1356998400&ttl=5&uuid={5}&w=1", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channel, config.SdkVersion, config.Uuid),
-                    "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"pam\",\"ttl\":5,\"channels\":{\"hello_my_channel\":{\"r\":1,\"w\":1,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}"
-                );
-            pubnub = new Pubnub(config, unitTest);
+            pubnub = this.createPubNubInstance(config);
+
+            //unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/grant/sub-key/{2}?signature=d5Pt7JMC5yEcRKTVeVU99JiFaeWTgmH-VLpgw7vv7p4=&channel={3}&pnsdk={4}&r=1&timestamp=1356998400&ttl=5&uuid={5}&w=1", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channel, config.SdkVersion, config.Uuid),
+            //        "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"pam\",\"ttl\":5,\"channels\":{\"hello_my_channel\":{\"r\":1,\"w\":1,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}"
+            //    );
 
             if (PubnubCommon.PAMEnabled)
             {
@@ -178,16 +186,12 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 Uuid = "mytestuuid",
-                CiperKey = "",
-                Secure = false
             };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
-            unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/grant/sub-key/{2}?signature=fh2CWqssGhYP0GU4e1-_zKdw9OIZ7cm_-4nQAnefhE4=&channel={3}&pnsdk={4}&r=1&timestamp=1356998400&ttl=5&uuid={5}&w=0", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channel, config.SdkVersion, config.Uuid),
-                    "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"pam\",\"ttl\":5,\"channels\":{\"hello_my_channel\":{\"r\":1,\"w\":0,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}"
-                );
-            pubnub = new Pubnub(config, unitTest);
+            pubnub = this.createPubNubInstance(config);
+            //unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/grant/sub-key/{2}?signature=fh2CWqssGhYP0GU4e1-_zKdw9OIZ7cm_-4nQAnefhE4=&channel={3}&pnsdk={4}&r=1&timestamp=1356998400&ttl=5&uuid={5}&w=0", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channel, config.SdkVersion, config.Uuid),
+            //        "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"pam\",\"ttl\":5,\"channels\":{\"hello_my_channel\":{\"r\":1,\"w\":0,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}"
+            //    );
 
             if (PubnubCommon.PAMEnabled)
             {
@@ -223,16 +227,13 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 Uuid = "mytestuuid",
-                CiperKey = "",
-                Secure = false
             };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
-            unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/grant/sub-key/{2}?signature=_51ym4mwmZxp4crPwWjF-MFQwSybNFJFsmswrdahVDs=&channel={3}&pnsdk={4}&r=0&timestamp=1356998400&ttl=5&uuid={5}&w=1", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channel, config.SdkVersion, config.Uuid),
-                    "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"pam\",\"ttl\":5,\"channels\":{\"hello_my_channel\":{\"r\":0,\"w\":1,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}"
-                );
-            pubnub = new Pubnub(config, unitTest);
+            pubnub = this.createPubNubInstance(config);
+
+            //unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/grant/sub-key/{2}?signature=_51ym4mwmZxp4crPwWjF-MFQwSybNFJFsmswrdahVDs=&channel={3}&pnsdk={4}&r=0&timestamp=1356998400&ttl=5&uuid={5}&w=1", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channel, config.SdkVersion, config.Uuid),
+            //        "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"pam\",\"ttl\":5,\"channels\":{\"hello_my_channel\":{\"r\":0,\"w\":1,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}"
+            //    );
 
             if (PubnubCommon.PAMEnabled)
             {
@@ -260,12 +261,15 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenUserLevelWithReadWriteShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_authchannel";
             string authKey = "hello_my_authkey";
@@ -295,12 +299,15 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenUserLevelWithReadShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_authchannel";
             string authKey = "hello_my_authkey";
@@ -330,12 +337,15 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenUserLevelWithWriteShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_authchannel";
             string authKey = "hello_my_authkey";
@@ -371,13 +381,9 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 Uuid = "mytestuuid",
-                CiperKey = "",
-                Secure = false
             };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
-            pubnub = new Pubnub(config, unitTest);
+            pubnub = this.createPubNubInstance(config);
 
             StringBuilder channelBuilder = new StringBuilder();
 
@@ -395,7 +401,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "";
 
-            if (!unitTest.EnableStubTest)
+            if (!PubnubCommon.EnableStubTest)
             {
                 channel = channelBuilder.ToString();
             }
@@ -405,9 +411,9 @@ namespace PubNubMessaging.Tests
                 channel = "csharp-hello_my_channel-0,csharp-hello_my_channel-1,csharp-hello_my_channel-2,csharp-hello_my_channel-3,csharp-hello_my_channel-4";
             }
 
-            unitTest.StubRequestResponse(@"http://pubsub.pubnub.com/v1/auth/grant/sub-key/demo-36?signature=tDimpjL8e8-G9WTJj9K4UDzeTAgU3QQHE0mSNWn34Kk=&channel=csharp-hello_my_channel-0%2Ccsharp-hello_my_channel-1%2Ccsharp-hello_my_channel-2%2Ccsharp-hello_my_channel-3%2Ccsharp-hello_my_channel-4&pnsdk=PubNub CSharp 4.0&r=1&timestamp=1356998400&ttl=5&uuid=mytestuuid&w=1",
-                "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"pam\",\"ttl\":5,\"channels\":{\"csharp-hello_my_channel-0\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-hello_my_channel-1\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-hello_my_channel-2\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-hello_my_channel-3\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-hello_my_channel-4\":{\"r\":1,\"w\":1,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}"
-            );
+            //unitTest.StubRequestResponse(@"http://pubsub.pubnub.com/v1/auth/grant/sub-key/demo-36?signature=tDimpjL8e8-G9WTJj9K4UDzeTAgU3QQHE0mSNWn34Kk=&channel=csharp-hello_my_channel-0%2Ccsharp-hello_my_channel-1%2Ccsharp-hello_my_channel-2%2Ccsharp-hello_my_channel-3%2Ccsharp-hello_my_channel-4&pnsdk=PubNub CSharp 4.0&r=1&timestamp=1356998400&ttl=5&uuid=mytestuuid&w=1",
+            //    "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"pam\",\"ttl\":5,\"channels\":{\"csharp-hello_my_channel-0\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-hello_my_channel-1\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-hello_my_channel-2\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-hello_my_channel-3\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-hello_my_channel-4\":{\"r\":1,\"w\":1,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}"
+            //);
             
             if (PubnubCommon.PAMEnabled)
             {
@@ -441,13 +447,9 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 Uuid = "mytestuuid",
-                CiperKey = "",
-                Secure = false
             };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
-            pubnub = new Pubnub(config, unitTest);
+            pubnub = this.createPubNubInstance(config);
 
             StringBuilder authKeyBuilder = new StringBuilder();
             for (int index = 0; index < multipleAuthGrantCount; index++)
@@ -463,7 +465,7 @@ namespace PubNubMessaging.Tests
             }
             string auth = "";
 
-            if (!unitTest.EnableStubTest)
+            if (!PubnubCommon.EnableStubTest)
             {
                 auth = authKeyBuilder.ToString();
             }
@@ -473,9 +475,9 @@ namespace PubNubMessaging.Tests
                 auth = "csharp-auth_key-0,csharp-auth_key-1,csharp-auth_key-2,csharp-auth_key-3,csharp-auth_key-4";
             }
 
-            unitTest.StubRequestResponse("http://pubsub.pubnub.com/v1/auth/grant/sub-key/demo-36?signature=RHYOczfs7yJBKoowJLytR6zLGAIU4aAaGYHN-i5mO9E=&auth=csharp-auth_key-0%2Ccsharp-auth_key-1%2Ccsharp-auth_key-2%2Ccsharp-auth_key-3%2Ccsharp-auth_key-4&channel=csharp-auth_key-0%2Ccsharp-auth_key-1%2Ccsharp-auth_key-2%2Ccsharp-auth_key-3%2Ccsharp-auth_key-4&pnsdk=PubNub CSharp 4.0&r=1&timestamp=1356998400&ttl=5&uuid=mytestuuid&w=1",
-                "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"pam\",\"ttl\":5,\"channels\":{\"csharp-auth_key-0\":{\"auths\":{\"csharp-auth_key-0\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-1\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-2\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-3\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-4\":{\"r\":1,\"w\":1,\"m\":0}}},\"csharp-auth_key-1\":{\"auths\":{\"csharp-auth_key-0\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-1\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-2\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-3\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-4\":{\"r\":1,\"w\":1,\"m\":0}}},\"csharp-auth_key-2\":{\"auths\":{\"csharp-auth_key-0\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-1\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-2\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-3\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-4\":{\"r\":1,\"w\":1,\"m\":0}}},\"csharp-auth_key-3\":{\"auths\":{\"csharp-auth_key-0\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-1\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-2\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-3\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-4\":{\"r\":1,\"w\":1,\"m\":0}}},\"csharp-auth_key-4\":{\"auths\":{\"csharp-auth_key-0\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-1\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-2\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-3\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-4\":{\"r\":1,\"w\":1,\"m\":0}}}}},\"service\":\"Access Manager\",\"status\":200}"
-            );
+            //unitTest.StubRequestResponse("http://pubsub.pubnub.com/v1/auth/grant/sub-key/demo-36?signature=RHYOczfs7yJBKoowJLytR6zLGAIU4aAaGYHN-i5mO9E=&auth=csharp-auth_key-0%2Ccsharp-auth_key-1%2Ccsharp-auth_key-2%2Ccsharp-auth_key-3%2Ccsharp-auth_key-4&channel=csharp-auth_key-0%2Ccsharp-auth_key-1%2Ccsharp-auth_key-2%2Ccsharp-auth_key-3%2Ccsharp-auth_key-4&pnsdk=PubNub CSharp 4.0&r=1&timestamp=1356998400&ttl=5&uuid=mytestuuid&w=1",
+            //    "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"pam\",\"ttl\":5,\"channels\":{\"csharp-auth_key-0\":{\"auths\":{\"csharp-auth_key-0\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-1\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-2\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-3\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-4\":{\"r\":1,\"w\":1,\"m\":0}}},\"csharp-auth_key-1\":{\"auths\":{\"csharp-auth_key-0\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-1\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-2\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-3\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-4\":{\"r\":1,\"w\":1,\"m\":0}}},\"csharp-auth_key-2\":{\"auths\":{\"csharp-auth_key-0\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-1\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-2\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-3\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-4\":{\"r\":1,\"w\":1,\"m\":0}}},\"csharp-auth_key-3\":{\"auths\":{\"csharp-auth_key-0\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-1\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-2\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-3\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-4\":{\"r\":1,\"w\":1,\"m\":0}}},\"csharp-auth_key-4\":{\"auths\":{\"csharp-auth_key-0\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-1\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-2\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-3\":{\"r\":1,\"w\":1,\"m\":0},\"csharp-auth_key-4\":{\"r\":1,\"w\":1,\"m\":0}}}}},\"service\":\"Access Manager\",\"status\":200}"
+            //);
 
             string[] authArray = auth.Split(',');
 
@@ -506,15 +508,19 @@ namespace PubNubMessaging.Tests
             receivedGrantMessage = false;
             receivedRevokeMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenRevokeAtSubKeyLevelReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
+
             if (PubnubCommon.PAMEnabled)
             {
-                if (!unitTest.EnableStubTest)
+                if (!PubnubCommon.EnableStubTest)
                 {
                     grantManualEvent = new ManualResetEvent(false);
                     pubnub.Grant().Read(true).Write(true).Manage(false).TTL(5).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = AccessToSubKeyLevelCallback, Error = DummyErrorCallback });
@@ -565,17 +571,13 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 Uuid = "mytestuuid",
-                CiperKey = "",
-                Secure = false
             };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
-            pubnub = new Pubnub(config, unitTest);
+            pubnub = this.createPubNubInstance(config);
 
             if (PubnubCommon.PAMEnabled)
             {
-                if (!unitTest.EnableStubTest)
+                if (!PubnubCommon.EnableStubTest)
                 {
                     grantManualEvent = new ManualResetEvent(false);
                     pubnub.Grant().Channels(new string[] { channel }).Read(true).Write(true).Manage(false).TTL(5).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = AccessToChannelLevelCallback, Error = DummyErrorCallback });
@@ -589,9 +591,9 @@ namespace PubNubMessaging.Tests
 
                 if (receivedGrantMessage)
                 {
-                    unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/grant/sub-key/{2}?signature=7kycJQxN4mABxs9wR-XhRPkyVJ2lNsRXIqHgIt2vugA=&channel={3}&pnsdk={4}&r=0&timestamp=1356998400&uuid={5}&w=0", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channel, config.SdkVersion, config.Uuid),
-                        "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"pam\",\"ttl\":1,\"channels\":{\"hello_my_channel\":{\"r\":0,\"w\":0,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}"
-                    );
+                    //unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/grant/sub-key/{2}?signature=7kycJQxN4mABxs9wR-XhRPkyVJ2lNsRXIqHgIt2vugA=&channel={3}&pnsdk={4}&r=0&timestamp=1356998400&uuid={5}&w=0", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channel, config.SdkVersion, config.Uuid),
+                    //    "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"pam\",\"ttl\":1,\"channels\":{\"hello_my_channel\":{\"r\":0,\"w\":0,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}"
+                    //);
 
                     revokeManualEvent = new ManualResetEvent(false);
                     Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess -> Grant ok..Now trying Revoke");
@@ -623,18 +625,21 @@ namespace PubNubMessaging.Tests
             receivedGrantMessage = false;
             receivedRevokeMessage = false;
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenRevokeAtUserLevelReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_authchannel";
             string authKey = "hello_my_authkey";
             if (PubnubCommon.PAMEnabled)
             {
-                if (!unitTest.EnableStubTest)
+                if (!PubnubCommon.EnableStubTest)
                 {
                     grantManualEvent = new ManualResetEvent(false);
                     pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(false).TTL(5).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = AccessToUserLevelCallback, Error = DummyErrorCallback });
@@ -684,16 +689,13 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 Uuid = "mytestuuid",
-                CiperKey = "",
-                Secure = false
             };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
-            unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/grant/sub-key/{2}?signature=rf_RVAZE2vf4kHhmRFuZw0Di1Z0bEXNwjjXg8AoFXqo=&channel-group={3}&m=1&pnsdk={4}&r=1&timestamp=1356998400&ttl=5&uuid={5}", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channelgroup, config.SdkVersion, config.Uuid),
-                    "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"ttl\":5,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}"
-                );
-            pubnub = new Pubnub(config, unitTest);
+            pubnub = this.createPubNubInstance(config);
+
+            //unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/grant/sub-key/{2}?signature=rf_RVAZE2vf4kHhmRFuZw0Di1Z0bEXNwjjXg8AoFXqo=&channel-group={3}&m=1&pnsdk={4}&r=1&timestamp=1356998400&ttl=5&uuid={5}", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channelgroup, config.SdkVersion, config.Uuid),
+            //        "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"ttl\":5,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}"
+            //    );
 
             if (PubnubCommon.PAMEnabled)
             {
@@ -729,16 +731,13 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 Uuid = "mytestuuid",
-                CiperKey = "",
-                Secure = false
             };
 
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.EnableStubTest = PubnubCommon.EnableStubTest;
-            unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/grant/sub-key/{2}?signature=lXzuy743zRu4LESs5xt1jZ-myQtp1JriUecgP2n_49g=&channel-group={3}&m=0&pnsdk={4}&r=1&timestamp=1356998400&ttl=5&uuid={5}", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channelgroup, config.SdkVersion, config.Uuid),
-                    "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"ttl\":5,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}"
-                );
-            pubnub = new Pubnub(config, unitTest);
+            pubnub = this.createPubNubInstance(config);
+
+            //unitTest.StubRequestResponse(string.Format("http{0}://{1}/v1/auth/grant/sub-key/{2}?signature=lXzuy743zRu4LESs5xt1jZ-myQtp1JriUecgP2n_49g=&channel-group={3}&m=0&pnsdk={4}&r=1&timestamp=1356998400&ttl=5&uuid={5}", config.Secure ? "s" : "", config.Origin, PubnubCommon.SubscribeKey, channelgroup, config.SdkVersion, config.Uuid),
+            //        "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"ttl\":5,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}"
+            //    );
 
             if (PubnubCommon.PAMEnabled)
             {

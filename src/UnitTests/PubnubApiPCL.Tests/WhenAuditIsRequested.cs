@@ -48,14 +48,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"subkey\",\"subscribe_key\":\"sub-c-25bce39a-6ead-11e6-b9ce-02ee2ddab7fe\",\"channels\":{},\"objects\":{},\"channel-groups\":{}},\"service\":\"Access Manager\",\"status\":200}";
 
@@ -106,14 +99,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"sub-c-25bce39a-6ead-11e6-b9ce-02ee2ddab7fe\",\"channels\":{}},\"service\":\"Access Manager\",\"status\":200}";
 
@@ -164,14 +150,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            if (PubnubCommon.EnableStubTest)
-            {
-                pubnub = this.createPubNubInstance(config);
-            }
-            else
-            {
-                pubnub = new Pubnub(config);
-            }
+            pubnub = this.createPubNubInstance(config);
 
             string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"channel-groups\":{}},\"service\":\"Access Manager\",\"status\":200}";
 
