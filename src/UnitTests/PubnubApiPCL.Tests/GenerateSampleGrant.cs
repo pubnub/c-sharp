@@ -132,37 +132,38 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void UserCallbackForSampleGrantAtUserLevel(PNAccessManagerGrantResult receivedMessage)
+        private void UserCallbackForSampleGrantAtUserLevel(PNAccessManagerGrantResult receivedMessage)
         {
             receivedGrantMessage = true;
             Console.WriteLine(receivedMessage);
             grantManualEvent.Set();
         }
 
-        void ErrorCallbackForSampleGrantAtUserLevel(PubnubClientError receivedMessage)
+        private void ErrorCallbackForSampleGrantAtUserLevel(PubnubClientError receivedMessage)
         {
             if (receivedMessage != null)
             {
                 Console.WriteLine(receivedMessage);
             }
+
             grantManualEvent.Set();
         }
 
-        void UserCallbackForSampleGrantAtChannelLevel(PNAccessManagerGrantResult receivedMessage)
+        private void UserCallbackForSampleGrantAtChannelLevel(PNAccessManagerGrantResult receivedMessage)
         {
             receivedGrantMessage = true;
             Console.WriteLine(receivedMessage);
             grantManualEvent.Set();
         }
 
-        void ErrorCallbackForSampleGrantAtChannelLevel(PubnubClientError receivedMessage)
+        private void ErrorCallbackForSampleGrantAtChannelLevel(PubnubClientError receivedMessage)
         {
             if (receivedMessage != null)
             {
                 Console.WriteLine(receivedMessage);
             }
+
             grantManualEvent.Set();
         }
-
     }
 }

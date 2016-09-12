@@ -13,7 +13,6 @@ namespace PubNubMessaging.Tests
         private ManualResetEvent auditManualEvent = new ManualResetEvent(false);
         private ManualResetEvent revokeManualEvent = new ManualResetEvent(false);
         private bool receivedAuditMessage = false;
-        private bool receivedRevokeMessage = false;
 
         private Pubnub pubnub = null;
         private Server server;
@@ -128,7 +127,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void UserCallbackForCleanUpAccessAtUserLevel(PNAccessManagerAuditResult receivedMessage)
+        private void UserCallbackForCleanUpAccessAtUserLevel(PNAccessManagerAuditResult receivedMessage)
         {
             try
             {
@@ -155,16 +154,15 @@ namespace PubNubMessaging.Tests
                                         {
                                             foreach (string authKey in auths.Keys)
                                             {
-                                                receivedRevokeMessage = false;
                                                 Console.WriteLine("Auth Key = " + authKey);
                                                 pubnub.Grant().Channels(new string[] { channelName }).AuthKeys(new string[] { authKey }).Read(false).Write(false).Manage(false).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = UserCallbackForRevokeAccess, Error = ErrorCallbackForRevokeAccess });
                                                 revokeManualEvent.WaitOne();
-
                                             }
                                         }
                                     }
                                 }
                             }
+
                             string level = receivedMessage.Payload.Level;
                             if (level == "subkey")
                             {
@@ -174,42 +172,46 @@ namespace PubNubMessaging.Tests
                     }
                 }
             }
-            catch { }
+            catch
+            {
+            }
             finally
             {
                 auditManualEvent.Set();
             }
         }
 
-        void ErrorCallbackForCleanUpAccessAtUserLevel(PubnubClientError receivedMessage)
+        private void ErrorCallbackForCleanUpAccessAtUserLevel(PubnubClientError receivedMessage)
         {
             if (receivedMessage != null)
             {
                 Console.WriteLine(receivedMessage);
             }
+
             auditManualEvent.Set();
         }
 
-        void UserCallbackForRevokeAccess(PNAccessManagerGrantResult receivedMessage)
+        private void UserCallbackForRevokeAccess(PNAccessManagerGrantResult receivedMessage)
         {
             if (receivedMessage != null)
             {
                 Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(receivedMessage));
-                receivedRevokeMessage = true;
             }
+
             revokeManualEvent.Set();
         }
 
-        void ErrorCallbackForRevokeAccess(PubnubClientError receivedMessage)
+        private void ErrorCallbackForRevokeAccess(PubnubClientError receivedMessage)
         {
             if (receivedMessage != null)
             {
                 Console.WriteLine(receivedMessage);
             }
+
             revokeManualEvent.Set();
         }
 
-        void UserCallbackForCleanUpAccessAtChannelLevel(PNAccessManagerAuditResult receivedMessage)
+        private void UserCallbackForCleanUpAccessAtChannelLevel(PNAccessManagerAuditResult receivedMessage)
         {
             try
             {
@@ -232,49 +234,51 @@ namespace PubNubMessaging.Tests
                                     Console.WriteLine(channelName);
                                     pubnub.Grant().Channels(new string[] { channelName }).Read(false).Write(false).Manage(false).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = UserCallbackForRevokeAccess, Error = ErrorCallbackForRevokeAccess });
                                     revokeManualEvent.WaitOne();
-
                                 }
-                                //foreach (JToken channel in channels.Children())
-                                //{
-                                //    if (channel is JProperty)
-                                //    {
-                                //        var channelProperty = channel as JProperty;
-                                //        if (channelProperty != null)
-                                //        {
-                                //            string channelName = channelProperty.Name;
-                                //            Console.WriteLine(channelName);
-                                //            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
-                                //            pubnub.GrantAccess<string>(channelName, false, false, UserCallbackForRevokeAccess, ErrorCallbackForRevokeAccess);
-                                //            revokeManualEvent.WaitOne();
-                                //        }
-                                //    }
-                                //}
+                                ////foreach (JToken channel in channels.Children())
+                                ////{
+                                ////    if (channel is JProperty)
+                                ////    {
+                                ////        var channelProperty = channel as JProperty;
+                                ////        if (channelProperty != null)
+                                ////        {
+                                ////            string channelName = channelProperty.Name;
+                                ////            Console.WriteLine(channelName);
+                                ////            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+                                ////            pubnub.GrantAccess<string>(channelName, false, false, UserCallbackForRevokeAccess, ErrorCallbackForRevokeAccess);
+                                ////            revokeManualEvent.WaitOne();
+                                ////        }
+                                ////    }
+                                ////}
                             }
+
                             string level = receivedMessage.Payload.Level;
+
                             if (level == "subkey")
                             {
                                 receivedAuditMessage = true;
                             }
                         }
                     }
-
                 }
             }
-            catch { }
+            catch
+            {
+            }
             finally
             {
                 auditManualEvent.Set();
             }
         }
 
-        void ErrorCallbackForCleanUpAccessAtChannelLevel(PubnubClientError receivedMessage)
+        private void ErrorCallbackForCleanUpAccessAtChannelLevel(PubnubClientError receivedMessage)
         {
             if (receivedMessage != null)
             {
                 Console.WriteLine(receivedMessage.Message);
             }
+
             auditManualEvent.Set();
         }
-
     }
 }

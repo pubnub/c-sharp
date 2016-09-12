@@ -12,31 +12,40 @@ namespace PubNubMessaging.Tests
     /// <summary>
     /// Custom class for testing the encryption and decryption 
     /// </summary>
-    class CustomClass
+    public class CustomClass
     {
-        public string foo = "hi!";
-        public int[] bar = { 1, 2, 3, 4, 5 };
+        public string foo { get; set; } = "hi!";
+
+        public int[] bar { get; set; } = { 1, 2, 3, 4, 5 };
     }
-    class SecretCustomClass
+
+    public class SecretCustomClass
     {
-        public string foo = "hello!";
-        public int[] bar = { 10, 20, 30, 40, 50 };
+        public string foo { get; set; } = "hello!";
+
+        public int[] bar { get; set; } = { 10, 20, 30, 40, 50 };
     }
 
     public class PubnubDemoObject
     {
-        public double VersionID = 3.4;
-        public string Timetoken = "13601488652764619";
-        public string OperationName = "Publish";
-        public string[] Channels = { "ch1" };
-        public PubnubDemoMessage DemoMessage = new PubnubDemoMessage();
-        public PubnubDemoMessage CustomMessage = new PubnubDemoMessage("Welcome to the world of Pubnub for Publish and Subscribe. Hah!");
-        public Person[] SampleXml = new DemoRoot().Person.ToArray();
+        public double VersionID { get; set; } = 3.4;
+
+        public string Timetoken { get; set; } = "13601488652764619";
+
+        public string OperationName { get; set; } = "Publish";
+
+        public string[] Channels { get; set; } = { "ch1" };
+
+        public PubnubDemoMessage DemoMessage { get; set; } = new PubnubDemoMessage();
+
+        public PubnubDemoMessage CustomMessage { get; set; } = new PubnubDemoMessage("Welcome to the world of Pubnub for Publish and Subscribe. Hah!");
+
+        public Person[] SampleXml { get; set; } = new DemoRoot().Person.ToArray();
     }
 
     public class PubnubDemoMessage
     {
-        public string DefaultMessage = "~!@#$%^&*()_+ `1234567890-= qwertyuiop[]\\ {}| asdfghjkl;' :\" zxcvbnm,./ <>? ";
+        public string DefaultMessage { get; set; } = "~!@#$%^&*()_+ `1234567890-= qwertyuiop[]\\ {}| asdfghjkl;' :\" zxcvbnm,./ <>? ";
 
         public PubnubDemoMessage()
         {
@@ -46,7 +55,6 @@ namespace PubNubMessaging.Tests
         {
             DefaultMessage = message;
         }
-
     }
 
     public class DemoRoot
@@ -58,8 +66,8 @@ namespace PubNubMessaging.Tests
                 List<Person> ret = new List<Person>();
                 Person p1 = new Person();
                 p1.ID = "ABCD123";
-                //PersonID id1 = new PersonID(); id1.ID = "ABCD123" ;
-                //p1.ID = id1;
+                ////PersonID id1 = new PersonID(); id1.ID = "ABCD123" ;
+                ////p1.ID = id1;
                 Name n1 = new Name();
                 n1.First = "John";
                 n1.Middle = "P.";
@@ -77,8 +85,8 @@ namespace PubNubMessaging.Tests
 
                 Person p2 = new Person();
                 p2.ID = "ABCD456";
-                //PersonID id2 = new PersonID(); id2.ID = "ABCD123" ;
-                //p2.ID = id2;
+                ////PersonID id2 = new PersonID(); id2.ID = "ABCD123" ;
+                ////p2.ID = id2;
                 Name n2 = new Name();
                 n2.First = "Peter";
                 n2.Middle = "Z.";
@@ -95,7 +103,6 @@ namespace PubNubMessaging.Tests
                 ret.Add(p2);
 
                 return ret;
-
             }
         }
     }
@@ -104,23 +111,28 @@ namespace PubNubMessaging.Tests
     {
         public string ID { get; set; }
 
-        public Name Name;
+        public Name Name { get; set; }
 
-        public Address Address;
+        public Address Address { get; set; }
     }
 
     public class Name
     {
         public string First { get; set; }
+
         public string Middle { get; set; }
+
         public string Last { get; set; }
     }
 
     public class Address
     {
         public string Street { get; set; }
+
         public string City { get; set; }
+
         public string State { get; set; }
+
         public string Country { get; set; }
     }
 
@@ -136,10 +148,10 @@ namespace PubNubMessaging.Tests
         public void TestNullEncryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
-            //serialized string
+            ////serialized string
             string message = null;
             
-            //encrypt
+            ////encrypt
             string encryptedMessage = pc.Encrypt(message);
         }
 
@@ -152,9 +164,9 @@ namespace PubNubMessaging.Tests
         public void TestNullDecryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
-            //deserialized string
+            ////deserialized string
             string message = null;
-            //decrypt
+            ////decrypt
             string decryptedMessage = pc.Decrypt(message);
 
             Assert.AreEqual("", decryptedMessage);
@@ -170,9 +182,9 @@ namespace PubNubMessaging.Tests
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
             string message = "q/xJqqN6qbiZMXYmiQC1Fw==";
-            //decrypt
+            ////decrypt
             string decryptedMessage = pc.Decrypt(message);
-            //deserialize again
+            ////deserialize again
             Assert.AreEqual("yay!", decryptedMessage);
         }
 
@@ -185,9 +197,9 @@ namespace PubNubMessaging.Tests
         public void TestYayEncryptionBasic()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
-            //deserialized string
+            ////deserialized string
             string message = "yay!";
-            //Encrypt
+            ////Encrypt
             string encryptedMessage = pc.Encrypt(message);
             Assert.AreEqual("q/xJqqN6qbiZMXYmiQC1Fw==", encryptedMessage);
         }
@@ -201,17 +213,18 @@ namespace PubNubMessaging.Tests
         public void TestYayDecryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
-            //string strMessage= "\"q/xJqqN6qbiZMXYmiQC1Fw==\"";
-            //Non deserialized string
+            ////string strMessage= "\"q/xJqqN6qbiZMXYmiQC1Fw==\"";
+            ////Non deserialized string
             string message = "\"Wi24KS4pcTzvyuGOHubiXg==\"";
-            //Deserialize
+            ////Deserialize
             message = JsonConvert.DeserializeObject<string>(message);
-            //decrypt
+            ////decrypt
             string decryptedMessage = pc.Decrypt(message);
-            //deserialize again
+            ////deserialize again
             message = JsonConvert.DeserializeObject<string>(decryptedMessage);
             Assert.AreEqual("yay!", message);
         }
+
         /// <summary>
         /// Tests the yay encryption.
         /// The output is not serialized
@@ -221,12 +234,12 @@ namespace PubNubMessaging.Tests
         public void TestYayEncryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
-            //deserialized string
+            ////deserialized string
             string message = "yay!";
-            //serialize the string
+            ////serialize the string
             message = JsonConvert.SerializeObject(message);
             Console.WriteLine(message);
-            //Encrypt
+            ////Encrypt
             string enc = pc.Encrypt(message);
             Assert.AreEqual("Wi24KS4pcTzvyuGOHubiXg==", enc);
         }
@@ -240,11 +253,11 @@ namespace PubNubMessaging.Tests
         public void TestArrayEncryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
-            //create an empty array object
+            ////create an empty array object
             object[] emptyArray = { };
-            //serialize
+            ////serialize
             string serializedArray = JsonConvert.SerializeObject(emptyArray);
-            //Encrypt
+            ////Encrypt
             string encryptedMessage = pc.Encrypt(serializedArray);
 
             Assert.AreEqual("Ns4TB41JjT2NCXaGLWSPAQ==", encryptedMessage);
@@ -260,14 +273,14 @@ namespace PubNubMessaging.Tests
         public void TestArrayDecryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
-            //Input the deserialized string
+            ////Input the deserialized string
             string message = "Ns4TB41JjT2NCXaGLWSPAQ==";
-            //decrypt
+            ////decrypt
             string decryptedMessage = pc.Decrypt(message);
-            //create a serialized object
+            ////create a serialized object
             object[] emptyArrayObject = { };
             string result = JsonConvert.SerializeObject(emptyArrayObject);
-            //compare the serialized object and the return of the Decrypt method
+            ////compare the serialized object and the return of the Decrypt method
             Assert.AreEqual(result, decryptedMessage);
         }
 
@@ -280,15 +293,16 @@ namespace PubNubMessaging.Tests
         public void TestObjectEncryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
-            //create an object
+            ////create an object
             Object obj = new Object();
-            //serialize
+            ////serialize
             string serializedObject = JsonConvert.SerializeObject(obj);
-            //encrypt
+            ////encrypt
             string encryptedMessage = pc.Encrypt(serializedObject);
 
             Assert.AreEqual("IDjZE9BHSjcX67RddfCYYg==", encryptedMessage);
         }
+
         /// <summary>
         /// Tests the object decryption.
         /// Assumes that the input message is deserialized
@@ -299,17 +313,18 @@ namespace PubNubMessaging.Tests
         public void TestObjectDecryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
-            //Deserialized
+            ////Deserialized
             string message = "IDjZE9BHSjcX67RddfCYYg==";
-            //Decrypt
+            ////Decrypt
             string decryptedMessage = pc.Decrypt(message);
-            //create an object
+            ////create an object
             Object obj = new Object();
-            //Serialize the object
+            ////Serialize the object
             string result = JsonConvert.SerializeObject(obj);
 
             Assert.AreEqual(result, decryptedMessage);
         }
+
         /// <summary>
         /// Tests my object encryption.
         /// The output is not serialized 
@@ -319,15 +334,16 @@ namespace PubNubMessaging.Tests
         public void TestMyObjectEncryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
-            //create an object of the custom class
+            ////create an object of the custom class
             CustomClass cc = new CustomClass();
-            //serialize it
+            ////serialize it
             string result = JsonConvert.SerializeObject(cc);
-            //encrypt it
+            ////encrypt it
             string encryptedMessage = pc.Encrypt(result);
 
             Assert.AreEqual("Zbr7pEF/GFGKj1rOstp0tWzA4nwJXEfj+ezLtAr8qqE=", encryptedMessage);
         }
+
         /// <summary>
         /// Tests my object decryption.
         /// The output is not deserialized
@@ -337,13 +353,13 @@ namespace PubNubMessaging.Tests
         public void TestMyObjectDecryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
-            //Deserialized
+            ////Deserialized
             string message = "Zbr7pEF/GFGKj1rOstp0tWzA4nwJXEfj+ezLtAr8qqE=";
-            //Decrypt
+            ////Decrypt
             string decryptedMessage = pc.Decrypt(message);
-            //create an object of the custom class
+            ////create an object of the custom class
             CustomClass cc = new CustomClass();
-            //Serialize it
+            ////Serialize it
             string result = JsonConvert.SerializeObject(cc);
 
             Assert.AreEqual(result, decryptedMessage);
@@ -358,11 +374,11 @@ namespace PubNubMessaging.Tests
         public void TestPubNubEncryption2()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
-            //Deserialized
+            ////Deserialized
             string message = "Pubnub Messaging API 2";
-            //serialize the message
+            ////serialize the message
             message = JsonConvert.SerializeObject(message);
-            //encrypt
+            ////encrypt
             string encryptedMessage = pc.Encrypt(message);
 
             Assert.AreEqual("f42pIQcWZ9zbTbH8cyLwB/tdvRxjFLOYcBNMVKeHS54=", encryptedMessage);
@@ -377,11 +393,11 @@ namespace PubNubMessaging.Tests
         public void TestPubNubDecryption2()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
-            //Deserialized string    
+            ////Deserialized string    
             string message = "f42pIQcWZ9zbTbH8cyLwB/tdvRxjFLOYcBNMVKeHS54=";
-            //Decrypt
+            ////Decrypt
             string decryptedMessage = pc.Decrypt(message);
-            //Deserialize
+            ////Deserialize
             message = JsonConvert.DeserializeObject<string>(decryptedMessage);
             Assert.AreEqual("Pubnub Messaging API 2", message);
         }
@@ -395,11 +411,11 @@ namespace PubNubMessaging.Tests
         public void TestPubNubEncryption1()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
-            //non serialized string
+            ////non serialized string
             string message = "Pubnub Messaging API 1";
-            //serialize
+            ////serialize
             message = JsonConvert.SerializeObject(message);
-            //encrypt
+            ////encrypt
             string encryptedMessage = pc.Encrypt(message);
 
             Assert.AreEqual("f42pIQcWZ9zbTbH8cyLwByD/GsviOE0vcREIEVPARR0=", encryptedMessage);
@@ -414,11 +430,11 @@ namespace PubNubMessaging.Tests
         public void TestPubNubDecryption1()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
-            //deserialized string
+            ////deserialized string
             string message = "f42pIQcWZ9zbTbH8cyLwByD/GsviOE0vcREIEVPARR0=";
-            //decrypt
+            ////decrypt
             string decryptedMessage = pc.Decrypt(message);
-            //deserialize
+            ////deserialize
             message = (decryptedMessage != "**DECRYPT ERROR**") ? JsonConvert.DeserializeObject<string>(decryptedMessage) : "";
             Assert.AreEqual("Pubnub Messaging API 1", message);
         }
@@ -432,9 +448,9 @@ namespace PubNubMessaging.Tests
         public void TestStuffCanEncryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
-            //input serialized string
+            ////input serialized string
             string message = "{\"this stuff\":{\"can get\":\"complicated!\"}}";
-            //encrypt
+            ////encrypt
             string encryptedMessage = pc.Encrypt(message);
 
             Assert.AreEqual("zMqH/RTPlC8yrAZ2UhpEgLKUVzkMI2cikiaVg30AyUu7B6J0FLqCazRzDOmrsFsF", encryptedMessage);
@@ -448,9 +464,9 @@ namespace PubNubMessaging.Tests
         public void TestStuffcanDecryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
-            //deserialized string
+            ////deserialized string
             string message = "zMqH/RTPlC8yrAZ2UhpEgLKUVzkMI2cikiaVg30AyUu7B6J0FLqCazRzDOmrsFsF";
-            //decrypt
+            ////decrypt
             string decryptedMessage = pc.Decrypt(message);
 
             Assert.AreEqual("{\"this stuff\":{\"can get\":\"complicated!\"}}", decryptedMessage);
@@ -465,9 +481,9 @@ namespace PubNubMessaging.Tests
         public void TestHashEncryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
-            //serialized string
+            ////serialized string
             string message = "{\"foo\":{\"bar\":\"foobar\"}}";
-            //encrypt
+            ////encrypt
             string encryptedMessage = pc.Encrypt(message);
 
             Assert.AreEqual("GsvkCYZoYylL5a7/DKhysDjNbwn+BtBtHj2CvzC4Y4g=", encryptedMessage);
@@ -481,9 +497,9 @@ namespace PubNubMessaging.Tests
         public void TestHashDecryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
-            //deserialized string
+            ////deserialized string
             string message = "GsvkCYZoYylL5a7/DKhysDjNbwn+BtBtHj2CvzC4Y4g=";
-            //decrypt
+            ////decrypt
             string decryptedMessage = pc.Decrypt(message);
 
             Assert.AreEqual("{\"foo\":{\"bar\":\"foobar\"}}", decryptedMessage);
@@ -516,9 +532,9 @@ namespace PubNubMessaging.Tests
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
             string message = "+BY5/miAA8aeuhVl4d13Kg==";
-            //decrypt
+            ////decrypt
             string decryptedMessage = pc.Decrypt(message);
-            //deserialize
+            ////deserialize
             message = (decryptedMessage != "**DECRYPT ERROR**") ? JsonConvert.DeserializeObject<string>(decryptedMessage) : "";
 
             Assert.AreEqual("漢語", message);
@@ -535,9 +551,9 @@ namespace PubNubMessaging.Tests
             PubnubCrypto pc = new PubnubCrypto("enigma");
             string message = "stpgsG1DZZxb44J7mFNSzg==";
             
-            //decrypt
+            ////decrypt
             string decryptedMessage = pc.Decrypt(message);
-            //deserialize
+            ////deserialize
             message = (decryptedMessage != "**DECRYPT ERROR**") ? JsonConvert.DeserializeObject<string>(decryptedMessage) : "";
 
             Assert.AreEqual("ÜÖ", message);
@@ -571,6 +587,7 @@ namespace PubNubMessaging.Tests
 
             Assert.AreEqual("mIoxTVM2WAM5j-M2vlp9bVblDLoZQI5XIoYyQ48U0as=", signature);
         }
+
         /// <summary>
         /// Tests the cipher.
         /// </summary>
@@ -584,7 +601,7 @@ namespace PubNubMessaging.Tests
             Assert.AreEqual("67a4f45f0d1d9bc606486fc42dc49416", strCipher);
         }*/
 
-        static string EncodeNonAsciiCharacters(string value)
+        public static string EncodeNonAsciiCharacters(string value)
         {
             StringBuilder sb = new StringBuilder();
             foreach (char c in value)
@@ -600,10 +617,11 @@ namespace PubNubMessaging.Tests
                     sb.Append(c);
                 }
             }
+
             return sb.ToString();
         }
 
-        static string DecodeEncodedNonAsciiCharacters(string value)
+        public static string DecodeEncodedNonAsciiCharacters(string value)
         {
             return Regex.Replace(
                 value,
@@ -613,7 +631,5 @@ namespace PubNubMessaging.Tests
                     return ((char)int.Parse(m.Groups["Value"].Value, NumberStyles.HexNumber)).ToString();
                 });
         }
-
-
     }
 }
