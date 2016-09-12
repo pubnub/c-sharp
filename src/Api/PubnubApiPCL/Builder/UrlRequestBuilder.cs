@@ -278,9 +278,7 @@ namespace PubnubApi
             string signature = "0";
             //long timeStamp = TranslateDateTimeToSeconds(DateTime.UtcNow);
 
-            long timeStamp = ((pubnubUnitTest == null) || (pubnubUnitTest is IPubnubUnitTest && !pubnubUnitTest.EnableStubTest))
-                ? TranslateDateTimeToSeconds(DateTime.UtcNow)
-                    : TranslateDateTimeToSeconds(new DateTime(2013, 01, 01));
+            long timeStamp = (pubnubUnitTest == null) ? TranslateDateTimeToSeconds(DateTime.UtcNow) : pubnubUnitTest.Timetoken;
 
             string queryString = "";
             StringBuilder queryStringBuilder = new StringBuilder();
@@ -355,9 +353,7 @@ namespace PubnubApi
         Uri IUrlRequestBuilder.BuildAuditAccessRequest(string channel, string channelGroup, string authKeysCommaDelimited)
         {
             string signature = "0";
-            long timeStamp = ((pubnubUnitTest == null) || (pubnubUnitTest is IPubnubUnitTest && !pubnubUnitTest.EnableStubTest))
-                ? TranslateDateTimeToSeconds(DateTime.UtcNow)
-                    : TranslateDateTimeToSeconds(new DateTime(2013, 01, 01));
+            long timeStamp = (pubnubUnitTest == null) ? TranslateDateTimeToSeconds(DateTime.UtcNow) : pubnubUnitTest.Timetoken;
             string queryString = "";
             StringBuilder queryStringBuilder = new StringBuilder();
             if (!string.IsNullOrEmpty(authKeysCommaDelimited))

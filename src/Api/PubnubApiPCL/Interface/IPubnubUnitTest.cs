@@ -8,28 +8,10 @@ namespace PubnubApi
 {
     public interface IPubnubUnitTest
     {
-        bool EnableStubTest
+        long Timetoken
         {
             get;
             set;
         }
-
-        string TestClassName
-        {
-            get;
-            set;
-        }
-
-        string TestCaseName
-        {
-            get;
-            set;
-        }
-
-        string GetStubResponse(HttpWebRequest request);
-
-        Dictionary<string, string> StubRequestResponse(string requestUriString, string expectedServerJsonResponse);
-
-        string GetExpectedServerJsonResponse(string requestUriString);
     }
 }

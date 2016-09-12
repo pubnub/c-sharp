@@ -186,11 +186,7 @@ namespace PubnubApi
 
         public override IAsyncResult BeginGetResponse(AsyncCallback callback, object state)
         {
-            if (pubnubUnitTest is IPubnubUnitTest && pubnubUnitTest.EnableStubTest)
-            {
-                return new PubnubWebAsyncResult(callback, state);
-            }
-            else if (machineSuspendMode)
+            if (machineSuspendMode)
             {
                 return new PubnubWebAsyncResult(callback, state);
             }
@@ -202,12 +198,7 @@ namespace PubnubApi
 
         public override WebResponse EndGetResponse(IAsyncResult asyncResult)
         {
-            if (pubnubUnitTest is IPubnubUnitTest && pubnubUnitTest.EnableStubTest)
-            {
-                string stubResponse = pubnubUnitTest.GetExpectedServerJsonResponse(request.RequestUri.ToString());
-                return new PubnubWebResponse(new MemoryStream(Encoding.UTF8.GetBytes(stubResponse)));
-            }
-            else if (machineSuspendMode)
+            if (machineSuspendMode)
             {
                 WebException simulateException = new WebException("Machine suspend mode enabled. No request will be processed.", WebExceptionStatus.Pending);
                 throw simulateException;

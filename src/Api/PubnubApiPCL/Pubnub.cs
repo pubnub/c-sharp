@@ -377,23 +377,6 @@ namespace PubnubApi
             }
         }
 
-        //TO BE REMOVED
-        public Pubnub(string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
-		{
-            throw new Exception("No support");
-        }
-
-        //TO BE REMOVED
-        public Pubnub(string publishKey, string subscribeKey, string secretKey)
-		{
-            throw new Exception("No support");
-        }
-
-        //TO BE REMOVED
-        public Pubnub(string publishKey, string subscribeKey)
-		{
-            throw new Exception("No support");
-        }
 		#endregion
 	}
 }

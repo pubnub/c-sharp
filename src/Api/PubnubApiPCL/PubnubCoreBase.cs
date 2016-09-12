@@ -250,21 +250,13 @@ namespace PubnubApi
 
         private bool InternetConnectionStatusWithUnitTestCheck(string channel, string channelGroup, Action<PubnubClientError> errorCallback, string[] rawChannels, string[] rawChannelGroups)
         {
-            bool networkConnection;
-            if (unitTest is IPubnubUnitTest && unitTest.EnableStubTest)
+            bool networkConnection = InternetConnectionStatus(channel, channelGroup, errorCallback, rawChannels, rawChannelGroups);
+            if (!networkConnection)
             {
-                networkConnection = true;
-            }
-            else
-            {
-                networkConnection = InternetConnectionStatus(channel, channelGroup, errorCallback, rawChannels, rawChannelGroups);
-                if (!networkConnection)
-                {
-                    string message = "Network connnect error - Internet connection is not available.";
-                    new PNCallbackService(pubnubConfig, jsonLib).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
-                        channel, channelGroup, errorCallback, message,
-                        PubnubErrorCode.NoInternet, null, null);
-                }
+                string message = "Network connnect error - Internet connection is not available.";
+                new PNCallbackService(pubnubConfig, jsonLib).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
+                    channel, channelGroup, errorCallback, message,
+                    PubnubErrorCode.NoInternet, null, null);
             }
 
             return networkConnection;
@@ -331,16 +323,7 @@ namespace PubnubApi
                         && (currentState.ResponseType == ResponseType.Subscribe || currentState.ResponseType == ResponseType.Presence || currentState.ResponseType == ResponseType.PresenceHeartbeat)
                         && overrideTcpKeepAlive)
                 {
-                    bool networkConnection;
-                    if (unitTest is IPubnubUnitTest && unitTest.EnableStubTest)
-                    {
-                        networkConnection = true;
-                    }
-                    else
-                    {
-                        networkConnection = CheckInternetConnectionStatus(pubnetSystemActive, currentState.ErrorCallback, currentState.Channels, currentState.ChannelGroups);
-                    }
-                    networkConnection = CheckInternetConnectionStatus(pubnetSystemActive, currentState.ErrorCallback, currentState.Channels, currentState.ChannelGroups);
+                    bool networkConnection = CheckInternetConnectionStatus(pubnetSystemActive, currentState.ErrorCallback, currentState.Channels, currentState.ChannelGroups);
 
                     ChannelInternetStatus[channel] = networkConnection;
                     ChannelGroupInternetStatus[channelGroup] = networkConnection;

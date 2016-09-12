@@ -706,7 +706,7 @@ namespace PubNubMessaging.Tests
             pubnub.WhereNow().Uuid(customUUID).Async(new PNCallback<PNWhereNowResult>() { Result = ThenWhereNowShouldReturnMessage, Error = DummyErrorCallback });
             whereNowManualEvent.WaitOne();
 
-            if (!pubnub.PubnubUnitTest.EnableStubTest)
+            if (!PubnubCommon.EnableStubTest)
             {
                 unsubscribeManualEvent = new ManualResetEvent(false);
                 pubnub.Unsubscribe<string>(whereNowChannel, DummyErrorCallback);
@@ -996,7 +996,7 @@ namespace PubNubMessaging.Tests
                             {
                                 foreach (PNHereNowResult.Data.ChannelData.UuidData uuidData in uuidDataArray)
                                 {
-                                    if (pubnub.PubnubUnitTest != null && pubnub.PubnubUnitTest.EnableStubTest)
+                                    if (PubnubCommon.EnableStubTest)
                                     {
                                         receivedHereNowMessage = true;
                                         break;
@@ -1043,7 +1043,7 @@ namespace PubNubMessaging.Tests
                                     PNHereNowResult.Data.ChannelData channelUuidListDictionary = channelUUID.Value;
                                     if (channelUuidListDictionary != null && channelUuidListDictionary.Uuids != null)
                                     {
-                                        if (pubnub.PubnubUnitTest != null && pubnub.PubnubUnitTest.EnableStubTest)
+                                        if (PubnubCommon.EnableStubTest)
                                         {
                                             receivedGlobalHereNowMessage = true;
                                             break;

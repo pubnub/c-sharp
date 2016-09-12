@@ -769,15 +769,8 @@ namespace PubnubApi.EndPoint
                 return;
             }
 
-            bool networkConnection;
-            if (unitTest is IPubnubUnitTest && unitTest.EnableStubTest)
-            {
-                networkConnection = true;
-            }
-            else
-            {
-                networkConnection = CheckInternetConnectionStatus(pubnetSystemActive, errorCallback, channels, channelGroups);
-            }
+            bool networkConnection = CheckInternetConnectionStatus(pubnetSystemActive, errorCallback, channels, channelGroups);
+
             if (!networkConnection)
             {
                 ChannelInternetStatus.AddOrUpdate(multiChannel, networkConnection, (key, oldValue) => networkConnection);
@@ -899,21 +892,13 @@ namespace PubnubApi.EndPoint
 
         private bool InternetConnectionStatusWithUnitTestCheck(string channel, string channelGroup, Action<PubnubClientError> errorCallback, string[] rawChannels, string[] rawChannelGroups)
         {
-            bool networkConnection;
-            if (unitTest is IPubnubUnitTest && unitTest.EnableStubTest)
+            bool networkConnection = InternetConnectionStatus(channel, channelGroup, errorCallback, rawChannels, rawChannelGroups);
+            if (!networkConnection)
             {
-                networkConnection = true;
-            }
-            else
-            {
-                networkConnection = InternetConnectionStatus(channel, channelGroup, errorCallback, rawChannels, rawChannelGroups);
-                if (!networkConnection)
-                {
-                    string message = "Network connnect error - Internet connection is not available.";
-                    new PNCallbackService(config, jsonLibrary).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
-                        channel, channelGroup, errorCallback, message,
-                        PubnubErrorCode.NoInternet, null, null);
-                }
+                string message = "Network connnect error - Internet connection is not available.";
+                new PNCallbackService(config, jsonLibrary).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
+                    channel, channelGroup, errorCallback, message,
+                    PubnubErrorCode.NoInternet, null, null);
             }
 
             return networkConnection;
@@ -1054,15 +1039,7 @@ namespace PubnubApi.EndPoint
                         if (ChannelInternetStatus.ContainsKey(channel)
                             && (netState.ResponseType == ResponseType.Subscribe || netState.ResponseType == ResponseType.Presence))
                         {
-                            bool networkConnection;
-                            if (unitTest is IPubnubUnitTest && unitTest.EnableStubTest)
-                            {
-                                networkConnection = true;
-                            }
-                            else
-                            {
-                                networkConnection = CheckInternetConnectionStatus(pubnetSystemActive, netState.ErrorCallback, netState.Channels, netState.ChannelGroups);
-                            }
+                            bool networkConnection = CheckInternetConnectionStatus(pubnetSystemActive, netState.ErrorCallback, netState.Channels, netState.ChannelGroups);
 
                             if (ChannelInternetStatus[channel])
                             {
@@ -1156,15 +1133,7 @@ namespace PubnubApi.EndPoint
                         if (channelGroup != "" && ChannelGroupInternetStatus.ContainsKey(channelGroup)
                             && (netState.ResponseType == ResponseType.Subscribe || netState.ResponseType == ResponseType.Presence))
                         {
-                            bool networkConnection;
-                            if (unitTest is IPubnubUnitTest && unitTest.EnableStubTest)
-                            {
-                                networkConnection = true;
-                            }
-                            else
-                            {
-                                networkConnection = CheckInternetConnectionStatus(pubnetSystemActive, netState.ErrorCallback, netState.Channels, netState.ChannelGroups);
-                            }
+                            bool networkConnection = CheckInternetConnectionStatus(pubnetSystemActive, netState.ErrorCallback, netState.Channels, netState.ChannelGroups);
 
                             if (ChannelGroupInternetStatus[channelGroup])
                             {
@@ -1301,36 +1270,28 @@ namespace PubnubApi.EndPoint
             RequestState<T> currentState = presenceHeartbeatState as RequestState<T>;
             if (currentState != null)
             {
-                bool networkConnection;
-                if (unitTest is IPubnubUnitTest && unitTest.EnableStubTest)
+                bool networkConnection = CheckInternetConnectionStatus(pubnetSystemActive, currentState.ErrorCallback, currentState.Channels, currentState.ChannelGroups);
+                if (networkConnection)
                 {
-                    networkConnection = true;
-                }
-                else
-                {
-                    networkConnection = CheckInternetConnectionStatus(pubnetSystemActive, currentState.ErrorCallback, currentState.Channels, currentState.ChannelGroups);
-                    if (networkConnection)
+                    string[] subscriberChannels = (currentState.Channels != null) ? currentState.Channels.Where(s => s.Contains("-pnpres") == false).ToArray() : null;
+                    string[] subscriberChannelGroups = (currentState.ChannelGroups != null) ? currentState.ChannelGroups.Where(s => s.Contains("-pnpres") == false).ToArray() : null;
+
+                    if ((subscriberChannels != null && subscriberChannels.Length > 0) || (subscriberChannelGroups != null && subscriberChannelGroups.Length > 0))
                     {
-                        string[] subscriberChannels = (currentState.Channels != null) ? currentState.Channels.Where(s => s.Contains("-pnpres") == false).ToArray() : null;
-                        string[] subscriberChannelGroups = (currentState.ChannelGroups != null) ? currentState.ChannelGroups.Where(s => s.Contains("-pnpres") == false).ToArray() : null;
+                        string channelsJsonState = BuildJsonUserState(subscriberChannels, subscriberChannelGroups, false);
+                        IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
+                        Uri request = urlBuilder.BuildPresenceHeartbeatRequest(subscriberChannels, subscriberChannelGroups, channelsJsonState);
 
-                        if ((subscriberChannels != null && subscriberChannels.Length > 0) || (subscriberChannelGroups != null && subscriberChannelGroups.Length > 0))
-                        {
-                            string channelsJsonState = BuildJsonUserState(subscriberChannels, subscriberChannelGroups, false);
-                            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
-                            Uri request = urlBuilder.BuildPresenceHeartbeatRequest(subscriberChannels, subscriberChannelGroups, channelsJsonState);
+                        RequestState<T> requestState = new RequestState<T>();
+                        requestState.Channels = currentState.Channels;
+                        requestState.ChannelGroups = currentState.ChannelGroups;
+                        requestState.ResponseType = ResponseType.PresenceHeartbeat;
+                        requestState.SubscribeRegularCallback = null;
+                        requestState.ErrorCallback = currentState.ErrorCallback;
+                        requestState.Reconnect = false;
+                        requestState.Response = null;
 
-                            RequestState<T> requestState = new RequestState<T>();
-                            requestState.Channels = currentState.Channels;
-                            requestState.ChannelGroups = currentState.ChannelGroups;
-                            requestState.ResponseType = ResponseType.PresenceHeartbeat;
-                            requestState.SubscribeRegularCallback = null;
-                            requestState.ErrorCallback = currentState.ErrorCallback;
-                            requestState.Reconnect = false;
-                            requestState.Response = null;
-
-                            string json = UrlProcessRequest<T>(request, requestState, false);
-                        }
+                        string json = UrlProcessRequest<T>(request, requestState, false);
                     }
                 }
 
