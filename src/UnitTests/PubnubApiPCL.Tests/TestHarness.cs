@@ -1,4 +1,5 @@
 ﻿using PubnubApi;
+using System;
 
 namespace PubNubMessaging.Tests
 {
@@ -13,7 +14,8 @@ namespace PubNubMessaging.Tests
                 pnConfiguration.Origin = PubnubCommon.StubOrign;
                 #pragma warning restore CS0162 // Unreachable code detected
                 IPubnubUnitTest unitTest = new PubnubUnitTest();
-                pubnub = new Pubnub(pnConfiguration);
+                unitTest.Timetoken = 1356998400;
+                pubnub = new Pubnub(pnConfiguration, unitTest);
                 ////pubnub.PubnubUnitTest = unitTest;
                 //// We need to change this method in PubnubWebRequestBase.cs #line 187
                 //// to return only request.BeginGetResponse(callback, state);
