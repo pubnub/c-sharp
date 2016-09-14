@@ -72,5 +72,66 @@ namespace PubnubApi.EndPoint
             TerminateCurrentSubscriberRequest();
 
         }
+
+        public static long TranslateDateTimeToSeconds(DateTime dotNetUTCDateTime)
+        {
+            TimeSpan timeSpan = dotNetUTCDateTime - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            long timeStamp = Convert.ToInt64(timeSpan.TotalSeconds);
+            return timeStamp;
+        }
+
+        /// <summary>
+        /// Convert the UTC/GMT DateTime to Unix Nano Seconds format
+        /// </summary>
+        /// <param name="dotNetUTCDateTime"></param>
+        /// <returns></returns>
+        public static long TranslateDateTimeToPubnubUnixNanoSeconds(DateTime dotNetUTCDateTime)
+        {
+            TimeSpan timeSpan = dotNetUTCDateTime - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            long timeStamp = Convert.ToInt64(timeSpan.TotalSeconds) * 10000000;
+            return timeStamp;
+        }
+
+        /// <summary>
+        /// Convert the Unix Nano Seconds format time to UTC/GMT DateTime
+        /// </summary>
+        /// <param name="unixNanoSecondTime"></param>
+        /// <returns></returns>
+        public static DateTime TranslatePubnubUnixNanoSecondsToDateTime(long unixNanoSecondTime)
+        {
+            try
+            {
+                double timeStamp = unixNanoSecondTime / 10000000;
+                DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(timeStamp);
+                return dateTime;
+            }
+            catch
+            {
+                return DateTime.MinValue;
+            }
+        }
+
+        public static DateTime TranslatePubnubUnixNanoSecondsToDateTime(string unixNanoSecondTime)
+        {
+            long numericTime;
+            bool tried = Int64.TryParse(unixNanoSecondTime, out numericTime);
+            if (tried)
+            {
+                try
+                {
+                    double timeStamp = numericTime / 10000000;
+                    DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(timeStamp);
+                    return dateTime;
+                }
+                catch
+                {
+                    return DateTime.MinValue;
+                }
+            }
+            else
+            {
+                return DateTime.MinValue;
+            }
+        }
     }
 }

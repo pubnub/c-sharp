@@ -105,7 +105,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        private void DummyMethodChannelSubscribeUserCallback(Message<string> result)
+        private void DummyMethodChannelSubscribeUserCallback(PNMessageResult<string> result)
         {
         }
 

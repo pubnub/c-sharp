@@ -363,7 +363,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        private void SubscriberDummyMethodForManyMessagesUserCallback(Message<string> result)
+        private void SubscriberDummyMethodForManyMessagesUserCallback(PNMessageResult<string> result)
         {
             //Console.WriteLine("WhenSubscribedToChannel -> \n ThenSubscriberShouldBeAbleToReceiveManyMessages -> \n SubscriberDummyMethodForManyMessagesUserCallback -> result = " + result);
             numberOfReceivedMessages = numberOfReceivedMessages + 1;
@@ -385,7 +385,7 @@ namespace PubNubMessaging.Tests
         {
         }
 
-        private void ReceivedChannelUserCallback(Message<string> result)
+        private void ReceivedChannelUserCallback(PNMessageResult<string> result)
         {
         }
 
@@ -417,11 +417,11 @@ namespace PubNubMessaging.Tests
             mreChannel2SubscribeConnect.Set();
         }
 
-        private void DummyMethodDuplicateChannelUserCallback1(Message<string> result)
+        private void DummyMethodDuplicateChannelUserCallback1(PNMessageResult<string> result)
         {
         }
 
-        private void DummyMethodDuplicateChannelUserCallback2(Message<string> result)
+        private void DummyMethodDuplicateChannelUserCallback2(PNMessageResult<string> result)
         {
         }
 
@@ -433,7 +433,7 @@ namespace PubNubMessaging.Tests
         {
         }
 
-        private void ReceivedMessageCallbackWhenSubscribed(Message<string> result)
+        private void ReceivedMessageCallbackWhenSubscribed(PNMessageResult<string> result)
         {
             if (result != null && result.Data != null)
             {
@@ -446,7 +446,7 @@ namespace PubNubMessaging.Tests
             mreSubscribe.Set(); 
         }
 
-        private void ReceivedMessageCallbackYesConnect(Message<string> result)
+        private void ReceivedMessageCallbackYesConnect(PNMessageResult<string> result)
         {
             //dummy method provided as part of subscribe connect status check.
         }

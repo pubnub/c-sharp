@@ -8,10 +8,10 @@ namespace PubnubApi
         public string[] ChannelGroups { get; set; }
         public ResponseType ResponseType { get; set; }
         public Action<T> NonSubscribeRegularCallback { get; set; }
-        public Action<Message<T>> SubscribeRegularCallback { get; set; }
-        public Action<PresenceAck> PresenceRegularCallback { get; set; }
+        public Action<PNMessageResult<T>> SubscribeRegularCallback { get; set; }
+        public Action<PNPresenceEventResult> PresenceRegularCallback { get; set; }
         public Action<ConnectOrDisconnectAck> ConnectCallback { get; set; }
-        public Action<PresenceAck> WildcardPresenceCallback { get; set; }
+        public Action<PNPresenceEventResult> WildcardPresenceCallback { get; set; }
         public Action<PubnubClientError> ErrorCallback { get; set; }
         public object Timetoken { get; set; }
         public bool Reconnect { get; set; }

@@ -1122,7 +1122,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void DummyMethodForSubscribe(Message<string> receivedMessage)
+        void DummyMethodForSubscribe(PNMessageResult<string> receivedMessage)
         {
             try
             {
@@ -1151,7 +1151,7 @@ namespace PubNubMessaging.Tests
             //Dummary callback method for subscribe and unsubscribe to test presence
         }
 
-        void DummyMethodForSubscribeUUID(Message<string> receivedMessage)
+        void DummyMethodForSubscribeUUID(PNMessageResult<string> receivedMessage)
         {
             try
             {

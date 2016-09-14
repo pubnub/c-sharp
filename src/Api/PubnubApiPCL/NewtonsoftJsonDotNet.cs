@@ -130,11 +130,11 @@ namespace PubnubApi
                 return ret;
             }
 
-            if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(Message<>))
+            if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(PNMessageResult<>))
             {
                 #region "Subscribe Message<>"
                 Type dataType = typeof(T).GetGenericArguments()[0];
-                Type generic = typeof(Message<>);
+                Type generic = typeof(PNMessageResult<>);
                 Type specific = generic.MakeGenericType(dataType);
 
                 //ConstructorInfo ci = specific.GetConstructor(Type.EmptyTypes);
@@ -600,16 +600,16 @@ namespace PubnubApi
                 ret = (T)Convert.ChangeType(ack, typeof(PNPublishResult), CultureInfo.InvariantCulture);
                 #endregion
             }
-            else if (typeof(T) == typeof(PresenceAck))
+            else if (typeof(T) == typeof(PNPresenceEventResult))
             {
                 #region "PresenceAck"
                 Dictionary<string, object> presenceDicObj = ConvertToDictionaryObject(listObject[0]);
 
-                PresenceAck ack = null;
+                PNPresenceEventResult ack = null;
 
                 if (presenceDicObj != null)
                 {
-                    ack = new PresenceAck();
+                    ack = new PNPresenceEventResult();
                     ack.Action = presenceDicObj["action"].ToString();
                     ack.Timestamp = Convert.ToInt64(presenceDicObj["timestamp"].ToString());
                     ack.UUID = presenceDicObj["uuid"].ToString();
@@ -622,7 +622,7 @@ namespace PubnubApi
                 }
 
 
-                ret = (T)Convert.ChangeType(ack, typeof(PresenceAck), CultureInfo.InvariantCulture);
+                ret = (T)Convert.ChangeType(ack, typeof(PNPresenceEventResult), CultureInfo.InvariantCulture);
                 #endregion
             }
             else if (typeof(T) == typeof(PNHistoryResult))

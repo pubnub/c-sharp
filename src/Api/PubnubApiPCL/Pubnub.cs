@@ -12,62 +12,22 @@ namespace PubnubApi
         private IJsonPluggableLibrary jsonPluggableLibrary = null;
         private IPubnubUnitTest pubnubUnitTest = null;
 
-		#region "PubNub API Channel Methods"
+        #region "PubNub API Channel Methods"
 
-		public void Subscribe<T>(string channel, Action<Message<T>> subscribeCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PubnubClientError> errorCallback)
+        public EndPoint.SubscribeOperation<T> Subscribe<T>()
 		{
-			if (string.IsNullOrEmpty(channel) || channel.Trim().Length <= 0)
-			{
-				throw new ArgumentException("Channel should be provided.");
-			}
-
-            EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.Subscribe<T>(channel, "", subscribeCallback, connectCallback, disconnectCallback, null, errorCallback);
+            return new EndPoint.SubscribeOperation<T>(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
-        public void Subscribe<T>(string channel, Action<Message<T>> subscribeCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PresenceAck> wildcardPresenceCallback, Action<PubnubClientError> errorCallback)
-		{
-			if (string.IsNullOrEmpty(channel) || channel.Trim().Length <= 0)
-			{
-				throw new ArgumentException("Channel should be provided.");
-			}
-
-            EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.Subscribe<T>(channel, "", subscribeCallback, connectCallback, disconnectCallback, wildcardPresenceCallback, errorCallback);
-        }
-
-        public void Subscribe<T>(string channel, string channelGroup, Action<Message<T>> subscribeCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.Subscribe<T>(channel, channelGroup, subscribeCallback, connectCallback, disconnectCallback, null, errorCallback);
-        }
-
-        public void Subscribe<T>(string channel, string channelGroup, Action<Message<T>> subscribeCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PresenceAck> wildcardPresenceCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.Subscribe<T>(channel, channelGroup, subscribeCallback, connectCallback, disconnectCallback, wildcardPresenceCallback, errorCallback);
+        public EndPoint.UnsubscribeOperation<T> Unsubscribe<T>()
+        {
+            return new EndPoint.UnsubscribeOperation<T>(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
         public EndPoint.PublishOperation Publish()
         {
             return new EndPoint.PublishOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
-
-		public void Presence(string channel, Action<PresenceAck> presenceCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PubnubClientError> errorCallback)
-		{
-			if (string.IsNullOrEmpty(channel) || channel.Trim().Length <= 0)
-			{
-				throw new ArgumentException("Channel should be provided.");
-			}
-            EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.Presence(channel, "", presenceCallback, connectCallback, disconnectCallback, errorCallback);
-		}
-
-		public void Presence(string channel, string channelGroup, Action<PresenceAck> presenceCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.Presence(channel, channelGroup, presenceCallback, connectCallback, disconnectCallback, errorCallback);
-		}
 
 		public EndPoint.HistoryOperation History()
 		{
@@ -83,41 +43,6 @@ namespace PubnubApi
 		{
             return new EndPoint.WhereNowOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
-
-		public void Unsubscribe<T>(string channel, string channelGroup, Action<PubnubClientError> errorCallback)
-		{
-            System.Threading.Tasks.Task.Factory.StartNew(() =>
-            {
-                EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-                endPoint.Unsubscribe<T>(channel, channelGroup, errorCallback);
-            });
-        }
-
-		public void Unsubscribe<T>(string channel, Action<PubnubClientError> errorCallback)
-		{
-			if (string.IsNullOrEmpty(channel) || channel.Trim().Length <= 0)
-			{
-				throw new ArgumentException("Channel should be provided.");
-			}
-
-            System.Threading.Tasks.Task.Factory.StartNew(() =>
-            {
-                EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-                endPoint.Unsubscribe<T>(channel, null, errorCallback);
-            });
-        }
-
-		public void PresenceUnsubscribe(string channel, string channelGroup, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.PresenceUnsubscribe(channel, channelGroup, disconnectCallback, errorCallback);
-		}
-
-		public void PresenceUnsubscribe(string channel, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PubnubClientError> errorCallback)
-		{
-            EndPoint.SubscribeOperation endPoint = new EndPoint.SubscribeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.PresenceUnsubscribe(channel, "", disconnectCallback, errorCallback);
-		}
 
 		public EndPoint.TimeOperation Time()
 		{

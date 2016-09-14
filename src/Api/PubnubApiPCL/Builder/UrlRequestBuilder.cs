@@ -276,9 +276,8 @@ namespace PubnubApi
         Uri IUrlRequestBuilder.BuildGrantAccessRequest(string channelsCommaDelimited, string channelGroupsCommaDelimited, string authKeysCommaDelimited, bool read, bool write, bool manage, long ttl)
         {
             string signature = "0";
-            //long timeStamp = TranslateDateTimeToSeconds(DateTime.UtcNow);
 
-            long timeStamp = (pubnubUnitTest == null) ? TranslateDateTimeToSeconds(DateTime.UtcNow) : pubnubUnitTest.Timetoken;
+            long timeStamp = (pubnubUnitTest == null) ? TranslateUtcDateTimeToSeconds(DateTime.UtcNow) : pubnubUnitTest.Timetoken;
 
             string queryString = "";
             StringBuilder queryStringBuilder = new StringBuilder();
@@ -353,7 +352,7 @@ namespace PubnubApi
         Uri IUrlRequestBuilder.BuildAuditAccessRequest(string channel, string channelGroup, string authKeysCommaDelimited)
         {
             string signature = "0";
-            long timeStamp = (pubnubUnitTest == null) ? TranslateDateTimeToSeconds(DateTime.UtcNow) : pubnubUnitTest.Timetoken;
+            long timeStamp = (pubnubUnitTest == null) ? TranslateUtcDateTimeToSeconds(DateTime.UtcNow) : pubnubUnitTest.Timetoken;
             string queryString = "";
             StringBuilder queryStringBuilder = new StringBuilder();
             if (!string.IsNullOrEmpty(authKeysCommaDelimited))
@@ -1137,7 +1136,7 @@ namespace PubnubApi
             return hexaHash;
         }
 
-        public static long TranslateDateTimeToSeconds(DateTime dotNetUTCDateTime)
+        public static long TranslateUtcDateTimeToSeconds(DateTime dotNetUTCDateTime)
         {
             TimeSpan timeSpan = dotNetUTCDateTime - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             long timeStamp = Convert.ToInt64(timeSpan.TotalSeconds);

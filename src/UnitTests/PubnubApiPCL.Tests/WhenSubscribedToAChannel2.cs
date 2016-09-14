@@ -275,7 +275,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        private void ReceivedMessageCallbackWhenSubscribed(Message<string> result)
+        private void ReceivedMessageCallbackWhenSubscribed(PNMessageResult<string> result)
         {
             if (result != null && result.Data != null)
             {

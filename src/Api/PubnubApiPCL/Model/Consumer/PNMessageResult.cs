@@ -2,7 +2,7 @@
 
 namespace PubnubApi
 {
-    public class Message<T>
+    public class PNMessageResult<T>
     {
         public T Data { get; set; }
         public DateTime Time { get; set; }

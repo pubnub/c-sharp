@@ -7,7 +7,7 @@ namespace PubnubApi
 {
     internal class PubnubPresenceChannelCallback
     {
-        public Action<PresenceAck> PresenceRegularCallback { get; set; }
+        public Action<PNPresenceEventResult> PresenceRegularCallback { get; set; }
         public Action<ConnectOrDisconnectAck> ConnectCallback { get; set; }
         public Action<ConnectOrDisconnectAck> DisconnectCallback { get; set; }
         public Action<PubnubClientError> ErrorCallback { get; set; }

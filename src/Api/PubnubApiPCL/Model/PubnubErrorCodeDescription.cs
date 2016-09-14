@@ -68,6 +68,7 @@ namespace PubnubApi
             dictionaryCodes.Add(138, "Timeout occured while performing operation related to channel group. Please try again. If it continues, please contact PubNub support");
             dictionaryCodes.Add(139, "Duplicate channel group subscription is not allowed. Internally Pubnub API removes the duplicates before processing");
             dictionaryCodes.Add(140, "WebExcepton. The underlying connection was closed: An unexpected error occurred on a receive. If it continues, please contact PubNub support");
+            dictionaryCodes.Add(141, "Callback is missing");
             dictionaryCodes.Add(0, "Undocumented error. Please contact PubNub support with full error object details for further investigation");
         }
 
