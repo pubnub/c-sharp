@@ -73,7 +73,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
 
-            pubnub.Unsubscribe<string>(channel, NoExistChannelErrorCallback);
+            pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute(new UnsubscribeCallback() { Error = NoExistChannelErrorCallback });
 
             meNotSubscribed.WaitOne();
 
@@ -101,12 +101,12 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
 
-            pubnub.Subscribe<string>(channel, DummyMethodChannelSubscribeUserCallback, DummyMethodChannelSubscribeConnectCallback, DummyMethodUnsubscribeChannelDisconnectCallback, DummyErrorCallback);
+            pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute(new SubscribeCallback<string>() { Message = DummyMethodChannelSubscribeUserCallback, Connect = DummyMethodChannelSubscribeConnectCallback, Disconnect = DummyMethodUnsubscribeChannelDisconnectCallback, Error = DummyErrorCallback });
             meChannelSubscribed.WaitOne();
 
             if (receivedChannelConnectedMessage)
             {
-                pubnub.Unsubscribe<string>(channel, DummyErrorCallback);
+                pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute(new UnsubscribeCallback() { Error = DummyErrorCallback });
                 meChannelUnsubscribed.WaitOne();
             }
 

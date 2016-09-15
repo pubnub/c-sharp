@@ -86,7 +86,7 @@ namespace PubNubMessaging.Tests
             mreSubscribe = new ManualResetEvent(false);
 
             mreSubscribeConnect = new ManualResetEvent(false);
-            pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+            pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute(new SubscribeCallback<string>() { Message = ReceivedMessageCallbackWhenSubscribed, Connect = SubscribeDummyMethodForConnectCallback, Disconnect = UnsubscribeDummyMethodForDisconnectCallback, Error = DummyErrorCallback });
             mreSubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
             mrePublish = new ManualResetEvent(false);
@@ -100,7 +100,7 @@ namespace PubNubMessaging.Tests
                 mreSubscribe.WaitOne(manualResetEventsWaitTimeout);
 
                 mreUnsubscribe = new ManualResetEvent(false);
-                pubnub.Unsubscribe<string>(channel, DummyErrorCallback);
+                pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute(new UnsubscribeCallback() { Error = DummyErrorCallback });
                 mreUnsubscribe.WaitOne(manualResetEventsWaitTimeout);
             }
             pubnub.EndPendingRequests(); 
@@ -143,7 +143,7 @@ namespace PubNubMessaging.Tests
             mreSubscribe = new ManualResetEvent(false);
 
             mreSubscribeConnect = new ManualResetEvent(false);
-            pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+            pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute(new SubscribeCallback<string>() { Message = ReceivedMessageCallbackWhenSubscribed, Connect = SubscribeDummyMethodForConnectCallback, Disconnect = UnsubscribeDummyMethodForDisconnectCallback, Error = DummyErrorCallback });
             mreSubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
             mrePublish = new ManualResetEvent(false);
@@ -157,7 +157,7 @@ namespace PubNubMessaging.Tests
                 mreSubscribe.WaitOne(manualResetEventsWaitTimeout);
 
                 mreUnsubscribe = new ManualResetEvent(false);
-                pubnub.Unsubscribe<string>(channel, DummyErrorCallback);
+                pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute(new UnsubscribeCallback() { Error = DummyErrorCallback });
                 mreUnsubscribe.WaitOne(manualResetEventsWaitTimeout);
             }
             pubnub.EndPendingRequests(); 
@@ -250,7 +250,7 @@ namespace PubNubMessaging.Tests
             mreSubscribe = new ManualResetEvent(false);
 
             mreSubscribeConnect = new ManualResetEvent(false);
-            pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+            pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute(new SubscribeCallback<string>() { Message = ReceivedMessageCallbackWhenSubscribed, Connect = SubscribeDummyMethodForConnectCallback, Disconnect = UnsubscribeDummyMethodForDisconnectCallback, Error = DummyErrorCallback });
             mreSubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
             mrePublish = new ManualResetEvent(false);
@@ -264,7 +264,7 @@ namespace PubNubMessaging.Tests
                 mreSubscribe.WaitOne(manualResetEventsWaitTimeout);
 
                 mreUnsubscribe = new ManualResetEvent(false);
-                pubnub.Unsubscribe<string>(channel, DummyErrorCallback);
+                pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute(new UnsubscribeCallback() { Error = DummyErrorCallback });
                 mreUnsubscribe.WaitOne(manualResetEventsWaitTimeout);
             }
             pubnub.EndPendingRequests(); 

@@ -127,7 +127,7 @@ namespace PubNubMessaging.Tests
             mreSubscribe = new ManualResetEvent(false);
 
             mreSubscribeConnect = new ManualResetEvent(false);
-            pubnub.Subscribe<string>(channel:wildCardSubscribeChannel, subscribeCallback:ReceivedMessageCallbackWhenSubscribed, connectCallback:SubscribeDummyMethodForConnectCallback, disconnectCallback: UnsubscribeDummyMethodForDisconnectCallback, errorCallback:DummyErrorCallback);
+            pubnub.Subscribe<string>().Channels(new string[] { wildCardSubscribeChannel }).Execute(new SubscribeCallback<string>() { Message = ReceivedMessageCallbackWhenSubscribed, Connect = SubscribeDummyMethodForConnectCallback, Disconnect = UnsubscribeDummyMethodForDisconnectCallback, Error = DummyErrorCallback });
             mreSubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
             mrePublish = new ManualResetEvent(false);
@@ -141,7 +141,7 @@ namespace PubNubMessaging.Tests
                 mreSubscribe.WaitOne(manualResetEventsWaitTimeout);
 
                 mreUnsubscribe = new ManualResetEvent(false);
-                pubnub.Unsubscribe<string>(wildCardSubscribeChannel, DummyErrorCallback);
+                pubnub.Unsubscribe<string>().Channels(new string[] { wildCardSubscribeChannel }).Execute(new UnsubscribeCallback() { Error = DummyErrorCallback });
                 mreUnsubscribe.WaitOne(manualResetEventsWaitTimeout);
             }
             pubnub.PubnubUnitTest = null;
@@ -235,7 +235,7 @@ namespace PubNubMessaging.Tests
             mreSubscribe = new ManualResetEvent(false);
 
             mreSubscribeConnect = new ManualResetEvent(false);
-            pubnub.Subscribe<string>(wildCardSubscribeChannel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+            pubnub.Subscribe<string>().Channels(new string[] { wildCardSubscribeChannel }).Execute(new SubscribeCallback<string>() { Message = ReceivedMessageCallbackWhenSubscribed, Connect = SubscribeDummyMethodForConnectCallback, Disconnect = UnsubscribeDummyMethodForDisconnectCallback, Error = DummyErrorCallback });
             mreSubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
             mrePublish = new ManualResetEvent(false);
@@ -249,7 +249,7 @@ namespace PubNubMessaging.Tests
                 mreSubscribe.WaitOne(manualResetEventsWaitTimeout);
 
                 mreUnsubscribe = new ManualResetEvent(false);
-                pubnub.Unsubscribe<string>(wildCardSubscribeChannel, DummyErrorCallback);
+                pubnub.Unsubscribe<string>().Channels(new string[] { wildCardSubscribeChannel }).Execute(new UnsubscribeCallback() { Error = DummyErrorCallback });
                 mreUnsubscribe.WaitOne(manualResetEventsWaitTimeout);
             }
             pubnub.PubnubUnitTest = null;
@@ -316,7 +316,7 @@ namespace PubNubMessaging.Tests
 
             string wildCardSubscribeChannel = "foo.*";
             string subChannelName = "hello_my_channel";
-            string commaDelimitedChannel = string.Format("{0},{1}", subChannelName, wildCardSubscribeChannel);
+            string[] commaDelimitedChannel = new string[] { subChannelName, wildCardSubscribeChannel };
             channelGroupName = "hello_my_group";
             string channelAddForGroup = "hello_my_channel1";
             string pubWildChannelName = "foo.a";
@@ -328,7 +328,7 @@ namespace PubNubMessaging.Tests
             mreSubscribe = new ManualResetEvent(false);
 
             mreSubscribeConnect = new ManualResetEvent(false);
-            pubnub.Subscribe<string>(channel: commaDelimitedChannel, channelGroup: channelGroupName, subscribeCallback: ReceivedMessageCallbackWhenSubscribed, connectCallback: SubscribeDummyMethodForConnectCallback, disconnectCallback: SubscribeDummyMethodForDisconnectCallback, wildcardPresenceCallback: null, errorCallback: DummyErrorCallback);
+            pubnub.Subscribe<string>().Channels(commaDelimitedChannel).ChannelGroups(new string[] { channelGroupName }).Execute(new SubscribeCallback<string>() { Message = ReceivedMessageCallbackWhenSubscribed, Connect = SubscribeDummyMethodForConnectCallback, Disconnect = SubscribeDummyMethodForDisconnectCallback, Presence = null, Error = DummyErrorCallback });
             mreSubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
             mrePublish = new ManualResetEvent(false);
@@ -364,7 +364,7 @@ namespace PubNubMessaging.Tests
                 mreSubscribe.WaitOne(manualResetEventsWaitTimeout);
 
                 mreUnsubscribe = new ManualResetEvent(false);
-                pubnub.Unsubscribe<string>(commaDelimitedChannel, channelGroupName, DummyErrorCallback);
+                pubnub.Unsubscribe<string>().Channels(commaDelimitedChannel).ChannelGroups(new string[] { channelGroupName }).Execute(new UnsubscribeCallback() { Error = DummyErrorCallback });
                 mreUnsubscribe.WaitOne(manualResetEventsWaitTimeout);
             }
             Assert.IsTrue(receivedMessage, "WhenSubscribedToWildcardChannel --> ChannelAndChannelGroupAndWildcardChannelSubscribeShouldReturnReceivedMessage Failed");
@@ -395,7 +395,7 @@ namespace PubNubMessaging.Tests
             mreSubscribe = new ManualResetEvent(false);
             mreSubscribeConnect = new ManualResetEvent(false);
 
-            pubnub.Subscribe<string>(channel: wildCardSubscribeChannel, channelGroup: channelGroupName, subscribeCallback: ReceivedMessageCallbackWhenSubscribed, connectCallback: SubscribeDummyMethodForConnectCallback, disconnectCallback: SubscribeDummyMethodForDisconnectCallback, wildcardPresenceCallback: ReceivedWildcardPresenceCallbackWhenSubscribed, errorCallback: DummyErrorCallback);
+            pubnub.Subscribe<string>().Channels(new string[] { wildCardSubscribeChannel }).ChannelGroups(new string[] { channelGroupName }).Execute(new SubscribeCallback<string>() { Message = ReceivedMessageCallbackWhenSubscribed, Connect = SubscribeDummyMethodForConnectCallback, Disconnect = SubscribeDummyMethodForDisconnectCallback, Presence = ReceivedWildcardPresenceCallbackWhenSubscribed, Error = DummyErrorCallback });
             mreSubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
             mreSubscribe.WaitOne(manualResetEventsWaitTimeout);
@@ -427,7 +427,7 @@ namespace PubNubMessaging.Tests
             mreSubscribe = new ManualResetEvent(false);
             mreSubscribeConnect = new ManualResetEvent(false);
 
-            pubnub.Subscribe<string>(channel: wildCardSubscribeChannel, channelGroup: channelGroupName, subscribeCallback: ReceivedMessageCallbackWhenSubscribed, connectCallback: SubscribeDummyMethodForConnectCallback,  disconnectCallback:SubscribeDummyMethodForDisconnectCallback, wildcardPresenceCallback: null, errorCallback: DummyErrorCallback);
+            pubnub.Subscribe<string>().Channels(new string[] { wildCardSubscribeChannel }).ChannelGroups(new string[] { channelGroupName }).Execute(new SubscribeCallback<string>() { Message = ReceivedMessageCallbackWhenSubscribed, Connect = SubscribeDummyMethodForConnectCallback, Disconnect = SubscribeDummyMethodForDisconnectCallback, Presence = null, Error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 10 * 1000;
             mreSubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
@@ -484,7 +484,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        private void ReceivedWildcardPresenceCallbackWhenSubscribed(PresenceAck result)
+        private void ReceivedWildcardPresenceCallbackWhenSubscribed(PNPresenceEventResult result)
         {
             Console.WriteLine(string.Format("ReceivedWildcardPresenceCallbackWhenSubscribed  = {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result)));
             if (result != null)

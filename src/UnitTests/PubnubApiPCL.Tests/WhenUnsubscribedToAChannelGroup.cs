@@ -83,14 +83,14 @@ namespace PubNubMessaging.Tests
             if (receivedChannelGroupMessage)
             {
                 unsubscribeManualEvent = new ManualResetEvent(false);
-                pubnub.Subscribe<string>("", channelGroupName, DummyMethodChannelSubscribeUserCallback, DummyMethodChannelSubscribeConnectCallback, DummyMethodSubscribeChannelDisconnectCallback, DummyErrorCallback);
+                pubnub.Subscribe<string>().ChannelGroups(new string[] { channelGroupName }).Execute(new SubscribeCallback<string>() { Message = DummyMethodChannelSubscribeUserCallback, Connect = DummyMethodChannelSubscribeConnectCallback, Disconnect = DummyMethodSubscribeChannelDisconnectCallback, Error = DummyErrorCallback });
                 Thread.Sleep(1000);
                 unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
                 if (receivedChannelGroupConnectedMessage)
                 {
                     unsubscribeManualEvent = new ManualResetEvent(false);
-                    pubnub.Unsubscribe<string>("", channelGroupName, DummyErrorCallback);
+                    pubnub.Unsubscribe<string>().ChannelGroups(new string[] { channelGroupName }).Execute(new UnsubscribeCallback() { Error = DummyErrorCallback });
                     unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
                 }
 

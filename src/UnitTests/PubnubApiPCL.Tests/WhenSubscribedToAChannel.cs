@@ -96,7 +96,7 @@ namespace PubNubMessaging.Tests
             mreSubscribe = new ManualResetEvent(false);
 
             mreSubscribeConnect = new ManualResetEvent(false);
-            pubnub.Subscribe<string>(channel, ReceivedMessageCallbackWhenSubscribed, SubscribeDummyMethodForConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummyErrorCallback);
+            pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute(new SubscribeCallback<string>() { Message = ReceivedMessageCallbackWhenSubscribed, Connect = SubscribeDummyMethodForConnectCallback, Disconnect = UnsubscribeDummyMethodForDisconnectCallback, Error = DummyErrorCallback });
             mreSubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
             mrePublish = new ManualResetEvent(false);
@@ -110,7 +110,7 @@ namespace PubNubMessaging.Tests
                 mreSubscribe.WaitOne(manualResetEventsWaitTimeout);
 
                 mreUnsubscribe = new ManualResetEvent(false);
-                pubnub.Unsubscribe<string>(channel, DummyErrorCallback);
+                pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute(new UnsubscribeCallback() { Error = DummyErrorCallback });
                 mreUnsubscribe.WaitOne(manualResetEventsWaitTimeout);
             }
             pubnub.EndPendingRequests(); 
@@ -191,7 +191,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
 
             mreSubscribeConnect = new ManualResetEvent(false);
-            pubnub.Subscribe<string>(channel, ReceivedMessageCallbackYesConnect, ConnectStatusCallback, ConnectStatusCallback, DummyErrorCallback);
+            pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute(new SubscribeCallback<string>() { Message = ReceivedMessageCallbackYesConnect, Connect = ConnectStatusCallback, Disconnect = ConnectStatusCallback, Error = DummyErrorCallback });
             manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             mreSubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
@@ -221,12 +221,12 @@ namespace PubNubMessaging.Tests
 
             string channel1 = "hello_my_channel1";
             mreChannel1SubscribeConnect = new ManualResetEvent(false);
-            pubnub.Subscribe<string>(channel1, ReceivedChannelUserCallback, ReceivedChannel1ConnectCallback, ReceivedChannel1ConnectCallback, DummyErrorCallback);
+            pubnub.Subscribe<string>().Channels(new string[] { channel1 }).Execute(new SubscribeCallback<string>() { Message = ReceivedChannelUserCallback, Connect = ReceivedChannel1ConnectCallback, Disconnect = ReceivedChannel1ConnectCallback, Error = DummyErrorCallback });
             mreChannel1SubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
             string channel2 = "hello_my_channel2";
             mreChannel2SubscribeConnect = new ManualResetEvent(false);
-            pubnub.Subscribe<string>(channel2, ReceivedChannelUserCallback, ReceivedChannel2ConnectCallback, ReceivedChannel1ConnectCallback, DummyErrorCallback);
+            pubnub.Subscribe<string>().Channels(new string[] { channel2 }).Execute(new SubscribeCallback<string>() { Message = ReceivedChannelUserCallback, Connect = ReceivedChannel2ConnectCallback, Disconnect = ReceivedChannel1ConnectCallback, Error = DummyErrorCallback });
             mreChannel2SubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests(); 
@@ -255,12 +255,12 @@ namespace PubNubMessaging.Tests
 
             string channel1 = "hello_my_channel1";
             mreChannel1SubscribeConnect = new ManualResetEvent(false);
-            pubnub.Subscribe<string>(channel1, ReceivedChannelUserCallback, ReceivedChannel1ConnectCallback, ReceivedChannel1ConnectCallback, DummyErrorCallback);
+            pubnub.Subscribe<string>().Channels(new string[] { channel1 }).Execute(new SubscribeCallback<string>() { Message = ReceivedChannelUserCallback, Connect = ReceivedChannel1ConnectCallback, Disconnect = ReceivedChannel1ConnectCallback, Error = DummyErrorCallback });
             mreChannel1SubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
             string channel2 = "hello_my_channel2";
             mreChannel2SubscribeConnect = new ManualResetEvent(false);
-            pubnub.Subscribe<string>(channel2, ReceivedChannelUserCallback, ReceivedChannel2ConnectCallback, ReceivedChannel1ConnectCallback, DummyErrorCallback);
+            pubnub.Subscribe<string>().Channels(new string[] { channel2 }).Execute(new SubscribeCallback<string>() { Message = ReceivedChannelUserCallback, Connect = ReceivedChannel2ConnectCallback, Disconnect = ReceivedChannel1ConnectCallback, Error = DummyErrorCallback });
             mreChannel2SubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests(); 
@@ -288,10 +288,10 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
 
-            pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback1, DummyMethodDuplicateChannelConnectCallback, DummyMethodDuplicateChannelDisconnectCallback, DummyErrorCallback);
+            pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute(new SubscribeCallback<string>() { Message = DummyMethodDuplicateChannelUserCallback1, Connect = DummyMethodDuplicateChannelConnectCallback, Disconnect = DummyMethodDuplicateChannelDisconnectCallback, Error = DummyErrorCallback });
             Thread.Sleep(100);
 
-            pubnub.Subscribe<string>(channel, DummyMethodDuplicateChannelUserCallback2, DummyMethodDuplicateChannelConnectCallback, DummyMethodDuplicateChannelDisconnectCallback, DuplicateChannelErrorCallback);
+            pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute(new SubscribeCallback<string>() { Message = DummyMethodDuplicateChannelUserCallback2, Connect = DummyMethodDuplicateChannelConnectCallback, Disconnect = DummyMethodDuplicateChannelDisconnectCallback, Error = DuplicateChannelErrorCallback });
             mreAlreadySubscribed.WaitOne(manualResetEventsWaitTimeout);
 
             pubnub.EndPendingRequests(); 
@@ -319,7 +319,7 @@ namespace PubNubMessaging.Tests
             manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             //Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Iniatiating Subscribe");
             mreSubscribe = new ManualResetEvent(false);
-            pubnub.Subscribe<string>(channel, SubscriberDummyMethodForManyMessagesUserCallback, SubscribeDummyMethodForManyMessagesConnectCallback, SubscribeDummyMethodForManyMessagesDisconnectCallback, DummyErrorCallback);
+            pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute(new SubscribeCallback<string>() { Message = SubscriberDummyMethodForManyMessagesUserCallback, Connect = SubscribeDummyMethodForManyMessagesConnectCallback, Disconnect = SubscribeDummyMethodForManyMessagesDisconnectCallback, Error = DummyErrorCallback });
             Thread.Sleep(1000);
             
             mreSubscribe.WaitOne(manualResetEventsWaitTimeout);

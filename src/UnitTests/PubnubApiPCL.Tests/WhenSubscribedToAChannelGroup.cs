@@ -104,7 +104,7 @@ namespace PubNubMessaging.Tests
             if (receivedChannelGroupMessage)
             {
                 subscribeManualEvent = new ManualResetEvent(false);
-                pubnub.Subscribe<string>("", channelGroupName, ReceivedMessageCallbackWhenSubscribed, SubscribeConnectCallback, SubscribeDisconnectCallback, DummySubscribeErrorCallback);
+                pubnub.Subscribe<string>().ChannelGroups(new string[] { channelGroupName }).Execute(new SubscribeCallback<string>() { Message = ReceivedMessageCallbackWhenSubscribed, Connect = SubscribeConnectCallback, Disconnect = SubscribeDisconnectCallback, Error = DummySubscribeErrorCallback });
                 Thread.Sleep(1000);
                 pubnub.Publish().Channel(channelName).Message("Test for WhenSubscribedToAChannelGroup ThenItShouldReturnReceivedMessage").Async(new PNCallback<PNPublishResult>() { Result = dummyPublishCallback, Error = DummyPublishErrorCallback });
                 manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
@@ -113,7 +113,7 @@ namespace PubNubMessaging.Tests
                 subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
                 subscribeManualEvent = new ManualResetEvent(false);
-                pubnub.Unsubscribe<string>("", channelGroupName, DummySubscribeErrorCallback);
+                pubnub.Unsubscribe<string>().ChannelGroups(new string[] { channelGroupName }).Execute(new UnsubscribeCallback() { Error = DummySubscribeErrorCallback });
 
                 subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
                 pubnub.EndPendingRequests(); 
@@ -155,7 +155,7 @@ namespace PubNubMessaging.Tests
             if (receivedChannelGroupMessage)
             {
                 subscribeManualEvent = new ManualResetEvent(false);
-                pubnub.Subscribe<string>("", channelGroupName, ReceivedMessageCallbackWhenSubscribed, SubscribeConnectCallback, SubscribeDisconnectCallback, DummySubscribeErrorCallback);
+                pubnub.Subscribe<string>().ChannelGroups(new string[] { channelGroupName }).Execute(new SubscribeCallback<string>() { Message = ReceivedMessageCallbackWhenSubscribed, Connect = SubscribeConnectCallback, Disconnect = SubscribeDisconnectCallback, Error = DummySubscribeErrorCallback });
                 Thread.Sleep(1000);
 
                 manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
@@ -215,7 +215,7 @@ namespace PubNubMessaging.Tests
             if (receivedChannelGroupMessage1 && receivedChannelGroupMessage2)
             {
                 subscribeManualEvent = new ManualResetEvent(false);
-                pubnub.Subscribe<string>("", string.Format("{0},{1}", channelGroupName1, channelGroupName2), ReceivedMessageCallbackWhenSubscribed, SubscribeConnectCallback, SubscribeDisconnectCallback, DummySubscribeErrorCallback);
+                pubnub.Subscribe<string>().ChannelGroups(new string[] { channelGroupName1, channelGroupName2 }).Execute(new SubscribeCallback<string>() { Message = ReceivedMessageCallbackWhenSubscribed, Connect = SubscribeConnectCallback, Disconnect = SubscribeDisconnectCallback, Error = DummySubscribeErrorCallback });
                 subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
                 pubnub.EndPendingRequests(); 
