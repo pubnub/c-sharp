@@ -27,12 +27,6 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public HereNowOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-        }
-
         public HereNowOperation Channels(string[] channels)
         {
             this.channelNames = channels;
@@ -59,26 +53,11 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNHereNowResult> callback)
         {
-            HereNow(this.channelNames, this.channelGroupNames, this.includeChannelUUIDs, this.includeUserState, callback.Result, callback.Error);
+            HereNow(this.channelNames, this.channelGroupNames, this.includeChannelUUIDs, this.includeUserState, callback);
         }
 
-        internal void HereNow(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, Action<PNHereNowResult> userCallback, Action<PubnubClientError> errorCallback)
+        internal void HereNow(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, PNCallback<PNHereNowResult> callback)
         {
-            //if ((channels == null && channelGroups == null)
-            //                || (channels != null && channelGroups != null && channels.Length == 0 && channelGroups.Length == 0))
-            //{
-            //    throw new ArgumentException("Missing Channel/ChannelGroup");
-            //}
-
-            if (userCallback == null)
-            {
-                throw new ArgumentException("Missing userCallback");
-            }
-
-            if (errorCallback == null)
-            {
-                throw new ArgumentException("Missing errorCallback");
-            }
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
             Uri request = urlBuilder.BuildHereNowRequest(channels, channelGroups, showUUIDList, includeUserState);
@@ -86,10 +65,11 @@ namespace PubnubApi.EndPoint
             RequestState<PNHereNowResult> requestState = new RequestState<PNHereNowResult>();
             requestState.Channels = channels;
             requestState.ChannelGroups = channelGroups;
-            requestState.ResponseType = ResponseType.Here_Now;
-            requestState.NonSubscribeRegularCallback = userCallback;
-            requestState.ErrorCallback = errorCallback;
+            requestState.ResponseType = PNOperationType.PNHereNowOperation;
+            //requestState.NonSubscribeRegularCallback = userCallback;
+            //requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
+            requestState.Callback = callback;
 
             string json = UrlProcessRequest<PNHereNowResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))

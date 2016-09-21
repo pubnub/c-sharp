@@ -22,12 +22,6 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public DeleteChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-        }
-
         public DeleteChannelGroupOperation ChannelGroup(string channelGroup)
         {
             this.channelGroupName = channelGroup;
@@ -36,23 +30,14 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNChannelGroupsDeleteGroupResult> callback)
         {
-            DeleteChannelGroup(this.channelGroupName, callback.Result, callback.Error);
+            DeleteChannelGroup(this.channelGroupName, callback);
         }
 
-        internal void DeleteChannelGroup(string groupName, Action<PNChannelGroupsDeleteGroupResult> userCallback, Action<PubnubClientError> errorCallback)
+        internal void DeleteChannelGroup(string groupName, PNCallback<PNChannelGroupsDeleteGroupResult> callback)
         {
             if (string.IsNullOrEmpty(groupName) || groupName.Trim().Length == 0)
             {
                 throw new ArgumentException("Missing groupName");
-            }
-
-            if (userCallback == null)
-            {
-                throw new ArgumentException("Missing userCallback");
-            }
-            if (errorCallback == null)
-            {
-                throw new ArgumentException("Missing errorCallback");
             }
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
@@ -60,11 +45,10 @@ namespace PubnubApi.EndPoint
             Uri request = urlBuilder.BuildRemoveChannelsFromChannelGroupRequest(null, "", groupName);
 
             RequestState<PNChannelGroupsDeleteGroupResult> requestState = new RequestState<PNChannelGroupsDeleteGroupResult>();
-            requestState.ResponseType = ResponseType.ChannelGroupRemove;
+            requestState.ResponseType = PNOperationType.ChannelGroupRemove;
             requestState.Channels = new string[] { };
             requestState.ChannelGroups = new string[] { groupName };
-            requestState.NonSubscribeRegularCallback = userCallback;
-            requestState.ErrorCallback = errorCallback;
+            requestState.Callback = callback;
             requestState.Reconnect = false;
 
             string json = UrlProcessRequest<PNChannelGroupsDeleteGroupResult>(request, requestState, false);

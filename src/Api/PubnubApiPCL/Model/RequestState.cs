@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 
 namespace PubnubApi
 {
@@ -10,17 +11,19 @@ namespace PubnubApi
         public Action<ConnectOrDisconnectAck> ConnectCallback { get; set; }
         public Action<PNPresenceEventResult> WildcardPresenceCallback { get; set; }
         public Action<PubnubClientError> ErrorCallback { get; set; }
-        public PubnubWebRequest Request { get; set; }
-        public PubnubWebResponse Response { get; set; }
-        public ResponseType ResponseType { get; set; }
+        public HttpWebRequest Request { get; set; }
+        public HttpWebResponse Response { get; set; }
+        public PNOperationType ResponseType { get; set; }
         public string[] Channels { get; set; }
         public string[] ChannelGroups { get; set; }
         public bool Timeout { get; set; }
         public bool Reconnect { get; set; }
         public long Timetoken { get; set; }
+        public PNCallback<T> Callback { get; set; }
 
         public RequestState()
         {
+            Callback = null;
             SubscribeRegularCallback = null;
             PresenceRegularCallback = null;
             WildcardPresenceCallback = null;

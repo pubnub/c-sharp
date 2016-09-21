@@ -21,7 +21,7 @@ namespace PubnubApi
             jsonLib = jsonPluggableLibrary;
         }
 
-        PubnubWebRequest IPubnubHttp.SetProxy<T>(PubnubWebRequest request)
+        HttpWebRequest IPubnubHttp.SetProxy<T>(HttpWebRequest request)
         {
             //REVISIT
             //#if (!SILVERLIGHT && !WINDOWS_PHONE && !NETFX_CORE)
@@ -37,7 +37,7 @@ namespace PubnubApi
             return request;
         }
 
-        PubnubWebRequest IPubnubHttp.SetTimeout<T>(RequestState<T> pubnubRequestState, PubnubWebRequest request)
+        HttpWebRequest IPubnubHttp.SetTimeout<T>(RequestState<T> pubnubRequestState, HttpWebRequest request)
         {
             //REVISIT
             //#if (!SILVERLIGHT && !WINDOWS_PHONE && !NETFX_CORE)
@@ -48,7 +48,7 @@ namespace PubnubApi
         }
 
 
-        PubnubWebRequest IPubnubHttp.SetServicePointSetTcpKeepAlive(PubnubWebRequest request)
+        HttpWebRequest IPubnubHttp.SetServicePointSetTcpKeepAlive(HttpWebRequest request)
         {
 #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !NETFX_CORE)
             //request.ServicePoint.SetTcpKeepAlive(true, base.LocalClientHeartbeatInterval * 1000, 1000);
@@ -57,14 +57,14 @@ namespace PubnubApi
             return request;
         }
 
-        async Task<string> IPubnubHttp.SendRequestAndGetJsonResponse<T>(Uri requestUri, RequestState<T> pubnubRequestState, PubnubWebRequest request)
+        async Task<string> IPubnubHttp.SendRequestAndGetJsonResponse<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request)
         {
-            PubnubWebResponse response = null;
+            HttpWebResponse response = null;
             System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Before Task.Factory.FromAsync", DateTime.Now.ToString()));
             try
             {
-                response = await Task.Factory.FromAsync<PubnubWebResponse>(request.BeginGetResponse, asyncPubnubResult => (PubnubWebResponse)request.EndGetResponse(asyncPubnubResult), pubnubRequestState);
-
+                response = await Task.Factory.FromAsync<HttpWebResponse>(request.BeginGetResponse, asyncPubnubResult => (HttpWebResponse)request.EndGetResponse(asyncPubnubResult), pubnubRequestState);
+                pubnubRequestState.Response = response;
                 System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Got PubnubWebResponse", DateTime.Now.ToString()));
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
                 {
@@ -80,6 +80,7 @@ namespace PubnubApi
             {
                 if (ex.Response != null)
                 {
+                    pubnubRequestState.Response = ex.Response as HttpWebResponse;
                     using (StreamReader streamReader = new StreamReader(ex.Response.GetResponseStream()))
                     {
                         //Need to return this response 
@@ -146,7 +147,7 @@ namespace PubnubApi
             */
         }
 
-        private string ReadStreamFromResponse(PubnubWebResponse response)
+        private string ReadStreamFromResponse(HttpWebResponse response)
         {
             System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Got PubnubWebResponse", DateTime.Now.ToString()));
             using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
@@ -167,7 +168,7 @@ namespace PubnubApi
                 RequestState<T> currentState = state as RequestState<T>;
                 if (currentState != null)
                 {
-                    PubnubWebRequest request = currentState.Request;
+                    HttpWebRequest request = currentState.Request;
                     if (request != null)
                     {
                         string currentMultiChannel = (currentState.Channels == null) ? "" : string.Join(",", currentState.Channels);
@@ -195,10 +196,10 @@ namespace PubnubApi
             }
         }
 
-        protected int GetTimeoutInSecondsForResponseType(ResponseType type)
+        protected int GetTimeoutInSecondsForResponseType(PNOperationType type)
         {
             int timeout;
-            if (type == ResponseType.Subscribe || type == ResponseType.Presence)
+            if (type == PNOperationType.PNSubscribeOperation || type == PNOperationType.Presence)
             {
                 timeout = pubnubConfig.SubscribeTimeout;
             }

@@ -26,13 +26,6 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public AddPushChannelOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-            unitTest = pubnubUnitTest;
-        }
-
         public AddPushChannelOperation PushType(PNPushType pushType)
         {
             this.pubnubPushType = pushType;
@@ -53,10 +46,10 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNPushAddChannelResult> callback)
         {
-            RegisterDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, callback.Result, callback.Error);
+            RegisterDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, callback);
         }
 
-        internal void RegisterDevice(string[] channels, PNPushType pushType, string pushToken, Action<PNPushAddChannelResult> userCallback, Action<PubnubClientError> errorCallback)
+        internal void RegisterDevice(string[] channels, PNPushType pushType, string pushToken, PNCallback<PNPushAddChannelResult> callback)
         {
             if (channels == null || channels.Length == 0 || channels[0] == null || channels[0].Trim().Length == 0)
             {
@@ -68,15 +61,6 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing deviceId");
             }
 
-            if (userCallback == null)
-            {
-                throw new ArgumentException("Missing userCallback");
-            }
-            if (errorCallback == null)
-            {
-                throw new ArgumentException("Missing errorCallback");
-            }
-
             string channel = string.Join(",", channels);
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unitTest);
@@ -84,9 +68,8 @@ namespace PubnubApi.EndPoint
 
             RequestState<PNPushAddChannelResult> requestState = new RequestState<PNPushAddChannelResult>();
             requestState.Channels = new string[] { channel };
-            requestState.ResponseType = ResponseType.PushRegister;
-            requestState.NonSubscribeRegularCallback = userCallback;
-            requestState.ErrorCallback = errorCallback;
+            requestState.ResponseType = PNOperationType.PushRegister;
+            requestState.Callback = callback;
             requestState.Reconnect = false;
 
             string json = UrlProcessRequest<PNPushAddChannelResult>(request, requestState, false);

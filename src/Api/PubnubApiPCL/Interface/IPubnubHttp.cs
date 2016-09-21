@@ -1,19 +1,20 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace PubnubApi
 {
     public interface IPubnubHttp
     {
-        PubnubWebRequest SetProxy<T>(PubnubWebRequest request);
+        HttpWebRequest SetProxy<T>(HttpWebRequest request);
 
-        PubnubWebRequest SetTimeout<T>(RequestState<T> pubnubRequestState, PubnubWebRequest request);
+        HttpWebRequest SetTimeout<T>(RequestState<T> pubnubRequestState, HttpWebRequest request);
 
-        PubnubWebRequest SetServicePointSetTcpKeepAlive(PubnubWebRequest request);
+        HttpWebRequest SetServicePointSetTcpKeepAlive(HttpWebRequest request);
 
         //void SendRequestAndGetResult<T>(Uri requestUri, RequestState<T> pubnubRequestState, PubnubWebRequest request);
 
-        Task<string> SendRequestAndGetJsonResponse<T>(Uri requestUri, RequestState<T> pubnubRequestState, PubnubWebRequest request);
+        Task<string> SendRequestAndGetJsonResponse<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request);
     }
 
 }

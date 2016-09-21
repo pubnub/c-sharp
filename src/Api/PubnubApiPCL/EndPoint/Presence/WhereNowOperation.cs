@@ -23,12 +23,6 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public WhereNowOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-        }
-
         public WhereNowOperation Uuid(string uuid)
         {
             this.whereNowUUID = uuid;
@@ -37,19 +31,11 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNWhereNowResult> callback)
         {
-            WhereNow(this.whereNowUUID, callback.Result, callback.Error);
+            WhereNow(this.whereNowUUID, callback);
         }
 
-        internal void WhereNow(string uuid, Action<PNWhereNowResult> userCallback, Action<PubnubClientError> errorCallback)
+        internal void WhereNow(string uuid, PNCallback<PNWhereNowResult> callback)
         {
-            if (userCallback == null)
-            {
-                throw new ArgumentException("Missing userCallback");
-            }
-            if (errorCallback == null)
-            {
-                throw new ArgumentException("Missing errorCallback");
-            }
             if (jsonLibrary == null)
             {
                 throw new NullReferenceException("Missing Json Pluggable Library for Pubnub Instance");
@@ -65,9 +51,8 @@ namespace PubnubApi.EndPoint
 
             RequestState<PNWhereNowResult> requestState = new RequestState<PNWhereNowResult>();
             requestState.Channels = new string[] { uuid };
-            requestState.ResponseType = ResponseType.Where_Now;
-            requestState.NonSubscribeRegularCallback = userCallback;
-            requestState.ErrorCallback = errorCallback;
+            requestState.ResponseType = PNOperationType.PNWhereNowOperation;
+            requestState.Callback = callback;
             requestState.Reconnect = false;
 
             string json = UrlProcessRequest<PNWhereNowResult>(request, requestState, false);

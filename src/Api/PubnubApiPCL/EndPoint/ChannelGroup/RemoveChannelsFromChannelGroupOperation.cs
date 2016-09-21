@@ -23,12 +23,6 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public RemoveChannelsFromChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-        }
-
         public RemoveChannelsFromChannelGroupOperation ChannelGroup(string channelGroup)
         {
             this.channelGroupName = channelGroup;
@@ -43,10 +37,10 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNChannelGroupsRemoveChannelResult> callback)
         {
-            RemoveChannelsFromChannelGroup(this.channelNames, "", this.channelGroupName, callback.Result, callback.Error);
+            RemoveChannelsFromChannelGroup(this.channelNames, "", this.channelGroupName, callback);
         }
 
-        internal void RemoveChannelsFromChannelGroup(string[] channels, string nameSpace, string groupName, Action<PNChannelGroupsRemoveChannelResult> userCallback, Action<PubnubClientError> errorCallback)
+        internal void RemoveChannelsFromChannelGroup(string[] channels, string nameSpace, string groupName, PNCallback<PNChannelGroupsRemoveChannelResult> callback)
         {
             if (channels == null || channels.Length == 0)
             {
@@ -63,15 +57,6 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing groupName");
             }
 
-            if (userCallback == null)
-            {
-                throw new ArgumentException("Missing userCallback");
-            }
-            if (errorCallback == null)
-            {
-                throw new ArgumentException("Missing errorCallback");
-            }
-
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
 
             string channelsCommaDelimited = channels != null && channels.Length > 0 ? string.Join(",", channels) : "";
@@ -80,11 +65,10 @@ namespace PubnubApi.EndPoint
             Uri request = urlBuilder.BuildRemoveChannelsFromChannelGroupRequest(channelsCommaDelimited, nameSpace, groupName);
 
             RequestState<PNChannelGroupsRemoveChannelResult> requestState = new RequestState<PNChannelGroupsRemoveChannelResult>();
-            requestState.ResponseType = ResponseType.ChannelGroupRemove;
+            requestState.ResponseType = PNOperationType.ChannelGroupRemove;
             requestState.Channels = new string[] { };
             requestState.ChannelGroups = new string[] { string.Format("{0}:{1}", nameSpace, groupName) };
-            requestState.NonSubscribeRegularCallback = userCallback;
-            requestState.ErrorCallback = errorCallback;
+            requestState.Callback = callback;
             requestState.Reconnect = false;
 
             string json = UrlProcessRequest<PNChannelGroupsRemoveChannelResult>(request, requestState, false);

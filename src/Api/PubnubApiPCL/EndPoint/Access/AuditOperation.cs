@@ -26,7 +26,7 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public AuditOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
+        public AuditOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
@@ -53,10 +53,10 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNAccessManagerAuditResult> callback)
         {
-            AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, callback.Result, callback.Error);
+            AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, callback);
         }
 
-        internal void AuditAccess<T>(string channel, string channelGroup, string[] authKeys, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        internal void AuditAccess(string channel, string channelGroup, string[] authKeys, PNCallback<PNAccessManagerAuditResult> callback)
         {
             if (string.IsNullOrEmpty(config.SecretKey) || string.IsNullOrEmpty(config.SecretKey.Trim()) || config.SecretKey.Length <= 0)
             {
@@ -68,7 +68,7 @@ namespace PubnubApi.EndPoint
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
             Uri request = urlBuilder.BuildAuditAccessRequest(channel, channelGroup, authKeysCommaDelimited);
 
-            RequestState<T> requestState = new RequestState<T>();
+            RequestState<PNAccessManagerAuditResult> requestState = new RequestState<PNAccessManagerAuditResult>();
             if (!string.IsNullOrEmpty(channel))
             {
                 requestState.Channels = new string[] { channel };
@@ -77,15 +77,14 @@ namespace PubnubApi.EndPoint
             {
                 requestState.ChannelGroups = new string[] { channelGroup };
             }
-            requestState.ResponseType = ResponseType.AuditAccess;
-            requestState.NonSubscribeRegularCallback = userCallback;
-            requestState.ErrorCallback = errorCallback;
+            requestState.ResponseType = PNOperationType.PNAccessManagerAudit;
+            requestState.Callback = callback;
             requestState.Reconnect = false;
 
-            string json = UrlProcessRequest<T>(request, requestState, false);
+            string json = UrlProcessRequest<PNAccessManagerAuditResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<T>(requestState, json);
+                List<object> result = ProcessJsonResponse<PNAccessManagerAuditResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
             }
         }

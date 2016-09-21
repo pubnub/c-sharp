@@ -25,13 +25,6 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public AuditPushChannelOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-            unitTest = pubnubUnitTest;
-        }
-
         public AuditPushChannelOperation PushType(PNPushType pushType)
         {
             this.pubnubPushType = pushType;
@@ -46,31 +39,22 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNPushListProvisionsResult> callback)
         {
-            GetChannelsForDevice(this.pubnubPushType, this.deviceTokenId, callback.Result, callback.Error);
+            GetChannelsForDevice(this.pubnubPushType, this.deviceTokenId, callback);
         }
 
-        internal void GetChannelsForDevice(PNPushType pushType, string pushToken, Action<PNPushListProvisionsResult> userCallback, Action<PubnubClientError> errorCallback)
+        internal void GetChannelsForDevice(PNPushType pushType, string pushToken, PNCallback<PNPushListProvisionsResult> callback)
         {
             if (pushToken == null)
             {
                 throw new ArgumentException("Missing Uri");
-            }
-            if (userCallback == null)
-            {
-                throw new ArgumentException("Missing userCallback");
-            }
-            if (errorCallback == null)
-            {
-                throw new ArgumentException("Missing errorCallback");
             }
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unitTest);
             Uri request = urlBuilder.BuildGetChannelsPushRequest(pushType, pushToken);
 
             RequestState<PNPushListProvisionsResult> requestState = new RequestState<PNPushListProvisionsResult>();
-            requestState.ResponseType = ResponseType.PushGet;
-            requestState.NonSubscribeRegularCallback = userCallback;
-            requestState.ErrorCallback = errorCallback;
+            requestState.ResponseType = PNOperationType.PushGet;
+            requestState.Callback = callback;
             requestState.Reconnect = false;
 
             string json = UrlProcessRequest<PNPushListProvisionsResult>(request, requestState, false);

@@ -13,7 +13,8 @@ using System.Runtime.Serialization;
 using System.Globalization;
 using System.Diagnostics;
 
-namespace PubnubApi
+using PubnubApi;
+namespace PubnubApiDemo
 {
     public class PubnubExample
     {
@@ -62,36 +63,117 @@ namespace PubnubApi
             }
         }
 
-
-        public class MyCustomObjectTypeHelper : PubnubSubscribeMessageType
+        public class DemoTimeResult : PNCallback<PNTimeResult>
         {
-            public override dynamic GetSubscribeMessageType(Type messageType, object pubnubSubscribeCallbackObject, bool isChannelGroup)
+            public override void OnResponse(PNTimeResult result, PNStatus status)
             {
-                if (messageType == typeof(PubnubDemoObject))
+                Console.WriteLine("Time Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                Console.WriteLine("Time PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+            }
+        };
+
+        public class DemoPublishResult : PNCallback<PNPublishResult>
+        {
+            public override void OnResponse(PNPublishResult result, PNStatus status)
+            {
+                Console.WriteLine("Publish Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                Console.WriteLine("Publish PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+            }
+        };
+
+        public class DemoHereNowResult : PNCallback<PNHereNowResult>
+        {
+            public override void OnResponse(PNHereNowResult result, PNStatus status)
+            {
+                Console.WriteLine("HereNow Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                Console.WriteLine("HereNow PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+            }
+        };
+
+        public class DemoWhereNowResult : PNCallback<PNWhereNowResult>
+        {
+            public override void OnResponse(PNWhereNowResult result, PNStatus status)
+            {
+                Console.WriteLine("WhereNow Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                Console.WriteLine("WhereNow PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+            }
+        };
+
+        public class DemoPNGetStateResult : PNCallback<PNGetStateResult>
+        {
+            public override void OnResponse(PNGetStateResult result, PNStatus status)
+            {
+                Console.WriteLine("GetState Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                Console.WriteLine("GetState PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+            }
+        };
+
+        public class DemoPNSetStateResult : PNCallback<PNSetStateResult>
+        {
+            public override void OnResponse(PNSetStateResult result, PNStatus status)
+            {
+                Console.WriteLine("SetState Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                Console.WriteLine("SetState PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+            }
+        };
+
+        public class DemoSubscribeCallback : SubscribeCallback
+        {
+            public override void Message<T>(Pubnub pubnub, PNMessageResult<T> message)
+            {
+                Console.WriteLine("SubscribeCallback: PNMessageResult: {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(message.Message));
+            }
+
+            public override void Presence(Pubnub pubnub, PNPresenceEventResult presence)
+            {
+                Console.WriteLine("SubscribeCallback: Presence: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(presence));
+            }
+
+            public override void Status(Pubnub pubnub, PNStatus status)
+            {
+                Console.WriteLine("SubscribeCallback: PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+
+                if (status.Category == PNStatusCategory.PNUnexpectedDisconnectCategory)
                 {
-                    if (isChannelGroup)
-                    {
-                        return pubnubSubscribeCallbackObject as PubnubSubscribeChannelGroupCallback<PubnubDemoObject>;
-                    }
-                    else
-                    {
-                        return pubnubSubscribeCallbackObject as PubnubSubscribeChannelCallback<PubnubDemoObject>;
-                    }
+                    // This event happens when radio / connectivity is lost
                 }
-                else if (messageType == typeof(UserCreated))
+                else if (status.Category == PNStatusCategory.PNConnectedCategory)
                 {
-                    if (isChannelGroup)
-                    {
-                        return pubnubSubscribeCallbackObject as PubnubSubscribeChannelGroupCallback<UserCreated>;
-                    }
-                    else
-                    {
-                        return pubnubSubscribeCallbackObject as PubnubSubscribeChannelCallback<UserCreated>;
-                    }
+                    // Connect event. You can do stuff like publish, and know you'll get it.
+                    // Or just use the connected event to confirm you are subscribed for
+                    // UI / internal notifications, etc
+
                 }
-                return null;
+                else if (status.Category == PNStatusCategory.PNReconnectedCategory)
+                {
+                    // Happens as part of our regular operation. This event happens when
+                    // radio / connectivity is lost, then regained.
+                }
+                else if (status.Category == PNStatusCategory.PNDecryptionErrorCategory)
+                {
+                    // Handle messsage decryption error. Probably client configured to
+                    // encrypt messages and on live data feed it received plain text.
+                }
             }
         }
+
+        public class DemoGrantResult : PNCallback<PNAccessManagerGrantResult>
+        {
+            public override void OnResponse(PNAccessManagerGrantResult result, PNStatus status)
+            {
+                Console.WriteLine("Grant Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                Console.WriteLine("Grant PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+            }
+        };
+
+        public class DemoAuditResult : PNCallback<PNAccessManagerAuditResult>
+        {
+            public override void OnResponse(PNAccessManagerAuditResult result, PNStatus status)
+            {
+                Console.WriteLine("Audit Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                Console.WriteLine("Audit PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+            }
+        };
 
         static void UnhandledExceptionTrapper(object sender, UnhandledExceptionEventArgs e)
         {
@@ -104,7 +186,6 @@ namespace PubnubApi
         {
             PNConfiguration config = new PNConfiguration();
             AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionTrapper;
-
             PubnubProxy proxy = null;
 
             Console.WriteLine("HINT: TO TEST RE-CONNECT AND CATCH-UP,");
@@ -223,8 +304,6 @@ namespace PubnubApi
             //TO SUPPORT GENERICS, ENSURE THAT YOU IMPLEMENT "NewtonsoftJsonDotNet" METHODS FOR JSON DESERIALIZATION 
             //pubnub.JsonPluggableLibrary = new MyCustomJsonNet();
 
-            //pubnub.SubscribeMessageType = new MyCustomObjectTypeHelper();
-
             Console.WriteLine("Use Custom Session UUID? ENTER Y for Yes, else N");
             string enableCustomUUID = Console.ReadLine();
             if (enableCustomUUID.Trim().ToLower() == "y")
@@ -324,6 +403,7 @@ namespace PubnubApi
             config.ErrorLevel = PubnubErrorFilter.Level.Info;
 
             pubnub = new Pubnub(config);
+            pubnub.AddListener(new DemoSubscribeCallback());
 
             //Console.WriteLine("By default Resume On Reconnect is enabled. Do you want to disable it? ENTER Y for Yes, else N");
             //string disableResumeOnReconnect = Console.ReadLine();
@@ -565,19 +645,11 @@ namespace PubnubApi
                         {
                             Console.WriteLine("Running subscribe()");
 
-                            pubnub.Subscribe<object>()
+                            pubnub.Subscribe<UserCreated>()
+                                .WithPresence()
                                 .Channels(new string[] { channel })
                                 .ChannelGroups(new string[] { channelGroup })
-                                .Execute(new SubscribeCallback<object>()
-                                            {
-                                                Connect = DisplayConnectDisconnectStatusMessage,
-                                                Disconnect = DisplayConnectDisconnectStatusMessage,
-                                                Message = DisplaySubscribeReturnMessage,
-                                                Presence = DisplayPresenceReturnMessage,
-                                                WildPresence = DisplayWildCardPresenceReturnMessage,
-                                                Error = DisplayErrorMessage,
-                                            }
-                                    );
+                                .Execute();
                         }
                         break;
                     case "2":
@@ -655,16 +727,30 @@ namespace PubnubApi
                         #endregion
 
                         Console.WriteLine("Running publish()");
+                        //UserCreated userCreated = new UserCreated();
+                        //userCreated.TimeStamp = DateTime.Now;
+                        //List<Phone> phoneList = new List<Phone>();
+                        //phoneList.Add(new Phone() { Number = "111-222-2222", PhoneType = PhoneType.Mobile, Extenion = "11" });
+                        //userCreated.User = new User { Id = 11, Name = "Doe", Addressee = new Addressee { Id = Guid.NewGuid(), Street = "My Street" }, Phones = phoneList };
+                        //publishMsg = userCreated;
+
+                        //pubnub.Publish()
+                        //    .Channel(channel)
+                        //    .Message(publishMsg)
+                        //    .Meta(jsonUserMetaData)
+                        //    .ShouldStore(store)
+                        //    .Async(new DemoPublishResult());
+
 
                         double doubleData;
                         int intData;
                         if (int.TryParse(publishMsg, out intData)) //capture numeric data
                         {
-                            pubnub.Publish().Channel(channel).Message(intData).Meta(jsonUserMetaData).ShouldStore(store).Async(new PNCallback<PNPublishResult>() { Result = DisplayPublishReturnMessage, Error = DisplayErrorMessage });
+                            pubnub.Publish().Channel(channel).Message(intData).Meta(jsonUserMetaData).ShouldStore(store).Async(new DemoPublishResult());
                         }
                         else if (double.TryParse(publishMsg, out doubleData)) //capture numeric data
                         {
-                            pubnub.Publish().Channel(channel).Message(doubleData).Meta(jsonUserMetaData).ShouldStore(store).Async(new PNCallback<PNPublishResult>() { Result = DisplayPublishReturnMessage, Error = DisplayErrorMessage });
+                            pubnub.Publish().Channel(channel).Message(doubleData).Meta(jsonUserMetaData).ShouldStore(store).Async(new DemoPublishResult());
                         }
                         else
                         {
@@ -674,66 +760,30 @@ namespace PubnubApi
                                 string strMsg = publishMsg.Substring(1, publishMsg.Length - 2);
                                 if (int.TryParse(strMsg, out intData))
                                 {
-                                    pubnub.Publish().Channel(channel).Message(strMsg).Meta(jsonUserMetaData).ShouldStore(store).Async(new PNCallback<PNPublishResult>() { Result = DisplayPublishReturnMessage, Error = DisplayErrorMessage });
+                                    pubnub.Publish().Channel(channel).Message(strMsg).Meta(jsonUserMetaData).ShouldStore(store).Async(new DemoPublishResult());
                                 }
                                 else if (double.TryParse(strMsg, out doubleData))
                                 {
-                                    pubnub.Publish().Channel(channel).Message(strMsg).Meta(jsonUserMetaData).ShouldStore(store).Async(new PNCallback<PNPublishResult>() { Result = DisplayPublishReturnMessage, Error = DisplayErrorMessage });
+                                    pubnub.Publish().Channel(channel).Message(strMsg).Meta(jsonUserMetaData).ShouldStore(store).Async(new DemoPublishResult());
                                 }
                                 else
                                 {
-                                    pubnub.Publish().Channel(channel).Message(publishMsg).Meta(jsonUserMetaData).ShouldStore(store).Async(new PNCallback<PNPublishResult>() { Result = DisplayPublishReturnMessage, Error = DisplayErrorMessage });
+                                    pubnub.Publish().Channel(channel).Message(publishMsg).Meta(jsonUserMetaData).ShouldStore(store).Async(new DemoPublishResult());
                                 }
                             }
                             else
                             {
-                                pubnub.Publish().Channel(channel).Message(publishMsg).Meta(jsonUserMetaData).ShouldStore(store).Async(new PNCallback<PNPublishResult>() { Result = DisplayPublishReturnMessage, Error = DisplayErrorMessage } );
+                                pubnub.Publish()
+                                    .Channel(channel)
+                                    .Message(publishMsg)
+                                    .Meta(jsonUserMetaData)
+                                    .ShouldStore(store)
+                                    .Async(new DemoPublishResult());
                             }
                         }
                         break;
                     case "3":
-                        Console.WriteLine("Enter CHANNEL name for presence. Use comma to enter multiple channels.");
-                        Console.WriteLine("NOTE: If you want to consider only Presence Channel Group(s), just hit ENTER");
-                        channel = Console.ReadLine();
-
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Presence Channel = {0}", channel));
-                        Console.ResetColor();
-                        Console.WriteLine();
-
-                        Console.WriteLine("Enter CHANNEL GROUP name for presence. Use comma to enter multiple channel groups.");
-                        Console.WriteLine("To denote a namespaced CHANNEL GROUP, use the colon (:) character with the format namespace:channelgroup.");
-                        Console.WriteLine("NOTE: If you want to consider only Presence Channel(s), assuming you already entered, just hit ENTER");
-                        channelGroup = Console.ReadLine();
-
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Presence Channel Group= {0}", channelGroup));
-                        Console.ResetColor();
-                        Console.WriteLine();
-
-                        if (channel.Length <= 0 && channelGroup.Length <= 0)
-                        {
-                            Console.WriteLine("To run presence(), atleast provide either channel name or channel group name or both");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Running presence()");
-
-                            pubnub.Subscribe<object>()
-                                .Channels(new string[] { channel })
-                                .ChannelGroups(new string[] { channelGroup })
-                                .WithPresence(true)
-                                .Execute(new SubscribeCallback<object>()
-                                {
-                                    Connect = DisplayConnectDisconnectStatusMessage,
-                                    Disconnect = DisplayConnectDisconnectStatusMessage,
-                                    Message = DisplaySubscribeReturnMessage,
-                                    Presence = DisplayPresenceReturnMessage,
-                                    WildPresence = DisplayWildCardPresenceReturnMessage,
-                                    Error = DisplayErrorMessage,
-                                }
-                            );
-                        }
+                        Console.WriteLine("Presency only subscribe not available.");
                         break;
                     case "4":
                         Console.WriteLine("Enter CHANNEL name for History");
@@ -745,11 +795,11 @@ namespace PubnubApi
                         Console.WriteLine();
 
                         Console.WriteLine("Running history()");
-                        pubnub.History()
-                            .Channel(channel)
-                            .Reverse(false)
-                            .Count(100)
-                            .Async(new PNCallback<PNHistoryResult>() { Result = DisplayHistoryReturnMessage, Error = DisplayErrorMessage });
+                        //pubnub.History()
+                        //    .Channel(channel)
+                        //    .Reverse(false)
+                        //    .Count(100)
+                        //    .Async(new PNCallback<PNHistoryResult>() { Result = DisplayHistoryReturnMessage, Error = DisplayErrorMessage });
                         break;
                     case "5":
                         bool showUUID = true;
@@ -798,7 +848,7 @@ namespace PubnubApi
                             .ChannelGroups(channelGroup.Split(','))
                             .IncludeUUIDs(showUUID)
                             .IncludeState(includeUserState)
-                            .Async(new PNCallback<PNHereNowResult>() { Result = DisplayHereNowReturnMessage, Error = DisplayErrorMessage });
+                            .Async(new DemoHereNowResult());
                         break;
                     case "6":
                         Console.WriteLine("Enter CHANNEL name for Unsubscribe. Use comma to enter multiple channels.");
@@ -827,45 +877,17 @@ namespace PubnubApi
                             pubnub.Unsubscribe<object>()
                                 .Channels(new string[] { channel })
                                 .ChannelGroups(new string[] { channelGroup })
-                                .Execute(new UnsubscribeCallback() { Error = DisplayErrorMessage });
+                                .Execute();
 
                         }
                         break;
                     case "7":
-                        Console.WriteLine("Enter CHANNEL name for Presence Unsubscribe. Use comma to enter multiple channels.");
-                        channel = Console.ReadLine();
-
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Channel = {0}", channel));
-                        Console.ResetColor();
-                        Console.WriteLine();
-
-                        Console.WriteLine("Enter channel group name for Presence Unsubscribe");
-                        Console.WriteLine("NOTE: If you want to consider only Channel, just hit ENTER");
-                        channelGroup = Console.ReadLine();
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("ChannelGroup = {0}", channelGroup));
-                        Console.ResetColor();
-
-                        if (channel.Length <= 0 && channelGroup.Length <= 0)
-                        {
-                            Console.WriteLine("To run presence-unsubscribe(), atleast provide either channel name or channel group name or both");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Running presence-unsubscribe()");
-
-                            pubnub.Unsubscribe<object>()
-                                .Channels(new string[] { channel })
-                                .ChannelGroups(new string[] { channelGroup })
-                                .WithPresence(true)
-                                .Execute(new UnsubscribeCallback() { Error = DisplayErrorMessage });
-                        }
+                        Console.WriteLine("Presence-Unsubscribe not available");
                         break;
                     case "8":
                         Console.WriteLine("Running time()");
                         pubnub.Time()
-                                .Async(new PNCallback<PNTimeResult>() { Result = DisplayTimeReturnMessage, Error = DisplayErrorMessage });
+                                .Async(new DemoTimeResult());
                         break;
                     case "9":
                         Console.WriteLine("Running Disconnect/auto-Reconnect Subscriber Request Connection");
@@ -968,6 +990,7 @@ namespace PubnubApi
                         Console.WriteLine();
 
                         Console.WriteLine("Running PamGrant()");
+
                         pubnub.Grant()
                             .Channels(channelList)
                             .ChannelGroups(channelGroupList)
@@ -976,7 +999,7 @@ namespace PubnubApi
                             .Write(write)
                             .Manage(manage)
                             .TTL(grantTimeLimitInMinutes)
-                            .Async(new PNCallback<PNAccessManagerGrantResult>() { Result = DisplayGrantReturnMessage, Error = DisplayErrorMessage });
+                            .Async(new DemoGrantResult());
                         break;
                     case "13":
                         Console.WriteLine("Enter CHANNEL name for PAM Audit");
@@ -1020,11 +1043,12 @@ namespace PubnubApi
                         Console.WriteLine();
 
                         Console.WriteLine("Running PamAudit()");
+
                         pubnub.Audit()
                             .Channel(channel)
                             .ChannelGroup(channelGroup)
                             .AuthKeys(authKeyListAudit)
-                            .Async(new PNCallback<PNAccessManagerAuditResult>() { Result = DisplayAuditReturnMessage, Error = DisplayErrorMessage });
+                            .Async(new  DemoAuditResult());
                         break;
                     case "14":
                         Console.WriteLine("Enter CHANNEL name(s) for PAM Revoke");
@@ -1078,7 +1102,7 @@ namespace PubnubApi
                             .Read(false)
                             .Write(false)
                             .Manage(false)
-                            .Async(new PNCallback<PNAccessManagerGrantResult>() { Result = DisplayGrantReturnMessage, Error = DisplayErrorMessage });
+                            .Async(new DemoGrantResult());
                         break;
                     //case "15":
                     //    Console.WriteLine("Enter CHANNEL name for PAM Grant Presence.");
@@ -1176,7 +1200,7 @@ namespace PubnubApi
                             .Channels(userStateChannel.Split(','))
                             .ChannelGroups(userStateChannelGroup.Split(','))
                             .State(addOrModifystate)
-                            .Async(new PNCallback<PNSetStateResult>() { Result = DisplaySetUserStateReturnMessage, Error = DisplayErrorMessage });
+                            .Async(new DemoPNSetStateResult());
 
                         break;
                     case "24":
@@ -1202,43 +1226,9 @@ namespace PubnubApi
                             .Channels(new string[] { deleteChannelUserState })
                             .ChannelGroups(new string[] { deleteChannelGroupUserState })
                             .State(deleteDic)
-                            .Async(new PNCallback<PNSetStateResult>() { Result = DisplaySetUserStateReturnMessage, Error = DisplayErrorMessage });
+                            .Async(new DemoPNSetStateResult());
 
                         break;
-                    //case "25":
-                    //    Console.WriteLine("Enter channel name");
-                    //    Console.WriteLine("NOTE: If you want to consider only Channel Group, just hit ENTER");
-                    //    string setUserStateChannel = Console.ReadLine();
-                    //    Console.ForegroundColor = ConsoleColor.Blue;
-                    //    Console.WriteLine(string.Format("Channel = {0}", setUserStateChannel));
-                    //    Console.ResetColor();
-
-                    //    Console.WriteLine("Enter channel group name");
-                    //    Console.WriteLine("NOTE: If you want to consider only Channel, just hit ENTER");
-                    //    string setUserStateChannelGroup = Console.ReadLine();
-                    //    Console.ForegroundColor = ConsoleColor.Blue;
-                    //    Console.WriteLine(string.Format("ChannelGroup = {0}", setUserStateChannelGroup));
-                    //    Console.ResetColor();
-
-                    //    Console.WriteLine("Enter user state in json format (Eg. {\"key1\":\"value1\",\"key2\":\"value2\"}");
-                    //    string jsonUserState = Console.ReadLine();
-
-                    //    if (jsonUserState.Trim() == "")
-                    //    {
-                    //        Console.WriteLine("Invalid User State");
-                    //        break;
-                    //    }
-                    //    Console.WriteLine("Enter UUID. (Optional. Press ENTER to skip it)");
-                    //    string uuid = Console.ReadLine();
-                    //    if (string.IsNullOrEmpty(uuid))
-                    //    {
-                    //        pubnub.SetUserState(new string[] { setUserStateChannel }, new string[] { setUserStateChannelGroup }, jsonUserState, DisplaySetUserStateReturnMessage, DisplayErrorMessage);
-                    //    }
-                    //    else
-                    //    {
-                    //        pubnub.SetUserState(new string[] { setUserStateChannel }, new string[] { setUserStateChannelGroup }, uuid, jsonUserState, DisplaySetUserStateReturnMessage, DisplayErrorMessage);
-                    //    }
-                    //    break;
                     case "26":
                         Console.WriteLine("Enter channel name");
                         Console.WriteLine("NOTE: If you want to consider only Channel Group, just hit ENTER");
@@ -1264,7 +1254,7 @@ namespace PubnubApi
                             .Channels(getUserStateChannel2List)
                             .ChannelGroups(getUserStateChannelGroup2List)
                             .Uuid(uuid2)
-                            .Async(new PNCallback<PNGetStateResult>() { Result = DisplayGetUserStateReturnMessage, Error = DisplayErrorMessage });
+                            .Async(new DemoPNGetStateResult());
 
                         break;
                     case "27":
@@ -1279,7 +1269,7 @@ namespace PubnubApi
                         Console.WriteLine("Running Where_Now()");
                         pubnub.WhereNow()
                             .Uuid(whereNowUuid)
-                            .Async(new PNCallback<PNWhereNowResult>() { Result = DisplayWhereNowReturnMessage, Error = DisplayErrorMessage });
+                            .Async(new DemoWhereNowResult());
                         break;
                     case "28":
                         Console.WriteLine("GlobalHereNow() merged with HereNow");
@@ -1306,10 +1296,10 @@ namespace PubnubApi
                         Console.ResetColor();
 
                         Console.WriteLine("Running AddPushNotificationsOnChannels()");
-                        pubnub.AddPushNotificationsOnChannels().Channels( new string[] { pushRegisterChannel })
-                            .PushType(PNPushType.MPNS)
-                            .DeviceId(pushToken)
-                            .Async(new PNCallback<PNPushAddChannelResult>() { Result = DisplayAddPushNotificationStatusMessage, Error = DisplayErrorMessage });
+                        //pubnub.AddPushNotificationsOnChannels().Channels( new string[] { pushRegisterChannel })
+                        //    .PushType(PNPushType.MPNS)
+                        //    .DeviceId(pushToken)
+                        //    .Async(new PNCallback<PNPushAddChannelResult>() { Result = DisplayAddPushNotificationStatusMessage, Error = DisplayErrorMessage });
                         break;
                     case "32":
                         Console.WriteLine("Enter channel name");
@@ -1325,11 +1315,11 @@ namespace PubnubApi
                         Console.ResetColor();
 
                         Console.WriteLine("Running RemovePushNotificationsFromChannels()");
-                        pubnub.RemovePushNotificationsFromChannels()
-                            .Channels(new string[] { pushRemoveChannel })
-                            .PushType(PNPushType.MPNS)
-                            .DeviceId(pushTokenRemove)
-                            .Async(new PNCallback<PNPushRemoveChannelResult>() { Result = DisplayRemovePushNotificationStatusMessage, Error = DisplayErrorMessage });
+                        //pubnub.RemovePushNotificationsFromChannels()
+                        //    .Channels(new string[] { pushRemoveChannel })
+                        //    .PushType(PNPushType.MPNS)
+                        //    .DeviceId(pushTokenRemove)
+                        //    .Async(new PNCallback<PNPushRemoveChannelResult>() { Result = DisplayRemovePushNotificationStatusMessage, Error = DisplayErrorMessage });
                         break;
                     case "33":
                         Console.WriteLine("Enter Push Token for MPNS");
@@ -1339,10 +1329,10 @@ namespace PubnubApi
                         Console.ResetColor();
 
                         Console.WriteLine("Running AuditPushChannelProvisions()");
-                        pubnub.AuditPushChannelProvisions()
-                            .PushType(PNPushType.MPNS)
-                            .DeviceId(pushTokenGetChannel)
-                            .Async(new PNCallback<PNPushListProvisionsResult>() { Result = DisplayAuditPushNotificationStatusMessage, Error = DisplayErrorMessage });
+                        //pubnub.AuditPushChannelProvisions()
+                        //    .PushType(PNPushType.MPNS)
+                        //    .DeviceId(pushTokenGetChannel)
+                        //    .Async(new PNCallback<PNPushListProvisionsResult>() { Result = DisplayAuditPushNotificationStatusMessage, Error = DisplayErrorMessage });
                         break;
                     case "34":
                         //Toast message publish
@@ -1368,7 +1358,7 @@ namespace PubnubApi
                         pubnub.Publish()
                             .Channel(toastChannel)
                             .Message(dicToast)
-                            .Async(new PNCallback<PNPublishResult>() { Result = DisplayPublishReturnMessage, Error = DisplayErrorMessage });
+                            .Async(new DemoPublishResult());
                         break;
                     case "35":
                         //Flip Tile message publish
@@ -1435,7 +1425,8 @@ namespace PubnubApi
                         config.EnableDebugForPushPublish = true;
                         pubnub.Publish()
                             .Channel(flipTileChannel)
-                            .Message(dicFlipTile).Async(new PNCallback<PNPublishResult>() { Result = DisplayPublishReturnMessage, Error = DisplayErrorMessage });
+                            .Message(dicFlipTile)
+                            .Async(new DemoPublishResult());
                         break;
                     case "36":
                         //Cycle Tile message publish
@@ -1480,7 +1471,8 @@ namespace PubnubApi
                         config.EnableDebugForPushPublish = true;
                         pubnub.Publish()
                             .Channel(cycleTileChannel)
-                            .Message(dicCycleTile).Async(new PNCallback<PNPublishResult>() { Result = DisplayPublishReturnMessage, Error = DisplayErrorMessage });
+                            .Message(dicCycleTile)
+                            .Async(new DemoPublishResult());
                         break;
                     case "37":
                         //Iconic Tile message publish
@@ -1525,7 +1517,7 @@ namespace PubnubApi
                         pubnub.Publish()
                             .Channel(iconicTileChannel)
                             .Message(dicIconicTile)
-                            .Async(new PNCallback<PNPublishResult>() { Result = DisplayPublishReturnMessage, Error = DisplayErrorMessage });
+                            .Async(new DemoPublishResult());
                         break;
                     case "38":
                         Console.WriteLine("Enter channel group name");
@@ -1541,10 +1533,10 @@ namespace PubnubApi
                         Console.WriteLine(string.Format("Channel = {0}", channel));
                         Console.ResetColor();
                         Console.WriteLine();
-                        pubnub.AddChannelsToChannelGroup()
-                            .ChannelGroup(addChannelGroupName)
-                            .Channels(channel.Split(','))
-                            .Async(new PNCallback<PNChannelGroupsAddChannelResult>() { Result = DisplayAddChannelToChannelGroupReturnMessage, Error = DisplayErrorMessage });
+                        //pubnub.AddChannelsToChannelGroup()
+                        //    .ChannelGroup(addChannelGroupName)
+                        //    .Channels(channel.Split(','))
+                        //    .Async(new PNCallback<PNChannelGroupsAddChannelResult>() { Result = DisplayAddChannelToChannelGroupReturnMessage, Error = DisplayErrorMessage });
                         break;
                     case "39":
                         Console.WriteLine("Enter channel group name");
@@ -1562,9 +1554,9 @@ namespace PubnubApi
                         string removeExistingGroup = Console.ReadLine();
                         if (removeExistingGroup.ToLower() == "y")
                         {
-                            pubnub.DeleteChannelGroup()
-                                .ChannelGroup(removeChannelGroupName)
-                                .Async(new PNCallback<PNChannelGroupsDeleteGroupResult>() { Result = DisplayRemoveChannelGroupReturnMessage, Error = DisplayErrorMessage });
+                            //pubnub.DeleteChannelGroup()
+                            //    .ChannelGroup(removeChannelGroupName)
+                            //    .Async(new PNCallback<PNChannelGroupsDeleteGroupResult>() { Result = DisplayRemoveChannelGroupReturnMessage, Error = DisplayErrorMessage });
                             break;
                         }
 
@@ -1574,16 +1566,17 @@ namespace PubnubApi
                         Console.WriteLine(string.Format("Channel = {0}", channel));
                         Console.ResetColor();
                         Console.WriteLine();
-                        pubnub.RemoveChannelsFromChannelGroup()
-                            .ChannelGroup(removeChannelGroupName)
-                            .Channels(channel.Split(',')).Async(new PNCallback<PNChannelGroupsRemoveChannelResult>() { Result = DisplayRemoveChannelFromChannelGroupReturnMessage, Error = DisplayErrorMessage });
+                        //pubnub.RemoveChannelsFromChannelGroup()
+                        //    .ChannelGroup(removeChannelGroupName)
+                        //    .Channels(channel.Split(',')).Async(new PNCallback<PNChannelGroupsRemoveChannelResult>() { Result = DisplayRemoveChannelFromChannelGroupReturnMessage, Error = DisplayErrorMessage });
                         break;
                     case "40":
                         Console.WriteLine("Do you want to get all existing channel group names? Default is No. Enter Y for Yes, Else just hit ENTER key");
                         string getExistingGroupNames = Console.ReadLine();
                         if (getExistingGroupNames.ToLower() == "y")
                         {
-                            pubnub.ListChannelGroups().Async(new PNCallback<PNChannelGroupsAllResult>() { Result = DisplayGetAllChannelGroupsReturnMessage, Error = DisplayErrorMessage });
+                            //pubnub.ListChannelGroups()
+                            //    .Async(new PNCallback<PNChannelGroupsAllResult>() { Result = DisplayGetAllChannelGroupsReturnMessage, Error = DisplayErrorMessage });
                             break;
                         }
 
@@ -1593,9 +1586,9 @@ namespace PubnubApi
                         Console.WriteLine(string.Format("channel group name = {0}", channelGroupName));
                         Console.ResetColor();
 
-                        pubnub.ListChannelsForChannelGroup()
-                            .ChannelGroup(channelGroupName)
-                            .Async(new PNCallback<PNChannelGroupsAllChannelsResult>() { Result = DisplayGetChannelsForChannelGroupReturnMessage, Error = DisplayErrorMessage });
+                        //pubnub.ListChannelsForChannelGroup()
+                        //    .ChannelGroup(channelGroupName)
+                        //    .Async(new PNCallback<PNChannelGroupsAllChannelsResult>() { Result = DisplayGetChannelsForChannelGroupReturnMessage, Error = DisplayErrorMessage });
                         break;
                     default:
                         Console.ForegroundColor = ConsoleColor.Red;
@@ -1859,6 +1852,7 @@ namespace PubnubApi
             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
             Console.WriteLine();
         }
+
 
         /// <summary>
         /// Callback method for error messages

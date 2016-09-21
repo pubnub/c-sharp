@@ -11,16 +11,12 @@ namespace PubnubApi.EndPoint
     {
         private static PNConfiguration config = null;
         private static IJsonPluggableLibrary jsonLibrary = null;
-        private static IPubnubUnitTest unitTest = null;
         private string[] subscribeChannelNames = null;
         private string[] subscribeChannelGroupNames = null;
         private string[] presenceChannelNames = new string[] { };
         private string[] presenceChannelGroupNames = new string[] { };
         private long subscribeTimetoken;
         private bool presenceSubscribeEnabled = false;
-        private bool ignoreSubscribeButPresence = false;
-
-        protected List<SubscribeCallback<T>> subscribeCallbackListeners = new List<SubscribeCallback<T>>();
 
         public SubscribeOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
         {
@@ -31,13 +27,6 @@ namespace PubnubApi.EndPoint
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
-        }
-
-        public SubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-            unitTest = pubnubUnitTest;
         }
 
         public SubscribeOperation<T> Channels(string[] channels)
@@ -64,14 +53,7 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
-        public SubscribeOperation<T> WithPresence(bool ignoreSubscribe)
-        {
-            this.presenceSubscribeEnabled = true;
-            this.ignoreSubscribeButPresence = ignoreSubscribe;
-            return this;
-        }
-
-        public void Execute(SubscribeCallback<T> callback)
+        public void Execute()
         {
             if (this.subscribeChannelNames == null)
             {
@@ -91,46 +73,34 @@ namespace PubnubApi.EndPoint
                                                 ? this.subscribeChannelGroupNames.Select(c => string.Format("{0}-pnpres", c)).ToArray() : new string[] { };
             }
 
-            if (this.ignoreSubscribeButPresence)
-            {
-                this.subscribeChannelNames = new string[] { };
-                this.subscribeChannelGroupNames = new string[] { };
-            }
-
             string[] channelNames = this.subscribeChannelNames.Concat(this.presenceChannelNames).ToArray();
             string[] channelGroupNames = this.subscribeChannelGroupNames.Concat(this.presenceChannelGroupNames).ToArray();
 
-            //Presence(this.presenceChannelNames, this.presenceChannelGroupNames, callback.Presence, callback.Connect, callback.Disconnect, callback.Error);
-            
-            Subscribe(channelNames, channelGroupNames, callback.Message, callback.Presence, callback.Connect, callback.Disconnect, callback.WildPresence, callback.Error);
+            Subscribe(channelNames, channelGroupNames);
         }
 
-        private void Subscribe(string[] channels, string[] channelGroups, Action<PNMessageResult<T>> subscribeCallback, Action<PNPresenceEventResult> presenceCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PNPresenceEventResult> wildPresenceCallback, Action<PubnubClientError> errorCallback)
+        private void Subscribe(string[] channels, string[] channelGroups)
         {
             if ((channels == null || channels.Length == 0) && (channelGroups == null || channelGroups.Length  == 0))
             {
                 throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
             }
 
-            if (errorCallback == null)
-            {
-                throw new ArgumentException("Missing errorCallback");
-            }
 
             string channel = (channels != null) ? string.Join(",", channels) : "";
             string channelGroup = (channelGroups != null) ? string.Join(",", channelGroups) : "";
 
-            if (subscribeCallback == null)
-            {
-                new PNCallbackService(config, jsonLibrary).CallErrorCallback(PubnubErrorSeverity.Info, PubnubMessageSource.Client,
-                            channel, channelGroup, errorCallback, "Missing subscribeCallback", PubnubErrorCode.InvalidChannel,
-                            null, null);
-            }
+            //if (subscribeCallback == null)
+            //{
+            //    new PNCallbackService(config, jsonLibrary).CallErrorCallback(PubnubErrorSeverity.Info, PubnubMessageSource.Client,
+            //                channel, channelGroup, errorCallback, "Missing subscribeCallback", PubnubErrorCode.InvalidChannel,
+            //                null, null);
+            //}
 
-            if (connectCallback == null)
-            {
-                throw new ArgumentException("Missing connectCallback");
-            }
+            //if (connectCallback == null)
+            //{
+            //    throw new ArgumentException("Missing connectCallback");
+            //}
 
             LoggingMethod.WriteToLog(string.Format("DateTime {0}, requested subscribe for channel={1} and channel group={2}", DateTime.Now.ToString(), channel, channelGroup), LoggingMethod.LevelInfo);
 
@@ -156,8 +126,8 @@ namespace PubnubApi.EndPoint
             //}
             System.Threading.Tasks.Task.Factory.StartNew(() =>
             {
-                SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unitTest);
-                manager.MultiChannelSubscribeInit<T>(ResponseType.Subscribe, channels, channelGroups, subscribeCallback, presenceCallback, connectCallback, disconnectCallback, wildPresenceCallback, errorCallback);
+                SubscribeManager manager = new SubscribeManager(config, jsonLibrary);
+                manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups);
             });
         }
 

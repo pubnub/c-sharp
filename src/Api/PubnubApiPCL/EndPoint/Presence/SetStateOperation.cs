@@ -26,12 +26,6 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public SetStateOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-        }
-
         public SetStateOperation Channels(string[] channels)
         {
             this.channelNames = channels;
@@ -59,10 +53,10 @@ namespace PubnubApi.EndPoint
         public void Async(PNCallback<PNSetStateResult> callback)
         {
             string serializedState = jsonLibrary.SerializeToJsonString(this.userState);
-            SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, callback.Result, callback.Error);
+            SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, callback);
         }
 
-        internal void SetUserState(string[] channels, string[] channelGroups, string uuid, string jsonUserState, Action<PNSetStateResult> userCallback, Action<PubnubClientError> errorCallback)
+        internal void SetUserState(string[] channels, string[] channelGroups, string uuid, string jsonUserState, PNCallback<PNSetStateResult> callback)
         {
             if ((channels == null && channelGroups == null)
                             || (channels != null && channelGroups != null && channels.Length == 0 && channelGroups.Length == 0))
@@ -73,16 +67,6 @@ namespace PubnubApi.EndPoint
             if (string.IsNullOrEmpty(jsonUserState) || string.IsNullOrEmpty(jsonUserState.Trim()))
             {
                 throw new ArgumentException("Missing User State");
-            }
-
-            if (userCallback == null)
-            {
-                throw new ArgumentException("Missing userCallback");
-            }
-
-            if (errorCallback == null)
-            {
-                throw new ArgumentException("Missing errorCallback");
             }
 
             List<string> channelList = new List<string>();
@@ -151,34 +135,24 @@ namespace PubnubApi.EndPoint
 
                     if (!stateChanged)
                     {
-                        string message = "No change in User State";
+                        StatusBuilder statusBuilder = new StatusBuilder(config, jsonLibrary);
+                        PNStatus status = statusBuilder.CreateStatusResponse< PNSetStateResult>(PNOperationType.PNSetStateOperation, PNStatusCategory.PNUnknownCategory, null, System.Net.HttpStatusCode.NotModified, null);
 
-                        new PNCallbackService(config, jsonLibrary).CallErrorCallback(PubnubErrorSeverity.Info, PubnubMessageSource.Client,
-                            commaDelimitedChannel, commaDelimitedChannelGroup, errorCallback, message, PubnubErrorCode.UserStateUnchanged, null, null);
+                        Announce(status);
                         return;
                     }
 
                 }
             }
 
-            SharedSetUserState(channels, channelGroups, uuid, jsonUserState, jsonUserState, userCallback, errorCallback);
+            SharedSetUserState(channels, channelGroups, uuid, jsonUserState, jsonUserState, callback);
         }
 
-        internal void SetUserState(string[] channels, string[] channelGroups, string uuid, KeyValuePair<string, object> keyValuePair, Action<PNSetStateResult> userCallback, Action<PubnubClientError> errorCallback)
+        internal void SetUserState(string[] channels, string[] channelGroups, string uuid, KeyValuePair<string, object> keyValuePair, PNCallback<PNSetStateResult> callback)
         {
             if ((channels == null && channelGroups != null) || (channels.Length == 0 && channelGroups.Length == 0))
             {
                 throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
-            }
-
-            if (userCallback == null)
-            {
-                throw new ArgumentException("Missing userCallback");
-            }
-
-            if (errorCallback == null)
-            {
-                throw new ArgumentException("Missing errorCallback");
             }
 
             List<string> channelList = new List<string>();
@@ -276,10 +250,10 @@ namespace PubnubApi.EndPoint
 
             if (!stateChanged)
             {
-                string message = "No change in User State";
+                StatusBuilder statusBuilder = new StatusBuilder(config, jsonLibrary);
+                PNStatus status = statusBuilder.CreateStatusResponse<PNSetStateResult>(PNOperationType.PNSetStateOperation, PNStatusCategory.PNUnknownCategory, null, System.Net.HttpStatusCode.NotModified, null);
 
-                new PNCallbackService(config, jsonLibrary).CallErrorCallback(PubnubErrorSeverity.Info, PubnubMessageSource.Client,
-                    commaDelimitedChannel, commaDelimitedChannelGroup, errorCallback, message, PubnubErrorCode.UserStateUnchanged, null, null);
+                Announce(status);
                 return;
             }
 
@@ -292,10 +266,10 @@ namespace PubnubApi.EndPoint
                 currentChannelGroupUserState = "{}";
             }
 
-            SharedSetUserState(channels, channelGroups, uuid, currentChannelUserState, currentChannelGroupUserState, userCallback, errorCallback);
+            SharedSetUserState(channels, channelGroups, uuid, currentChannelUserState, currentChannelGroupUserState, callback);
         }
 
-        private void SharedSetUserState(string[] channels, string[] channelGroups, string uuid, string jsonChannelUserState, string jsonChannelGroupUserState, Action<PNSetStateResult> userCallback, Action<PubnubClientError> errorCallback)
+        private void SharedSetUserState(string[] channels, string[] channelGroups, string uuid, string jsonChannelUserState, string jsonChannelGroupUserState, PNCallback<PNSetStateResult> callback)
         {
             List<string> channelList = new List<string>();
             List<string> channelGroupList = new List<string>();
@@ -394,9 +368,8 @@ namespace PubnubApi.EndPoint
             RequestState<PNSetStateResult> requestState = new RequestState<PNSetStateResult>();
             requestState.Channels = channels;
             requestState.ChannelGroups = channelGroups;
-            requestState.ResponseType = ResponseType.SetUserState;
-            requestState.NonSubscribeRegularCallback = userCallback;
-            requestState.ErrorCallback = errorCallback;
+            requestState.ResponseType = PNOperationType.PNSetStateOperation;
+            requestState.Callback = callback;
             requestState.Reconnect = false;
 
             //Set TerminateSubRequest to true to bounce the long-polling subscribe requests to update user state

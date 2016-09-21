@@ -21,12 +21,6 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public ListChannelsForChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-        }
-
         public ListChannelsForChannelGroupOperation ChannelGroup(string channelGroup)
         {
             this.channelGroupName = channelGroup;
@@ -35,23 +29,14 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNChannelGroupsAllChannelsResult> callback)
         {
-            GetChannelsForChannelGroup(this.channelGroupName, callback.Result, callback.Error);
+            GetChannelsForChannelGroup(this.channelGroupName, callback);
         }
 
-        internal void GetChannelsForChannelGroup(string groupName, Action<PNChannelGroupsAllChannelsResult> userCallback, Action<PubnubClientError> errorCallback)
+        internal void GetChannelsForChannelGroup(string groupName, PNCallback<PNChannelGroupsAllChannelsResult> callback)
         {
             if (string.IsNullOrEmpty(groupName) || groupName.Trim().Length == 0)
             {
                 throw new ArgumentException("Missing groupName");
-            }
-
-            if (userCallback == null)
-            {
-                throw new ArgumentException("Missing userCallback");
-            }
-            if (errorCallback == null)
-            {
-                throw new ArgumentException("Missing errorCallback");
             }
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
@@ -59,10 +44,9 @@ namespace PubnubApi.EndPoint
             Uri request = urlBuilder.BuildGetChannelsForChannelGroupRequest(null, groupName, false);
 
             RequestState<PNChannelGroupsAllChannelsResult> requestState = new RequestState<PNChannelGroupsAllChannelsResult>();
-            requestState.ResponseType = ResponseType.ChannelGroupGet;
+            requestState.ResponseType = PNOperationType.ChannelGroupGet;
             requestState.ChannelGroups = new string[] { groupName };
-            requestState.NonSubscribeRegularCallback = userCallback;
-            requestState.ErrorCallback = errorCallback;
+            requestState.Callback = callback;
             requestState.Reconnect = false;
 
             string json = UrlProcessRequest<PNChannelGroupsAllChannelsResult>(request, requestState, false);
@@ -99,7 +83,7 @@ namespace PubnubApi.EndPoint
             Uri request = urlBuilder.BuildGetChannelsForChannelGroupRequest(nameSpace, groupName, false);
 
             RequestState<T> requestState = new RequestState<T>();
-            requestState.ResponseType = ResponseType.ChannelGroupGet;
+            requestState.ResponseType = PNOperationType.ChannelGroupGet;
             requestState.ChannelGroups = new string[] { string.Format("{0}:{1}", nameSpace, groupName) };
             requestState.NonSubscribeRegularCallback = userCallback;
             requestState.ErrorCallback = errorCallback;

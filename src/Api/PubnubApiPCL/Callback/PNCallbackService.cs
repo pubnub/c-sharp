@@ -63,7 +63,7 @@ namespace PubnubApi
         //			}
         //		}
 
-        internal void GoToCallback<T>(List<object> result, Action<T> callback, bool internalObject, ResponseType type)
+        internal void GoToCallback<T>(List<object> result, Action<T> callback, bool internalObject, PNOperationType type)
         {
             if (callback != null)
             {
@@ -71,7 +71,7 @@ namespace PubnubApi
                 {
                     JsonResponseToCallback(result, callback);
                 }
-                else if (typeof(T) == typeof(long) && type == ResponseType.Time)
+                else if (typeof(T) == typeof(long) && type == PNOperationType.PNTimeOperation)
                 {
                     long timetoken;
                     Int64.TryParse(result[0].ToString(), out timetoken);
@@ -135,8 +135,8 @@ namespace PubnubApi
 
         internal PubnubClientError CallErrorCallback(PubnubErrorSeverity errSeverity, PubnubMessageSource msgSource,
                                                          string channel, string channelGroup, Action<PubnubClientError> errorCallback,
-                                                         string message, PubnubErrorCode errorType, PubnubWebRequest req,
-                                                         PubnubWebResponse res)
+                                                         string message, PubnubErrorCode errorType, HttpWebRequest req,
+                                                         HttpWebResponse res)
         {
             int statusCode = (int)errorType;
 
@@ -150,7 +150,7 @@ namespace PubnubApi
         internal PubnubClientError CallErrorCallback(PubnubErrorSeverity errSeverity, PubnubMessageSource msgSource,
                                                          string channel, string channelGroup, Action<PubnubClientError> errorCallback,
                                                          string message, int currentHttpStatusCode, string statusMessage,
-                                                         PubnubWebRequest req, PubnubWebResponse res)
+                                                         HttpWebRequest req, HttpWebResponse res)
         {
             PubnubErrorCode pubnubErrorType = PubnubErrorCodeHelper.GetErrorType((int)currentHttpStatusCode, statusMessage);
 
@@ -165,8 +165,8 @@ namespace PubnubApi
 
         internal PubnubClientError CallErrorCallback(PubnubErrorSeverity errSeverity, PubnubMessageSource msgSource,
                                                          string channel, string channelGroup, Action<PubnubClientError> errorCallback,
-                                                         Exception ex, PubnubWebRequest req,
-                                                         PubnubWebResponse res)
+                                                         Exception ex, HttpWebRequest req,
+                                                         HttpWebResponse res)
         {
             PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(ex);
 
@@ -180,8 +180,8 @@ namespace PubnubApi
 
         internal PubnubClientError CallErrorCallback(PubnubErrorSeverity errSeverity, PubnubMessageSource msgSource,
                                                          string channel, string channelGroup, Action<PubnubClientError> errorCallback,
-                                                         WebException webex, PubnubWebRequest req,
-                                                         PubnubWebResponse res)
+                                                         WebException webex, HttpWebRequest req,
+                                                         HttpWebResponse res)
         {
             PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(webex.Status, webex.Message);
             int statusCode = (int)errorType;

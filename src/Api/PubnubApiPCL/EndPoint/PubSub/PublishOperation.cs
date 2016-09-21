@@ -28,12 +28,6 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public PublishOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-        }
-
         public PublishOperation Message(object message)
         {
             this.msg = message;
@@ -66,10 +60,10 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNPublishResult> callback)
         {
-            Publish(this.channelName, this.msg, this.storeInHistory, this.userMetadata, callback.Result, callback.Error);
+            Publish(this.channelName, this.msg, this.storeInHistory, this.userMetadata, callback);
         }
 
-        private void Publish(string channel, object message, bool storeInHistory, string jsonUserMetaData, Action<PNPublishResult> userCallback, Action<PubnubClientError> errorCallback)
+        private void Publish(string channel, object message, bool storeInHistory, string jsonUserMetaData, PNCallback<PNPublishResult> callback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
             {
@@ -81,13 +75,9 @@ namespace PubnubApi.EndPoint
                 throw new MissingMemberException("Invalid publish key");
             }
 
-            if (userCallback == null)
+            if (callback == null)
             {
                 throw new ArgumentException("Missing userCallback");
-            }
-            if (errorCallback == null)
-            {
-                throw new ArgumentException("Missing errorCallback");
             }
 
             if (config.EnableDebugForPushPublish)
@@ -110,9 +100,8 @@ namespace PubnubApi.EndPoint
 
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
             requestState.Channels = new string[] { channel };
-            requestState.ResponseType = ResponseType.Publish;
-            requestState.NonSubscribeRegularCallback = userCallback;
-            requestState.ErrorCallback = errorCallback;
+            requestState.ResponseType = PNOperationType.PNPublishOperation;
+            requestState.Callback = callback;
             requestState.Reconnect = false;
 
             string json = UrlProcessRequest<PNPublishResult>(request, requestState, false);

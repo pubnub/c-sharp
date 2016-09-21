@@ -10,7 +10,6 @@ namespace PubnubApi.EndPoint
     {
         private static PNConfiguration config = null;
         private static IJsonPluggableLibrary jsonLibrary = null;
-        private static IPubnubUnitTest unitTest = null;
 
         public OtherOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
         {
@@ -21,13 +20,6 @@ namespace PubnubApi.EndPoint
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
-        }
-
-        public OtherOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-            unitTest = pubnubUnitTest;
         }
 
         public void ChangeUUID(string newUUID)
@@ -59,7 +51,7 @@ namespace PubnubApi.EndPoint
                 RequestState<string> requestState = new RequestState<string>();
                 requestState.Channels = channels;
                 requestState.ChannelGroups = channelGroups;
-                requestState.ResponseType = ResponseType.Leave;
+                requestState.ResponseType = PNOperationType.Leave;
                 requestState.SubscribeRegularCallback = null;
                 requestState.PresenceRegularCallback = null;
                 requestState.ErrorCallback = null;

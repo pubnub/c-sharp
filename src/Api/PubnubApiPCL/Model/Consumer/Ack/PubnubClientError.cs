@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Net;
 using System.Text;
 
 namespace PubnubApi
@@ -14,8 +15,8 @@ namespace PubnubApi
         string _channel = "";
         string _channelGroup = "";
         Exception _detailedDotNetException = null;
-        PubnubWebRequest _pubnubWebRequest = null;
-        PubnubWebResponse _pubnubWebResponse = null;
+        HttpWebRequest _pubnubWebRequest = null;
+        HttpWebResponse _pubnubWebResponse = null;
         string _description = "";
         DateTime _dateTimeGMT;
 
@@ -23,7 +24,7 @@ namespace PubnubApi
         {
         }
 
-        public PubnubClientError(int statusCode, PubnubErrorSeverity errorSeverity, bool isDotNetException, string message, Exception detailedDotNetException, PubnubMessageSource source, PubnubWebRequest pubnubWebRequest, PubnubWebResponse pubnubWebResponse, string description, string channel, string channelGroup)
+        public PubnubClientError(int statusCode, PubnubErrorSeverity errorSeverity, bool isDotNetException, string message, Exception detailedDotNetException, PubnubMessageSource source, HttpWebRequest pubnubWebRequest, HttpWebResponse pubnubWebResponse, string description, string channel, string channelGroup)
         {
             _dateTimeGMT = DateTime.Now.ToUniversalTime();
             _statusCode = statusCode;
@@ -39,7 +40,7 @@ namespace PubnubApi
             _description = description;
         }
 
-        public PubnubClientError(int statusCode, PubnubErrorSeverity errorSeverity, string message, PubnubMessageSource source, PubnubWebRequest pubnubWebRequest, PubnubWebResponse pubnubWebResponse, string description, string channel, string channelGroup)
+        public PubnubClientError(int statusCode, PubnubErrorSeverity errorSeverity, string message, PubnubMessageSource source, HttpWebRequest pubnubWebRequest, HttpWebResponse pubnubWebResponse, string description, string channel, string channelGroup)
         {
             _dateTimeGMT = DateTime.Now.ToUniversalTime();
             _statusCode = statusCode;
@@ -103,7 +104,7 @@ namespace PubnubApi
             }
         }
 
-        public PubnubWebRequest PubnubWebRequest
+        public HttpWebRequest PubnubWebRequest
         {
             get
             {
@@ -111,7 +112,7 @@ namespace PubnubApi
             }
         }
 
-        public PubnubWebResponse PubnubWebResponse
+        public HttpWebResponse PubnubWebResponse
         {
             get
             {
@@ -166,9 +167,9 @@ namespace PubnubApi
             errorBuilder.AppendLine();
             errorBuilder.AppendFormat("DetailedDotNetException={0} ", (_detailedDotNetException != null) ? _detailedDotNetException.ToString() : "");
             errorBuilder.AppendLine();
-            errorBuilder.AppendFormat("PubnubWebRequest={0} ", (_pubnubWebRequest != null) ? _pubnubWebRequest.ToString() : "");
+            errorBuilder.AppendFormat("HttpWebRequest={0} ", (_pubnubWebRequest != null) ? _pubnubWebRequest.ToString() : "");
             errorBuilder.AppendLine();
-            errorBuilder.AppendFormat("PubnubWebResponse={0} ", (_pubnubWebResponse != null) ? _pubnubWebResponse.ToString() : "");
+            errorBuilder.AppendFormat("HttpWebResponse={0} ", (_pubnubWebResponse != null) ? _pubnubWebResponse.ToString() : "");
             errorBuilder.AppendLine();
             errorBuilder.AppendFormat("Channel={0} ", (_channel != null) ? _channel : "");
             errorBuilder.AppendLine();

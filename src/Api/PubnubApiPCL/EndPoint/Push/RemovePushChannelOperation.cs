@@ -26,13 +26,6 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public RemovePushChannelOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-            unitTest = pubnubUnitTest;
-        }
-
         public RemovePushChannelOperation PushType(PNPushType pushType)
         {
             this.pubnubPushType = pushType;
@@ -53,10 +46,10 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNPushRemoveChannelResult> callback)
         {
-            RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, callback.Result, callback.Error);
+            RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, callback);
         }
 
-        internal void RemoveChannelForDevice(string[] channels, PNPushType pushType, string pushToken, Action<PNPushRemoveChannelResult> userCallback, Action<PubnubClientError> errorCallback)
+        internal void RemoveChannelForDevice(string[] channels, PNPushType pushType, string pushToken, PNCallback<PNPushRemoveChannelResult> callback)
         {
             if (channels == null || channels.Length == 0 || channels[0] == null || channels[0].Trim().Length == 0)
             {
@@ -67,14 +60,6 @@ namespace PubnubApi.EndPoint
             {
                 throw new ArgumentException("Missing deviceId");
             }
-            if (userCallback == null)
-            {
-                throw new ArgumentException("Missing userCallback");
-            }
-            if (errorCallback == null)
-            {
-                throw new ArgumentException("Missing errorCallback");
-            }
 
             string channel = string.Join(",", channels);
 
@@ -83,9 +68,8 @@ namespace PubnubApi.EndPoint
 
             RequestState<PNPushRemoveChannelResult> requestState = new RequestState<PNPushRemoveChannelResult>();
             requestState.Channels = new string[] { channel };
-            requestState.ResponseType = ResponseType.PushRemove;
-            requestState.NonSubscribeRegularCallback = userCallback;
-            requestState.ErrorCallback = errorCallback;
+            requestState.ResponseType = PNOperationType.PushRemove;
+            requestState.Callback = callback;
             requestState.Reconnect = false;
 
             string json = UrlProcessRequest<PNPushRemoveChannelResult>(request, requestState, false);

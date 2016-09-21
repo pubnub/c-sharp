@@ -144,7 +144,7 @@ namespace PubnubApi
                     object message = ci.Invoke(new object[] { });
 
                     //Set data
-                    PropertyInfo dataProp = specific.GetProperty("Data");
+                    PropertyInfo dataProp = specific.GetProperty("Message");
 
                     object userMessage = null;
                     if (listObject[0].GetType() == typeof(Newtonsoft.Json.Linq.JValue))
@@ -188,15 +188,17 @@ namespace PubnubApi
                     }
 
                     //Set Time
-                    PropertyInfo timeProp = specific.GetProperty("Time");
-                    timeProp.SetValue(message, Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(listObject[1].ToString()), null);
+                    PropertyInfo timeProp = specific.GetProperty("Timetoken");
+                    long timetoken;
+                    Int64.TryParse(listObject[1].ToString(), out timetoken);
+                    timeProp.SetValue(message, timetoken, null);
 
                     // Set ChannelName
-                    PropertyInfo channelNameProp = specific.GetProperty("ChannelName");
+                    PropertyInfo channelNameProp = specific.GetProperty("Channel");
                     channelNameProp.SetValue(message, (listObject.Count == 4) ? listObject[3].ToString() : listObject[2].ToString(), null);
 
-                    PropertyInfo typeProp = specific.GetProperty("Type");
-                    typeProp.SetValue(message, dataType, null);
+                    //PropertyInfo typeProp = specific.GetProperty("Type");
+                    //typeProp.SetValue(message, dataType, null);
 
                     ret = (T)Convert.ChangeType(message, specific, CultureInfo.InvariantCulture);
                 }
@@ -583,26 +585,22 @@ namespace PubnubApi
                     ack.StatusCode = statusCode;
 
                 ret = (T)Convert.ChangeType(ack, typeof(ConnectOrDisconnectAck), CultureInfo.InvariantCulture);
+                #endregion
             }
             else if (typeof(T) == typeof(PNPublishResult))
             {
-                var ack = new PNPublishResult
+                #region "PNPublishResult"
+                var result = new PNPublishResult
                 {
-                    StatusMessage = listObject[1].ToString(),
                     Timetoken = Int64.Parse(listObject[2].ToString()),
-                    ChannelName = listObject[3].ToString(),
-                    Payload = (listObject.Count == 5) ? listObject[4] : null
                 };
-                int statusCode;
-                if (int.TryParse(listObject[0].ToString(), out statusCode))
-                    ack.StatusCode = statusCode;
 
-                ret = (T)Convert.ChangeType(ack, typeof(PNPublishResult), CultureInfo.InvariantCulture);
+                ret = (T)Convert.ChangeType(result, typeof(PNPublishResult), CultureInfo.InvariantCulture);
                 #endregion
             }
             else if (typeof(T) == typeof(PNPresenceEventResult))
             {
-                #region "PresenceAck"
+                #region "PNPresenceEventResult"
                 Dictionary<string, object> presenceDicObj = ConvertToDictionaryObject(listObject[0]);
 
                 PNPresenceEventResult ack = null;
@@ -610,17 +608,16 @@ namespace PubnubApi
                 if (presenceDicObj != null)
                 {
                     ack = new PNPresenceEventResult();
-                    ack.Action = presenceDicObj["action"].ToString();
+                    ack.Event = presenceDicObj["action"].ToString();
                     ack.Timestamp = Convert.ToInt64(presenceDicObj["timestamp"].ToString());
-                    ack.UUID = presenceDicObj["uuid"].ToString();
+                    ack.Uuid = presenceDicObj["uuid"].ToString();
                     ack.Occupancy = Int32.Parse(presenceDicObj["occupancy"].ToString());
 
                     //ack.Timetoken = Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(listObject[1].ToString()),
                     ack.Timetoken = Convert.ToInt64(listObject[1].ToString());
-                    ack.ChannelGroupName = (listObject.Count == 4) ? listObject[2].ToString() : "";
-                    ack.ChannelName = (listObject.Count == 4) ? listObject[3].ToString() : listObject[2].ToString();
+                    //ack.ChannelGroupName = (listObject.Count == 4) ? listObject[2].ToString() : "";
+                    ack.Channel = (listObject.Count == 4) ? listObject[3].ToString() : listObject[2].ToString();
                 }
-
 
                 ret = (T)Convert.ChangeType(ack, typeof(PNPresenceEventResult), CultureInfo.InvariantCulture);
                 #endregion
@@ -639,38 +636,27 @@ namespace PubnubApi
             }
             else if (typeof(T) == typeof(PNHereNowResult))
             {
-                #region "HereNowAck"
+                #region "PNHereNowResult"
                 Dictionary<string, object> herenowDicObj = ConvertToDictionaryObject(listObject[0]);
 
-                PNHereNowResult ack = null;
-
-                int statusCode = 0;
+                PNHereNowResult hereNowResult = null;
 
                 if (herenowDicObj != null)
                 {
-                    ack = new PNHereNowResult();
+                    hereNowResult = new PNHereNowResult();
 
-                    if (int.TryParse(herenowDicObj["status"].ToString(), out statusCode))
-                        ack.StatusCode = statusCode;
-
-                    ack.StatusMessage = herenowDicObj["message"].ToString();
-
-                    ack.Service = herenowDicObj["service"].ToString();
-
-                    ack.ChannelName = listObject[1].ToString();
-
-                    ack.Payload = new PNHereNowResult.Data();
+                    string hereNowChannelName = listObject[1].ToString();
 
                     if (herenowDicObj.ContainsKey("payload"))
                     {
                         Dictionary<string, object> hereNowPayloadDic = ConvertToDictionaryObject(herenowDicObj["payload"]);
                         if (hereNowPayloadDic != null && hereNowPayloadDic.Count > 0)
                         {
-                            ack.Payload.Total_occupancy = Int32.Parse(hereNowPayloadDic["total_occupancy"].ToString());
-                            ack.Payload.Total_channels = Int32.Parse(hereNowPayloadDic["total_channels"].ToString());
+                            hereNowResult.TotalOccupancy = Int32.Parse(hereNowPayloadDic["total_occupancy"].ToString());
+                            hereNowResult.TotalChannels = Int32.Parse(hereNowPayloadDic["total_channels"].ToString());
                             if (hereNowPayloadDic.ContainsKey("channels"))
                             {
-                                ack.Payload.Channels = new Dictionary<string, PNHereNowResult.Data.ChannelData>();
+                                Dictionary<string, PNHereNowChannelData> hereNowChannelData = new Dictionary<string, PNHereNowChannelData>();
 
                                 Dictionary<string, object> hereNowChannelListDic = ConvertToDictionaryObject(hereNowPayloadDic["channels"]);
                                 if (hereNowChannelListDic != null && hereNowChannelListDic.Count > 0)
@@ -680,20 +666,21 @@ namespace PubnubApi
                                         Dictionary<string, object> hereNowChannelItemDic = ConvertToDictionaryObject(hereNowChannelListDic[channel]);
                                         if (hereNowChannelItemDic != null && hereNowChannelItemDic.Count > 0)
                                         {
-                                            PNHereNowResult.Data.ChannelData channelData = new PNHereNowResult.Data.ChannelData();
+                                            PNHereNowChannelData channelData = new PNHereNowChannelData();
+                                            channelData.ChannelName = channel;
                                             channelData.Occupancy = Convert.ToInt32(hereNowChannelItemDic["occupancy"].ToString());
                                             if (hereNowChannelItemDic.ContainsKey("uuids"))
                                             {
                                                 object[] hereNowChannelUuidList = ConvertToObjectArray(hereNowChannelItemDic["uuids"]);
                                                 if (hereNowChannelUuidList != null && hereNowChannelUuidList.Length > 0)
                                                 {
-                                                    List<PNHereNowResult.Data.ChannelData.UuidData> uuidDataList = new List<PNHereNowResult.Data.ChannelData.UuidData>();
+                                                    List<PNHereNowOccupantData> uuidDataList = new List<PNHereNowOccupantData>();
 
                                                     for (int index = 0; index < hereNowChannelUuidList.Length; index++)
                                                     {
                                                         if (hereNowChannelUuidList[index].GetType() == typeof(string))
                                                         {
-                                                            PNHereNowResult.Data.ChannelData.UuidData uuidData = new PNHereNowResult.Data.ChannelData.UuidData();
+                                                            PNHereNowOccupantData uuidData = new PNHereNowOccupantData();
                                                             uuidData.Uuid = hereNowChannelUuidList[index].ToString();
                                                             uuidDataList.Add(uuidData);
                                                         }
@@ -702,7 +689,7 @@ namespace PubnubApi
                                                             Dictionary<string, object> hereNowChannelItemUuidsDic = ConvertToDictionaryObject(hereNowChannelUuidList[index]);
                                                             if (hereNowChannelItemUuidsDic != null && hereNowChannelItemUuidsDic.Count > 0)
                                                             {
-                                                                PNHereNowResult.Data.ChannelData.UuidData uuidData = new PNHereNowResult.Data.ChannelData.UuidData();
+                                                                PNHereNowOccupantData uuidData = new PNHereNowOccupantData();
                                                                 uuidData.Uuid = hereNowChannelItemUuidsDic["uuid"].ToString();
                                                                 if (hereNowChannelItemUuidsDic.ContainsKey("state"))
                                                                 {
@@ -712,10 +699,10 @@ namespace PubnubApi
                                                             }
                                                         }
                                                     }
-                                                    channelData.Uuids = uuidDataList.ToArray();
+                                                    channelData.Occupants = uuidDataList;
                                                 }
                                             }
-                                            ack.Payload.Channels.Add(channel, channelData);
+                                            hereNowResult.Channels.Add(channel, channelData);
                                         }
                                     }
                                 }
@@ -724,20 +711,20 @@ namespace PubnubApi
                     }
                     else if (herenowDicObj.ContainsKey("occupancy"))
                     {
-                        ack.Payload.Total_occupancy = Int32.Parse(herenowDicObj["occupancy"].ToString());
-                        ack.Payload.Channels = new Dictionary<string, PNHereNowResult.Data.ChannelData>();
+                        hereNowResult.TotalOccupancy = Int32.Parse(herenowDicObj["occupancy"].ToString());
+                        hereNowResult.Channels = new Dictionary<string, PNHereNowChannelData>();
                         if (herenowDicObj.ContainsKey("uuids"))
                         {
                             object[] uuidArray = ConvertToObjectArray(herenowDicObj["uuids"]);
                             if (uuidArray != null && uuidArray.Length > 0)
                             {
-                                List<PNHereNowResult.Data.ChannelData.UuidData> uuidDataList = new List<PNHereNowResult.Data.ChannelData.UuidData>();
+                                List<PNHereNowOccupantData> uuidDataList = new List<PNHereNowOccupantData>();
                                 for (int index = 0; index < uuidArray.Length; index++)
                                 {
                                     Dictionary<string, object> hereNowChannelItemUuidsDic = ConvertToDictionaryObject(uuidArray[index]);
                                     if (hereNowChannelItemUuidsDic != null && hereNowChannelItemUuidsDic.Count > 0)
                                     {
-                                        PNHereNowResult.Data.ChannelData.UuidData uuidData = new PNHereNowResult.Data.ChannelData.UuidData();
+                                        PNHereNowOccupantData uuidData = new PNHereNowOccupantData();
                                         uuidData.Uuid = hereNowChannelItemUuidsDic["uuid"].ToString();
                                         if (hereNowChannelItemUuidsDic.ContainsKey("state"))
                                         {
@@ -747,17 +734,19 @@ namespace PubnubApi
                                     }
                                     else
                                     {
-                                        PNHereNowResult.Data.ChannelData.UuidData uuidData = new PNHereNowResult.Data.ChannelData.UuidData();
+                                        PNHereNowOccupantData uuidData = new PNHereNowOccupantData();
                                         uuidData.Uuid = uuidArray[index].ToString();
                                         uuidDataList.Add(uuidData);
                                     }
                                 }
-                                PNHereNowResult.Data.ChannelData channelData = new PNHereNowResult.Data.ChannelData();
-                                channelData.Uuids = uuidDataList.ToArray();
-                                channelData.Occupancy = ack.Payload.Total_occupancy;
 
-                                ack.Payload.Channels.Add(ack.ChannelName, channelData);
-                                ack.Payload.Total_channels = ack.Payload.Channels.Count;
+                                PNHereNowChannelData channelData = new PNHereNowChannelData();
+                                channelData.ChannelName = hereNowChannelName;
+                                channelData.Occupants = uuidDataList;
+                                channelData.Occupancy = hereNowResult.TotalOccupancy;
+
+                                hereNowResult.Channels.Add(hereNowChannelName, channelData);
+                                hereNowResult.TotalChannels = hereNowResult.Channels.Count;
                             }
                         }
                         else
@@ -767,12 +756,12 @@ namespace PubnubApi
                             int totalChannels = 0;
                             foreach (string channel in arrChannel)
                             {
-                                PNHereNowResult.Data.ChannelData channelData = new PNHereNowResult.Data.ChannelData();
+                                PNHereNowChannelData channelData = new PNHereNowChannelData();
                                 channelData.Occupancy = 1;
-                                ack.Payload.Channels.Add(channel, channelData);
+                                hereNowResult.Channels.Add(channel, channelData);
                                 totalChannels++;
                             }
-                            ack.Payload.Total_channels = totalChannels;
+                            hereNowResult.TotalChannels = totalChannels;
 
 
                         }
@@ -780,7 +769,7 @@ namespace PubnubApi
 
                 }
 
-                ret = (T)Convert.ChangeType(ack, typeof(PNHereNowResult), CultureInfo.InvariantCulture);
+                ret = (T)Convert.ChangeType(hereNowResult, typeof(PNHereNowResult), CultureInfo.InvariantCulture);
                 #endregion
             }
             else if (typeof(T) == typeof(GlobalHereNowAck))
@@ -877,20 +866,10 @@ namespace PubnubApi
 
                 PNWhereNowResult ack = null;
 
-                int statusCode = 0;
-
                 if (wherenowDicObj != null)
                 {
                     ack = new PNWhereNowResult();
 
-                    if (int.TryParse(wherenowDicObj["status"].ToString(), out statusCode))
-                        ack.StatusCode = statusCode;
-
-                    ack.StatusMessage = wherenowDicObj["message"].ToString();
-
-                    ack.Service = wherenowDicObj["service"].ToString();
-
-                    ack.Payload = new PNWhereNowResult.Data();
                     if (wherenowDicObj.ContainsKey("payload"))
                     {
                         Dictionary<string, object> whereNowPayloadDic = ConvertToDictionaryObject(wherenowDicObj["payload"]);
@@ -898,7 +877,6 @@ namespace PubnubApi
                         {
                             if (whereNowPayloadDic.ContainsKey("channels"))
                             {
-                                //ack.Payload.channels = null;
                                 object[] whereNowChannelList = ConvertToObjectArray(whereNowPayloadDic["channels"]);
                                 if (whereNowChannelList != null && whereNowChannelList.Length >= 0)
                                 {
@@ -907,7 +885,7 @@ namespace PubnubApi
                                     {
                                         channelList.Add(channel);
                                     }
-                                    ack.Payload.Channels = channelList.ToArray();
+                                    ack.Channels = channelList;
                                 }
 
                             }

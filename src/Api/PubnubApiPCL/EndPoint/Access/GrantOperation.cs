@@ -31,7 +31,7 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public GrantOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
+        public GrantOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
@@ -82,10 +82,10 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNAccessManagerGrantResult> callback)
         {
-            GrantAccess(this.channelNames, this.channelGroupNames, this.authenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, callback.Result, callback.Error);
+            GrantAccess(this.channelNames, this.channelGroupNames, this.authenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, callback);
         }
 
-        internal void GrantAccess(string[] channels, string[] channelGroups, string[] authKeys, bool read, bool write, bool manage, long ttl, Action<PNAccessManagerGrantResult> userCallback, Action<PubnubClientError> errorCallback)
+        internal void GrantAccess(string[] channels, string[] channelGroups, string[] authKeys, bool read, bool write, bool manage, long ttl, PNCallback<PNAccessManagerGrantResult> callback)
         {
             if (string.IsNullOrEmpty(config.SecretKey) || string.IsNullOrEmpty(config.SecretKey.Trim()) || config.SecretKey.Length <= 0)
             {
@@ -130,9 +130,8 @@ namespace PubnubApi.EndPoint
             RequestState<PNAccessManagerGrantResult> requestState = new RequestState<PNAccessManagerGrantResult>();
             requestState.Channels = channels;
             requestState.ChannelGroups = channelGroups;
-            requestState.ResponseType = ResponseType.GrantAccess;
-            requestState.NonSubscribeRegularCallback = userCallback;
-            requestState.ErrorCallback = errorCallback;
+            requestState.ResponseType = PNOperationType.PNAccessManagerGrant;
+            requestState.Callback = callback;
             requestState.Reconnect = false;
 
             string json = UrlProcessRequest<PNAccessManagerGrantResult>(request, requestState, false);

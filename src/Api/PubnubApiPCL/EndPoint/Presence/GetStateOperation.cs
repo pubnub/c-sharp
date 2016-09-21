@@ -25,12 +25,6 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public GetStateOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-        }
-
         public GetStateOperation Channels(string[] channels)
         {
             this.channelNames = channels;
@@ -51,10 +45,10 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNGetStateResult> callback)
         {
-            GetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, callback.Result, callback.Error);
+            GetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, callback);
         }
 
-        internal void GetUserState(string[] channels, string[] channelGroups, string uuid, Action<PNGetStateResult> userCallback, Action<PubnubClientError> errorCallback)
+        internal void GetUserState(string[] channels, string[] channelGroups, string uuid, PNCallback<PNGetStateResult> callback)
         {
             if ((channels == null && channelGroups == null)
                            || (channels != null && channelGroups != null && channels.Length == 0 && channelGroups.Length == 0))
@@ -64,14 +58,6 @@ namespace PubnubApi.EndPoint
             if ((channels == null && channelGroups != null) || (channels.Length == 0  && channelGroups.Length == 0))
             {
                 throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
-            }
-            if (userCallback == null)
-            {
-                throw new ArgumentException("Missing userCallback");
-            }
-            if (errorCallback == null)
-            {
-                throw new ArgumentException("Missing errorCallback");
             }
 
             if (string.IsNullOrEmpty(uuid) || uuid.Trim().Length == 0)
@@ -88,9 +74,8 @@ namespace PubnubApi.EndPoint
             RequestState<PNGetStateResult> requestState = new RequestState<PNGetStateResult>();
             requestState.Channels = channels;
             requestState.ChannelGroups = channelGroups;
-            requestState.ResponseType = ResponseType.GetUserState;
-            requestState.NonSubscribeRegularCallback = userCallback;
-            requestState.ErrorCallback = errorCallback;
+            requestState.ResponseType = PNOperationType.PNGetState;
+            requestState.Callback = callback;
             requestState.Reconnect = false;
 
             string json = UrlProcessRequest<PNGetStateResult>(request, requestState, false);

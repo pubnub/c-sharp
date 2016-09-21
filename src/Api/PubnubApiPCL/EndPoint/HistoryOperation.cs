@@ -29,12 +29,6 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public HistoryOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-        }
-
         public HistoryOperation Channel(string channel)
         {
             this.channelName = channel;
@@ -73,23 +67,15 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNHistoryResult> callback)
         {
-            History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, callback.Result, callback.Error);
+            History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, callback);
         }
 
 
-        internal void History(string channel, long start, long end, int count, bool reverse, bool includeToken, Action<PNHistoryResult> userCallback, Action<PubnubClientError> errorCallback)
+        internal void History(string channel, long start, long end, int count, bool reverse, bool includeToken, PNCallback<PNHistoryResult> callback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()))
             {
                 throw new ArgumentException("Missing Channel");
-            }
-            if (userCallback == null)
-            {
-                throw new ArgumentException("Missing userCallback");
-            }
-            if (errorCallback == null)
-            {
-                throw new ArgumentException("Missing errorCallback");
             }
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
@@ -97,9 +83,8 @@ namespace PubnubApi.EndPoint
 
             RequestState<PNHistoryResult> requestState = new RequestState<PNHistoryResult>();
             requestState.Channels = new string[] { channel };
-            requestState.ResponseType = ResponseType.DetailedHistory;
-            requestState.NonSubscribeRegularCallback = userCallback;
-            requestState.ErrorCallback = errorCallback;
+            requestState.ResponseType = PNOperationType.PNHistoryOperation;
+            requestState.Callback = callback;
             requestState.Reconnect = false;
 
             string json = UrlProcessRequest< PNHistoryResult>(request, requestState, false);
@@ -108,21 +93,6 @@ namespace PubnubApi.EndPoint
                 List<object> result = ProcessJsonResponse<PNHistoryResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
             }
-            else
-            {
-                HistoryExceptionHandler(channel, errorCallback);
-            }
-        }
-
-        private void HistoryExceptionHandler(string channelName, Action<PubnubClientError> errorCallback)
-        {
-            string message = "Operation Timeout or Network connnect error";
-
-            LoggingMethod.WriteToLog(string.Format("DateTime {0}, HistoryExceptionHandler response={1}", DateTime.Now.ToString(), message), LoggingMethod.LevelInfo);
-
-            new PNCallbackService(config, jsonLibrary).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
-                channelName, "", errorCallback, message,
-                PubnubErrorCode.DetailedHistoryOperationTimeout, null, null);
         }
 
     }

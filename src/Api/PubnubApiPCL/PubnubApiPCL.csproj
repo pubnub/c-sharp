@@ -35,6 +35,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Builder\ResponseBuilder.cs" />
+    <Compile Include="Builder\StatusBuilder.cs" />
     <Compile Include="Builder\UrlRequestBuilder.cs" />
     <Compile Include="Callback\PNCallbackService.cs" />
     <Compile Include="EndPoint\Access\AuditOperation.cs" />
@@ -49,24 +51,32 @@
     <Compile Include="EndPoint\Presence\HereNowOperation.cs" />
     <Compile Include="EndPoint\Presence\SetStateOperation.cs" />
     <Compile Include="EndPoint\Presence\WhereNowOperation.cs" />
+    <Compile Include="EndPoint\PubSub\ListenerManager.cs" />
     <Compile Include="EndPoint\PubSub\PublishOperation.cs" />
     <Compile Include="EndPoint\PubSub\SubscribeManager.cs" />
     <Compile Include="EndPoint\PubSub\SubscribeOperation.cs" />
     <Compile Include="EndPoint\OtherOperation.cs" />
+    <Compile Include="EndPoint\PubSub\UnsubscribeAllOperation.cs" />
     <Compile Include="EndPoint\PubSub\UnsubscribeOperation.cs" />
     <Compile Include="EndPoint\Push\AddPushChannelOperation.cs" />
     <Compile Include="EndPoint\Push\AuditPushChannelOperation.cs" />
     <Compile Include="EndPoint\Push\RemovePushChannelOperation.cs" />
     <Compile Include="EndPoint\TimeOperation.cs" />
     <Compile Include="Enum\PNHeartbeatNotificationOption.cs" />
+    <Compile Include="Enum\PNOperationType_TBR.cs" />
+    <Compile Include="Enum\PNStatusCategory.cs" />
+    <Compile Include="HttpUtility.cs" />
     <Compile Include="Interface\IPubnubHttp.cs" />
     <Compile Include="Interface\IPubnubProxy.cs" />
     <Compile Include="Interface\IUrlRequestBuilder.cs" />
+    <Compile Include="Model\Consumer\JsonNode.cs" />
+    <Compile Include="Model\Consumer\PNAccessManagerKeyData.cs" />
     <Compile Include="Model\Consumer\PNChannelGroupsAddChannelResult.cs" />
     <Compile Include="Model\Consumer\PNAccessManagerAuditResult.cs" />
     <Compile Include="ClientNetworkStatus.cs" />
     <Compile Include="ConcurrentDictionary.cs" />
     <Compile Include="Model\Consumer\Ack\ConnectOrDisconnectAck.cs" />
+    <Compile Include="Model\Consumer\PNErrorData.cs" />
     <Compile Include="Model\Consumer\PNHistoryResult.cs" />
     <Compile Include="Model\Consumer\PNChannelGroupsAllResult.cs" />
     <Compile Include="Model\Consumer\PNChannelGroupsAllChannelsResult.cs" />
@@ -79,6 +89,7 @@
     <Compile Include="Model\Consumer\PNPushAddChannelResult.cs" />
     <Compile Include="Model\Consumer\PNPushListProvisionsResult.cs" />
     <Compile Include="Model\Consumer\PNPushRemoveChannelResult.cs" />
+    <Compile Include="Model\Consumer\PNStatus.cs" />
     <Compile Include="Model\Consumer\PNTimeResult.cs" />
     <Compile Include="Model\Consumer\SubscribeCallback.cs" />
     <Compile Include="Model\InternetState.cs" />
@@ -86,7 +97,7 @@
     <Compile Include="Interface\IPubnubSubscribeMessageType.cs" />
     <Compile Include="Interface\IPubnubUnitTest.cs" />
     <Compile Include="Log\LoggingMethod.cs" />
-    <Compile Include="Model\UnsubscribeCallback.cs" />
+    <Compile Include="Model\Consumer\UnsubscribeCallback.cs" />
     <Compile Include="PNConfiguration.cs" />
     <Compile Include="PubnubCoreBase.cs" />
     <Compile Include="PubnubHttp.cs" />
@@ -119,19 +130,12 @@
     <Compile Include="Callback\PubnubSubscribeChannelCallback.cs" />
     <Compile Include="Callback\PubnubSubscribeChannelGroupCallback.cs" />
     <Compile Include="Model\PubnubSubscribeMessageType.cs" />
-    <Compile Include="Http\PubnubWebAsyncResult.cs" />
-    <Compile Include="Http\PubnubWebRequest.cs" />
-    <Compile Include="Http\PubnubWebRequestBase.cs" />
-    <Compile Include="Http\PubnubWebRequestCreator.cs" />
-    <Compile Include="Http\PubnubWebRequestCreatorBase.cs" />
-    <Compile Include="Http\PubnubWebResponse.cs" />
-    <Compile Include="Http\PubnubWebResponseBase.cs" />
     <Compile Include="Enum\PushTypeService.cs" />
     <Compile Include="Model\ReconnectState.cs" />
     <Compile Include="Model\Consumer\PNChannelGroupsRemoveChannelResult.cs" />
     <Compile Include="Model\Consumer\PNChannelGroupsDeleteGroupResult.cs" />
     <Compile Include="Model\RequestState.cs" />
-    <Compile Include="Enum\ResponseType.cs" />
+    <Compile Include="Enum\PNOperationType.cs" />
     <Compile Include="Model\Consumer\PNSetStateResult.cs" />
     <Compile Include="Model\Consumer\PNWhereNowResult.cs" />
     <Compile Include="Security\SecureMessage.cs" />
@@ -158,18 +162,19 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.IO, Version=1.5.11.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.Bcl.1.1.8\lib\portable-net40+sl5+win8+wp8+wpa81\System.IO.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.Bcl.1.1.10\lib\portable-net40+sl5+win8+wp8+wpa81\System.IO.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Runtime, Version=2.6.8.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.Bcl.1.1.8\lib\portable-net40+sl5+win8+wp8+wpa81\System.Runtime.dll</HintPath>
+    <Reference Include="System.Runtime, Version=2.6.10.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Bcl.1.1.10\lib\portable-net40+sl5+win8+wp8+wpa81\System.Runtime.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Threading.Tasks, Version=2.6.8.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.Bcl.1.1.8\lib\portable-net40+sl5+win8+wp8+wpa81\System.Threading.Tasks.dll</HintPath>
+    <Reference Include="System.Threading.Tasks, Version=2.6.10.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Bcl.1.1.10\lib\portable-net40+sl5+win8+wp8+wpa81\System.Threading.Tasks.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="$(ProgramFiles)\MSBuild\StyleCop\v4.7\StyleCop.targets" />
   <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />

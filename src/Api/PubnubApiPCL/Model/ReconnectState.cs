@@ -6,7 +6,7 @@ namespace PubnubApi
 	{
 		public string[] Channels { get; set; }
         public string[] ChannelGroups { get; set; }
-        public ResponseType ResponseType { get; set; }
+        public PNOperationType ResponseType { get; set; }
         public Action<T> NonSubscribeRegularCallback { get; set; }
         public Action<PNMessageResult<T>> SubscribeRegularCallback { get; set; }
         public Action<PNPresenceEventResult> PresenceRegularCallback { get; set; }

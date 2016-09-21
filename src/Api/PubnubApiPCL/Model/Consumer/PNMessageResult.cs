@@ -4,14 +4,10 @@ namespace PubnubApi
 {
     public class PNMessageResult<T>
     {
-        public T Data { get; set; }
-        public DateTime Time { get; set; }
-        public string ChannelName { get; set; }
-        public Type Type { get; set; }
-
-        public override string ToString()
-        {
-            return Data.ToString();
-        }
+        public T Message { get; set; }
+        public string Channel { get; set; }
+        private string Subscription;
+        public long Timetoken { get; set; }
+        public object UserMetadata { get; set; }
     }
 }
