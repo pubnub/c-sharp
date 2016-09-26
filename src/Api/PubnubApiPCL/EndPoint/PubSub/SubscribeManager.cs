@@ -284,12 +284,12 @@ namespace PubnubApi.EndPoint
                         result.Add("");
                         LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON response={1}", DateTime.Now.ToString(), jsonString), LoggingMethod.LevelInfo);
 
-                        PubnubChannelGroupCallbackKey callbackKey = new PubnubChannelGroupCallbackKey();
-                        callbackKey.ChannelGroup = channelGroupToBeRemoved;//.Replace("-pnpres", "");
+                        //PubnubChannelGroupCallbackKey callbackKey = new PubnubChannelGroupCallbackKey();
+                        //callbackKey.ChannelGroup = channelGroupToBeRemoved;//.Replace("-pnpres", "");
 
                         if (type == PNOperationType.PresenceUnsubscribe || (type == PNOperationType.PNUnsubscribeOperation && IsPresenceChannel(channelGroupToBeRemoved)))
                         {
-                            callbackKey.ResponseType = PNOperationType.Presence;
+                            //callbackKey.ResponseType = PNOperationType.Presence;
                             //if (ChannelGroupCallbacks.Count > 0 && ChannelGroupCallbacks.ContainsKey(callbackKey))
                             //{
                             //    PubnubPresenceChannelGroupCallback currentPubnubCallback = ChannelGroupCallbacks[callbackKey] as PubnubPresenceChannelGroupCallback;
@@ -303,7 +303,7 @@ namespace PubnubApi.EndPoint
                         }
                         else if (type == PNOperationType.PNUnsubscribeOperation)
                         {
-                            callbackKey.ResponseType = PNOperationType.PNSubscribeOperation;
+                            //callbackKey.ResponseType = PNOperationType.PNSubscribeOperation;
                             //if (ChannelGroupCallbacks.Count > 0 && ChannelGroupCallbacks.ContainsKey(callbackKey))
                             //{
                             //    PubnubSubscribeChannelGroupCallback<T> currentPubnubCallback = ChannelGroupCallbacks[callbackKey] as PubnubSubscribeChannelGroupCallback<T>;
@@ -567,8 +567,8 @@ namespace PubnubApi.EndPoint
                     string currentLoopChannelGroup = validChannelGroups[index].ToString();
                     MultiChannelGroupSubscribe.GetOrAdd(currentLoopChannelGroup, 0);
 
-                    PubnubChannelGroupCallbackKey callbackKey = new PubnubChannelGroupCallbackKey();
-                    callbackKey.ChannelGroup = currentLoopChannelGroup;
+                    //PubnubChannelGroupCallbackKey callbackKey = new PubnubChannelGroupCallbackKey();
+                    //callbackKey.ChannelGroup = currentLoopChannelGroup;
 
                     //if (responseType == PNOperationType.Presence || (responseType == PNOperationType.PNSubscribeOperation && IsPresenceChannel(currentLoopChannelGroup)))
                     //{
@@ -770,9 +770,9 @@ namespace PubnubApi.EndPoint
             if (!networkConnection)
             {
                 string message = "Network connnect error - Internet connection is not available.";
-                new PNCallbackService(config, jsonLibrary).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
-                    channel, channelGroup, errorCallback, message,
-                    PubnubErrorCode.NoInternet, null, null);
+                //new PNCallbackService(config, jsonLibrary).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
+                //    channel, channelGroup, errorCallback, message,
+                //    PubnubErrorCode.NoInternet, null, null);
             }
 
             return networkConnection;
@@ -935,9 +935,9 @@ namespace PubnubApi.EndPoint
 
                                         string message = "Detected internet connection problem.Retrying connection";
 
-                                        PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
-                                        callbackKey.Channel = activeChannel;
-                                        callbackKey.ResponseType = netState.ResponseType;
+                                        //PubnubChannelCallbackKey callbackKey = new PubnubChannelCallbackKey();
+                                        //callbackKey.Channel = activeChannel;
+                                        //callbackKey.ResponseType = netState.ResponseType;
 
                                         //if (ChannelCallbacks.Count > 0 && ChannelCallbacks.ContainsKey(callbackKey))
                                         //{
@@ -983,8 +983,8 @@ namespace PubnubApi.EndPoint
                             string multiChannelGroup = (netState.ChannelGroups != null) ? string.Join(",", netState.ChannelGroups) : "";
                             string message = "Internet connection available";
 
-                            new PNCallbackService(config, jsonLibrary).CallErrorCallback(PubnubErrorSeverity.Warn, PubnubMessageSource.Client,
-                                multiChannel, multiChannelGroup, netState.ErrorCallback, message, PubnubErrorCode.YesInternet, null, null);
+                            //new PNCallbackService(config, jsonLibrary).CallErrorCallback(PubnubErrorSeverity.Warn, PubnubMessageSource.Client,
+                            //    multiChannel, multiChannelGroup, netState.ErrorCallback, message, PubnubErrorCode.YesInternet, null, null);
 
                             LoggingMethod.WriteToLog(string.Format("DateTime {0}, {1} {2} reconnectNetworkCallback. Internet Available : {3}", DateTime.Now.ToString(), channel, netState.ResponseType, ChannelInternetStatus[channel]), LoggingMethod.LevelInfo);
                             switch (netState.ResponseType)
@@ -1028,9 +1028,9 @@ namespace PubnubApi.EndPoint
 
                                         string message = "Detected internet connection problem. Retrying connection";
 
-                                        PubnubChannelGroupCallbackKey callbackKey = new PubnubChannelGroupCallbackKey();
-                                        callbackKey.ChannelGroup = activeChannelGroup;
-                                        callbackKey.ResponseType = netState.ResponseType;
+                                        //PubnubChannelGroupCallbackKey callbackKey = new PubnubChannelGroupCallbackKey();
+                                        //callbackKey.ChannelGroup = activeChannelGroup;
+                                        //callbackKey.ResponseType = netState.ResponseType;
 
                                         //if (ChannelGroupCallbacks.Count > 0 && ChannelGroupCallbacks.ContainsKey(callbackKey))
                                         //{
@@ -1075,8 +1075,8 @@ namespace PubnubApi.EndPoint
                             string multiChannelGroup = (netState.ChannelGroups != null) ? string.Join(",", netState.ChannelGroups) : "";
                             string message = "Internet connection available";
 
-                            new PNCallbackService(config, jsonLibrary).CallErrorCallback(PubnubErrorSeverity.Warn, PubnubMessageSource.Client,
-                                multiChannel, multiChannelGroup, netState.ErrorCallback, message, PubnubErrorCode.YesInternet, null, null);
+                            //new PNCallbackService(config, jsonLibrary).CallErrorCallback(PubnubErrorSeverity.Warn, PubnubMessageSource.Client,
+                            //    multiChannel, multiChannelGroup, netState.ErrorCallback, message, PubnubErrorCode.YesInternet, null, null);
 
                             LoggingMethod.WriteToLog(string.Format("DateTime {0}, channelgroup={1} {2} reconnectNetworkCallback. Internet Available", DateTime.Now.ToString(), channelGroup, netState.ResponseType), LoggingMethod.LevelInfo);
                             switch (netState.ResponseType)
@@ -1103,8 +1103,8 @@ namespace PubnubApi.EndPoint
                     string multiChannel = (netState.Channels != null) ? string.Join(",", netState.Channels) : "";
                     string multiChannelGroup = (netState.ChannelGroups != null) ? string.Join(",", netState.ChannelGroups) : "";
 
-                    new PNCallbackService(config, jsonLibrary).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
-                        multiChannel, multiChannelGroup, netState.ErrorCallback, ex, null, null);
+                    //new PNCallbackService(config, jsonLibrary).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
+                    //    multiChannel, multiChannelGroup, netState.ErrorCallback, ex, null, null);
                 }
 
                 LoggingMethod.WriteToLog(string.Format("DateTime {0} method:reconnectNetworkCallback \n Exception Details={1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelError);

@@ -38,7 +38,7 @@ namespace PubnubApi
             //Compute Hash using the SHA256 
             string strKeySHA256HashRaw = ComputeHashRaw(this.cipherKey);
             //delete the "-" that appear after every 2 chars
-            string strKeySHA256Hash = (strKeySHA256HashRaw.Replace("-", "")).Substring(0, 32);
+            string strKeySHA256Hash = strKeySHA256HashRaw.Replace("-", "").Substring(0, 32);
             //convert to lower case
             return strKeySHA256Hash.ToLower();
         }

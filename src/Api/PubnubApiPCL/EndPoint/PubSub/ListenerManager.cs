@@ -11,7 +11,6 @@ namespace PubnubApi.EndPoint
     {
         private static PNConfiguration config = null;
         private static IJsonPluggableLibrary jsonLibrary = null;
-        private static IPubnubUnitTest unitTest = null;
 
         private object _syncLockSubscribeCallback = new object();
 

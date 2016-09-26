@@ -5,7 +5,9 @@ using System.Text;
 
 namespace PubnubApi
 {
-    public class JsonNode
+    public class PNHistoryItemResult
     {
+        public long Timetoken { get; set; }
+        public object Entry { get; set; }
     }
 }

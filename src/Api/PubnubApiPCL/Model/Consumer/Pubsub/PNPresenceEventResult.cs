@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.Generic;
+
 namespace PubnubApi
 {
     public class PNPresenceEventResult
@@ -15,7 +17,7 @@ namespace PubnubApi
         public string Uuid { get; set; }
         public long Timestamp { get; set; }
         public int Occupancy { get; set; }
-        public JsonNode State { get; set; }
+        public Dictionary<string, object> State { get; set; }
 
         public string Channel { get; set; }
         public string Subscription { get; set; }

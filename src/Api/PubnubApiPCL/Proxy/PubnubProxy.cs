@@ -4,10 +4,10 @@ namespace PubnubApi
 {
     public class PubnubProxy: IPubnubProxy
     {
-        string proxyServer = "";
-        int proxyPort;
-        string proxyUserName = "";
-        string proxyPassword = "";
+        private string proxyServer = "";
+        private int proxyPort;
+        private string proxyUserName = "";
+        private string proxyPassword = "";
 
         string IPubnubProxy.Server
         {

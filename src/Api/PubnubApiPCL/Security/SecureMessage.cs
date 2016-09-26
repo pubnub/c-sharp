@@ -46,8 +46,8 @@ namespace PubnubApi
                             string multiChannel = string.Join(",", channels);
                             string multiChannelGroup = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups) : "";
 
-                            new PNCallbackService(config, jsonLib).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
-                                multiChannel, multiChannelGroup, errorCallback, ex, null, null);
+                            //new PNCallbackService(config, jsonLib).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
+                            //    multiChannel, multiChannelGroup, errorCallback, ex, null, null);
                         }
                         object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : jsonLib.DeserializeToObject(decryptMessage);
                         receivedMsg.Add(decodeMessage);

@@ -117,7 +117,7 @@ namespace PubnubApi.EndPoint
             if (authKeys != null && authKeys.Length > 0)
             {
                 authList = new List<string>(authKeys);
-                authList = channelGroupList.Where(auth => !string.IsNullOrEmpty(auth) && auth.Trim().Length > 0).Distinct<string>().ToList();
+                authList = authList.Where(auth => !string.IsNullOrEmpty(auth) && auth.Trim().Length > 0).Distinct<string>().ToList();
             }
 
             string channelsCommaDelimited = string.Join(",", channelList.ToArray());
