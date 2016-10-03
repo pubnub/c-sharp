@@ -1,196 +1,196 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
-using System.ComponentModel;
-using System.Threading;
-using System.Collections;
-//using Newtonsoft.Json;
-//using Newtonsoft.Json.Linq;
-using PubnubApi;
+﻿//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
+//using NUnit.Framework;
+//using System.ComponentModel;
+//using System.Threading;
+//using System.Collections;
+////using Newtonsoft.Json;
+////using Newtonsoft.Json.Linq;
+//using PubnubApi;
 
-namespace PubNubMessaging.Tests
-{
-    [TestFixture]
-    public class WhenUnsubscribedToAChannel : TestHarness
-    {
-        ManualResetEvent meNotSubscribed = new ManualResetEvent(false);
-        ManualResetEvent meChannelSubscribed = new ManualResetEvent(false);
-        ManualResetEvent meChannelUnsubscribed = new ManualResetEvent(false);
-        ManualResetEvent grantManualEvent = new ManualResetEvent(false);
+//namespace PubNubMessaging.Tests
+//{
+//    [TestFixture]
+//    public class WhenUnsubscribedToAChannel : TestHarness
+//    {
+//        ManualResetEvent meNotSubscribed = new ManualResetEvent(false);
+//        ManualResetEvent meChannelSubscribed = new ManualResetEvent(false);
+//        ManualResetEvent meChannelUnsubscribed = new ManualResetEvent(false);
+//        ManualResetEvent grantManualEvent = new ManualResetEvent(false);
 
-        bool receivedNotSubscribedMessage = false;
-        bool receivedUnsubscribedMessage = false;
-        bool receivedChannelConnectedMessage = false;
-        bool receivedGrantMessage = false;
+//        bool receivedNotSubscribedMessage = false;
+//        bool receivedUnsubscribedMessage = false;
+//        bool receivedChannelConnectedMessage = false;
+//        bool receivedGrantMessage = false;
 
-        Pubnub pubnub = null;
+//        Pubnub pubnub = null;
 
-        [TestFixtureSetUp]
-        public void Init()
-        {
-            if (!PubnubCommon.PAMEnabled) return;
+//        [TestFixtureSetUp]
+//        public void Init()
+//        {
+//            if (!PubnubCommon.PAMEnabled) return;
 
-            receivedGrantMessage = false;
+//            receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
-            {
-                PublishKey = PubnubCommon.PublishKey,
-                SubscribeKey = PubnubCommon.SubscribeKey,
-                SecretKey = PubnubCommon.SecretKey,
-                Uuid = "mytestuuid",
-            };
+//            PNConfiguration config = new PNConfiguration()
+//            {
+//                PublishKey = PubnubCommon.PublishKey,
+//                SubscribeKey = PubnubCommon.SubscribeKey,
+//                SecretKey = PubnubCommon.SecretKey,
+//                Uuid = "mytestuuid",
+//            };
 
-            pubnub = this.createPubNubInstance(config);
+//            pubnub = this.createPubNubInstance(config);
 
-            string channel = "hello_my_channel";
+//            string channel = "hello_my_channel";
 
-            pubnub.Grant().Channels(new string[] { channel }).Read(true).Write(true).Manage(false).TTL(20).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = ThenUnsubscribeInitializeShouldReturnGrantMessage, Error = DummyErrorCallback });
-            Thread.Sleep(1000);
+//            pubnub.Grant().Channels(new string[] { channel }).Read(true).Write(true).Manage(false).TTL(20).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = ThenUnsubscribeInitializeShouldReturnGrantMessage, Error = DummyErrorCallback });
+//            Thread.Sleep(1000);
 
-            grantManualEvent.WaitOne();
+//            grantManualEvent.WaitOne();
 
-            pubnub.EndPendingRequests(); 
-            pubnub.PubnubUnitTest = null;
-            pubnub = null;
-            Assert.IsTrue(receivedGrantMessage, "WhenUnsubscribedToAChannel Grant access failed.");
-        }
+//            pubnub.EndPendingRequests(); 
+//            pubnub.PubnubUnitTest = null;
+//            pubnub = null;
+//            Assert.IsTrue(receivedGrantMessage, "WhenUnsubscribedToAChannel Grant access failed.");
+//        }
 
-        [Test]
-        public void ThenNoExistChannelShouldReturnNotSubscribed()
-        {
-            receivedNotSubscribedMessage = false;
+//        [Test]
+//        public void ThenNoExistChannelShouldReturnNotSubscribed()
+//        {
+//            receivedNotSubscribedMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
-            {
-                PublishKey = PubnubCommon.PublishKey,
-                SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
-            };
+//            PNConfiguration config = new PNConfiguration()
+//            {
+//                PublishKey = PubnubCommon.PublishKey,
+//                SubscribeKey = PubnubCommon.SubscribeKey,
+//                Uuid = "mytestuuid",
+//            };
 
-            pubnub = this.createPubNubInstance(config);
+//            pubnub = this.createPubNubInstance(config);
 
-            string channel = "hello_my_channel";
+//            string channel = "hello_my_channel";
 
-            pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute(new UnsubscribeCallback() { Error = NoExistChannelErrorCallback });
+//            pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute(new UnsubscribeCallback() { Error = NoExistChannelErrorCallback });
 
-            meNotSubscribed.WaitOne();
+//            meNotSubscribed.WaitOne();
 
-            pubnub.EndPendingRequests(); 
-            pubnub.PubnubUnitTest = null;
-            pubnub = null;
+//            pubnub.EndPendingRequests(); 
+//            pubnub.PubnubUnitTest = null;
+//            pubnub = null;
 
-            Assert.IsTrue(receivedNotSubscribedMessage, "WhenUnsubscribedToAChannel --> ThenNoExistChannelShouldReturnNotSubscribed Failed");
-        }
+//            Assert.IsTrue(receivedNotSubscribedMessage, "WhenUnsubscribedToAChannel --> ThenNoExistChannelShouldReturnNotSubscribed Failed");
+//        }
 
-        [Test]
-        public void ThenShouldReturnUnsubscribedMessage()
-        {
-            receivedChannelConnectedMessage = false;
-            receivedUnsubscribedMessage = false;
+//        [Test]
+//        public void ThenShouldReturnUnsubscribedMessage()
+//        {
+//            receivedChannelConnectedMessage = false;
+//            receivedUnsubscribedMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
-            {
-                PublishKey = PubnubCommon.PublishKey,
-                SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
-            };
+//            PNConfiguration config = new PNConfiguration()
+//            {
+//                PublishKey = PubnubCommon.PublishKey,
+//                SubscribeKey = PubnubCommon.SubscribeKey,
+//                Uuid = "mytestuuid",
+//            };
 
-            pubnub = this.createPubNubInstance(config);
+//            pubnub = this.createPubNubInstance(config);
 
-            string channel = "hello_my_channel";
+//            string channel = "hello_my_channel";
 
-            pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute(new SubscribeCallback<string>() { Message = DummyMethodChannelSubscribeUserCallback, Connect = DummyMethodChannelSubscribeConnectCallback, Disconnect = DummyMethodUnsubscribeChannelDisconnectCallback, Error = DummyErrorCallback });
-            meChannelSubscribed.WaitOne();
+//            pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute(new SubscribeCallback<string>() { Message = DummyMethodChannelSubscribeUserCallback, Connect = DummyMethodChannelSubscribeConnectCallback, Disconnect = DummyMethodUnsubscribeChannelDisconnectCallback, Error = DummyErrorCallback });
+//            meChannelSubscribed.WaitOne();
 
-            if (receivedChannelConnectedMessage)
-            {
-                pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute(new UnsubscribeCallback() { Error = DummyErrorCallback });
-                meChannelUnsubscribed.WaitOne();
-            }
+//            if (receivedChannelConnectedMessage)
+//            {
+//                pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute(new UnsubscribeCallback() { Error = DummyErrorCallback });
+//                meChannelUnsubscribed.WaitOne();
+//            }
 
-            pubnub.EndPendingRequests(); 
-            pubnub.PubnubUnitTest = null;
-            pubnub = null;
+//            pubnub.EndPendingRequests(); 
+//            pubnub.PubnubUnitTest = null;
+//            pubnub = null;
 
-            Assert.IsTrue(receivedUnsubscribedMessage, "WhenUnsubscribedToAChannel --> ThenShouldReturnUnsubscribedMessage Failed");
-        }
+//            Assert.IsTrue(receivedUnsubscribedMessage, "WhenUnsubscribedToAChannel --> ThenShouldReturnUnsubscribedMessage Failed");
+//        }
 
-        void ThenUnsubscribeInitializeShouldReturnGrantMessage(PNAccessManagerGrantResult receivedMessage)
-        {
-            try
-            {
-                if (receivedMessage != null)
-                {
-                    var status = receivedMessage.StatusCode;
-                    if (status == 200)
-                    {
-                        receivedGrantMessage = true;
-                    }
+//        void ThenUnsubscribeInitializeShouldReturnGrantMessage(PNAccessManagerGrantResult receivedMessage)
+//        {
+//            try
+//            {
+//                if (receivedMessage != null)
+//                {
+//                    var status = receivedMessage.StatusCode;
+//                    if (status == 200)
+//                    {
+//                        receivedGrantMessage = true;
+//                    }
 
-                }
-            }
-            catch { }
-            finally
-            {
-                grantManualEvent.Set();
-            }
-        }
+//                }
+//            }
+//            catch { }
+//            finally
+//            {
+//                grantManualEvent.Set();
+//            }
+//        }
 
-        private void DummyMethodChannelSubscribeUserCallback(PNMessageResult<string> result)
-        {
-        }
+//        private void DummyMethodChannelSubscribeUserCallback(PNMessageResult<string> result)
+//        {
+//        }
 
-        private void DummyMethodChannelSubscribeConnectCallback(ConnectOrDisconnectAck result)
-        {
-            if (result.StatusMessage.Contains("Connected"))
-            {
-                receivedChannelConnectedMessage = true;
-            }
-            meChannelSubscribed.Set();
-        }
+//        private void DummyMethodChannelSubscribeConnectCallback(ConnectOrDisconnectAck result)
+//        {
+//            if (result.StatusMessage.Contains("Connected"))
+//            {
+//                receivedChannelConnectedMessage = true;
+//            }
+//            meChannelSubscribed.Set();
+//        }
 
-        private void DummyMethodUnsubscribeChannelUserCallback(string result)
-        {
-        }
+//        private void DummyMethodUnsubscribeChannelUserCallback(string result)
+//        {
+//        }
 
-        private void DummyMethodUnsubscribeChannelConnectCallback(ConnectOrDisconnectAck result)
-        {
-        }
+//        private void DummyMethodUnsubscribeChannelConnectCallback(ConnectOrDisconnectAck result)
+//        {
+//        }
 
-        private void DummyMethodUnsubscribeChannelDisconnectCallback(ConnectOrDisconnectAck result)
-        {
-            if (result.StatusMessage.Contains("Unsubscribed from"))
-            {
-                receivedUnsubscribedMessage = true;
-            }
-            meChannelUnsubscribed.Set();
-        }
+//        private void DummyMethodUnsubscribeChannelDisconnectCallback(ConnectOrDisconnectAck result)
+//        {
+//            if (result.StatusMessage.Contains("Unsubscribed from"))
+//            {
+//                receivedUnsubscribedMessage = true;
+//            }
+//            meChannelUnsubscribed.Set();
+//        }
 
-        private void DummyMethodNoExistChannelUnsubscribeChannelUserCallback(string result)
-        {
-        }
+//        private void DummyMethodNoExistChannelUnsubscribeChannelUserCallback(string result)
+//        {
+//        }
 
-        private void DummyMethodNoExistChannelUnsubscribeChannelConnectCallback(ConnectOrDisconnectAck result)
-        {
-        }
+//        private void DummyMethodNoExistChannelUnsubscribeChannelConnectCallback(ConnectOrDisconnectAck result)
+//        {
+//        }
 
-        private void DummyMethodNoExistChannelUnsubscribeChannelDisconnectCallback1(ConnectOrDisconnectAck result)
-        {
-        }
+//        private void DummyMethodNoExistChannelUnsubscribeChannelDisconnectCallback1(ConnectOrDisconnectAck result)
+//        {
+//        }
 
-        private void DummyErrorCallback(PubnubClientError result)
-        {
-        }
+//        private void DummyErrorCallback(PubnubClientError result)
+//        {
+//        }
 
-        private void NoExistChannelErrorCallback(PubnubClientError result)
-        {
-            if (result != null && result.Message.ToLower().Contains("not subscribed"))
-            {
-                receivedNotSubscribedMessage = true;
-            }
-            meNotSubscribed.Set();
-        }
-    }
-}
+//        private void NoExistChannelErrorCallback(PubnubClientError result)
+//        {
+//            if (result != null && result.Message.ToLower().Contains("not subscribed"))
+//            {
+//                receivedNotSubscribedMessage = true;
+//            }
+//            meNotSubscribed.Set();
+//        }
+//    }
+//}

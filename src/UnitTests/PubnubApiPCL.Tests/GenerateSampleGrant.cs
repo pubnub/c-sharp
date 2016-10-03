@@ -9,11 +9,12 @@ namespace PubNubMessaging.Tests
     [TestFixture]
     public class GenerateSampleGrant : TestHarness
     {
-        private ManualResetEvent grantManualEvent = new ManualResetEvent(false);
-        private bool receivedGrantMessage = false;
-        private int sampleCount = 100;
+        private static ManualResetEvent grantManualEvent = new ManualResetEvent(false);
+        private static bool receivedGrantMessage = false;
+        private static int sampleCount = 100;
+        private static string currentUnitTestCase;
 
-        private Pubnub pubnub = null;
+        private static Pubnub pubnub = null;
         private Server server;
         private UnitTestLog unitLog;
 
@@ -36,6 +37,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void AtUserLevel()
         {
+            currentUnitTestCase = "AtUserLevel";
+
             if (!PubnubCommon.PAMEnabled)
             {
                 Assert.Ignore("PAM not enabled; GenerateSampleGrant -> AtUserLevel.");
@@ -69,7 +72,7 @@ namespace PubNubMessaging.Tests
                     grantManualEvent = new ManualResetEvent(false);
                     string channelName = string.Format("csharp-pam-ul-channel-{0}", index);
                     string authKey = string.Format("csharp-pam-authkey-0-{0},csharp-pam-authkey-1-{1}", index, index);
-                    pubnub.Grant().Channels(new string[] { channelName }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(false).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = UserCallbackForSampleGrantAtUserLevel, Error = ErrorCallbackForSampleGrantAtUserLevel });
+                    pubnub.Grant().Channels(new string[] { channelName }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(false).Async(new GrantResult());
                     grantManualEvent.WaitOne();
                 }
 
@@ -86,6 +89,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void AtChannelLevel()
         {
+            currentUnitTestCase = "AtChannelLevel";
+
             if (!PubnubCommon.PAMEnabled)
             {
                 Assert.Ignore("PAM not enabled; GenerateSampleGrant -> AtChannelLevel.");
@@ -118,7 +123,7 @@ namespace PubNubMessaging.Tests
                 {
                     grantManualEvent = new ManualResetEvent(false);
                     string channelName = string.Format("csharp-pam-cl-channel-{0}", index);
-                    pubnub.Grant().Channels(new string[] { channelName }).Read(true).Write(true).Manage(false).Async(new PNCallback<PNAccessManagerGrantResult>() { Result = UserCallbackForSampleGrantAtChannelLevel, Error = ErrorCallbackForSampleGrantAtChannelLevel });
+                    pubnub.Grant().Channels(new string[] { channelName }).Read(true).Write(true).Manage(false).Async(new GrantResult());
                     grantManualEvent.WaitOne();
                 }
 
@@ -132,38 +137,28 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        private void UserCallbackForSampleGrantAtUserLevel(PNAccessManagerGrantResult receivedMessage)
+        private class GrantResult : PNCallback<PNAccessManagerGrantResult>
         {
-            receivedGrantMessage = true;
-            Console.WriteLine(receivedMessage);
-            grantManualEvent.Set();
-        }
-
-        private void ErrorCallbackForSampleGrantAtUserLevel(PubnubClientError receivedMessage)
-        {
-            if (receivedMessage != null)
+            public override void OnResponse(PNAccessManagerGrantResult result, PNStatus status)
             {
-                Console.WriteLine(receivedMessage);
+                try
+                {
+                    Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+
+                    if (result != null)
+                    {
+                        Console.WriteLine("PNAccessManagerAuditResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        receivedGrantMessage = true;
+                    }
+                }
+                catch
+                {
+                }
+                finally
+                {
+                    grantManualEvent.Set();
+                }
             }
-
-            grantManualEvent.Set();
-        }
-
-        private void UserCallbackForSampleGrantAtChannelLevel(PNAccessManagerGrantResult receivedMessage)
-        {
-            receivedGrantMessage = true;
-            Console.WriteLine(receivedMessage);
-            grantManualEvent.Set();
-        }
-
-        private void ErrorCallbackForSampleGrantAtChannelLevel(PubnubClientError receivedMessage)
-        {
-            if (receivedMessage != null)
-            {
-                Console.WriteLine(receivedMessage);
-            }
-
-            grantManualEvent.Set();
         }
     }
 }

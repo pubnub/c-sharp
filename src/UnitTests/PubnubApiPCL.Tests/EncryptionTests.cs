@@ -150,7 +150,7 @@ namespace PubNubMessaging.Tests
             PubnubCrypto pc = new PubnubCrypto("enigma");
             ////serialized string
             string message = null;
-            
+
             ////encrypt
             string encryptedMessage = pc.Encrypt(message);
         }
@@ -550,7 +550,7 @@ namespace PubNubMessaging.Tests
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
             string message = "stpgsG1DZZxb44J7mFNSzg==";
-            
+
             ////decrypt
             string decryptedMessage = pc.Decrypt(message);
             ////deserialize
@@ -558,7 +558,7 @@ namespace PubNubMessaging.Tests
 
             Assert.AreEqual("ÜÖ", message);
         }
-        
+
         /// <summary>
         /// Tests the german encryption.
         /// The input is not serialized

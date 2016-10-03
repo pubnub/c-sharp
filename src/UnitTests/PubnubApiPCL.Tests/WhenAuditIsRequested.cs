@@ -10,10 +10,10 @@ namespace PubNubMessaging.Tests
     [TestFixture]
     public class WhenAuditIsRequested : TestHarness
     {
-        private ManualResetEvent auditManualEvent = new ManualResetEvent(false);
-        private bool receivedAuditMessage = false;
-        string currentUnitTestCase = "";
-        private Pubnub pubnub = null;
+        private static ManualResetEvent auditManualEvent = new ManualResetEvent(false);
+        private static bool receivedAuditMessage = false;
+        private static string currentUnitTestCase = "";
+        private static Pubnub pubnub = null;
         private Server server;
         private UnitTestLog unitLog;
 
@@ -32,12 +32,11 @@ namespace PubNubMessaging.Tests
         {
             server.Stop();
         }
-    
+
         [Test]
         public void ThenSubKeyLevelShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenSubKeyLevelShouldReturnSuccess";
-
             receivedAuditMessage = false;
 
             PNConfiguration config = new PNConfiguration()
@@ -65,12 +64,12 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.Audit().Async(new PNCallback<PNAccessManagerAuditResult>() { Result = AccessToSubKeyLevelCallback, Error = DummyErrorCallback });
+                pubnub.Audit().Async(new AuditResult());
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();
 
-                pubnub.EndPendingRequests(); 
+                pubnub.EndPendingRequests();
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedAuditMessage, "WhenAuditIsRequested -> ThenSubKeyLevelShouldReturnSuccess failed.");
@@ -85,9 +84,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenChannelLevelShouldReturnSuccess()
         {
-            string channel = "hello_my_channel";
-
             currentUnitTestCase = "ThenChannelLevelShouldReturnSuccess";
+            string channel = "hello_my_channel";
 
             receivedAuditMessage = false;
 
@@ -117,12 +115,12 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.Audit().Channel(channel).Async(new PNCallback<PNAccessManagerAuditResult>() { Result = AccessToChannelLevelCallback, Error = DummyErrorCallback });
+                pubnub.Audit().Channel(channel).Async(new AuditResult());
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();
 
-                pubnub.EndPendingRequests(); 
+                pubnub.EndPendingRequests();
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedAuditMessage, "WhenAuditIsRequested -> ThenChannelLevelShouldReturnSuccess failed.");
@@ -136,10 +134,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenChannelGroupLevelShouldReturnSuccess()
         {
-            string channelgroup = "hello_my_group";
-
             currentUnitTestCase = "ThenChannelGroupLevelShouldReturnSuccess";
-
+            string channelgroup = "hello_my_group";
             receivedAuditMessage = false;
 
             PNConfiguration config = new PNConfiguration()
@@ -168,12 +164,12 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.Audit().ChannelGroup(channelgroup).Async(new PNCallback<PNAccessManagerAuditResult>() { Result = AccessToChannelLevelCallback, Error = DummyErrorCallback });
+                pubnub.Audit().ChannelGroup(channelgroup).Async(new AuditResult());
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();
 
-                pubnub.EndPendingRequests(); 
+                pubnub.EndPendingRequests();
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedAuditMessage, "WhenAuditIsRequested -> ThenChannelGroupLevelShouldReturnSuccess failed.");
@@ -184,73 +180,52 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void AccessToSubKeyLevelCallback(PNAccessManagerAuditResult receivedMessage)
+        private class AuditResult : PNCallback<PNAccessManagerAuditResult>
         {
-            try
+            public override void OnResponse(PNAccessManagerAuditResult result, PNStatus status)
             {
-                if (receivedMessage != null)
-                {
-                    int statusCode = receivedMessage.StatusCode;
-                    string statusMessage = receivedMessage.StatusMessage;
-                    if (statusCode == 200 && statusMessage.ToLower() == "success")
-                    {
-                        if (receivedMessage.Payload != null)
-                        {
-                            Dictionary<string, PNAccessManagerAuditResult.Data.ChannelData> channels = receivedMessage.Payload.Channels;
-                            if (channels != null && channels.Count >= 0)
-                            {
-                                Console.WriteLine("{0} - AccessToSubKeyLevelCallback - Audit Count = {1}", currentUnitTestCase, channels.Count);
-                            }
-                            string level = receivedMessage.Payload.Level;
-                            if (level == "subkey")
-                            {
-                                receivedAuditMessage = true;
-                            }
-                        }
-                    }
+                Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
 
-                }
-            }
-            catch { }
-            finally
-            {
-                auditManualEvent.Set();
-            }
-        }
-
-        void AccessToChannelLevelCallback(PNAccessManagerAuditResult receivedMessage)
-        {
-            try
-            {
-                if (receivedMessage != null)
+                try
                 {
-                    int statusCode = receivedMessage.StatusCode;
-                    string statusMessage = receivedMessage.StatusMessage;
-                    if (statusCode == 200 && statusMessage.ToLower() == "success")
+                    if (result != null)
                     {
-                        if (receivedMessage.Payload != null)
+                        Console.WriteLine("PNAccessManagerAuditResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        if (status.StatusCode == 200 && status.Error == false)
                         {
-                            string level = receivedMessage.Payload.Level;
-                            if (currentUnitTestCase == "ThenChannelLevelShouldReturnSuccess")
+                            if (currentUnitTestCase == "ThenSubKeyLevelShouldReturnSuccess")
                             {
-                                Dictionary<string, PNAccessManagerAuditResult.Data.ChannelData> channels = receivedMessage.Payload.Channels;
-                                if (channels != null && channels.Count >= 0)
+                                if (!String.IsNullOrEmpty(result.Channel))
                                 {
-                                    Console.WriteLine("{0} - AccessToChannelLevelCallback - Audit Channel Count = {1}", currentUnitTestCase, channels.Count);
+                                    var channels = result.Channel.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                                    Console.WriteLine("{0} - AccessToSubKeyLevelCallback - Audit Count = {1}", currentUnitTestCase, channels.Length);
                                 }
-                                if (level.Contains("channel"))
+
+                                if (result.Level == "subkey")
+                                {
+                                    receivedAuditMessage = true;
+                                }
+                            }
+                            else if (currentUnitTestCase == "ThenChannelLevelShouldReturnSuccess")
+                            {
+                                if (!String.IsNullOrEmpty(result.Channel))
+                                {
+                                    var channels = result.Channel.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                                    Console.WriteLine("{0} - AccessToChannelLevelCallback - Audit Channel Count = {1}", currentUnitTestCase, channels.Length);
+                                }
+                                if (result.Level.Contains("channel"))
                                 {
                                     receivedAuditMessage = true;
                                 }
                             }
                             else if (currentUnitTestCase == "ThenChannelGroupLevelShouldReturnSuccess")
                             {
-                                Dictionary<string, PNAccessManagerAuditResult.Data.ChannelGroupData> channelgroups = receivedMessage.Payload.Channelgroups;
-                                if (channelgroups != null && channelgroups.Count >= 0)
+                                if (!String.IsNullOrEmpty(result.ChannelGroup))
                                 {
-                                    Console.WriteLine("{0} - AccessToChannelLevelCallback - Audit ChannelGroup Count = {1}", currentUnitTestCase, channelgroups.Count);
+                                    var channelgroups = result.ChannelGroup.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                                    Console.WriteLine("{0} - AccessToChannelLevelCallback - Audit ChannelGroup Count = {1}", currentUnitTestCase, channelgroups.Length);
                                 }
-                                if (level.Contains("channel-group"))
+                                if (result.Level.Contains("channel-group"))
                                 {
                                     receivedAuditMessage = true;
                                 }
@@ -258,17 +233,14 @@ namespace PubNubMessaging.Tests
                         }
                     }
                 }
+                catch
+                {
+                }
+                finally
+                {
+                    auditManualEvent.Set();
+                }
             }
-            catch { }
-            finally
-            {
-                auditManualEvent.Set();
-            }
-        }
-
-        private void DummyErrorCallback(PubnubClientError result)
-        {
-            Console.WriteLine(result.Description);
         }
     }
 }

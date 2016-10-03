@@ -23,6 +23,7 @@ namespace MockServer
         private Dictionary<string, Request> requests = new Dictionary<string, Request>();
         private int read;
         private bool secure = false;
+        private bool finalizeServer = false;
 
         /// <summary>
         /// Mock Web Server
@@ -78,6 +79,8 @@ namespace MockServer
         /// </summary>
         public void Start()
         {
+            finalizeServer = false;
+
             if (trf == null)
             {
                 trf = new Thread(new ThreadStart(ServerFunction));
@@ -92,6 +95,8 @@ namespace MockServer
         /// </summary>
         public void Stop()
         {
+            finalizeServer = true;
+
             LoggingMethod.WriteToLog("Stopping Server...", LoggingMethod.LevelInfo);
 
             try
@@ -177,7 +182,17 @@ namespace MockServer
                         }
                         catch
                         {
-                            item = requests[path.Substring(0, path.IndexOf("?"))];
+                            try
+                            {
+                                item = requests[path.Substring(0, path.IndexOf("?"))];
+                            }
+                            catch
+                            {
+                                item = new MockServer.Request();
+                                item.Method = "GET";
+                                item.Response = "";
+                                item.StatusCode = HttpStatusCode.OK;
+                            }
                         }
 
                         LoggingMethod.WriteToLog(String.Format("Response: {0}", item.Response), LoggingMethod.LevelVerbose);
@@ -242,9 +257,12 @@ namespace MockServer
             }
             catch (Exception error)
             {
-                LoggingMethod.WriteToLog(String.Format("Error: {0}", error.Message), LoggingMethod.LevelVerbose);
-                listener.Stop();
-                goto Start;
+                if (!finalizeServer)
+                {
+                    LoggingMethod.WriteToLog(String.Format("Error: {0}", error.Message), LoggingMethod.LevelVerbose);
+                    listener.Stop();
+                    goto Start;
+                }
             }
         }
 
