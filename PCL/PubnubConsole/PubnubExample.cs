@@ -1383,7 +1383,7 @@ namespace PubNubMessaging.Core
 					Console.WriteLine(string.Format("Push Token = {0}", pushTokenGetChannel));
 					Console.ResetColor();
 
-					Console.WriteLine("Running RegisterDeviceForPush()");
+					Console.WriteLine("Running GetChannelsForDevicePush()");
 					pubnub.GetChannelsForDevicePush<string>(PushTypeService.MPNS, pushTokenGetChannel, DisplayReturnMessage, DisplayErrorMessage);
 					break;
 				case "34": 
