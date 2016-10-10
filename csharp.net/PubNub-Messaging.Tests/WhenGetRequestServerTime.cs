@@ -134,7 +134,7 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSdkVersionIsVerified()
         {
-            string expectedSdkVersion = "PubNub-CSharp-.NET/3.7.7";
+            string expectedSdkVersion = "PubNub-CSharp-.NET/3.8.3";
 
             pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
 

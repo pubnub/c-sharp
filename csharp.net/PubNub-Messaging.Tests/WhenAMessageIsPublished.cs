@@ -312,7 +312,7 @@ namespace PubNubMessaging.Tests
         public void ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo()
         {
             isSecretEncryptPublished = false;
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "key", "enigma", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "enigma", false);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";
@@ -783,7 +783,7 @@ namespace PubNubMessaging.Tests
         public void ThenOptionalSecretKeyShouldBeProvidedInConstructor()
         {
             isPublished2 = false;
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "key");
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey);
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
             unitTest.TestClassName = "WhenAMessageIsPublished";

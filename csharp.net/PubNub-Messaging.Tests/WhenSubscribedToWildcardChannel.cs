@@ -287,7 +287,7 @@ namespace PubNubMessaging.Tests
             receivedMessage = false;
             currentTestCase = "ChannelAndChannelGroupAndWildcardChannelSubscribeShouldReturnReceivedMessage";
 
-            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "", "", false);
+            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
             pubnub.SessionUUID = "myuuid";
 
             PubnubUnitTest unitTest = new PubnubUnitTest();
