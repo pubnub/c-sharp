@@ -5,41 +5,23 @@ using System.Net;
 namespace PubnubApi
 {
 	#region "Network Status -- code split required"
-	internal abstract class ClientNetworkStatus
+	internal class ClientNetworkStatus
 	{
-		private static bool networkStatus = true;
-		private static bool failClientNetworkForTesting = false;
+        private static IJsonPluggableLibrary jsonLib;
+        private static PNConfiguration pubnubConfig;
+
+        private static bool networkStatus = true;
 		private static bool machineSuspendMode = false;
 
-		private static IJsonPluggableLibrary jsonPluggableLibrary;
-		internal static IJsonPluggableLibrary JsonPluggableLibrary
-		{
-			get
-			{
-				return jsonPluggableLibrary;
-			}
-			set
-			{
-				jsonPluggableLibrary = value;
-			}
-		}
+        public ClientNetworkStatus(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary)
+        {
+            pubnubConfig = config;
+            jsonLib = jsonPluggableLibrary;
+        }
+
 
         private static ManualResetEvent mres = new ManualResetEvent(false);
         private static ManualResetEvent mreSocketAsync = new ManualResetEvent(false);
-
-        internal static bool SimulateNetworkFailForTesting
-		{
-			get
-			{
-				return failClientNetworkForTesting;
-			}
-
-			set
-			{
-				failClientNetworkForTesting = value;
-			}
-
-		}
 
 		internal static bool MachineSuspendMode
 		{
@@ -53,16 +35,16 @@ namespace PubnubApi
 			}
 		}
 
-		internal static bool CheckInternetStatus(bool systemActive, Action<PubnubClientError> errorCallback, string[] channels, string[] channelGroups)
+		internal bool CheckInternetStatus<T>(bool systemActive, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
 		{
-			if (failClientNetworkForTesting || machineSuspendMode)
+			if (machineSuspendMode)
 			{
 				//Only to simulate network fail
 				return false;
 			}
 			else
 			{
-                CheckClientNetworkAvailability(CallbackClientNetworkStatus, errorCallback, channels, channelGroups);
+                CheckClientNetworkAvailability(CallbackClientNetworkStatus, type, callback, channels, channelGroups);
 				return networkStatus;
 			}
 		}
@@ -81,7 +63,7 @@ namespace PubnubApi
         private static object internetCheckLock = new object();
         private static bool isInternetCheckRunning = false;
 
-		private static void CheckClientNetworkAvailability(Action<bool> callback, Action<PubnubClientError> errorCallback, string[] channels, string[] channelGroups)
+		private static void CheckClientNetworkAvailability<T>(Action<bool> internalCallback, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
 		{
             lock (internetCheckLock)
             {
@@ -94,19 +76,21 @@ namespace PubnubApi
             mres = new ManualResetEvent(false);
 
 
-			InternetState state = new InternetState();
-			state.Callback = callback;
-			state.ErrorCallback = errorCallback;
-			state.Channels = channels;
+			InternetState<T> state = new InternetState<T>();
+			state.InternalCallback = internalCallback;
+            state.PubnubCallbacck = callback;
+            state.ResponseType = type;
+            //state.ErrorCallback = errorCallback;
+            state.Channels = channels;
             state.ChannelGroups = channelGroups;
 
-            ThreadPool.QueueUserWorkItem(CheckSocketConnect, state);
+            ThreadPool.QueueUserWorkItem(CheckSocketConnect<T>, state);
 
             mres.WaitOne(500);
 
 		}
 
-		private static void CheckSocketConnect(object internetState)
+		private static void CheckSocketConnect<T>(object internetState)
 		{
             lock (internetCheckLock)
             {
@@ -114,18 +98,20 @@ namespace PubnubApi
             }
 
             HttpWebRequest myRequest = null;
-            Action<bool> callback = null;
-            Action<PubnubClientError> errorCallback = null;
+            Action<bool> internalCallback = null;
+            PNCallback<T> pubnubCallback = null;
+            PNOperationType type = PNOperationType.None;
             string[] channels = null;
             string[] channelGroups = null;
 
 			try
 			{
-                InternetState state = internetState as InternetState;
+                InternetState<T> state = internetState as InternetState<T>;
                 if (state != null)
                 {
-                    callback = state.Callback;
-                    errorCallback = state.ErrorCallback;
+                    internalCallback = state.InternalCallback;
+                    type = state.ResponseType;
+                    pubnubCallback = state.PubnubCallbacck;
                     channels = state.Channels;
                     channelGroups = state.ChannelGroups;
                 }
@@ -149,7 +135,7 @@ namespace PubnubApi
 						catch(Exception ex)
 						{
                             networkStatus = false;
-                            ParseCheckSocketConnectException(ex, channels, channelGroups, errorCallback, callback);
+                            ParseCheckSocketConnectException<T>(ex, type, channels, channelGroups, pubnubCallback, internalCallback);
                             LoggingMethod.WriteToLog(string.Format("DateTime {0} CheckSocketConnect Failed {1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelInfo);
                         }
                         finally
@@ -166,7 +152,7 @@ namespace PubnubApi
 			{
 				
 				networkStatus = false;
-				ParseCheckSocketConnectException(ex, channels, channelGroups, errorCallback, callback);
+				ParseCheckSocketConnectException<T>(ex, type, channels, channelGroups, pubnubCallback, internalCallback);
 			}
 			finally
 			{
@@ -176,47 +162,47 @@ namespace PubnubApi
 		}
 
 
-        private static void ParseCheckSocketConnectException(Exception ex, string[] channels, string[] channelGroups, Action<PubnubClientError> errorCallback, Action<bool> callback)
+        private static void ParseCheckSocketConnectException<T>(Exception ex, PNOperationType type, string[] channels, string[] channelGroups, PNCallback<T> callback, Action<bool> internalcallback)
 		{
-			PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(ex);
-			int statusCode = (int)errorType;
-			string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(errorType);
-            string channel = (channels == null) ? "" : string.Join(",", channels);
-            string channelGroup = (channelGroups == null) ? "" : string.Join(",", channelGroups);
-            PubnubClientError error = new PubnubClientError(statusCode, PubnubErrorSeverity.Warn, true, ex.ToString(), ex, PubnubMessageSource.Client, null, null, errorDescription, channel, channelGroup);
-			GoToCallback(error, errorCallback);
+            PNStatusCategory errorCategory = PNStatusCategoryHelper.GetPNStatusCategory(ex);
+            StatusBuilder statusBuilder = new StatusBuilder(pubnubConfig, jsonLib);
+            PNStatus status = statusBuilder.CreateStatusResponse<T>(type, errorCategory, null, (int)System.Net.HttpStatusCode.NotFound, ex);
 
+            if (callback != null)
+            {
+                callback.OnResponse(default(T), status);
+            }
 
 			LoggingMethod.WriteToLog(string.Format("DateTime {0} checkInternetStatus Error. {1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelError);
-			callback(false);
+			internalcallback(false);
 		}
 
-		private static void GoToCallback<T>(object result, Action<T> callback)
-		{
-			if (callback != null)
-			{
-				if (typeof(T) == typeof(string))
-				{
-					JsonResponseToCallback(result, callback);
-				}
-				else
-				{
-					callback((T)(object)result);
-				}
-			}
-		}
+		//private static void GoToCallback<T>(object result, Action<T> callback)
+		//{
+		//	if (callback != null)
+		//	{
+		//		if (typeof(T) == typeof(string))
+		//		{
+		//			JsonResponseToCallback(result, callback);
+		//		}
+		//		else
+		//		{
+		//			callback((T)(object)result);
+		//		}
+		//	}
+		//}
 
-		private static void GoToCallback<T>(PubnubClientError result, Action<PubnubClientError> callback)
-		{
-			if (callback != null)
-			{
-				//TODO:
-				//Include custom message related to error/status code for developer
-				//error.AdditionalMessage = MyCustomErrorMessageRetrieverBasedOnStatusCode(error.StatusCode);
+		//private static void GoToCallback<T>(PubnubClientError result, Action<PubnubClientError> callback)
+		//{
+		//	if (callback != null)
+		//	{
+		//		//TODO:
+		//		//Include custom message related to error/status code for developer
+		//		//error.AdditionalMessage = MyCustomErrorMessageRetrieverBasedOnStatusCode(error.StatusCode);
 
-				callback(result);
-			}
-		}
+		//		callback(result);
+		//	}
+		//}
 
 
 		private static void JsonResponseToCallback<T>(object result, Action<T> callback)
@@ -225,7 +211,7 @@ namespace PubnubApi
 
 			if (typeof(T) == typeof(string))
 			{
-				callbackJson = jsonPluggableLibrary.SerializeToJsonString(result);
+				callbackJson = jsonLib.SerializeToJsonString(result);
 
 				Action<string> castCallback = callback as Action<string>;
 				castCallback(callbackJson);

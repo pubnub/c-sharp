@@ -3,32 +3,39 @@ namespace PubnubApi
 {
     public enum PNOperationType
     {
-        PNPublishOperation,
-        PNTimeOperation,
+        None,
         PNSubscribeOperation,
-        Presence,
-        PNHereNowOperation,
-        PNHistoryOperation,
-        Leave,
         PNUnsubscribeOperation,
-        PresenceUnsubscribe,
-        PNAccessManagerGrant,
-        PNAccessManagerAudit,
-        RevokeAccess,
+        PNPublishOperation,
+        PNHistoryOperation,
+        PNWhereNowOperation,
+
         PNHeartbeatOperation,
         PNSetStateOperation,
-        PNGetState,
-        PNWhereNowOperation,
-        GlobalHere_Now,
+        PNAddChannelsToGroupOperation,
+        PNRemoveChannelsFromGroupOperation,
+        PNChannelGroupsOperation,
+        PNRemoveGroupOperation,
+        PNChannelsForGroupOperation,
+
+        Presence,
+        Leave,
+        PresenceUnsubscribe,
+        RevokeAccess,
         PushRegister,
         PushRemove,
         PushGet,
         PushUnregister,
-        PNAddChannelsToGroupOperation,
-        ChannelGroupRemove,
         ChannelGroupGet,
         ChannelGroupGrantAccess,
         ChannelGroupAuditAccess,
-        ChannelGroupRevokeAccess
+        ChannelGroupRevokeAccess,
+
+        PNTimeOperation,
+
+        PNHereNowOperation,
+        PNGetStateOperation,
+        PNAccessManagerAudit,
+        PNAccessManagerGrant
     }
 }

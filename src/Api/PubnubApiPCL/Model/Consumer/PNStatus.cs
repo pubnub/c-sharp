@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,11 +9,15 @@ namespace PubnubApi
 {
     public class PNStatus
     {
+        [JsonConverter(typeof(StringEnumConverter))]
         public PNStatusCategory Category { get; set; }
+
         public PNErrorData ErrorData { get; set; }
         public bool Error { get; set; }
 
         public int StatusCode { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
         public PNOperationType Operation { get; set; }
 
         public bool TlsEnabled { get; set; }
@@ -22,8 +28,8 @@ namespace PubnubApi
         public object ClientRequest { get; set; }
 
         // send back channel, channel groups that were affected by this operation
-        public List<string> AffectedChannels { get; set; }
-        public List<string> AffectedChannelGroups { get; set; }
+        public List<string> AffectedChannels { get; set; } = new List<string>();
+        public List<string> AffectedChannelGroups { get; set; } = new List<string>();
 
         //private Endpoint executedEndpoint;
 

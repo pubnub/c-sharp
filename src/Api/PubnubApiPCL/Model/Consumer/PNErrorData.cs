@@ -4,14 +4,8 @@ namespace PubnubApi
 {
     public class PNErrorData
     {
-        public string Information;
-        public Exception Throwable;
-
-        //public PNErrorData()
-        //{
-        //    this.Information = "";
-        //    this.Throwable = null;
-        //}
+        public string Information { get; set; }
+        public Exception Throwable { get; set; }
 
         public PNErrorData(string information, Exception throwable)
         {

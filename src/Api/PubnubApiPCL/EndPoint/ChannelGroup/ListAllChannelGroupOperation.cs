@@ -33,7 +33,7 @@ namespace PubnubApi.EndPoint
 
             RequestState<PNChannelGroupsListAllResult> requestState = new RequestState<PNChannelGroupsListAllResult>();
             requestState.ResponseType = PNOperationType.ChannelGroupGet;
-            requestState.Callback = callback;
+            requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
 
             string json = UrlProcessRequest<PNChannelGroupsListAllResult>(request, requestState, false);

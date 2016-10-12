@@ -84,7 +84,7 @@ namespace PubnubApi.EndPoint
             RequestState<PNHistoryResult> requestState = new RequestState<PNHistoryResult>();
             requestState.Channels = new string[] { channel };
             requestState.ResponseType = PNOperationType.PNHistoryOperation;
-            requestState.Callback = callback;
+            requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
 
             string json = UrlProcessRequest< PNHistoryResult>(request, requestState, false);

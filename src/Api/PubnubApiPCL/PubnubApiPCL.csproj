@@ -75,13 +75,11 @@
     <Compile Include="Model\Consumer\AccessManager\PNAccessManagerAuditResult.cs" />
     <Compile Include="ClientNetworkStatus.cs" />
     <Compile Include="ConcurrentDictionary.cs" />
-    <Compile Include="Model\Consumer\Ack\ConnectOrDisconnectAck.cs" />
     <Compile Include="Model\Consumer\PNErrorData.cs" />
     <Compile Include="Model\Consumer\History\PNHistoryResult.cs" />
     <Compile Include="Model\Consumer\ChannelGroup\PNChannelGroupsListAllResult.cs" />
     <Compile Include="Model\Consumer\ChannelGroup\PNChannelGroupsAllChannelsResult.cs" />
     <Compile Include="Model\Consumer\Presence\PNGetStateResult.cs" />
-    <Compile Include="Model\Consumer\Ack\GlobalHereNowAck.cs" />
     <Compile Include="Model\Consumer\AccessManager\PNAccessManagerGrantResult.cs" />
     <Compile Include="Model\Consumer\Presence\PNHereNowResult.cs" />
     <Compile Include="Interface\IJsonPluggableLibrary.cs" />
@@ -113,12 +111,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Model\Consumer\Pubsub\PNPublishResult.cs" />
     <Compile Include="Pubnub.cs" />
-    <Compile Include="Model\Consumer\Ack\PubnubClientError.cs" />
     <Compile Include="Security\PubnubCrypto.cs" />
     <Compile Include="Security\PubnubCryptoBase.cs" />
     <Compile Include="Enum\PubnubErrorCode.cs" />
     <Compile Include="Model\PubnubErrorCodeDescription.cs" />
-    <Compile Include="Model\PubnubErrorCodeHelper.cs" />
+    <Compile Include="Model\PNStatusCategoryHelper.cs" />
     <Compile Include="Model\PubnubErrorFilter.cs" />
     <Compile Include="Enum\PubnubErrorSeverity.cs" />
     <Compile Include="Enum\PubnubMessageSource.cs" />

@@ -95,13 +95,11 @@ namespace PubnubApi
                 if (ex.Message.IndexOf("The request was aborted: The request was canceled") == -1
                                 && ex.Message.IndexOf("Machine suspend mode enabled. No request will be processed.") == -1)
                 {
-                    if (pubnubRequestState != null && pubnubRequestState.ErrorCallback != null)
+                    if (pubnubRequestState != null && pubnubRequestState.PubnubCallback != null)
                     {
-                        string multiChannel = (pubnubRequestState.Channels != null) ? string.Join(",", pubnubRequestState.Channels) : "";
-                        string multiChannelGroup = (pubnubRequestState.ChannelGroups != null) ? string.Join(",", pubnubRequestState.ChannelGroups) : "";
-
-                        //new PNCallbackService(pubnubConfig, jsonLib).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
-                        //    multiChannel, multiChannelGroup, pubnubRequestState.ErrorCallback, ex, pubnubRequestState.Request, pubnubRequestState.Response);
+                        PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(ex.Status, ex.Message);
+                        StatusBuilder statusBuilder = new StatusBuilder(pubnubConfig, jsonLib);
+                        statusBuilder.CreateStatusResponse<T>(pubnubRequestState.ResponseType, category, pubnubRequestState, (int)HttpStatusCode.NotFound, ex);
                     }
                     LoggingMethod.WriteToLog(string.Format("DateTime {0} Exception={1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelError);
                     //UrlRequestCommonExceptionHandler<T>(pubnubRequestState.ResponseType, pubnubRequestState.Channels, pubnubRequestState.ChannelGroups, false, pubnubRequestState.SubscribeRegularCallback, pubnubRequestState.PresenceRegularCallback, pubnubRequestState.ConnectCallback, pubnubRequestState.WildcardPresenceCallback, pubnubRequestState.ErrorCallback, false);

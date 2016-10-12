@@ -78,7 +78,7 @@ namespace PubnubApi.EndPoint
                 requestState.ChannelGroups = new string[] { channelGroup };
             }
             requestState.ResponseType = PNOperationType.PNAccessManagerAudit;
-            requestState.Callback = callback;
+            requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
 
             string json = UrlProcessRequest<PNAccessManagerAuditResult>(request, requestState, false);

@@ -101,7 +101,7 @@ namespace PubnubApi.EndPoint
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
             requestState.Channels = new string[] { channel };
             requestState.ResponseType = PNOperationType.PNPublishOperation;
-            requestState.Callback = callback;
+            requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
 
             string json = UrlProcessRequest<PNPublishResult>(request, requestState, false);

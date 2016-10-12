@@ -35,7 +35,7 @@ namespace PubnubApi.EndPoint
             RequestState<PNTimeResult> requestState = new RequestState<PNTimeResult>();
             requestState.Channels = null;
             requestState.ResponseType = PNOperationType.PNTimeOperation;
-            requestState.Callback = callback;
+            requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
 
             string json = UrlProcessRequest<PNTimeResult>(request, requestState, false);

@@ -45,10 +45,10 @@ namespace PubnubApi.EndPoint
             Uri request = urlBuilder.BuildRemoveChannelsFromChannelGroupRequest(null, "", groupName);
 
             RequestState<PNChannelGroupsDeleteGroupResult> requestState = new RequestState<PNChannelGroupsDeleteGroupResult>();
-            requestState.ResponseType = PNOperationType.ChannelGroupRemove;
+            requestState.ResponseType = PNOperationType.PNRemoveGroupOperation;
             requestState.Channels = new string[] { };
             requestState.ChannelGroups = new string[] { groupName };
-            requestState.Callback = callback;
+            requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
 
             string json = UrlProcessRequest<PNChannelGroupsDeleteGroupResult>(request, requestState, false);

@@ -19,14 +19,14 @@ namespace PubnubApi
         private string publishQueryparameters = "";
         private string hereNowParameters = "";
         private string historyParameters = "";
-        private string globalHereNowParameters = "";
         private string grantParameters = "";
         private string auditParameters = "";
         private string revokeParameters = "";
         private string getUserStateParameters = "";
         private string setUserStateParameters = "";
         private string channelGroupAddParameters = "";
-        private string channelGroupRemoveParameters = "";
+        private string removeChannelsFromGroupParameters = "";
+        private string removeChannelGroupParameters = "";
         private string pushRegisterDeviceParameters = "";
         private string pushUnregisterDeviceParameters = "";
         private string pushRemoveChannelParameters = "";
@@ -413,7 +413,7 @@ namespace PubnubApi
 
             if (!string.IsNullOrEmpty(channelGroupsCommaDelimited) && channelGroupsCommaDelimited.Trim().Length > 0)
             {
-                getUserStateParameters = string.Format("&channel-group={0}", EncodeUricomponent(channelGroupsCommaDelimited, PNOperationType.PNGetState, false, false));
+                getUserStateParameters = string.Format("&channel-group={0}", EncodeUricomponent(channelGroupsCommaDelimited, PNOperationType.PNGetStateOperation, false, false));
             }
 
             List<string> url = new List<string>();
@@ -427,7 +427,7 @@ namespace PubnubApi
             url.Add("uuid");
             url.Add(uuid);
 
-            return BuildRestApiRequest<Uri>(url, PNOperationType.PNGetState);
+            return BuildRestApiRequest<Uri>(url, PNOperationType.PNGetStateOperation);
         }
 
         Uri IUrlRequestBuilder.BuildSetUserStateRequest(string channelsCommaDelimited, string channelGroupsCommaDelimited, string uuid, string jsonUserState)
@@ -492,14 +492,18 @@ namespace PubnubApi
             bool nameSpaceAvailable = false;
             bool channelAvaiable = false;
 
+            PNOperationType type = PNOperationType.PNRemoveGroupOperation;
+
             StringBuilder parameterBuilder = new StringBuilder();
-            channelGroupRemoveParameters = "";
+            removeChannelGroupParameters = "";
+            removeChannelsFromGroupParameters = "";
 
             if (!String.IsNullOrEmpty(channelsCommaDelimited))
             {
                 channelAvaiable = true;
                 parameterBuilder.AppendFormat("?remove={0}", channelsCommaDelimited);
-                channelGroupRemoveParameters = parameterBuilder.ToString();
+                removeChannelsFromGroupParameters = parameterBuilder.ToString();
+                type = PNOperationType.PNRemoveChannelsFromGroupOperation;
             }
 
             // Build URL
@@ -533,7 +537,7 @@ namespace PubnubApi
                 url.Add("remove");
             }
 
-            return BuildRestApiRequest<Uri>(url, PNOperationType.ChannelGroupRemove);
+            return BuildRestApiRequest<Uri>(url, type);
         }
 
         Uri IUrlRequestBuilder.BuildGetChannelsForChannelGroupRequest(string nameSpace, string groupName, bool limitToChannelGroupScopeOnly)
@@ -789,7 +793,7 @@ namespace PubnubApi
 
                 url.AppendFormat("&pnsdk={0}", EncodeUricomponent(pubnubConfig.SdkVersion, type, false, true));
             }
-            else if (type == PNOperationType.PNGetState)
+            else if (type == PNOperationType.PNGetStateOperation)
             {
                 queryParamExist = true;
                 url.AppendFormat("?uuid={0}", uuid);
@@ -806,19 +810,6 @@ namespace PubnubApi
                 queryParamExist = true;
                 url.Append(hereNowParameters);
                 url.AppendFormat("&uuid={0}", uuid);
-                if (!string.IsNullOrEmpty(pubnubConfig.AuthKey))
-                {
-                    url.AppendFormat("&auth={0}", EncodeUricomponent(pubnubConfig.AuthKey, type, false, false));
-                }
-
-                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(pubnubConfig.SdkVersion, type, false, true));
-            }
-            else if (type == PNOperationType.GlobalHere_Now)
-            {
-                queryParamExist = true;
-                url.Append(globalHereNowParameters);
-                url.AppendFormat("&uuid={0}", uuid);
-
                 if (!string.IsNullOrEmpty(pubnubConfig.AuthKey))
                 {
                     url.AppendFormat("&auth={0}", EncodeUricomponent(pubnubConfig.AuthKey, type, false, false));
@@ -878,7 +869,7 @@ namespace PubnubApi
                 }
                 url.AppendFormat("&pnsdk={0}", EncodeUricomponent(pubnubConfig.SdkVersion, type, false, true));
             }
-            else if (type == PNOperationType.PNAddChannelsToGroupOperation || type == PNOperationType.ChannelGroupRemove || type == PNOperationType.ChannelGroupGet)
+            else if (type == PNOperationType.PNAddChannelsToGroupOperation || type == PNOperationType.PNRemoveChannelsFromGroupOperation || type == PNOperationType.PNRemoveGroupOperation || type == PNOperationType.ChannelGroupGet)
             {
                 queryParamExist = true;
                 switch (type)
@@ -886,8 +877,11 @@ namespace PubnubApi
                     case PNOperationType.PNAddChannelsToGroupOperation:
                         url.Append(channelGroupAddParameters);
                         break;
-                    case PNOperationType.ChannelGroupRemove:
-                        url.Append(channelGroupRemoveParameters);
+                    case PNOperationType.PNRemoveChannelsFromGroupOperation:
+                        url.Append(removeChannelsFromGroupParameters);
+                        break;
+                    case PNOperationType.PNRemoveGroupOperation:
+                        url.Append(removeChannelGroupParameters);
                         break;
                     case PNOperationType.ChannelGroupGet:
                         break;

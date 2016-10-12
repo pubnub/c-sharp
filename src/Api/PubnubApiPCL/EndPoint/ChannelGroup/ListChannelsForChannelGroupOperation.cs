@@ -46,7 +46,7 @@ namespace PubnubApi.EndPoint
             RequestState<PNChannelGroupsAllChannelsResult> requestState = new RequestState<PNChannelGroupsAllChannelsResult>();
             requestState.ResponseType = PNOperationType.ChannelGroupGet;
             requestState.ChannelGroups = new string[] { groupName };
-            requestState.Callback = callback;
+            requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
 
             string json = UrlProcessRequest<PNChannelGroupsAllChannelsResult>(request, requestState, false);
@@ -57,44 +57,5 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        internal void GetChannelsForChannelGroup<T>(string nameSpace, string groupName, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            if (nameSpace == null)
-            {
-                throw new ArgumentException("Missing nameSpace");
-            }
-
-            if (string.IsNullOrEmpty(groupName) || groupName.Trim().Length == 0)
-            {
-                throw new ArgumentException("Missing groupName");
-            }
-
-            if (userCallback == null)
-            {
-                throw new ArgumentException("Missing userCallback");
-            }
-            if (errorCallback == null)
-            {
-                throw new ArgumentException("Missing errorCallback");
-            }
-
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
-
-            Uri request = urlBuilder.BuildGetChannelsForChannelGroupRequest(nameSpace, groupName, false);
-
-            RequestState<T> requestState = new RequestState<T>();
-            requestState.ResponseType = PNOperationType.ChannelGroupGet;
-            requestState.ChannelGroups = new string[] { string.Format("{0}:{1}", nameSpace, groupName) };
-            requestState.NonSubscribeRegularCallback = userCallback;
-            requestState.ErrorCallback = errorCallback;
-            requestState.Reconnect = false;
-
-            string json = UrlProcessRequest<T>(request, requestState, false);
-            if (!string.IsNullOrEmpty(json))
-            {
-                List<object> result = ProcessJsonResponse<T>(requestState, json);
-                ProcessResponseCallbacks(result, requestState);
-            }
-        }
     }
 }

@@ -132,16 +132,6 @@ namespace PubnubApi
             EndPoint.OtherOperation.TerminateCurrentSubscriberRequest();
 		}
 
-		public void EnableSimulateNetworkFailForTestingOnly()
-		{
-            EndPoint.OtherOperation.EnableSimulateNetworkFailForTestingOnly();
-        }
-
-		public void DisableSimulateNetworkFailForTestingOnly()
-		{
-            EndPoint.OtherOperation.DisableSimulateNetworkFailForTestingOnly();
-		}
-
 		public void EnableMachineSleepModeForTestingOnly()
 		{
             EndPoint.OtherOperation.EnableMachineSleepModeForTestingOnly();
@@ -276,14 +266,6 @@ namespace PubnubApi
             {
                 this.jsonPluggableLibrary = new NewtonsoftJsonDotNet();
             }
-            CheckRequiredConfigValues();
-        }
-
-        public Pubnub(PNConfiguration config, IPubnubUnitTest pubnubUnitTest)
-        {
-            this.pubnubConfig = config;
-            this.jsonPluggableLibrary = new NewtonsoftJsonDotNet();
-            this.pubnubUnitTest = pubnubUnitTest;
             CheckRequiredConfigValues();
         }
 

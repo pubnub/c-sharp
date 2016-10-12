@@ -52,7 +52,7 @@ namespace PubnubApi.EndPoint
             RequestState<PNWhereNowResult> requestState = new RequestState<PNWhereNowResult>();
             requestState.Channels = new string[] { uuid };
             requestState.ResponseType = PNOperationType.PNWhereNowOperation;
-            requestState.Callback = callback;
+            requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
 
             string json = UrlProcessRequest<PNWhereNowResult>(request, requestState, false);

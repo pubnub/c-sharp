@@ -5,6 +5,6 @@ namespace PubnubApi
 {
     public class PNPushListProvisionsResult
     {
-        public List<string> Channels;
+        public List<string> Channels { get; set; }
     }
 }

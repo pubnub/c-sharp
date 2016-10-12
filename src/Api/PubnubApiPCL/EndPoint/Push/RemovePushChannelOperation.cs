@@ -10,7 +10,6 @@ namespace PubnubApi.EndPoint
     {
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
-        private IPubnubUnitTest unitTest;
         private PNPushType pubnubPushType;
         private string[] channelNames = null;
         private string deviceTokenId = "";
@@ -63,13 +62,13 @@ namespace PubnubApi.EndPoint
 
             string channel = string.Join(",", channels);
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unitTest);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
             Uri request = urlBuilder.BuildRemoveChannelPushRequest(channel, pushType, pushToken);
 
             RequestState<PNPushRemoveChannelResult> requestState = new RequestState<PNPushRemoveChannelResult>();
             requestState.Channels = new string[] { channel };
             requestState.ResponseType = PNOperationType.PushRemove;
-            requestState.Callback = callback;
+            requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
 
             string json = UrlProcessRequest<PNPushRemoveChannelResult>(request, requestState, false);

@@ -17,7 +17,7 @@ namespace PubnubApi
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public PNStatus CreateStatusResponse<T>(PNOperationType type, PNStatusCategory category, RequestState<T> asyncRequestState, HttpStatusCode httpStatusCode, Exception throwable)
+        public PNStatus CreateStatusResponse<T>(PNOperationType type, PNStatusCategory category, RequestState<T> asyncRequestState, int statusCode, Exception throwable)
         {
             PNStatus status = new PNStatus();
             status.Category = category;
@@ -59,7 +59,7 @@ namespace PubnubApi
                 }
                 else
                 {
-                    status.StatusCode = (int)httpStatusCode;
+                    status.StatusCode = statusCode;
                 }
             }
             status.Origin = config.Origin;

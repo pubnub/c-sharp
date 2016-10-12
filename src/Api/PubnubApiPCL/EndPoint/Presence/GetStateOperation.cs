@@ -74,8 +74,8 @@ namespace PubnubApi.EndPoint
             RequestState<PNGetStateResult> requestState = new RequestState<PNGetStateResult>();
             requestState.Channels = channels;
             requestState.ChannelGroups = channelGroups;
-            requestState.ResponseType = PNOperationType.PNGetState;
-            requestState.Callback = callback;
+            requestState.ResponseType = PNOperationType.PNGetStateOperation;
+            requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
 
             string json = UrlProcessRequest<PNGetStateResult>(request, requestState, false);

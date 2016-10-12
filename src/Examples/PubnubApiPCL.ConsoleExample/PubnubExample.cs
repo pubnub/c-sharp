@@ -77,7 +77,8 @@ namespace PubnubApiDemo
             public override void OnResponse(PNPublishResult result, PNStatus status)
             {
                 Console.WriteLine("Publish Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                Console.WriteLine("Publish PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                //Console.WriteLine("Publish PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                Console.WriteLine("Publish PNStatus => Status = : " + status.StatusCode.ToString());
             }
         };
 
@@ -140,7 +141,12 @@ namespace PubnubApiDemo
 
             public override void Status(Pubnub pubnub, PNStatus status)
             {
-                Console.WriteLine("SubscribeCallback: PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                //Console.WriteLine("SubscribeCallback: PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                Console.WriteLine("SubscribeCallback: PNStatus: " + status.StatusCode.ToString());
+                if (status.StatusCode != 200)
+                {
+                    Console.WriteLine(status.ErrorData.Information);
+                }
 
                 if (status.Category == PNStatusCategory.PNUnexpectedDisconnectCategory)
                 {
@@ -148,6 +154,7 @@ namespace PubnubApiDemo
                 }
                 else if (status.Category == PNStatusCategory.PNConnectedCategory)
                 {
+                    Console.WriteLine("CONNECTED {0} Channels = {1}, ChannelGroups = {2}", status.StatusCode, string.Join(",",status.AffectedChannels), string.Join(",", status.AffectedChannelGroups));
                     // Connect event. You can do stuff like publish, and know you'll get it.
                     // Or just use the connected event to confirm you are subscribed for
                     // UI / internal notifications, etc
@@ -155,6 +162,7 @@ namespace PubnubApiDemo
                 }
                 else if (status.Category == PNStatusCategory.PNReconnectedCategory)
                 {
+                    Console.WriteLine("RE-CONNECTED {0} Channels = {1}, ChannelGroups = {2}", status.StatusCode, string.Join(",", status.AffectedChannels), string.Join(",", status.AffectedChannelGroups));
                     // Happens as part of our regular operation. This event happens when
                     // radio / connectivity is lost, then regained.
                 }
@@ -726,10 +734,10 @@ namespace PubnubApiDemo
                         {
                             Console.WriteLine("Running subscribe()");
 
-                            pubnub.Subscribe<UserCreated>()
+                            pubnub.Subscribe<string>()
                                 .WithPresence()
-                                .Channels(new string[] { channel })
-                                .ChannelGroups(new string[] { channelGroup })
+                                .Channels(channel.Split(','))
+                                .ChannelGroups(channelGroup.Split(','))
                                 .Execute();
                         }
                         break;
@@ -975,23 +983,23 @@ namespace PubnubApiDemo
                         Console.WriteLine("Running Disconnect/auto-Reconnect Subscriber Request Connection");
                         pubnub.TerminateCurrentSubscriberRequest();
                         break;
-                    case "10":
-                        Console.WriteLine("Disabling Network Connection (no internet)");
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Initiating Simulation of Internet non-availability");
-                        Console.WriteLine("Until Choice=11 is entered, no operations will occur");
-                        Console.WriteLine("NOTE: Publish from other pubnub clients can occur and those will be ");
-                        Console.WriteLine("      captured upon choice=11 is entered provided resume on reconnect is enabled.");
-                        Console.ResetColor();
-                        pubnub.EnableSimulateNetworkFailForTestingOnly();
-                        break;
-                    case "11":
-                        Console.WriteLine("Enabling Network Connection (yes internet)");
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Stopping Simulation of Internet non-availability");
-                        Console.ResetColor();
-                        pubnub.DisableSimulateNetworkFailForTestingOnly();
-                        break;
+                    //case "10":
+                    //    Console.WriteLine("Disabling Network Connection (no internet)");
+                    //    Console.ForegroundColor = ConsoleColor.Red;
+                    //    Console.WriteLine("Initiating Simulation of Internet non-availability");
+                    //    Console.WriteLine("Until Choice=11 is entered, no operations will occur");
+                    //    Console.WriteLine("NOTE: Publish from other pubnub clients can occur and those will be ");
+                    //    Console.WriteLine("      captured upon choice=11 is entered provided resume on reconnect is enabled.");
+                    //    Console.ResetColor();
+                    //    pubnub.EnableSimulateNetworkFailForTestingOnly();
+                    //    break;
+                    //case "11":
+                    //    Console.WriteLine("Enabling Network Connection (yes internet)");
+                    //    Console.ForegroundColor = ConsoleColor.Red;
+                    //    Console.WriteLine("Stopping Simulation of Internet non-availability");
+                    //    Console.ResetColor();
+                    //    pubnub.DisableSimulateNetworkFailForTestingOnly();
+                    //    break;
                     case "12":
                         Console.WriteLine("Enter CHANNEL name(s) for PAM Grant.");
                         channel = Console.ReadLine();

@@ -67,7 +67,7 @@ namespace PubnubApi.EndPoint
             requestState.ResponseType = PNOperationType.PNAddChannelsToGroupOperation;
             requestState.Channels = new string[] { };
             requestState.ChannelGroups = new string[] { string.Format("{0}:{1}", nameSpace, groupName) };
-            requestState.Callback = callback;
+            requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
 
             string json = UrlProcessRequest<PNChannelGroupsAddChannelResult>(request, requestState, false);

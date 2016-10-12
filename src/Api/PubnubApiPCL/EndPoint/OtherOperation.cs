@@ -34,7 +34,7 @@ namespace PubnubApi.EndPoint
             string oldUUID = config.Uuid;
 
             config.Uuid = newUUID;
-            Uuid = newUUID;
+            CurrentUuid = newUUID;
 
             string[] channels = GetCurrentSubscriberChannels();
             string[] channelGroups = GetCurrentSubscriberChannelGroups();
@@ -52,10 +52,6 @@ namespace PubnubApi.EndPoint
                 requestState.Channels = channels;
                 requestState.ChannelGroups = channelGroups;
                 requestState.ResponseType = PNOperationType.Leave;
-                requestState.SubscribeRegularCallback = null;
-                requestState.PresenceRegularCallback = null;
-                requestState.ErrorCallback = null;
-                requestState.ConnectCallback = null;
                 requestState.Reconnect = false;
 
                 string json = UrlProcessRequest(request, requestState, false); // connectCallback = null

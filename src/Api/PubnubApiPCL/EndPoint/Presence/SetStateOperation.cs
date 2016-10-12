@@ -44,7 +44,7 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
-        public SetStateOperation uuid(string uuid)
+        public SetStateOperation Uuid(string uuid)
         {
             this.channelUUID = uuid;
             return this;
@@ -136,7 +136,7 @@ namespace PubnubApi.EndPoint
                     if (!stateChanged)
                     {
                         StatusBuilder statusBuilder = new StatusBuilder(config, jsonLibrary);
-                        PNStatus status = statusBuilder.CreateStatusResponse< PNSetStateResult>(PNOperationType.PNSetStateOperation, PNStatusCategory.PNUnknownCategory, null, System.Net.HttpStatusCode.NotModified, null);
+                        PNStatus status = statusBuilder.CreateStatusResponse< PNSetStateResult>(PNOperationType.PNSetStateOperation, PNStatusCategory.PNUnknownCategory, null, (int)System.Net.HttpStatusCode.NotModified, null);
 
                         Announce(status);
                         return;
@@ -251,7 +251,7 @@ namespace PubnubApi.EndPoint
             if (!stateChanged)
             {
                 StatusBuilder statusBuilder = new StatusBuilder(config, jsonLibrary);
-                PNStatus status = statusBuilder.CreateStatusResponse<PNSetStateResult>(PNOperationType.PNSetStateOperation, PNStatusCategory.PNUnknownCategory, null, System.Net.HttpStatusCode.NotModified, null);
+                PNStatus status = statusBuilder.CreateStatusResponse<PNSetStateResult>(PNOperationType.PNSetStateOperation, PNStatusCategory.PNUnknownCategory, null, (int)System.Net.HttpStatusCode.NotModified, null);
 
                 Announce(status);
                 return;
@@ -369,7 +369,7 @@ namespace PubnubApi.EndPoint
             requestState.Channels = channels;
             requestState.ChannelGroups = channelGroups;
             requestState.ResponseType = PNOperationType.PNSetStateOperation;
-            requestState.Callback = callback;
+            requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
 
             //Set TerminateSubRequest to true to bounce the long-polling subscribe requests to update user state

@@ -69,7 +69,7 @@ namespace PubnubApi.EndPoint
             //requestState.NonSubscribeRegularCallback = userCallback;
             //requestState.ErrorCallback = errorCallback;
             requestState.Reconnect = false;
-            requestState.Callback = callback;
+            requestState.PubnubCallback = callback;
 
             string json = UrlProcessRequest<PNHereNowResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))

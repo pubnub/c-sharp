@@ -5,52 +5,49 @@ using System.Net;
 
 namespace PubnubApi
 {
-    internal static class PubnubErrorCodeHelper
+    internal static class PNStatusCategoryHelper
     {
 
-        public static PubnubErrorCode GetErrorType(WebExceptionStatus webExceptionStatus, string webExceptionMessage)
+        public static PNStatusCategory GetPNStatusCategory(WebExceptionStatus webExceptionStatus, string webExceptionMessage)
         {
-            PubnubErrorCode ret = PubnubErrorCode.None;
+            PNStatusCategory ret = PNStatusCategory.PNUnknownCategory;
             switch (webExceptionStatus)
             {
                 case WebExceptionStatus.RequestCanceled:
-                    ret = PubnubErrorCode.WebRequestCanceled;
+                    ret = PNStatusCategory.PNCancelledCategory;
                     break;
                 case WebExceptionStatus.ConnectFailure:
-                    ret = PubnubErrorCode.ConnectFailure;
+                    ret = PNStatusCategory.PNNetworkIssuesCategory;
                     break;
                 case WebExceptionStatus.SendFailure:
-                    ret = PubnubErrorCode.ConnectFailure;
+                    ret = PNStatusCategory.PNNetworkIssuesCategory;
                     break;
                 case WebExceptionStatus.Pending:
-                    if (webExceptionMessage == "Machine suspend mode enabled. No request will be processed.")
-                    {
-                        ret = PubnubErrorCode.PubnubClientMachineSleep;
-                    }
+                    ret = PNStatusCategory.PNNetworkIssuesCategory;
                     break;
                 case WebExceptionStatus.Success:
-                    ret = PubnubErrorCode.ConnectFailure;
+                    ret = PNStatusCategory.PNNetworkIssuesCategory;
                     break;
                 default:
 #if NETFX_CORE
                 if (webExceptionStatus.ToString() == "NameResolutionFailure")
                 {
-                    ret = PubnubErrorCode.NameResolutionFailure;
+                    ret = PNStatusCategory.PNNetworkIssuesCategory;
                 }
                 else
                 {
                     Debug.WriteLine("ATTENTION: webExceptionStatus = " + webExceptionStatus.ToString());
-                    ret = PubnubErrorCode.None;
+                    ret = PNStatusCategory.PNUnknownCategory;
                 }
 #else
                     if (webExceptionStatus.ToString() == "SecureChannelFailure")
                     {
-                        ret = PubnubErrorCode.ConnectFailure;
+                        ret = PNStatusCategory.PNNetworkIssuesCategory;
                     }
                     else
                     {
                         Debug.WriteLine("ATTENTION: webExceptionStatus = " + webExceptionStatus.ToString());
-                        ret = PubnubErrorCode.None;
+                        ret = PNStatusCategory.PNUnknownCategory;
                     }
 #endif
                     break;
@@ -58,157 +55,157 @@ namespace PubnubApi
             return ret;
         }
 
-        public static PubnubErrorCode GetErrorType(Exception ex)
+        public static PNStatusCategory GetPNStatusCategory(Exception ex)
         {
-            PubnubErrorCode ret = PubnubErrorCode.None;
+            PNStatusCategory ret = PNStatusCategory.PNUnknownCategory;
 
             string errorType = ex.GetType().ToString();
             string errorMessage = ex.Message;
 
             if (errorType == "System.FormatException" && errorMessage == "Invalid length for a Base-64 char array or string.")
             {
-                ret = PubnubErrorCode.PubnubMessageDecryptException;
+                ret = PNStatusCategory.PNDecryptionErrorCategory;
             }
             else if (errorType == "System.FormatException" && errorMessage == "The input is not a valid Base-64 string as it contains a non-base 64 character, more than two padding characters, or an illegal character among the padding characters. ")
             {
-                ret = PubnubErrorCode.PubnubMessageDecryptException;
+                ret = PNStatusCategory.PNDecryptionErrorCategory;
             }
             else if (errorType == "System.ObjectDisposedException" && errorMessage == "Cannot access a disposed object.")
             {
-                ret = PubnubErrorCode.PubnubObjectDisposedException;
+                ret = PNStatusCategory.PNUnknownCategory;
             }
             else if (errorType == "System.Net.Sockets.SocketException" && errorMessage == "The requested name is valid, but no data of the requested type was found")
             {
-                ret = PubnubErrorCode.PubnubSocketConnectException;
+                ret = PNStatusCategory.PNNetworkIssuesCategory;
             }
             else if (errorType == "System.Net.Sockets.SocketException" && errorMessage == "No such host is known")
             {
-                ret = PubnubErrorCode.PubnubSocketConnectException;
+                ret = PNStatusCategory.PNNetworkIssuesCategory;
             }
             else if (errorType == "System.Security.Cryptography.CryptographicException" && errorMessage == "Padding is invalid and cannot be removed.")
             {
-                ret = PubnubErrorCode.PubnubCryptographicException;
+                ret = PNStatusCategory.PNDecryptionErrorCategory;
             }
             else if (errorType == "System.Runtime.InteropServices.SEHException" && errorMessage == "External component has thrown an exception.")
             {
-                ret = PubnubErrorCode.PubnubInterOpSEHException;
+                ret = PNStatusCategory.PNUnknownCategory;
             }
             else if (errorType == "System.Net.WebException" && errorMessage.Contains("The remote name could not be resolved:"))
             {
-                ret = PubnubErrorCode.NameResolutionFailure;
+                ret = PNStatusCategory.PNNetworkIssuesCategory;
             }
             else if (errorType == "System.Net.WebException" && errorMessage.Contains("Unable to connect to the remote server"))
             {
-                ret = PubnubErrorCode.NameResolutionFailure;
+                ret = PNStatusCategory.PNNetworkIssuesCategory;
             }
             else if (errorType == "System.Net.WebException" && errorMessage.Contains("Unable to read data from the transport connection"))
             {
-                ret = PubnubErrorCode.ConnectFailure;
+                ret = PNStatusCategory.PNNetworkIssuesCategory;
             }
             else if (errorType == "System.Net.WebException" && errorMessage.Contains("SecureChannelFailure"))
             {
-                ret = PubnubErrorCode.ConnectFailure;
+                ret = PNStatusCategory.PNNetworkIssuesCategory;
             }
             else if (errorType == "System.Net.WebException" && errorMessage.Contains("ConnectFailure"))
             {
-                ret = PubnubErrorCode.ConnectFailure;
+                ret = PNStatusCategory.PNNetworkIssuesCategory;
             }
             else if (errorType == "System.Net.WebException" && errorMessage.Contains("ReceiveFailure"))
             {
-                ret = PubnubErrorCode.ConnectFailure;
+                ret = PNStatusCategory.PNNetworkIssuesCategory;
             }
             else if (errorType == "System.Net.WebException" && errorMessage.Contains("SendFailure"))
             {
-                ret = PubnubErrorCode.ConnectFailure;
+                ret = PNStatusCategory.PNNetworkIssuesCategory;
             }
             else
             {
                 //Console.WriteLine("ATTENTION: Error Type = " + errorType);
                 //Console.WriteLine("ATTENTION: Error Message = " + errorMessage);
-                ret = PubnubErrorCode.None;
+                ret = PNStatusCategory.PNUnknownCategory;
             }
             return ret;
         }
 
-        public static PubnubErrorCode GetErrorType(int statusCode, string httpErrorCodeMessage)
+        public static PNStatusCategory GetPNStatusCategory(int statusCode, string httpErrorCodeMessage)
         {
-            PubnubErrorCode ret = PubnubErrorCode.None;
+            PNStatusCategory ret = PNStatusCategory.PNUnknownCategory;
 
             switch (statusCode)
             {
                 case 400:
                     if (httpErrorCodeMessage.ToUpper().Contains("MESSAGE TOO LARGE"))
                     {
-                        ret = PubnubErrorCode.MessageTooLarge;
+                        ret = PNStatusCategory.PNBadRequestCategory;
                     }
-                    else if (httpErrorCodeMessage.ToUpper() == "INVALID KEY")
+                    else if (httpErrorCodeMessage.ToUpper() == "INVALID KEY" || httpErrorCodeMessage.ToUpper() == "INVALID SUBSCRIBE KEY")
                     {
-                        ret = PubnubErrorCode.InvalidKey;
+                        ret = PNStatusCategory.PNAccessDeniedCategory;
                     }
                     else if (httpErrorCodeMessage.ToUpper() == "BADREQUEST")
                     {
-                        ret = PubnubErrorCode.BadRequest;
+                        ret = PNStatusCategory.PNBadRequestCategory;
                     }
                     else if (httpErrorCodeMessage.ToUpper() == "NO UUID SPECIFIED")
                     {
-                        ret = PubnubErrorCode.NoUuidSpecified;
+                        ret = PNStatusCategory.PNBadRequestCategory;
                     }
                     else if (httpErrorCodeMessage.ToUpper() == "INVALID TIMESTAMP")
                     {
-                        ret = PubnubErrorCode.InvalidTimestamp;
+                        ret = PNStatusCategory.PNBadRequestCategory;
                     }
                     else if (httpErrorCodeMessage.ToUpper() == "INVALID TYPE ARGUMENT")
                     {
-                        ret = PubnubErrorCode.InvalidTypeArgument;
+                        ret = PNStatusCategory.PNBadRequestCategory;
                     }
                     else if (httpErrorCodeMessage.ToUpper() == "CHANNEL GROUP OR GROUPS RESULT IN EMPTY SUBSCRIPTION SET")
                     {
-                        ret = PubnubErrorCode.EmptyGroupSubscription;
+                        ret = PNStatusCategory.PNBadRequestCategory;
                     }
                     else if (httpErrorCodeMessage.ToUpper() == "COULD NOT PARSE REQUEST")
                     {
-                        ret = PubnubErrorCode.CouldNotParseRequest;
+                        ret = PNStatusCategory.PNBadRequestCategory;
                     }
                     break;
                 case 401:
-                    ret = PubnubErrorCode.InvalidSubscribeKey;
+                    ret = PNStatusCategory.PNAccessDeniedCategory;
                     break;
                 case 402:
                     if (httpErrorCodeMessage.ToUpper() == "NOT ENABLED")
                     {
-                        ret = PubnubErrorCode.PamNotEnabled;
+                        ret = PNStatusCategory.PNAccessDeniedCategory;
                     }
                     break;
                 case 403:
                     if (httpErrorCodeMessage.ToUpper() == "FORBIDDEN")
                     {
-                        ret = PubnubErrorCode.Forbidden;
+                        ret = PNStatusCategory.PNAccessDeniedCategory;
                     }
                     else if (httpErrorCodeMessage.ToUpper() == "SIGNATURE DOES NOT MATCH")
                     {
-                        ret = PubnubErrorCode.SignatureDoesNotMatch;
+                        ret = PNStatusCategory.PNAccessDeniedCategory;
                     }
                     break;
                 case 404:
-                    ret = PubnubErrorCode.NotFound;
+                    ret = PNStatusCategory.PNBadRequestCategory;
                     break;
                 case 414:
-                    ret = PubnubErrorCode.RequestUriTooLong;
+                    ret = PNStatusCategory.PNBadRequestCategory;
                     break;
                 case 500:
-                    ret = PubnubErrorCode.InternalServerError;
+                    ret = PNStatusCategory.PNBadRequestCategory;
                     break;
                 case 502:
-                    ret = PubnubErrorCode.BadGateway;
+                    ret = PNStatusCategory.PNNetworkIssuesCategory;
                     break;
                 case 503:
-                    ret = PubnubErrorCode.ServiceUnavailable;
+                    ret = PNStatusCategory.PNNetworkIssuesCategory;
                     break;
                 case 504:
-                    ret = PubnubErrorCode.GatewayTimeout;
+                    ret = PNStatusCategory.PNNetworkIssuesCategory;
                     break;
                 default:
-                    ret = PubnubErrorCode.None;
+                    ret = PNStatusCategory.PNUnknownCategory;
                     break;
             }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections;
+using System.Net;
 
 namespace PubnubApi
 {
@@ -20,7 +21,7 @@ namespace PubnubApi
             return secureMessage;
         }
 
-        public List<object> DecodeDecryptLoop(List<object> message, string[] channels, string[] channelGroups, Action<PubnubClientError> errorCallback)
+        public List<object> DecodeDecryptLoop<T>(List<object> message, string[] channels, string[] channelGroups, PNCallback<T> errorCallback)
         {
             List<object> returnMessage = new List<object>();
             if (config.CiperKey.Length > 0)
@@ -43,11 +44,12 @@ namespace PubnubApi
                         {
                             decryptMessage = "**DECRYPT ERROR**";
 
-                            string multiChannel = string.Join(",", channels);
-                            string multiChannelGroup = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups) : "";
+                            PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(ex);
+                            PNStatus status = new StatusBuilder(config, jsonLib).CreateStatusResponse<T>(PNOperationType.PNHistoryOperation, category, null, (int)HttpStatusCode.NotFound, ex);
+                            status.AffectedChannels.AddRange(channels);
+                            status.AffectedChannelGroups.AddRange(channelGroups);
 
-                            //new PNCallbackService(config, jsonLib).CallErrorCallback(PubnubErrorSeverity.Critical, PubnubMessageSource.Client,
-                            //    multiChannel, multiChannelGroup, errorCallback, ex, null, null);
+                            errorCallback.OnResponse(default(T), status);
                         }
                         object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : jsonLib.DeserializeToObject(decryptMessage);
                         receivedMsg.Add(decodeMessage);

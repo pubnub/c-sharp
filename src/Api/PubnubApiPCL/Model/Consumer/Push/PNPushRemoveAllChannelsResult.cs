@@ -2,7 +2,7 @@
 
 namespace PubnubApi
 {
-    class PNPushRemoveAllChannelsResult
+    public class PNPushRemoveAllChannelsResult
     {
     }
 }

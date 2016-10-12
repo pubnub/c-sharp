@@ -12,7 +12,7 @@ namespace PubnubApi.EndPoint
         private static PNConfiguration config = null;
         private static IJsonPluggableLibrary jsonLibrary = null;
 
-        private object _syncLockSubscribeCallback = new object();
+        private object syncLockSubscribeCallback = new object();
 
         public ListenerManager(PNConfiguration pubnubConfig) :base(pubnubConfig)
         {
@@ -27,14 +27,14 @@ namespace PubnubApi.EndPoint
 
         internal void CurrentPubnubInstance(Pubnub instance)
         {
-            pubnub = instance;
+            PubnubInstance = instance;
         }
 
         public void AddListener(SubscribeCallback listener)
         {
             if (listener != null)
             {
-                lock (_syncLockSubscribeCallback)
+                lock (syncLockSubscribeCallback)
                 {
                     SubscribeCallbackListenerList.Add(listener);
                 }
@@ -45,7 +45,7 @@ namespace PubnubApi.EndPoint
         {
             if (listener != null)
             {
-                lock (_syncLockSubscribeCallback)
+                lock (syncLockSubscribeCallback)
                 {
                     SubscribeCallbackListenerList.Remove(listener);
                 }
