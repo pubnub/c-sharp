@@ -1,4 +1,4 @@
-﻿//Build Date: Sept 08, 2016
+﻿//Build Date: Oct 10, 2016
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -38,25 +38,8 @@ using Newtonsoft.Json.Linq;
 
 namespace PubNubMessaging.Core
 {
-	// INotifyPropertyChanged provides a standard event for objects to notify clients that one of its properties has changed
 	internal abstract class PubnubCore
 	{
-
-		#region "Events"
-
-		// Common property changed event
-		//public event PropertyChangedEventHandler PropertyChanged;
-
-		//public void RaisePropertyChanged(string propertyName)
-		//{
-		//	var handler = PropertyChanged;
-		//	if (handler != null) 
-  //          {
-		//		handler(this, new PropertyChangedEventArgs(propertyName));
-		//	}
-		//}
-
-		#endregion
 
 		#region "Class variables"
 
@@ -108,20 +91,7 @@ namespace PubNubMessaging.Core
 		protected string secretKey = "";
 		protected string cipherKey = "";
 		protected bool ssl = false;
-        protected string parameters = "";
-		private string subscribeParameters = "";
-		private string presenceHeartbeatParameters = "";
-		private string hereNowParameters = "";
-		private string setUserStateParameters = "";
-        private string getUserStateParameters = "";
-		private string globalHereNowParameters = "";
-        private string pushRegisterDeviceParameters = "";
-        private string pushRemoveChannelParameters = "";
-        private string pushGetChannelsParameters = "";
-        private string pushUnregisterDeviceParameters = "";
-        private string channelGroupAddParameters = "";
-        private string channelGroupRemoveParameters = "";
-        private string _pnsdkVersion = "PubNub-CSharp-.NET/3.8.2";
+        private string _pnsdkVersion = "PubNub-CSharp-.NET/3.8.3";
         private string _pushServiceName = "push.pubnub.com";
         private bool _addPayloadToPublishResponse = false;
 
@@ -1592,54 +1562,7 @@ namespace PubNubMessaging.Core
 		/// <returns></returns>
 		private bool ProcessRequest (List<string> urlComponents, ResponseType type)
 		{
-			string channelName = GetChannelName (urlComponents, type);
-			StringBuilder url = new StringBuilder ();
-
-			// Add Origin To The Request
-			url.Append (this._origin);
-
-			// Generate URL with UTF-8 Encoding
-			foreach (string url_bit in urlComponents) {
-				url.Append ("/");
-				url.Append (EncodeUricomponent (url_bit, type, true, false));
-			}
-
-			VerifyOrSetSessionUUID ();
-			if (type == ResponseType.Presence || type == ResponseType.Subscribe) {
-				url.Append ("?uuid=");
-				url.Append (this.sessionUUID);
-			}
-
-			if (type == ResponseType.DetailedHistory)
-				url.Append (parameters);
-
-			Uri requestUri = new Uri (url.ToString ());
-
-			ForceCanonicalPathAndQuery (requestUri);
-
-			// Create Request
-			HttpWebRequest request = (HttpWebRequest)WebRequest.Create (requestUri);
-
-			try {
-				// Make request with the following inline Asynchronous callback
-				request.BeginGetResponse (new AsyncCallback ((asynchronousResult) => {
-					HttpWebRequest asyncWebRequest = (HttpWebRequest)asynchronousResult.AsyncState;
-					HttpWebResponse asyncWebResponse = (HttpWebResponse)asyncWebRequest.EndGetResponse (asynchronousResult);
-					using (StreamReader streamReader = new StreamReader (asyncWebResponse.GetResponseStream ())) {
-						// Deserialize the result
-						string jsonString = streamReader.ReadToEnd ();
-						Action<PubnubClientError> dummyCallback = obj => {
-						};
-						WrapResultBasedOnResponseType<string> (type, jsonString, new string[] { channelName }, null, false, 0, null, dummyCallback);
-					}
-				}), request
-
-				);
-
-				return true;
-			} catch (System.Exception) {
-				return false;
-			}
+            return false;
 		}
 
 		#endregion
@@ -1714,50 +1637,43 @@ namespace PubNubMessaging.Core
 
         private Uri BuildDetailedHistoryRequest(string channel, long start, long end, int count, bool reverse, bool includeToken)
 		{
-            StringBuilder parameterBuilder = new StringBuilder();
-			parameters = "";
-			if (count <= -1)
-				count = 100;
-            
-            parameterBuilder.AppendFormat("?count={0}", count);
+            ResponseType currentType = ResponseType.DetailedHistory;
+
+            List<string> url = new List<string>();
+            url.Add("v2");
+            url.Add("history");
+            url.Add("sub-key");
+            url.Add(this.subscribeKey);
+            url.Add("channel");
+            url.Add(channel);
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            requestQueryStringParams.Add("count", (count <= -1) ? "100" : count.ToString());
+
             if (reverse)
             {
-                parameterBuilder.AppendFormat("&reverse={0}", reverse.ToString().ToLower());
+                requestQueryStringParams.Add("reverse", reverse.ToString().ToLower());
             }
             if (start != -1)
             {
-                parameterBuilder.AppendFormat("&start={0}", start.ToString().ToLower());
+                requestQueryStringParams.Add("start", start.ToString().ToLower());
             }
             if (end != -1)
             {
-                parameterBuilder.AppendFormat("&end={0}", end.ToString().ToLower());
+                requestQueryStringParams.Add("end", end.ToString().ToLower());
             }
-			if (!string.IsNullOrEmpty (_authenticationKey)) 
-            {
-                parameterBuilder.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, ResponseType.DetailedHistory, false, false));
-			}
 
-            parameterBuilder.AppendFormat("&uuid={0}", EncodeUricomponent(sessionUUID, ResponseType.DetailedHistory, false, false));
             if (includeToken)
             {
-                parameterBuilder.AppendFormat("&include_token={0}", includeToken.ToString().ToLower());
+                requestQueryStringParams.Add("include_token", includeToken.ToString().ToLower());
             }
-            parameterBuilder.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, ResponseType.DetailedHistory, false, true));
-            parameterBuilder.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
 
-            parameters = parameterBuilder.ToString();
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
 
-			List<string> url = new List<string> ();
-
-			url.Add ("v2");
-			url.Add ("history");
-			url.Add ("sub-key");
-			url.Add (this.subscribeKey);
-			url.Add ("channel");
-			url.Add (channel);
-
-			return BuildRestApiRequest<Uri> (url, ResponseType.DetailedHistory);
-		}
+            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+        }
 
 		#endregion
 
@@ -1914,15 +1830,8 @@ namespace PubNubMessaging.Core
 
         private Uri BuildRegisterDevicePushRequest(string channel, PushTypeService pushType, string pushToken)
         {
-            StringBuilder parameterBuilder = new StringBuilder();
-            pushRegisterDeviceParameters = "";
+            ResponseType currentType = ResponseType.PushRegister;
 
-            parameterBuilder.AppendFormat("?add={0}", EncodeUricomponent(channel, ResponseType.PushRegister, true, false));
-            parameterBuilder.AppendFormat("&type={0}", pushType.ToString().ToLower());
-            
-            pushRegisterDeviceParameters = parameterBuilder.ToString();
-
-            // Build URL
             List<string> url = new List<string>();
             url.Add("v1");
             url.Add("push");
@@ -1931,20 +1840,21 @@ namespace PubNubMessaging.Core
             url.Add("devices");
             url.Add(pushToken.ToString());
 
-            return BuildRestApiRequest<Uri>(url, ResponseType.PushRegister);
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            requestQueryStringParams.Add("type", pushType.ToString().ToLower());
+            requestQueryStringParams.Add("add", EncodeUricomponent(channel, currentType, true, false));
+
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
         }
 
         private Uri BuildRemoveChannelPushRequest(string channel, PushTypeService pushType, string pushToken)
         {
-            StringBuilder parameterBuilder = new StringBuilder();
-            pushRemoveChannelParameters = "";
+            ResponseType currentType = ResponseType.PushRemove;
 
-            parameterBuilder.AppendFormat("?remove={0}", EncodeUricomponent(channel, ResponseType.PushRemove, true, false));
-            parameterBuilder.AppendFormat("&type={0}", pushType.ToString().ToLower());
-
-            pushRemoveChannelParameters = parameterBuilder.ToString();
-
-            // Build URL
             List<string> url = new List<string>();
             url.Add("v1");
             url.Add("push");
@@ -1953,19 +1863,21 @@ namespace PubNubMessaging.Core
             url.Add("devices");
             url.Add(pushToken.ToString());
 
-            return BuildRestApiRequest<Uri>(url, ResponseType.PushRemove);
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            requestQueryStringParams.Add("type", pushType.ToString().ToLower());
+            requestQueryStringParams.Add("remove", EncodeUricomponent(channel, currentType, true, false));
+
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
         }
 
         private Uri BuildGetChannelsPushRequest(PushTypeService pushType, string pushToken)
         {
-            StringBuilder parameterBuilder = new StringBuilder();
-            pushGetChannelsParameters = "";
+            ResponseType currentType = ResponseType.PushGet;
 
-            parameterBuilder.AppendFormat("?type={0}", pushType.ToString().ToLower());
-
-            pushGetChannelsParameters = parameterBuilder.ToString();
-
-            // Build URL
             List<string> url = new List<string>();
             url.Add("v1");
             url.Add("push");
@@ -1974,19 +1886,20 @@ namespace PubNubMessaging.Core
             url.Add("devices");
             url.Add(pushToken.ToString());
 
-            return BuildRestApiRequest<Uri>(url, ResponseType.PushGet);
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            requestQueryStringParams.Add("type", pushType.ToString().ToLower());
+
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
         }
 
         private Uri BuildUnregisterDevicePushRequest(PushTypeService pushType, string pushToken)
         {
-            StringBuilder parameterBuilder = new StringBuilder();
-            pushUnregisterDeviceParameters = "";
+            ResponseType currentType = ResponseType.PushUnregister;
 
-            parameterBuilder.AppendFormat("?type={0}", pushType.ToString().ToLower());
-
-            pushUnregisterDeviceParameters = parameterBuilder.ToString();
-
-            // Build URL
             List<string> url = new List<string>();
             url.Add("v1");
             url.Add("push");
@@ -1996,7 +1909,14 @@ namespace PubNubMessaging.Core
             url.Add(pushToken.ToString());
             url.Add("remove");
 
-            return BuildRestApiRequest<Uri>(url, ResponseType.PushUnregister);
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            requestQueryStringParams.Add("type", pushType.ToString().ToLower());
+
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
         }
         #endregion
 
@@ -2390,14 +2310,8 @@ namespace PubNubMessaging.Core
         } 
         private Uri BuildAddChannelsToChannelGroupRequest(string[] channels, string nameSpace, string groupName)
         {
-            StringBuilder parameterBuilder = new StringBuilder();
-            channelGroupAddParameters = "";
+            ResponseType currentType = ResponseType.ChannelGroupAdd;
 
-            parameterBuilder.AppendFormat("?add={0}", string.Join(",",channels));
-
-            channelGroupAddParameters = parameterBuilder.ToString();
-
-            // Build URL
             List<string> url = new List<string>();
             url.Add("v1");
             url.Add("channel-registration");
@@ -2411,26 +2325,24 @@ namespace PubNubMessaging.Core
             url.Add("channel-group");
             url.Add(groupName);
 
-            return BuildRestApiRequest<Uri>(url, ResponseType.ChannelGroupAdd);
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            requestQueryStringParams.Add("add", string.Join(",", channels));
+
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
         }
 
         private Uri BuildRemoveChannelsFromChannelGroupRequest(string[] channels, string nameSpace, string groupName)
         {
+            ResponseType currentType = ResponseType.ChannelGroupRemove;
+
             bool groupNameAvailable = false;
             bool nameSpaceAvailable = false;
             bool channelAvaiable = false;
 
-            StringBuilder parameterBuilder = new StringBuilder();
-            channelGroupRemoveParameters = "";
-
-            if (channels != null && channels.Length > 0)
-            {
-                channelAvaiable = true;
-                parameterBuilder.AppendFormat("?remove={0}", string.Join(",", channels));
-                channelGroupRemoveParameters = parameterBuilder.ToString();
-            }
-
-            // Build URL
             List<string> url = new List<string>();
             url.Add("v1");
             url.Add("channel-registration");
@@ -2461,11 +2373,24 @@ namespace PubNubMessaging.Core
                 url.Add("remove");
             }
 
-            return BuildRestApiRequest<Uri>(url, ResponseType.ChannelGroupRemove);
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            if (channels != null && channels.Length > 0)
+            {
+                channelAvaiable = true;
+                requestQueryStringParams.Add("remove", string.Join(",", channels));
+            }
+
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
         }
 
         private Uri BuildGetChannelsForChannelGroupRequest(string nameSpace, string groupName, bool limitToChannelGroupScopeOnly)
         {
+            ResponseType currentType = ResponseType.ChannelGroupGet;
+
             bool groupNameAvailable = false;
             bool nameSpaceAvailable = false;
 
@@ -2503,7 +2428,13 @@ namespace PubNubMessaging.Core
                     url.Add("channel-group");
                 }
             }
-            return BuildRestApiRequest<Uri>(url, ResponseType.ChannelGroupGet);
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
         }
 
 
@@ -2571,57 +2502,37 @@ namespace PubNubMessaging.Core
 
         private Uri BuildPublishRequest(string channel, object originalMessage, bool storeInHistory, string jsonUserMetaData)
         {
+            ResponseType currentType = ResponseType.Publish;
             string message = (_enableJsonEncodingForPublish) ? JsonEncodePublishMsg(originalMessage) : originalMessage.ToString();
 
-            StringBuilder publishParamBuilder = new StringBuilder();
-            if (!storeInHistory)
-            {
-                publishParamBuilder.Append("store=0");
-            }
-            if (!string.IsNullOrEmpty(jsonUserMetaData) && _jsonPluggableLibrary != null && _jsonPluggableLibrary.IsDictionaryCompatible(jsonUserMetaData))
-            {
-                if (publishParamBuilder.ToString().Length > 0)
-                {
-                    publishParamBuilder.AppendFormat("&meta={0}", EncodeUricomponent(jsonUserMetaData, ResponseType.Publish, false, false));
-                }
-                else
-                {
-                    publishParamBuilder.AppendFormat("meta={0}", EncodeUricomponent(jsonUserMetaData, ResponseType.Publish, false, false));
-                }
-            }
-            parameters = publishParamBuilder.ToString();
-
-            // Generate String to Sign
-            string signature = "0";
-            if (this.secretKey.Length > 0)
-            {
-                StringBuilder string_to_sign = new StringBuilder();
-                string_to_sign
-                    .Append(this.publishKey)
-                        .Append('/')
-                        .Append(this.subscribeKey)
-                        .Append('/')
-                        .Append(this.secretKey)
-                        .Append('/')
-                        .Append(channel)
-                        .Append('/')
-                        .Append(message); // 1
-
-                // Sign Message
-                signature = Md5(string_to_sign.ToString());
-            }
-
-            // Build URL
             List<string> url = new List<string>();
             url.Add("publish");
             url.Add(this.publishKey);
             url.Add(this.subscribeKey);
-            url.Add(signature);
+            url.Add("0");
             url.Add(channel);
             url.Add("0");
             url.Add(message);
 
-            return BuildRestApiRequest<Uri>(url, ResponseType.Publish);
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            if (!string.IsNullOrEmpty(_authenticationKey))
+            {
+                requestQueryStringParams.Add("auth", EncodeUricomponent(_authenticationKey, currentType, false, false));
+            }
+            if (!string.IsNullOrEmpty(jsonUserMetaData) && _jsonPluggableLibrary != null && _jsonPluggableLibrary.IsDictionaryCompatible(jsonUserMetaData))
+            {
+                requestQueryStringParams.Add("meta", EncodeUricomponent(jsonUserMetaData, currentType, false, false));
+            }
+            if (!storeInHistory)
+            {
+                requestQueryStringParams.Add("store", "0");
+            }
+
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
         }
 
 		#endregion
@@ -2725,8 +2636,6 @@ namespace PubNubMessaging.Core
 					} 
 					else if (Char.IsSurrogatePair(s,positionOfChar)){
 						string codepoint = ConvertToUtf32(s, positionOfChar).ToString("X4");
-						//string codepoint = get_char_code(ch).ToString("X4");
-						//string codepoint = "U+" + ((int)ch).ToString("X4");
 
 						int cpValue = int.Parse (codepoint, NumberStyles.HexNumber);
 						if (cpValue <= 0x7F)
@@ -2760,13 +2669,7 @@ namespace PubNubMessaging.Core
 							o.Append(utf8HexValue);
 						}
 
-//						string charTarget = char.ConvertFromUtf32 (int.Parse (codepoint, NumberStyles.HexNumber));
-//						o.Append(charTarget);
-
 						prevSurroagePair = true;
-//					}
-//					else if (Char.IsSurrogate (ch)) {
-//						o.Append (ch);
 					} else {
 						string escapeChar = System.Uri.EscapeDataString (ch.ToString ());
 						o.Append (escapeChar);
@@ -2785,20 +2688,10 @@ namespace PubNubMessaging.Core
 			return encodedUri;
 		}
 
-//		public int get_char_code(char character){ 
-//			System.Text.UTF8Encoding encoding = new System.Text.UnicodeEncoding(); 
-//			byte[] bytes = encoding.GetBytes(character.ToString().ToCharArray()); 
-//			return BitConverter.ToInt32(bytes, 0); 
-//		}
 		internal const int HIGH_SURROGATE_START  = 0x00d800;
 		internal const int LOW_SURROGATE_END     = 0x00dfff;
 		internal const int LOW_SURROGATE_START   = 0x00dc00;
 		internal const int UNICODE_PLANE01_START = 0x10000;
-
-//		internal const char  HIGH_SURROGATE_START  = '\ud800';
-//		internal const char  HIGH_SURROGATE_END    = '\udbff';
-//		internal const char  LOW_SURROGATE_START   = '\udc00';
-//		internal const char  LOW_SURROGATE_END     = '\udfff';
 
 		public static int ConvertToUtf32(String s, int index) {
 			if (s == null) {
@@ -3341,31 +3234,137 @@ namespace PubNubMessaging.Core
 
 		private Uri BuildMultiChannelSubscribeRequest (string[] channels, string[] channelGroups, object timetoken)
 		{
-            StringBuilder subscribeParamBuilder = new StringBuilder();
-            subscribeParameters = "";
-			string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
-			if (channelsJsonState != "{}" && channelsJsonState != "") {
-                subscribeParamBuilder.AppendFormat("&state={0}", EncodeUricomponent(channelsJsonState, ResponseType.Subscribe, false, false));
-			}
+            ResponseType currentType = ResponseType.Subscribe;
+            string channelForUrl = (channels.Length > 0) ? string.Join(",", channels) : ",";
+
+            List<string> url = new List<string>();
+            url.Add("subscribe");
+            url.Add(this.subscribeKey);
+            url.Add(channelForUrl);
+            url.Add("0");
+            url.Add(timetoken.ToString());
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            if (_pubnubPresenceHeartbeatInSeconds != 0)
+            {
+                requestQueryStringParams.Add("heartbeat", _pubnubPresenceHeartbeatInSeconds.ToString());
+            }
+
             if (channelGroups != null && channelGroups.Length > 0 && channelGroups[0] != "")
             {
-                subscribeParamBuilder.AppendFormat("&channel-group={0}", string.Join(",", channelGroups));
+                requestQueryStringParams.Add("channel-group", string.Join(",", channelGroups));
             }
-            subscribeParameters = subscribeParamBuilder.ToString();
 
-			List<string> url = new List<string> ();
-			url.Add ("subscribe");
-			url.Add (this.subscribeKey);
-			url.Add ((channels.Length > 0) ? string.Join (",", channels) : ",");
-			url.Add ("0");
-			url.Add (timetoken.ToString ());
+            string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
+            if (channelsJsonState != "{}" && channelsJsonState != "")
+            {
+                requestQueryStringParams.Add("state", EncodeUricomponent(channelsJsonState, currentType, false, false));
+            }
 
-			return BuildRestApiRequest<Uri> (url, ResponseType.Subscribe);
-		}
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
 
-		#endregion
+            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+        }
 
-		#region "Unsubscribe Presence And Subscribe"
+        private Dictionary<string, string> GenerateCommonQueryParams(ResponseType type)
+        {
+            long timeStamp = TranslateDateTimeToSeconds(DateTime.UtcNow);
+
+            if ((type == ResponseType.GrantAccess || type == ResponseType.AuditAccess)
+                && _pubnubUnitTest != null && _pubnubUnitTest is IPubnubUnitTest && _pubnubUnitTest.EnableStubTest)
+            {
+                timeStamp = TranslateDateTimeToSeconds(new DateTime(2013, 01, 01));
+            }
+
+            Dictionary<string, string> ret = new Dictionary<string, string>();
+            ret.Add("uuid", sessionUUID);
+            ret.Add("pnsdk", EncodeUricomponent(_pnsdkVersion, ResponseType.Subscribe, false, true));
+            ret.Add("requestid", Guid.NewGuid().ToString());
+            ret.Add("timestamp", timeStamp.ToString());
+
+            if (type != ResponseType.Time
+                    && type != ResponseType.GrantAccess && type != ResponseType.ChannelGroupGrantAccess
+                    && type != ResponseType.AuditAccess && type != ResponseType.ChannelGroupAuditAccess)
+            {
+                if (!string.IsNullOrEmpty(_authenticationKey))
+                {
+                    ret.Add("auth", EncodeUricomponent(_authenticationKey, type, false, false));
+                }
+            }
+
+            return ret;
+        }
+
+        private string GenerateSignature(ResponseType type, string queryStringToSign, string partialUrl)
+        {
+            string signature = "";
+            StringBuilder string_to_sign = new StringBuilder();
+            string_to_sign.Append(this.subscribeKey).Append("\n").Append(this.publishKey).Append("\n");
+            if (type == ResponseType.GrantAccess || type == ResponseType.ChannelGroupGrantAccess)
+            {
+                string_to_sign.Append("grant").Append("\n");
+            }
+            else if (type == ResponseType.AuditAccess || type == ResponseType.ChannelGroupAuditAccess)
+            {
+                string_to_sign.Append("audit").Append("\n");
+            }
+            else
+            {
+                string_to_sign.Append(partialUrl.ToString()).Append("\n");
+            }
+            string_to_sign.Append(queryStringToSign);
+
+            PubnubCrypto pubnubCrypto = new PubnubCrypto(this.cipherKey);
+            signature = pubnubCrypto.PubnubAccessManagerSign(this.secretKey, string_to_sign.ToString());
+            System.Diagnostics.Debug.WriteLine(string_to_sign.ToString() + " => Signature = " + signature);
+            return signature;
+        }
+
+        private string BuildQueryString(ResponseType type, List<string> urlComponentList, Dictionary<string, string> queryStringParamDic)
+        {
+            string queryString = "";
+
+            if (queryStringParamDic == null)
+            {
+                queryStringParamDic = new Dictionary<string, string>();
+            }
+
+            Dictionary<string, string> commonQueryStringParams = GenerateCommonQueryParams(type);
+            Dictionary<string, string> queryStringParams = new Dictionary<string, string>(commonQueryStringParams.Concat(queryStringParamDic).GroupBy(item => item.Key).ToDictionary(item => item.Key, item => item.First().Value));
+
+            string queryToSign = string.Join("&", queryStringParams.OrderBy(kvp => kvp.Key).Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value)).ToArray());
+
+            if (this.secretKey.Length > 0)
+            {
+                StringBuilder partialUrl = new StringBuilder();
+                for (int componentIndex = 0; componentIndex < urlComponentList.Count; componentIndex++)
+                {
+                    partialUrl.Append("/");
+                    if (type == ResponseType.Publish && componentIndex == urlComponentList.Count - 1)
+                    {
+                        partialUrl.Append(EncodeUricomponent(urlComponentList[componentIndex].ToString(), type, false, false));
+                    }
+                    else
+                    {
+                        partialUrl.Append(EncodeUricomponent(urlComponentList[componentIndex].ToString(), type, true, false));
+                    }
+                }
+
+                string signature = GenerateSignature(type, queryToSign, partialUrl.ToString());
+                queryString = string.Format("{0}&signature={1}", queryToSign, signature);
+            }
+            else
+            {
+                queryString = queryToSign;
+            }
+
+            return queryString;
+        }
+        #endregion
+
+        #region "Unsubscribe Presence And Subscribe"
 
         public void PresenceUnsubscribe(string channel, string channelGroup, Action<object> presenceCallback, Action<object> connectCallback, Action<object> disconnectCallback, Action<PubnubClientError> errorCallback)
         {
@@ -3802,32 +3801,41 @@ namespace PubNubMessaging.Core
 
 		private Uri BuildMultiChannelLeaveRequest (string[] channels, string[] channelGroups, string uuid)
 		{
-            StringBuilder unsubscribeParamBuilder = new StringBuilder();
-            subscribeParameters = "";
+            ResponseType currentType = ResponseType.Leave;
+            string multiChannel = (channels != null && channels.Length > 0) ? string.Join(",", channels) : ",";
+            List<string> url = new List<string>();
+
+            url.Add("v2");
+            url.Add("presence");
+            url.Add("sub_key");
+            url.Add(this.subscribeKey);
+            url.Add("channel");
+            url.Add(multiChannel);
+            url.Add("leave");
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            if (_pubnubPresenceHeartbeatInSeconds != 0)
+            {
+                requestQueryStringParams.Add("heartbeat", _pubnubPresenceHeartbeatInSeconds.ToString());
+            }
+
             string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
             if (channelsJsonState != "{}" && channelsJsonState != "")
             {
-                unsubscribeParamBuilder.AppendFormat("&state={0}", EncodeUricomponent(channelsJsonState, ResponseType.Leave, false, false));
+                requestQueryStringParams.Add("state", EncodeUricomponent(channelsJsonState, currentType, false, false));
             }
+
             if (channelGroups != null && channelGroups.Length > 0)
             {
-                unsubscribeParamBuilder.AppendFormat("&channel-group={0}", string.Join(",", channelGroups));
+                requestQueryStringParams.Add("channel-group", string.Join(",", channelGroups));
             }
-            subscribeParameters = unsubscribeParamBuilder.ToString();
 
-            string multiChannel = (channels != null && channels.Length > 0) ? string.Join(",", channels) : ",";
-			List<string> url = new List<string> ();
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
 
-			url.Add ("v2");
-			url.Add ("presence");
-			url.Add ("sub_key");
-			url.Add (this.subscribeKey);
-			url.Add ("channel");
-            url.Add(multiChannel);
-			url.Add ("leave");
-
-			return BuildRestApiRequest<Uri> (url, ResponseType.Leave, uuid);
-		}
+            return BuildRestApiRequest<Uri>(url, currentType, uuid, queryParams);
+        }
 
 		#endregion
 
@@ -3872,50 +3880,66 @@ namespace PubNubMessaging.Core
 
 		private Uri BuildHereNowRequest (string channel, bool showUUIDList, bool includeUserState)
 		{
-			int disableUUID = (showUUIDList) ? 0 : 1;
-			int userState = (includeUserState) ? 1 : 0;
-			hereNowParameters = string.Format ("?disable_uuids={0}&state={1}", disableUUID, userState);
+            ResponseType currentType = ResponseType.Here_Now;
 
-			List<string> url = new List<string> ();
+            List<string> url = new List<string>();
+            url.Add("v2");
+            url.Add("presence");
+            url.Add("sub_key");
+            url.Add(this.subscribeKey);
+            url.Add("channel");
+            url.Add(channel);
 
-			url.Add ("v2");
-			url.Add ("presence");
-			url.Add ("sub_key");
-			url.Add (this.subscribeKey);
-			url.Add ("channel");
-			url.Add (channel);
+            int disableUUID = (showUUIDList) ? 0 : 1;
+            int userState = (includeUserState) ? 1 : 0;
 
-			return BuildRestApiRequest<Uri> (url, ResponseType.Here_Now);
-		}
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            requestQueryStringParams.Add("disable_uuids", disableUUID.ToString());
+            requestQueryStringParams.Add("state", userState.ToString());
+
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+        }
 
 		private Uri BuildPresenceHeartbeatRequest (string[] channels, string[] channelGroups)
 		{
-            StringBuilder presenceHeartbeatBuilder = new StringBuilder();
-            presenceHeartbeatParameters = "";
-            string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
-			if (channelsJsonState != "{}" && channelsJsonState != "") 
-            {
-                presenceHeartbeatBuilder.AppendFormat("&state={0}", EncodeUricomponent(channelsJsonState, ResponseType.PresenceHeartbeat, false, false));
-			}
-            if (channelGroups != null && channelGroups.Length > 0)
-            {
-                presenceHeartbeatBuilder.AppendFormat("&channel-group={0}", string.Join(",", channelGroups));
-            }
-            presenceHeartbeatParameters = presenceHeartbeatBuilder.ToString();
+            ResponseType currentType = ResponseType.PresenceHeartbeat;
 
             string multiChannel = (channels != null && channels.Length > 0) ? string.Join(",", channels) : ",";
-			List<string> url = new List<string> ();
-            
-			url.Add ("v2");
-			url.Add ("presence");
-			url.Add ("sub_key");
-			url.Add (this.subscribeKey);
-			url.Add ("channel");
-            url.Add(multiChannel);
-			url.Add ("heartbeat");
 
-			return BuildRestApiRequest<Uri> (url, ResponseType.PresenceHeartbeat);
-		}
+            List<string> url = new List<string>();
+            url.Add("v2");
+            url.Add("presence");
+            url.Add("sub_key");
+            url.Add(this.subscribeKey);
+            url.Add("channel");
+            url.Add(multiChannel);
+            url.Add("heartbeat");
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
+            if (channelsJsonState != "{}" && channelsJsonState != "")
+            {
+                requestQueryStringParams.Add("state", EncodeUricomponent(channelsJsonState, currentType, false, false));
+            }
+            if (channelGroups != null && channelGroups.Length > 0)
+            {
+                requestQueryStringParams.Add("channel-group", string.Join(",", channelGroups));
+            }
+            if (_pubnubPresenceHeartbeatInSeconds != 0)
+            {
+                requestQueryStringParams.Add("heartbeat", _pubnubPresenceHeartbeatInSeconds.ToString());
+            }
+
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+        }
 
 		#endregion
 
@@ -3957,19 +3981,27 @@ namespace PubNubMessaging.Core
 
 		private Uri BuildGlobalHereNowRequest (bool showUUIDList, bool includeUserState)
 		{
-			int disableUUID = (showUUIDList) ? 0 : 1;
-			int userState = (includeUserState) ? 1 : 0;
-			globalHereNowParameters = string.Format ("?disable_uuids={0}&state={1}", disableUUID, userState);
+            ResponseType currentType = ResponseType.GlobalHere_Now;
 
-			List<string> url = new List<string> ();
+            List<string> url = new List<string>();
+            url.Add("v2");
+            url.Add("presence");
+            url.Add("sub_key");
+            url.Add(this.subscribeKey);
 
-			url.Add ("v2");
-			url.Add ("presence");
-			url.Add ("sub_key");
-			url.Add (this.subscribeKey);
+            int disableUUID = (showUUIDList) ? 0 : 1;
+            int userState = (includeUserState) ? 1 : 0;
 
-			return BuildRestApiRequest<Uri> (url, ResponseType.GlobalHere_Now);
-		}
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            requestQueryStringParams.Add("disable_uuids", disableUUID.ToString());
+            requestQueryStringParams.Add("state", userState.ToString());
+
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+        }
 
 		#endregion
 
@@ -4010,17 +4042,21 @@ namespace PubNubMessaging.Core
 
 		private Uri BuildWhereNowRequest (string uuid)
 		{
-			List<string> url = new List<string> ();
+            ResponseType currentType = ResponseType.Where_Now;
 
-			url.Add ("v2");
-			url.Add ("presence");
-			url.Add ("sub_key");
-			url.Add (this.subscribeKey);
-			url.Add ("uuid");
-			url.Add (uuid);
+            List<string> url = new List<string>();
+            url.Add("v2");
+            url.Add("presence");
+            url.Add("sub_key");
+            url.Add(this.subscribeKey);
+            url.Add("uuid");
+            url.Add(uuid);
 
-			return BuildRestApiRequest<Uri> (url, ResponseType.Where_Now);
-		}
+            string queryString = BuildQueryString(currentType, url, null);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+        }
 
 		#endregion
 
@@ -4064,13 +4100,18 @@ namespace PubNubMessaging.Core
 
 		public Uri BuildTimeRequest ()
 		{
-			List<string> url = new List<string> ();
+            ResponseType currentType = ResponseType.Time;
 
-			url.Add ("time");
-			url.Add ("0");
+            List<string> url = new List<string>();
 
-			return BuildRestApiRequest<Uri> (url, ResponseType.Time);
-		}
+            url.Add("time");
+            url.Add("0");
+
+            string queryString = BuildQueryString(currentType, url, null);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+        }
 
 		#endregion
 
@@ -4764,60 +4805,73 @@ namespace PubNubMessaging.Core
         
         private Uri BuildSetUserStateRequest(string channel, string channelGroup, string uuid, string jsonUserState)
 		{
+            ResponseType currentType = ResponseType.SetUserState;
+
             if (string.IsNullOrEmpty(channel) && channel.Trim().Length <= 0)
             {
                 channel = ",";
             }
+
+            List<string> url = new List<string>();
+            url.Add("v2");
+            url.Add("presence");
+            url.Add("sub_key");
+            url.Add(this.subscribeKey);
+            url.Add("channel");
+            url.Add(channel);
+            url.Add("uuid");
+            url.Add(uuid);
+            url.Add("data");
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
             if (!string.IsNullOrEmpty(channelGroup) && channelGroup.Trim().Length > 0)
             {
-                setUserStateParameters = string.Format("?state={0}&channel-group={1}", EncodeUricomponent(jsonUserState, ResponseType.SetUserState, false, false), EncodeUricomponent(channelGroup, ResponseType.SetUserState, false, false));
+                requestQueryStringParams.Add("state", EncodeUricomponent(jsonUserState, currentType, false, false));
+                requestQueryStringParams.Add("channel-group", EncodeUricomponent(channelGroup, currentType, false, false));
             }
             else
             {
-                setUserStateParameters = string.Format("?state={0}", EncodeUricomponent(jsonUserState, ResponseType.SetUserState, false, false));
+                requestQueryStringParams.Add("state", EncodeUricomponent(jsonUserState, currentType, false, false));
             }
 
-			List<string> url = new List<string>();
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
 
-			url.Add ("v2");
-			url.Add ("presence");
-			url.Add ("sub_key");
-			url.Add (this.subscribeKey);
-			url.Add ("channel");
-			url.Add (channel);
-			url.Add ("uuid");
-			url.Add (uuid);
-			url.Add ("data");
-
-			return BuildRestApiRequest<Uri> (url, ResponseType.SetUserState);
-		}
+            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+        }
 
 		private Uri BuildGetUserStateRequest (string channel, string channelGroup, string uuid)
 		{
-            getUserStateParameters = "";
+            ResponseType currentType = ResponseType.GetUserState;
+
             if (string.IsNullOrEmpty(channel) && channel.Trim().Length <= 0)
             {
                 channel = ",";
             }
 
+            List<string> url = new List<string>();
+            url.Add("v2");
+            url.Add("presence");
+            url.Add("sub_key");
+            url.Add(this.subscribeKey);
+            url.Add("channel");
+            url.Add(channel);
+            url.Add("uuid");
+            url.Add(uuid);
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
             if (!string.IsNullOrEmpty(channelGroup) && channelGroup.Trim().Length > 0)
             {
-                getUserStateParameters = string.Format("&channel-group={0}", EncodeUricomponent(channelGroup, ResponseType.GetUserState, false, false));
+                requestQueryStringParams.Add("channel-group", EncodeUricomponent(channelGroup, currentType, false, false));
             }
 
-			List<string> url = new List<string> ();
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
 
-			url.Add ("v2");
-			url.Add ("presence");
-			url.Add ("sub_key");
-			url.Add (this.subscribeKey);
-			url.Add ("channel");
-			url.Add (channel);
-			url.Add ("uuid");
-			url.Add (uuid);
-
-			return BuildRestApiRequest<Uri> (url, ResponseType.GetUserState);
-		}
+            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+        }
 
 		#endregion
 
@@ -5989,108 +6043,69 @@ namespace PubNubMessaging.Core
 
 		private Uri BuildGrantAccessRequest(string channel, string authenticationKey, bool read, bool write, int ttl)
 		{
-			string signature = "0";
-			long timeStamp = TranslateDateTimeToSeconds (DateTime.UtcNow);
-			string queryString = "";
-			StringBuilder queryStringBuilder = new StringBuilder ();
+            ResponseType currentType = ResponseType.GrantAccess;
+
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("auth");
+            url.Add("grant");
+            url.Add("sub-key");
+            url.Add(this.subscribeKey);
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
             if (!string.IsNullOrEmpty(authenticationKey))
             {
-                queryStringBuilder.AppendFormat("auth={0}", EncodeUricomponent(authenticationKey, ResponseType.GrantAccess, false, false));
-			}
+                requestQueryStringParams.Add("auth", EncodeUricomponent(authenticationKey, currentType, false, false));
+            }
 
-			if (!string.IsNullOrEmpty(channel)) 
+            if (!string.IsNullOrEmpty(channel))
             {
-				queryStringBuilder.AppendFormat ("{0}channel={1}", (queryStringBuilder.Length > 0) ? "&" : "", EncodeUricomponent(channel, ResponseType.GrantAccess, false,false));
-			}
+                requestQueryStringParams.Add("channel", EncodeUricomponent(channel, currentType, false, false));
+            }
 
-			queryStringBuilder.AppendFormat ("{0}", (queryStringBuilder.Length > 0) ? "&" : "");
-            queryStringBuilder.AppendFormat("pnsdk={0}", EncodeUricomponent(_pnsdkVersion, ResponseType.GrantAccess, false, true));
-            queryStringBuilder.AppendFormat("&r={0}", Convert.ToInt32(read));
-            queryStringBuilder.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
-            queryStringBuilder.AppendFormat("&timestamp={0}", timeStamp.ToString());
             if (ttl > -1)
             {
-                queryStringBuilder.AppendFormat("&ttl={0}", ttl.ToString());
+                requestQueryStringParams.Add("ttl", ttl.ToString());
             }
-            queryStringBuilder.AppendFormat("&uuid={0}", EncodeUricomponent(sessionUUID, ResponseType.GrantAccess, false,false));
-            queryStringBuilder.AppendFormat("&w={0}", Convert.ToInt32(write));
 
-            if (this.secretKey.Length > 0) 
-            {
-				StringBuilder string_to_sign = new StringBuilder();
-				string_to_sign.Append (this.subscribeKey)
-					.Append("\n")
-						.Append(this.publishKey)
-						.Append("\n")
-						.Append("grant")
-						.Append("\n")
-						.Append(queryStringBuilder.ToString());
+            requestQueryStringParams.Add("r", Convert.ToInt32(read).ToString());
+            requestQueryStringParams.Add("w", Convert.ToInt32(write).ToString());
 
-				PubnubCrypto pubnubCrypto = new PubnubCrypto (this.cipherKey);
-				signature = pubnubCrypto.PubnubAccessManagerSign (this.secretKey, string_to_sign.ToString());
-				queryString = string.Format("signature={0}&{1}", signature, queryStringBuilder.ToString());
-			}
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
 
-			parameters = "";
-			parameters += "?" + queryString;
-
-			List<string> url = new List<string>();
-			url.Add("v1");
-			url.Add("auth");
-			url.Add("grant");
-			url.Add("sub-key");
-			url.Add(this.subscribeKey);
-
-			return BuildRestApiRequest<Uri>(url, ResponseType.GrantAccess);
-		}
+            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+        }
 
         private Uri BuildAuditAccessRequest(string channel, string authenticationKey)
 		{
-			string signature = "0";
-			long timeStamp = ((_pubnubUnitTest == null) || (_pubnubUnitTest is IPubnubUnitTest && !_pubnubUnitTest.EnableStubTest))
-				? TranslateDateTimeToSeconds (DateTime.UtcNow) 
-					: TranslateDateTimeToSeconds (new DateTime (2013, 01, 01));
-			string queryString = "";
-			StringBuilder queryStringBuilder = new StringBuilder ();
+            ResponseType currentType = ResponseType.AuditAccess;
+
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("auth");
+            url.Add("audit");
+            url.Add("sub-key");
+            url.Add(this.subscribeKey);
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
             if (!string.IsNullOrEmpty(authenticationKey))
             {
-                queryStringBuilder.AppendFormat("auth={0}", EncodeUricomponent(authenticationKey, ResponseType.AuditAccess, false, false));
-			}
-			if (!string.IsNullOrEmpty (channel)) {
-				queryStringBuilder.AppendFormat ("{0}channel={1}", (queryStringBuilder.Length > 0) ? "&" : "", EncodeUricomponent (channel, ResponseType.AuditAccess, false, false));
-			}
-            queryStringBuilder.AppendFormat("{0}pnsdk={1}", (queryStringBuilder.Length > 0) ? "&" : "", EncodeUricomponent(_pnsdkVersion, ResponseType.AuditAccess, false, true));
-            queryStringBuilder.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
-            queryStringBuilder.AppendFormat("{0}timestamp={1}", (queryStringBuilder.Length > 0) ? "&" : "", timeStamp.ToString());
-            queryStringBuilder.AppendFormat("{0}uuid={1}", (queryStringBuilder.Length > 0) ? "&" : "", EncodeUricomponent(sessionUUID, ResponseType.AuditAccess, false, false));
+                requestQueryStringParams.Add("auth", EncodeUricomponent(authenticationKey, currentType, false, false));
+            }
 
-			if (this.secretKey.Length > 0) {
-				StringBuilder string_to_sign = new StringBuilder ();
-				string_to_sign.Append (this.subscribeKey)
-					.Append ("\n")
-						.Append (this.publishKey)
-						.Append ("\n")
-						.Append ("audit")
-						.Append ("\n")
-						.Append (queryStringBuilder.ToString ());
+            if (!string.IsNullOrEmpty(channel))
+            {
+                requestQueryStringParams.Add("channel", EncodeUricomponent(channel, currentType, false, false));
+            }
 
-				PubnubCrypto pubnubCrypto = new PubnubCrypto (this.cipherKey);
-				signature = pubnubCrypto.PubnubAccessManagerSign (this.secretKey, string_to_sign.ToString ());
-				queryString = string.Format ("signature={0}&{1}", signature, queryStringBuilder.ToString ());
-			}
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
 
-			parameters = "";
-			parameters += "?" + queryString;
-
-			List<string> url = new List<string> ();
-			url.Add ("v1");
-			url.Add ("auth");
-			url.Add ("audit");
-			url.Add ("sub-key");
-			url.Add (this.subscribeKey);
-
-			return BuildRestApiRequest<Uri> (url, ResponseType.AuditAccess);
-		}
+            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+        }
 
 		public bool GrantAccess<T> (string channel, bool read, bool write, Action<T> userCallback, Action<PubnubClientError> errorCallback)
 		{
@@ -6213,51 +6228,7 @@ namespace PubNubMessaging.Core
 
         private Uri BuildChannelGroupGrantAccessRequest(string channelGroup, string authenticationKey, bool read, bool write, bool manage, int ttl)
         {
-            string signature = "0";
-            long timeStamp = TranslateDateTimeToSeconds(DateTime.UtcNow);
-            string queryString = "";
-            StringBuilder queryStringBuilder = new StringBuilder();
-            if (!string.IsNullOrEmpty(authenticationKey))
-            {
-                queryStringBuilder.AppendFormat("auth={0}", EncodeUricomponent(authenticationKey, ResponseType.ChannelGroupGrantAccess, false, false));
-            }
-
-            if (!string.IsNullOrEmpty(channelGroup))
-            {
-                queryStringBuilder.AppendFormat("{0}channel-group={1}", (queryStringBuilder.Length > 0) ? "&" : "", EncodeUricomponent(channelGroup, ResponseType.ChannelGroupGrantAccess, false, false));
-            }
-
-            queryStringBuilder.AppendFormat("{0}", (queryStringBuilder.Length > 0) ? "&" : "");
-            queryStringBuilder.AppendFormat("m={0}", Convert.ToInt32(manage));
-            queryStringBuilder.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, ResponseType.ChannelGroupGrantAccess, false, true));
-            queryStringBuilder.AppendFormat("&r={0}", Convert.ToInt32(read));
-            queryStringBuilder.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
-            queryStringBuilder.AppendFormat("&timestamp={0}", timeStamp.ToString()  );
-            if (ttl > -1)
-            {
-                queryStringBuilder.AppendFormat("&ttl={0}", ttl.ToString());
-            }
-            queryStringBuilder.AppendFormat("&uuid={0}", EncodeUricomponent(sessionUUID, ResponseType.ChannelGroupGrantAccess, false, false));
-            //queryStringBuilder.AppendFormat("&w={0}", Convert.ToInt32(write)); Not supported at this time.
-
-            if (this.secretKey.Length > 0)
-            {
-                StringBuilder string_to_sign = new StringBuilder();
-                string_to_sign.Append(this.subscribeKey)
-                    .Append("\n")
-                        .Append(this.publishKey)
-                        .Append("\n")
-                        .Append("grant")
-                        .Append("\n")
-                        .Append(queryStringBuilder.ToString());
-
-                PubnubCrypto pubnubCrypto = new PubnubCrypto(this.cipherKey);
-                signature = pubnubCrypto.PubnubAccessManagerSign(this.secretKey, string_to_sign.ToString());
-                queryString = string.Format("signature={0}&{1}", signature, queryStringBuilder.ToString());
-            }
-
-            parameters = "";
-            parameters += "?" + queryString;
+            ResponseType currentType = ResponseType.ChannelGroupGrantAccess;
 
             List<string> url = new List<string>();
             url.Add("v1");
@@ -6266,48 +6237,35 @@ namespace PubNubMessaging.Core
             url.Add("sub-key");
             url.Add(this.subscribeKey);
 
-            return BuildRestApiRequest<Uri>(url, ResponseType.ChannelGroupGrantAccess);
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            if (!string.IsNullOrEmpty(authenticationKey))
+            {
+                requestQueryStringParams.Add("auth", EncodeUricomponent(authenticationKey, currentType, false, false));
+            }
+
+            if (!string.IsNullOrEmpty(channelGroup))
+            {
+                requestQueryStringParams.Add("channel-group", EncodeUricomponent(channelGroup, currentType, false, false));
+            }
+
+            if (ttl > -1)
+            {
+                requestQueryStringParams.Add("ttl", ttl.ToString());
+            }
+
+            requestQueryStringParams.Add("m", Convert.ToInt32(manage).ToString());
+            requestQueryStringParams.Add("r", Convert.ToInt32(read).ToString());
+
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
         }
 
         private Uri BuildChannelGroupAuditAccessRequest(string channelGroup, string authenticationKey)
         {
-            string signature = "0";
-            long timeStamp = ((_pubnubUnitTest == null) || (_pubnubUnitTest is IPubnubUnitTest && !_pubnubUnitTest.EnableStubTest))
-                ? TranslateDateTimeToSeconds(DateTime.UtcNow)
-                    : TranslateDateTimeToSeconds(new DateTime(2013, 01, 01));
-            string queryString = "";
-            StringBuilder queryStringBuilder = new StringBuilder();
-            if (!string.IsNullOrEmpty(authenticationKey))
-            {
-                queryStringBuilder.AppendFormat("auth={0}", EncodeUricomponent(authenticationKey, ResponseType.ChannelGroupAuditAccess, false, false));
-            }
-            if (!string.IsNullOrEmpty(channelGroup))
-            {
-                queryStringBuilder.AppendFormat("{0}channel-group={1}", (queryStringBuilder.Length > 0) ? "&" : "", EncodeUricomponent(channelGroup, ResponseType.ChannelGroupAuditAccess, false, false));
-            }
-            queryStringBuilder.AppendFormat("{0}pnsdk={1}", (queryStringBuilder.Length > 0) ? "&" : "", EncodeUricomponent(_pnsdkVersion, ResponseType.ChannelGroupAuditAccess, false, true));
-            queryStringBuilder.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
-            queryStringBuilder.AppendFormat("{0}timestamp={1}", (queryStringBuilder.Length > 0) ? "&" : "", timeStamp.ToString());
-            queryStringBuilder.AppendFormat("{0}uuid={1}", (queryStringBuilder.Length > 0) ? "&" : "", EncodeUricomponent(sessionUUID, ResponseType.ChannelGroupAuditAccess, false, false));
-
-            if (this.secretKey.Length > 0)
-            {
-                StringBuilder string_to_sign = new StringBuilder();
-                string_to_sign.Append(this.subscribeKey)
-                    .Append("\n")
-                        .Append(this.publishKey)
-                        .Append("\n")
-                        .Append("audit")
-                        .Append("\n")
-                        .Append(queryStringBuilder.ToString());
-
-                PubnubCrypto pubnubCrypto = new PubnubCrypto(this.cipherKey);
-                signature = pubnubCrypto.PubnubAccessManagerSign(this.secretKey, string_to_sign.ToString());
-                queryString = string.Format("signature={0}&{1}", signature, queryStringBuilder.ToString());
-            }
-
-            parameters = "";
-            parameters += "?" + queryString;
+            ResponseType currentType = ResponseType.ChannelGroupAuditAccess;
 
             List<string> url = new List<string>();
             url.Add("v1");
@@ -6316,7 +6274,22 @@ namespace PubNubMessaging.Core
             url.Add("sub-key");
             url.Add(this.subscribeKey);
 
-            return BuildRestApiRequest<Uri>(url, ResponseType.ChannelGroupAuditAccess);
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            if (!string.IsNullOrEmpty(authenticationKey))
+            {
+                requestQueryStringParams.Add("auth", EncodeUricomponent(authenticationKey, currentType, false, false));
+            }
+
+            if (!string.IsNullOrEmpty(channelGroup))
+            {
+                requestQueryStringParams.Add("channel-group", EncodeUricomponent(channelGroup, currentType, false, false));
+            }
+
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
         }
 
         public bool ChannelGroupGrantAccess<T>(string channelGroup, bool read, bool write, bool manage, Action<T> userCallback, Action<PubnubClientError> errorCallback)
@@ -6843,224 +6816,69 @@ namespace PubNubMessaging.Core
             }
 		}
 
-		private Uri BuildRestApiRequest<T> (List<string> urlComponents, ResponseType type)
-		{
-			VerifyOrSetSessionUUID ();
+        private Uri BuildRestApiRequest<T>(List<string> urlComponents, ResponseType type, string queryString)
+        {
+            VerifyOrSetSessionUUID();
 
-			return BuildRestApiRequest<T> (urlComponents, type, this.sessionUUID);
-		}
+            return BuildRestApiRequest<T>(urlComponents, type, this.sessionUUID, queryString);
+        }
 
-		private Uri BuildRestApiRequest<T> (List<string> urlComponents, ResponseType type, string uuid)
-		{
-			bool queryParamExist = false;
-			StringBuilder url = new StringBuilder ();
+        private Uri BuildRestApiRequest<T>(List<string> urlComponents, ResponseType type, string uuid, string queryString)
+        {
+            StringBuilder url = new StringBuilder();
 
-			if (string.IsNullOrEmpty (uuid)) {
-				VerifyOrSetSessionUUID ();
-				uuid = this.sessionUUID;
-			}
-            
+            if (string.IsNullOrEmpty(uuid))
+            {
+                VerifyOrSetSessionUUID();
+                uuid = this.sessionUUID;
+            }
+
             uuid = EncodeUricomponent(uuid, type, false, false);
 
-			// Add http or https based on SSL flag
-			if (this.ssl) {
-				url.Append ("https://");
-			} else {
-				url.Append ("http://");
-			}
+            // Add http or https based on SSL flag
+            if (this.ssl)
+            {
+                url.Append("https://");
+            }
+            else
+            {
+                url.Append("http://");
+            }
 
-			// Add Origin To The Request
-			url.Append (this._origin);
+            // Add Origin To The Request
+            url.Append(this._origin);
 
-			// Generate URL with UTF-8 Encoding
-			for (int componentIndex = 0; componentIndex < urlComponents.Count; componentIndex++) 
+            // Generate URL with UTF-8 Encoding
+            for (int componentIndex = 0; componentIndex < urlComponents.Count; componentIndex++)
             {
-				url.Append ("/");
+                url.Append("/");
 
-				if (type == ResponseType.Publish && componentIndex == urlComponents.Count - 1) {
-					url.Append(EncodeUricomponent(urlComponents[componentIndex].ToString(), type, false, false));
-				} else {
-					url.Append(EncodeUricomponent(urlComponents[componentIndex].ToString(), type, true, false));
-				}
-			}
-
-			if (type == ResponseType.Presence || type == ResponseType.Subscribe || type == ResponseType.Leave) 
-            {
-				queryParamExist = true;
-				url.AppendFormat("?uuid={0}", uuid);
-				url.Append(subscribeParameters);
-				if (!string.IsNullOrEmpty(_authenticationKey)) {
-					url.AppendFormat ("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
-				}
-				if (_pubnubPresenceHeartbeatInSeconds != 0) {
-					url.AppendFormat("&heartbeat={0}", _pubnubPresenceHeartbeatInSeconds);
-				}
-                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
-                url.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
-            }
-			else if (type == ResponseType.PresenceHeartbeat) 
-            {
-				queryParamExist = true;
-				url.AppendFormat("?uuid={0}", uuid);
-				url.Append(presenceHeartbeatParameters);
-				if (_pubnubPresenceHeartbeatInSeconds != 0) 
+                if (type == ResponseType.Publish && componentIndex == urlComponents.Count - 1)
                 {
-					url.AppendFormat("&heartbeat={0}", _pubnubPresenceHeartbeatInSeconds);
-				}
-				if (!string.IsNullOrEmpty(_authenticationKey)) 
-                {
-					url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
-				}
-                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
-                url.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
-            }
-			else if (type == ResponseType.SetUserState) 
-            {
-				queryParamExist = true;
-				url.Append(setUserStateParameters);
-                url.AppendFormat("&uuid={0}", uuid);
-				if (!string.IsNullOrEmpty(_authenticationKey)) 
-                {
-					url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
-				}
-                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
-                url.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
-            }
-			else if (type == ResponseType.GetUserState) 
-            {
-                queryParamExist = true;
-                url.AppendFormat("?uuid={0}", uuid);
-                url.Append(getUserStateParameters);
-                if (!string.IsNullOrEmpty(_authenticationKey))
-                {
-                    url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
+                    url.Append(EncodeUricomponent(urlComponents[componentIndex].ToString(), type, false, false));
                 }
-                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
-                url.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
-            }
-            else if (type == ResponseType.Here_Now) 
-            {
-                queryParamExist = true;
-                url.Append(hereNowParameters);
-                url.AppendFormat("&uuid={0}", uuid);
-				if (!string.IsNullOrEmpty(_authenticationKey)) 
+                else
                 {
-					url.AppendFormat ("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
-				}
-                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
-                url.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
-            }
-			else if (type == ResponseType.GlobalHere_Now) 
-            {
-                queryParamExist = true;
-                url.Append(globalHereNowParameters);
-                url.AppendFormat("&uuid={0}", uuid);
-				if (!string.IsNullOrEmpty(_authenticationKey)) 
-                {
-					url.AppendFormat ("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
-				}
-                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
-                url.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
-            }
-			else if (type == ResponseType.Where_Now) 
-            {
-                queryParamExist = true;
-                url.AppendFormat("?uuid={0}", uuid);
-                if (!string.IsNullOrEmpty(_authenticationKey))
-                {
-                    url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
-                }
-                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
-                url.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
-            }
-            else if (type == ResponseType.Publish) 
-            {
-				queryParamExist = true;
-                url.AppendFormat("?uuid={0}", uuid);
-                if (parameters != "")
-                {
-                    url.AppendFormat("&{0}", parameters);
-                }
-                if (!string.IsNullOrEmpty(_authenticationKey))
-                {
-                    url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
-                }
-                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
-                url.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
-            }
-            else if (type == ResponseType.PushRegister || type == ResponseType.PushRemove || type == ResponseType.PushGet || type == ResponseType.PushUnregister)
-            {
-                queryParamExist = true;
-                switch (type)
-                {
-                    case ResponseType.PushRegister:
-                        url.Append(pushRegisterDeviceParameters);
-                        break;
-                    case ResponseType.PushRemove:
-                        url.Append(pushRemoveChannelParameters);
-                        break;
-                    case ResponseType.PushUnregister:
-                        url.Append(pushUnregisterDeviceParameters);
-                        break;
-                    default:
-                        url.Append(pushGetChannelsParameters);
-                        break;
-                }
-                url.AppendFormat("&uuid={0}", uuid);
-                if (!string.IsNullOrEmpty(_authenticationKey))
-                {
-                    url.AppendFormat("&auth={0}", EncodeUricomponent(_authenticationKey, type, false, false));
-                }
-                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
-                url.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
-            }
-            else if (type == ResponseType.ChannelGroupAdd || type == ResponseType.ChannelGroupRemove || type == ResponseType.ChannelGroupGet)
-            {
-                queryParamExist = true;
-                switch (type)
-                {
-                    case ResponseType.ChannelGroupAdd:
-                        url.Append(channelGroupAddParameters);
-                        break;
-                    case ResponseType.ChannelGroupRemove:
-                        url.Append(channelGroupRemoveParameters);
-                        break;
-                    case ResponseType.ChannelGroupGet:
-                        break;
-                    default:
-                        break;
+                    url.Append(EncodeUricomponent(urlComponents[componentIndex].ToString(), type, true, false));
                 }
             }
-            else if (type == ResponseType.DetailedHistory 
-                || type == ResponseType.GrantAccess || type == ResponseType.AuditAccess || type == ResponseType.RevokeAccess
-                || type == ResponseType.ChannelGroupGrantAccess || type == ResponseType.ChannelGroupAuditAccess || type == ResponseType.ChannelGroupRevokeAccess)
+
+            url.Append(queryString);
+
+            Uri requestUri = new Uri(url.ToString());
+
+            if (type == ResponseType.Publish || type == ResponseType.Subscribe || type == ResponseType.Presence)
             {
-                url.Append(parameters);
-                queryParamExist = true;
+                ForceCanonicalPathAndQuery(requestUri);
             }
 
-            if (!queryParamExist)
-            {
-                url.AppendFormat("?uuid={0}", uuid);
-                url.AppendFormat("&pnsdk={0}", EncodeUricomponent(_pnsdkVersion, type, false, true));
-                url.AppendFormat("&requestid={0}", Guid.NewGuid().ToString());
-            }
+            return requestUri;
 
+        }
 
-			Uri requestUri = new Uri (url.ToString());
+        #endregion
 
-			if (type == ResponseType.Publish || type == ResponseType.Subscribe || type == ResponseType.Presence)
-            {
-				ForceCanonicalPathAndQuery(requestUri);
-			}
-
-			return requestUri;
-
-		}
-
-		#endregion
-
-	}
+    }
 	#region "Unit test interface"
 	public interface IPubnubUnitTest
 	{
