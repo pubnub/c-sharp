@@ -15,7 +15,8 @@ namespace PubNubMessaging.Tests
                 #pragma warning restore CS0162 // Unreachable code detected
                 IPubnubUnitTest unitTest = new PubnubUnitTest();
                 unitTest.Timetoken = 1356998400;
-                pubnub = new Pubnub(pnConfiguration, unitTest);
+                pubnub = new Pubnub(pnConfiguration);
+                pubnub.PubnubUnitTest = unitTest;
                 ////pubnub.PubnubUnitTest = unitTest;
                 //// We need to change this method in PubnubWebRequestBase.cs #line 187
                 //// to return only request.BeginGetResponse(callback, state);
