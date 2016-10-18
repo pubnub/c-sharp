@@ -131,7 +131,10 @@ namespace PubnubApiDemo
         {
             public override void Message<T>(Pubnub pubnub, PNMessageResult<T> message)
             {
-                Console.WriteLine("SubscribeCallback: PNMessageResult: {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(message.Message));
+                if (message != null)
+                {
+                    Console.WriteLine("SubscribeCallback: PNMessageResult: {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(message.Message));
+                }
             }
 
             public override void Presence(Pubnub pubnub, PNPresenceEventResult presence)
@@ -143,9 +146,11 @@ namespace PubnubApiDemo
             {
                 //Console.WriteLine("SubscribeCallback: PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
                 Console.WriteLine("SubscribeCallback: PNStatus: " + status.StatusCode.ToString());
-                if (status.StatusCode != 200)
+                if (status.StatusCode != 200 || status.Error)
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine(status.ErrorData.Information);
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
 
                 if (status.Category == PNStatusCategory.PNUnexpectedDisconnectCategory)
@@ -821,11 +826,10 @@ namespace PubnubApiDemo
                         //List<Phone> phoneList = new List<Phone>();
                         //phoneList.Add(new Phone() { Number = "111-222-2222", PhoneType = PhoneType.Mobile, Extenion = "11" });
                         //userCreated.User = new User { Id = 11, Name = "Doe", Addressee = new Addressee { Id = Guid.NewGuid(), Street = "My Street" }, Phones = phoneList };
-                        //publishMsg = userCreated;
 
                         //pubnub.Publish()
                         //    .Channel(channel)
-                        //    .Message(publishMsg)
+                        //    .Message(userCreated)
                         //    .Meta(jsonUserMetaData)
                         //    .ShouldStore(store)
                         //    .Async(new DemoPublishResult());

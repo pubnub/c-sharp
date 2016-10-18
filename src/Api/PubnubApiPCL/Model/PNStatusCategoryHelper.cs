@@ -118,6 +118,10 @@ namespace PubnubApi
             {
                 ret = PNStatusCategory.PNNetworkIssuesCategory;
             }
+            else if (errorType == "System.ArgumentException" && errorMessage.Contains("cannot be converted to type"))
+            {
+                ret = PNStatusCategory.PNMalformedResponseCategory;
+            }
             else
             {
                 //Console.WriteLine("ATTENTION: Error Type = " + errorType);

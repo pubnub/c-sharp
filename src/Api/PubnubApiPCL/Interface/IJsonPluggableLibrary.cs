@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,8 @@ namespace PubnubApi
 {
     public interface IJsonPluggableLibrary
     {
+        object BuildJsonObject(string jsonString);
+
         bool IsArrayCompatible(string jsonString);
 
         bool IsDictionaryCompatible(string jsonString);

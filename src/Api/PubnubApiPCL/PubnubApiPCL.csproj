@@ -37,6 +37,7 @@
   <ItemGroup>
     <Compile Include="Builder\ResponseBuilder.cs" />
     <Compile Include="Builder\StatusBuilder.cs" />
+    <Compile Include="Builder\UriUtil.cs" />
     <Compile Include="Builder\UrlRequestBuilder.cs" />
     <Compile Include="EndPoint\Access\AuditOperation.cs" />
     <Compile Include="EndPoint\Access\GrantOperation.cs" />
@@ -64,7 +65,9 @@
     <Compile Include="Enum\PNHeartbeatNotificationOption.cs" />
     <Compile Include="Enum\PNOperationType_TBR.cs" />
     <Compile Include="Enum\PNStatusCategory.cs" />
-    <Compile Include="HttpUtility.cs" />
+    <Compile Include="HttpUtility\HttpUtility.cs" />
+    <Compile Include="HttpUtility\HttpValue.cs" />
+    <Compile Include="HttpUtility\HttpValueCollection.cs" />
     <Compile Include="Interface\IPubnubHttp.cs" />
     <Compile Include="Interface\IPubnubProxy.cs" />
     <Compile Include="Interface\IUrlRequestBuilder.cs" />
@@ -81,6 +84,8 @@
     <Compile Include="Model\Consumer\ChannelGroup\PNChannelGroupsAllChannelsResult.cs" />
     <Compile Include="Model\Consumer\Presence\PNGetStateResult.cs" />
     <Compile Include="Model\Consumer\AccessManager\PNAccessManagerGrantResult.cs" />
+    <Compile Include="Model\Consumer\Presence\PNHereNowChannelData.cs" />
+    <Compile Include="Model\Consumer\Presence\PNHereNowOccupantData.cs" />
     <Compile Include="Model\Consumer\Presence\PNHereNowResult.cs" />
     <Compile Include="Interface\IJsonPluggableLibrary.cs" />
     <Compile Include="Callbacks\PNCallback.cs" />

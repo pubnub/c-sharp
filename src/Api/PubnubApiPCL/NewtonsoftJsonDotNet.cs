@@ -24,6 +24,20 @@ namespace PubnubApi
             return ret;
         }
 
+        public object BuildJsonObject(string jsonString)
+        {
+            object ret = null;
+
+            try
+            {
+                var token = JToken.Parse(jsonString);
+                ret = token;
+            }
+            catch { }
+
+            return ret;
+        }
+
         public bool IsArrayCompatible(string jsonString)
         {
             bool ret = false;
@@ -137,7 +151,6 @@ namespace PubnubApi
                 Type generic = typeof(PNMessageResult<>);
                 Type specific = generic.MakeGenericType(dataType);
 
-                //ConstructorInfo ci = specific.GetConstructor(Type.EmptyTypes);
                 ConstructorInfo ci = specific.GetConstructors().FirstOrDefault();
                 if (ci != null)
                 {
@@ -151,6 +164,7 @@ namespace PubnubApi
                     {
                         JValue jsonValue = listObject[0] as JValue;
                         userMessage = jsonValue.Value;
+                        userMessage = ConvertToDataType(dataType, userMessage);
 
                         dataProp.SetValue(message, userMessage, null);
                     }
@@ -166,9 +180,6 @@ namespace PubnubApi
                             userMessage = token.ToObject(dataProp.PropertyType, JsonSerializer.Create());
                         }
 
-                        //userMessage = ConvertJTokenToObject(listObject[0] as JToken);
-                        //userMessage = Activator.CreateInstance(
-                        //PopulateObject(listObject[0].ToString(), message);
                         dataProp.SetValue(message, userMessage, null);
                     }
                     else if (listObject[0].GetType() == typeof(Newtonsoft.Json.Linq.JArray))
@@ -176,9 +187,6 @@ namespace PubnubApi
                         JToken token = listObject[0] as JToken;
                         userMessage = token.ToObject(dataProp.PropertyType, JsonSerializer.Create());
 
-                        //userMessage = ConvertJTokenToObject(listObject[0] as JToken);
-                        //userMessage = Activator.CreateInstance(
-                        //PopulateObject(listObject[0].ToString(), message);
                         dataProp.SetValue(message, userMessage, null);
                     }
                     else if (listObject[0].GetType() == typeof(System.String))
@@ -499,22 +507,6 @@ namespace PubnubApi
                 ret = (T)Convert.ChangeType(ack, typeof(PNAccessManagerAuditResult), CultureInfo.InvariantCulture);
                 #endregion
             }
-            //else if (typeof(T) == typeof(ConnectOrDisconnectAck))
-            //{
-            //    #region "ConnectOrDisconnectAck"
-            //    var ack = new ConnectOrDisconnectAck
-            //    {
-            //        StatusMessage = listObject[1].ToString(),
-            //        ChannelGroupName = (listObject.Count == 4) ? listObject[2].ToString() : "",
-            //        ChannelName = (listObject.Count == 4) ? listObject[3].ToString() : listObject[2].ToString()
-            //    };
-            //    int statusCode;
-            //    if (int.TryParse(listObject[0].ToString(), out statusCode))
-            //        ack.StatusCode = statusCode;
-
-            //    ret = (T)Convert.ChangeType(ack, typeof(ConnectOrDisconnectAck), CultureInfo.InvariantCulture);
-            //    #endregion
-            //}
             else if (typeof(T) == typeof(PNPublishResult))
             {
                 #region "PNPublishResult"
@@ -1088,6 +1080,17 @@ namespace PubnubApi
                         ret.Add(key, dictionary[key]);
                     }
                 }
+                else if (localContainer.GetType().ToString() == "Newtonsoft.Json.Linq.JProperty")
+                {
+                    ret = new Dictionary<string, object>();
+
+                    JProperty jsonProp = localContainer as JProperty;
+                    if (jsonProp != null)
+                    {
+                        string propName = jsonProp.Name;
+                        ret.Add(propName, ConvertJTokenToObject(jsonProp.Value));
+                    }
+                }
             }
 
             return ret;
@@ -1194,6 +1197,62 @@ namespace PubnubApi
             }
 
             return null;
+        }
+
+        private static object ConvertToDataType(Type dataType, object inputValue)
+        {
+            if (dataType == inputValue.GetType())
+            {
+                return inputValue;
+            }
+
+            object userMessage = inputValue;
+            switch (dataType.FullName)
+            {
+                case "System.Int32":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.Int32), CultureInfo.InvariantCulture);
+                    break;
+                case "System.Int16":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.Int16), CultureInfo.InvariantCulture);
+                    break;
+                case "System.UInt64":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.UInt64), CultureInfo.InvariantCulture);
+                    break;
+                case "System.UInt32":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.UInt32), CultureInfo.InvariantCulture);
+                    break;
+                case "System.UInt16":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.UInt16), CultureInfo.InvariantCulture);
+                    break;
+                case "System.Byte":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.Byte), CultureInfo.InvariantCulture);
+                    break;
+                case "System.SByte":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.SByte), CultureInfo.InvariantCulture);
+                    break;
+                case "System.Decimal":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.Decimal), CultureInfo.InvariantCulture);
+                    break;
+                case "System.Boolean":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.Boolean), CultureInfo.InvariantCulture);
+                    break;
+                case "System.Double":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.Double), CultureInfo.InvariantCulture);
+                    break;
+                case "System.Char":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.Char), CultureInfo.InvariantCulture);
+                    break;
+                case "System.String":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.String), CultureInfo.InvariantCulture);
+                    break;
+                case "System.Object":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.Object), CultureInfo.InvariantCulture);
+                    break;
+                default:
+                    break;
+            }
+
+            return userMessage;
         }
 
         #endregion

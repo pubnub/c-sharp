@@ -3,11 +3,11 @@ namespace PubnubApi
 {
     public class MpnsCycleTileNotification
     {
-        public string type = "cycle";
-        public int delay = 0;
-        public string title = "";
-        public int? count = 0;
-        public string small_background_image = "";
-        public string[] images = null;
+        public string type { get; set; } = "cycle";
+        public int delay { get; set; } = 0;
+        public string title { get; set; } = "";
+        public int? count { get; set; } = 0;
+        public string small_background_image { get; set; } = "";
+        public string[] images { get; set; } = null;
     }
 }

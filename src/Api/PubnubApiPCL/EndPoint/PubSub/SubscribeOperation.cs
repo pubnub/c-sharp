@@ -15,7 +15,7 @@ namespace PubnubApi.EndPoint
         private List<string> subscribeChannelGroupNames = new List<string>();
         private List<string> presenceChannelNames = new List<string>();
         private List<string> presenceChannelGroupNames = new List<string>();
-        private long subscribeTimetoken;
+        private long subscribeTimetoken = -1;
         private bool presenceSubscribeEnabled = false;
 
         public SubscribeOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
@@ -120,10 +120,21 @@ namespace PubnubApi.EndPoint
                 arrayChannelGroup = channelGroup.Trim().Split(',');
             }
 
+            Dictionary<string, string> initialSubscribeUrlParams = new Dictionary<string, string>();
+            if (this.subscribeTimetoken >= 0)
+            {
+                initialSubscribeUrlParams.Add("tt", this.subscribeTimetoken.ToString());
+            }
+            if (!string.IsNullOrEmpty(config.FilterExpression) && config.FilterExpression.Trim().Length > 0)
+            {
+                initialSubscribeUrlParams.Add("filter-expr", new UriUtil().EncodeUriComponent(config.FilterExpression, PNOperationType.PNSubscribeOperation, false, false));
+            }
+
+
             System.Threading.Tasks.Task.Factory.StartNew(() =>
             {
                 SubscribeManager manager = new SubscribeManager(config, jsonLibrary);
-                manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups);
+                manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups, initialSubscribeUrlParams);
             });
         }
 

@@ -1,46 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Collections;
+using System.Collections.ObjectModel;
 
 namespace PubnubApi
 {
-    public sealed class HttpUtility
-    {
-        public static HttpValueCollection ParseQueryString(string query)
-        {
-            if (query == null)
-            {
-                throw new ArgumentNullException("query");
-            }
-
-            if ((query.Length > 0) && (query[0] == '?'))
-            {
-                query = query.Substring(1);
-            }
-
-            return new HttpValueCollection(query, true);
-        }
-    }
-
-    public sealed class HttpValue
-    {
-        public HttpValue()
-        {
-        }
-
-        public HttpValue(string key, string value)
-        {
-            this.Key = key;
-            this.Value = value;
-        }
-
-        public string Key { get; set; }
-        public string Value { get; set; }
-    }
-
     public class HttpValueCollection : Collection<HttpValue>
     {
         #region Constructors
@@ -131,7 +97,7 @@ namespace PubnubApi
                         // If .NET 4.5 and above (Thanks @Paya)
                         //key = WebUtility.UrlDecode(key);
                         // If .NET 4.0 use this instead.
-                         key = Uri.EscapeDataString(key);
+                        key = Uri.EscapeDataString(key);
                     }
 
                     if (stringBuilder.Length > 0)

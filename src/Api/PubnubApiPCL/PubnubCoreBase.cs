@@ -307,6 +307,56 @@ namespace PubnubApi
             }
         }
 
+        protected static long GetTimetokenFromMultiplexResult(List<object> result)
+        {
+            long jsonTimetoken = 0;
+            Dictionary<string, object> timetokenObj = jsonLib.ConvertToDictionaryObject(result[0]);
+
+            if (timetokenObj != null && timetokenObj.Count > 0 && timetokenObj.ContainsKey("t"))
+            {
+                Dictionary<string, object> timeAndRegionDictionary = timetokenObj["t"] as Dictionary<string, object>;
+                if (timeAndRegionDictionary != null && timeAndRegionDictionary.Count > 0 && timeAndRegionDictionary.ContainsKey("t"))
+                {
+                    Int64.TryParse(timeAndRegionDictionary["t"].ToString(), out jsonTimetoken);
+                }
+            }
+            else
+            {
+                timetokenObj = jsonLib.ConvertToDictionaryObject(result[1]);
+                if (timetokenObj != null && timetokenObj.Count > 0 && timetokenObj.ContainsKey("t"))
+                {
+                    Dictionary<string, object> timeAndRegionDictionary = timetokenObj["t"] as Dictionary<string, object>;
+                    if (timeAndRegionDictionary != null && timeAndRegionDictionary.Count > 0 && timeAndRegionDictionary.ContainsKey("t"))
+                    {
+                        Int64.TryParse(timeAndRegionDictionary["t"].ToString(), out jsonTimetoken);
+                    }
+                }
+            }
+
+            return jsonTimetoken;
+        }
+
+        protected static List<object> GetMessageFromMultiplexResult(List<object> result)
+        {
+            List<object> jsonMessageList = null;
+
+            Dictionary<string, object> messageDicObj = jsonLib.ConvertToDictionaryObject(result[1]);
+            if (messageDicObj != null && messageDicObj.Count > 0 && messageDicObj.ContainsKey("m"))
+            {
+                jsonMessageList = messageDicObj["m"] as List<object>;
+            }
+            else
+            {
+                messageDicObj = jsonLib.ConvertToDictionaryObject(result[0]);
+                if (messageDicObj != null && messageDicObj.Count > 0 && messageDicObj.ContainsKey("m"))
+                {
+                    jsonMessageList = messageDicObj["m"] as List<object>;
+                }
+            }
+
+            return jsonMessageList;
+        }
+
         private static bool IsZeroTimeTokenRequest<T>(RequestState<T> asyncRequestState, List<object> result)
         {
             bool ret = false;
@@ -314,14 +364,15 @@ namespace PubnubApi
             {
                 if (asyncRequestState != null && asyncRequestState.Request != null && result != null && result.Count > 0)
                 {
-                    object[] message = result[0] as object[];
+                    List<object> message = GetMessageFromMultiplexResult(result);
                     Uri restUri = asyncRequestState.Request.RequestUri;
                     List<object> segments = restUri.AbsolutePath.Split('/').Where(s => s.ToString() != "").ToList<object>();
-                    if (segments != null)
+                    HttpValueCollection restUriQueryCollection = HttpUtility.ParseQueryString(restUri.Query);
+                    if (segments != null && restUriQueryCollection != null && restUriQueryCollection.Count > 0 && restUriQueryCollection.ContainsKey("tt"))
                     {
-                        string req = segments[0].ToString().ToLower();
-                        string timetoken = segments[segments.Count - 1].ToString();
-                        if (req == "subscribe" && timetoken == "0" && message != null && message.Length == 0)
+                        string req = string.Format("{0}/{1}",segments[0].ToString().ToLower(), segments[1].ToString().ToLower());
+                        string timetoken = restUriQueryCollection["tt"].ToString();
+                        if (req == "v2/subscribe" && timetoken == "0" && message != null && message.Count == 0)
                         {
                             ret = true;
                         }
@@ -361,116 +412,117 @@ namespace PubnubApi
 
         private static void ResponseToUserCallback<T>(List<object> result, PNOperationType type, string[] channels, string[] channelGroups, RequestState<T> asyncRequestState)
         {
-            string[] messageChannels = null;
-            string[] messageChannelGroups = null;
             var userCallback = (asyncRequestState != null) ? asyncRequestState.PubnubCallback : null;
             switch (type)
             {
                 case PNOperationType.PNSubscribeOperation:
                 case PNOperationType.Presence:
-                    var messages = (from item in result
-                                    select item as object).ToArray();
-                    if (messages != null && messages.Length > 0)
+                    List<object> messageList = GetMessageFromMultiplexResult(result);
+                    long messageTimetoken = GetTimetokenFromMultiplexResult(result);
+
+                    if (messageList != null && messageList.Count > 0)
                     {
-                        object[] messageList = messages[0] as object[];
-                        if (messageList != null && messageList.Length > 0)
+                        Dictionary<string, object> messageDic = jsonLib.ConvertToDictionaryObject(messageList[0]);
+                        if (messageDic != null && messageDic.Count > 0)
                         {
-                            if (messages.Length == 4 || messages.Length == 6)
+                            string currentMessageChannel = "";
+                            string currentMessageChannelGroup = "";
+                            if (messageDic.ContainsKey("c"))
                             {
-                                messageChannelGroups = messages[2].ToString().Split(',');
-                                messageChannels = messages[3].ToString().Split(',');
+                                currentMessageChannel = messageDic["c"].ToString();
+                            }
+
+                            if (messageDic.ContainsKey("b"))
+                            {
+                                currentMessageChannelGroup = messageDic["b"].ToString();
+                            }
+
+                            if (currentMessageChannel == currentMessageChannelGroup)
+                            {
+                                currentMessageChannelGroup = "";
+                            }
+
+                            object payload = null;
+                            if (messageDic.ContainsKey("d"))
+                            {
+                                payload = messageDic["d"];
+                            }
+                            List<object> payloadContainer = new List<object>();
+                            if (currentMessageChannel.Contains("-pnpres") || currentMessageChannel.Contains(".*-pnpres"))
+                            {
+                                payloadContainer.Add(payload);
                             }
                             else
                             {
-                                messageChannels = messages[2].ToString().Split(',');
-                                messageChannelGroups = null;
-                            }
-                            for (int messageIndex = 0; messageIndex < messageList.Length; messageIndex++)
-                            {
-                                string currentChannel = (messageChannels.Length == 1) ? (string)messageChannels[0] : (string)messageChannels[messageIndex];
-                                string currentChannelGroup = "";
-                                if (messageChannelGroups != null && messageChannelGroups.Length > 0)
+                                if (pubnubConfig.CiperKey.Length > 0) //decrypt the subscriber message if cipherkey is available
                                 {
-                                    currentChannelGroup = (messageChannelGroups.Length == 1) ? (string)messageChannelGroups[0] : (string)messageChannelGroups[messageIndex];
-                                }
-                                List<object> itemMessage = new List<object>();
-                                if (currentChannel.Contains(".*-pnpres"))
-                                {
-                                    itemMessage.Add(messageList[messageIndex]);
-                                }
-                                else if (currentChannel.Contains("-pnpres"))
-                                {
-                                    itemMessage.Add(messageList[messageIndex]);
+                                    string decryptMessage = "";
+                                    PubnubCrypto aes = new PubnubCrypto(pubnubConfig.CiperKey);
+                                    try
+                                    {
+                                        decryptMessage = aes.Decrypt(payload.ToString());
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        decryptMessage = "**DECRYPT ERROR**";
+
+                                        PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(ex);
+                                        PNStatus status = new StatusBuilder(pubnubConfig, jsonLib).CreateStatusResponse<T>(type, category, null, (int)HttpStatusCode.NotFound, ex);
+                                        if (!string.IsNullOrEmpty(currentMessageChannel))
+                                        {
+                                            status.AffectedChannels.Add(currentMessageChannel);
+                                        }
+                                        if (!string.IsNullOrEmpty(currentMessageChannelGroup))
+                                        {
+                                            status.AffectedChannelGroups.Add(currentMessageChannelGroup);
+                                        }
+
+                                        Announce(status);
+                                    }
+                                    object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : jsonLib.DeserializeToObject(decryptMessage);
+
+                                    payloadContainer.Add(decodeMessage);
                                 }
                                 else
                                 {
-                                    if (pubnubConfig.CiperKey.Length > 0) //decrypt the subscriber message if cipherkey is available
+                                    string payloadJson = jsonLib.SerializeToJsonString(payload);
+                                    object payloadJObject = jsonLib.BuildJsonObject(payloadJson);
+                                    if (payloadJObject == null)
                                     {
-                                        string decryptMessage = "";
-                                        PubnubCrypto aes = new PubnubCrypto(pubnubConfig.CiperKey);
-                                        try
-                                        {
-                                            decryptMessage = aes.Decrypt(messageList[messageIndex].ToString());
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            decryptMessage = "**DECRYPT ERROR**";
-
-                                            PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(ex);
-                                            PNStatus status = new StatusBuilder(pubnubConfig, jsonLib).CreateStatusResponse<T>(type, category, null, (int)HttpStatusCode.NotFound, ex);
-                                            if (!string.IsNullOrEmpty(currentChannel))
-                                            {
-                                                status.AffectedChannels.Add(currentChannel);
-                                            }
-                                            if (!string.IsNullOrEmpty(currentChannelGroup))
-                                            {
-                                                status.AffectedChannelGroups.Add(currentChannelGroup);
-                                            }
-
-                                            Announce(status);
-                                        }
-                                        object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : jsonLib.DeserializeToObject(decryptMessage);
-
-                                        itemMessage.Add(decodeMessage);
+                                        payloadContainer.Add(payload);
                                     }
                                     else
                                     {
-                                        itemMessage.Add(messageList[messageIndex]);
+                                        payloadContainer.Add(payloadJObject);
                                     }
-                                }
-                                itemMessage.Add(messages[1].ToString());
-
-                                if (currentChannel == currentChannelGroup)
-                                {
-                                    itemMessage.Add(currentChannel.Replace("-pnpres", ""));
-                                }
-                                else
-                                {
-                                    if (currentChannelGroup != "")
-                                    {
-                                        itemMessage.Add(currentChannelGroup.Replace("-pnpres", ""));
-                                    }
-                                    if (currentChannel != "")
-                                    {
-                                        itemMessage.Add(currentChannel.Replace("-pnpres", ""));
-                                    }
-                                }
-
-                                if (currentChannel.Contains("-pnpres"))
-                                {
-                                    ResponseBuilder responseBuilder = new ResponseBuilder(pubnubConfig, jsonLib);
-                                    PNPresenceEventResult presenceEvent = responseBuilder.JsonToObject<PNPresenceEventResult>(itemMessage, true);
-
-                                    Announce(presenceEvent);
-                                }
-                                else
-                                {
-                                    ResponseBuilder responseBuilder = new ResponseBuilder(pubnubConfig, jsonLib);
-                                    PNMessageResult<T> userMessage = responseBuilder.JsonToObject<PNMessageResult<T>>(itemMessage, true);
-
-                                    Announce(userMessage);
                                 }
                             }
+                            payloadContainer.Add(messageTimetoken);
+                            if (!string.IsNullOrEmpty(currentMessageChannel))
+                            {
+                                payloadContainer.Add(currentMessageChannel);
+                            }
+                            if (!string.IsNullOrEmpty(currentMessageChannelGroup))
+                            {
+                                payloadContainer.Add(currentMessageChannelGroup);
+                            }
+
+                            if (currentMessageChannel.Contains("-pnpres"))
+                            {
+                                Dictionary<string, object> presencePayload = payload as Dictionary<string, object>;
+                                ResponseBuilder responseBuilder = new ResponseBuilder(pubnubConfig, jsonLib);
+                                PNPresenceEventResult presenceEvent = responseBuilder.JsonToObject<PNPresenceEventResult>(payloadContainer, true);
+
+                                Announce(presenceEvent);
+                            }
+                            else
+                            {
+                                ResponseBuilder responseBuilder = new ResponseBuilder(pubnubConfig, jsonLib);
+                                PNMessageResult<T> userMessage = responseBuilder.JsonToObject<PNMessageResult<T>>(payloadContainer, true);
+
+                                Announce(userMessage);
+                            }
+
                         }
                     }
                     break;
@@ -773,7 +825,7 @@ namespace PubnubApi
                                 result.Add(multiChannelGroup);
                                 result.Add(multiChannel);
 
-                                long receivedTimetoken = (result.Count > 1 && result[1].ToString() != "") ? Convert.ToInt64(result[1].ToString()) : 0;
+                                long receivedTimetoken = GetTimetokenFromMultiplexResult(result);
 
                                 long minimumTimetoken1 = (MultiChannelSubscribe.Count > 0) ? MultiChannelSubscribe.Min(token => token.Value) : 0;
                                 long minimumTimetoken2 = (MultiChannelGroupSubscribe.Count > 0) ? MultiChannelGroupSubscribe.Min(token => token.Value) : 0;
@@ -1306,10 +1358,7 @@ namespace PubnubApi
                                 (-1 == pubnubNetworkTcpCheckIntervalInSeconds) ? -1 : pubnubNetworkTcpCheckIntervalInSeconds * 1000);
                             requestHeatbeatTimer.Dispose();
                         }
-                        catch (ObjectDisposedException)
-                        {
-                            //Known exception to be ignored
-                        }
+                        catch (ObjectDisposedException){ /*Known exception to be ignored*/ }
 
                         Timer removedTimer = null;
                         bool removed = ChannelLocalClientHeartbeatTimer.TryRemove(requestUri, out removedTimer);
@@ -1374,7 +1423,6 @@ namespace PubnubApi
                     }
                 }
             }
-
 
             ConcurrentDictionary<string, Timer> channelGroupReconnectCollection = ChannelGroupReconnectTimer;
             ICollection<string> groupKeyCollection = channelGroupReconnectCollection.Keys;

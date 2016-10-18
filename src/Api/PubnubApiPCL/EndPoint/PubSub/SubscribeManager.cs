@@ -88,20 +88,8 @@ namespace PubnubApi.EndPoint
 
         internal void MultiChannelUnSubscribeInit<T>(PNOperationType type, string channel, string channelGroup)
         {
-            bool channelGroupUnsubscribeOnly = false;
-            bool channelUnsubscribeOnly = false;
-
             string[] rawChannels = (channel != null && channel.Trim().Length > 0) ? channel.Split(',') : new string[] { };
             string[] rawChannelGroups = (channelGroup != null && channelGroup.Trim().Length > 0) ? channelGroup.Split(',') : new string[] { };
-
-            if (rawChannels.Length > 0 && rawChannelGroups.Length <= 0)
-            {
-                channelUnsubscribeOnly = true;
-            }
-            if (rawChannels.Length <= 0 && rawChannelGroups.Length > 0)
-            {
-                channelGroupUnsubscribeOnly = true;
-            }
 
             List<string> validChannels = new List<string>();
             List<string> validChannelGroups = new List<string>();
@@ -290,7 +278,7 @@ namespace PubnubApi.EndPoint
 
 
                     //Continue with any remaining channels for subscribe/presence
-                    MultiChannelSubscribeRequest<T>(type, channels, channelGroups, 0, false);
+                    MultiChannelSubscribeRequest<T>(type, channels, channelGroups, 0, false, null);
                 }
                 else
                 {
@@ -306,10 +294,9 @@ namespace PubnubApi.EndPoint
 
         }
 
-        internal void MultiChannelSubscribeInit<T>(PNOperationType responseType, string[] rawChannels, string[] rawChannelGroups)
+        internal void MultiChannelSubscribeInit<T>(PNOperationType responseType, string[] rawChannels, string[] rawChannelGroups, Dictionary<string, string> initialSubscribeUrlParams)
         {
             bool channelGroupSubscribeOnly = false;
-            bool channelSubscribeOnly = false;
 
             string channel = (rawChannels != null) ? string.Join(",", rawChannels) : "";
             string channelGroup = (rawChannelGroups != null) ? string.Join(",", rawChannelGroups) : "";
@@ -414,10 +401,6 @@ namespace PubnubApi.EndPoint
                 string[] channels = MultiChannelSubscribe.Keys.ToArray<string>();
                 string[] channelGroups = MultiChannelGroupSubscribe.Keys.ToArray<string>();
 
-                if (channels != null && channels.Length > 0 && (channelGroups == null || channelGroups.Length == 0))
-                {
-                    channelSubscribeOnly = true;
-                }
                 if (channelGroups != null && channelGroups.Length > 0 && (channels == null || channels.Length == 0))
                 {
                     channelGroupSubscribeOnly = true;
@@ -434,11 +417,11 @@ namespace PubnubApi.EndPoint
                 }
 
                 ResetInternetCheckSettings(channels, channelGroups);
-                MultiChannelSubscribeRequest<T>(responseType, channels, channelGroups, 0, false);
+                MultiChannelSubscribeRequest<T>(responseType, channels, channelGroups, 0, false, initialSubscribeUrlParams);
             }
         }
 
-        private static void MultiChannelSubscribeRequest<T>(PNOperationType type, string[] channels, string[] channelGroups, object timetoken, bool reconnect)
+        private static void MultiChannelSubscribeRequest<T>(PNOperationType type, string[] channels, string[] channelGroups, object timetoken, bool reconnect, Dictionary<string, string> initialSubscribeUrlParams)
         {
             //Exit if the channel is unsubscribed
             if (MultiChannelSubscribe != null && MultiChannelSubscribe.Count <= 0 && MultiChannelGroupSubscribe != null && MultiChannelGroupSubscribe.Count <= 0)
@@ -474,6 +457,7 @@ namespace PubnubApi.EndPoint
             }
 
             // Begin recursive subscribe
+            RequestState<T> pubnubRequestState = null;
             try
             {
                 RegisterPresenceHeartbeatTimer<T>(channels, channelGroups);
@@ -509,9 +493,9 @@ namespace PubnubApi.EndPoint
                 string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
                 config.Uuid = CurrentUuid; // to make sure we capture if UUID is changed
                 IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
-                Uri request = urlBuilder.BuildMultiChannelSubscribeRequest(channels, channelGroups, (Convert.ToInt64(timetoken.ToString()) == 0) ? Convert.ToInt64(timetoken.ToString()) : lastTimetoken, channelsJsonState);
+                Uri request = urlBuilder.BuildMultiChannelSubscribeRequest(channels, channelGroups, (Convert.ToInt64(timetoken.ToString()) == 0) ? Convert.ToInt64(timetoken.ToString()) : lastTimetoken, channelsJsonState, initialSubscribeUrlParams);
 
-                RequestState<T> pubnubRequestState = new RequestState<T>();
+                pubnubRequestState = new RequestState<T>();
                 pubnubRequestState.Channels = channels;
                 pubnubRequestState.ChannelGroups = channelGroups;
                 pubnubRequestState.ResponseType = type;
@@ -523,22 +507,27 @@ namespace PubnubApi.EndPoint
                 if (!string.IsNullOrEmpty(json))
                 {
                     List<object> result = ProcessJsonResponse<T>(pubnubRequestState, json);
-                    ProcessResponseCallbacks(result, pubnubRequestState);
+                    ProcessResponseCallbacks<T>(result, pubnubRequestState);
 
                     if ((pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation || pubnubRequestState.ResponseType == PNOperationType.Presence) && (result != null) && (result.Count > 0))
                     {
-                        if (pubnubRequestState.Channels != null)
+                        long jsonTimetoken = GetTimetokenFromMultiplexResult(result);
+
+                        if (jsonTimetoken > 0)
                         {
-                            foreach (string currentChannel in pubnubRequestState.Channels)
+                            if (pubnubRequestState.Channels != null)
                             {
-                                MultiChannelSubscribe.AddOrUpdate(currentChannel, Convert.ToInt64(result[1].ToString()), (key, oldValue) => Convert.ToInt64(result[1].ToString()));
+                                foreach (string currentChannel in pubnubRequestState.Channels)
+                                {
+                                    MultiChannelSubscribe.AddOrUpdate(currentChannel, jsonTimetoken, (key, oldValue) => jsonTimetoken);
+                                }
                             }
-                        }
-                        if (pubnubRequestState.ChannelGroups != null && pubnubRequestState.ChannelGroups.Length > 0)
-                        {
-                            foreach (string currentChannelGroup in pubnubRequestState.ChannelGroups)
+                            if (pubnubRequestState.ChannelGroups != null && pubnubRequestState.ChannelGroups.Length > 0)
                             {
-                                MultiChannelGroupSubscribe.AddOrUpdate(currentChannelGroup, Convert.ToInt64(result[1].ToString()), (key, oldValue) => Convert.ToInt64(result[1].ToString()));
+                                foreach (string currentChannelGroup in pubnubRequestState.ChannelGroups)
+                                {
+                                    MultiChannelGroupSubscribe.AddOrUpdate(currentChannelGroup, jsonTimetoken, (key, oldValue) => jsonTimetoken);
+                                }
                             }
                         }
                     }
@@ -564,12 +553,12 @@ namespace PubnubApi.EndPoint
                 LoggingMethod.WriteToLog(string.Format("DateTime {0} method:_subscribe \n channel={1} \n timetoken={2} \n Exception Details={3}", DateTime.Now.ToString(), string.Join(",", channels), timetoken.ToString(), ex.ToString()), LoggingMethod.LevelError);
 
                 PNStatusCategory errorCategory = PNStatusCategoryHelper.GetPNStatusCategory(ex);
-                PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, errorCategory, null, (int)HttpStatusCode.NotFound, ex);
+                PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, errorCategory, pubnubRequestState, (int)HttpStatusCode.NotFound, ex);
                 status.AffectedChannels.AddRange(channels);
                 status.AffectedChannels.AddRange(channelGroups);
                 Announce(status);
 
-                MultiChannelSubscribeRequest<T>(type, channels, channelGroups, timetoken, false);
+                MultiChannelSubscribeRequest<T>(type, channels, channelGroups, LastSubscribeTimetoken, false, null);
             }
         }
 
@@ -659,7 +648,8 @@ namespace PubnubApi.EndPoint
 
             if (message != null && message.Count >= 3)
             {
-                MultiChannelSubscribeRequest<T>(type, channels, channelGroups, (object)message[1], false);
+                long timetoken = GetTimetokenFromMultiplexResult(message);
+                MultiChannelSubscribeRequest<T>(type, channels, channelGroups, timetoken, false, null);
             }
         }
 
@@ -762,7 +752,7 @@ namespace PubnubApi.EndPoint
                             {
                                 case PNOperationType.PNSubscribeOperation:
                                 case PNOperationType.Presence:
-                                    MultiChannelSubscribeRequest<T>(netState.ResponseType, netState.Channels, netState.ChannelGroups, netState.Timetoken, true);
+                                    MultiChannelSubscribeRequest<T>(netState.ResponseType, netState.Channels, netState.ChannelGroups, netState.Timetoken, true, null);
                                     break;
                                 default:
                                     break;
@@ -821,7 +811,7 @@ namespace PubnubApi.EndPoint
                             {
                                 case PNOperationType.PNSubscribeOperation:
                                 case PNOperationType.Presence:
-                                    MultiChannelSubscribeRequest<T>(netState.ResponseType, netState.Channels, netState.ChannelGroups, netState.Timetoken, true);
+                                    MultiChannelSubscribeRequest<T>(netState.ResponseType, netState.Channels, netState.ChannelGroups, netState.Timetoken, true, null);
                                     break;
                                 default:
                                     break;

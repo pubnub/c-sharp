@@ -19,6 +19,7 @@ namespace PubnubApi
         public T JsonToObject<T>(List<object> result, bool internalObject)
         {
             T ret = default(T);
+
             if (!internalObject)
             {
                 ret = jsonLib.DeserializeToObject<T>(result);
