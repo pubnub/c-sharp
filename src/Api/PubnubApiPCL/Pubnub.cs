@@ -16,42 +16,42 @@ namespace PubnubApi
 
         public EndPoint.SubscribeOperation<T> Subscribe<T>()
 		{
-            return new EndPoint.SubscribeOperation<T>(pubnubConfig, jsonPluggableLibrary);
+            return new EndPoint.SubscribeOperation<T>(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
         public EndPoint.UnsubscribeOperation<T> Unsubscribe<T>()
         {
-            return new EndPoint.UnsubscribeOperation<T>(pubnubConfig, jsonPluggableLibrary);
+            return new EndPoint.UnsubscribeOperation<T>(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
         public EndPoint.UnsubscribeAllOperation<T> UnsubscribeAll<T>()
         {
-            return new EndPoint.UnsubscribeAllOperation<T>(pubnubConfig, jsonPluggableLibrary);
+            return new EndPoint.UnsubscribeAllOperation<T>(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
         public EndPoint.PublishOperation Publish()
         {
-            return new EndPoint.PublishOperation(pubnubConfig, jsonPluggableLibrary);
+            return new EndPoint.PublishOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
 		public EndPoint.HistoryOperation History()
 		{
-            return new EndPoint.HistoryOperation(pubnubConfig, jsonPluggableLibrary);
+            return new EndPoint.HistoryOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
 		public EndPoint.HereNowOperation HereNow()
 		{
-            return new EndPoint.HereNowOperation(pubnubConfig, jsonPluggableLibrary);
+            return new EndPoint.HereNowOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
 		public EndPoint.WhereNowOperation WhereNow()
 		{
-            return new EndPoint.WhereNowOperation(pubnubConfig, jsonPluggableLibrary);
+            return new EndPoint.WhereNowOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
 		public EndPoint.TimeOperation Time()
 		{
-            return new EndPoint.TimeOperation(pubnubConfig, jsonPluggableLibrary);
+            return new EndPoint.TimeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
 		public EndPoint.AuditOperation Audit()
@@ -66,27 +66,27 @@ namespace PubnubApi
 
 		public EndPoint.SetStateOperation SetPresenceState()
 		{
-            return new EndPoint.SetStateOperation(pubnubConfig, jsonPluggableLibrary);
+            return new EndPoint.SetStateOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
 		public EndPoint.GetStateOperation GetPresenceState()
 		{
-            return new EndPoint.GetStateOperation(pubnubConfig, jsonPluggableLibrary);
+            return new EndPoint.GetStateOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
 		public EndPoint.AddPushChannelOperation AddPushNotificationsOnChannels()
 		{
-            return new EndPoint.AddPushChannelOperation(pubnubConfig, jsonPluggableLibrary);
+            return new EndPoint.AddPushChannelOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
 		public EndPoint.RemovePushChannelOperation RemovePushNotificationsFromChannels()
 		{
-            return new EndPoint.RemovePushChannelOperation(pubnubConfig, jsonPluggableLibrary);
+            return new EndPoint.RemovePushChannelOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
 		public EndPoint.AuditPushChannelOperation AuditPushChannelProvisions()
 		{
-            return new EndPoint.AuditPushChannelOperation(pubnubConfig, jsonPluggableLibrary);
+            return new EndPoint.AuditPushChannelOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
         #endregion
@@ -95,32 +95,32 @@ namespace PubnubApi
 
         public EndPoint.AddChannelsToChannelGroupOperation AddChannelsToChannelGroup()
 		{
-            return new EndPoint.AddChannelsToChannelGroupOperation(pubnubConfig, jsonPluggableLibrary);
+            return new EndPoint.AddChannelsToChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
 		public EndPoint.RemoveChannelsFromChannelGroupOperation RemoveChannelsFromChannelGroup()
 		{
-            return new EndPoint.RemoveChannelsFromChannelGroupOperation(pubnubConfig, jsonPluggableLibrary);
+            return new EndPoint.RemoveChannelsFromChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
 		public EndPoint.DeleteChannelGroupOperation DeleteChannelGroup()
 		{
-            return new EndPoint.DeleteChannelGroupOperation(pubnubConfig, jsonPluggableLibrary);
+            return new EndPoint.DeleteChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
 		public EndPoint.ListChannelsForChannelGroupOperation ListChannelsForChannelGroup()
 		{
-            return new EndPoint.ListChannelsForChannelGroupOperation(pubnubConfig, jsonPluggableLibrary);
+            return new EndPoint.ListChannelsForChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
         public EndPoint.ListAllChannelGroupOperation ListChannelGroups()
 		{
-            return new EndPoint.ListAllChannelGroupOperation(pubnubConfig, jsonPluggableLibrary);
+            return new EndPoint.ListAllChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
         public void AddListener(SubscribeCallback listener)
         {
-            EndPoint.ListenerManager listenerManager = new EndPoint.ListenerManager(pubnubConfig, jsonPluggableLibrary);
+            EndPoint.ListenerManager listenerManager = new EndPoint.ListenerManager(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
             listenerManager.CurrentPubnubInstance(this);
             listenerManager.AddListener(listener);
         }
@@ -144,7 +144,7 @@ namespace PubnubApi
 
 		public void EndPendingRequests()
 		{
-            EndPoint.OtherOperation endPoint = new EndPoint.OtherOperation(pubnubConfig, jsonPluggableLibrary);
+            EndPoint.OtherOperation endPoint = new EndPoint.OtherOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
             endPoint.EndPendingRequests();
         }
 
@@ -155,7 +155,7 @@ namespace PubnubApi
 
 		public void ChangeUUID(string newUUID)
 		{
-            EndPoint.OtherOperation endPoint = new EndPoint.OtherOperation(pubnubConfig, jsonPluggableLibrary);
+            EndPoint.OtherOperation endPoint = new EndPoint.OtherOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
             endPoint.ChangeUUID(newUUID);
 		}
 
@@ -202,32 +202,6 @@ namespace PubnubApi
             set
             {
                 pubnubUnitTest = value;
-            }
-        }
-
-        //TO BE REMOVED
-        public bool EnableJsonEncodingForPublish
-        {
-            get
-            {
-                throw new Exception("No support");
-            }
-            set
-            {
-                throw new Exception("No support");
-            }
-        }
-
-        //TO BE REMOVED
-        public bool EnableDebugForPushPublish
-        {
-            get
-            {
-                throw new Exception("No support");
-            }
-            set
-            {
-                throw new Exception("No support");
             }
         }
 

@@ -10,6 +10,7 @@ namespace PubnubApi.EndPoint
     {
         private static PNConfiguration config = null;
         private static IJsonPluggableLibrary jsonLibrary = null;
+        private IPubnubUnitTest unit = null;
 
         public TimeOperation(PNConfiguration pubnubConfig):base(pubnubConfig)
         {
@@ -22,6 +23,14 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
+        public TimeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary)
+        {
+            config = pubnubConfig;
+            jsonLibrary = jsonPluggableLibrary;
+            unit = pubnubUnit;
+        }
+
+
         public void Async(PNCallback<PNTimeResult> callback)
         {
             Time(callback);
@@ -29,7 +38,7 @@ namespace PubnubApi.EndPoint
 
         internal void Time(PNCallback<PNTimeResult> callback)
         {
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
             Uri request = urlBuilder.BuildTimeRequest();
 
             RequestState<PNTimeResult> requestState = new RequestState<PNTimeResult>();

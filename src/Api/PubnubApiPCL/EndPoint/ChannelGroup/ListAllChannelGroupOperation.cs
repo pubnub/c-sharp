@@ -8,6 +8,7 @@ namespace PubnubApi.EndPoint
     {
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
+        private IPubnubUnitTest unit = null;
 
         public ListAllChannelGroupOperation(PNConfiguration pubnubConfig) : base(pubnubConfig)
         {
@@ -20,6 +21,13 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
         }
 
+        public ListAllChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary)
+        {
+            config = pubnubConfig;
+            jsonLibrary = jsonPluggableLibrary;
+            unit = pubnubUnit;
+        }
+
         public void Async(PNCallback<PNChannelGroupsListAllResult> callback)
         {
             GetAllChannelGroup(callback);
@@ -27,7 +35,7 @@ namespace PubnubApi.EndPoint
 
         internal void GetAllChannelGroup(PNCallback<PNChannelGroupsListAllResult> callback)
         {
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
 
             Uri request = urlBuilder.BuildGetAllChannelGroupRequest();
 

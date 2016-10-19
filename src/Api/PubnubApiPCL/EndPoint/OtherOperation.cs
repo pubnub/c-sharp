@@ -10,6 +10,7 @@ namespace PubnubApi.EndPoint
     {
         private static PNConfiguration config = null;
         private static IJsonPluggableLibrary jsonLibrary = null;
+        private IPubnubUnitTest unit = null;
 
         public OtherOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
         {
@@ -21,6 +22,14 @@ namespace PubnubApi.EndPoint
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
         }
+
+        public OtherOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary)
+        {
+            config = pubnubConfig;
+            jsonLibrary = jsonPluggableLibrary;
+            unit = pubnubUnit;
+        }
+
 
         public void ChangeUUID(string newUUID)
         {
@@ -45,7 +54,7 @@ namespace PubnubApi.EndPoint
             if (channels.Length > 0 || channelGroups.Length > 0)
             {
                 string channelsJsonState = BuildJsonUserState(channels.ToArray(), channelGroups.ToArray(), false);
-                IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
+                IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
                 Uri request = urlBuilder.BuildMultiChannelLeaveRequest(channels, channelGroups, oldUUID, channelsJsonState);
 
                 RequestState<string> requestState = new RequestState<string>();
