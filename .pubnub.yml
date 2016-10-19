@@ -3,6 +3,37 @@ changelog:
   - 
     changes: 
       - 
+        text: "Added PAM signature when secret key is provided"
+        type: feature
+    date: ~
+    version: v3.8.3
+  - 
+    changes: 
+      - 
+        text: "Added requestid url queryparam to avoid caching issues"
+        type: improvement
+    date: ~
+    version: v3.8.2
+  - 
+    changes: 
+      - 
+        text: "Improved error logging to handle network failure"
+        type: improvement
+      - 
+        text: "Applied strong naming to .net SDKS, PCL, NetPlatform SDKs"
+        type: improvement
+    date: ~
+    version: v3.8.1
+  - 
+    changes: 
+      - 
+        text: "Created NetPlatform SDK to support .net core and multi-PCL profile."
+        type: feature
+    date: ~
+    version: v3.8.0
+  - 
+    changes: 
+      - 
         text: "Implemented Channel Groups for mono clients (mono-for-mac, monotouch, mono-for-android, mono-for-linux)."
         type: feature
       - 
@@ -122,4 +153,4 @@ features:
 name: c-sharp
 schema: 1
 scm: github.com/pubnub/c-sharp
-version: "3.7.6"
+version: "3.8.3"
