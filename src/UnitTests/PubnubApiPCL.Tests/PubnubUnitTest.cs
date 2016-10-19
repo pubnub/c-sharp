@@ -14,6 +14,7 @@ namespace PubNubMessaging.Tests
     public class PubnubUnitTest : IPubnubUnitTest
     {
         private long pubnubTimetoken;
+        private string requestId;
 
         long IPubnubUnitTest.Timetoken
         {
@@ -27,5 +28,18 @@ namespace PubNubMessaging.Tests
                 pubnubTimetoken = value;
             }
         }
+
+        string IPubnubUnitTest.RequestId
+        {
+            get
+            {
+                return requestId;
+            }
+            set
+            {
+                requestId = value;
+            }
+        }
+
     }
 }

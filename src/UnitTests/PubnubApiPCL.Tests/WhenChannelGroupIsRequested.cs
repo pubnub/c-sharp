@@ -105,6 +105,11 @@ namespace PubNubMessaging.Tests
                     .WithMethod("GET")
                     .WithPath(string.Format("/v1/channel-registration/sub-key/{0}/channel-group/{1}", PubnubCommon.SubscribeKey, channelGroupName))
                     .WithParameter("add", channelName)
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "2171aa21-8c83-4464-a87b-e22ffa7a60a4")
+                    .WithParameter("timestamp", "1476878856")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("signature", "m-4DV0R7bzufK2_-ZhLhu_27z-bpaEZG7G29WiFj0Pw=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 

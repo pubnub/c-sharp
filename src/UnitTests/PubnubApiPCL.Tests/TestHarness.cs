@@ -15,6 +15,7 @@ namespace PubNubMessaging.Tests
                 #pragma warning restore CS0162 // Unreachable code detected
                 IPubnubUnitTest unitTest = new PubnubUnitTest();
                 unitTest.Timetoken = 1356998400;
+                unitTest.RequestId = "myRequestId";
                 pubnub = new Pubnub(pnConfiguration);
                 pubnub.PubnubUnitTest = unitTest;
                 ////pubnub.PubnubUnitTest = unitTest;
