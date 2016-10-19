@@ -15,6 +15,19 @@ namespace PubNubMessaging.Tests
     {
         private long pubnubTimetoken;
 
+        string IPubnubUnitTest.RequestId
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         long IPubnubUnitTest.Timetoken
         {
             get
