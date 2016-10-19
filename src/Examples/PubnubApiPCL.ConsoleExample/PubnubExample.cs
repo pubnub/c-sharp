@@ -149,7 +149,10 @@ namespace PubnubApiDemo
                 if (status.StatusCode != 200 || status.Error)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine(status.ErrorData.Information);
+                    if (status.ErrorData != null)
+                    {
+                        Console.WriteLine(status.ErrorData.Information);
+                    }
                     Console.ForegroundColor = ConsoleColor.White;
                 }
 
