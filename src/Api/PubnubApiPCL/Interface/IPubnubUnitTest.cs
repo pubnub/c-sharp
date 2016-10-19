@@ -13,5 +13,11 @@ namespace PubnubApi
             get;
             set;
         }
+
+        string RequestId
+        {
+            get;
+            set;
+        }
     }
 }

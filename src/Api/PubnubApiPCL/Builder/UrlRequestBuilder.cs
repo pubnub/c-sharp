@@ -681,11 +681,12 @@ namespace PubnubApi
         private Dictionary<string, string> GenerateCommonQueryParams(PNOperationType type)
         {
             long timeStamp = TranslateUtcDateTimeToSeconds(DateTime.UtcNow);
+            string requestid = Guid.NewGuid().ToString();
 
-            if ((type == PNOperationType.PNAccessManagerGrant || type == PNOperationType.PNAccessManagerAudit)
-                && pubnubUnitTest != null)
+            if (pubnubUnitTest != null)
             {
                 timeStamp = pubnubUnitTest.Timetoken;
+                requestid = string.IsNullOrEmpty(pubnubUnitTest.RequestId) ? "" : pubnubUnitTest.RequestId;
             }
 
             Dictionary<string, string> ret = new Dictionary<string, string>();
