@@ -6,6 +6,8 @@ namespace PubnubApi.EndPoint
     {
         private static PNConfiguration config = null;
         private static IJsonPluggableLibrary jsonLibrary = null;
+        private IPubnubUnitTest unit = null;
+
         private string[] subscribeChannelNames = null;
         private string[] subscribeChannelGroupNames = null;
         private string[] presenceChannelNames = new string[] { };
@@ -20,6 +22,13 @@ namespace PubnubApi.EndPoint
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
+        }
+
+        public UnsubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary)
+        {
+            config = pubnubConfig;
+            jsonLibrary = jsonPluggableLibrary;
+            unit = pubnubUnit;
         }
 
         public UnsubscribeOperation<T> Channels(string[] channels)
@@ -52,7 +61,7 @@ namespace PubnubApi.EndPoint
             LoggingMethod.WriteToLog(string.Format("DateTime {0}, requested unsubscribe for channel(s)={1}", DateTime.Now.ToString(), channel), LoggingMethod.LevelInfo);
             System.Threading.Tasks.Task.Factory.StartNew(() =>
             {
-                SubscribeManager manager = new SubscribeManager(config, jsonLibrary);
+                SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit);
                 manager.MultiChannelUnSubscribeInit<T>(PNOperationType.PNUnsubscribeOperation, channel, channelGroup);
             });
         }

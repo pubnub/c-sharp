@@ -10,6 +10,8 @@ namespace PubnubApi.EndPoint
     {
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
+        private IPubnubUnitTest unit = null;
+
         private PNPushType pubnubPushType;
         private string deviceTokenId = "";
 
@@ -22,6 +24,13 @@ namespace PubnubApi.EndPoint
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
+        }
+
+        public AuditPushChannelOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary)
+        {
+            config = pubnubConfig;
+            jsonLibrary = jsonPluggableLibrary;
+            unit = pubnubUnit;
         }
 
         public AuditPushChannelOperation PushType(PNPushType pushType)
@@ -48,7 +57,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing Uri");
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
             Uri request = urlBuilder.BuildGetChannelsPushRequest(pushType, pushToken);
 
             RequestState<PNPushListProvisionsResult> requestState = new RequestState<PNPushListProvisionsResult>();

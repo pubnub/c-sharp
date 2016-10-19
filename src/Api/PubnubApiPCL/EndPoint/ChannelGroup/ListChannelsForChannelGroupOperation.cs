@@ -8,6 +8,8 @@ namespace PubnubApi.EndPoint
     {
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
+        private IPubnubUnitTest unit = null;
+
         private string channelGroupName = "";
 
         public ListChannelsForChannelGroupOperation(PNConfiguration pubnubConfig) : base(pubnubConfig)
@@ -20,6 +22,14 @@ namespace PubnubApi.EndPoint
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
         }
+
+        public ListChannelsForChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary)
+        {
+            config = pubnubConfig;
+            jsonLibrary = jsonPluggableLibrary;
+            unit = pubnubUnit;
+        }
+
 
         public ListChannelsForChannelGroupOperation ChannelGroup(string channelGroup)
         {
@@ -39,7 +49,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing groupName");
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
 
             Uri request = urlBuilder.BuildGetChannelsForChannelGroupRequest(null, groupName, false);
 

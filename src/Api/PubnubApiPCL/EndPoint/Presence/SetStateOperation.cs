@@ -10,6 +10,8 @@ namespace PubnubApi.EndPoint
     {
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
+        private IPubnubUnitTest unit = null;
+
         private string[] channelNames = null;
         private string[] channelGroupNames = null;
         private Dictionary<string, object> userState = null;
@@ -24,6 +26,13 @@ namespace PubnubApi.EndPoint
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
+        }
+
+        public SetStateOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary)
+        {
+            config = pubnubConfig;
+            jsonLibrary = jsonPluggableLibrary;
+            unit = pubnubUnit;
         }
 
         public SetStateOperation Channels(string[] channels)
@@ -362,7 +371,7 @@ namespace PubnubApi.EndPoint
                 //jsonUserState = string.Format("{{\"{0}\":{{{1}}},\"{2}\":{{{3}}}}}", channel, jsonChannelUserState, channelGroup, jsonChannelGroupUserState);
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
             Uri request = urlBuilder.BuildSetUserStateRequest(commaDelimitedChannels, commaDelimitedChannelGroups, uuid, jsonUserState);
 
             RequestState<PNSetStateResult> requestState = new RequestState<PNSetStateResult>();

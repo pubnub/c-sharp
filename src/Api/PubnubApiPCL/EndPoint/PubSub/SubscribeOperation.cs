@@ -11,6 +11,8 @@ namespace PubnubApi.EndPoint
     {
         private static PNConfiguration config = null;
         private static IJsonPluggableLibrary jsonLibrary = null;
+        private IPubnubUnitTest unit = null;
+
         private List<string> subscribeChannelNames = new List<string>();
         private List<string> subscribeChannelGroupNames = new List<string>();
         private List<string> presenceChannelNames = new List<string>();
@@ -27,6 +29,13 @@ namespace PubnubApi.EndPoint
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
+        }
+
+        public SubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary)
+        {
+            config = pubnubConfig;
+            jsonLibrary = jsonPluggableLibrary;
+            unit = pubnubUnit;
         }
 
         public SubscribeOperation<T> Channels(string[] channels)
@@ -133,7 +142,7 @@ namespace PubnubApi.EndPoint
 
             System.Threading.Tasks.Task.Factory.StartNew(() =>
             {
-                SubscribeManager manager = new SubscribeManager(config, jsonLibrary);
+                SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit);
                 manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups, initialSubscribeUrlParams);
             });
         }

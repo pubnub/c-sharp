@@ -10,6 +10,7 @@ namespace PubnubApi.EndPoint
     {
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
+        private IPubnubUnitTest unit = null;
 
         private object msg = null;
         private string channelName = "";
@@ -27,6 +28,14 @@ namespace PubnubApi.EndPoint
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
         }
+
+        public PublishOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary)
+        {
+            config = pubnubConfig;
+            jsonLibrary = jsonPluggableLibrary;
+            unit = pubnubUnit;
+        }
+
 
         public PublishOperation Message(object message)
         {
@@ -95,7 +104,7 @@ namespace PubnubApi.EndPoint
                 jsonUserMetaData = "";
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
             Uri request = urlBuilder.BuildPublishRequest(channel, message, storeInHistory, jsonUserMetaData);
 
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();

@@ -8,6 +8,7 @@ namespace PubnubApi.EndPoint
     {
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
+        private IPubnubUnitTest unit = null;
 
         private string channelGroupName = "";
 
@@ -20,6 +21,13 @@ namespace PubnubApi.EndPoint
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
+        }
+
+        public DeleteChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary)
+        {
+            config = pubnubConfig;
+            jsonLibrary = jsonPluggableLibrary;
+            unit = pubnubUnit;
         }
 
         public DeleteChannelGroupOperation ChannelGroup(string channelGroup)
@@ -40,7 +48,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing groupName");
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
 
             Uri request = urlBuilder.BuildRemoveChannelsFromChannelGroupRequest(null, "", groupName);
 
