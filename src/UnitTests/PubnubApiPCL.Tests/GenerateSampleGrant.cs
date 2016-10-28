@@ -68,29 +68,6 @@ namespace PubNubMessaging.Tests
                 string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"ttl\":20,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
 
                 server.AddRequest(new Request()
-<<<<<<< HEAD
-                        .WithMethod("GET")
-                        .WithPath(string.Format("/v1/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
-                        .WithResponse(expected)
-                        .WithStatusCode(System.Net.HttpStatusCode.OK));
-
-                for (int index = 0; index < sampleCount; index++)
-                {
-                    grantManualEvent = new ManualResetEvent(false);
-                    string channelName = string.Format("csharp-pam-ul-channel-{0}", index);
-                    string authKey = string.Format("csharp-pam-authkey-0-{0},csharp-pam-authkey-1-{1}", index, index);
-                    pubnub.Grant().Channels(new string[] { channelName }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(false).Async(new GrantResult());
-                    grantManualEvent.WaitOne();
-                }
-
-                pubnub.Destroy();
-                pubnub = null;
-                Assert.IsTrue(receivedGrantMessage, "GenerateSampleGrant -> AtUserLevel failed.");
-            }
-            else
-            {
-                Assert.Ignore("Only for live test; GenerateSampleGrant -> AtUserLevel.");
-=======
                     .WithMethod("GET")
                     .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
                     .WithParameter("auth", "csharp-pam-authkey-0-0%2Ccsharp-pam-authkey-1-0")
@@ -108,10 +85,10 @@ namespace PubNubMessaging.Tests
 
                 pubnub.Grant().Channels(new string[] { channelName }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(false).Async(new GrantResult());
                 grantManualEvent.WaitOne();
->>>>>>> edge
             }
 
-            pubnub.EndPendingRequests();
+
+            pubnub.Destroy();
             pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "GenerateSampleGrant -> AtUserLevel failed.");
         }
@@ -163,29 +140,11 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-<<<<<<< HEAD
-                for (int index = 0; index < sampleCount; index++)
-                {
-                    grantManualEvent = new ManualResetEvent(false);
-                    string channelName = string.Format("csharp-pam-cl-channel-{0}", index);
-                    pubnub.Grant().Channels(new string[] { channelName }).Read(true).Write(true).Manage(false).Async(new GrantResult());
-                    grantManualEvent.WaitOne();
-                }
-
-                pubnub.Destroy();
-                pubnub = null;
-                Assert.IsTrue(receivedGrantMessage, "GenerateSampleGrant -> AtChannelLevel failed.");
-            }
-            else
-            {
-                Assert.Ignore("Only for live test; GenerateSampleGrant -> AtChannelLevel.");
-=======
                 pubnub.Grant().Channels(new string[] { channelName }).Read(true).Write(true).Manage(false).Async(new GrantResult());
                 grantManualEvent.WaitOne();
->>>>>>> edge
             }
 
-            pubnub.EndPendingRequests();
+            pubnub.Destroy();
             pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "GenerateSampleGrant -> AtChannelLevel failed.");
         }

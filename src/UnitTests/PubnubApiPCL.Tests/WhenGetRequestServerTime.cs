@@ -137,13 +137,10 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
-<<<<<<< HEAD
-                Proxy = proxy
-=======
-                PNProxy = proxy,
-                Secure=false
->>>>>>> edge
+                Proxy = proxy,
+                Secure = false
             };
+
 
             pubnub = this.createPubNubInstance(config);
 
