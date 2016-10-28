@@ -713,22 +713,13 @@ namespace PubnubApi
             string signature = "";
             StringBuilder string_to_sign = new StringBuilder();
             string_to_sign.Append(this.pubnubConfig.SubscribeKey).Append("\n").Append(this.pubnubConfig.PublishKey).Append("\n");
-            if (type == PNOperationType.PNAccessManagerGrant || type == PNOperationType.ChannelGroupGrantAccess)
-            {
-                string_to_sign.Append("grant").Append("\n");
-            }
-            else if (type == PNOperationType.PNAccessManagerAudit || type == PNOperationType.ChannelGroupAuditAccess)
-            {
-                string_to_sign.Append("audit").Append("\n");
-            }
-            else
-            {
-                string_to_sign.Append(partialUrl.ToString()).Append("\n");
-            }
+            string_to_sign.Append(partialUrl.ToString()).Append("\n");
             string_to_sign.Append(queryStringToSign);
 
             PubnubCrypto pubnubCrypto = new PubnubCrypto(this.pubnubConfig.CiperKey);
             signature = pubnubCrypto.PubnubAccessManagerSign(this.pubnubConfig.SecretKey, string_to_sign.ToString());
+            System.Diagnostics.Debug.WriteLine("string_to_sign = " + string_to_sign.ToString());
+            System.Diagnostics.Debug.WriteLine("signature = " + signature);
             return signature;
         }
 
@@ -838,7 +829,7 @@ namespace PubnubApi
 
         private void ForceCanonicalPathAndQuery(Uri requestUri)
         {
-            LoggingMethod.WriteToLog("Inside ForceCanonicalPathAndQuery = " + requestUri.ToString(), LoggingMethod.LevelInfo);
+            LoggingMethod.WriteToLog("Inside ForceCanonicalPathAndQuery = " + requestUri.ToString(), PNLogVerbosity.BODY);
             try
             {
                 FieldInfo flagsFieldInfo = typeof(Uri).GetField("m_Flags", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -851,7 +842,7 @@ namespace PubnubApi
             }
             catch (Exception ex)
             {
-                LoggingMethod.WriteToLog("Exception Inside ForceCanonicalPathAndQuery = " + ex.ToString(), LoggingMethod.LevelInfo);
+                LoggingMethod.WriteToLog("Exception Inside ForceCanonicalPathAndQuery = " + ex.ToString(), PNLogVerbosity.BODY);
             }
         }
 

@@ -10,7 +10,6 @@ namespace PubnubApi
 
 	public class LoggingMethod
 	{
-		private static int logLevel = 0;
 		private static IPubnubLog pubnubLog = null;
 
 		public static IPubnubLog PubnubLog
@@ -20,65 +19,12 @@ namespace PubnubApi
 			}
 			set {
 				pubnubLog = value;
-				logLevel = (int)pubnubLog.LogLevel;
-
-			}
-		}
-		public static Level LogLevel
-		{
-			get
-			{
-				return (Level)logLevel;
-			}
-			set
-			{
-				logLevel = (int)value;
-			}
-		}
-		public enum Level
-		{
-			Off,
-			Error,
-			Info,
-			Verbose,
-			Warning
-		}
-
-		public static bool LevelError
-		{
-			get
-			{
-				return (int)LogLevel >= 1;
 			}
 		}
 
-		public static bool LevelInfo
+		public static void WriteToLog(string logText, PNLogVerbosity logVerbosity)
 		{
-			get
-			{
-				return (int)LogLevel >= 2;
-			}
-		}
-
-		public static bool LevelVerbose
-		{
-			get
-			{
-				return (int)LogLevel >= 3;
-			}
-		}
-
-		public static bool LevelWarning
-		{
-			get
-			{
-				return (int)LogLevel >= 4;
-			}
-		}
-
-		public static void WriteToLog(string logText, bool writeToLog)
-		{
-			if (writeToLog)
+			if (logVerbosity == PNLogVerbosity.BODY)
             {
 				//System.Diagnostics.Debug.WriteLine(logText);
 				try

@@ -63,7 +63,9 @@
     <Compile Include="EndPoint\Push\RemovePushChannelOperation.cs" />
     <Compile Include="EndPoint\TimeOperation.cs" />
     <Compile Include="Enum\PNHeartbeatNotificationOption.cs" />
+    <Compile Include="Enum\PNLogVerbosity.cs" />
     <Compile Include="Enum\PNOperationType_TBR.cs" />
+    <Compile Include="Enum\PNReconnectionPolicy.cs" />
     <Compile Include="Enum\PNStatusCategory.cs" />
     <Compile Include="HttpUtility\HttpUtility.cs" />
     <Compile Include="HttpUtility\HttpValue.cs" />

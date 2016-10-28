@@ -23,5 +23,6 @@ namespace PubnubApi
         PNDecryptionErrorCategory,
         PNTLSConnectionFailedCategory,
         PNTLSUntrustedCertificateCategory,
+        PNRequestMessageCountExceededCategory
     }
 }

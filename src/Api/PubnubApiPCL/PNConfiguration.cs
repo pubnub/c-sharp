@@ -70,11 +70,11 @@ namespace PubnubApi
             }
         }
 
-        //public LoggingMethod.Level LogVerbosity { get; set; }
+        public PNLogVerbosity LogVerbosity { get; set; }
 
         public IPubnubLog PubnubLog { get; set; }
 
-        public IPubnubProxy PNProxy { get; set; }
+        public IPubnubProxy Proxy { get; set; }
 
         public PubnubErrorFilter.Level ErrorLevel { get; set; }
 
@@ -96,6 +96,14 @@ namespace PubnubApi
         public bool AddPayloadToPublishResponse { get; set; }
 
         public string FilterExpression { get; set; }
+
+        public bool IncludeInstanceIdentifier { get; set; }
+
+        public bool IncludeRequestIdentifier { get; set; }
+
+        public PNReconnectionPolicy ReconnectionPolicy { get; set; } = PNReconnectionPolicy.EXPONENTIAL;
+
+        public int RequestMessageCountThreshold { get; set; } = 100;
 
         public PNConfiguration()
         {

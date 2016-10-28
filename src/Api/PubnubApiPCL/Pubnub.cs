@@ -129,7 +129,8 @@ namespace PubnubApi
         #region "PubNub API Other Methods"
         public void TerminateCurrentSubscriberRequest()
 		{
-            EndPoint.OtherOperation.TerminateCurrentSubscriberRequest();
+            EndPoint.OtherOperation endpoint = new EndPoint.OtherOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endpoint.TerminateCurrentSubscriberRequest();
 		}
 
 		public void EnableMachineSleepModeForTestingOnly()
@@ -141,12 +142,6 @@ namespace PubnubApi
 		{
             EndPoint.OtherOperation.DisableMachineSleepModeForTestingOnly();
 		}
-
-		public void EndPendingRequests()
-		{
-            EndPoint.OtherOperation endPoint = new EndPoint.OtherOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
-            endPoint.EndPendingRequests();
-        }
 
         public Guid GenerateGuid()
 		{
@@ -174,25 +169,31 @@ namespace PubnubApi
 			return EndPoint.OtherOperation.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
 		}
 
+        public List<string> GetSubscribedChannels()
+        {
+            EndPoint.OtherOperation endpoint = new EndPoint.OtherOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            return endpoint.GetSubscribedChannels();
+        }
+
+        public List<string> GetSubscribedChannelGroups()
+        {
+            EndPoint.OtherOperation endpoint = new EndPoint.OtherOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            return endpoint.GetSubscribedChannelGroups();
+        }
+
+        public void Destroy()
+        {
+            EndPoint.OtherOperation endpoint = new EndPoint.OtherOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endpoint.EndPendingRequests();
+        }
         //public void SetErrorFilterLevel(PubnubErrorFilter.Level errorLevel)
         //{
         //    pubnub.PubnubErrorLevel = errorLevel;
         //}  
 
-		#endregion
+        #endregion
 
-		#region "Properties"
-		public string AuthenticationKey {
-			get {return pubnubConfig.AuthKey;}
-			set { pubnubConfig.AuthKey = value;}
-		}
-
-        public string SessionUUID
-        {
-            get { return pubnubConfig.Uuid; }
-            set { pubnubConfig.Uuid = value; }
-        }
-
+        #region "Properties"
         public IPubnubUnitTest PubnubUnitTest
         {
             get
@@ -232,16 +233,16 @@ namespace PubnubApi
             CheckRequiredConfigValues();
         }
 
-        public Pubnub(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary)
-        {
-            pubnubConfig = config;
-            this.jsonPluggableLibrary = jsonPluggableLibrary;
-            if (jsonPluggableLibrary == null)
-            {
-                this.jsonPluggableLibrary = new NewtonsoftJsonDotNet();
-            }
-            CheckRequiredConfigValues();
-        }
+        //public Pubnub(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary)
+        //{
+        //    pubnubConfig = config;
+        //    this.jsonPluggableLibrary = jsonPluggableLibrary;
+        //    if (jsonPluggableLibrary == null)
+        //    {
+        //        this.jsonPluggableLibrary = new NewtonsoftJsonDotNet();
+        //    }
+        //    CheckRequiredConfigValues();
+        //}
 
         private void CheckRequiredConfigValues()
         {

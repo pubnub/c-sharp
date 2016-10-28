@@ -130,5 +130,34 @@ namespace PubnubApi.EndPoint
                 return DateTime.MinValue;
             }
         }
+
+        public List<string> GetSubscribedChannels()
+        {
+            List<string> ret = null;
+            string[] currentSubscribedChannels = GetCurrentSubscriberChannels();
+            if (currentSubscribedChannels != null)
+            {
+                ret = currentSubscribedChannels.ToList();
+            }
+
+            return ret;
+        }
+
+        public List<string> GetSubscribedChannelGroups()
+        {
+            List<string> ret = null;
+            string[] currentSubscribedChannelGroups = GetCurrentSubscriberChannelGroups();
+            if (currentSubscribedChannelGroups != null)
+            {
+                ret = currentSubscribedChannelGroups.ToList();
+            }
+
+            return ret;
+        }
+
+        public void Destory()
+        {
+            EndPendingRequests();
+        }
     }
 }

@@ -58,7 +58,7 @@ namespace PubnubApi.EndPoint
             string channel = (channels != null) ? string.Join(",", channels) : "";
             string channelGroup = (channelGroups != null) ? string.Join(",", channelGroups) : "";
 
-            LoggingMethod.WriteToLog(string.Format("DateTime {0}, requested unsubscribe for channel(s)={1}", DateTime.Now.ToString(), channel), LoggingMethod.LevelInfo);
+            LoggingMethod.WriteToLog(string.Format("DateTime {0}, requested unsubscribe for channel(s)={1}", DateTime.Now.ToString(), channel), PNLogVerbosity.BODY);
             System.Threading.Tasks.Task.Factory.StartNew(() =>
             {
                 SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit);
