@@ -51,7 +51,7 @@
 
 //            grantManualEvent.WaitOne();
 
-//            pubnub.EndPendingRequests();
+//            pubnub.Destroy();
 //            pubnub = null;
 //            Assert.IsTrue(receivedGrantMessage, "WhenUnsubscribedToAChannelGroup Grant access failed.");
 //        }
@@ -94,7 +94,7 @@
 //                    unsubscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 //                }
 
-//                pubnub.EndPendingRequests();
+//                pubnub.Destroy();
 //                pubnub = null;
 
 //                Assert.IsTrue(receivedMessage, "WhenUnsubscribedToAChannelGroup --> ThenShouldReturnUnsubscribedMessage Failed");

@@ -70,7 +70,7 @@ namespace PubNubMessaging.Tests
 
                 grantManualEvent.WaitOne();
 
-                pubnub.EndPendingRequests();
+                pubnub.Destroy();
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadWriteShouldReturnSuccess failed.");
@@ -106,7 +106,7 @@ namespace PubNubMessaging.Tests
 
                 grantManualEvent.WaitOne();
 
-                pubnub.EndPendingRequests();
+                pubnub.Destroy();
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadShouldReturnSuccess failed.");
@@ -142,7 +142,7 @@ namespace PubNubMessaging.Tests
 
                 grantManualEvent.WaitOne();
 
-                pubnub.EndPendingRequests();
+                pubnub.Destroy();
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithWriteShouldReturnSuccess failed.");
@@ -185,7 +185,7 @@ namespace PubNubMessaging.Tests
 
                 grantManualEvent.WaitOne();
 
-                pubnub.EndPendingRequests();
+                pubnub.Destroy();
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenMultipleChannelGrantShouldReturnSuccess failed.");
@@ -230,7 +230,7 @@ namespace PubNubMessaging.Tests
 
                 grantManualEvent.WaitOne();
 
-                pubnub.EndPendingRequests();
+                pubnub.Destroy();
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenMultipleAuthGrantShouldReturnSuccess failed.");
@@ -274,7 +274,7 @@ namespace PubNubMessaging.Tests
                     Thread.Sleep(1000);
                     revokeManualEvent.WaitOne();
 
-                    pubnub.EndPendingRequests();
+                    pubnub.Destroy();
                     pubnub.PubnubUnitTest = null;
                     pubnub = null;
                     Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant success but revoke failed.");
@@ -315,7 +315,7 @@ namespace PubNubMessaging.Tests
 
                 grantManualEvent.WaitOne();
 
-                pubnub.EndPendingRequests();
+                pubnub.Destroy();
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelGroupLevelWithReadManageShouldReturnSuccess failed.");
@@ -351,7 +351,7 @@ namespace PubNubMessaging.Tests
 
                 grantManualEvent.WaitOne();
 
-                pubnub.EndPendingRequests();
+                pubnub.Destroy();
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelGroupLevelWithReadShouldReturnSuccess failed.");

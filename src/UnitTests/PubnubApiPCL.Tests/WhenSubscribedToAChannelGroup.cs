@@ -73,7 +73,7 @@
 //            Thread.Sleep(1000);
 //            grantManualEvent.WaitOne(310 * 1000);
 
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //            Assert.IsTrue(receivedGrantMessage, "WhenSubscribedToAChannelGroup Grant access failed.");
@@ -116,7 +116,7 @@
 //                pubnub.Unsubscribe<string>().ChannelGroups(new string[] { channelGroupName }).Execute(new UnsubscribeCallback() { Error = DummySubscribeErrorCallback });
 
 //                subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
-//                pubnub.EndPendingRequests(); 
+//                pubnub.Destroy(); 
 //                pubnub.PubnubUnitTest = null;
 //                pubnub = null;
                 
@@ -161,7 +161,7 @@
 //                manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 //                subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
-//                pubnub.EndPendingRequests(); 
+//                pubnub.Destroy(); 
 //                pubnub.PubnubUnitTest = null;
 //                pubnub = null;
 
@@ -218,7 +218,7 @@
 //                pubnub.Subscribe<string>().ChannelGroups(new string[] { channelGroupName1, channelGroupName2 }).Execute(new SubscribeCallback<string>() { Message = ReceivedMessageCallbackWhenSubscribed, Connect = SubscribeConnectCallback, Disconnect = SubscribeDisconnectCallback, Error = DummySubscribeErrorCallback });
 //                subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
-//                pubnub.EndPendingRequests(); 
+//                pubnub.Destroy(); 
 //                pubnub.PubnubUnitTest = null;
 //                pubnub = null;
 

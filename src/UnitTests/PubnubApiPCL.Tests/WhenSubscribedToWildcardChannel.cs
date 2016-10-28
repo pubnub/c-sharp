@@ -93,7 +93,7 @@
 //                Thread.Sleep(1000);
 //                mreGrant.WaitOne();
 //            }
-//            pubnub.EndPendingRequests();
+//            pubnub.Destroy();
 //            pubnub = null;
 //            Assert.IsTrue(receivedGrantMessage, "WhenSubscribedToWildcardChannel Grant access failed.");
 //        }
@@ -145,7 +145,7 @@
 //                mreUnsubscribe.WaitOne(manualResetEventsWaitTimeout);
 //            }
 //            pubnub.PubnubUnitTest = null;
-//            pubnub.EndPendingRequests();
+//            pubnub.Destroy();
 //            pubnub = null;
 
 //        }
@@ -253,7 +253,7 @@
 //                mreUnsubscribe.WaitOne(manualResetEventsWaitTimeout);
 //            }
 //            pubnub.PubnubUnitTest = null;
-//            pubnub.EndPendingRequests();
+//            pubnub.Destroy();
 //            pubnub = null;
 
 //        }
@@ -369,7 +369,7 @@
 //            }
 //            Assert.IsTrue(receivedMessage, "WhenSubscribedToWildcardChannel --> ChannelAndChannelGroupAndWildcardChannelSubscribeShouldReturnReceivedMessage Failed");
 //            pubnub.PubnubUnitTest = null;
-//            pubnub.EndPendingRequests();
+//            pubnub.Destroy();
 //            pubnub = null;
 
 //        }
@@ -402,7 +402,7 @@
 
 //            Assert.IsTrue(receivedMessage, "WhenSubscribedToWildcardChannel --> ThenSubscribeShouldReturnWildCardPresenceEventInWildcardPresenceCallback Failed");
 //            pubnub.PubnubUnitTest = null;
-//            pubnub.EndPendingRequests();
+//            pubnub.Destroy();
 //            pubnub = null;
 //        }
 
@@ -435,7 +435,7 @@
 
 //            Assert.IsTrue(!receivedMessage, "WhenSubscribedToWildcardChannel --> ThenSubscribeShouldNotReturnWildCardPresenceEventWhenNoCallback Failed");
 //            pubnub.PubnubUnitTest = null;
-//            pubnub.EndPendingRequests();
+//            pubnub.Destroy();
 //            pubnub = null;
 
 //        }

@@ -63,7 +63,7 @@
 
 //            mreGrant.WaitOne();
 
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //            Assert.IsTrue(receivedGrantMessage, "WhenSubscribedToAChannel Grant access failed.");
@@ -113,7 +113,7 @@
 //                pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute(new UnsubscribeCallback() { Error = DummyErrorCallback });
 //                mreUnsubscribe.WaitOne(manualResetEventsWaitTimeout);
 //            }
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 
@@ -195,7 +195,7 @@
 //            manualResetEventsWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 //            mreSubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 
@@ -229,7 +229,7 @@
 //            pubnub.Subscribe<string>().Channels(new string[] { channel2 }).Execute(new SubscribeCallback<string>() { Message = ReceivedChannelUserCallback, Connect = ReceivedChannel2ConnectCallback, Disconnect = ReceivedChannel1ConnectCallback, Error = DummyErrorCallback });
 //            mreChannel2SubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 
@@ -263,7 +263,7 @@
 //            pubnub.Subscribe<string>().Channels(new string[] { channel2 }).Execute(new SubscribeCallback<string>() { Message = ReceivedChannelUserCallback, Connect = ReceivedChannel2ConnectCallback, Disconnect = ReceivedChannel1ConnectCallback, Error = DummyErrorCallback });
 //            mreChannel2SubscribeConnect.WaitOne(manualResetEventsWaitTimeout);
 
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 
@@ -294,7 +294,7 @@
 //            pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute(new SubscribeCallback<string>() { Message = DummyMethodDuplicateChannelUserCallback2, Connect = DummyMethodDuplicateChannelConnectCallback, Disconnect = DummyMethodDuplicateChannelDisconnectCallback, Error = DuplicateChannelErrorCallback });
 //            mreAlreadySubscribed.WaitOne(manualResetEventsWaitTimeout);
 
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 
@@ -335,7 +335,7 @@
 //                }
 //            }
 //            mreSubscriberManyMessages.WaitOne(manualResetEventsWaitTimeout);
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 

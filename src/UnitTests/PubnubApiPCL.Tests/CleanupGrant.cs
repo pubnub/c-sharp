@@ -75,7 +75,7 @@ namespace PubNubMessaging.Tests
 
                 pubnub.Audit().Async(new AuditResult());
                 auditManualEvent.WaitOne();
-                pubnub.EndPendingRequests();
+                pubnub.Destroy();
                 pubnub = null;
                 Assert.IsTrue(receivedAuditMessage, "CleanupGrant -> AtUserLevel failed.");
             }
@@ -122,7 +122,7 @@ namespace PubNubMessaging.Tests
                 pubnub.Audit().Async(new AuditResult());
                 auditManualEvent.WaitOne();
 
-                pubnub.EndPendingRequests();
+                pubnub.Destroy();
                 pubnub = null;
                 Assert.IsTrue(receivedAuditMessage, "CleanupGrant -> AtChannelLevel failed.");
             }

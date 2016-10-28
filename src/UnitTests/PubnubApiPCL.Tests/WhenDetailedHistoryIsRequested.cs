@@ -67,7 +67,7 @@
 
 //            grantManualEvent.WaitOne();
 
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //            Assert.IsTrue(receivedGrantMessage, "WhenDetailedHistoryIsRequested Grant access failed.");
@@ -109,7 +109,7 @@
 
 //                Assert.IsTrue(!messageReceived, "Message stored for Publish when no store is expected");
 //            }
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //        }
@@ -158,7 +158,7 @@
 
 //                Assert.IsTrue(messageReceived, "Encrypted message not showed up in history");
 //            }
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //        }
@@ -182,7 +182,7 @@
 //            pubnub.History().Channel(channel).Count(10).IncludeTimetoken(false).Async(new PNCallback<PNHistoryResult>() { Result = DetailedHistoryCount10Callback, Error = DummyErrorCallback });
 //            mreDetailedHistory.WaitOne(310 * 1000);
 
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //            Assert.IsTrue(messageReceived, "Detailed History Failed");
@@ -207,7 +207,7 @@
 //            pubnub.History().Channel(channel).Count(10).Reverse(true).IncludeTimetoken(false).Async(new PNCallback<PNHistoryResult>() { Result = DetailedHistoryCount10ReverseTrueCallback, Error = DummyErrorCallback });
 //            mreMessageCount10ReverseTrue.WaitOne(310 * 1000);
 
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //            Assert.IsTrue(message10ReverseTrueReceived, "Detailed History Failed");
@@ -249,7 +249,7 @@
 //            Thread.Sleep(2000);
 //            mreMessageStartReverseTrue.WaitOne(310 * 1000);
 
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //            Assert.IsTrue(messageStartReverseTrue, "Detailed History with Start and Reverse True Failed");
@@ -278,7 +278,7 @@
 //            pubnub.History().Channel(channel).Count(10).Reverse(true).IncludeTimetoken(false).Async(new PNCallback<PNHistoryResult>() { Result = DetailHistoryWithNullKeyseDummyCallback, Error = DummyErrorCallback });
 //            mreDetailedHistory.WaitOne(310 * 1000);
 
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //            Assert.IsTrue(messageReceived, "Detailed History With Null Keys Failed");
@@ -430,7 +430,7 @@
 //                pubnub.History().Channel(channel).Start(midtime - 1).Count(totalMessages / 2).Reverse(false).IncludeTimetoken(false).Async(new PNCallback<PNHistoryResult>() { Result = CaptureFirstPublishSetRegularDetailedHistoryCallback, Error = DummyErrorCallback });
 //                mreDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
 //            }
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //        }
@@ -512,7 +512,7 @@
 //            pubnub.History().Channel(channel).Start(midtime - 1).Count(totalMessages / 2).Reverse(false).IncludeTimetoken(false).Async(new PNCallback<PNHistoryResult>() { Result = CaptureFirstPublishSetRegularDetailedHistoryCallback, Error = DummyErrorCallback });
 //            mreDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
 
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //        }

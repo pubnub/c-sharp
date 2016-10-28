@@ -52,7 +52,7 @@
 
 //            mreGrant.WaitOne();
 
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //            Assert.IsTrue(receivedGrantMessage, "WhenSubscribedToAChannel Grant access failed.");
@@ -103,7 +103,7 @@
 //                pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute(new UnsubscribeCallback() { Error = DummyErrorCallback });
 //                mreUnsubscribe.WaitOne(manualResetEventsWaitTimeout);
 //            }
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //        }
@@ -160,7 +160,7 @@
 //                pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute(new UnsubscribeCallback() { Error = DummyErrorCallback });
 //                mreUnsubscribe.WaitOne(manualResetEventsWaitTimeout);
 //            }
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 
@@ -267,7 +267,7 @@
 //                pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute(new UnsubscribeCallback() { Error = DummyErrorCallback });
 //                mreUnsubscribe.WaitOne(manualResetEventsWaitTimeout);
 //            }
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //        }

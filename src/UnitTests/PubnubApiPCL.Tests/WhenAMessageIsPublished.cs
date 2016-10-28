@@ -119,7 +119,7 @@
 
 //            grantManualEvent.WaitOne();
 
-//            pubnub.EndPendingRequests();
+//            pubnub.Destroy();
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //            Assert.IsTrue(receivedGrantMessage, "WhenAMessageIsPublished Grant access failed.");
@@ -159,7 +159,7 @@
 
 //            pubnub.Publish().Channel(channel).Message(message).Async(new PNCallback<PNPublishResult>() { Result = { }, Error = { } });
 
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //        }
@@ -224,7 +224,7 @@
 
 //                Assert.IsTrue(isUnencryptDetailedHistory, "Unable to match the successful unencrypt Publish");
 //            }
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //        }
@@ -290,7 +290,7 @@
 
 //                Assert.IsTrue(isUnencryptObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
 //            }
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //        }
@@ -362,7 +362,7 @@
 
 //                Assert.IsTrue(isEncryptObjectDetailedHistory, "Unable to match the successful encrypt object Publish");
 //            }
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //        }
@@ -434,7 +434,7 @@
 
 //                Assert.IsTrue(isEncryptObjectDetailedHistory, "Unable to match the successful encrypt object Publish with SSL");
 //            }
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //        }
@@ -499,7 +499,7 @@
 
 //                Assert.IsTrue(isEncryptDetailedHistory, "Unable to decrypt the successful Publish");
 //            }
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //        }
@@ -570,7 +570,7 @@
 
 //                Assert.IsTrue(isSecretEncryptDetailedHistory, "Unable to decrypt the successful Secret key Publish");
 //            }
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //        }
@@ -638,7 +638,7 @@
 
 //                Assert.IsTrue(isComplexObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
 //            }
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //        }
@@ -706,7 +706,7 @@
 //                mreSerializedMessagePublishDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
 //                Assert.IsTrue(isSerializedObjectMessageDetailedHistory, "Unable to match the successful serialized object message Publish");
 //            }
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //        }
@@ -742,7 +742,7 @@
 //            manualResetEventsWaitTimeout = 310 * 1000;
 //            mreLaregMessagePublish.WaitOne(manualResetEventsWaitTimeout);
 
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //            Assert.IsTrue(isLargeMessagePublished, "Message Too Large is not failing as expected.");
@@ -811,7 +811,7 @@
 
 //            mreOptionalSecretKeyPublish.WaitOne(310 * 1000);
 
-//            pubnub.EndPendingRequests();
+//            pubnub.Destroy();
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //            Assert.IsTrue(isPublished2, "Publish Failed with secret key");
@@ -846,7 +846,7 @@
 //            pubnub.Publish().Channel(channel).Message(message).Async(new PNCallback<PNPublishResult>() { Result = ReturnNoSSLDefaultTrueCallback, Error = DummyErrorCallback });
 //            mreNoSslPublish.WaitOne(310 * 1000);
 
-//            pubnub.EndPendingRequests();
+//            pubnub.Destroy();
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //            Assert.IsTrue(isPublished3, "Publish Failed with no SSL");

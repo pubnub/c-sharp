@@ -50,7 +50,7 @@
 
 //            mreGrant.WaitOne();
 
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //            Assert.IsTrue(receivedGrantMessage, "WhenAMessageIsPublished Grant access failed.");
@@ -81,7 +81,7 @@
 //            pubnub.Publish().Channel(channel).Message(dicToast).Async(new PNCallback<PNPublishResult>() { Result = PublishCallbackResult, Error = DummyErrorCallback });
 //            mrePublish.WaitOne(60 * 1000);
 
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //            Assert.IsTrue(receivedSuccessMessage, "Toast Publish Failed");
@@ -118,7 +118,7 @@
 //            pubnub.Publish().Channel(channel).Message(dicTile).Async(new PNCallback<PNPublishResult>() { Result = PublishCallbackResult, Error = DummyErrorCallback });
 //            mrePublish.WaitOne(60 * 1000);
 
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //            Assert.IsTrue(receivedSuccessMessage, "Flip Tile Publish Failed");
@@ -154,7 +154,7 @@
 //            pubnub.Publish().Channel(channel).Message(dicTile).Async(new PNCallback<PNPublishResult>() { Result = PublishCallbackResult, Error = DummyErrorCallback });
 //            mrePublish.WaitOne(60 * 1000);
 
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //            Assert.IsTrue(receivedSuccessMessage, "Cycle Tile Publish Failed");
@@ -190,7 +190,7 @@
 //            pubnub.Publish().Channel(channel).Message(dicTile).Async(new PNCallback<PNPublishResult>() { Result = PublishCallbackResult, Error = DummyErrorCallback });
 //            mrePublish.WaitOne(60 * 1000);
 
-//            pubnub.EndPendingRequests(); 
+//            pubnub.Destroy(); 
 //            pubnub.PubnubUnitTest = null;
 //            pubnub = null;
 //            Assert.IsTrue(receivedSuccessMessage, "Iconic Tile Publish Failed");

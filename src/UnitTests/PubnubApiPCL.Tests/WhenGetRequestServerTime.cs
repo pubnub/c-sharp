@@ -73,7 +73,7 @@ namespace PubNubMessaging.Tests
                 
             mreTime.WaitOne(310 * 1000);
 
-            pubnub.EndPendingRequests();
+            pubnub.Destroy();
             pubnub = null;
 
             Assert.IsTrue(timeReceived, "time() Failed");
@@ -112,7 +112,7 @@ namespace PubNubMessaging.Tests
 
             mreTime.WaitOne(310 * 1000);
 
-            pubnub.EndPendingRequests();
+            pubnub.Destroy();
             pubnub = null;
 
             Assert.IsTrue(timeReceived, "time() with SSL Failed");
@@ -139,7 +139,7 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
-                PNProxy = proxy
+                Proxy = proxy
             };
 
             pubnub = this.createPubNubInstance(config);
@@ -162,7 +162,7 @@ namespace PubNubMessaging.Tests
 
                 mreTime.WaitOne(310 * 1000);
 
-                pubnub.EndPendingRequests();
+                pubnub.Destroy();
 
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
@@ -194,7 +194,7 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
-                PNProxy = proxy
+                Proxy = proxy
             };
 
             pubnub = this.createPubNubInstance(config);
@@ -217,7 +217,7 @@ namespace PubNubMessaging.Tests
 
                 mreTime.WaitOne(310 * 1000);
 
-                pubnub.EndPendingRequests();
+                pubnub.Destroy();
 
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
