@@ -61,18 +61,6 @@ namespace PubNubMessaging.Tests
 
                 pubnub = this.createPubNubInstance(config);
 
-                string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"ttl\":20,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
-
-                server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath(string.Format("/v1/auth/audit/sub-key/{0}", PubnubCommon.SubscribeKey))
-                    .WithParameter("signature", "Yxvw2lCm7HL0tB9kj8qFA0YCC3KbxyTKkUcrwti9PKQ=")
-                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
-                    .WithParameter("timestamp", "1356998400")
-                    .WithParameter("uuid", config.Uuid)
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
-
                 pubnub.Audit().Async(new AuditResult());
                 auditManualEvent.WaitOne();
                 pubnub.Destroy();
@@ -110,14 +98,6 @@ namespace PubNubMessaging.Tests
                 };
 
                 pubnub = this.createPubNubInstance(config);
-
-                string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"ttl\":20,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
-
-                server.AddRequest(new Request()
-                        .WithMethod("GET")
-                        .WithPath(string.Format("/v1/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
-                        .WithResponse(expected)
-                        .WithStatusCode(System.Net.HttpStatusCode.OK));
 
                 pubnub.Audit().Async(new AuditResult());
                 auditManualEvent.WaitOne();

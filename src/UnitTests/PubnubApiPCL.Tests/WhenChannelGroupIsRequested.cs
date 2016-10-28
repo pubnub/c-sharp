@@ -53,15 +53,18 @@ namespace PubNubMessaging.Tests
 
             server.AddRequest(new Request()
                     .WithMethod("GET")
-                    .WithPath(string.Format("/v1/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
-                    .WithParameter("signature", "ytgdyeV_yhD_a8KRyNsUaumaW4h70SWIsiHuuKE39Fw=")
+                    .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithParameter("auth", authKey)
                     .WithParameter("channel-group", channelGroupName)
                     .WithParameter("m", "1")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("r", "1")
+                    .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("ttl", "20")
                     .WithParameter("uuid", config.Uuid)
+                    .WithParameter("w", "1")
+                    .WithParameter("signature", "5qae8a33Kt5xxMJ5JxadWN_nPQEESvDJoGLJRiIKS6w=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -195,6 +198,11 @@ namespace PubNubMessaging.Tests
             server.AddRequest(new Request()
                     .WithMethod("GET")
                     .WithPath(string.Format("/v1/channel-registration/sub-key/{0}/channel-group/{1}", PubnubCommon.SubscribeKey, channelGroupName))
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("signature", "51U6an41OCb1g1wV_hxyjvEl6ldlYou4xWcKKPpwDzU=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -240,6 +248,11 @@ namespace PubNubMessaging.Tests
             server.AddRequest(new Request()
                     .WithMethod("GET")
                     .WithPath(string.Format("/v1/channel-registration/sub-key/{0}/channel-group", PubnubCommon.SubscribeKey))
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("signature", "oO0Jg2ykL-fj6Jp5Qg694NY3EftLcI2yZUPlBULqLdg=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 

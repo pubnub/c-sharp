@@ -54,10 +54,11 @@ namespace PubNubMessaging.Tests
             server.AddRequest(new Request()
                     .WithMethod("GET")
                     .WithPath(string.Format("/v1/auth/audit/sub-key/{0}", PubnubCommon.SubscribeKey))
-                    .WithParameter("signature", "8OajzzQLuMQvNuc9deWo2_LFVy4FbyGZLjV5TuhybW4=")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
+                    .WithParameter("signature", "Lli-ZFxyfj7xwSTZZ4v3bAfjRZzlMzDMpnovWbZRNBs=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -104,13 +105,15 @@ namespace PubNubMessaging.Tests
             server.AddRequest(new Request()
                     .WithMethod("GET")
                     .WithPath(string.Format("/v1/auth/audit/sub-key/{0}", PubnubCommon.SubscribeKey))
-                    .WithParameter("signature", "kVcEpy88jSLs9YTfAGqqAuA-7HYvH6HtJFla8yNQJCg=")
                     .WithParameter("channel", channel)
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
+                    .WithParameter("signature", "rkeNIGXBwvVJtmr8TWbrrIm3I4wulQPCsX-5we3nkrA=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
+
 
             if (PubnubCommon.PAMEnabled)
             {
@@ -153,11 +156,12 @@ namespace PubNubMessaging.Tests
             server.AddRequest(new Request()
                     .WithMethod("GET")
                     .WithPath(string.Format("/v1/auth/audit/sub-key/{0}", PubnubCommon.SubscribeKey))
-                    .WithParameter("signature", "Yxvw2lCm7HL0tB9kj8qFA0YCC3KbxyTKkUcrwti9PKQ=")
                     .WithParameter("channel-group", channelgroup)
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
+                    .WithParameter("signature", "CSofmzHYSRnRVyB3b20w-8DctUyQZIJTiZ_fKeyEBhw=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 

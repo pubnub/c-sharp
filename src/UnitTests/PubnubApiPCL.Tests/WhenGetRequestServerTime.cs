@@ -57,16 +57,6 @@ namespace PubNubMessaging.Tests
 
             pubnub = this.createPubNubInstance(config);
 
-            string expected = "[14725889985315301]";
-
-            server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath("/time/0")
-                    .WithParameter("uuid", config.Uuid)
-                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
-
             expectedTime = 14725889985315301;
 
             pubnub.Time().Async(new TimeResult());
@@ -101,8 +91,10 @@ namespace PubNubMessaging.Tests
             server.AddRequest(new Request()
                     .WithMethod("GET")
                     .WithPath("/time/0")
-                    .WithParameter("uuid", config.Uuid)
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -121,6 +113,12 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenWithProxyItShouldReturnTimeStamp()
         {
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("EnableStubTest is True.");
+                return;
+            }
+
             currentUnitTestCase = "ThenWithProxyItShouldReturnTimeStamp";
 
             bool proxyConfigured = true;
@@ -139,20 +137,15 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
+<<<<<<< HEAD
                 Proxy = proxy
+=======
+                PNProxy = proxy,
+                Secure=false
+>>>>>>> edge
             };
 
             pubnub = this.createPubNubInstance(config);
-
-            string expected = "[14725889985315301]";
-
-            server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath("/time/0")
-                    .WithParameter("uuid", config.Uuid)
-                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             expectedTime = 14725889985315301;
 
@@ -204,8 +197,10 @@ namespace PubNubMessaging.Tests
             server.AddRequest(new Request()
                     .WithMethod("GET")
                     .WithPath("/time/0")
-                    .WithParameter("uuid", config.Uuid)
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
