@@ -30,7 +30,6 @@ namespace PubnubApiDemo
 
         public class PlatformPubnubLog : IPubnubLog
         {
-            private LoggingMethod.Level _logLevel = LoggingMethod.Level.Info;
             //LoggingMethod.Level.Info => To  capture verbose info
             private string logFilePath = "";
 
@@ -42,18 +41,6 @@ namespace PubnubApiDemo
                 System.Diagnostics.Debug.WriteLine(folder);
                 logFilePath = System.IO.Path.Combine(folder, "pubnubmessaging.log");
                 Trace.Listeners.Add(new TextWriterTraceListener(logFilePath));
-            }
-
-            public LoggingMethod.Level LogLevel
-            {
-                get
-                {
-                    return _logLevel;
-                }
-                set
-                {
-                    _logLevel = value;
-                }
             }
 
             public void WriteToLog(string log)
@@ -391,16 +378,6 @@ namespace PubnubApiDemo
             Console.ResetColor();
             Console.WriteLine();
 
-            //pubnub = new Pubnub(publishKey, subscribeKey, secretKey, cipherKey,
-            //    (enableSSL.Trim().ToLower() == "y") ? true : false);
-
-            //pubnub.SetPubnubLog(new PlatformPubnubLog());
-            //pubnub.Origin = origin;
-            //pubnub.AddPayloadToPublishResponse = true;
-
-            //TO SUPPORT GENERICS, ENSURE THAT YOU IMPLEMENT "NewtonsoftJsonDotNet" METHODS FOR JSON DESERIALIZATION 
-            //pubnub.JsonPluggableLibrary = new MyCustomJsonNet();
-
             Console.WriteLine("Use Custom Session UUID? ENTER Y for Yes, else N");
             string enableCustomUUID = Console.ReadLine();
             if (enableCustomUUID.Trim().ToLower() == "y")
@@ -443,12 +420,10 @@ namespace PubnubApiDemo
             if (enableLoggingString.Trim().ToLower() == "n")
             {
                 config.PubnubLog = null;
-                //config.LogVerbosity = LoggingMethod.Level.Off;
                 Console.WriteLine("Disabled internal logging");
             }
             else
             {
-                //config.LogVerbosity = LoggingMethod.Level.Info;
                 config.PubnubLog = new PlatformPubnubLog();
                 Console.WriteLine("Enabled internal logging");
 
@@ -681,7 +656,7 @@ namespace PubnubApiDemo
                     Console.WriteLine("ENTER 15 FOR Grant Access to Presence Channel/ChannelGroup");
                     Console.WriteLine("ENTER 16 FOR Audit Access to Presence Channel/ChannelGroup");
                     Console.WriteLine("ENTER 17 FOR Revoke Access to Presence Channel/ChannelGroup");
-                    Console.WriteLine("ENTER 18 FOR Change/Update Auth Key (Current value = {0})", pubnub.AuthenticationKey);
+                    //Console.WriteLine("ENTER 18 FOR Change/Update Auth Key (Current value = {0})", config.AuthKey);
                     Console.WriteLine("ENTER 19 TO Simulate Machine Sleep Mode");
                     Console.WriteLine("ENTER 20 TO Simulate Machine Awake Mode");
                     //Console.WriteLine("ENTER 21 TO Set Presence Heartbeat (Current value = {0} sec)", pubnub.PresenceHeartbeat);
@@ -712,7 +687,7 @@ namespace PubnubApiDemo
                 {
                     case "99":
                         exitFlag = true;
-                        pubnub.EndPendingRequests();
+                        pubnub.Destroy();
                         break;
                     case "1":
                         Console.WriteLine("Enter CHANNEL name for subscribe. Use comma to enter multiple channels.");
@@ -1205,18 +1180,18 @@ namespace PubnubApiDemo
                     //    Console.WriteLine("Enter CHANNEL name for PAM Grant Presence.");
                     //    Console.WriteLine();
                     //    break;
-                    case "18":
-                        Console.WriteLine("Enter Auth Key (applies to all subscribed channels).");
-                        Console.WriteLine("If you don't want to use Auth Key, Press ENTER Key");
-                        authKey = Console.ReadLine();
-                        pubnub.AuthenticationKey = authKey;
+                    //case "18":
+                    //    Console.WriteLine("Enter Auth Key (applies to all subscribed channels).");
+                    //    Console.WriteLine("If you don't want to use Auth Key, Press ENTER Key");
+                    //    authKey = Console.ReadLine();
+                    //    pubnub.AuthenticationKey = authKey;
 
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Auth Key = {0}", authKey));
-                        Console.ResetColor();
-                        Console.WriteLine();
+                    //    Console.ForegroundColor = ConsoleColor.Blue;
+                    //    Console.WriteLine(string.Format("Auth Key = {0}", authKey));
+                    //    Console.ResetColor();
+                    //    Console.WriteLine();
 
-                        break;
+                    //    break;
                     case "19":
                         Console.WriteLine("Enabling simulation of Sleep/Suspend Mode");
                         pubnub.EnableMachineSleepModeForTestingOnly();
