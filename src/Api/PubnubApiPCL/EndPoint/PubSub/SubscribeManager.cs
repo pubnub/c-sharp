@@ -455,6 +455,7 @@ namespace PubnubApi.EndPoint
             if (!networkConnection)
             {
                 ConnectionErrors++;
+                UpdatePubnubNetworkTcpCheckIntervalInSeconds();
                 ChannelInternetStatus.AddOrUpdate(multiChannel, networkConnection, (key, oldValue) => networkConnection);
                 ChannelGroupInternetStatus.AddOrUpdate(multiChannelGroup, networkConnection, (key, oldValue) => networkConnection);
             }
@@ -697,6 +698,8 @@ namespace PubnubApi.EndPoint
         {
             if (netState != null && ((netState.Channels != null && netState.Channels.Length > 0) || (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)))
             {
+                LoggingMethod.WriteToLog(string.Format("DateTime {0}, SubscribeManager ReconnectNetwork interval = {1} sec", DateTime.Now.ToString(), PubnubNetworkTcpCheckIntervalInSeconds), PNLogVerbosity.BODY);
+
                 System.Threading.Timer timer = new Timer(new TimerCallback(ReconnectNetworkCallback<T>), netState, 0,
                                                       (-1 == PubnubNetworkTcpCheckIntervalInSeconds) ? Timeout.Infinite : PubnubNetworkTcpCheckIntervalInSeconds * 1000);
 
@@ -737,6 +740,8 @@ namespace PubnubApi.EndPoint
                             else
                             {
                                 ChannelInternetStatus.AddOrUpdate(channel, networkConnection, (key, oldValue) => networkConnection);
+                                ConnectionErrors++;
+                                UpdatePubnubNetworkTcpCheckIntervalInSeconds();
 
                                 LoggingMethod.WriteToLog(string.Format("DateTime {0}, channel={1} {2} reconnectNetworkCallback. Retry", DateTime.Now.ToString(), channel, netState.ResponseType), PNLogVerbosity.BODY);
 
