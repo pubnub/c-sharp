@@ -17,6 +17,7 @@ namespace PubnubApi.EndPoint
         private bool storeInHistory = true;
         private bool httpPost = false;
         private string userMetadata = "";
+        private int ttl = -1;
 
         public PublishOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
         {
@@ -67,12 +68,23 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
-        public void Async(PNCallback<PNPublishResult> callback)
+        /// <summary>
+        /// tttl in hours
+        /// </summary>
+        /// <param name="ttl"></param>
+        /// <returns></returns>
+        public PublishOperation Ttl(int ttl)
         {
-            Publish(this.channelName, this.msg, this.storeInHistory, this.userMetadata, callback);
+            this.ttl = ttl;
+            return this;
         }
 
-        private void Publish(string channel, object message, bool storeInHistory, string jsonUserMetaData, PNCallback<PNPublishResult> callback)
+        public void Async(PNCallback<PNPublishResult> callback)
+        {
+            Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, callback);
+        }
+
+        private void Publish(string channel, object message, bool storeInHistory, int ttl, string jsonUserMetaData, PNCallback<PNPublishResult> callback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
             {
@@ -105,7 +117,7 @@ namespace PubnubApi.EndPoint
             }
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
-            Uri request = urlBuilder.BuildPublishRequest(channel, message, storeInHistory, jsonUserMetaData);
+            Uri request = urlBuilder.BuildPublishRequest(channel, message, storeInHistory, ttl, jsonUserMetaData);
 
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
             requestState.Channels = new string[] { channel };
