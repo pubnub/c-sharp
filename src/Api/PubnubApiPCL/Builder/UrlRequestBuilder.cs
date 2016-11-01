@@ -302,7 +302,7 @@ namespace PubnubApi
             PNOperationType currentType = PNOperationType.PNAccessManagerAudit;
 
             List<string> url = new List<string>();
-            url.Add("v1");
+            url.Add("v2");
             url.Add("auth");
             url.Add("audit");
             url.Add("sub-key");
