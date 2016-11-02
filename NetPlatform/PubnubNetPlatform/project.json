@@ -1,5 +1,5 @@
 ﻿{
-  "version": "3.8.3.0",
+  "version": "3.8.4.0",
   "title": "PubNub C# .NET Platform - Web Data Push API",
   "authors": [ "Pandu Masabathula" ],
   "packOptions": {
