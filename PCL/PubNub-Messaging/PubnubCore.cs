@@ -1,4 +1,4 @@
-﻿//Build Date: Oct 10, 2016
+﻿//Build Date: Nov 02, 2016
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -2467,7 +2467,7 @@ namespace PubNubMessaging.Core
 		/// <param name="message"></param>
 		/// <param name="userCallback"></param>
 		/// <returns></returns>
-        public bool Publish<T>(string channel, object message, bool storeInHistory, string jsonUserMetaData, Action<T> userCallback, Action<PubnubClientError> errorCallback)
+        public bool Publish<T>(string channel, object message, bool storeInHistory, int ttl, string jsonUserMetaData, Action<T> userCallback, Action<PubnubClientError> errorCallback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
             {
@@ -2505,7 +2505,7 @@ namespace PubNubMessaging.Core
                 jsonUserMetaData = "";
             }
 
-            Uri request = BuildPublishRequest(channel, message, storeInHistory, jsonUserMetaData);
+            Uri request = BuildPublishRequest(channel, message, storeInHistory, ttl, jsonUserMetaData);
 
             RequestState<T> requestState = new RequestState<T>();
             requestState.Channels = new string[] { channel };
@@ -2517,7 +2517,7 @@ namespace PubNubMessaging.Core
             return UrlProcessRequest<T>(request, requestState);
         }
 
-        private Uri BuildPublishRequest(string channel, object originalMessage, bool storeInHistory, string jsonUserMetaData)
+        private Uri BuildPublishRequest(string channel, object originalMessage, bool storeInHistory, int ttl, string jsonUserMetaData)
         {
             ResponseType currentType = ResponseType.Publish;
             string message = (_enableJsonEncodingForPublish) ? JsonEncodePublishMsg(originalMessage) : originalMessage.ToString();
@@ -2541,6 +2541,12 @@ namespace PubNubMessaging.Core
             {
                 requestQueryStringParams.Add("meta", EncodeUricomponent(jsonUserMetaData, currentType, false, false));
             }
+
+            if (storeInHistory && ttl >= 0)
+            {
+                requestQueryStringParams.Add("ttl", ttl.ToString());
+            }
+
             if (!storeInHistory)
             {
                 requestQueryStringParams.Add("store", "0");

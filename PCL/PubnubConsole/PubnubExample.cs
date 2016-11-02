@@ -415,7 +415,8 @@ namespace PubNubMessaging.Core
 			string channel="";
 			string channelGroup = "";
 			int currentUserChoice = 0;
-			string userinput = "";
+            int publishTtl = -1;
+            string userinput = "";
 			Console.WriteLine("");
 			while (!exitFlag)
 			{
@@ -526,7 +527,19 @@ namespace PubNubMessaging.Core
 					Console.WriteLine(string.Format("Store In History = {0}", storeInHistory));
 					Console.ResetColor();
 
-                    Console.WriteLine("Enter User Meta Data in JSON dictionary format. If you don't want to enter for now, just press ENTER");
+                    if (store)
+                    {
+                        Console.WriteLine("Message TTL in numeric Hours. Default is 0. To accept default(0), just press ENTER");
+                        string messageTTL = Console.ReadLine();
+                        Int32.TryParse(messageTTL, out publishTtl);
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Message TTL = {0}", publishTtl));
+                        Console.ResetColor();
+
+                    }
+
+                        Console.WriteLine("Enter User Meta Data in JSON dictionary format. If you don't want to enter for now, just press ENTER");
                     string jsonUserMetaData = Console.ReadLine();
 
                     Console.ForegroundColor = ConsoleColor.Blue;
@@ -578,11 +591,11 @@ namespace PubNubMessaging.Core
 					int intData;
 					if (int.TryParse(publishMsg, out intData)) //capture numeric data
 					{
-                        pubnub.Publish<string>(channel, intData, store, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.Publish<string>(channel, intData, store, publishTtl, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
 					}
 					else if (double.TryParse(publishMsg, out doubleData)) //capture numeric data
 					{
-                        pubnub.Publish<string>(channel, doubleData, store, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
+                        pubnub.Publish<string>(channel, doubleData, store, publishTtl, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
 					}
 					else
 					{
@@ -592,20 +605,20 @@ namespace PubNubMessaging.Core
 							string strMsg = publishMsg.Substring(1, publishMsg.Length - 2);
 							if (int.TryParse(strMsg, out intData))
 							{
-                                pubnub.Publish<string>(channel, strMsg, store, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
+                                pubnub.Publish<string>(channel, strMsg, store, publishTtl, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
 							}
 							else if (double.TryParse(strMsg, out doubleData))
 							{
-                                pubnub.Publish<string>(channel, strMsg, store, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
+                                pubnub.Publish<string>(channel, strMsg, store, publishTtl, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
 							}
 							else
 							{
-                                pubnub.Publish<string>(channel, publishMsg, store, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
+                                pubnub.Publish<string>(channel, publishMsg, store, publishTtl, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
 							}
 						}
 						else
 						{
-                            pubnub.Publish<string>(channel, publishMsg, store, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
+                            pubnub.Publish<string>(channel, publishMsg, store, publishTtl, jsonUserMetaData, DisplayReturnMessage, DisplayErrorMessage);
 						}
 					}
 					break;
