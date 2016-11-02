@@ -383,6 +383,7 @@ namespace PubNubMessaging.Core
             string channel="";
             string channelGroup = "";
             int currentUserChoice = 0;
+            int publishTtl = -1;
             string userinput = "";
             Console.WriteLine("");
             while (!exitFlag)
@@ -485,6 +486,16 @@ namespace PubNubMessaging.Core
                         Console.WriteLine(string.Format("Store In History = {0}", storeInHistory));
                         Console.ResetColor();
 
+                        if (store) {
+                            Console.WriteLine ("Message TTL in numeric Hours. Default is 0. To accept default(0), just press ENTER");
+                            string messageTTL = Console.ReadLine ();
+                            Int32.TryParse (messageTTL, out publishTtl);
+
+                            Console.ForegroundColor = ConsoleColor.Blue;
+                            Console.WriteLine (string.Format ("Message TTL = {0}", publishTtl));
+                            Console.ResetColor ();
+
+                        }
                         Console.WriteLine("Enter User Meta Data in JSON dictionary format. If you don't want to enter for now, just press ENTER");
                         string jsonUserMetaData = Console.ReadLine();
 
