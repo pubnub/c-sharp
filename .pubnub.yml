@@ -3,6 +3,13 @@ changelog:
   - 
     changes: 
       - 
+        text: "Added publish message ttl"
+        type: feature
+    date: ~
+    version: v3.8.4
+  - 
+    changes: 
+      - 
         text: "Added PAM signature when secret key is provided"
         type: feature
     date: ~
