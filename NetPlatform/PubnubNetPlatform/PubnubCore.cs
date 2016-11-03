@@ -1,4 +1,4 @@
-﻿//Build Date: Nov 02, 2016
+﻿//Build Date: Nov 03, 2016
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -91,7 +91,7 @@ namespace PubNubMessaging.Core
 		protected string secretKey = "";
 		protected string cipherKey = "";
 		protected bool ssl = false;
-        private string _pnsdkVersion = "PubNub-CSharp-.NET/3.8.3";
+        private string _pnsdkVersion = "PubNub-CSharp-.NET/3.8.4";
         private string _pushServiceName = "push.pubnub.com";
         private bool _addPayloadToPublishResponse = false;
 
