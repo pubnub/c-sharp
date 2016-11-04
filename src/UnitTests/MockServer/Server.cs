@@ -43,6 +43,15 @@ namespace MockServer
         }
 
         /// <summary>
+        /// To indicate whether https request or not
+        /// </summary>
+        /// <param name="secure"></param>
+        public void RunOnHttps(bool secure)
+        {
+            this.secure = secure;
+        }
+
+        /// <summary>
         /// Add a request to server
         /// </summary>
         /// <param name="request">Request</param>

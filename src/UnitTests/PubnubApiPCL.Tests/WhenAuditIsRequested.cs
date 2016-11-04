@@ -49,16 +49,17 @@ namespace PubNubMessaging.Tests
 
             pubnub = this.createPubNubInstance(config);
 
-            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"subkey\",\"subscribe_key\":\"sub-c-25bce39a-6ead-11e6-b9ce-02ee2ddab7fe\",\"channels\":{},\"objects\":{},\"channel-groups\":{}},\"service\":\"Access Manager\",\"status\":200}";
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"subkey\",\"subscribe_key\":\"demo-36\",\"channels\":{},\"objects\":{},\"channel-groups\":{}},\"service\":\"Access Manager\",\"status\":200}";
 
+            server.RunOnHttps(config.Secure);
             server.AddRequest(new Request()
                     .WithMethod("GET")
-                    .WithPath(string.Format("/v1/auth/audit/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithPath(string.Format("/v2/auth/audit/sub-key/{0}", PubnubCommon.SubscribeKey))
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
-                    .WithParameter("signature", "Lli-ZFxyfj7xwSTZZ4v3bAfjRZzlMzDMpnovWbZRNBs=")
+                    .WithParameter("signature", "SKDBGle-y_p_sh7G_nPPIAF6oVAoGPsQS1PqxRj3S8E=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -100,17 +101,18 @@ namespace PubNubMessaging.Tests
 
             pubnub = this.createPubNubInstance(config);
 
-            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"sub-c-25bce39a-6ead-11e6-b9ce-02ee2ddab7fe\",\"channels\":{}},\"service\":\"Access Manager\",\"status\":200}";
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"demo-36\",\"channels\":{}},\"service\":\"Access Manager\",\"status\":200}";
 
+            server.RunOnHttps(config.Secure);
             server.AddRequest(new Request()
                     .WithMethod("GET")
-                    .WithPath(string.Format("/v1/auth/audit/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithPath(string.Format("/v2/auth/audit/sub-key/{0}", PubnubCommon.SubscribeKey))
                     .WithParameter("channel", channel)
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
-                    .WithParameter("signature", "rkeNIGXBwvVJtmr8TWbrrIm3I4wulQPCsX-5we3nkrA=")
+                    .WithParameter("signature", "baAWVdNKvELa07NaIA9kqk7eH7ittOXow0kPHRm4KAs=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -151,17 +153,18 @@ namespace PubNubMessaging.Tests
 
             pubnub = this.createPubNubInstance(config);
 
-            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"channel-groups\":{}},\"service\":\"Access Manager\",\"status\":200}";
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"demo-36\",\"channel-groups\":{}},\"service\":\"Access Manager\",\"status\":200}";
 
+            server.RunOnHttps(config.Secure);
             server.AddRequest(new Request()
                     .WithMethod("GET")
-                    .WithPath(string.Format("/v1/auth/audit/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithPath(string.Format("/v2/auth/audit/sub-key/{0}", PubnubCommon.SubscribeKey))
                     .WithParameter("channel-group", channelgroup)
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
-                    .WithParameter("signature", "CSofmzHYSRnRVyB3b20w-8DctUyQZIJTiZ_fKeyEBhw=")
+                    .WithParameter("signature", "mvBhczAANRNn1l0IR9FZmJaB8XUpnG8IWlihg9hmc2g=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
