@@ -34,7 +34,12 @@ namespace PubnubApi
             return new EndPoint.PublishOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
-		public EndPoint.HistoryOperation History()
+        public EndPoint.FireOperation Fire()
+        {
+            return new EndPoint.FireOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
+
+        public EndPoint.HistoryOperation History()
 		{
             return new EndPoint.HistoryOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }

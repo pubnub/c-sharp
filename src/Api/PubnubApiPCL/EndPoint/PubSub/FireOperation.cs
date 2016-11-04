@@ -6,7 +6,7 @@ using PubnubApi.Interface;
 
 namespace PubnubApi.EndPoint
 {
-    public class PublishOperation : PubnubCoreBase
+    public class FireOperation : PubnubCoreBase
     {
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
@@ -14,77 +14,76 @@ namespace PubnubApi.EndPoint
 
         private object msg = null;
         private string channelName = "";
-        private bool storeInHistory = true;
+        private bool storeInHistory = false;
         private bool httpPost = false;
         private string userMetadata = "";
         private int ttl = -1;
 
-        public PublishOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
+        public FireOperation(PNConfiguration pubnubConfig) : base(pubnubConfig)
         {
             config = pubnubConfig;
         }
 
-        public PublishOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary):base(pubnubConfig, jsonPluggableLibrary)
+        public FireOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary) : base(pubnubConfig, jsonPluggableLibrary)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public PublishOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary)
+        public FireOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
         }
 
-
-        public PublishOperation Message(object message)
+        public FireOperation Message(object message)
         {
             this.msg = message;
             return this;
         }
 
-        public PublishOperation Channel(string channelName)
+        public FireOperation Channel(string channelName)
         {
             this.channelName = channelName;
             return this;
         }
 
-        public PublishOperation ShouldStore(bool store)
-        {
-            this.storeInHistory = store;
-            return this;
-        }
+        //public FireOperation ShouldStore(bool store)
+        //{
+        //    this.storeInHistory = store;
+        //    return this;
+        //}
 
-        public PublishOperation Meta(string jsonMetadata)
+        public FireOperation Meta(string jsonMetadata)
         {
             this.userMetadata = jsonMetadata;
             return this;
         }
 
-        public PublishOperation UsePOST(bool post)
+        public FireOperation UsePOST(bool post)
         {
             this.httpPost = post;
             return this;
         }
 
-        /// <summary>
-        /// tttl in hours
-        /// </summary>
-        /// <param name="ttl"></param>
-        /// <returns></returns>
-        public PublishOperation Ttl(int ttl)
-        {
-            this.ttl = ttl;
-            return this;
-        }
+        ///// <summary>
+        ///// tttl in hours
+        ///// </summary>
+        ///// <param name="ttl"></param>
+        ///// <returns></returns>
+        //public FireOperation Ttl(int ttl)
+        //{
+        //    this.ttl = ttl;
+        //    return this;
+        //}
 
         public void Async(PNCallback<PNPublishResult> callback)
         {
-            Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, callback);
+            Fire(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, callback);
         }
 
-        private void Publish(string channel, object message, bool storeInHistory, int ttl, string jsonUserMetaData, PNCallback<PNPublishResult> callback)
+        private void Fire(string channel, object message, bool storeInHistory, int ttl, string jsonUserMetaData, PNCallback<PNPublishResult> callback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
             {
@@ -116,8 +115,11 @@ namespace PubnubApi.EndPoint
                 jsonUserMetaData = "";
             }
 
+            Dictionary<string, string> urlParam = new Dictionary<string, string>();
+            urlParam.Add("norep", "true");
+
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
-            Uri request = urlBuilder.BuildPublishRequest(channel, message, storeInHistory, ttl, jsonUserMetaData, null);
+            Uri request = urlBuilder.BuildPublishRequest(channel, message, storeInHistory, ttl, jsonUserMetaData, urlParam);
 
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
             requestState.Channels = new string[] { channel };
@@ -132,6 +134,6 @@ namespace PubnubApi.EndPoint
                 ProcessResponseCallbacks(result, requestState);
             }
         }
-
     }
+
 }

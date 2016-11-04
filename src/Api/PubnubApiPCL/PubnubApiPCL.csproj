@@ -51,6 +51,7 @@
     <Compile Include="EndPoint\Presence\HereNowOperation.cs" />
     <Compile Include="EndPoint\Presence\SetStateOperation.cs" />
     <Compile Include="EndPoint\Presence\WhereNowOperation.cs" />
+    <Compile Include="EndPoint\PubSub\FireOperation.cs" />
     <Compile Include="EndPoint\PubSub\ListenerManager.cs" />
     <Compile Include="EndPoint\PubSub\PublishOperation.cs" />
     <Compile Include="EndPoint\PubSub\SubscribeManager.cs" />
