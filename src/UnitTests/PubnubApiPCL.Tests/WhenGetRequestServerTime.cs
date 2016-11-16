@@ -37,12 +37,6 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenItShouldReturnTimeStamp()
         {
-            if (PubnubCommon.EnableStubTest)
-            {
-                Assert.Ignore("EnableStubTest is True.");
-                return;
-            }
-
             currentUnitTestCase = "ThenItShouldReturnTimeStamp";
             timeReceived = false;
             mreTime = new ManualResetEvent(false);
@@ -57,7 +51,17 @@ namespace PubNubMessaging.Tests
 
             pubnub = this.createPubNubInstance(config);
 
-            expectedTime = 14725889985315301;
+            string expected = "[14725889985315301]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             pubnub.Time().Async(new TimeResult());
                 
@@ -98,8 +102,6 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            expectedTime = 14725889985315301;
-
             pubnub.Time().Async(new TimeResult());
 
             mreTime.WaitOne(310 * 1000);
@@ -113,15 +115,7 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenWithProxyItShouldReturnTimeStamp()
         {
-            if (PubnubCommon.EnableStubTest)
-            {
-                Assert.Ignore("EnableStubTest is True.");
-                return;
-            }
-
             currentUnitTestCase = "ThenWithProxyItShouldReturnTimeStamp";
-
-            bool proxyConfigured = true;
 
             IPubnubProxy proxy = new PubnubProxy();
             proxy.Server = "test.pandu.com";
@@ -137,7 +131,7 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
-                Proxy = proxy,
+                //Proxy = proxy,
                 Secure = false
             };
 
@@ -146,7 +140,7 @@ namespace PubNubMessaging.Tests
 
             expectedTime = 14725889985315301;
 
-            if (proxyConfigured)
+            if (config.Proxy != null)
             {
                 pubnub.Time().Async(new TimeResult());
 
@@ -168,8 +162,6 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenWithProxyItShouldReturnTimeStampWithSSL()
         {
-            bool proxyConfigured = true;
-
             IPubnubProxy proxy = new PubnubProxy();
             proxy.Server = "test.pandu.com";
             proxy.Port = 808;
@@ -184,7 +176,7 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
-                Proxy = proxy
+                //Proxy = proxy
             };
 
             pubnub = this.createPubNubInstance(config);
@@ -201,9 +193,8 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            long expectedTime = 14725889985315301;
 
-            if (proxyConfigured)
+            if (config.Proxy != null)
             {
                 pubnub.Time().Async(new TimeResult());
 

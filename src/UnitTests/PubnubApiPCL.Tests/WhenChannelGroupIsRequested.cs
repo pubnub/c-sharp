@@ -49,7 +49,7 @@ namespace PubNubMessaging.Tests
 
             pubnub = this.createPubNubInstance(config);
 
-            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"ttl\":20,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"demo-36\",\"ttl\":20,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
 
             server.AddRequest(new Request()
                     .WithMethod("GET")
@@ -64,7 +64,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("ttl", "20")
                     .WithParameter("uuid", config.Uuid)
                     .WithParameter("w", "1")
-                    .WithParameter("signature", "5qae8a33Kt5xxMJ5JxadWN_nPQEESvDJoGLJRiIKS6w=")
+                    .WithParameter("signature", "pOL-X541lXTpA8fNkJE3k7FjaZwo0qynAkPhBPANiCg=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -112,7 +112,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
-                    .WithParameter("signature", "GxvqczR2FCHioz2nUPDUnv2qpnKUB9O_hFOW798_BFQ=")
+                    .WithParameter("signature", "7SHIgQF3vhz3V0-zF-5RB69mWg6Zf8mI3RiJc5ZpctE=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -157,7 +157,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
-                    .WithParameter("signature", "6vLNLWtjycfAZUlXGKm2idWmZq1SrgGPohb-xaGoBNk=")
+                    .WithParameter("signature", "NFlZ-Yz7_dVBvcLB3WlVCSu2vqXS7QvvAd7gzWp9Fj0=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -202,7 +202,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
-                    .WithParameter("signature", "51U6an41OCb1g1wV_hxyjvEl6ldlYou4xWcKKPpwDzU=")
+                    .WithParameter("signature", "2Qee4fBcLlsg9jaGVs8b7IE_XKd_I1iV7FR4Wzhkwxc=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -225,12 +225,6 @@ namespace PubNubMessaging.Tests
         {
             currentUnitTestCase = "ThenGetAllChannelGroupShouldReturnSuccess";
 
-            if (PubnubCommon.PAMEnabled)
-            {
-                Assert.Ignore("PAM is enabled; WhenChannelGroupIsRequested -> ThenGetAllChannelGroupShouldReturnSuccess.");
-                return;
-            }
-
             receivedChannelGroupMessage = false;
 
             PNConfiguration config = new PNConfiguration()
@@ -252,7 +246,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
-                    .WithParameter("signature", "oO0Jg2ykL-fj6Jp5Qg694NY3EftLcI2yZUPlBULqLdg=")
+                    .WithParameter("signature", "P4jKeHVu7QmBuvJABirYUd7wKoOBO7Gxc1XZOrKbnbM=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
