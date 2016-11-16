@@ -59,6 +59,8 @@ namespace PubnubApi
         {
             PNStatusCategory ret = PNStatusCategory.PNUnknownCategory;
 
+            if (ex == null) return ret;
+
             string errorType = ex.GetType().ToString();
             string errorMessage = ex.Message;
 

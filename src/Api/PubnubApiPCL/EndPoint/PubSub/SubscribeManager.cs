@@ -212,8 +212,8 @@ namespace PubnubApi.EndPoint
                     }
                 }
 
-                Dictionary<string, long> originalMultiChannelSubscribe = MultiChannelSubscribe.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-                Dictionary<string, long> originalMultiChannelGroupSubscribe = MultiChannelGroupSubscribe.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                Dictionary<string, long> originalMultiChannelSubscribe = MultiChannelSubscribe.Count > 0 ? MultiChannelSubscribe.ToDictionary(kvp => kvp.Key, kvp => kvp.Value) : null;
+                Dictionary<string, long> originalMultiChannelGroupSubscribe = MultiChannelGroupSubscribe.Count > 0 ? MultiChannelGroupSubscribe.ToDictionary(kvp => kvp.Key, kvp => kvp.Value) : null;
 
                 //Remove the valid channels from subscribe list for unsubscribe 
                 for (int index = 0; index < validChannels.Count; index++)
@@ -264,14 +264,14 @@ namespace PubnubApi.EndPoint
                 //Check any chained subscribes while unsubscribe 
                 foreach (string key in MultiChannelSubscribe.Keys)
                 {
-                    if (!originalMultiChannelSubscribe.ContainsKey(key))
+                    if (originalMultiChannelSubscribe != null && !originalMultiChannelSubscribe.ContainsKey(key))
                     {
                         return;
                     }
                 }
                 foreach (string key in MultiChannelGroupSubscribe.Keys)
                 {
-                    if (!originalMultiChannelGroupSubscribe.ContainsKey(key))
+                    if (originalMultiChannelGroupSubscribe != null && !originalMultiChannelGroupSubscribe.ContainsKey(key))
                     {
                         return;
                     }

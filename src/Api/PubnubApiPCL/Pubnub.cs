@@ -129,6 +129,13 @@ namespace PubnubApi
             listenerManager.CurrentPubnubInstance(this);
             listenerManager.AddListener(listener);
         }
+
+        public void RemoveListener(SubscribeCallback listener)
+        {
+            EndPoint.ListenerManager listenerManager = new EndPoint.ListenerManager(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            listenerManager.CurrentPubnubInstance(this);
+            listenerManager.RemoveListener(listener);
+        }
         #endregion
 
         #region "PubNub API Other Methods"

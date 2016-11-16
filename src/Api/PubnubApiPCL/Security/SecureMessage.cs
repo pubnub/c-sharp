@@ -38,7 +38,17 @@ namespace PubnubApi
                         string decryptMessage = "";
                         try
                         {
-                            decryptMessage = aes.Decrypt(element.ToString());
+                            Dictionary<string, object> historyEnv = jsonLib.ConvertToDictionaryObject(element);
+                            if (historyEnv != null && historyEnv.ContainsKey("message"))
+                            {
+                                string dictionaryValue = aes.Decrypt(historyEnv["message"].ToString());
+                                historyEnv["message"] = jsonLib.DeserializeToObject(dictionaryValue);
+                                decryptMessage = jsonLib.SerializeToJsonString(historyEnv);
+                            }
+                            else
+                            {
+                                decryptMessage = aes.Decrypt(element.ToString());
+                            }
                         }
                         catch (Exception ex)
                         {

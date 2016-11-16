@@ -729,7 +729,7 @@ namespace PubnubApi
                         Announce(status);
                     }
 
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0} PubnubBaseCore UrlProcessRequest Exception={1}", DateTime.Now.ToString(), webEx.ToString()), PNLogVerbosity.BODY);
+                    LoggingMethod.WriteToLog(string.Format("DateTime {0} PubnubBaseCore UrlProcessRequest Exception={1}", DateTime.Now.ToString(), webEx != null ? webEx.ToString() : exceptionMessage), PNLogVerbosity.BODY);
                 }
 
                 return "";
@@ -1553,25 +1553,25 @@ namespace PubnubApi
 
         public void Announce(PNStatus status)
         {
-            foreach (SubscribeCallback subscribeCallback in SubscribeCallbackListenerList)
+            for (int listenerIndex=0; listenerIndex < SubscribeCallbackListenerList.Count; listenerIndex++)
             {
-                subscribeCallback.Status(PubnubInstance, status);
+                SubscribeCallbackListenerList[listenerIndex].Status(PubnubInstance, status);
             }
         }
 
         public void Announce<T>(PNMessageResult<T> message)
         {
-            foreach (SubscribeCallback subscribeCallback in SubscribeCallbackListenerList)
+            for (int listenerIndex = 0; listenerIndex < SubscribeCallbackListenerList.Count; listenerIndex++)
             {
-                subscribeCallback.Message(PubnubInstance, message);
+                SubscribeCallbackListenerList[listenerIndex].Message(PubnubInstance, message);
             }
         }
 
         public void Announce(PNPresenceEventResult presence)
         {
-            foreach (SubscribeCallback subscribeCallback in SubscribeCallbackListenerList)
+            for (int listenerIndex = 0; listenerIndex < SubscribeCallbackListenerList.Count; listenerIndex++)
             {
-                subscribeCallback.Presence(PubnubInstance, presence);
+                SubscribeCallbackListenerList[listenerIndex].Presence(PubnubInstance, presence);
             }
         }
     }
