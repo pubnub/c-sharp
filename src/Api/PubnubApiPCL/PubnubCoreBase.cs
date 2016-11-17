@@ -393,7 +393,7 @@ namespace PubnubApi
                                                   where channel.Value == 0
                                                   select channel.Key;
                 status.AffectedChannels.AddRange(newChannels.ToList());
-
+                status.AffectedChannels = status.AffectedChannels.Distinct().ToList();
             }
 
             if (channelGroups != null && channelGroups.Length > 0)
@@ -403,6 +403,7 @@ namespace PubnubApi
                                                        select channelGroup.Key;
 
                 status.AffectedChannelGroups.AddRange(newChannelGroups.ToList());
+                status.AffectedChannelGroups = status.AffectedChannelGroups.Distinct().ToList();
             }
 
             Announce(status);
@@ -478,10 +479,12 @@ namespace PubnubApi
                                             if (!string.IsNullOrEmpty(currentMessageChannel))
                                             {
                                                 status.AffectedChannels.Add(currentMessageChannel);
+                                                status.AffectedChannels = status.AffectedChannels.Distinct().ToList();
                                             }
                                             if (!string.IsNullOrEmpty(currentMessageChannelGroup))
                                             {
                                                 status.AffectedChannelGroups.Add(currentMessageChannelGroup);
+                                                status.AffectedChannelGroups = status.AffectedChannelGroups.Distinct().ToList();
                                             }
 
                                             Announce(status);

@@ -23,7 +23,7 @@ namespace PubnubApi
             status.Category = category;
             status.Operation = type;
 
-            if (asyncRequestState == null || asyncRequestState.Response == null || throwable != null)
+            if ((asyncRequestState != null && asyncRequestState.Response == null) || throwable != null)
             {
                 status.Error = true;
             }
@@ -61,6 +61,20 @@ namespace PubnubApi
                 {
                     status.StatusCode = statusCode;
                 }
+
+                if (asyncRequestState.ChannelGroups != null)
+                {
+                    status.AffectedChannelGroups = asyncRequestState.ChannelGroups.ToList<string>();
+                }
+
+                if (asyncRequestState.Channels != null)
+                {
+                    status.AffectedChannels = asyncRequestState.Channels.ToList<string>();
+                }
+            }
+            else
+            {
+                status.StatusCode = statusCode;
             }
             status.Origin = config.Origin;
             status.TlsEnabled = config.Secure;

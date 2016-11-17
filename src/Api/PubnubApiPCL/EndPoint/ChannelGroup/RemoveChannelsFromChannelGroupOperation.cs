@@ -75,7 +75,7 @@ namespace PubnubApi.EndPoint
             RequestState<PNChannelGroupsRemoveChannelResult> requestState = new RequestState<PNChannelGroupsRemoveChannelResult>();
             requestState.ResponseType = PNOperationType.PNRemoveChannelsFromGroupOperation;
             requestState.Channels = new string[] { };
-            requestState.ChannelGroups = new string[] { string.Format("{0}:{1}", nameSpace, groupName) };
+            requestState.ChannelGroups = new string[] { groupName };
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
 

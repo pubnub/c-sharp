@@ -145,19 +145,19 @@ namespace PubnubApi
             */
         }
 
-        private string ReadStreamFromResponse(HttpWebResponse response)
-        {
-            System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Got PubnubWebResponse", DateTime.Now.ToString()));
-            using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
-            {
-                //Need to return this response 
-                string jsonString = streamReader.ReadToEnd();
-                System.Diagnostics.Debug.WriteLine(jsonString);
-                System.Diagnostics.Debug.WriteLine("");
-                System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON", DateTime.Now.ToString()));
-                return jsonString;
-            }
-        }
+        //private string ReadStreamFromResponse(HttpWebResponse response)
+        //{
+        //    System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Got PubnubWebResponse", DateTime.Now.ToString()));
+        //    using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
+        //    {
+        //        //Need to return this response 
+        //        string jsonString = streamReader.ReadToEnd();
+        //        System.Diagnostics.Debug.WriteLine(jsonString);
+        //        System.Diagnostics.Debug.WriteLine("");
+        //        System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON", DateTime.Now.ToString()));
+        //        return jsonString;
+        //    }
+        //}
 
         protected void OnPubnubWebRequestTimeout<T>(object state, bool timeout)
         {

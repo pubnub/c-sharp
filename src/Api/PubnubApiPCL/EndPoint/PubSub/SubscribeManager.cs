@@ -224,7 +224,10 @@ namespace PubnubApi.EndPoint
                     if (unsubscribeStatus)
                     {
                         PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNDisconnectedCategory, null, (int)HttpStatusCode.OK, null);
-                        status.AffectedChannels.Add(channelToBeRemoved);
+                        if (!status.AffectedChannels.Contains(channelToBeRemoved))
+                        {
+                            status.AffectedChannels.Add(channelToBeRemoved);
+                        }
                         Announce(status);
 
                         base.DeleteLocalChannelUserState(channelToBeRemoved);
@@ -232,7 +235,10 @@ namespace PubnubApi.EndPoint
                     else
                     {
                         PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNDisconnectedCategory, null, (int)HttpStatusCode.NotFound, new Exception("Unsubscribe Error. Please retry the channel unsubscribe operation"));
-                        status.AffectedChannels.Add(channelToBeRemoved);
+                        if (!status.AffectedChannels.Contains(channelToBeRemoved))
+                        {
+                            status.AffectedChannels.Add(channelToBeRemoved);
+                        }
                         Announce(status);
                     }
                 }
@@ -244,7 +250,10 @@ namespace PubnubApi.EndPoint
                     if (unsubscribeStatus)
                     {
                         PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNDisconnectedCategory, null, (int)HttpStatusCode.OK, null);
-                        status.AffectedChannels.Add(channelGroupToBeRemoved);
+                        if (!status.AffectedChannelGroups.Contains(channelGroupToBeRemoved))
+                        {
+                            status.AffectedChannelGroups.Add(channelGroupToBeRemoved);
+                        }
                         Announce(status);
 
                         base.DeleteLocalChannelGroupUserState(channelGroupToBeRemoved);
@@ -252,7 +261,10 @@ namespace PubnubApi.EndPoint
                     else
                     {
                         PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNDisconnectedCategory, null, (int)HttpStatusCode.NotFound, new Exception("Unsubscribe Error. Please retry the channelgroup unsubscribe operation"));
-                        status.AffectedChannels.Add(channelGroupToBeRemoved);
+                        if (!status.AffectedChannelGroups.Contains(channelGroupToBeRemoved))
+                        {
+                            status.AffectedChannelGroups.Add(channelGroupToBeRemoved);
+                        }
                         Announce(status);
                     }
                 }
@@ -262,16 +274,19 @@ namespace PubnubApi.EndPoint
                 string[] channelGroups = MultiChannelGroupSubscribe.Keys.ToArray<string>();
 
                 //Check any chained subscribes while unsubscribe 
-                foreach (string key in MultiChannelSubscribe.Keys)
+                for(int keyIndex=0; keyIndex < MultiChannelSubscribe.Count; keyIndex++)
                 {
-                    if (originalMultiChannelSubscribe != null && !originalMultiChannelSubscribe.ContainsKey(key))
+                    KeyValuePair<string, long> kvp = MultiChannelSubscribe.ElementAt(keyIndex);
+                    if (originalMultiChannelSubscribe != null && !originalMultiChannelSubscribe.ContainsKey(kvp.Key))
                     {
                         return;
                     }
                 }
-                foreach (string key in MultiChannelGroupSubscribe.Keys)
+
+                for (int keyIndex = 0; keyIndex < MultiChannelGroupSubscribe.Count; keyIndex++)
                 {
-                    if (originalMultiChannelGroupSubscribe != null && !originalMultiChannelGroupSubscribe.ContainsKey(key))
+                    KeyValuePair<string, long> kvp = MultiChannelGroupSubscribe.ElementAt(keyIndex);
+                    if (originalMultiChannelGroupSubscribe != null && !originalMultiChannelGroupSubscribe.ContainsKey(kvp.Key))
                     {
                         return;
                     }
