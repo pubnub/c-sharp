@@ -12,24 +12,12 @@ namespace PubNubMessaging.Tests
     {
         private static ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
         private static ManualResetEvent publishManualEvent = new ManualResetEvent(false);
-        //ManualResetEvent mreUnsubscribe = new ManualResetEvent(false);
-        //ManualResetEvent mreAlreadySubscribed = new ManualResetEvent(false);
-        //ManualResetEvent mreChannel1SubscribeConnect = new ManualResetEvent(false);
-        //ManualResetEvent mreChannel2SubscribeConnect = new ManualResetEvent(false);
-        //ManualResetEvent mreSubscriberManyMessages = new ManualResetEvent(false);
         private static ManualResetEvent grantManualEvent = new ManualResetEvent(false);
-        //ManualResetEvent mreSubscribe = new ManualResetEvent(false);
 
         private static bool receivedMessage = false;
         private static object publishedMessage = null;
         private static long publishTimetoken = 0;
-        //bool receivedConnectMessage = false;
-        //bool receivedAlreadySubscribedMessage = false;
-        //bool receivedChannel1ConnectMessage = false;
-        //bool receivedChannel2ConnectMessage = false;
-        //bool receivedManyMessages = false;
         private static bool receivedGrantMessage = false;
-        //private static bool receivedPublishMessage = false;
 
         private static int numberOfReceivedMessages = 0;
 
@@ -94,7 +82,6 @@ namespace PubNubMessaging.Tests
 
         }
 
-
         [Test]
         public void ThenComplexMessageSubscribeShouldReturnReceivedMessage()
         {
@@ -114,6 +101,7 @@ namespace PubNubMessaging.Tests
                 SecretKey = secretKey,
                 CiperKey = cipherKey,
                 Uuid = "mytestuuid",
+                AuthKey = authKey,
                 Secure = ssl
             };
 
@@ -139,9 +127,7 @@ namespace PubNubMessaging.Tests
 
             if (receivedMessage)
             {
-
                 Thread.Sleep(1000);
-
                 pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
                 Thread.Sleep(2000);
             }
