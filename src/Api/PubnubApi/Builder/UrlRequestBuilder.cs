@@ -839,7 +839,7 @@ namespace PubnubApi
 
         private void ForceCanonicalPathAndQuery(Uri requestUri)
         {
-#if !NETSTANDARD10 && !NETSTANDARD11 && !NETSTANDARD12 && !WP81
+#if !NETSTANDARD10 && !NETSTANDARD11 && !NETSTANDARD12 && !WP81 && !PORTABLE111
             LoggingMethod.WriteToLog("Inside ForceCanonicalPathAndQuery = " + requestUri.ToString(), PNLogVerbosity.BODY);
             try
             {
