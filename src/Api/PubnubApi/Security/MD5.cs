@@ -1,19 +1,20 @@
 using System;
 using System.IO;
-#if NETFX_CORE
-using Windows.Security.Cryptography;
-using Windows.Security.Cryptography.Core;
-using Windows.Storage.Streams;
-#else
-using System.Security.Cryptography;
-#endif
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Globalization;
+//using System.Text.RegularExpressions;
+//using System.Globalization;
+//using Org.BouncyCastle.Crypto;
+//using Org.BouncyCastle.Crypto.Parameters;
+//using Org.BouncyCastle.Security;
 
 namespace PubnubApi
 {
 	#region "Crypto"
+
+	/// <summary>
+	/// MD5 Service provider
+	/// </summary>
+
 	/// <summary>
 	/// MD5 messaging-digest algorithm is a widely used cryptographic hash function that produces 128-bit hash value.
 	/// </summary>
@@ -71,7 +72,7 @@ namespace PubnubApi
 		private const byte S42 = 10;
 		private const byte S43 = 15;
 		private const byte S44 = 21;
-		static private byte[] PADDING = new byte[] {
+		static private byte[] padding = new byte[] {
 			0x80, 0, 0, 0, 0, 0, 
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 
@@ -84,19 +85,19 @@ namespace PubnubApi
 		#region F, G, H and I are basic MD5 functions.
 		static private uint F(uint x, uint y, uint z)
 		{
-			return (((x) & (y)) | ((~x) & (z)));
+			return (x & y) | (~x & z);
 		}
 		static private uint G(uint x, uint y, uint z)
 		{
-			return (((x) & (z)) | ((y) & (~z)));
+			return (x & z) | (y & ~z);
 		}
 		static private uint H(uint x, uint y, uint z)
 		{
-			return ((x) ^ (y) ^ (z));
+			return x ^ y ^ z;
 		}
 		static private uint I(uint x, uint y, uint z)
 		{
-			return ((y) ^ ((x) | (~z)));
+			return y ^ (x | ~z);
 		}
 		#endregion
 
@@ -109,7 +110,7 @@ namespace PubnubApi
 		/// <returns></returns>
 		static private uint ROTATE_LEFT(uint x, byte n)
 		{
-			return (((x) << (n)) | ((x) >> (32 - (n))));
+			return (x << n) | (x >> (32 - n));
 		}
 		#endregion
 
@@ -119,27 +120,27 @@ namespace PubnubApi
 		/// Rotation is separate from addition to prevent re-computation.
 		static private void FF(ref uint a, uint b, uint c, uint d, uint x, byte s, uint ac)
 		{
-			(a) += F((b), (c), (d)) + (x) + (uint)(ac);
-			(a) = ROTATE_LEFT((a), (s));
-			(a) += (b);
+			a += F(b, c, d) + x + (uint)ac;
+			a = ROTATE_LEFT(a, s);
+			a += b;
 		}
 		static private void GG(ref uint a, uint b, uint c, uint d, uint x, byte s, uint ac)
 		{
-			(a) += G((b), (c), (d)) + (x) + (uint)(ac);
-			(a) = ROTATE_LEFT((a), (s));
-			(a) += (b);
+			a += G(b, c, d) + x + (uint)ac;
+			a = ROTATE_LEFT(a, s);
+			a += b;
 		}
 		static private void HH(ref uint a, uint b, uint c, uint d, uint x, byte s, uint ac)
 		{
-			(a) += H((b), (c), (d)) + (x) + (uint)(ac);
-			(a) = ROTATE_LEFT((a), (s));
-			(a) += (b);
+			a += H(b, c, d) + x + (uint)ac;
+			a = ROTATE_LEFT(a, s);
+			a += b;
 		}
 		static private void II(ref uint a, uint b, uint c, uint d, uint x, byte s, uint ac)
 		{
-			(a) += I((b), (c), (d)) + (x) + (uint)(ac);
-			(a) = ROTATE_LEFT((a), (s));
-			(a) += (b);
+			a += I(b, c, d) + x + (uint)ac;
+			a = ROTATE_LEFT(a, s);
+			a += b;
 		}
 		#endregion
 
@@ -147,17 +148,17 @@ namespace PubnubApi
 		/// <summary>
 		/// state (ABCD)
 		/// </summary>
-		uint[] state = new uint[4];
+		private uint[] state = new uint[4];
 
 		/// <summary>
 		/// number of bits, modulo 2^64 (LSB first)
 		/// </summary>
-		uint[] count = new uint[2];
+		private uint[] count = new uint[2];
 
 		/// <summary>
 		/// input buffer
 		/// </summary>
-		byte[] buffer = new byte[64];
+		private byte[] buffer = new byte[64];
 		#endregion
 
 		internal MD5()
@@ -203,7 +204,7 @@ namespace PubnubApi
 			// Update number of bits
 			if ((this.count[0] += (uint)((uint)count << 3)) < ((uint)count << 3))
 				this.count[1]++;
-			this.count[1] += ((uint)count >> 29);
+			this.count[1] += (uint)count >> 29;
 
 			partLen = 64 - index;
 
@@ -243,7 +244,7 @@ namespace PubnubApi
 			// Pad out to 56 mod 64.
 			index = (int)((uint)(this.count[0] >> 3) & 0x3f);
 			padLen = (index < 56) ? (56 - index) : (120 - index);
-			HashCore(PADDING, 0, padLen);
+			HashCore(padding, 0, padLen);
 
 			// Append length (before padding)
 			HashCore(bits, 0, 8);
@@ -400,9 +401,9 @@ namespace PubnubApi
 
 		#region expose the same interface as the regular MD5 object
 
-		protected byte[] HashValue;
-		protected int State;
-		public virtual bool CanReuseTransform
+		protected byte[] HashValue { get; set; }
+        protected int State { get; set; }
+        public virtual bool CanReuseTransform
 		{
 			get
 			{
@@ -433,7 +434,7 @@ namespace PubnubApi
 				return HashSizeValue;
 			}
 		}
-		protected int HashSizeValue = 128;
+		protected int HashSizeValue { get; set; } = 128;
 
 		public virtual int InputBlockSize
 		{
@@ -562,6 +563,6 @@ namespace PubnubApi
 			Dispose(true);
 		}
 	}
-
 	#endregion
 }
+

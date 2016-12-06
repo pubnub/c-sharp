@@ -472,7 +472,7 @@ namespace PubnubApiDemo
             config.SubscribeKey = subscribeKey;
             config.PublishKey = publishKey;
             config.SecretKey = secretKey;
-            config.ErrorLevel = PubnubErrorFilter.Level.Info;
+            //config.ErrorLevel = PubnubErrorFilter.Level.Info;
 
             pubnub = new Pubnub(config);
             pubnub.AddListener(new DemoSubscribeCallback());

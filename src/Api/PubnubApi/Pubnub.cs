@@ -1,612 +1,286 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading;
+using PubnubApi;
 
 namespace PubnubApi
 {
 	public class Pubnub
 	{
-        PubnubWin pubnub;
-        
+        private PNConfiguration pubnubConfig = null;
+        private IJsonPluggableLibrary jsonPluggableLibrary = null;
+        private IPubnubUnitTest pubnubUnitTest = null;
+
         #region "PubNub API Channel Methods"
 
-        public void Subscribe<T>(string channel, Action<Message<T>> subscribeCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PubnubClientError> errorCallback)
+        public EndPoint.SubscribeOperation<T> Subscribe<T>()
 		{
-            if (string.IsNullOrEmpty(channel) || channel.Trim().Length <= 0)
-            {
-                throw new ArgumentException("Channel should be provided.");
-            }
-            pubnub.Subscribe<T>(channel, "", subscribeCallback, connectCallback, disconnectCallback, null, errorCallback);
-		}
-
-        public void Subscribe<T>(string channel, Action<Message<T>> subscribeCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PresenceAck> wildcardPresenceCallback, Action<PubnubClientError> errorCallback)
-        {
-            if (string.IsNullOrEmpty(channel) || channel.Trim().Length <= 0)
-            {
-                throw new ArgumentException("Channel should be provided.");
-            }
-            pubnub.Subscribe<T>(channel, "", subscribeCallback, connectCallback, disconnectCallback, wildcardPresenceCallback, errorCallback);
+            return new EndPoint.SubscribeOperation<T>(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
-        public void Subscribe<T>(string channel, string channelGroup, Action<Message<T>> subscribeCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PubnubClientError> errorCallback)
+        public EndPoint.UnsubscribeOperation<T> Unsubscribe<T>()
         {
-            pubnub.Subscribe<T>(channel, channelGroup, subscribeCallback, connectCallback, disconnectCallback, null, errorCallback);
+            return new EndPoint.UnsubscribeOperation<T>(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
-        public void Subscribe<T>(string channel, string channelGroup, Action<Message<T>> subscribeCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PresenceAck> wildcardPresenceCallback, Action<PubnubClientError> errorCallback)
+        public EndPoint.UnsubscribeAllOperation<T> UnsubscribeAll<T>()
         {
-            pubnub.Subscribe<T>(channel, channelGroup, subscribeCallback, connectCallback, disconnectCallback, wildcardPresenceCallback, errorCallback);
+            return new EndPoint.UnsubscribeAllOperation<T>(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
-		public bool Publish(string channel, object message, Action<PublishAck> userCallback, Action<PubnubClientError> errorCallback)
+        public EndPoint.PublishOperation Publish()
+        {
+            return new EndPoint.PublishOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
+
+        public EndPoint.FireOperation Fire()
+        {
+            return new EndPoint.FireOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
+
+        public EndPoint.HistoryOperation History()
 		{
-			return pubnub.Publish(channel, message, true, "", userCallback, errorCallback);
-		}
-
-        public bool Publish(string channel, object message, bool storeInHistory, string jsonUserMetaData, Action<PublishAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            return pubnub.Publish(channel, message, storeInHistory, jsonUserMetaData, userCallback, errorCallback);
+            return new EndPoint.HistoryOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
-        public void Presence(string channel, Action<PresenceAck> presenceCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PubnubClientError> errorCallback)
+		public EndPoint.HereNowOperation HereNow()
 		{
-            if (string.IsNullOrEmpty(channel) || channel.Trim().Length <= 0)
-            {
-                throw new ArgumentException("Channel should be provided.");
-            }
-
-			pubnub.Presence(channel, "", presenceCallback, connectCallback, disconnectCallback, errorCallback);
-		}
-
-        public void Presence(string channel, string channelGroup, Action<PresenceAck> presenceCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.Presence(channel, channelGroup, presenceCallback, connectCallback, disconnectCallback, errorCallback);
+            return new EndPoint.HereNowOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
-        public bool DetailedHistory(string channel, long start, long end, int count, bool reverse, bool includeToken, Action<DetailedHistoryAck> userCallback, Action<PubnubClientError> errorCallback)
+		public EndPoint.WhereNowOperation WhereNow()
 		{
-			return pubnub.DetailedHistory(channel, start, end, count, reverse, includeToken, userCallback, errorCallback);
-		}
+            return new EndPoint.WhereNowOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
 
-        public bool DetailedHistory(string channel, long start, bool includeToken, Action<DetailedHistoryAck> userCallback, Action<PubnubClientError> errorCallback, bool reverse)
+		public EndPoint.TimeOperation Time()
 		{
-			return pubnub.DetailedHistory(channel, start, -1, -1, reverse, includeToken, userCallback, errorCallback);
-		}
+            return new EndPoint.TimeOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
 
-        public bool DetailedHistory(string channel, int count, bool includeToken, Action<DetailedHistoryAck> userCallback, Action<PubnubClientError> errorCallback)
+		public EndPoint.AuditOperation Audit()
 		{
-			return pubnub.DetailedHistory(channel, -1, -1, count, false, includeToken, userCallback, errorCallback);
-		}
+            return new EndPoint.AuditOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
 
-		public bool HereNow(string[] channels, Action<HereNowAck> userCallback, Action<PubnubClientError> errorCallback)
+		public EndPoint.GrantOperation Grant()
 		{
-			return pubnub.HereNow(channels, null, true, false, userCallback, errorCallback);
-		}
-        public bool HereNow(string[] channels, string[] channelGroups, Action<HereNowAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            return pubnub.HereNow(channels, channelGroups, true, false, userCallback, errorCallback);
+            return new EndPoint.GrantOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
-        public bool HereNow(string[] channels, bool showUUIDList, bool includeUserState, Action<HereNowAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            return pubnub.HereNow(channels, null, showUUIDList, includeUserState, userCallback, errorCallback);
-        }
-        public bool HereNow(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, Action<HereNowAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            return pubnub.HereNow(channels, channelGroups, showUUIDList, includeUserState, userCallback, errorCallback);
-        }
-
-        public bool GlobalHereNow(bool showUUIDList, bool includeUserState, Action<GlobalHereNowAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            return pubnub.GlobalHereNow(showUUIDList, includeUserState, userCallback, errorCallback);
-        }
-
-        public void WhereNow(string uuid, Action<WhereNowAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.WhereNow(uuid, userCallback, errorCallback);
-        }
-
-        public void Unsubscribe<T>(string channel, string channelGroup, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.Unsubscribe<T>(channel, channelGroup, errorCallback);
-        }
-
-        public void Unsubscribe<T>(string channel, Action<PubnubClientError> errorCallback)
+		public EndPoint.SetStateOperation SetPresenceState()
 		{
-            if (string.IsNullOrEmpty(channel) || channel.Trim().Length <= 0)
-            {
-                throw new ArgumentException("Channel should be provided.");
-            }
-            pubnub.Unsubscribe<T>(channel, null, errorCallback);
-		}
-
-        public void PresenceUnsubscribe(string channel, string channelGroup, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.PresenceUnsubscribe(channel, channelGroup, disconnectCallback, errorCallback);
+            return new EndPoint.SetStateOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
-        public void PresenceUnsubscribe(string channel, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PubnubClientError> errorCallback)
+		public EndPoint.GetStateOperation GetPresenceState()
 		{
-            pubnub.PresenceUnsubscribe(channel, "", disconnectCallback, errorCallback);
-		}
+            return new EndPoint.GetStateOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
 
-		public bool Time(Action<long> userCallback, Action<PubnubClientError> errorCallback)
+		public EndPoint.AddPushChannelOperation AddPushNotificationsOnChannels()
 		{
-			return pubnub.Time(userCallback, errorCallback);
-		}
-
-        public void AuditAccess(string channel, string authenticationKey, Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.AuditAccess<AuditAck>(channel, authenticationKey, userCallback, errorCallback);
+            return new EndPoint.AddPushChannelOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
-        public void AuditAccess(string channel, Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
+		public EndPoint.RemovePushChannelOperation RemovePushNotificationsFromChannels()
 		{
-            pubnub.AuditAccess<AuditAck>(channel, userCallback, errorCallback);
-		}
+            return new EndPoint.RemovePushChannelOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+        }
 
-        public void AuditAccess(Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
+		public EndPoint.AuditPushChannelOperation AuditPushChannelProvisions()
 		{
-            pubnub.AuditAccess<AuditAck>(userCallback, errorCallback);
-		}
-
-        public void AuditPresenceAccess(string channel, Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.AuditPresenceAccess<AuditAck>(channel, userCallback, errorCallback);
+            return new EndPoint.AuditPushChannelOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
-        public void AuditPresenceAccess(string channel, string authenticationKey, Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.AuditPresenceAccess<AuditAck>(channel, authenticationKey, userCallback, errorCallback);
-        }
-
-        public bool GrantAccess(string channel, bool read, bool write, int ttl, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            return pubnub.GrantAccess<GrantAck>(channel, read, write, ttl, userCallback, errorCallback);
-		}
-
-		public bool GrantAccess(string channel, bool read, bool write, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-			return pubnub.GrantAccess<GrantAck>(channel, read, write, userCallback, errorCallback);
-		}
-
-        public bool GrantAccess(string channel, string authenticationKey, bool read, bool write, int ttl, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            return pubnub.GrantAccess<GrantAck>(channel, authenticationKey, read, write, ttl, userCallback, errorCallback);
-        }
-
-        public bool GrantAccess(string channel, string authenticationKey, bool read, bool write, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            return pubnub.GrantAccess<GrantAck>(channel, authenticationKey, read, write, userCallback, errorCallback);
-        }
-
-
-        public bool GrantPresenceAccess(string channel, bool read, bool write, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            return pubnub.GrantPresenceAccess<GrantAck>(channel, read, write, userCallback, errorCallback);
-		}
-
-        public bool GrantPresenceAccess(string channel, bool read, bool write, int ttl, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-		{
-            return pubnub.GrantPresenceAccess<GrantAck>(channel, read, write, ttl, userCallback, errorCallback);
-		}
-
-        public bool GrantPresenceAccess(string channel, string authenticationKey, bool read, bool write, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            return pubnub.GrantPresenceAccess<GrantAck>(channel, authenticationKey, read, write, userCallback, errorCallback);
-        }
-
-        public bool GrantPresenceAccess(string channel, string authenticationKey, bool read, bool write, int ttl, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            return pubnub.GrantPresenceAccess<GrantAck>(channel, authenticationKey, read, write, ttl, userCallback, errorCallback);
-        }
-
-        public void ChannelGroupAuditAccess(string channelGroup, string authenticationKey, Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.ChannelGroupAuditAccess<AuditAck>(channelGroup, authenticationKey, userCallback, errorCallback);
-        }
-
-        public void ChannelGroupAuditAccess(string channelGroup, Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.ChannelGroupAuditAccess<AuditAck>(channelGroup, userCallback, errorCallback);
-        }
-
-        public void ChannelGroupAuditAccess(Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.ChannelGroupAuditAccess<AuditAck>(userCallback, errorCallback);
-        }
-
-        public void ChannelGroupAuditPresenceAccess(string channelGroup, Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.ChannelGroupAuditPresenceAccess<AuditAck>(channelGroup, userCallback, errorCallback);
-        }
-
-        public void ChannelGroupAuditPresenceAccess(string channelGroup, string authenticationKey, Action<AuditAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.ChannelGroupAuditPresenceAccess<AuditAck>(channelGroup, authenticationKey, userCallback, errorCallback);
-        }
-
-        public bool ChannelGroupGrantAccess(string channelGroup, bool read, bool manage, int ttl, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            return pubnub.ChannelGroupGrantAccess<GrantAck>(channelGroup, read, false, manage, ttl, userCallback, errorCallback);
-        }
-
-        public bool ChannelGroupGrantAccess(string channelGroup, bool read, bool manage, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            return pubnub.ChannelGroupGrantAccess<GrantAck>(channelGroup, read, false, manage, userCallback, errorCallback);
-        }
-
-        public bool ChannelGroupGrantAccess(string channelGroup, string authenticationKey, bool read, bool manage, int ttl, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            return pubnub.ChannelGroupGrantAccess<GrantAck>(channelGroup, authenticationKey, read, false, manage, ttl, userCallback, errorCallback);
-        }
-
-        public bool ChannelGroupGrantAccess(string channelGroup, string authenticationKey, bool read, bool manage, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            return pubnub.ChannelGroupGrantAccess<GrantAck>(channelGroup, authenticationKey, read, false, manage, userCallback, errorCallback);
-        }
-
-
-        public bool ChannelGroupGrantPresenceAccess(string channelGroup, bool read, bool manage, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            return pubnub.ChannelGroupGrantPresenceAccess<GrantAck>(channelGroup, read, false, manage, userCallback, errorCallback);
-        }
-
-        public bool ChannelGroupGrantPresenceAccess(string channelGroup, bool read, bool manage, int ttl, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            return pubnub.ChannelGroupGrantPresenceAccess<GrantAck>(channelGroup, read, false, manage, ttl, userCallback, errorCallback);
-        }
-
-        public bool ChannelGroupGrantPresenceAccess(string channelGroup, string authenticationKey, bool read, bool manage, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            return pubnub.ChannelGroupGrantPresenceAccess<GrantAck>(channelGroup, authenticationKey, read, false, manage, userCallback, errorCallback);
-        }
-
-        public bool ChannelGroupGrantPresenceAccess(string channelGroup, string authenticationKey, bool read, bool manage, int ttl, Action<GrantAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            return pubnub.ChannelGroupGrantPresenceAccess<GrantAck>(channelGroup, authenticationKey, read, false, manage, ttl, userCallback, errorCallback);
-        }
-
-
-        public void SetUserState(string channel, string channelGroup, string uuid, string jsonUserState, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.SetUserState(channel, channelGroup, uuid, jsonUserState, userCallback, errorCallback);
-        }
-
-        public void SetUserState(string channel, string channelGroup, string jsonUserState, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.SetUserState(channel, channelGroup, "", jsonUserState, userCallback, errorCallback);
-        }
-
-        public void SetUserState(string channel, string jsonUserState, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.SetUserState(channel,"", jsonUserState, userCallback, errorCallback);
-        }
-
-        public void SetUserState(string channel, string channelGroup, string uuid, System.Collections.Generic.KeyValuePair<string, object> keyValuePair, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.SetUserState(channel, channelGroup, uuid, keyValuePair, userCallback, errorCallback);
-        }
-
-        public void SetUserState(string channel, string channelGroup, System.Collections.Generic.KeyValuePair<string, object> keyValuePair, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.SetUserState(channel, channelGroup, "", keyValuePair, userCallback, errorCallback);
-        }
-
-        public void SetUserState(string channel, System.Collections.Generic.KeyValuePair<string, object> keyValuePair, Action<SetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.SetUserState(channel, "", keyValuePair, userCallback, errorCallback);
-        }
-
-        public void GetUserState(string channel, string channelGroup, Action<GetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.GetUserState(channel, channelGroup, "", userCallback, errorCallback);
-        }
-
-        public void GetUserState(string channel, Action<GetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.GetUserState(channel, "", userCallback, errorCallback);
-        }
-
-        public void GetUserState(string channel, string channelGroup, string uuid, Action<GetUserStateAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.GetUserState(channel, channelGroup, uuid, userCallback, errorCallback);
-        }
-
-        public void RegisterDeviceForPush<T>(string channel, PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.RegisterDeviceForPush<T>(channel, pushType, pushToken, userCallback, errorCallback);
-        }
-        
-        public void UnregisterDeviceForPush<T>(PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.UnregisterDeviceForPush<T>(pushType, pushToken, userCallback, errorCallback);
-        }
-        
-        public void RemoveChannelForDevicePush<T>(string channel, PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.RemoveChannelForDevicePush<T>(channel, pushType, pushToken, userCallback, errorCallback);
-        }
-        public void RemoveChannelForDevicePush(string channel, PushTypeService pushType, string pushToken, Action<object> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.RemoveChannelForDevicePush<object>(channel, pushType, pushToken, userCallback, errorCallback);
-        }
-
-        public void GetChannelsForDevicePush<T>(PushTypeService pushType, string pushToken, Action<T> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.GetChannelsForDevicePush<T>(pushType, pushToken, userCallback, errorCallback);
-        }
         #endregion
 
         #region "PubNub API Channel Group Methods"
-        public void AddChannelsToChannelGroup(string[] channels, string groupName, Action<AddChannelToChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.AddChannelsToChannelGroup(channels, groupName, userCallback, errorCallback);
+
+        public EndPoint.AddChannelsToChannelGroupOperation AddChannelsToChannelGroup()
+		{
+            return new EndPoint.AddChannelsToChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
-        public void AddChannelsToChannelGroup(string[] channels, string nameSpace, string groupName, Action<AddChannelToChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.AddChannelsToChannelGroup(channels, nameSpace, groupName, userCallback, errorCallback);
+		public EndPoint.RemoveChannelsFromChannelGroupOperation RemoveChannelsFromChannelGroup()
+		{
+            return new EndPoint.RemoveChannelsFromChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
-        public void RemoveChannelsFromChannelGroup(string[] channels, string nameSpace, string groupName, Action<RemoveChannelFromChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.RemoveChannelsFromChannelGroup(channels, nameSpace, groupName, userCallback, errorCallback);
+		public EndPoint.DeleteChannelGroupOperation DeleteChannelGroup()
+		{
+            return new EndPoint.DeleteChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
-        public void RemoveChannelsFromChannelGroup(string[] channels, string groupName, Action<RemoveChannelFromChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.RemoveChannelsFromChannelGroup(channels, groupName, userCallback, errorCallback);
+		public EndPoint.ListChannelsForChannelGroupOperation ListChannelsForChannelGroup()
+		{
+            return new EndPoint.ListChannelsForChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
-        public void RemoveChannelGroup(string nameSpace, string groupName, Action<RemoveChannelGroupAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.RemoveChannelGroup(nameSpace, groupName, userCallback, errorCallback);
+        public EndPoint.ListAllChannelGroupOperation ListChannelGroups()
+		{
+            return new EndPoint.ListAllChannelGroupOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
         }
 
-        public void RemoveChannelGroupNameSpace(string nameSpace, Action<RemoveNamespaceAck> userCallback, Action<PubnubClientError> errorCallback)
+        public void AddListener(SubscribeCallback listener)
         {
-            pubnub.RemoveChannelGroupNameSpace(nameSpace, userCallback, errorCallback);
+            EndPoint.ListenerManager listenerManager = new EndPoint.ListenerManager(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            listenerManager.CurrentPubnubInstance(this);
+            listenerManager.AddListener(listener);
         }
 
-        public void GetChannelsForChannelGroup(string nameSpace, string groupName, Action<GetChannelGroupChannelsAck> userCallback, Action<PubnubClientError> errorCallback)
+        public void RemoveListener(SubscribeCallback listener)
         {
-            pubnub.GetChannelsForChannelGroup(nameSpace, groupName, userCallback, errorCallback);
+            EndPoint.ListenerManager listenerManager = new EndPoint.ListenerManager(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            listenerManager.CurrentPubnubInstance(this);
+            listenerManager.RemoveListener(listener);
         }
-
-        public void GetChannelsForChannelGroup(string groupName, Action<GetChannelGroupChannelsAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.GetChannelsForChannelGroup(groupName, userCallback, errorCallback);
-        }
-
-        public void GetAllChannelGroups(string nameSpace, Action<GetAllChannelGroupsAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.GetAllChannelGroups(nameSpace, userCallback, errorCallback);
-        }
-
-        public void GetAllChannelGroups(Action<GetAllChannelGroupsAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.GetAllChannelGroups(userCallback, errorCallback);
-        }
-        
-        public void GetAllChannelGroupNamespaces(Action<GetAllNamespacesAck> userCallback, Action<PubnubClientError> errorCallback)
-        {
-            pubnub.GetAllChannelGroupNamespaces(userCallback, errorCallback);
-        }
-
         #endregion
 
         #region "PubNub API Other Methods"
         public void TerminateCurrentSubscriberRequest()
 		{
-			pubnub.TerminateCurrentSubscriberRequest();
-		}
-
-		public void EnableSimulateNetworkFailForTestingOnly()
-		{
-			pubnub.EnableSimulateNetworkFailForTestingOnly();
-		}
-
-		public void DisableSimulateNetworkFailForTestingOnly()
-		{
-			pubnub.DisableSimulateNetworkFailForTestingOnly();
+            EndPoint.OtherOperation endpoint = new EndPoint.OtherOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endpoint.TerminateCurrentSubscriberRequest();
 		}
 
 		public void EnableMachineSleepModeForTestingOnly()
 		{
-			pubnub.EnableMachineSleepModeForTestingOnly();
+            EndPoint.OtherOperation.EnableMachineSleepModeForTestingOnly();
 		}
 
 		public void DisableMachineSleepModeForTestingOnly()
 		{
-			pubnub.DisableMachineSleepModeForTestingOnly();
+            EndPoint.OtherOperation.DisableMachineSleepModeForTestingOnly();
 		}
 
-		public void EndPendingRequests()
+        public Guid GenerateGuid()
 		{
-			pubnub.EndPendingRequests();
+			return Guid.NewGuid();
 		}
 
-		public Guid GenerateGuid()
+		public void ChangeUUID(string newUUID)
 		{
-			return pubnub.GenerateGuid();
+            EndPoint.OtherOperation endPoint = new EndPoint.OtherOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endPoint.ChangeUUID(newUUID);
 		}
 
-        public void ChangeUUID(string newUUID)
+		public static long TranslateDateTimeToPubnubUnixNanoSeconds(DateTime dotNetUTCDateTime)
+		{
+			return EndPoint.OtherOperation.TranslateDateTimeToPubnubUnixNanoSeconds(dotNetUTCDateTime);
+		}
+
+		public static DateTime TranslatePubnubUnixNanoSecondsToDateTime(long unixNanoSecondTime)
+		{
+			return EndPoint.OtherOperation.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
+		}
+
+		public static DateTime TranslatePubnubUnixNanoSecondsToDateTime(string unixNanoSecondTime)
+		{
+			return EndPoint.OtherOperation.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
+		}
+
+        public List<string> GetSubscribedChannels()
         {
-            pubnub.ChangeUUID(newUUID);
+            EndPoint.OtherOperation endpoint = new EndPoint.OtherOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            return endpoint.GetSubscribedChannels();
         }
 
-        public static long TranslateDateTimeToPubnubUnixNanoSeconds(DateTime dotNetUTCDateTime)
+        public List<string> GetSubscribedChannelGroups()
         {
-            return PubnubWin.TranslateDateTimeToPubnubUnixNanoSeconds(dotNetUTCDateTime);
+            EndPoint.OtherOperation endpoint = new EndPoint.OtherOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            return endpoint.GetSubscribedChannelGroups();
         }
 
-        public static DateTime TranslatePubnubUnixNanoSecondsToDateTime(long unixNanoSecondTime)
+        public void Destroy()
         {
-            return PubnubWin.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
+            EndPoint.OtherOperation endpoint = new EndPoint.OtherOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            endpoint.EndPendingRequests();
         }
-
-        public static DateTime TranslatePubnubUnixNanoSecondsToDateTime(string unixNanoSecondTime)
-        {
-            return PubnubWin.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
-        }
-
-        //public void SetInternalLogLevel(LoggingMethod.Level logLevel)  
-        //{  
-        //    pubnub.PubnubLogLevel = logLevel;  
+        //public void SetErrorFilterLevel(PubnubErrorFilter.Level errorLevel)
+        //{
+        //    pubnub.PubnubErrorLevel = errorLevel;
         //}  
-  
-        //public void SetErrorFilterLevel(PubnubErrorFilter.Level errorLevel)  
-        //{  
-        //    pubnub.PubnubErrorLevel = errorLevel;  
-        //}  
 
-		#endregion
+        #endregion
 
-		#region "Properties"
-
-        public PNConfiguration Configuration
-        {
-            get { return pubnub.Configuration; }
-        }
-		public int LocalClientHeartbeatInterval {
-			get {return pubnub.LocalClientHeartbeatInterval;}
-			set {pubnub.LocalClientHeartbeatInterval = value;}
-		}
-
-		public int NetworkCheckRetryInterval {
-			get {return pubnub.NetworkCheckRetryInterval;}
-			set {pubnub.NetworkCheckRetryInterval = value;}
-		}
-
-		public int NetworkCheckMaxRetries {
-			get {return pubnub.NetworkCheckMaxRetries;}
-			set {pubnub.NetworkCheckMaxRetries = value;}
-		}
-
-		public bool EnableResumeOnReconnect {
-			get {return pubnub.EnableResumeOnReconnect;}
-			set {pubnub.EnableResumeOnReconnect = value;}
-		}
-
+        #region "Properties"
         public IPubnubUnitTest PubnubUnitTest
-		{
-			get
-			{
-				return pubnub.PubnubUnitTest;
-			}
-			set
-			{
-				pubnub.PubnubUnitTest = value;
-			}
-		}
-
-        public bool EnableJsonEncodingForPublish
         {
             get
             {
-                return pubnub.EnableJsonEncodingForPublish;
+                return pubnubUnitTest;
             }
             set
             {
-                pubnub.EnableJsonEncodingForPublish = value;
+                pubnubUnitTest = value;
             }
         }
 
-        public PubnubProxy Proxy
+        public PNConfiguration PNConfig
         {
             get
             {
-                return pubnub.Proxy;
-            }
-            set
-            {
-                pubnub.Proxy = value;
+                return pubnubConfig;
             }
         }
 
         public IJsonPluggableLibrary JsonPluggableLibrary
+		{
+			get
+			{
+				return jsonPluggableLibrary;
+			}
+		}
+
+        #endregion
+
+        #region "Constructors"
+
+        public Pubnub(PNConfiguration config)
         {
-            get
-            {
-                return pubnub.JsonPluggableLibrary;
-            }
-            set
-            {
-                pubnub.JsonPluggableLibrary = value;
-            }
+            pubnubConfig = config;
+            jsonPluggableLibrary = new NewtonsoftJsonDotNet();
+            CheckRequiredConfigValues();
         }
 
-        //public IPubnubSubscribeMessageType SubscribeMessageType
+        //public Pubnub(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary)
         //{
-        //    get
+        //    pubnubConfig = config;
+        //    this.jsonPluggableLibrary = jsonPluggableLibrary;
+        //    if (jsonPluggableLibrary == null)
         //    {
-        //        return pubnub.SubscribeMessageType;
+        //        this.jsonPluggableLibrary = new NewtonsoftJsonDotNet();
         //    }
-        //    set
-        //    {
-        //        pubnub.SubscribeMessageType = value;
-        //    }
+        //    CheckRequiredConfigValues();
         //}
 
-        public bool EnableDebugForPushPublish
+        private void CheckRequiredConfigValues()
         {
-            get
+            if (pubnubConfig != null)
             {
-                return pubnub.EnableDebugForPushPublish;
-            }
-            set
-            {
-                pubnub.EnableDebugForPushPublish = value;
+                if (string.IsNullOrEmpty(pubnubConfig.SubscribeKey))
+                {
+                    pubnubConfig.SubscribeKey = "";
+                }
+
+                if (string.IsNullOrEmpty(pubnubConfig.PublishKey))
+                {
+                    pubnubConfig.PublishKey = "";
+                }
+
+                if (string.IsNullOrEmpty(pubnubConfig.SecretKey))
+                {
+                    pubnubConfig.SecretKey = "";
+                }
+
+                if (string.IsNullOrEmpty(pubnubConfig.CiperKey))
+                {
+                    pubnubConfig.CiperKey = "";
+                }
             }
         }
-
-        public Collection<Uri> PushRemoteImageDomainUri
-        {
-            get
-            {
-                return pubnub.PushRemoteImageDomainUri;
-            }
-
-            set
-            {
-                pubnub.PushRemoteImageDomainUri = value;
-            }
-        }
-
-        public string PushServiceName
-        {
-            get
-            {
-                return pubnub.PushServiceName;
-            }
-
-            set
-            {
-                pubnub.PushServiceName = value;
-            }
-        }
-
-        public bool AddPayloadToPublishResponse
-        {
-            get
-            {
-                return pubnub.AddPayloadToPublishResponse;
-            }
-            set
-            {
-                pubnub.AddPayloadToPublishResponse = value;
-            }
-        }
-		#endregion
-
-		#region "Constructors"
-
-		public Pubnub(PNConfiguration pnConfiguration)
-		{
-            pubnub = new PubnubWin(pnConfiguration);
-		}
 
 		#endregion
 	}

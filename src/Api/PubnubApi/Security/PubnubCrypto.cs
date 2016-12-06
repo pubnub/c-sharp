@@ -1,6 +1,15 @@
 ﻿using System;
-using System.Security.Cryptography;
 using System.Text;
+
+#if NET35
+using System.Security.Cryptography;
+#else
+using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Crypto.Modes;
+using Org.BouncyCastle.Crypto.Paddings;
+using Org.BouncyCastle.Crypto.Parameters;
+#endif
 
 namespace PubnubApi
 {
@@ -13,117 +22,104 @@ namespace PubnubApi
 
         protected override string ComputeHashRaw(string input)
         {
-#if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || __IOS__ || MONODROID || __ANDROID__ )
-            HashAlgorithm algorithm = new System.Security.Cryptography.SHA256Managed();
-#elif NETFX_CORE
-            HashAlgorithmProvider algorithm = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha256);
-#else
-            HashAlgorithm algorithm = new SHA256CryptoServiceProvider();
-#endif
-
-#if (SILVERLIGHT || WINDOWS_PHONE)
+#if NET35
+            HashAlgorithm algorithm = SHA256.Create();
             Byte[] inputBytes = System.Text.Encoding.UTF8.GetBytes(input);
-#elif NETFX_CORE
-            IBuffer inputBuffer = CryptographicBuffer.ConvertStringToBinary(input, BinaryStringEncoding.Utf8);
-#else
-            Byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
-#endif
-#if NETFX_CORE
-            IBuffer hashedBuffer = algorithm.HashData(inputBuffer);
-            byte[] inputBytes;
-            CryptographicBuffer.CopyToByteArray(hashedBuffer, out inputBytes);
-            return BitConverter.ToString(inputBytes);
-#else
             Byte[] hashedBytes = algorithm.ComputeHash(inputBytes);
             return BitConverter.ToString(hashedBytes);
+#else
+            Sha256Digest algorithm = new Sha256Digest();
+            Byte[] inputBytes = System.Text.Encoding.UTF8.GetBytes(input);
+            Byte[] bufferBytes = new byte[algorithm.GetDigestSize()];
+            algorithm.BlockUpdate(inputBytes, 0, inputBytes.Length);
+            algorithm.DoFinal(bufferBytes, 0);
+            return BitConverter.ToString(bufferBytes);
 #endif
         }
 
         protected override string EncryptOrDecrypt(bool type, string plainStr)
         {
-            byte[] cipherText = null;
+            //Demo params
+            string keyString = GetEncryptionKey();
 
-#if (SILVERLIGHT || WINDOWS_PHONE)
-                AesManaged aesEncryption = new AesManaged();
-                aesEncryption.KeySize = 256;
-                aesEncryption.BlockSize = 128;
-                //get ASCII bytes of the string
-                aesEncryption.IV = System.Text.Encoding.UTF8.GetBytes("0123456789012345");
-                aesEncryption.Key = System.Text.Encoding.UTF8.GetBytes(GetEncryptionKey());
-#elif NETFX_CORE
-            SymmetricKeyAlgorithmProvider algoritmProvider = SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithmNames.AesCbcPkcs7);
-            IBuffer keyMaterial = CryptographicBuffer.ConvertStringToBinary(GetEncryptionKey(), BinaryStringEncoding.Utf8);
-            CryptographicKey key = algoritmProvider.CreateSymmetricKey(keyMaterial);
-            IBuffer iv = CryptographicBuffer.ConvertStringToBinary("0123456789012345", BinaryStringEncoding.Utf8);
+#if NET35
+            Aes aesAlg = Aes.Create();
+            aesAlg.KeySize = 256;
+            aesAlg.BlockSize = 128;
+            aesAlg.Mode = CipherMode.CBC;
+            aesAlg.Padding = PaddingMode.PKCS7;
+            aesAlg.IV = System.Text.Encoding.UTF8.GetBytes("0123456789012345");
+            aesAlg.Key = System.Text.Encoding.UTF8.GetBytes(keyString);
 #else
-            RijndaelManaged aesEncryption = new RijndaelManaged();
-            aesEncryption.KeySize = 256;
-            aesEncryption.BlockSize = 128;
-            //Mode CBC
-            aesEncryption.Mode = CipherMode.CBC;
-            //padding
-            aesEncryption.Padding = PaddingMode.PKCS7;
-            //get ASCII bytes of the string
-            aesEncryption.IV = System.Text.Encoding.ASCII.GetBytes("0123456789012345");
-            aesEncryption.Key = System.Text.Encoding.ASCII.GetBytes(GetEncryptionKey());
+            string input = plainStr;
+            byte[] inputBytes;
+            byte[] iv = System.Text.Encoding.UTF8.GetBytes("0123456789012345");
+            byte[] keyBytes = System.Text.Encoding.UTF8.GetBytes(keyString);
+
+            //Set up
+            AesEngine engine = new AesEngine();
+            CbcBlockCipher blockCipher = new CbcBlockCipher(engine); //CBC
+            PaddedBufferedBlockCipher cipher = new PaddedBufferedBlockCipher(blockCipher); //Default scheme is PKCS5/PKCS7
+            KeyParameter keyParam = new KeyParameter(keyBytes);
+            ParametersWithIV keyParamWithIV = new ParametersWithIV(keyParam, iv, 0, iv.Length);
 #endif
 
 
             if (type)
             {
+                // Encrypt
+#if NET35
+                byte[] cipherText = null;
                 plainStr = EncodeNonAsciiCharacters(plainStr);
-#if (SILVERLIGHT || WINDOWS_PHONE)
-                ICryptoTransform crypto = aesEncryption.CreateEncryptor();
+                ICryptoTransform crypto = aesAlg.CreateEncryptor();
                 byte[] plainText = Encoding.UTF8.GetBytes(plainStr);
-                
-                //encrypt
-                cipherText = crypto.TransformFinalBlock(plainText, 0, plainText.Length);
-#elif NETFX_CORE
-                IBuffer buffMsg = CryptographicBuffer.ConvertStringToBinary(plainStr, BinaryStringEncoding.Utf8);
-                IBuffer buffEncrypt = CryptographicEngine.Encrypt(key, buffMsg, iv);
-                CryptographicBuffer.CopyToByteArray(buffEncrypt, out cipherText);
-#else
-                ICryptoTransform crypto = aesEncryption.CreateEncryptor();
-                byte[] plainText = Encoding.ASCII.GetBytes(plainStr);
 
-                //encrypt
                 cipherText = crypto.TransformFinalBlock(plainText, 0, plainText.Length);
-#endif
 
                 return Convert.ToBase64String(cipherText);
+#else
+                input = EncodeNonAsciiCharacters(input);
+                inputBytes = Encoding.UTF8.GetBytes(input);
+                cipher.Init(true, keyParamWithIV);
+                byte[] outputBytes = new byte[cipher.GetOutputSize(inputBytes.Length)];
+                int length = cipher.ProcessBytes(inputBytes, outputBytes, 0);
+                cipher.DoFinal(outputBytes, length); //Do the final block
+                string encryptedInput = Convert.ToBase64String(outputBytes);
+
+                return encryptedInput;
+#endif
             }
             else
             {
-                string decrypted = "";
                 try
                 {
-                    //decode
+                    //Decrypt
+#if NET35
+                    string decrypted = "";
                     byte[] decryptedBytes = Convert.FromBase64CharArray(plainStr.ToCharArray(), 0, plainStr.Length);
+                    ICryptoTransform decrypto = aesAlg.CreateDecryptor();
 
-
-#if (SILVERLIGHT || WINDOWS_PHONE)
-                    ICryptoTransform decrypto = aesEncryption.CreateDecryptor();
-                    //decrypt
                     var data = decrypto.TransformFinalBlock(decryptedBytes, 0, decryptedBytes.Length);
-                    decrypted = Encoding.UTF8.GetString(data, 0, data.Length);
-#elif NETFX_CORE
-                    IBuffer buffMsg = CryptographicBuffer.DecodeFromBase64String(plainStr);
-                    IBuffer buffDecrypted = CryptographicEngine.Decrypt(key, buffMsg, iv);
-                    CryptographicBuffer.CopyToByteArray(buffDecrypted, out decryptedBytes);
-                    decrypted = Encoding.UTF8.GetString(decryptedBytes, 0, decryptedBytes.Length);
+                    decrypted = System.Text.Encoding.UTF8.GetString(data, 0, data.Length);
+                    return decrypted;
 #else
-                    ICryptoTransform decrypto = aesEncryption.CreateDecryptor();
-                    //decrypt                    
-                    decrypted = System.Text.Encoding.ASCII.GetString(decrypto.TransformFinalBlock(decryptedBytes, 0, decryptedBytes.Length));
+                    inputBytes = Convert.FromBase64CharArray(input.ToCharArray(), 0, input.Length);
+                    cipher.Init(false, keyParamWithIV);
+                    byte[] encryptedBytes = new byte[cipher.GetOutputSize(inputBytes.Length)];
+                    int encryptLength = cipher.ProcessBytes(inputBytes, encryptedBytes, 0);
+                    int numOfOutputBytes = cipher.DoFinal(encryptedBytes, encryptLength); //Do the final block
+                    int len = Array.IndexOf(encryptedBytes, (byte)0);
+                    len = (len == -1) ? encryptedBytes.Length : len;
+                    string actualInput = Encoding.UTF8.GetString(encryptedBytes, 0, len);
+                    return actualInput;
 #endif
 
-                    return decrypted;
                 }
                 catch (Exception ex)
                 {
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0} Decrypt Error. {1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelVerbose);
+                    LoggingMethod.WriteToLog(string.Format("DateTime {0} Decrypt Error. {1}", DateTime.Now.ToString(), ex.ToString()), PNLogVerbosity.BODY);
                     throw ex;
-                    //LoggingMethod.WriteToLog(string.Format("DateTime {0} Decrypt Error. {1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelVerbose);
+                    //LoggingMethod.WriteToLog(string.Format("DateTime {0} Decrypt Error. {1}", DateTime.Now.ToString(), ex.ToString()), PNLogVerbosity.BODY);
                     //return "**DECRYPT ERROR**";
                 }
             }

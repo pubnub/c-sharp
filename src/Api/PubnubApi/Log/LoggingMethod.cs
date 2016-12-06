@@ -10,77 +10,36 @@ namespace PubnubApi
 
 	public class LoggingMethod
 	{
-		private static int logLevel = 0;
-		public static Level LogLevel
-		{
-			get
-			{
-				return (Level)logLevel;
-			}
-			set
-			{
-				logLevel = (int)value;
-			}
-		}
-		public enum Level
-		{
-			Off,
-			Error,
-			Info,
-			Verbose,
-			Warning
-		}
+		private static IPubnubLog pubnubLog = null;
 
-		public static bool LevelError
+		public static IPubnubLog PubnubLog
 		{
-			get
-			{
-				return (int)LogLevel >= 1;
+			get{
+				return pubnubLog;
+			}
+			set {
+				pubnubLog = value;
 			}
 		}
 
-		public static bool LevelInfo
+		public static void WriteToLog(string logText, PNLogVerbosity logVerbosity)
 		{
-			get
-			{
-				return (int)LogLevel >= 2;
-			}
-		}
-
-		public static bool LevelVerbose
-		{
-			get
-			{
-				return (int)LogLevel >= 3;
-			}
-		}
-
-		public static bool LevelWarning
-		{
-			get
-			{
-				return (int)LogLevel >= 4;
-			}
-		}
-
-		public static void WriteToLog(string logText, bool writeToLog)
-		{
-			if (writeToLog)
+			if (logVerbosity == PNLogVerbosity.BODY)
             {
-                #if (SILVERLIGHT || WINDOWS_PHONE || MONOTOUCH || __IOS__ || MONODROID || __ANDROID__ || NETFX_CORE)
-                System.Diagnostics.Debug.WriteLine(logText);
-				#else
+				//System.Diagnostics.Debug.WriteLine(logText);
 				try
 				{
-					Trace.WriteLine(logText);
-					Trace.Flush();
+					if (pubnubLog != null)
+					{
+						pubnubLog.WriteToLog(logText);
+					}
 				}
-				catch { }
-				#endif
+				catch(Exception ex) {
+					System.Diagnostics.Debug.WriteLine(ex.ToString());
+				}
 			}
 		}
 	}
-
 	#endregion
 }
 

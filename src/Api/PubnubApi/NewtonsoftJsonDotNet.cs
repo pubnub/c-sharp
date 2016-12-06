@@ -1,11 +1,11 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
 using System.Linq;
+using System.IO;
 using System.Reflection;
+using System.Globalization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace PubnubApi
 {
@@ -21,6 +21,20 @@ namespace PubnubApi
                 ret = true;
             }
             catch { }
+            return ret;
+        }
+
+        public object BuildJsonObject(string jsonString)
+        {
+            object ret = null;
+
+            try
+            {
+                var token = JToken.Parse(jsonString);
+                ret = token;
+            }
+            catch { }
+
             return ret;
         }
 
@@ -121,6 +135,162 @@ namespace PubnubApi
             return ret;
         }
 
+        private bool IsGenericTypeForMessage<T>()
+        {
+            bool ret = false;
+#if NET35 || NET40
+            if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(PNMessageResult<>))
+            {
+                ret = true;
+            }
+            System.Diagnostics.Debug.WriteLine("NET35/40 IsGenericTypeForMessage = {0}", ret.ToString());
+#elif NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12 || NETSTANDARD13 || WP81 
+            if (typeof(T).GetTypeInfo().IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(PNMessageResult<>))
+            {
+                ret = true;
+            }
+            System.Diagnostics.Debug.WriteLine("PCL/CORE IsGenericTypeForMessage = {0}", ret.ToString());
+#endif
+            return ret;
+        }
+
+        private T DeserializeMessageToObjectBasedOnPlatform<T>(List<object> listObject)
+        {
+            T ret = default(T);
+
+#if NET35 || NET40
+            Type dataType = typeof(T).GetGenericArguments()[0];
+            Type generic = typeof(PNMessageResult<>);
+            Type specific = generic.MakeGenericType(dataType);
+
+            ConstructorInfo ci = specific.GetConstructors().FirstOrDefault();
+            if (ci != null)
+            {
+                object message = ci.Invoke(new object[] { });
+
+                //Set data
+                PropertyInfo dataProp = specific.GetProperty("Message");
+
+                object userMessage = null;
+                if (listObject[0].GetType() == typeof(Newtonsoft.Json.Linq.JValue))
+                {
+                    JValue jsonValue = listObject[0] as JValue;
+                    userMessage = jsonValue.Value;
+                    userMessage = ConvertToDataType(dataType, userMessage);
+
+                    dataProp.SetValue(message, userMessage, null);
+                }
+                else if (listObject[0].GetType() == typeof(Newtonsoft.Json.Linq.JObject))
+                {
+                    JToken token = listObject[0] as JToken;
+                    if (dataProp.PropertyType == typeof(string))
+                    {
+                        userMessage = JsonConvert.SerializeObject(token);
+                    }
+                    else
+                    {
+                        userMessage = token.ToObject(dataProp.PropertyType, JsonSerializer.Create());
+                    }
+
+                    dataProp.SetValue(message, userMessage, null);
+                }
+                else if (listObject[0].GetType() == typeof(Newtonsoft.Json.Linq.JArray))
+                {
+                    JToken token = listObject[0] as JToken;
+                    userMessage = token.ToObject(dataProp.PropertyType, JsonSerializer.Create());
+
+                    dataProp.SetValue(message, userMessage, null);
+                }
+                else if (listObject[0].GetType() == typeof(System.String))
+                {
+                    userMessage = listObject[0] as string;
+                    dataProp.SetValue(message, userMessage, null);
+                }
+
+                //Set Time
+                PropertyInfo timeProp = specific.GetProperty("Timetoken");
+                long timetoken;
+                Int64.TryParse(listObject[1].ToString(), out timetoken);
+                timeProp.SetValue(message, timetoken, null);
+
+                // Set ChannelName
+                PropertyInfo channelNameProp = specific.GetProperty("Channel");
+                channelNameProp.SetValue(message, (listObject.Count == 4) ? listObject[3].ToString() : listObject[2].ToString(), null);
+
+                //PropertyInfo typeProp = specific.GetProperty("Type");
+                //typeProp.SetValue(message, dataType, null);
+
+                ret = (T)Convert.ChangeType(message, specific, CultureInfo.InvariantCulture);
+            }
+#elif NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12 || NETSTANDARD13 || WP81 
+            Type dataType = typeof(T).GetTypeInfo().GenericTypeArguments[0];
+            Type generic = typeof(PNMessageResult<>);
+            Type specific = generic.MakeGenericType(dataType);
+
+            ConstructorInfo ci = specific.GetTypeInfo().DeclaredConstructors.FirstOrDefault();
+            if (ci != null)
+            {
+                object message = ci.Invoke(new object[] { });
+
+                //Set data
+                PropertyInfo dataProp = specific.GetRuntimeProperty("Message");
+
+                object userMessage = null;
+                if (listObject[0].GetType() == typeof(Newtonsoft.Json.Linq.JValue))
+                {
+                    JValue jsonValue = listObject[0] as JValue;
+                    userMessage = jsonValue.Value;
+                    userMessage = ConvertToDataType(dataType, userMessage);
+
+                    dataProp.SetValue(message, userMessage, null);
+                }
+                else if (listObject[0].GetType() == typeof(Newtonsoft.Json.Linq.JObject))
+                {
+                    JToken token = listObject[0] as JToken;
+                    if (dataProp.PropertyType == typeof(string))
+                    {
+                        userMessage = JsonConvert.SerializeObject(token);
+                    }
+                    else
+                    {
+                        userMessage = token.ToObject(dataProp.PropertyType, JsonSerializer.Create());
+                    }
+
+                    dataProp.SetValue(message, userMessage, null);
+                }
+                else if (listObject[0].GetType() == typeof(Newtonsoft.Json.Linq.JArray))
+                {
+                    JToken token = listObject[0] as JToken;
+                    userMessage = token.ToObject(dataProp.PropertyType, JsonSerializer.Create());
+
+                    dataProp.SetValue(message, userMessage, null);
+                }
+                else if (listObject[0].GetType() == typeof(System.String))
+                {
+                    userMessage = listObject[0] as string;
+                    dataProp.SetValue(message, userMessage, null);
+                }
+
+                //Set Time
+                PropertyInfo timeProp = specific.GetRuntimeProperty("Timetoken");
+                long timetoken;
+                Int64.TryParse(listObject[1].ToString(), out timetoken);
+                timeProp.SetValue(message, timetoken, null);
+
+                // Set ChannelName
+                PropertyInfo channelNameProp = specific.GetRuntimeProperty("Channel");
+                channelNameProp.SetValue(message, (listObject.Count == 4) ? listObject[3].ToString() : listObject[2].ToString(), null);
+
+                //PropertyInfo typeProp = specific.GetProperty("Type");
+                //typeProp.SetValue(message, dataType, null);
+
+                ret = (T)Convert.ChangeType(message, specific, CultureInfo.InvariantCulture);
+            }
+#endif
+
+            return ret;
+        }
+
         public virtual T DeserializeToObject<T>(List<object> listObject)
         {
             T ret = default(T);
@@ -130,104 +300,22 @@ namespace PubnubApi
                 return ret;
             }
 
-            if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(Message<>))
+            if (IsGenericTypeForMessage<T>())
             {
                 #region "Subscribe Message<>"
-                Type dataType = typeof(T).GetGenericArguments()[0];
-                Type generic = typeof(Message<>);
-                Type specific = generic.MakeGenericType(dataType);
-
-                //ConstructorInfo ci = specific.GetConstructor(Type.EmptyTypes);
-                ConstructorInfo ci = specific.GetConstructors().FirstOrDefault();
-                if (ci != null)
-                {
-                    object message = ci.Invoke(new object[] { });
-
-                    //Set data
-                    PropertyInfo dataProp = specific.GetProperty("Data");
-
-                    object userMessage = null;
-                    if (listObject[0].GetType() == typeof(Newtonsoft.Json.Linq.JValue))
-                    {
-                        JValue jValue = listObject[0] as JValue;
-                        userMessage = jValue.Value;
-
-                        dataProp.SetValue(message, userMessage, null);
-                    }
-                    else if (listObject[0].GetType() == typeof(Newtonsoft.Json.Linq.JObject))
-                    {
-                        JToken token = listObject[0] as JToken;
-                        if (dataProp.PropertyType == typeof(string))
-                        {
-                            userMessage = JsonConvert.SerializeObject(token);
-                        }
-                        else
-                        {
-                            userMessage = token.ToObject(dataProp.PropertyType, JsonSerializer.Create());
-                        }
-
-                        //userMessage = ConvertJTokenToObject(listObject[0] as JToken);
-                        //userMessage = Activator.CreateInstance(
-                        //PopulateObject(listObject[0].ToString(), message);
-                        dataProp.SetValue(message, userMessage, null);
-                    }
-                    else if (listObject[0].GetType() == typeof(Newtonsoft.Json.Linq.JArray))
-                    {
-                        JToken token = listObject[0] as JToken;
-                        userMessage = token.ToObject(dataProp.PropertyType, JsonSerializer.Create());
-
-                        //userMessage = ConvertJTokenToObject(listObject[0] as JToken);
-                        //userMessage = Activator.CreateInstance(
-                        //PopulateObject(listObject[0].ToString(), message);
-                        dataProp.SetValue(message, userMessage, null);
-                    }
-                    else if (listObject[0].GetType() == typeof(System.String))
-                    {
-                        userMessage = listObject[0] as string;
-                        dataProp.SetValue(message, userMessage, null);
-                    }
-
-                    //Set Time
-                    PropertyInfo timeProp = specific.GetProperty("Time");
-                    timeProp.SetValue(message, Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(listObject[1].ToString()), null);
-
-                    // Set ChannelName
-                    PropertyInfo channelNameProp = specific.GetProperty("ChannelName");
-                    channelNameProp.SetValue(message, (listObject.Count == 4) ? listObject[3].ToString() : listObject[2].ToString(), null);
-
-                    PropertyInfo typeProp = specific.GetProperty("Type");
-                    typeProp.SetValue(message, dataType, null);
-
-                    ret = (T)Convert.ChangeType(message, specific, CultureInfo.InvariantCulture);
-                }
-                #endregion
+                return DeserializeMessageToObjectBasedOnPlatform<T>(listObject);
+#endregion
             }
-            else if (typeof(T) == typeof(GrantAck))
+            else if (typeof(T) == typeof(PNAccessManagerGrantResult))
             {
-                #region "GrantAck"
+#region "PNAccessManagerGrantResult"
                 Dictionary<string, object> grantDicObj = ConvertToDictionaryObject(listObject[0]);
 
-                GrantAck ack = null;
-
-                int statusCode = 0; //For Grant, status code 200 = success
+                PNAccessManagerGrantResult ack = null;
 
                 if (grantDicObj != null)
                 {
-                    ack = new GrantAck();
-
-                    if (int.TryParse(grantDicObj["status"].ToString(), out statusCode))
-                        ack.StatusCode = statusCode;
-
-                    ack.StatusMessage = grantDicObj["message"].ToString();
-
-                    ack.Service = grantDicObj["service"].ToString();
-
-                    if (grantDicObj.ContainsKey("warning"))
-                    {
-                        ack.Warning = Convert.ToBoolean(grantDicObj["warning"].ToString());
-                    }
-
-                    ack.Payload = new GrantAck.Data();
+                    ack = new PNAccessManagerGrantResult();
 
                     if (grantDicObj.ContainsKey("payload"))
                     {
@@ -236,31 +324,31 @@ namespace PubnubApi
                         {
                             if (grantAckPayloadDic.ContainsKey("level"))
                             {
-                                ack.Payload.Level = grantAckPayloadDic["level"].ToString();
+                                ack.Level = grantAckPayloadDic["level"].ToString();
                             }
 
                             if (grantAckPayloadDic.ContainsKey("subscribe_key"))
                             {
-                                ack.Payload.SubscribeKey = grantAckPayloadDic["subscribe_key"].ToString();
+                                ack.SubscribeKey = grantAckPayloadDic["subscribe_key"].ToString();
                             }
 
                             if (grantAckPayloadDic.ContainsKey("ttl"))
                             {
-                                ack.Payload.TTL = Convert.ToInt32(grantAckPayloadDic["ttl"].ToString());
+                                ack.Ttl = Convert.ToInt32(grantAckPayloadDic["ttl"].ToString());
                             }
 
-                            if (ack.Payload != null && ack.Payload.Level != null && ack.Payload.Level == "subkey")
+                            if (!string.IsNullOrEmpty(ack.Level) && ack.Level == "subkey")
                             {
-                                ack.Payload.Access = new GrantAck.Data.SubkeyAccess();
-                                ack.Payload.Access.read = grantAckPayloadDic["r"].ToString() == "1";
-                                ack.Payload.Access.write = grantAckPayloadDic["w"].ToString() == "1";
-                                ack.Payload.Access.manage = grantAckPayloadDic["m"].ToString() == "1";
+                                //ack.Payload.Access = new PNAccessManagerGrantResult.Data.SubkeyAccess();
+                                //ack.Payload.Access.Read = grantAckPayloadDic["r"].ToString() == "1";
+                                //ack.Payload.Access.Write = grantAckPayloadDic["w"].ToString() == "1";
+                                //ack.Payload.Access.Manage = grantAckPayloadDic["m"].ToString() == "1";
                             }
                             else
                             {
                                 if (grantAckPayloadDic.ContainsKey("channels"))
                                 {
-                                    ack.Payload.channels = new Dictionary<string, GrantAck.Data.ChannelData>();
+                                    ack.Channels = new Dictionary<string, Dictionary<string, PNAccessManagerKeyData>>();
 
                                     Dictionary<string, object> grantAckChannelListDic = ConvertToDictionaryObject(grantAckPayloadDic["channels"]);
                                     if (grantAckChannelListDic != null && grantAckChannelListDic.Count > 0)
@@ -270,10 +358,9 @@ namespace PubnubApi
                                             Dictionary<string, object> grantAckChannelDataDic = ConvertToDictionaryObject(grantAckChannelListDic[channel]);
                                             if (grantAckChannelDataDic != null && grantAckChannelDataDic.Count > 0)
                                             {
-                                                GrantAck.Data.ChannelData grantAckChannelData = new GrantAck.Data.ChannelData();
                                                 if (grantAckChannelDataDic.ContainsKey("auths"))
                                                 {
-                                                    grantAckChannelData.auths = new Dictionary<string, GrantAck.Data.ChannelData.AuthData>();
+                                                    Dictionary<string, PNAccessManagerKeyData> authKeyDataDic = new Dictionary<string, PNAccessManagerKeyData>();
 
                                                     Dictionary<string, object> grantAckChannelAuthListDic = ConvertToDictionaryObject(grantAckChannelDataDic["auths"]);
                                                     if (grantAckChannelAuthListDic != null && grantAckChannelAuthListDic.Count > 0)
@@ -281,45 +368,37 @@ namespace PubnubApi
                                                         foreach (string authKey in grantAckChannelAuthListDic.Keys)
                                                         {
                                                             Dictionary<string, object> grantAckChannelAuthDataDic = ConvertToDictionaryObject(grantAckChannelAuthListDic[authKey]);
+
                                                             if (grantAckChannelAuthDataDic != null && grantAckChannelAuthDataDic.Count > 0)
                                                             {
-                                                                GrantAck.Data.ChannelData.AuthData authData = new GrantAck.Data.ChannelData.AuthData();
-                                                                authData.Access = new GrantAck.Data.ChannelData.AuthData.AuthAccess();
-                                                                authData.Access.read = grantAckChannelAuthDataDic["r"].ToString() == "1";
-                                                                authData.Access.write = grantAckChannelAuthDataDic["w"].ToString() == "1";
-                                                                authData.Access.manage = grantAckChannelAuthDataDic["m"].ToString() == "1";
+                                                                PNAccessManagerKeyData authData = new PNAccessManagerKeyData();
+                                                                authData.ReadEnabled = grantAckChannelAuthDataDic["r"].ToString() == "1";
+                                                                authData.WriteEnabled = grantAckChannelAuthDataDic["w"].ToString() == "1";
+                                                                authData.ManageEnabled = grantAckChannelAuthDataDic.ContainsKey("m") ? grantAckChannelAuthDataDic["m"].ToString() == "1" : false;
 
-                                                                grantAckChannelData.auths.Add(authKey, authData);
+                                                                authKeyDataDic.Add(authKey, authData);
                                                             }
 
                                                         }
+
+                                                        ack.Channels.Add(channel, authKeyDataDic);
                                                     }
                                                 }
-                                                else
-                                                {
-                                                    grantAckChannelData.Access = new GrantAck.Data.ChannelData.ChannelAccess();
-                                                    grantAckChannelData.Access.read = grantAckChannelDataDic["r"].ToString() == "1";
-                                                    grantAckChannelData.Access.write = grantAckChannelDataDic["w"].ToString() == "1";
-                                                    grantAckChannelData.Access.manage = grantAckChannelDataDic["m"].ToString() == "1";
-                                                }
-
-                                                ack.Payload.channels.Add(channel, grantAckChannelData);
                                             }
                                         }
                                     }
                                 }//end of if channels
                                 else if (grantAckPayloadDic.ContainsKey("channel"))
                                 {
-                                    ack.Payload.channels = new Dictionary<string, GrantAck.Data.ChannelData>();
+                                    ack.Channels = new Dictionary<string, Dictionary<string, PNAccessManagerKeyData>>();
 
                                     string channelName = grantAckPayloadDic["channel"].ToString();
                                     if (grantAckPayloadDic.ContainsKey("auths"))
                                     {
-                                        GrantAck.Data.ChannelData grantAckChannelData = new GrantAck.Data.ChannelData();
-
-                                        grantAckChannelData.auths = new Dictionary<string, GrantAck.Data.ChannelData.AuthData>();
+                                        Dictionary<string, PNAccessManagerKeyData> authKeyDataDic = new Dictionary<string, PNAccessManagerKeyData>();
 
                                         Dictionary<string, object> grantAckChannelAuthListDic = ConvertToDictionaryObject(grantAckPayloadDic["auths"]);
+
                                         if (grantAckChannelAuthListDic != null && grantAckChannelAuthListDic.Count > 0)
                                         {
                                             foreach (string authKey in grantAckChannelAuthListDic.Keys)
@@ -327,24 +406,24 @@ namespace PubnubApi
                                                 Dictionary<string, object> grantAckChannelAuthDataDic = ConvertToDictionaryObject(grantAckChannelAuthListDic[authKey]);
                                                 if (grantAckChannelAuthDataDic != null && grantAckChannelAuthDataDic.Count > 0)
                                                 {
-                                                    GrantAck.Data.ChannelData.AuthData authData = new GrantAck.Data.ChannelData.AuthData();
-                                                    authData.Access = new GrantAck.Data.ChannelData.AuthData.AuthAccess();
-                                                    authData.Access.read = grantAckChannelAuthDataDic["r"].ToString() == "1";
-                                                    authData.Access.write = grantAckChannelAuthDataDic["w"].ToString() == "1";
-                                                    authData.Access.manage = grantAckChannelAuthDataDic["m"].ToString() == "1";
+                                                    PNAccessManagerKeyData authData = new PNAccessManagerKeyData();
+                                                    authData.ReadEnabled = grantAckChannelAuthDataDic["r"].ToString() == "1";
+                                                    authData.WriteEnabled = grantAckChannelAuthDataDic["w"].ToString() == "1";
+                                                    authData.ManageEnabled = grantAckChannelAuthDataDic.ContainsKey("m") ? grantAckChannelAuthDataDic["m"].ToString() == "1" : false;
 
-                                                    grantAckChannelData.auths.Add(authKey, authData);
+                                                    authKeyDataDic.Add(authKey, authData);
                                                 }
 
                                             }
-                                            ack.Payload.channels.Add(channelName, grantAckChannelData);
+
+                                            ack.Channels.Add(channelName, authKeyDataDic);
                                         }
                                     }
-                                }
+                                } //end of if channel
 
                                 if (grantAckPayloadDic.ContainsKey("channel-groups"))
                                 {
-                                    ack.Payload.channelgroups = new Dictionary<string, GrantAck.Data.ChannelGroupData>();
+                                    ack.ChannelGroups = new Dictionary<string, Dictionary<string, PNAccessManagerKeyData>>();
 
                                     Dictionary<string, object> grantAckCgListDic = ConvertToDictionaryObject(grantAckPayloadDic["channel-groups"]);
                                     if (grantAckCgListDic != null && grantAckCgListDic.Count > 0)
@@ -354,10 +433,9 @@ namespace PubnubApi
                                             Dictionary<string, object> grantAckCgDataDic = ConvertToDictionaryObject(grantAckCgListDic[channelgroup]);
                                             if (grantAckCgDataDic != null && grantAckCgDataDic.Count > 0)
                                             {
-                                                GrantAck.Data.ChannelGroupData grantAckCgData = new GrantAck.Data.ChannelGroupData();
                                                 if (grantAckCgDataDic.ContainsKey("auths"))
                                                 {
-                                                    grantAckCgData.auths = new Dictionary<string, GrantAck.Data.ChannelGroupData.AuthData>();
+                                                    Dictionary<string, PNAccessManagerKeyData> authKeyDataDic = new Dictionary<string, PNAccessManagerKeyData>();
 
                                                     Dictionary<string, object> grantAckCgAuthListDic = ConvertToDictionaryObject(grantAckCgDataDic["auths"]);
                                                     if (grantAckCgAuthListDic != null && grantAckCgAuthListDic.Count > 0)
@@ -367,31 +445,86 @@ namespace PubnubApi
                                                             Dictionary<string, object> grantAckCgAuthDataDic = ConvertToDictionaryObject(grantAckCgAuthListDic[authKey]);
                                                             if (grantAckCgAuthDataDic != null && grantAckCgAuthDataDic.Count > 0)
                                                             {
-                                                                GrantAck.Data.ChannelGroupData.AuthData authData = new GrantAck.Data.ChannelGroupData.AuthData();
-                                                                authData.Access = new GrantAck.Data.ChannelGroupData.AuthData.AuthAccess();
-                                                                authData.Access.read = grantAckCgAuthDataDic["r"].ToString() == "1";
-                                                                authData.Access.write = grantAckCgAuthDataDic["w"].ToString() == "1";
-                                                                authData.Access.manage = grantAckCgAuthDataDic["m"].ToString() == "1";
+                                                                PNAccessManagerKeyData authData = new PNAccessManagerKeyData();
+                                                                authData.ReadEnabled = grantAckCgAuthDataDic["r"].ToString() == "1";
+                                                                authData.WriteEnabled = grantAckCgAuthDataDic["w"].ToString() == "1";
+                                                                authData.ManageEnabled = grantAckCgAuthDataDic.ContainsKey("m") ? grantAckCgAuthDataDic["m"].ToString() == "1" : false;
 
-                                                                grantAckCgData.auths.Add(authKey, authData);
+                                                                authKeyDataDic.Add(authKey, authData);
                                                             }
 
                                                         }
+
+                                                        ack.ChannelGroups.Add(channelgroup, authKeyDataDic);
                                                     }
                                                 }
-                                                else
-                                                {
-                                                    grantAckCgData.Access = new GrantAck.Data.ChannelGroupData.ChannelGroupAccess();
-                                                    grantAckCgData.Access.read = grantAckCgDataDic["r"].ToString() == "1";
-                                                    grantAckCgData.Access.write = grantAckCgDataDic["w"].ToString() == "1";
-                                                    grantAckCgData.Access.manage = grantAckCgDataDic["m"].ToString() == "1";
-                                                }
-
-                                                ack.Payload.channelgroups.Add(channelgroup, grantAckCgData);
                                             }
                                         }
-                                    }
+                                    }// if no dictionary due to REST bug
+                                    else
+                                    {
+                                        string channelGroupName = grantAckPayloadDic["channel-groups"].ToString();
+                                        if (grantAckPayloadDic.ContainsKey("auths"))
+                                        {
+                                            Dictionary<string, PNAccessManagerKeyData> authKeyDataDic = new Dictionary<string, PNAccessManagerKeyData>();
+
+                                            Dictionary<string, object> grantAckChannelAuthListDic = ConvertToDictionaryObject(grantAckPayloadDic["auths"]);
+
+                                            if (grantAckChannelAuthListDic != null && grantAckChannelAuthListDic.Count > 0)
+                                            {
+                                                foreach (string authKey in grantAckChannelAuthListDic.Keys)
+                                                {
+                                                    Dictionary<string, object> grantAckChannelAuthDataDic = ConvertToDictionaryObject(grantAckChannelAuthListDic[authKey]);
+                                                    if (grantAckChannelAuthDataDic != null && grantAckChannelAuthDataDic.Count > 0)
+                                                    {
+                                                        PNAccessManagerKeyData authData = new PNAccessManagerKeyData();
+                                                        authData.ReadEnabled = grantAckChannelAuthDataDic["r"].ToString() == "1";
+                                                        authData.WriteEnabled = grantAckChannelAuthDataDic["w"].ToString() == "1";
+                                                        authData.ManageEnabled = grantAckChannelAuthDataDic.ContainsKey("m") ? grantAckChannelAuthDataDic["m"].ToString() == "1" : false;
+
+                                                        authKeyDataDic.Add(authKey, authData);
+                                                    }
+
+                                                }
+
+                                                ack.ChannelGroups.Add(channelGroupName, authKeyDataDic);
+                                            }
+                                        }
+
+                                    } //end of else if for REST bug
                                 }//end of if channel-groups
+                                else if (grantAckPayloadDic.ContainsKey("channel-group"))
+                                {
+                                    ack.ChannelGroups = new Dictionary<string, Dictionary<string, PNAccessManagerKeyData>>();
+
+                                    string channelGroupName = grantAckPayloadDic["channel-group"].ToString();
+                                    if (grantAckPayloadDic.ContainsKey("auths"))
+                                    {
+                                        Dictionary<string, PNAccessManagerKeyData> authKeyDataDic = new Dictionary<string, PNAccessManagerKeyData>();
+
+                                        Dictionary<string, object> grantAckChannelAuthListDic = ConvertToDictionaryObject(grantAckPayloadDic["auths"]);
+
+                                        if (grantAckChannelAuthListDic != null && grantAckChannelAuthListDic.Count > 0)
+                                        {
+                                            foreach (string authKey in grantAckChannelAuthListDic.Keys)
+                                            {
+                                                Dictionary<string, object> grantAckChannelAuthDataDic = ConvertToDictionaryObject(grantAckChannelAuthListDic[authKey]);
+                                                if (grantAckChannelAuthDataDic != null && grantAckChannelAuthDataDic.Count > 0)
+                                                {
+                                                    PNAccessManagerKeyData authData = new PNAccessManagerKeyData();
+                                                    authData.ReadEnabled = grantAckChannelAuthDataDic["r"].ToString() == "1";
+                                                    authData.WriteEnabled = grantAckChannelAuthDataDic["w"].ToString() == "1";
+                                                    authData.ManageEnabled = grantAckChannelAuthDataDic.ContainsKey("m") ? grantAckChannelAuthDataDic["m"].ToString() == "1" : false;
+
+                                                    authKeyDataDic.Add(authKey, authData);
+                                                }
+
+                                            }
+
+                                            ack.ChannelGroups.Add(channelGroupName, authKeyDataDic);
+                                        }
+                                    }
+                                } //end of if channel-group
                             } //end of else subkey
 
                         }
@@ -399,37 +532,20 @@ namespace PubnubApi
                     }
                 }
 
-                ret = (T)Convert.ChangeType(ack, typeof(GrantAck), CultureInfo.InvariantCulture);
-                #endregion
+                ret = (T)Convert.ChangeType(ack, typeof(PNAccessManagerGrantResult), CultureInfo.InvariantCulture);
+#endregion
             }
-            else if (typeof(T) == typeof(AuditAck))
+            else if (typeof(T) == typeof(PNAccessManagerAuditResult))
             {
-                #region "AuditAck"
+#region "PNAccessManagerAuditResult"
                 Dictionary<string, object> auditDicObj = ConvertToDictionaryObject(listObject[0]);
 
-                AuditAck ack = null;
-
-                int statusCode = 0; //For Audit, status code 200 = success
+                PNAccessManagerAuditResult ack = null;
 
                 if (auditDicObj != null)
                 {
-                    ack = new AuditAck();
+                    ack = new PNAccessManagerAuditResult();
 
-                    if (int.TryParse(auditDicObj["status"].ToString(), out statusCode))
-                        ack.StatusCode = statusCode;
-
-                    ack.StatusMessage = auditDicObj["message"].ToString();
-
-                    ack.Service = auditDicObj["service"].ToString();
-
-                    if (auditDicObj.ContainsKey("warning"))
-                    {
-                        ack.Warning = Convert.ToBoolean(auditDicObj["warning"].ToString());
-                    }
-
-                    ack.Payload = new AuditAck.Data();
-
-                    //AuditAckPayload auditAckPayload = DeserializeToObject<AuditAckPayload>(ack.Payload);
                     if (auditDicObj.ContainsKey("payload"))
                     {
                         Dictionary<string, object> auditAckPayloadDic = ConvertToDictionaryObject(auditDicObj["payload"]);
@@ -437,240 +553,152 @@ namespace PubnubApi
                         {
                             if (auditAckPayloadDic.ContainsKey("level"))
                             {
-                                ack.Payload.Level = auditAckPayloadDic["level"].ToString();
+                                ack.Level = auditAckPayloadDic["level"].ToString();
                             }
 
                             if (auditAckPayloadDic.ContainsKey("subscribe_key"))
                             {
-                                ack.Payload.SubscribeKey = auditAckPayloadDic["subscribe_key"].ToString();
+                                ack.SubscribeKey = auditAckPayloadDic["subscribe_key"].ToString();
                             }
 
-                            if (auditAckPayloadDic.ContainsKey("channels"))
+                            if (auditAckPayloadDic.ContainsKey("channel"))
                             {
-                                ack.Payload.channels = new Dictionary<string, AuditAck.Data.ChannelData>();
+                                ack.Channel = auditAckPayloadDic["channel"].ToString();
+                            }
 
-                                Dictionary<string, object> auditAckChannelListDic = ConvertToDictionaryObject(auditAckPayloadDic["channels"]);
-                                if (auditAckChannelListDic != null && auditAckChannelListDic.Count > 0)
+                            if (auditAckPayloadDic.ContainsKey("channel-group"))
+                            {
+                                ack.ChannelGroup = auditAckPayloadDic["channel-group"].ToString();
+                            }
+
+                            if (auditAckPayloadDic.ContainsKey("auths"))
+                            {
+                                Dictionary<string, object> auditAckAuthListDic = ConvertToDictionaryObject(auditAckPayloadDic["auths"]);
+                                if (auditAckAuthListDic != null && auditAckAuthListDic.Count > 0)
                                 {
-                                    foreach (string channel in auditAckChannelListDic.Keys)
+                                    ack.AuthKeys = new Dictionary<string, PNAccessManagerKeyData>();
+
+                                    foreach (string authKey in auditAckAuthListDic.Keys)
                                     {
-                                        Dictionary<string, object> auditAckChannelDataDic = ConvertToDictionaryObject(auditAckChannelListDic[channel]);
-                                        if (auditAckChannelDataDic != null && auditAckChannelDataDic.Count > 0)
+                                        Dictionary<string, object> authDataDic = ConvertToDictionaryObject(auditAckAuthListDic[authKey]);
+                                        if (authDataDic != null && authDataDic.Count > 0)
                                         {
-                                            AuditAck.Data.ChannelData auditAckChannelData = new AuditAck.Data.ChannelData();
-                                            if (auditAckChannelDataDic.ContainsKey("auths"))
-                                            {
-                                                auditAckChannelData.auths = new Dictionary<string, AuditAck.Data.ChannelData.AuthData>();
+                                            PNAccessManagerKeyData authData = new PNAccessManagerKeyData();
+                                            authData.ReadEnabled = authDataDic["r"].ToString() == "1";
+                                            authData.WriteEnabled = authDataDic["w"].ToString() == "1";
+                                            authData.ManageEnabled = authDataDic.ContainsKey("m") ? authDataDic["m"].ToString() == "1" : false;
 
-                                                Dictionary<string, object> auditAckChannelAuthListDic = ConvertToDictionaryObject(auditAckChannelDataDic["auths"]);
-                                                if (auditAckChannelAuthListDic != null && auditAckChannelAuthListDic.Count > 0)
-                                                {
-                                                    foreach (string authKey in auditAckChannelAuthListDic.Keys)
-                                                    {
-                                                        Dictionary<string, object> auditAckChannelAuthDataDic = ConvertToDictionaryObject(auditAckChannelAuthListDic[authKey]);
-                                                        if (auditAckChannelAuthDataDic != null && auditAckChannelAuthDataDic.Count > 0)
-                                                        {
-                                                            AuditAck.Data.ChannelData.AuthData authData = new AuditAck.Data.ChannelData.AuthData();
-                                                            authData.Access = new AuditAck.Data.ChannelData.AuthData.AuthAccess();
-                                                            authData.Access.read = auditAckChannelAuthDataDic["r"].ToString() == "1";
-                                                            authData.Access.write = auditAckChannelAuthDataDic["w"].ToString() == "1";
-                                                            authData.Access.manage = auditAckChannelAuthDataDic.ContainsKey("m") ? auditAckChannelAuthDataDic["m"].ToString() == "1" : false;
-                                                            if (auditAckChannelAuthDataDic.ContainsKey("ttl"))
-                                                            {
-                                                                authData.Access.TTL = Int32.Parse(auditAckChannelAuthDataDic["ttl"].ToString());
-                                                            }
-
-                                                            auditAckChannelData.auths.Add(authKey, authData);
-                                                        }
-
-                                                    }
-                                                }
-                                            }
-                                            else
-                                            {
-                                                auditAckChannelData.Access = new AuditAck.Data.ChannelData.ChannelAccess();
-                                                auditAckChannelData.Access.read = auditAckChannelDataDic["r"].ToString() == "1";
-                                                auditAckChannelData.Access.write = auditAckChannelDataDic["w"].ToString() == "1";
-                                                auditAckChannelData.Access.manage = auditAckChannelDataDic.ContainsKey("m") ? auditAckChannelDataDic["m"].ToString() == "1" : false;
-                                                if (auditAckChannelDataDic.ContainsKey("ttl"))
-                                                {
-                                                    auditAckChannelData.Access.TTL = Int32.Parse(auditAckChannelDataDic["ttl"].ToString());
-                                                }
-                                            }
-
-                                            ack.Payload.channels.Add(channel, auditAckChannelData);
+                                            ack.AuthKeys.Add(authKey, authData);
                                         }
                                     }
                                 }
-                            }//end of if channels
-                            if (auditAckPayloadDic.ContainsKey("channel-groups"))
-                            {
-                                ack.Payload.channelgroups = new Dictionary<string, AuditAck.Data.ChannelGroupData>();
-
-                                Dictionary<string, object> auditAckCgListDic = ConvertToDictionaryObject(auditAckPayloadDic["channel-groups"]);
-                                if (auditAckCgListDic != null && auditAckCgListDic.Count > 0)
-                                {
-                                    foreach (string channelgroup in auditAckCgListDic.Keys)
-                                    {
-                                        Dictionary<string, object> auditAckCgDataDic = ConvertToDictionaryObject(auditAckCgListDic[channelgroup]);
-                                        if (auditAckCgDataDic != null && auditAckCgDataDic.Count > 0)
-                                        {
-                                            AuditAck.Data.ChannelGroupData auditAckCgData = new AuditAck.Data.ChannelGroupData();
-                                            if (auditAckCgDataDic.ContainsKey("auths"))
-                                            {
-                                                auditAckCgData.auths = new Dictionary<string, AuditAck.Data.ChannelGroupData.AuthData>();
-
-                                                Dictionary<string, object> auditAckCgAuthListDic = ConvertToDictionaryObject(auditAckCgDataDic["auths"]);
-                                                if (auditAckCgAuthListDic != null && auditAckCgAuthListDic.Count > 0)
-                                                {
-                                                    foreach (string authKey in auditAckCgAuthListDic.Keys)
-                                                    {
-                                                        Dictionary<string, object> auditAckCgAuthDataDic = ConvertToDictionaryObject(auditAckCgAuthListDic[authKey]);
-                                                        if (auditAckCgAuthDataDic != null && auditAckCgAuthDataDic.Count > 0)
-                                                        {
-                                                            AuditAck.Data.ChannelGroupData.AuthData authData = new AuditAck.Data.ChannelGroupData.AuthData();
-                                                            authData.Access = new AuditAck.Data.ChannelGroupData.AuthData.AuthAccess();
-                                                            authData.Access.read = auditAckCgAuthDataDic["r"].ToString() == "1";
-                                                            authData.Access.write = auditAckCgAuthDataDic["w"].ToString() == "1";
-                                                            authData.Access.manage = auditAckCgAuthDataDic.ContainsKey("m") ? auditAckCgAuthDataDic["m"].ToString() == "1" : false;
-                                                            if (auditAckCgAuthDataDic.ContainsKey("ttl"))
-                                                            {
-                                                                authData.Access.TTL = Int32.Parse(auditAckCgAuthDataDic["ttl"].ToString());
-                                                            }
-
-                                                            auditAckCgData.auths.Add(authKey, authData);
-                                                        }
-
-                                                    }
-                                                }
-                                            }
-                                            else
-                                            {
-                                                auditAckCgData.Access = new AuditAck.Data.ChannelGroupData.ChannelGroupAccess();
-                                                auditAckCgData.Access.read = auditAckCgDataDic["r"].ToString() == "1";
-                                                auditAckCgData.Access.write = auditAckCgDataDic["w"].ToString() == "1";
-                                                auditAckCgData.Access.manage = auditAckCgDataDic.ContainsKey("m") ? auditAckCgDataDic["m"].ToString() == "1" : false;
-                                                if (auditAckCgDataDic.ContainsKey("ttl"))
-                                                {
-                                                    auditAckCgData.Access.TTL = Int32.Parse(auditAckCgDataDic["ttl"].ToString());
-                                                }
-                                            }
-
-                                            ack.Payload.channelgroups.Add(channelgroup, auditAckCgData);
-                                        }
-                                    }
-                                }
-                            }//end of if channel-groups
+                            }
 
                         }
                     }
                 }
 
-                ret = (T)Convert.ChangeType(ack, typeof(AuditAck), CultureInfo.InvariantCulture);
-                #endregion
+                ret = (T)Convert.ChangeType(ack, typeof(PNAccessManagerAuditResult), CultureInfo.InvariantCulture);
+#endregion
             }
-            else if (typeof(T) == typeof(ConnectOrDisconnectAck))
+            else if (typeof(T) == typeof(PNPublishResult))
             {
-                #region "ConnectOrDisconnectAck"
-                var ack = new ConnectOrDisconnectAck
+#region "PNPublishResult"
+                var result = new PNPublishResult
                 {
-                    StatusMessage = listObject[1].ToString(),
-                    ChannelGroupName = (listObject.Count == 4) ? listObject[2].ToString() : "",
-                    ChannelName = (listObject.Count == 4) ? listObject[3].ToString() : listObject[2].ToString()
-                };
-                int statusCode;
-                if (int.TryParse(listObject[0].ToString(), out statusCode))
-                    ack.StatusCode = statusCode;
-
-                ret = (T)Convert.ChangeType(ack, typeof(ConnectOrDisconnectAck), CultureInfo.InvariantCulture);
-            }
-            else if (typeof(T) == typeof(PublishAck))
-            {
-                var ack = new PublishAck
-                {
-                    StatusMessage = listObject[1].ToString(),
                     Timetoken = Int64.Parse(listObject[2].ToString()),
-                    ChannelName = listObject[3].ToString(),
-                    Payload = (listObject.Count == 5) ? listObject[4] : null
                 };
-                int statusCode;
-                if (int.TryParse(listObject[0].ToString(), out statusCode))
-                    ack.StatusCode = statusCode;
 
-                ret = (T)Convert.ChangeType(ack, typeof(PublishAck), CultureInfo.InvariantCulture);
-                #endregion
+                ret = (T)Convert.ChangeType(result, typeof(PNPublishResult), CultureInfo.InvariantCulture);
+#endregion
             }
-            else if (typeof(T) == typeof(PresenceAck))
+            else if (typeof(T) == typeof(PNPresenceEventResult))
             {
-                #region "PresenceAck"
+#region "PNPresenceEventResult"
                 Dictionary<string, object> presenceDicObj = ConvertToDictionaryObject(listObject[0]);
 
-                PresenceAck ack = null;
+                PNPresenceEventResult ack = null;
 
                 if (presenceDicObj != null)
                 {
-                    ack = new PresenceAck();
-                    ack.Action = presenceDicObj["action"].ToString();
+                    ack = new PNPresenceEventResult();
+                    ack.Event = presenceDicObj["action"].ToString();
                     ack.Timestamp = Convert.ToInt64(presenceDicObj["timestamp"].ToString());
-                    ack.UUID = presenceDicObj["uuid"].ToString();
+                    ack.Uuid = presenceDicObj["uuid"].ToString();
                     ack.Occupancy = Int32.Parse(presenceDicObj["occupancy"].ToString());
 
                     //ack.Timetoken = Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(listObject[1].ToString()),
                     ack.Timetoken = Convert.ToInt64(listObject[1].ToString());
-                    ack.ChannelGroupName = (listObject.Count == 4) ? listObject[2].ToString() : "";
-                    ack.ChannelName = (listObject.Count == 4) ? listObject[3].ToString() : listObject[2].ToString();
+                    //ack.ChannelGroupName = (listObject.Count == 4) ? listObject[2].ToString() : "";
+                    ack.Channel = (listObject.Count == 4) ? listObject[3].ToString() : listObject[2].ToString();
                 }
 
-
-                ret = (T)Convert.ChangeType(ack, typeof(PresenceAck), CultureInfo.InvariantCulture);
-                #endregion
+                ret = (T)Convert.ChangeType(ack, typeof(PNPresenceEventResult), CultureInfo.InvariantCulture);
+#endregion
             }
-            else if (typeof(T) == typeof(DetailedHistoryAck))
+            else if (typeof(T) == typeof(PNHistoryResult))
             {
-                #region "DetailedHistoryAck"
-                DetailedHistoryAck ack = new DetailedHistoryAck();
+#region "PNHistoryResult"
+                PNHistoryResult ack = new PNHistoryResult();
                 ack.StartTimeToken = Convert.ToInt64(listObject[1].ToString());
                 ack.EndTimeToken = Convert.ToInt64(listObject[2].ToString());
-                ack.ChannelName = listObject[3].ToString();
-                ack.Message = ConvertToObjectArray(listObject[0]);
+                //ack.ChannelName = listObject[3].ToString();
+                List<object> messagesContainer = listObject[0] as List<object>;
+                if (messagesContainer != null)
+                {
+                    ack.Messages = new List<PNHistoryItemResult>();
+                    foreach(var message in messagesContainer)
+                    {
+                        PNHistoryItemResult result = new PNHistoryItemResult();
+                        Dictionary<string, object> dicMessageTimetoken = ConvertToDictionaryObject(message);
+                        if (dicMessageTimetoken != null)
+                        {
+                            if (dicMessageTimetoken.ContainsKey("message"))
+                            {
+                                result.Entry = dicMessageTimetoken["message"];
+                            }
+                            if (dicMessageTimetoken.ContainsKey("timetoken"))
+                            {
+                                long messageTimetoken;
+                                Int64.TryParse(dicMessageTimetoken["timetoken"].ToString(), out messageTimetoken);
+                                result.Timetoken = messageTimetoken;
+                            }
+                        }
+                        else
+                        {
+                            result.Entry = message;
+                        }
 
-                ret = (T)Convert.ChangeType(ack, typeof(DetailedHistoryAck), CultureInfo.InvariantCulture);
-                #endregion
+                        ack.Messages.Add(result);
+                    }
+                }
+
+                ret = (T)Convert.ChangeType(ack, typeof(PNHistoryResult), CultureInfo.InvariantCulture);
+#endregion
             }
-            else if (typeof(T) == typeof(HereNowAck))
+            else if (typeof(T) == typeof(PNHereNowResult))
             {
-                #region "HereNowAck"
+#region "PNHereNowResult"
                 Dictionary<string, object> herenowDicObj = ConvertToDictionaryObject(listObject[0]);
 
-                HereNowAck ack = null;
-
-                int statusCode = 0;
+                PNHereNowResult hereNowResult = null;
 
                 if (herenowDicObj != null)
                 {
-                    ack = new HereNowAck();
+                    hereNowResult = new PNHereNowResult();
 
-                    if (int.TryParse(herenowDicObj["status"].ToString(), out statusCode))
-                        ack.StatusCode = statusCode;
-
-                    ack.StatusMessage = herenowDicObj["message"].ToString();
-
-                    ack.Service = herenowDicObj["service"].ToString();
-
-                    ack.ChannelName = listObject[1].ToString();
-
-                    ack.Payload = new HereNowAck.Data();
+                    string hereNowChannelName = listObject[1].ToString();
 
                     if (herenowDicObj.ContainsKey("payload"))
                     {
                         Dictionary<string, object> hereNowPayloadDic = ConvertToDictionaryObject(herenowDicObj["payload"]);
                         if (hereNowPayloadDic != null && hereNowPayloadDic.Count > 0)
                         {
-                            ack.Payload.total_occupancy = Int32.Parse(hereNowPayloadDic["total_occupancy"].ToString());
-                            ack.Payload.total_channels = Int32.Parse(hereNowPayloadDic["total_channels"].ToString());
+                            hereNowResult.TotalOccupancy = Int32.Parse(hereNowPayloadDic["total_occupancy"].ToString());
+                            hereNowResult.TotalChannels = Int32.Parse(hereNowPayloadDic["total_channels"].ToString());
                             if (hereNowPayloadDic.ContainsKey("channels"))
                             {
-                                ack.Payload.channels = new Dictionary<string, HereNowAck.Data.ChannelData>();
+                                Dictionary<string, PNHereNowChannelData> hereNowChannelData = new Dictionary<string, PNHereNowChannelData>();
 
                                 Dictionary<string, object> hereNowChannelListDic = ConvertToDictionaryObject(hereNowPayloadDic["channels"]);
                                 if (hereNowChannelListDic != null && hereNowChannelListDic.Count > 0)
@@ -680,21 +708,22 @@ namespace PubnubApi
                                         Dictionary<string, object> hereNowChannelItemDic = ConvertToDictionaryObject(hereNowChannelListDic[channel]);
                                         if (hereNowChannelItemDic != null && hereNowChannelItemDic.Count > 0)
                                         {
-                                            HereNowAck.Data.ChannelData channelData = new HereNowAck.Data.ChannelData();
-                                            channelData.occupancy = Convert.ToInt32(hereNowChannelItemDic["occupancy"].ToString());
+                                            PNHereNowChannelData channelData = new PNHereNowChannelData();
+                                            channelData.ChannelName = channel;
+                                            channelData.Occupancy = Convert.ToInt32(hereNowChannelItemDic["occupancy"].ToString());
                                             if (hereNowChannelItemDic.ContainsKey("uuids"))
                                             {
                                                 object[] hereNowChannelUuidList = ConvertToObjectArray(hereNowChannelItemDic["uuids"]);
                                                 if (hereNowChannelUuidList != null && hereNowChannelUuidList.Length > 0)
                                                 {
-                                                    List<HereNowAck.Data.ChannelData.UuidData> uuidDataList = new List<HereNowAck.Data.ChannelData.UuidData>();
+                                                    List<PNHereNowOccupantData> uuidDataList = new List<PNHereNowOccupantData>();
 
                                                     for (int index = 0; index < hereNowChannelUuidList.Length; index++)
                                                     {
                                                         if (hereNowChannelUuidList[index].GetType() == typeof(string))
                                                         {
-                                                            HereNowAck.Data.ChannelData.UuidData uuidData = new HereNowAck.Data.ChannelData.UuidData();
-                                                            uuidData.uuid = hereNowChannelUuidList[index].ToString();
+                                                            PNHereNowOccupantData uuidData = new PNHereNowOccupantData();
+                                                            uuidData.Uuid = hereNowChannelUuidList[index].ToString();
                                                             uuidDataList.Add(uuidData);
                                                         }
                                                         else
@@ -702,20 +731,20 @@ namespace PubnubApi
                                                             Dictionary<string, object> hereNowChannelItemUuidsDic = ConvertToDictionaryObject(hereNowChannelUuidList[index]);
                                                             if (hereNowChannelItemUuidsDic != null && hereNowChannelItemUuidsDic.Count > 0)
                                                             {
-                                                                HereNowAck.Data.ChannelData.UuidData uuidData = new HereNowAck.Data.ChannelData.UuidData();
-                                                                uuidData.uuid = hereNowChannelItemUuidsDic["uuid"].ToString();
+                                                                PNHereNowOccupantData uuidData = new PNHereNowOccupantData();
+                                                                uuidData.Uuid = hereNowChannelItemUuidsDic["uuid"].ToString();
                                                                 if (hereNowChannelItemUuidsDic.ContainsKey("state"))
                                                                 {
-                                                                    uuidData.state = ConvertToDictionaryObject(hereNowChannelItemUuidsDic["state"]);
+                                                                    uuidData.State = ConvertToDictionaryObject(hereNowChannelItemUuidsDic["state"]);
                                                                 }
                                                                 uuidDataList.Add(uuidData);
                                                             }
                                                         }
                                                     }
-                                                    channelData.uuids = uuidDataList.ToArray();
+                                                    channelData.Occupants = uuidDataList;
                                                 }
                                             }
-                                            ack.Payload.channels.Add(channel, channelData);
+                                            hereNowResult.Channels.Add(channel, channelData);
                                         }
                                     }
                                 }
@@ -724,40 +753,42 @@ namespace PubnubApi
                     }
                     else if (herenowDicObj.ContainsKey("occupancy"))
                     {
-                        ack.Payload.total_occupancy = Int32.Parse(herenowDicObj["occupancy"].ToString());
-                        ack.Payload.channels = new Dictionary<string, HereNowAck.Data.ChannelData>();
+                        hereNowResult.TotalOccupancy = Int32.Parse(herenowDicObj["occupancy"].ToString());
+                        hereNowResult.Channels = new Dictionary<string, PNHereNowChannelData>();
                         if (herenowDicObj.ContainsKey("uuids"))
                         {
                             object[] uuidArray = ConvertToObjectArray(herenowDicObj["uuids"]);
                             if (uuidArray != null && uuidArray.Length > 0)
                             {
-                                List<HereNowAck.Data.ChannelData.UuidData> uuidDataList = new List<HereNowAck.Data.ChannelData.UuidData>();
+                                List<PNHereNowOccupantData> uuidDataList = new List<PNHereNowOccupantData>();
                                 for (int index = 0; index < uuidArray.Length; index++)
                                 {
                                     Dictionary<string, object> hereNowChannelItemUuidsDic = ConvertToDictionaryObject(uuidArray[index]);
                                     if (hereNowChannelItemUuidsDic != null && hereNowChannelItemUuidsDic.Count > 0)
                                     {
-                                        HereNowAck.Data.ChannelData.UuidData uuidData = new HereNowAck.Data.ChannelData.UuidData();
-                                        uuidData.uuid = hereNowChannelItemUuidsDic["uuid"].ToString();
+                                        PNHereNowOccupantData uuidData = new PNHereNowOccupantData();
+                                        uuidData.Uuid = hereNowChannelItemUuidsDic["uuid"].ToString();
                                         if (hereNowChannelItemUuidsDic.ContainsKey("state"))
                                         {
-                                            uuidData.state = ConvertToDictionaryObject(hereNowChannelItemUuidsDic["state"]);
+                                            uuidData.State = ConvertToDictionaryObject(hereNowChannelItemUuidsDic["state"]);
                                         }
                                         uuidDataList.Add(uuidData);
                                     }
                                     else
                                     {
-                                        HereNowAck.Data.ChannelData.UuidData uuidData = new HereNowAck.Data.ChannelData.UuidData();
-                                        uuidData.uuid = uuidArray[index].ToString();
+                                        PNHereNowOccupantData uuidData = new PNHereNowOccupantData();
+                                        uuidData.Uuid = uuidArray[index].ToString();
                                         uuidDataList.Add(uuidData);
                                     }
                                 }
-                                HereNowAck.Data.ChannelData channelData = new HereNowAck.Data.ChannelData();
-                                channelData.uuids = uuidDataList.ToArray();
-                                channelData.occupancy = ack.Payload.total_occupancy;
 
-                                ack.Payload.channels.Add(ack.ChannelName, channelData);
-                                ack.Payload.total_channels = ack.Payload.channels.Count;
+                                PNHereNowChannelData channelData = new PNHereNowChannelData();
+                                channelData.ChannelName = hereNowChannelName;
+                                channelData.Occupants = uuidDataList;
+                                channelData.Occupancy = hereNowResult.TotalOccupancy;
+
+                                hereNowResult.Channels.Add(hereNowChannelName, channelData);
+                                hereNowResult.TotalChannels = hereNowResult.Channels.Count;
                             }
                         }
                         else
@@ -767,12 +798,12 @@ namespace PubnubApi
                             int totalChannels = 0;
                             foreach (string channel in arrChannel)
                             {
-                                HereNowAck.Data.ChannelData channelData = new HereNowAck.Data.ChannelData();
-                                channelData.occupancy = 1;
-                                ack.Payload.channels.Add(channel, channelData);
+                                PNHereNowChannelData channelData = new PNHereNowChannelData();
+                                channelData.Occupancy = 1;
+                                hereNowResult.Channels.Add(channel, channelData);
                                 totalChannels++;
                             }
-                            ack.Payload.total_channels = totalChannels;
+                            hereNowResult.TotalChannels = totalChannels;
 
 
                         }
@@ -780,117 +811,20 @@ namespace PubnubApi
 
                 }
 
-                ret = (T)Convert.ChangeType(ack, typeof(HereNowAck), CultureInfo.InvariantCulture);
-                #endregion
+                ret = (T)Convert.ChangeType(hereNowResult, typeof(PNHereNowResult), CultureInfo.InvariantCulture);
+#endregion
             }
-            else if (typeof(T) == typeof(GlobalHereNowAck))
+            else if (typeof(T) == typeof(PNWhereNowResult))
             {
-                #region "GlobalHereNowAck"
-                Dictionary<string, object> globalHerenowDicObj = ConvertToDictionaryObject(listObject[0]);
-
-                GlobalHereNowAck ack = null;
-
-                int statusCode = 0;
-
-                if (globalHerenowDicObj != null)
-                {
-                    ack = new GlobalHereNowAck();
-
-                    if (int.TryParse(globalHerenowDicObj["status"].ToString(), out statusCode))
-                        ack.StatusCode = statusCode;
-
-                    ack.StatusMessage = globalHerenowDicObj["message"].ToString();
-
-                    ack.Service = globalHerenowDicObj["service"].ToString();
-
-                    ack.Payload = new GlobalHereNowAck.Data();
-                    if (globalHerenowDicObj.ContainsKey("payload"))
-                    {
-                        Dictionary<string, object> globalHereNowPayloadDic = ConvertToDictionaryObject(globalHerenowDicObj["payload"]);
-                        if (globalHereNowPayloadDic != null && globalHereNowPayloadDic.Count > 0)
-                        {
-                            ack.Payload.total_occupancy = Int32.Parse(globalHereNowPayloadDic["total_occupancy"].ToString());
-                            ack.Payload.total_channels = Int32.Parse(globalHereNowPayloadDic["total_channels"].ToString());
-                            if (globalHereNowPayloadDic.ContainsKey("channels"))
-                            {
-                                ack.Payload.channels = new Dictionary<string, GlobalHereNowAck.Data.ChannelData>();
-
-                                Dictionary<string, object> globalHereNowChannelListDic = ConvertToDictionaryObject(globalHereNowPayloadDic["channels"]);
-                                if (globalHereNowChannelListDic != null && globalHereNowChannelListDic.Count > 0)
-                                {
-                                    foreach (string channel in globalHereNowChannelListDic.Keys)
-                                    {
-                                        Dictionary<string, object> globalHereNowChannelItemDic = ConvertToDictionaryObject(globalHereNowChannelListDic[channel]);
-                                        if (globalHereNowChannelItemDic != null && globalHereNowChannelItemDic.Count > 0)
-                                        {
-                                            GlobalHereNowAck.Data.ChannelData channelData = new GlobalHereNowAck.Data.ChannelData();
-                                            channelData.occupancy = Convert.ToInt32(globalHereNowChannelItemDic["occupancy"].ToString());
-                                            if (globalHereNowChannelItemDic.ContainsKey("uuids"))
-                                            {
-                                                object[] globalHereNowChannelUuidList = ConvertToObjectArray(globalHereNowChannelItemDic["uuids"]);
-                                                if (globalHereNowChannelUuidList != null && globalHereNowChannelUuidList.Length > 0)
-                                                {
-                                                    List<GlobalHereNowAck.Data.ChannelData.UuidData> uuidDataList = new List<GlobalHereNowAck.Data.ChannelData.UuidData>();
-
-                                                    for (int index = 0; index < globalHereNowChannelUuidList.Length; index++)
-                                                    {
-                                                        if (globalHereNowChannelUuidList[index].GetType() == typeof(string))
-                                                        {
-                                                            GlobalHereNowAck.Data.ChannelData.UuidData uuidData = new GlobalHereNowAck.Data.ChannelData.UuidData();
-                                                            uuidData.uuid = globalHereNowChannelUuidList[index].ToString();
-                                                            uuidDataList.Add(uuidData);
-                                                        }
-                                                        else
-                                                        {
-                                                            Dictionary<string, object> globalHereNowChannelItemUuidsDic = ConvertToDictionaryObject(globalHereNowChannelUuidList[index]);
-                                                            if (globalHereNowChannelItemUuidsDic != null && globalHereNowChannelItemUuidsDic.Count > 0)
-                                                            {
-                                                                GlobalHereNowAck.Data.ChannelData.UuidData uuidData = new GlobalHereNowAck.Data.ChannelData.UuidData();
-                                                                uuidData.uuid = globalHereNowChannelItemUuidsDic["uuid"].ToString();
-                                                                if (globalHereNowChannelItemUuidsDic.ContainsKey("state"))
-                                                                {
-                                                                    uuidData.state = ConvertToDictionaryObject(globalHereNowChannelItemUuidsDic["state"]);
-                                                                }
-                                                                uuidDataList.Add(uuidData);
-                                                            }
-                                                        }
-                                                    }
-                                                    channelData.uuids = uuidDataList.ToArray();
-                                                }
-                                            }
-                                            ack.Payload.channels.Add(channel, channelData);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                ret = (T)Convert.ChangeType(ack, typeof(GlobalHereNowAck), CultureInfo.InvariantCulture);
-                #endregion
-            }
-            else if (typeof(T) == typeof(WhereNowAck))
-            {
-                #region "WhereNowAck"
+#region "WhereNowAck"
                 Dictionary<string, object> wherenowDicObj = ConvertToDictionaryObject(listObject[0]);
 
-                WhereNowAck ack = null;
-
-                int statusCode = 0;
+                PNWhereNowResult ack = null;
 
                 if (wherenowDicObj != null)
                 {
-                    ack = new WhereNowAck();
+                    ack = new PNWhereNowResult();
 
-                    if (int.TryParse(wherenowDicObj["status"].ToString(), out statusCode))
-                        ack.StatusCode = statusCode;
-
-                    ack.StatusMessage = wherenowDicObj["message"].ToString();
-
-                    ack.Service = wherenowDicObj["service"].ToString();
-
-                    ack.Payload = new WhereNowAck.Data();
                     if (wherenowDicObj.ContainsKey("payload"))
                     {
                         Dictionary<string, object> whereNowPayloadDic = ConvertToDictionaryObject(wherenowDicObj["payload"]);
@@ -898,7 +832,6 @@ namespace PubnubApi
                         {
                             if (whereNowPayloadDic.ContainsKey("channels"))
                             {
-                                //ack.Payload.channels = null;
                                 object[] whereNowChannelList = ConvertToObjectArray(whereNowPayloadDic["channels"]);
                                 if (whereNowChannelList != null && whereNowChannelList.Length >= 0)
                                 {
@@ -907,7 +840,7 @@ namespace PubnubApi
                                     {
                                         channelList.Add(channel);
                                     }
-                                    ack.Payload.channels = channelList.ToArray();
+                                    ack.Channels = channelList;
                                 }
 
                             }
@@ -915,301 +848,213 @@ namespace PubnubApi
                     }
                 }
 
-                ret = (T)Convert.ChangeType(ack, typeof(WhereNowAck), CultureInfo.InvariantCulture);
-                #endregion
+                ret = (T)Convert.ChangeType(ack, typeof(PNWhereNowResult), CultureInfo.InvariantCulture);
+#endregion
             }
-            else if (typeof(T) == typeof(SetUserStateAck))
+            else if (typeof(T) == typeof(PNSetStateResult))
             {
-                #region "SetUserStateAck"
+#region "SetUserStateAck"
                 Dictionary<string, object> setUserStatewDicObj = ConvertToDictionaryObject(listObject[0]);
 
-                SetUserStateAck ack = null;
-
-                int statusCode = 0;
+                PNSetStateResult ack = null;
 
                 if (setUserStatewDicObj != null)
                 {
-                    ack = new SetUserStateAck();
+                    ack = new PNSetStateResult();
 
-                    if (int.TryParse(setUserStatewDicObj["status"].ToString(), out statusCode))
-                        ack.StatusCode = statusCode;
+                    //if (listObject != null && listObject.Count >= 2 && listObject[1] != null && !string.IsNullOrEmpty(listObject[1].ToString()))
+                    //{
+                    //    ack.ChannelGroupName = listObject[1].ToString().Split(',');
+                    //}
 
-                    ack.StatusMessage = setUserStatewDicObj["message"].ToString();
+                    //if (listObject != null && listObject.Count >= 3 && listObject[2] != null && !string.IsNullOrEmpty(listObject[2].ToString()))
+                    //{
+                    //    ack.ChannelName = listObject[2].ToString().Split(',');
+                    //}
 
-                    ack.Service = setUserStatewDicObj["service"].ToString();
-
-                    if (listObject != null && listObject.Count >= 2 && listObject[1] != null && !string.IsNullOrEmpty(listObject[1].ToString()))
-                    {
-                        ack.ChannelGroupName = listObject[1].ToString().Split(',');
-                    }
-
-                    if (listObject != null && listObject.Count >= 3 && listObject[2] != null && !string.IsNullOrEmpty(listObject[2].ToString()))
-                    {
-                        ack.ChannelName = listObject[2].ToString().Split(',');
-                    }
-
-                    ack.Payload = new Dictionary<string, object>();
+                    ack.State = new Dictionary<string, object>();
 
                     if (setUserStatewDicObj.ContainsKey("payload"))
                     {
                         Dictionary<string, object> setStateDic = ConvertToDictionaryObject(setUserStatewDicObj["payload"]);
                         if (setStateDic != null)
                         {
-                            ack.Payload = setStateDic;
+                            ack.State = setStateDic;
                         }
                     }
 
                 }
 
-                ret = (T)Convert.ChangeType(ack, typeof(SetUserStateAck), CultureInfo.InvariantCulture);
-                #endregion
+                ret = (T)Convert.ChangeType(ack, typeof(PNSetStateResult), CultureInfo.InvariantCulture);
+#endregion
             }
-            else if (typeof(T) == typeof(GetUserStateAck))
+            else if (typeof(T) == typeof(PNGetStateResult))
             {
-                #region "GetUserStateAck"
+#region "PNGetStateResult"
                 Dictionary<string, object> getUserStatewDicObj = ConvertToDictionaryObject(listObject[0]);
 
-                GetUserStateAck ack = null;
-
-                int statusCode = 0;
+                PNGetStateResult ack = null;
 
                 if (getUserStatewDicObj != null)
                 {
-                    ack = new GetUserStateAck();
+                    ack = new PNGetStateResult();
 
-                    if (int.TryParse(getUserStatewDicObj["status"].ToString(), out statusCode))
-                        ack.StatusCode = statusCode;
+                    //if (listObject != null && listObject.Count >= 2 && listObject[1] != null && !string.IsNullOrEmpty(listObject[1].ToString()))
+                    //{
+                    //    ack.ChannelGroupName = listObject[1].ToString().Split(',');
+                    //}
+                    //if (listObject != null && listObject.Count >= 3 && listObject[2] != null && !string.IsNullOrEmpty(listObject[2].ToString()))
+                    //{
+                    //    ack.ChannelName = listObject[2].ToString().Split(',');
+                    //}
 
-                    ack.StatusMessage = getUserStatewDicObj["message"].ToString();
-
-                    ack.Service = getUserStatewDicObj["service"].ToString();
-
-                    ack.UUID = getUserStatewDicObj["uuid"].ToString();
-
-                    if (listObject != null && listObject.Count >= 2 && listObject[1] != null && !string.IsNullOrEmpty(listObject[1].ToString()))
-                    {
-                        ack.ChannelGroupName = listObject[1].ToString().Split(',');
-                    }
-                    if (listObject != null && listObject.Count >= 3 && listObject[2] != null && !string.IsNullOrEmpty(listObject[2].ToString()))
-                    {
-                        ack.ChannelName = listObject[2].ToString().Split(',');
-                    }
-
-                    ack.Payload = new Dictionary<string, object>();
+                    ack.StateByUUID = new Dictionary<string, object>();
 
                     if (getUserStatewDicObj.ContainsKey("payload"))
                     {
                         Dictionary<string, object> getStateDic = ConvertToDictionaryObject(getUserStatewDicObj["payload"]);
                         if (getStateDic != null)
                         {
-                            ack.Payload = getStateDic;
+                            ack.StateByUUID = getStateDic;
                         }
                     }
-
-
                 }
 
-                ret = (T)Convert.ChangeType(ack, typeof(GetUserStateAck), CultureInfo.InvariantCulture);
-                #endregion
+                ret = (T)Convert.ChangeType(ack, typeof(PNGetStateResult), CultureInfo.InvariantCulture);
+#endregion
             }
-            else if (typeof(T) == typeof(GetChannelGroupChannelsAck))
+            else if (typeof(T) == typeof(PNChannelGroupsAllChannelsResult))
             {
-                #region "GetChannelGroupChannelsAck"
+#region "PNChannelGroupsAllChannelsResult"
                 Dictionary<string, object> getCgChannelsDicObj = ConvertToDictionaryObject(listObject[0]);
 
-                GetChannelGroupChannelsAck ack = null;
-
-                int statusCode = 0;
+                PNChannelGroupsAllChannelsResult ack = null;
 
                 if (getCgChannelsDicObj != null)
                 {
-                    ack = new GetChannelGroupChannelsAck();
-
-                    if (int.TryParse(getCgChannelsDicObj["status"].ToString(), out statusCode))
-                        ack.StatusCode = statusCode;
-
-                    ack.Service = getCgChannelsDicObj["service"].ToString();
-
+                    ack = new PNChannelGroupsAllChannelsResult();
                     Dictionary<string, object> getCgChannelPayloadDic = ConvertToDictionaryObject(getCgChannelsDicObj["payload"]);
                     if (getCgChannelPayloadDic != null && getCgChannelPayloadDic.Count > 0)
                     {
-                        ack.Payload = new GetChannelGroupChannelsAck.Data();
-                        ack.Payload.ChannelGroupName = getCgChannelPayloadDic["group"].ToString();
-
-                        object[] cgChPayloadChannels = ConvertToObjectArray(getCgChannelPayloadDic["channels"]);
-                        if (cgChPayloadChannels != null && cgChPayloadChannels.Length > 0)
+                        ack.ChannelGroup = getCgChannelPayloadDic["group"].ToString();
+                        object[] channelGroupChPayloadChannels = ConvertToObjectArray(getCgChannelPayloadDic["channels"]);
+                        if (channelGroupChPayloadChannels != null && channelGroupChPayloadChannels.Length > 0)
                         {
-                            List<string> chList = new List<string>();
-                            for (int index = 0; index < cgChPayloadChannels.Length; index++)
+                            List<string> channelList = new List<string>();
+                            for (int index = 0; index < channelGroupChPayloadChannels.Length; index++)
                             {
-                                chList.Add(cgChPayloadChannels[index].ToString());
+                                channelList.Add(channelGroupChPayloadChannels[index].ToString());
                             }
-                            ack.Payload.ChannelName = chList.ToArray();
+                            ack.Channels = channelList;
                         }
                     }
-
-                    ack.Error = Convert.ToBoolean(getCgChannelsDicObj["error"].ToString());
                 }
 
-                ret = (T)Convert.ChangeType(ack, typeof(GetChannelGroupChannelsAck), CultureInfo.InvariantCulture);
-                #endregion
+                ret = (T)Convert.ChangeType(ack, typeof(PNChannelGroupsAllChannelsResult), CultureInfo.InvariantCulture);
+#endregion
             }
-            else if (typeof(T) == typeof(GetAllChannelGroupsAck))
+            else if (typeof(T) == typeof(PNChannelGroupsListAllResult))
             {
-                #region "GetAllChannelGroupsAck"
+#region "PNChannelGroupsListAllResult"
                 Dictionary<string, object> getAllCgDicObj = ConvertToDictionaryObject(listObject[0]);
 
-                GetAllChannelGroupsAck ack = null;
-
-                int statusCode = 0;
+                PNChannelGroupsListAllResult ack = null;
 
                 if (getAllCgDicObj != null)
                 {
-                    ack = new GetAllChannelGroupsAck();
-
-                    if (int.TryParse(getAllCgDicObj["status"].ToString(), out statusCode))
-                        ack.StatusCode = statusCode;
-
-                    ack.Service = getAllCgDicObj["service"].ToString();
+                    ack = new PNChannelGroupsListAllResult();
 
                     Dictionary<string, object> getAllCgPayloadDic = ConvertToDictionaryObject(getAllCgDicObj["payload"]);
                     if (getAllCgPayloadDic != null && getAllCgPayloadDic.Count > 0)
                     {
-                        ack.Payload = new GetAllChannelGroupsAck.Data();
-                        ack.Payload.Namespace = getAllCgPayloadDic["namespace"].ToString();
-
-                        object[] cgAllCgPayloadChannels = ConvertToObjectArray(getAllCgPayloadDic["groups"]);
-                        if (cgAllCgPayloadChannels != null && cgAllCgPayloadChannels.Length > 0)
+                        object[] channelGroupAllCgPayloadChannels = ConvertToObjectArray(getAllCgPayloadDic["groups"]);
+                        if (channelGroupAllCgPayloadChannels != null && channelGroupAllCgPayloadChannels.Length > 0)
                         {
                             List<string> allCgList = new List<string>();
-                            for (int index = 0; index < cgAllCgPayloadChannels.Length; index++)
+                            for (int index = 0; index < channelGroupAllCgPayloadChannels.Length; index++)
                             {
-                                allCgList.Add(cgAllCgPayloadChannels[index].ToString());
+                                allCgList.Add(channelGroupAllCgPayloadChannels[index].ToString());
                             }
-                            ack.Payload.ChannelGroupName = allCgList.ToArray();
+                            ack.Groups = allCgList;
                         }
                     }
-
-                    ack.Error = Convert.ToBoolean(getAllCgDicObj["error"].ToString());
                 }
 
-                ret = (T)Convert.ChangeType(ack, typeof(GetAllChannelGroupsAck), CultureInfo.InvariantCulture);
-                #endregion
+                ret = (T)Convert.ChangeType(ack, typeof(PNChannelGroupsListAllResult), CultureInfo.InvariantCulture);
+#endregion
             }
-            else if (typeof(T) == typeof(GetAllNamespacesAck))
+            else if (typeof(T) == typeof(PNChannelGroupsAddChannelResult))
             {
-                #region "GetAllNamespacesAck"
-                Dictionary<string, object> getAllNamespaceDicObj = ConvertToDictionaryObject(listObject[0]);
-
-                GetAllNamespacesAck ack = null;
-
-                int statusCode = 0;
-
-                if (getAllNamespaceDicObj != null)
-                {
-                    ack = new GetAllNamespacesAck();
-
-                    if (int.TryParse(getAllNamespaceDicObj["status"].ToString(), out statusCode))
-                        ack.StatusCode = statusCode;
-
-                    ack.Service = getAllNamespaceDicObj["service"].ToString();
-
-                    Dictionary<string, object> getAllNsPayloadDic = ConvertToDictionaryObject(getAllNamespaceDicObj["payload"]);
-                    if (getAllNsPayloadDic != null && getAllNsPayloadDic.Count > 0)
-                    {
-                        ack.Payload = new GetAllNamespacesAck.Data();
-                        ack.Payload.SubKey = getAllNsPayloadDic["sub_key"].ToString();
-
-                        object[] cgAllNsPayloadNamespaces = ConvertToObjectArray(getAllNsPayloadDic["namespaces"]);
-                        if (cgAllNsPayloadNamespaces != null && cgAllNsPayloadNamespaces.Length > 0)
-                        {
-                            List<string> allCgList = new List<string>();
-                            for (int index = 0; index < cgAllNsPayloadNamespaces.Length; index++)
-                            {
-                                allCgList.Add(cgAllNsPayloadNamespaces[index].ToString());
-                            }
-                            ack.Payload.NamespaceName = allCgList.ToArray();
-                        }
-                    }
-
-                    ack.Error = Convert.ToBoolean(getAllNamespaceDicObj["error"].ToString());
-                }
-
-                ret = (T)Convert.ChangeType(ack, typeof(GetAllNamespacesAck), CultureInfo.InvariantCulture);
-                #endregion
-            }
-            else if (typeof(T) == typeof(AddChannelToChannelGroupAck))
-            {
-                #region "AddChannelToChannelGroupAck"
+#region "AddChannelToChannelGroupAck"
                 Dictionary<string, object> addChToCgDicObj = ConvertToDictionaryObject(listObject[0]);
 
-                AddChannelToChannelGroupAck ack = null;
+                PNChannelGroupsAddChannelResult ack = null;
 
-                int statusCode = 0;
+                //int statusCode = 0;
 
                 if (addChToCgDicObj != null)
                 {
-                    ack = new AddChannelToChannelGroupAck();
+                    ack = new PNChannelGroupsAddChannelResult();
 
-                    if (int.TryParse(addChToCgDicObj["status"].ToString(), out statusCode))
-                        ack.StatusCode = statusCode;
+                    //if (int.TryParse(addChToCgDicObj["status"].ToString(), out statusCode))
+                    //    ack.Status = statusCode;
 
-                    ack.StatusMessage = addChToCgDicObj["message"].ToString();
-                    ack.Service = addChToCgDicObj["service"].ToString();
+                    //ack.Message = addChToCgDicObj["message"].ToString();
+                    //ack.Service = addChToCgDicObj["service"].ToString();
 
-                    ack.Error = Convert.ToBoolean(addChToCgDicObj["error"].ToString());
+                    //ack.Error = Convert.ToBoolean(addChToCgDicObj["error"].ToString());
 
-                    ack.ChannelGroupName = listObject[1].ToString();
+                    //ack.ChannelGroup = listObject[1].ToString();
                 }
 
-                ret = (T)Convert.ChangeType(ack, typeof(AddChannelToChannelGroupAck), CultureInfo.InvariantCulture);
-                #endregion
+                ret = (T)Convert.ChangeType(ack, typeof(PNChannelGroupsAddChannelResult), CultureInfo.InvariantCulture);
+#endregion
             }
-            else if (typeof(T) == typeof(RemoveChannelFromChannelGroupAck))
+            else if (typeof(T) == typeof(PNChannelGroupsRemoveChannelResult))
             {
-                #region "RemoveChannelFromChannelGroupAck"
+#region "PNChannelGroupsRemoveChannelResult"
                 Dictionary<string, object> removeChFromCgDicObj = ConvertToDictionaryObject(listObject[0]);
 
-                RemoveChannelFromChannelGroupAck ack = null;
+                PNChannelGroupsRemoveChannelResult ack = null;
 
                 int statusCode = 0;
 
                 if (removeChFromCgDicObj != null)
                 {
-                    ack = new RemoveChannelFromChannelGroupAck();
+                    ack = new PNChannelGroupsRemoveChannelResult();
 
                     if (int.TryParse(removeChFromCgDicObj["status"].ToString(), out statusCode))
-                        ack.StatusCode = statusCode;
+                        ack.Status = statusCode;
 
-                    ack.StatusMessage = removeChFromCgDicObj["message"].ToString();
+                    ack.Message = removeChFromCgDicObj["message"].ToString();
                     ack.Service = removeChFromCgDicObj["service"].ToString();
 
                     ack.Error = Convert.ToBoolean(removeChFromCgDicObj["error"].ToString());
 
-                    ack.ChannelGroupName = listObject[1].ToString();
+                    ack.ChannelGroup = listObject[1].ToString();
                 }
 
-                ret = (T)Convert.ChangeType(ack, typeof(RemoveChannelFromChannelGroupAck), CultureInfo.InvariantCulture);
-                #endregion
+                ret = (T)Convert.ChangeType(ack, typeof(PNChannelGroupsRemoveChannelResult), CultureInfo.InvariantCulture);
+#endregion
             }
-            else if (typeof(T) == typeof(RemoveChannelGroupAck))
+            else if (typeof(T) == typeof(PNChannelGroupsDeleteGroupResult))
             {
-                #region "RemoveChannelGroupAck"
+#region "PNChannelGroupsDeleteGroupResult"
                 Dictionary<string, object> removeCgDicObj = ConvertToDictionaryObject(listObject[0]);
 
-                RemoveChannelGroupAck ack = null;
+                PNChannelGroupsDeleteGroupResult ack = null;
 
                 int statusCode = 0;
 
                 if (removeCgDicObj != null)
                 {
-                    ack = new RemoveChannelGroupAck();
+                    ack = new PNChannelGroupsDeleteGroupResult();
 
                     if (int.TryParse(removeCgDicObj["status"].ToString(), out statusCode))
-                        ack.StatusCode = statusCode;
+                        ack.Status = statusCode;
 
                     ack.Service = removeCgDicObj["service"].ToString();
-                    ack.StatusMessage = removeCgDicObj["message"].ToString();
+                    ack.Message = removeCgDicObj["message"].ToString();
 
                     //Dictionary<string, object> removeCgPayloadDic = ConvertToDictionaryObject(removeCgDicObj["payload"]);
                     //if (removeCgPayloadDic != null && removeCgPayloadDic.Count > 0)
@@ -1232,34 +1077,60 @@ namespace PubnubApi
                     ack.Error = Convert.ToBoolean(removeCgDicObj["error"].ToString());
                 }
 
-                ret = (T)Convert.ChangeType(ack, typeof(RemoveChannelGroupAck), CultureInfo.InvariantCulture);
-                #endregion
+                ret = (T)Convert.ChangeType(ack, typeof(PNChannelGroupsDeleteGroupResult), CultureInfo.InvariantCulture);
+#endregion
             }
-            else if (typeof(T) == typeof(RemoveNamespaceAck))
+            else if (typeof(T) == typeof(PNTimeResult))
             {
-                #region "RemoveNamespaceAck"
-                Dictionary<string, object> removeNsDicObj = ConvertToDictionaryObject(listObject[0]);
+#region "PNTimeResult"
 
-                RemoveNamespaceAck ack = null;
+                Int64 timetoken = 0;
 
-                int statusCode = 0;
+                Int64.TryParse(listObject[0].ToString(), out timetoken);
 
-                if (removeNsDicObj != null)
+                PNTimeResult result = new PNTimeResult()
                 {
-                    ack = new RemoveNamespaceAck();
+                    Timetoken = timetoken
+                };
 
-                    if (int.TryParse(removeNsDicObj["status"].ToString(), out statusCode))
-                        ack.StatusCode = statusCode;
+                ret = (T)Convert.ChangeType(result, typeof(PNTimeResult), CultureInfo.InvariantCulture);
+#endregion
+            }
+            else if (typeof(T) == typeof(PNPushAddChannelResult))
+            {
+#region "PNPushAddChannelResult"
 
-                    ack.StatusMessage = removeNsDicObj["message"].ToString();
+                PNPushAddChannelResult result = new PNPushAddChannelResult();
 
-                    ack.Service = removeNsDicObj["service"].ToString();
+                ret = (T)Convert.ChangeType(result, typeof(PNPushAddChannelResult), CultureInfo.InvariantCulture);
+#endregion
+            }
+            else if (typeof(T) == typeof(PNPushListProvisionsResult))
+            {
+#region "PNPushListProvisionsResult"
 
-                    ack.Error = Convert.ToBoolean(removeNsDicObj["error"].ToString());
-                }
+                PNPushListProvisionsResult result = new PNPushListProvisionsResult();
 
-                ret = (T)Convert.ChangeType(ack, typeof(RemoveNamespaceAck), CultureInfo.InvariantCulture);
-                #endregion
+                ret = (T)Convert.ChangeType(result, typeof(PNPushListProvisionsResult), CultureInfo.InvariantCulture);
+#endregion
+            }
+            else if (typeof(T) == typeof(PNPushRemoveChannelResult))
+            {
+#region "PNPushRemoveChannelResult"
+
+                PNPushRemoveChannelResult result = new PNPushRemoveChannelResult();
+
+                ret = (T)Convert.ChangeType(result, typeof(PNPushRemoveChannelResult), CultureInfo.InvariantCulture);
+#endregion
+            }
+            else if (typeof(T) == typeof(PNPushRemoveAllChannelsResult))
+            {
+#region "PNPushRemoveAllChannelsResult"
+
+                PNPushRemoveAllChannelsResult result = new PNPushRemoveAllChannelsResult();
+
+                ret = (T)Convert.ChangeType(result, typeof(PNPushRemoveAllChannelsResult), CultureInfo.InvariantCulture);
+#endregion
             }
             else
             {
@@ -1284,10 +1155,10 @@ namespace PubnubApi
                 {
                     ret = new Dictionary<string, object>();
 
-                    IDictionary<string, JToken> jDictionary = localContainer as JObject;
-                    if (jDictionary != null)
+                    IDictionary<string, JToken> jsonDictionary = localContainer as JObject;
+                    if (jsonDictionary != null)
                     {
-                        foreach (KeyValuePair<string, JToken> pair in jDictionary)
+                        foreach (KeyValuePair<string, JToken> pair in jsonDictionary)
                         {
                             JToken token = pair.Value;
                             ret.Add(pair.Key, ConvertJTokenToObject(token));
@@ -1303,6 +1174,17 @@ namespace PubnubApi
                         ret.Add(key, dictionary[key]);
                     }
                 }
+                else if (localContainer.GetType().ToString() == "Newtonsoft.Json.Linq.JProperty")
+                {
+                    ret = new Dictionary<string, object>();
+
+                    JProperty jsonProp = localContainer as JProperty;
+                    if (jsonProp != null)
+                    {
+                        string propName = jsonProp.Name;
+                        ret.Add(propName, ConvertJTokenToObject(jsonProp.Value));
+                    }
+                }
             }
 
             return ret;
@@ -1315,15 +1197,15 @@ namespace PubnubApi
 
             if (localContainer != null && localContainer.GetType().ToString() == "Newtonsoft.Json.Linq.JObject[]")
             {
-                IDictionary<string, JToken>[] iDictionary = localContainer as IDictionary<string, JToken>[];
-                if (iDictionary != null && iDictionary.Length > 0)
+                IDictionary<string, JToken>[] jsonDictionary = localContainer as IDictionary<string, JToken>[];
+                if (jsonDictionary != null && jsonDictionary.Length > 0)
                 {
-                    ret = new Dictionary<string, object>[iDictionary.Length];
+                    ret = new Dictionary<string, object>[jsonDictionary.Length];
 
-                    for (int index = 0; index < iDictionary.Length; index++)
+                    for (int index = 0; index < jsonDictionary.Length; index++)
                     {
-                        IDictionary<string, JToken> iItem = iDictionary[index];
-                        foreach (KeyValuePair<string, JToken> pair in iItem)
+                        IDictionary<string, JToken> jsonItem = jsonDictionary[index];
+                        foreach (KeyValuePair<string, JToken> pair in jsonItem)
                         {
                             JToken token = pair.Value;
                             ret[index].Add(pair.Key, ConvertJTokenToObject(token));
@@ -1372,17 +1254,17 @@ namespace PubnubApi
                 return null;
             }
 
-            var jValue = token as JValue;
-            if (jValue != null)
+            var jsonValue = token as JValue;
+            if (jsonValue != null)
             {
-                return jValue.Value;
+                return jsonValue.Value;
             }
 
-            var jContainer = token as JArray;
-            if (jContainer != null)
+            var jsonContainer = token as JArray;
+            if (jsonContainer != null)
             {
                 List<object> jsonList = new List<object>();
-                foreach (JToken arrayItem in jContainer)
+                foreach (JToken arrayItem in jsonContainer)
                 {
                     jsonList.Add(ConvertJTokenToObject(arrayItem));
                 }
@@ -1411,7 +1293,64 @@ namespace PubnubApi
             return null;
         }
 
-        #endregion
+        private static object ConvertToDataType(Type dataType, object inputValue)
+        {
+            if (dataType == inputValue.GetType())
+            {
+                return inputValue;
+            }
+
+            object userMessage = inputValue;
+            switch (dataType.FullName)
+            {
+                case "System.Int32":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.Int32), CultureInfo.InvariantCulture);
+                    break;
+                case "System.Int16":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.Int16), CultureInfo.InvariantCulture);
+                    break;
+                case "System.UInt64":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.UInt64), CultureInfo.InvariantCulture);
+                    break;
+                case "System.UInt32":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.UInt32), CultureInfo.InvariantCulture);
+                    break;
+                case "System.UInt16":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.UInt16), CultureInfo.InvariantCulture);
+                    break;
+                case "System.Byte":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.Byte), CultureInfo.InvariantCulture);
+                    break;
+                case "System.SByte":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.SByte), CultureInfo.InvariantCulture);
+                    break;
+                case "System.Decimal":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.Decimal), CultureInfo.InvariantCulture);
+                    break;
+                case "System.Boolean":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.Boolean), CultureInfo.InvariantCulture);
+                    break;
+                case "System.Double":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.Double), CultureInfo.InvariantCulture);
+                    break;
+                case "System.Char":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.Char), CultureInfo.InvariantCulture);
+                    break;
+                case "System.String":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.String), CultureInfo.InvariantCulture);
+                    break;
+                case "System.Object":
+                    userMessage = Convert.ChangeType(inputValue, typeof(System.Object), CultureInfo.InvariantCulture);
+                    break;
+                default:
+                    break;
+            }
+
+            return userMessage;
+        }
+
+#endregion
 
     }
+
 }

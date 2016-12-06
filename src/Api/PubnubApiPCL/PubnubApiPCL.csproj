@@ -34,6 +34,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>pubnub.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="Builder\ResponseBuilder.cs" />
     <Compile Include="Builder\StatusBuilder.cs" />
@@ -101,7 +107,6 @@
     <Compile Include="Callbacks\SubscribeCallback.cs" />
     <Compile Include="Model\InternetState.cs" />
     <Compile Include="Interface\IPubnubLog.cs" />
-    <Compile Include="Interface\IPubnubSubscribeMessageType.cs" />
     <Compile Include="Interface\IPubnubUnitTest.cs" />
     <Compile Include="Log\LoggingMethod.cs" />
     <Compile Include="PNConfiguration.cs" />
@@ -122,9 +127,7 @@
     <Compile Include="Security\PubnubCrypto.cs" />
     <Compile Include="Security\PubnubCryptoBase.cs" />
     <Compile Include="Enum\PubnubErrorCode.cs" />
-    <Compile Include="Model\PubnubErrorCodeDescription.cs" />
     <Compile Include="Model\PNStatusCategoryHelper.cs" />
-    <Compile Include="Model\PubnubErrorFilter.cs" />
     <Compile Include="Enum\PubnubErrorSeverity.cs" />
     <Compile Include="Enum\PubnubMessageSource.cs" />
     <Compile Include="Proxy\PubnubProxy.cs" />
@@ -141,6 +144,7 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="pubnub.snk" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="crypto, Version=1.7.0.0, Culture=neutral, PublicKeyToken=52d7d8cd84e8295f, processorArchitecture=MSIL">
@@ -172,7 +176,6 @@
       <Private>True</Private>
     </Reference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="$(ProgramFiles)\MSBuild\StyleCop\v4.7\StyleCop.targets" />
   <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />

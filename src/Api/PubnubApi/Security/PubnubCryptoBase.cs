@@ -1,8 +1,15 @@
 ﻿using System;
 using System.Globalization;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+
+#if NET35
+using System.Security.Cryptography;
+#else
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Security;
+#endif
 
 namespace PubnubApi
 {
@@ -35,7 +42,7 @@ namespace PubnubApi
             //Compute Hash using the SHA256 
             string strKeySHA256HashRaw = ComputeHashRaw(this.cipherKey);
             //delete the "-" that appear after every 2 chars
-            string strKeySHA256Hash = (strKeySHA256HashRaw.Replace("-", "")).Substring(0, 32);
+            string strKeySHA256Hash = strKeySHA256HashRaw.Replace("-", "").Substring(0, 32);
             //convert to lower case
             return strKeySHA256Hash.ToLower();
         }
@@ -66,18 +73,6 @@ namespace PubnubApi
 
             return EncryptOrDecrypt(false, cipherText);
         }
-
-        //md5 used for AES encryption key
-        /*private static byte[] Md5(string cipherKey)
-		{
-			MD5 obj = new MD5CryptoServiceProvider();
-			#if (SILVERLIGHT || WINDOWS_PHONE)
-			byte[] data = Encoding.UTF8.GetBytes(cipherKey);
-			#else
-			byte[] data = Encoding.Default.GetBytes(cipherKey);
-			#endif
-			return obj.ComputeHash(data);
-		}*/
 
         /// <summary>
         /// Converts the upper case hex to lower case hex.
@@ -133,28 +128,26 @@ namespace PubnubApi
             byte[] keyByte = encoding.GetBytes(secret);
             byte[] messageBytes = encoding.GetBytes(message);
 
-#if NETFX_CORE
-            var hmacsha256 = MacAlgorithmProvider.OpenAlgorithm(MacAlgorithmNames.HmacSha256);
-            IBuffer valueBuffer = CryptographicBuffer.ConvertStringToBinary(message, BinaryStringEncoding.Utf8);
-            IBuffer buffKeyMaterial = CryptographicBuffer.ConvertStringToBinary(secret, BinaryStringEncoding.Utf8);
-
-            CryptographicKey cryptographicKey = hmacsha256.CreateKey(buffKeyMaterial);
-
-            // Sign the key and message together.
-            IBuffer bufferProtected = CryptographicEngine.Sign(cryptographicKey, valueBuffer);
-
-            DataReader dataReader = DataReader.FromBuffer(bufferProtected);
-            byte[] hashmessage = new byte[bufferProtected.Length];
-            dataReader.ReadBytes(hashmessage);
-
-            return Convert.ToBase64String(hashmessage).Replace('+', '-').Replace('/', '_');
-#else
+#if NET35
             using (var hmacsha256 = new HMACSHA256(keyByte))
             {
                 byte[] hashmessage = hmacsha256.ComputeHash(messageBytes);
                 return Convert.ToBase64String(hashmessage).Replace('+', '-').Replace('/', '_');
             }
+#else
+
+            //http://mycsharp.de/wbb2/thread.php?postid=3550104
+            KeyParameter paramKey = new KeyParameter(keyByte);
+            IMac mac = MacUtilities.GetMac("HMac-SHA256");
+            mac.Init(paramKey);
+            mac.Reset();
+            mac.BlockUpdate(messageBytes, 0, messageBytes.Length);
+            byte[] hashmessage = new byte[mac.GetMacSize()];
+            mac.DoFinal(hashmessage, 0);
+            return Convert.ToBase64String(hashmessage).Replace('+', '-').Replace('/', '_');
 #endif
         }
+
+
     }
 }

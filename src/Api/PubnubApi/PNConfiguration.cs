@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
 
 namespace PubnubApi
 {
     public class PNConfiguration
     {
-        private int _presenceHeartbeatTimeout;
-        private int _presenceHeartbeatInterval;
-        private string _uuid = "";
+        private int presenceHeartbeatTimeout;
+        private int presenceHeartbeatInterval;
+        private string uuid = "";
 
         public string Origin { get; set; }
 
@@ -16,7 +19,7 @@ namespace PubnubApi
         {
             get
             {
-                return _presenceHeartbeatTimeout;
+                return presenceHeartbeatTimeout;
             }
         }
 
@@ -24,7 +27,7 @@ namespace PubnubApi
         {
             get
             {
-                return _presenceHeartbeatInterval;
+                return presenceHeartbeatInterval;
             }
         }
 
@@ -44,13 +47,13 @@ namespace PubnubApi
         {
             get
             {
-                return _uuid;
+                return uuid;
             }
             set
             {
                 if (value != null && value.Trim().Length > 0)
                 {
-                    _uuid = value;
+                    uuid = value;
                 }
                 else
                 {
@@ -59,7 +62,19 @@ namespace PubnubApi
             }
         }
 
-        public LoggingMethod.Level LogVerbosity { get; set; }
+        public string SdkVersion
+        {
+            get
+            {
+                return "PubNub CSharp 4.0";
+            }
+        }
+
+        public PNLogVerbosity LogVerbosity { get; set; }
+
+        public IPubnubLog PubnubLog { get; set; }
+
+        public IPubnubProxy Proxy { get; set; }
 
         public int ConnectTimeout { get; set; }
 
@@ -67,31 +82,59 @@ namespace PubnubApi
 
         public PNHeartbeatNotificationOption HeartbeatNotificationOption { get; set; }
 
+        public string PushServiceName { get; set; }
+
+        public bool EnableDebugForPushPublish { get; set; }
+
+        public Collection<Uri> PushRemoteImageDomainUri { get; set; }
+
+        //For publishing direct JSON string
+        public bool EnableJsonEncodingForPublish { get; set; }
+
+        public bool AddPayloadToPublishResponse { get; set; }
+
         public string FilterExpression { get; set; }
+
+        public bool IncludeInstanceIdentifier { get; set; }
+
+        public bool IncludeRequestIdentifier { get; set; }
+
+        public PNReconnectionPolicy ReconnectionPolicy { get; set; } = PNReconnectionPolicy.EXPONENTIAL;
+
+        public int RequestMessageCountThreshold { get; set; } = 100;
 
         public PNConfiguration()
         {
-            this._presenceHeartbeatTimeout = 300;
-            this._uuid = Guid.NewGuid().ToString();
+            this.Origin = "pubsub.pubnub.com";
+            this.presenceHeartbeatTimeout = 300;
+            this.uuid = Guid.NewGuid().ToString();
             this.NonSubscribeRequestTimeout = 10;
             this.SubscribeTimeout = 310;
             this.ConnectTimeout = 5;
-            this.LogVerbosity = LoggingMethod.Level.Off;
+            //this.LogVerbosity = LoggingMethod.Level.Off;
+            this.CiperKey = "";
+            this.PublishKey = "";
+            this.SubscribeKey = "";
+            this.SecretKey = "";
             this.Secure = true;
+            this.EnableJsonEncodingForPublish = true;
         }
 
         public PNConfiguration SetPresenceHeartbeatTimeoutWithCustomInterval(int timeout, int interval)
         {
-            this._presenceHeartbeatTimeout = timeout;
-            this._presenceHeartbeatInterval = interval;
+            this.presenceHeartbeatTimeout = timeout;
+            this.presenceHeartbeatInterval = interval;
 
             return this;
         }
+
         public PNConfiguration SetPresenceHeartbeatTimeout(int timeout)
         {
-            this._presenceHeartbeatTimeout = timeout;
+            this.presenceHeartbeatTimeout = timeout;
 
             return SetPresenceHeartbeatTimeoutWithCustomInterval(timeout, (timeout / 2) - 1);
         }
+
+
     }
 }
