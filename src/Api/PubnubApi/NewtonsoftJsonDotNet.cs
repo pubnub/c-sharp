@@ -144,7 +144,7 @@ namespace PubnubApi
                 ret = true;
             }
             System.Diagnostics.Debug.WriteLine("NET35/40 IsGenericTypeForMessage = {0}", ret.ToString());
-#elif NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12 || NETSTANDARD13 || WP81 
+#elif NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12 || NETSTANDARD13 || NETSTANDARD14 || WP81 
             if (typeof(T).GetTypeInfo().IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(PNMessageResult<>))
             {
                 ret = true;
@@ -222,7 +222,7 @@ namespace PubnubApi
 
                 ret = (T)Convert.ChangeType(message, specific, CultureInfo.InvariantCulture);
             }
-#elif NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12 || NETSTANDARD13 || WP81 
+#elif NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12 || NETSTANDARD13 || NETSTANDARD14 || WP81 
             Type dataType = typeof(T).GetTypeInfo().GenericTypeArguments[0];
             Type generic = typeof(PNMessageResult<>);
             Type specific = generic.MakeGenericType(dataType);

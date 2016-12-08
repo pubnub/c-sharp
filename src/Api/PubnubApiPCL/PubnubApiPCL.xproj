@@ -7,11 +7,11 @@
 
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>3efc211d-8b9a-4b3e-94b5-71abdbbc6848</ProjectGuid>
-    <RootNamespace>PubnubApi</RootNamespace>
+    <ProjectGuid>b23455af-6376-482c-bbed-74c3744d6aa6</ProjectGuid>
+    <RootNamespace>PubnubApiPCL</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">.\obj</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">.\bin\</OutputPath>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
   </PropertyGroup>
 
   <PropertyGroup>

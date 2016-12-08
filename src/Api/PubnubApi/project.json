@@ -9,16 +9,20 @@
     "iconUrl": "http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png",
     "requireLicenseAcceptance": true,
     "repository": { "url": "https://github.com/pubnub/c-sharp/" },
-    "releaseNotes": "New Release 4.0.1.0",
+    "releaseNotes": "New Release 4.0.1.0. ***ATTENTION*** Major changes in SDK. All methods and signatures changed. Auto-upgrade NOT recommended",
     "tags": [ "Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing" ],
     "summary": "PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously"
   },
   "buildOptions": {
     "keyFile": "pubnub.snk",
-    "defines": [ "DEBUG" ]
+    "defines": [ "DEBUG", "RELEASE" ]
   },
   "description": "PubNub allows you to securely connect mobile phones, tablets, laptops, desktops and other clients outside of your cloud. PubNub provides the connectivity from your cloud to push data to end clients (phones, tablets, laptops and servers). This is called Real-time Data Push, or Push Notifications. PubNub removes the need for your client apps to constantly poll your cloud for new updates. So you can push data from a Server to a Client. And also you may push data from one Server to another Server, just like Azure ServiceBus ESB. Another option is available for a Mobile Phone to Push Data to another Mobile Phone or any endpoint. With PubNub this becomes easy using the two basic Publish/Subscribe APIs. Additionally PubNub provides automatic Broadcasting. When multiple clients/servers/phones are subscribed to a single channel, each endpoint receives a published message simultaneously.",
   "copyright": "PubNub 2012-2017",
+
+  "supports": {
+
+  },
 
   "dependencies": {
     "Newtonsoft.Json": "9.0.1"
@@ -41,166 +45,7 @@
         "Portable.BouncyCastle": "1.8.1.1",
         "Microsoft.Bcl.Async": "1.0.168"
       }
-    },
-
-    ".NETPortable,Version=v4.0,Profile=Profile136": {
-      "buildOptions": { "define": [ "PORTABLE136" ] },
-      "frameworkAssemblies": {
-        "mscorlib": "",
-        "System": "",
-        "System.Core": "",
-        "System.Net": ""
-      },
-
-      "dependencies": {
-        "Portable.BouncyCastle": "1.8.1.1",
-        "Microsoft.Bcl.Async": "1.0.168"
-      },
-      "imports": [
-      ]
-    },
-
-    ".NETPortable,Version=v4.5,Profile=Profile111": {
-      "buildOptions": { "define": [ "PORTABLE111" ] },
-      "frameworkAssemblies": {
-        "mscorlib": "",
-        "System": "",
-        "System.Core": "",
-        "System.Net": "",
-        "System.Net.Primitives": "",
-        "System.Net.Requests": ""
-      },
-
-      "dependencies": {
-        "Portable.BouncyCastle": "1.8.1.1"
-      },
-      "imports": [
-      ]
-    },
-
-    //".NETPortable,Version=v4.5,Profile=Profile259": {
-    //  "buildOptions": { "define": [ "PORTABLE259" ] },
-    //  "frameworkAssemblies": {
-    //    "mscorlib": "",
-    //    "System": "",
-    //    "System.Core": "",
-    //    "System.Net": "",
-    //    "System.Net.Primitives": "",
-    //    "System.Net.Requests": "",
-    //  },
-
-    //  "dependencies": {
-    //    "Portable.BouncyCastle": "1.8.1.1"
-    //  },
-    //  "imports": [
-    //    //"MonoAndroid10",
-    //    //"xamarinios10",
-    //    //"MonoTouch10",
-    //    //"monomac"
-    //  ]
-    //},
-
-    //"wpa8.1": {
-    //  "buildOptions": { "define": [ "WP81" ] },
-    //  "frameworkAssemblies": {
-    //    "Microsoft.CSharp": "",
-    //    "System": "",
-    //    "System.Core": "",
-    //    "mscorlib": ""
-    //  },
-    //  "dependencies": {
-    //    "System.ComponentModel": "4.0.0",
-    //    "System.Collections": "4.0.0",
-    //    "System.Reflection.Primitives": "4.0.0",
-    //    "System.Reflection.Extensions": "4.0.0",
-    //    "Microsoft.Net.Http": "2.2.29",
-    //    "System.Runtime": "4.0.10",
-    //    "System.Net.Primitives": "4.0.0",
-    //    "System.Net.Requests": "4.0.0",
-    //    "Portable.BouncyCastle": "1.8.1.1",
-    //    "System.Threading": "4.0.0",
-    //    "System.Threading.Timer": "4.0.0"
-
-    //  }
-    //},
-
-    //docs.nuget.org/ndocs/schema/target-frameworks
-
-    "netstandard1.0": {
-      "buildOptions": { "define": [ "NETSTANDARD10" ] },
-      "dependencies": {
-        //"Microsoft.NETCore.Portable.Compatibility": "1.0.1",
-        "Portable.BouncyCastle": "1.8.1.1",
-        "NETStandard.Library": "1.6.0",
-        "System.Net.Requests": "4.0.11",
-        "System.Reflection.Primitives": "4.0.1",
-        "System.Linq.Queryable": "4.0.1",
-        "System.Text.Encoding": "4.0.11",
-        "System.Text.Encoding.Extensions": "4.0.11"
-      },
-      "imports": [
-        "portable-net45+win8+wpa81+wp8",
-        "portable-win81+wp81+wpa81"
-      ]
-    },
-
-    //"netstandard1.1": {
-    //  "buildOptions": { "define": [ "NETSTANDARD11" ] },
-    //  "dependencies": {
-    //    //"Microsoft.NETCore.Portable.Compatibility": "1.0.1",
-    //    "Portable.BouncyCastle": "1.8.1.1",
-    //    "NETStandard.Library": "1.6.0",
-    //    "System.Net.Requests": "4.0.11",
-    //    "System.Reflection.Primitives": "4.0.1",
-    //    "System.Linq.Queryable": "4.0.1",
-    //    "System.Text.Encoding": "4.0.11",
-    //    "System.Text.Encoding.Extensions": "4.0.11"
-    //    //"System.Runtime.InteropServices.RuntimeInformation":"4.0.0"
-    //  },
-    //  "imports": [
-    //    //"portable-net45+win8+wpa81"
-    //  ]
-    //},
-
-    //"netstandard1.2": {
-    //  "buildOptions": { "define": [ "NETSTANDARD12" ] },
-    //  "dependencies": {
-    //    //"Microsoft.NETCore.Portable.Compatibility": "1.0.1",
-    //    "Portable.BouncyCastle": "1.8.1.1",
-    //    "NETStandard.Library": "1.6.0",
-    //    "System.Net.Requests": "4.0.11",
-    //    "System.Reflection.Primitives": "4.0.1",
-    //    "System.Linq.Queryable": "4.0.1",
-    //    "System.Text.Encoding": "4.0.11",
-    //    "System.Text.Encoding.Extensions": "4.0.11"
-    //  },
-    //  "imports": [
-    //    "portable-net451+win81+wpa81"
-    //  ]
-    //},
-
-    "netstandard1.3": {
-      "buildOptions": { "define": [ "NETSTANDARD13" ] },
-      "dependencies": {
-        //"Microsoft.NETCore.Portable.Compatibility": "1.0.1",
-        "Portable.BouncyCastle": "1.8.1.1",
-        "NETStandard.Library": "1.6.0",
-        "System.Net.Requests": "4.0.11",
-        "System.Reflection.Primitives": "4.0.1",
-        "System.Reflection.TypeExtensions": "4.1.0",
-        "System.Threading.ThreadPool": "4.0.10",
-        "System.Linq.Queryable": "4.0.1",
-        "System.Text.Encoding": "4.0.11",
-        "System.Text.Encoding.Extensions": "4.0.11"
-      },
-      "imports": [
-        //"dnxcore50",
-        //"portable-net45+win8+wpa81+wp8",
-        //"portable45-net45+win8+wp8+wpa81",
-        //"portable-net40+sl5+win8+wp8"
-      ]
     }
-
 
   }
 }

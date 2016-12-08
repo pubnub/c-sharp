@@ -75,10 +75,6 @@
     <Compile Include="EncryptionTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Api\PubnubApiPCL\PubnubApiPCL.csproj">
-      <Project>{84a6a216-af4f-4ac1-bb88-7a78f2e2521c}</Project>
-      <Name>PubnubApiPCL</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MockServer\MockServer.csproj">
       <Project>{0bd7fd95-ebc0-4b57-a589-d84b92ef6056}</Project>
       <Name>MockServer</Name>
