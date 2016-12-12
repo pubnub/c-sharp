@@ -1,124 +1,149 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using NUnit.Framework;
 using System.ComponentModel;
 using System.Threading;
 using System.Collections;
-//using Newtonsoft.Json;
-//using Newtonsoft.Json.Linq;
 using PubnubApi;
+using MockServer;
 
 
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
-    public class WhenPushIsRequested
+    public class WhenPushIsRequested : TestHarness
     {
-        //string currentUnitTestCase = "";
-        bool receivedSuccessMessage = false;
-        static bool receivedGrantMessage = false;
+        private static bool receivedPublishMessage = false;
+        private static bool receivedGrantMessage = false;
 
         ManualResetEvent mrePush = new ManualResetEvent(false);
-        ManualResetEvent mreGrant = new ManualResetEvent(false);
-        ManualResetEvent mrePublish = new ManualResetEvent(false);
+        private static ManualResetEvent grantManualEvent = new ManualResetEvent(false);
+        private static ManualResetEvent publishManualEvent = new ManualResetEvent(false);
 
-        Pubnub pubnub = null;
+        private static string channel = "hello_my_channel";
+        private static string authKey = "myAuth";
+        private static long publishTimetoken = 0;
+        private static string currentTestCase = "";
+        int manualResetEventWaitTimeout = 310 * 1000;
+
+        private static Pubnub pubnub = null;
+
+        private Server server;
+        private UnitTestLog unitLog;
+
 
         [TestFixtureSetUp]
         public void Init()
         {
+            unitLog = new Tests.UnitTestLog();
+            unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
+            server = new Server(new Uri("https://" + PubnubCommon.StubOrign));
+            MockServer.LoggingMethod.MockServerLog = unitLog;
+            server.Start();
+
             if (!PubnubCommon.PAMEnabled) return;
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = PubnubCommon.SecretKey;
-            config.CiperKey = "";
-            config.Secure = false;
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                AuthKey = authKey,
+                Uuid = "mytestuuid",
+                Secure = false
+            };
 
-            pubnub = new Pubnub(config);
+            pubnub = this.createPubNubInstance(config);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "GrantRequestUnitTest";
-            unitTest.TestCaseName = "Init";
-            pubnub.PubnubUnitTest = unitTest;
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"demo-36\",\"ttl\":20,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
 
-            string channel = "hello_my_channel";
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithParameter("auth", authKey)
+                    .WithParameter("channel", channel)
+                    .WithParameter("m", "1")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("r", "1")
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("ttl", "20")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("w", "1")
+                    .WithParameter("signature", "pOL-X541lXTpA8fNkJE3k7FjaZwo0qynAkPhBPANiCg=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.GrantAccess(channel, true, true, 20, ThenPublishInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+
             Thread.Sleep(1000);
 
-            mreGrant.WaitOne();
+            grantManualEvent.WaitOne();
 
-            pubnub.EndPendingRequests(); 
+            pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(receivedGrantMessage, "WhenAMessageIsPublished Grant access failed.");
+
+            Assert.IsTrue(receivedGrantMessage, "WhenPushIsRequested Grant access failed.");
         }
 
         [Test]
         public void ThenPublishMpnsToastShouldReturnSuccess()
         {
-            receivedSuccessMessage = false;
+            receivedPublishMessage = false;
+            publishTimetoken = 0;
+            currentTestCase = "ThenPublishMpnsToastShouldReturnSuccess";
 
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = "";
-            config.CiperKey = "";
-            config.Secure = false;
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false,
+                EnableDebugForPushPublish = true
+            };
 
-            pubnub = new Pubnub(config);
-
-            string channel = "hello_my_channel";
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenPushIsRequested";
-            unitTest.TestCaseName = "ThenPublishMpnsToastShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-
-            mrePublish = new ManualResetEvent(false);
+            pubnub = this.createPubNubInstance(config);
 
             MpnsToastNotification toast = new MpnsToastNotification();
             toast.text1 = "hardcode message";
             Dictionary<string, object> dicToast = new Dictionary<string, object>();
             dicToast.Add("pn_mpns", toast);
 
-            pubnub.EnableDebugForPushPublish = true;
-            pubnub.Publish(channel, dicToast, PublishCallbackResult, DummyErrorCallback);
-            mrePublish.WaitOne(60 * 1000);
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
-            pubnub.EndPendingRequests(); 
+            publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(dicToast).Async(new UTPublishResult());
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(receivedSuccessMessage, "Toast Publish Failed");
+
+            Assert.IsTrue(receivedPublishMessage, "Toast Publish Failed");
         }
 
         [Test]
         public void ThenPublishMpnsFlipTileShouldReturnSuccess()
         {
-            receivedSuccessMessage = false;
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = "";
-            config.CiperKey = "";
-            config.Secure = false;
+            receivedPublishMessage = false;
+            publishTimetoken = 0;
+            currentTestCase = "ThenPublishMpnsFlipTileShouldReturnSuccess";
 
-            pubnub = new Pubnub(config);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false,
+                EnableDebugForPushPublish = true
+            };
 
-            string channel = "hello_my_channel";
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenPushIsRequested";
-            unitTest.TestCaseName = "ThenPublishMpnsFlipTileShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-
-            mrePublish = new ManualResetEvent(false);
+            pubnub = this.createPubNubInstance(config);
 
             MpnsFlipTileNotification tile = new MpnsFlipTileNotification();
             tile.title = "front title";
@@ -130,38 +155,37 @@ namespace PubNubMessaging.Tests
             Dictionary<string, object> dicTile = new Dictionary<string, object>();
             dicTile.Add("pn_mpns", tile);
 
-            pubnub.EnableDebugForPushPublish = true;
-            pubnub.Publish(channel, dicTile, PublishCallbackResult, DummyErrorCallback);
-            mrePublish.WaitOne(60 * 1000);
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
-            pubnub.EndPendingRequests(); 
+            publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(dicTile).Async(new UTPublishResult());
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(receivedSuccessMessage, "Flip Tile Publish Failed");
+            Assert.IsTrue(receivedPublishMessage, "Flip Tile Publish Failed");
         }
 
         [Test]
         public void ThenPublishMpnsCycleTileShouldReturnSuccess()
         {
-            receivedSuccessMessage = false;
+            receivedPublishMessage = false;
+            publishTimetoken = 0;
+            currentTestCase = "ThenPublishMpnsCycleTileShouldReturnSuccess";
 
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = "";
-            config.CiperKey = "";
-            config.Secure = false;
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false,
+                EnableDebugForPushPublish = true
+            };
 
-            pubnub = new Pubnub(config);
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenPushIsRequested";
-            unitTest.TestCaseName = "ThenPublishMpnsCycleTileShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-
-            mrePublish = new ManualResetEvent(false);
 
             MpnsCycleTileNotification tile = new MpnsCycleTileNotification();
             tile.title = "front title";
@@ -171,38 +195,37 @@ namespace PubNubMessaging.Tests
             Dictionary<string, object> dicTile = new Dictionary<string, object>();
             dicTile.Add("pn_mpns", tile);
 
-            pubnub.EnableDebugForPushPublish = true;
-            pubnub.Publish(channel, dicTile, PublishCallbackResult, DummyErrorCallback);
-            mrePublish.WaitOne(60 * 1000);
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
-            pubnub.EndPendingRequests(); 
+            publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(dicTile).Async(new UTPublishResult());
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(receivedSuccessMessage, "Cycle Tile Publish Failed");
+            Assert.IsTrue(receivedPublishMessage, "Cycle Tile Publish Failed");
         }
 
         [Test]
         public void ThenPublishMpnsIconicTileShouldReturnSuccess()
         {
-            receivedSuccessMessage = false;
+            receivedPublishMessage = false;
+            publishTimetoken = 0;
+            currentTestCase = "ThenPublishMpnsIconicTileShouldReturnSuccess";
 
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = "";
-            config.CiperKey = "";
-            config.Secure = false;
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false,
+                EnableDebugForPushPublish = true
+            };
 
-            pubnub = new Pubnub(config);
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenPushIsRequested";
-            unitTest.TestCaseName = "ThenPublishMpnsIconicTileShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-
-            mrePublish = new ManualResetEvent(false);
 
             MpnsIconicTileNotification tile = new MpnsIconicTileNotification();
             tile.title = "front title";
@@ -212,57 +235,74 @@ namespace PubNubMessaging.Tests
             Dictionary<string, object> dicTile = new Dictionary<string, object>();
             dicTile.Add("pn_mpns", tile);
 
-            pubnub.EnableDebugForPushPublish = true;
-            pubnub.Publish(channel, dicTile, PublishCallbackResult, DummyErrorCallback);
-            mrePublish.WaitOne(60 * 1000);
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
-            pubnub.EndPendingRequests(); 
+            publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(dicTile).Async(new UTPublishResult());
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(receivedSuccessMessage, "Iconic Tile Publish Failed");
+            Assert.IsTrue(receivedPublishMessage, "Iconic Tile Publish Failed");
         }
 
-        private void PublishCallbackResult(PublishAck result)
+        private class UTGrantResult : PNCallback<PNAccessManagerGrantResult>
         {
-            if (result != null)
+            public override void OnResponse(PNAccessManagerGrantResult result, PNStatus status)
             {
-                long statusCode = result.StatusCode;
-                string statusMessage = result.StatusMessage;
-                if (statusCode == 1 && statusMessage.ToLower() == "sent")
+                try
                 {
-                    receivedSuccessMessage = true;
-                }
-            }
-            mrePublish.Set();
-        }
+                    Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
 
-        void ThenPublishInitializeShouldReturnGrantMessage(GrantAck receivedMessage)
-        {
-            try
-            {
-                if (receivedMessage != null)
-                {
-                    var status = receivedMessage.StatusCode;
-                    if (status == 200)
+                    if (result != null)
                     {
-                        receivedGrantMessage = true;
+                        Console.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        if (result.Channels != null && result.Channels.Count > 0)
+                        {
+                            var read = result.Channels[channel][authKey].ReadEnabled;
+                            var write = result.Channels[channel][authKey].WriteEnabled;
+                            if (read && write)
+                            {
+                                receivedGrantMessage = true;
+                            }
+                        }
                     }
                 }
-            }
-            catch { }
-            finally
-            {
-                mreGrant.Set();
+                catch
+                {
+                }
+                finally
+                {
+                    grantManualEvent.Set();
+                }
             }
         }
 
-        private void DummyErrorCallback(PubnubClientError result)
+        public class UTPublishResult : PNCallback<PNPublishResult>
         {
-            if (result != null)
+            public override void OnResponse(PNPublishResult result, PNStatus status)
             {
-                Console.WriteLine(result.Message);
-            }
-        }
+                Console.WriteLine("Publish Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                Console.WriteLine("Publish PNStatus => Status = : " + status.StatusCode.ToString());
+                if (result != null && status.StatusCode == 200 && !status.Error)
+                {
+                    publishTimetoken = result.Timetoken;
+                    switch (currentTestCase)
+                    {
+                        case "ThenPublishMpnsToastShouldReturnSuccess":
+                        case "ThenPublishMpnsFlipTileShouldReturnSuccess":
+                        case "ThenPublishMpnsCycleTileShouldReturnSuccess":
+                        case "ThenPublishMpnsIconicTileShouldReturnSuccess":
+                            receivedPublishMessage = true;
+                            break;
+                        default:
+                            break;
+                    }
+                }
 
+                publishManualEvent.Set();
+            }
+        };
     }
 }

@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("PubNub-Messaging.Tests")]
+[assembly: AssemblyTitle("PubnubApi.Tests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("PubNub-Messaging.Tests")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2012")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("PubnubApi.Tests")]
+[assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("6d606ad6-0682-4be8-89e2-0e08f0b865c4")]
+[assembly: Guid("951bd84a-40c7-4b8d-b27e-658f8adae20f")]
 
 // Version information for an assembly consists of the following four values:
 //

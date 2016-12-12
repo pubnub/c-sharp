@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace PubNubMessaging.Tests {
+namespace PubnubApi.Tests {
     using System;
     
     
@@ -22,7 +22,7 @@ namespace PubNubMessaging.Tests {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resource {
+    public class Resource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,10 +36,10 @@ namespace PubNubMessaging.Tests {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("PubNubMessaging.Tests.Resource", typeof(Resource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("PubnubApi.Tests.Resource", typeof(Resource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -51,7 +51,7 @@ namespace PubNubMessaging.Tests {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace PubNubMessaging.Tests {
         /// <summary>
         ///   Looks up a localized string similar to [[{&quot;VersionID&quot;:3.4,&quot;Timetoken&quot;:&quot;13601488652764619&quot;,&quot;OperationName&quot;:&quot;Publish&quot;,&quot;Channels&quot;:[&quot;ch1&quot;],&quot;DemoMessage&quot;:{&quot;DefaultMessage&quot;:&quot;~!@#$%^&amp;*()_+ `1234567890-= qwertyuiop[]\\ {}| asdfghjkl;&apos; :\&quot; zxcvbnm,./ &lt;&gt;? &quot;},&quot;CustomMessage&quot;:{&quot;DefaultMessage&quot;:&quot;Welcome to the world of Pubnub for Publish and Subscribe. Hah!&quot;},&quot;SampleXml&quot;:[{&quot;ID&quot;:&quot;ABCD123&quot;,&quot;Name&quot;:{&quot;First&quot;:&quot;John&quot;,&quot;Middle&quot;:&quot;P.&quot;,&quot;Last&quot;:&quot;Doe&quot;},&quot;Address&quot;:{&quot;Street&quot;:&quot;123 Duck Street&quot;,&quot;City&quot;:&quot;New City&quot;,&quot;State&quot;:&quot;New York&quot;,&quot;Country&quot;:&quot;United States&quot;}},{&quot;ID&quot;:&quot;ABCD456&quot;,&quot;Na [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string ComplexMessage {
+        public static string ComplexMessage {
             get {
                 return ResourceManager.GetString("ComplexMessage", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace PubNubMessaging.Tests {
         /// <summary>
         ///   Looks up a localized string similar to Numerous questions remain about the origins of the chemical and what impact its apparent use could have on the ongoing Syrian civil war and international involvement in it.When asked if the intelligence community&apos;s conclusion pushed the situation across President Barack Obama&apos;s \&quot;red line\&quot; that could potentially trigger more U.S. involvement in the Syrian civil war, Hagel said it&apos;s too soon to say.\&quot;We need all the facts. We need all the information,\&quot; he said. \&quot;What I&apos;ve just given you is what our intell [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string LargeMessage32K {
+        public static string LargeMessage32K {
             get {
                 return ResourceManager.GetString("LargeMessage32K", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace PubNubMessaging.Tests {
         /// <summary>
         ///   Looks up a localized string similar to %22Numerous%20questions%20remain%20about%20the%20origins%20of%20the%20chemical%20and%20what%20impact%20its%20apparent%20use%20could%20have%20on%20the%20ongoing%20Syrian%20civil%20war%20and%20international%20involvement%20in%20it.When%20asked%20if%20the%20intelligence%20community%27s%20conclusion%20pushed%20the%20situation%20across%20President%20Barack%20Obama%27s%20%5C%5C%5C%22red%20line%5C%5C%5C%22%20that%20could%20potentially%20trigger%20more%20U.S.%20involvement%20in%20the%20Syrian%20civil%20war%2C%20Hag [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string LargeMessage32KStatic {
+        public static string LargeMessage32KStatic {
             get {
                 return ResourceManager.GetString("LargeMessage32KStatic", resourceCulture);
             }

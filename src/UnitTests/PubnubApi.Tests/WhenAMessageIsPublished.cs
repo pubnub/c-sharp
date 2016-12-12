@@ -1,135 +1,181 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using NUnit.Framework;
-using System.ComponentModel;
 using System.Threading;
-using System.Collections;
-//using Newtonsoft.Json;
-//using Newtonsoft.Json.Linq;
 using PubnubApi;
+using System.Collections.Generic;
+using MockServer;
+using PubnubApi.Tests;
 
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
-    public class WhenAMessageIsPublished
+    public class WhenAMessageIsPublished : TestHarness
     {
-        ManualResetEvent mreUnencryptedPublish = new ManualResetEvent(false);
-        ManualResetEvent mreOptionalSecretKeyPublish = new ManualResetEvent(false);
-        ManualResetEvent mreNoSslPublish = new ManualResetEvent(false);
+        private ManualResetEvent mreUnencryptedPublish = new ManualResetEvent(false);
+        private ManualResetEvent mreOptionalSecretKeyPublish = new ManualResetEvent(false);
+        private ManualResetEvent mreNoSslPublish = new ManualResetEvent(false);
 
-        ManualResetEvent mreUnencryptObjectPublish = new ManualResetEvent(false);
-        ManualResetEvent mreEncryptObjectPublish = new ManualResetEvent(false);
-        ManualResetEvent mreEncryptPublish = new ManualResetEvent(false);
-        ManualResetEvent mreSecretEncryptPublish = new ManualResetEvent(false);
-        ManualResetEvent mreComplexObjectPublish = new ManualResetEvent(false);
-        ManualResetEvent mreLaregMessagePublish = new ManualResetEvent(false);
+        private ManualResetEvent mreUnencryptObjectPublish = new ManualResetEvent(false);
+        private ManualResetEvent mreEncryptObjectPublish = new ManualResetEvent(false);
+        private ManualResetEvent mreEncryptPublish = new ManualResetEvent(false);
+        private ManualResetEvent mreSecretEncryptPublish = new ManualResetEvent(false);
+        private ManualResetEvent mreComplexObjectPublish = new ManualResetEvent(false);
+        private ManualResetEvent mreLaregMessagePublish = new ManualResetEvent(false);
 
-        ManualResetEvent mreEncryptDetailedHistory = new ManualResetEvent(false);
-        ManualResetEvent mreSecretEncryptDetailedHistory = new ManualResetEvent(false);
-        ManualResetEvent mreUnencryptDetailedHistory = new ManualResetEvent(false);
-        ManualResetEvent mreUnencryptObjectDetailedHistory = new ManualResetEvent(false);
-        ManualResetEvent mreEncryptObjectDetailedHistory = new ManualResetEvent(false);
-        ManualResetEvent mreComplexObjectDetailedHistory = new ManualResetEvent(false);
-        ManualResetEvent mreSerializedObjectMessageForPublish = new ManualResetEvent(false);
-        ManualResetEvent mreSerializedMessagePublishDetailedHistory = new ManualResetEvent(false);
-        ManualResetEvent grantManualEvent = new ManualResetEvent(false);
+        private ManualResetEvent mreEncryptDetailedHistory = new ManualResetEvent(false);
+        private ManualResetEvent mreSecretEncryptDetailedHistory = new ManualResetEvent(false);
+        private ManualResetEvent mreUnencryptDetailedHistory = new ManualResetEvent(false);
+        private ManualResetEvent mreUnencryptObjectDetailedHistory = new ManualResetEvent(false);
+        private ManualResetEvent mreEncryptObjectDetailedHistory = new ManualResetEvent(false);
+        private ManualResetEvent mreComplexObjectDetailedHistory = new ManualResetEvent(false);
+        private ManualResetEvent mreSerializedObjectMessageForPublish = new ManualResetEvent(false);
+        private ManualResetEvent mreSerializedMessagePublishDetailedHistory = new ManualResetEvent(false);
+        private static ManualResetEvent grantManualEvent = new ManualResetEvent(false);
+        private static ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+        private static ManualResetEvent historyManualEvent = new ManualResetEvent(false);
 
-        bool isPublished2 = false;
-        bool isPublished3 = false;
+        private bool isPublished2 = false;
+        private bool isPublished3 = false;
 
-        bool isUnencryptPublished = false;
-        bool isUnencryptObjectPublished = false;
-        bool isEncryptObjectPublished = false;
-        bool isUnencryptDetailedHistory = false;
-        bool isUnencryptObjectDetailedHistory = false;
-        bool isEncryptObjectDetailedHistory = false;
-        bool isEncryptPublished = false;
-        bool isSecretEncryptPublished = false;
-        bool isEncryptDetailedHistory = false;
-        bool isSecretEncryptDetailedHistory = false;
-        bool isComplexObjectPublished = false;
-        bool isComplexObjectDetailedHistory = false;
-        bool isSerializedObjectMessagePublished = false;
-        bool isSerializedObjectMessageDetailedHistory = false;
-        bool isLargeMessagePublished = false;
-        bool receivedGrantMessage = false;
+        private bool isUnencryptPublished = false;
+        private bool isUnencryptObjectPublished = false;
+        private bool isEncryptObjectPublished = false;
+        private bool isUnencryptDetailedHistory = false;
+        private bool isUnencryptObjectDetailedHistory = false;
+        private bool isEncryptObjectDetailedHistory = false;
+        private bool isEncryptPublished = false;
+        private bool isSecretEncryptPublished = false;
+        private bool isEncryptDetailedHistory = false;
+        private bool isSecretEncryptDetailedHistory = false;
+        private bool isComplexObjectPublished = false;
+        private bool isComplexObjectDetailedHistory = false;
+        private bool isSerializedObjectMessagePublished = false;
+        private bool isSerializedObjectMessageDetailedHistory = false;
+        private bool isLargeMessagePublished = false;
+        private static bool receivedGrantMessage = false;
+        private static bool receivedPublishMessage = false;
 
-        long unEncryptPublishTimetoken = 0;
-        long unEncryptObjectPublishTimetoken = 0;
-        long encryptObjectPublishTimetoken = 0;
-        long encryptPublishTimetoken = 0;
-        long secretEncryptPublishTimetoken = 0;
-        long complexObjectPublishTimetoken = 0;
-        long serializedMessagePublishTimetoken = 0;
+        private static long publishTimetoken = 0;
+        private long unEncryptPublishTimetoken = 0;
+        private long unEncryptObjectPublishTimetoken = 0;
+        private long encryptObjectPublishTimetoken = 0;
+        private long encryptPublishTimetoken = 0;
+        private long secretEncryptPublishTimetoken = 0;
+        private long complexObjectPublishTimetoken = 0;
+        private long serializedMessagePublishTimetoken = 0;
 
-        const string messageForUnencryptPublish = "Pubnub Messaging API 1";
-        const string messageForEncryptPublish = "漢語";
-        const string messageForSecretEncryptPublish = "Pubnub Messaging API 2";
-        const string messageLarge32K = "Numerous questions remain about the origins of the chemical and what impact its apparent use could have on the ongoing Syrian civil war and international involvement in it.When asked if the intelligence community's conclusion pushed the situation across President Barack Obama's \"red line\" that could potentially trigger more U.S. involvement in the Syrian civil war, Hagel said it's too soon to say.\"We need all the facts. We need all the information,\" he said. \"What I've just given you is what our intelligence community has said they know. As I also said, they are still assessing and they are still looking at what happened, who was responsible and the other specifics that we'll need.\" In a letter sent to lawmakers before Hagel's announcement, the White House said that intelligence analysts have concluded \"with varying degrees of confidence that the Syrian regime has used chemical weapons on a small scale in Syria, specifically the chemical agent sarin.\" In the letter, signed by White House legislative affairs office Director Miguel Rodriguez, the White House said the \"chain of custody\" of the chemicals was not clear and that intelligence analysts could not confirm the circumstances under which the sarin was used, including the role of Syrian President Bashar al-Assad's regime. Read Rodriguez's letter to Levin (PDF) But, the letter said, \"we do believe that any use of chemical weapons in Syria would very likely have originated with the Assad regime.\" The Syrian government has been battling a rebellion for more than two years, bringing international condemnation of the regime and pleas for greater international assistance. The United Nations estimated in February that more than 70,000 people had died since the conflict began. The administration is \"pressing for a comprehensive United Nations investigation that can credibly evaluate the evidence and establish what took place,\" the White House letter said. Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. Numerous questions remain about the origins of the chemical and what impact its apparent use could have on the ongoing Syrian civil war and international involvement in it.When asked if the intelligence community's conclusion pushed the situation across President Barack Obama's \"red line\" that could potentially trigger more U.S. involvement in the Syrian civil war, Hagel said it's too soon to say.\"We need all the facts. We need all the information,\" he said. \"What I've just given you is what our intelligence community has said they know. As I also said, they are still assessing and they are still looking at what happened, who was responsible and the other specifics that we'll need.\" In a letter sent to lawmakers before Hagel's announcement, the White House said that intelligence analysts have concluded \"with varying degrees of confidence that the Syrian regime has used chemical weapons on a small scale in Syria, specifically the chemical agent sarin.\" In the letter, signed by White House legislative affairs office Director Miguel Rodriguez, the White House said the \"chain of custody\" of the chemicals was not clear and that intelligence analysts could not confirm the circumstances under which the sarin was used, including the role of Syrian President Bashar al-Assad's regime. Read Rodriguez's letter to Levin (PDF) But, the letter said, \"we do believe that any use of chemical weapons in Syria would very likely have originated with the Assad regime.\" The Syrian government has been battling a rebellion for more than two years, bringing international condemnation of the regime and pleas for greater international assistance. The United Nations estimated in February that more than 70,000 people had died since the conflict began. The administration is \"pressing for a comprehensive United Nations investigation that can credibly evaluate the evidence and establish what took place,\" the White House letter said. Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. Numerous questions remain about the origins of the chemical and what impact its apparent use could have on the ongoing Syrian civil war and international involvement in it.When asked if the intelligence community's conclusion pushed the situation across President Barack Obama's \"red line\" that could potentially trigger more U.S. involvement in the Syrian civil war, Hagel said it's too soon to say.\"We need all the facts. We need all the information,\" he said. \"What I've just given you is what our intelligence community has said they know. As I also said, they are still assessing and they are still looking at what happened, who was responsible and the other specifics that we'll need.\" In a letter sent to lawmakers before Hagel's announcement, the White House said that intelligence analysts have concluded \"with varying degrees of confidence that the Syrian regime has used chemical weapons on a small scale in Syria, specifically the chemical agent sarin.\" In the letter, signed by White House legislative affairs office Director Miguel Rodriguez, the White House said the \"chain of custody\" of the chemicals was not clear and that intelligence analysts could not confirm the circumstances under which the sarin was used, including the role of Syrian President Bashar al-Assad's regime. Read Rodriguez's letter to Levin (PDF) But, the letter said, \"we do believe that any use of chemical weapons in Syria would very likely have originated with the Assad regime.\" The Syrian government has been battling a rebellion for more than two years, bringing international condemnation of the regime and pleas for greater international assistance. The United Nations estimated in February that more than 70,000 people had died since the conflict began. The administration is \"pressing for a comprehensive United Nations investigation that can credibly evaluate the evidence and establish what took place,\" the White House letter said. Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. Numerous questions remain about the origins of the chemical and what impact its apparent use could have on the ongoing Syrian civil war and international involvement in it.When asked if the intelligence community's conclusion pushed the situation across President Barack Obama's \"red line\" that could potentially trigger more U.S. involvement in the Syrian civil war, Hagel said it's too soon to say.\"We need all the facts. We need all the information,\" he said. \"What I've just given you is what our intelligence community has said they know. As I also said, they are still assessing and they are still looking at what happened, who was responsible and the other specifics that we'll need.\" In a letter sent to lawmakers before Hagel's announcement, the White House said that intelligence analysts have concluded \"with varying degrees of confidence that the Syrian regime has used chemical weapons on a small scale in Syria, specifically the chemical agent sarin.\" In the letter, signed by White House legislative affairs office Director Miguel Rodriguez, the White House said the \"chain of custody\" of the chemicals was not clear and that intelligence analysts could not confirm the circumstances under which the sarin was used, including the role of Syrian President Bashar al-Assad's regime. Read Rodriguez's letter to Levin (PDF) But, the letter said, \"we do believe that any use of chemical weapons in Syria would very likely have originated with the Assad regime.\" The Syrian government has been battling a rebellion for more than two years, bringing international condemnation of the regime and pleas for greater international assistance. The United Nations estimated in February that more than 70,000 people had died since the conflict began. The administration is \"pressing for a comprehensive United Nations investigation that can credibly evaluate the evidence and establish what took place,\" the White House letter said. Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. Numerous questions remain about the origins of the chemical and what impact its apparent use could have on the ongoing Syrian civil war and international involvement in it.When asked if the intelligence community's conclusion pushed the situation across President Barack Obama's \"red line\" that could potentially trigger more U.S. involvement in the Syrian civil war, Hagel said it's too soon to say.\"We need all the facts. We need all the information,\" he said. \"What I've just given you is what our intelligence community has said they know. As I also said, they are still assessing and they are still looking at what happened, who was responsible and the other specifics that we'll need.\" In a letter sent to lawmakers before Hagel's announcement, the White House said that intelligence analysts have concluded \"with varying degrees of confidence that the Syrian regime has used chemical weapons on a small scale in Syria, specifically the chemical agent sarin.\" In the letter, signed by White House legislative affairs office Director Miguel Rodriguez, the White House said the \"chain of custody\" of the chemicals was not clear and that intelligence analysts could not confirm the circumstances under which the sarin was used, including the role of Syrian President Bashar al-Assad's regime. Read Rodriguez's letter to Levin (PDF) But, the letter said, \"we do believe that any use of chemical weapons in Syria would very likely have originated with the Assad regime.\" The Syrian government has been battling a rebellion for more than two years, bringing international condemnation of the regime and pleas for greater international assistance. The United Nations estimated in February that more than 70,000 people had died since the conflict began. The administration is \"pressing for a comprehensive United Nations investigation that can credibly evaluate the evidence and establish what took place,\" the White House letter said. Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. Numerous questions remain about the origins of the chemical and what impact its apparent use could have on the ongoing Syrian civil war and international involvement in it.When asked if the intelligence community's conclusion pushed the situation across President Barack Obama's \"red line\" that could potentially trigger more U.S. involvement in the Syrian civil war, Hagel said it's too soon to say.\"We need all the facts. We need all the information,\" he said. \"What I've just given you is what our intelligence community has said they know. As I also said, they are still assessing and they are still looking at what happened, who was responsible and the other specifics that we'll need.\" In a letter sent to lawmakers before Hagel's announcement, the White House said that intelligence analysts have concluded \"with varying degrees of confidence that the Syrian regime has used chemical weapons on a small scale in Syria, specifically the chemical agent sarin.\" In the letter, signed by White House legislative affairs office Director Miguel Rodriguez, the White House said the \"chain of custody\" of the chemicals was not clear and that intelligence analysts could not confirm the circumstances under which the sarin was used, including the role of Syrian President Bashar al-Assad's regime. Read Rodriguez's letter to Levin (PDF) But, the letter said, \"we do believe that any use of chemical weapons in Syria would very likely have originated with the Assad regime.\" The Syrian government has been battling a rebellion for more than two years, bringing international condemnation of the regime and pleas for greater international assistance. The United Nations estimated in February that more than 70,000 people had died since the conflict began. The administration is \"pressing for a comprehensive United Nations investigation that can credibly evaluate the evidence and establish what took place,\" the White House letter said. Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. Numerous questions remain about the origins of the chemical and what impact its apparent use could have on the ongoing Syrian civil war and international involvement in it.When asked if the intelligence community's conclusion pushed the situation across President Barack Obama's \"red line\" that could potentially trigger more U.S. involvement in the Syrian civil war, Hagel said it's too soon to say.\"We need all the facts. We need all the information,\" he said. \"What I've just given you is what our intelligence community has said they know. As I also said, they are still assessing and they are still looking at what happened, who was responsible and the other specifics that we'll need.\" In a letter sent to lawmakers before Hagel's announcement, the White House said that intelligence analysts have concluded \"with varying degrees of confidence that the Syrian regime has used chemical weapons on a small scale in Syria, specifically the chemical agent sarin.\" In the letter, signed by White House legislative affairs office Director Miguel Rodriguez, the White House said the \"chain of custody\" of the chemicals was not clear and that intelligence analysts could not confirm the circumstances under which the sarin was used, including the role of Syrian President Bashar al-Assad's regime. Read Rodriguez's letter to Levin (PDF) But, the letter said, \"we do believe that any use of chemical weapons in Syria would very likely have originated with the Assad regime.\" The Syrian government has been battling a rebellion for more than two years, bringing international condemnation of the regime and pleas for greater international assistance. The United Nations estimated in February that more than 70,000 people had died since the conflict began. The administration is \"pressing for a comprehensive United Nations investigation that can credibly evaluate the evidence and establish what took place,\" the White House letter said. Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. Numerous questions remain about the origins of the chemical and what impact its apparent use could have on the ongoing Syrian civil war and international involvement in it.When asked if the intelligence community's conclusion pushed the situation across President Barack Obama's \"red line\" that could potentially trigger more U.S. involvement in the Syrian civil war, Hagel said it's too soon to say.\"We need all the facts. We need all the information,\" he said. \"What I've just given you is what our intelligence community has said they know. As I also said, they are still assessing and they are still looking at what happened, who was responsible and the other specifics that we'll need.\" In a letter sent to lawmakers before Hagel's announcement, the White House said that intelligence analysts have concluded \"with varying degrees of confidence that the Syrian regime has used chemical weapons on a small scale in Syria, specifically the chemical agent sarin.\" In the letter, signed by White House legislative affairs office Director Miguel Rodriguez, the White House said the \"chain of custody\" of the chemicals was not clear and that intelligence analysts could not confirm the circumstances under which the sarin was used, including the role of Syrian President Bashar al-Assad's regime. Read Rodriguez's letter to Levin (PDF) But, the letter said, \"we do believe that any use of chemical weapons in Syria would very likely have originated with the Assad regime.\" The Syrian government has been battling a rebellion for more than two years, bringing international condemnation of the regime and pleas for greater international assistance. The United Nations estimated in February that more than 70,000 people had died since the conflict began. The administration is \"pressing for a comprehensive United Nations investigation that can credibly evaluate the evidence and establish what took place,\" the White House letter said. Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. Numerous questions remain about the origins of the chemical and what impact its apparent use could have on the ongoing Syrian civil war and international involvement in it.When asked if the intelligence community's conclusion pushed the situation across President Barack Obama's \"red line\" that could potentially trigger more U.S. involvement in the Syrian civil war, Hagel said it's too soon to say.\"We need all the facts. We need all the information,\" he said. \"What I've just given you is what our intelligence community has said they know. As I also said, they are still assessing and they are still looking at what happened, who was responsible and the other specifics that we'll need.\" In a letter sent to lawmakers before Hagel's announcement, the White House said that intelligence analysts have concluded \"with varying degrees of confidence that the Syrian regime has used chemical weapons on a small scale in Syria, specifically the chemical agent sarin.\" In the letter, signed by White House legislative affairs office Director Miguel Rodriguez, the White House said the \"chain of custody\" of the chemicals was not clear and that intelligence analysts could not confirm the circumstances under which the sarin was used, including the role of Syrian President Bashar al-Assad's regime. Read Rodriguez's letter to Levin (PDF) But, the letter said, \"we do believe that any use of chemical weapons in Syria would very likely have originated with the Assad regime.\" The Syrian government has been battling a rebellion for more than two years, bringing international condemnation of the regime and pleas for greater international assistance. The United Nations estimated in February that more than 70,000 people had died since the conflict began. The administration is \"pressing for a comprehensive United Nations investigation that can credibly evaluate the evidence and establish what took place,\" the White House letter said. Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. Numerous questions remain about the origins of the chemical and what impact its apparent use could have on the ongoing Syrian civil war and international involvement in it.When asked if the intelligence community's conclusion pushed the situation across President Barack Obama's \"red line\" that could potentially trigger more U.S. involvement in the Syrian civil war, Hagel said it's too soon to say.\"We need all the facts. We need all the information,\" he said. \"What I've just given you is what our intelligence community has said they know. As I also said, they are still assessing and they are still looking at what happened, who was responsible and the other specifics that we'll need.\" In a letter sent to lawmakers before Hagel's announcement, the White House said that intelligence analysts have concluded \"with varying degrees of confidence that the Syrian regime has used chemical weapons on a small scale in Syria, specifically the chemical agent sarin.\" In the letter, signed by White House legislative affairs office Director Miguel Rodriguez, the White House said the \"chain of custody\" of the chemicals was not clear and that intelligence analysts could not confirm the circumstances under which the sarin was used, including the role of Syrian President Bashar al-Assad's regime. Read Rodriguez's letter to Levin (PDF) But, the letter said, \"we do believe that any use of chemical weapons in Syria would very likely have originated with the Assad regime.\" The Syrian government has been battling a rebellion for more than two years, bringing international condemnation of the regime and pleas for greater international assistance. The United Nations estimated in February that more than 70,000 people had died since the conflict began. The administration is \"pressing for a comprehensive United Nations investigation that can credibly evaluate the evidence and establish what took place,\" the White House letter said. Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. ONE..Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. TWO..Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. THREE..Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. FOUR..Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. FIVE..Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. SIX..Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. SEVEN..Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. EIGHT..Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. NINE..Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. TEN..Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. ELEVEN..Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. THIRTEEN..Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. FOURTEEN..Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. FIFTEEN..Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. SIXTEEN..Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. SEVENTEEN..Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. EIGHTEEN..Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. NINETEEN..Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. TWENTY..Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. TWENTY ONE..Sen. John McCain, one of the lawmakers who received the letter, said the use of chemical weapons was only a matter of time. alpha beta 12";
-        string messageObjectForUnencryptPublish = "";
-        string messageObjectForEncryptPublish = "";
-        string messageComplexObjectForPublish = "";
-        string serializedObjectMessageForPublish;
+        private const string messageForUnencryptPublish = "Pubnub Messaging API 1";
+        private const string messageForEncryptPublish = "漢語";
+        private const string messageForSecretEncryptPublish = "Pubnub Messaging API 2";
+        private string messageObjectForUnencryptPublish = "";
+        private string messageObjectForEncryptPublish = "";
+        private string messageComplexObjectForPublish = "";
+        private string serializedObjectMessageForPublish;
 
-        int manualResetEventsWaitTimeout = 310 * 1000;
+        int manualResetEventWaitTimeout = 310 * 1000;
+        private static string channel = "hello_my_channel";
+        private static string authKey = "myAuth";
+        private static string currentTestCase = "";
 
-        Pubnub pubnub = null;
+        private static Pubnub pubnub = null;
+
+        private Server server;
+        private UnitTestLog unitLog;
 
         [TestFixtureSetUp]
         public void Init()
         {
+            unitLog = new Tests.UnitTestLog();
+            unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
+            server = new Server(new Uri("https://" + PubnubCommon.StubOrign));
+            MockServer.LoggingMethod.MockServerLog = unitLog;
+            server.Start();
+
             if (!PubnubCommon.PAMEnabled) return;
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = PubnubCommon.SecretKey;
-            config.CiperKey = "";
-            config.Secure = false;
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                AuthKey = authKey,
+                Uuid = "mytestuuid",
+                Secure = false
+            };
 
-            pubnub = new Pubnub(config);
+            pubnub = this.createPubNubInstance(config);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "GrantRequestUnitTest";
-            unitTest.TestCaseName = "Init";
-            pubnub.PubnubUnitTest = unitTest;
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"demo-36\",\"ttl\":20,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
 
-            string channel = "hello_my_channel";
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithParameter("auth", authKey)
+                    .WithParameter("channel", channel)
+                    .WithParameter("m", "1")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("r", "1")
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("ttl", "20")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("w", "1")
+                    .WithParameter("signature", "pOL-X541lXTpA8fNkJE3k7FjaZwo0qynAkPhBPANiCg=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.GrantAccess(channel, true, true, 20, ThenPublishInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+
             Thread.Sleep(1000);
 
             grantManualEvent.WaitOne();
 
-            pubnub.EndPendingRequests(); 
+            pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "WhenAMessageIsPublished Grant access failed.");
+        }
+
+        [TestFixtureTearDown]
+        public void Exit()
+        {
+            server.Stop();
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentException))]
         public void ThenNullMessageShouldReturnException()
         {
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = "";
-            config.CiperKey = "";
-            config.Secure = false;
-
-            pubnub = new Pubnub(config);
-
             string channel = "hello_my_channel";
             object message = null;
 
-            pubnub.Publish(channel, message, null, DummyErrorCallback);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
 
-            pubnub.EndPendingRequests(); 
+            pubnub = this.createPubNubInstance(config);
+
+            string expected = "";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, message))
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            pubnub.Publish()
+                    .Channel(channel)
+                    .Message(message)
+                    .Async(new UTPublishResult());
+
+            pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
@@ -137,40 +183,73 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenUnencryptPublishShouldReturnSuccessCodeAndInfo()
         {
-            isUnencryptPublished = false;
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = "";
-            config.CiperKey = "";
-            config.Secure = false;
+            receivedPublishMessage = false;
+            publishTimetoken = 0;
+            currentTestCase = "ThenUnencryptPublishShouldReturnSuccessCodeAndInfo";
 
-            pubnub = new Pubnub(config);
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenUnencryptPublishShouldReturnSuccessCodeAndInfo";
-            pubnub.PubnubUnitTest = unitTest;
             string channel = "hello_my_channel";
             string message = messageForUnencryptPublish;
 
-            pubnub.Publish(channel, message, ReturnSuccessUnencryptPublishCodeCallback, DummyErrorCallback);
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
-            mreUnencryptedPublish.WaitOne(manualResetEventsWaitTimeout);
-
-            if (!isUnencryptPublished)
+            PNConfiguration config = new PNConfiguration()
             {
-                Assert.IsTrue(isUnencryptPublished, "Unencrypt Publish Failed");
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = this.createPubNubInstance(config);
+
+            string expected = "[1,\"Sent\",\"14715278266153304\"]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, "%22Pubnub%20Messaging%20API%201%22"))
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+
+            publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            if (!receivedPublishMessage)
+            {
+                Assert.IsTrue(receivedPublishMessage, "Unencrypt Publish Failed");
             }
             else
             {
-                Thread.Sleep(1000);
-                pubnub.DetailedHistory(channel, -1, unEncryptPublishTimetoken, -1, false, false,CaptureUnencryptDetailedHistoryCallback, DummyErrorCallback);
-                mreUnencryptDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
+                receivedPublishMessage = false;
 
-                Assert.IsTrue(isUnencryptDetailedHistory, "Unable to match the successful unencrypt Publish");
+                Thread.Sleep(1000);
+
+                expected = "[[\"Pubnub Messaging API 1\"],14715432709547189,14715432709547189]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithParameter("count", "100")
+                        .WithParameter("end", "14715278266153304")
+                        .WithParameter("uuid", config.Uuid)
+                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+                historyManualEvent = new ManualResetEvent(false);
+
+                pubnub.History().Channel(channel)
+                    .End(PubnubCommon.EnableStubTest ? 14715278266153304 : publishTimetoken)
+                    .Reverse(false)
+                    .IncludeTimetoken(true)
+                    .Async(new UTHistoryResult());
+
+                historyManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+                Assert.IsTrue(receivedPublishMessage, "Unable to match the successful unencrypt Publish");
             }
-            pubnub.EndPendingRequests(); 
+            pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
@@ -178,43 +257,75 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo()
         {
-            isUnencryptObjectPublished = false;
+            receivedPublishMessage = false;
+            publishTimetoken = 0;
+            currentTestCase = "ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo";
 
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = "";
-            config.CiperKey = "";
-            config.Secure = false;
-
-            pubnub = new Pubnub(config);
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo";
-            pubnub.PubnubUnitTest = unitTest;
             string channel = "hello_my_channel";
             object message = new CustomClass();
-            //messageObjectForUnencryptPublish = JsonConvert.SerializeObject(message);
+
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = this.createPubNubInstance(config);
+
+            string expected = "[1,\"Sent\",\"14715286132003364\"]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, "%7B%22foo%22%3A%22hi%21%22%2C%22bar%22%3A%5B1%2C2%2C3%2C4%2C5%5D%7D"))
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             messageObjectForUnencryptPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
 
-            pubnub.Publish(channel, message, ReturnSuccessUnencryptObjectPublishCodeCallback, DummyErrorCallback);
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
-            mreUnencryptObjectPublish.WaitOne(manualResetEventsWaitTimeout);
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
-            if (!isUnencryptObjectPublished)
+            publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            if (!receivedPublishMessage)
             {
-                Assert.IsTrue(isUnencryptObjectPublished, "Unencrypt Publish Failed");
+                Assert.IsTrue(receivedPublishMessage, "Unencrypt Publish Failed");
             }
             else
             {
-                Thread.Sleep(1000);
-                pubnub.DetailedHistory(channel, -1, unEncryptObjectPublishTimetoken, -1, false, false, CaptureUnencryptObjectDetailedHistoryCallback, DummyErrorCallback);
-                mreUnencryptObjectDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
+                receivedPublishMessage = false;
 
-                Assert.IsTrue(isUnencryptObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
+                Thread.Sleep(1000);
+
+                expected = "[[{\"foo\":\"hi!\",\"bar\":[1,2,3,4,5]}],14715286132003364,14715286132003364]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithParameter("count", "100")
+                        .WithParameter("end", "14715286132003364")
+                        .WithParameter("uuid", config.Uuid)
+                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+                historyManualEvent = new ManualResetEvent(false);
+
+                pubnub.History().Channel(channel)
+                    .End(PubnubCommon.EnableStubTest ? 14715286132003364 : unEncryptObjectPublishTimetoken)
+                    .Reverse(false)
+                    .IncludeTimetoken(true)
+                    .Async(new UTHistoryResult());
+
+                historyManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+                Assert.IsTrue(receivedPublishMessage, "Unable to match the successful unencrypt object Publish");
             }
-            pubnub.EndPendingRequests(); 
+            pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
@@ -222,48 +333,78 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo()
         {
-            isEncryptObjectPublished = false;
-            isEncryptObjectDetailedHistory = false;
-
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = "";
-            config.CiperKey = "enigma";
-            config.Secure = false;
-
-            pubnub = new Pubnub(config);
-            
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo";
-
-            pubnub.PubnubUnitTest = unitTest;
+            receivedPublishMessage = false;
+            publishTimetoken = 0;
+            currentTestCase = "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo";
 
             string channel = "hello_my_channel";
             object message = new SecretCustomClass();
-            //messageObjectForEncryptPublish = JsonConvert.SerializeObject(message);
+
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                CiperKey = "enigma",
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+
+            pubnub = this.createPubNubInstance(config);
+
+            string expected = "[1,\"Sent\",\"14715322883933786\"]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, "%22nQTUCOeyWWgWh5NRLhSlhIingu92WIQ6RFloD9rOZsTUjAhD7AkMaZJVgU7l28e2%22"))
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             messageObjectForEncryptPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
 
-            mreEncryptObjectPublish = new ManualResetEvent(false);
-            pubnub.Publish(channel, message, ReturnSuccessEncryptObjectPublishCodeCallback, DummyErrorCallback);
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
-            mreEncryptObjectPublish.WaitOne(manualResetEventsWaitTimeout);
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
-            if (!isEncryptObjectPublished)
+            publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            if (!receivedPublishMessage)
             {
-                Assert.IsTrue(isEncryptObjectPublished, "Encrypt Object Publish Failed");
+                Assert.IsTrue(receivedPublishMessage, "Encrypt Object Publish Failed");
             }
             else
             {
-                Thread.Sleep(1000);
-                mreEncryptObjectDetailedHistory = new ManualResetEvent(false);
-                pubnub.DetailedHistory(channel, -1, encryptObjectPublishTimetoken, -1, false, false, CaptureEncryptObjectDetailedHistoryCallback, DummyErrorCallback);
-                mreEncryptObjectDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
+                receivedPublishMessage = false;
 
-                Assert.IsTrue(isEncryptObjectDetailedHistory, "Unable to match the successful encrypt object Publish");
+                Thread.Sleep(1000);
+
+                expected = "[[\"nQTUCOeyWWgWh5NRLhSlhIingu92WIQ6RFloD9rOZsTUjAhD7AkMaZJVgU7l28e2\"],14715325858469956,14715325858469956]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithParameter("count", "100")
+                        .WithParameter("end", "14715325228931129")
+                        .WithParameter("uuid", config.Uuid)
+                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+                historyManualEvent = new ManualResetEvent(false);
+
+                pubnub.History().Channel(channel)
+                    .End(PubnubCommon.EnableStubTest ? 14715325228931129 : encryptObjectPublishTimetoken)
+                    .Count(100)
+                    .Reverse(false)
+                    .IncludeTimetoken(false)
+                    .Async(new UTHistoryResult());
+
+                historyManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+                Assert.IsTrue(receivedPublishMessage, "Unable to match the successful encrypt object Publish");
             }
-            pubnub.EndPendingRequests(); 
+            pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
@@ -271,48 +412,78 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfoWithSSL()
         {
-            isEncryptObjectPublished = false;
-            isEncryptObjectDetailedHistory = false;
-
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = "";
-            config.CiperKey = "enigma";
-            config.Secure = false;
-
-            pubnub = new Pubnub(config);
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo";
-
-            pubnub.PubnubUnitTest = unitTest;
+            receivedPublishMessage = false;
+            publishTimetoken = 0;
+            currentTestCase = "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfoWithSSL";
 
             string channel = "hello_my_channel";
             object message = new SecretCustomClass();
-            //messageObjectForEncryptPublish = JsonConvert.SerializeObject(message);
+
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                CiperKey = "enigma",
+                Uuid = "mytestuuid",
+                Secure = true
+            };
+
+            pubnub = this.createPubNubInstance(config);
+
+            string expected = "[1,\"Sent\",\"14715322883933786\"]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, "%22nQTUCOeyWWgWh5NRLhSlhIingu92WIQ6RFloD9rOZsTUjAhD7AkMaZJVgU7l28e2%22"))
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             messageObjectForEncryptPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
 
-            mreEncryptObjectPublish = new ManualResetEvent(false);
-            pubnub.Publish(channel, message, ReturnSuccessEncryptObjectPublishCodeCallback, DummyErrorCallback);
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
-            mreEncryptObjectPublish.WaitOne(manualResetEventsWaitTimeout);
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
-            if (!isEncryptObjectPublished)
+            publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            if (!receivedPublishMessage)
             {
-                Assert.IsTrue(isEncryptObjectPublished, "Encrypt Object Publish with SSL Failed");
+                Assert.IsTrue(receivedPublishMessage, "Encrypt Object Publish Failed with SSL");
             }
             else
             {
-                Thread.Sleep(1000);
-                mreEncryptObjectDetailedHistory = new ManualResetEvent(false);
-                pubnub.DetailedHistory(channel, -1, encryptObjectPublishTimetoken, -1, false, false, CaptureEncryptObjectDetailedHistoryCallback, DummyErrorCallback);
-                mreEncryptObjectDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
+                receivedPublishMessage = false;
 
-                Assert.IsTrue(isEncryptObjectDetailedHistory, "Unable to match the successful encrypt object Publish with SSL");
+                Thread.Sleep(1000);
+
+                expected = "[[\"nQTUCOeyWWgWh5NRLhSlhIingu92WIQ6RFloD9rOZsTUjAhD7AkMaZJVgU7l28e2\"],14715325858469956,14715325858469956]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithParameter("count", "100")
+                        .WithParameter("end", "14715325228931129")
+                        .WithParameter("uuid", config.Uuid)
+                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+                historyManualEvent = new ManualResetEvent(false);
+
+                pubnub.History().Channel(channel)
+                    .End(PubnubCommon.EnableStubTest ? 14715325228931129 : encryptObjectPublishTimetoken)
+                    .Count(100)
+                    .Reverse(false)
+                    .IncludeTimetoken(false)
+                    .Async(new UTHistoryResult());
+
+                historyManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+                Assert.IsTrue(receivedPublishMessage, "Unable to match the successful encrypt object Publish with SSL");
             }
-            pubnub.EndPendingRequests(); 
+            pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
@@ -320,43 +491,76 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenEncryptPublishShouldReturnSuccessCodeAndInfo()
         {
-            isEncryptPublished = false;
-
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = "";
-            config.CiperKey = "enigma";
-            config.Secure = false;
-
-            pubnub = new Pubnub(config);
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenEncryptPublishShouldReturnSuccessCodeAndInfo";
-
-            pubnub.PubnubUnitTest = unitTest;
+            receivedPublishMessage = false;
+            publishTimetoken = 0;
+            currentTestCase = "ThenEncryptPublishShouldReturnSuccessCodeAndInfo";
 
             string channel = "hello_my_channel";
             string message = messageForEncryptPublish;
 
-            pubnub.Publish(channel, message, ReturnSuccessEncryptPublishCodeCallback, DummyErrorCallback);
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
-            mreEncryptPublish.WaitOne(manualResetEventsWaitTimeout);
-
-            if (!isEncryptPublished)
+            PNConfiguration config = new PNConfiguration()
             {
-                Assert.IsTrue(isEncryptPublished, "Encrypt Publish Failed");
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                CiperKey = "enigma",
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+
+            pubnub = this.createPubNubInstance(config);
+
+            string expected = "[1,\"Sent\",\"14715426119520817\"]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, "%22%2BBY5%2FmiAA8aeuhVl4d13Kg%3D%3D%22"))
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+
+            publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            if (!receivedPublishMessage)
+            {
+                Assert.IsTrue(receivedPublishMessage, "Encrypt Publish Failed");
             }
             else
             {
-                Thread.Sleep(1000);
-                pubnub.DetailedHistory(channel, -1, encryptPublishTimetoken, -1, false, false, CaptureEncryptDetailedHistoryCallback, DummyErrorCallback);
-                mreEncryptDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
+                receivedPublishMessage = false;
 
-                Assert.IsTrue(isEncryptDetailedHistory, "Unable to decrypt the successful Publish");
+                Thread.Sleep(1000);
+
+                expected = "[[\"+BY5/miAA8aeuhVl4d13Kg==\"],14715426119520817,14715426119520817]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithParameter("count", "100")
+                        .WithParameter("end", "14715426119520817")
+                        .WithParameter("uuid", config.Uuid)
+                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+                historyManualEvent = new ManualResetEvent(false);
+
+                pubnub.History().Channel(channel)
+                    .End(PubnubCommon.EnableStubTest ? 14715426119520817 : encryptPublishTimetoken)
+                    .Reverse(false)
+                    .IncludeTimetoken(true)
+                    .Async(new UTHistoryResult());
+
+                historyManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+                Assert.IsTrue(receivedPublishMessage, "Unable to decrypt the successful Publish");
             }
-            pubnub.EndPendingRequests(); 
+
+            pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
@@ -364,43 +568,81 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo()
         {
-            isSecretEncryptPublished = false;
-
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = "key";
-            config.CiperKey = "enigma";
-            config.Secure = false;
-
-            pubnub = new Pubnub(config);
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo";
-
-            pubnub.PubnubUnitTest = unitTest;
+            receivedPublishMessage = false;
+            publishTimetoken = 0;
+            currentTestCase = "ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo";
 
             string channel = "hello_my_channel";
             string message = messageForSecretEncryptPublish;
 
-            pubnub.Publish(channel, message, ReturnSuccessSecretEncryptPublishCodeCallback, DummyErrorCallback);
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
-            mreSecretEncryptPublish.WaitOne(manualResetEventsWaitTimeout);
-
-            if (!isSecretEncryptPublished)
+            PNConfiguration config = new PNConfiguration()
             {
-                Assert.IsTrue(isSecretEncryptPublished, "Secret Encrypt Publish Failed");
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                CiperKey = "enigma",
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+
+            pubnub = this.createPubNubInstance(config);
+
+            string url = String.Format("/publish/{0}/{1}/{2}/{3}/0/{4}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "e462eda69685ce9ddfd5be20c7e13cab", channel, "%22f42pIQcWZ9zbTbH8cyLwB%2FtdvRxjFLOYcBNMVKeHS54%3D%22");
+
+            string expected = "[1, \"Sent\", \"14715438956854374\"]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/{2}/{3}/0/{4}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, "e462eda69685ce9ddfd5be20c7e13cab", channel, "%22f42pIQcWZ9zbTbH8cyLwB%2FtdvRxjFLOYcBNMVKeHS54%3D%22"))
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+
+            publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            if (!receivedPublishMessage)
+            {
+                Assert.IsTrue(receivedPublishMessage, "Secret Encrypt Publish Failed");
             }
             else
             {
-                Thread.Sleep(1000);
-                pubnub.DetailedHistory(channel, -1, secretEncryptPublishTimetoken, -1, false, false, CaptureSecretEncryptDetailedHistoryCallback, DummyErrorCallback);
-                mreSecretEncryptDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
+                receivedPublishMessage = false;
 
-                Assert.IsTrue(isSecretEncryptDetailedHistory, "Unable to decrypt the successful Secret key Publish");
+                Thread.Sleep(1000);
+
+                url = String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel);
+
+                expected = "[[\"f42pIQcWZ9zbTbH8cyLwB/tdvRxjFLOYcBNMVKeHS54=\"],14715438956854374,14715438956854374]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithParameter("count", "100")
+                        .WithParameter("end", "14715438956854374")
+                        .WithParameter("uuid", config.Uuid)
+                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+                historyManualEvent = new ManualResetEvent(false);
+
+                pubnub.History().Channel(channel)
+                    .End(PubnubCommon.EnableStubTest ? 14715438956854374 : secretEncryptPublishTimetoken)
+                    .Reverse(false)
+                    .IncludeTimetoken(false)
+                    .Async(new UTHistoryResult());
+
+                historyManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+                Assert.IsTrue(receivedPublishMessage, "Unable to decrypt the successful Secret key Publish");
             }
-            pubnub.EndPendingRequests(); 
+
+            pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
@@ -408,43 +650,78 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo()
         {
-            isComplexObjectPublished = false;
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = "";
-            config.CiperKey = "";
-            config.Secure = false;
-
-            pubnub = new Pubnub(config);
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo";
-            pubnub.PubnubUnitTest = unitTest;
+            receivedPublishMessage = false;
+            publishTimetoken = 0;
+            currentTestCase = "ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo";
 
             string channel = "hello_my_channel";
             object message = new PubnubDemoObject();
+
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid4",
+                Secure = false
+            };
+
+            pubnub = this.createPubNubInstance(config);
+
+            string expected = "[1, \"Sent\", \"14715459088445832\"]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/%7B%22VersionID%22:3.4%2C%22Timetoken%22:%2213601488652764619%22%2C%22OperationName%22:%22Publish%22%2C%22Channels%22:%5B%22ch1%22%5D%2C%22DemoMessage%22:%7B%22DefaultMessage%22:%22~!%40%23%24%25%5E%26*()_%2B%20%601234567890-%3D%20qwertyuiop%5B%5D%5C%5C%20%7B%7D%7C%20asdfghjkl%3B'%20:%5C%22%20zxcvbnm%2C.%2F%20%3C%3E%3F%20%22%7D%2C%22CustomMessage%22:%7B%22DefaultMessage%22:%22Welcome%20to%20the%20world%20of%20Pubnub%20for%20Publish%20and%20Subscribe.%20Hah!%22%7D%2C%22SampleXml%22:%5B%7B%22ID%22:%22ABCD123%22%2C%22Name%22:%7B%22First%22:%22John%22%2C%22Middle%22:%22P.%22%2C%22Last%22:%22Doe%22%7D%2C%22Address%22:%7B%22Street%22:%22123%20Duck%20Street%22%2C%22City%22:%22New%20City%22%2C%22State%22:%22New%20York%22%2C%22Country%22:%22United%20States%22%7D%7D%2C%7B%22ID%22:%22ABCD456%22%2C%22Name%22:%7B%22First%22:%22Peter%22%2C%22Middle%22:%22Z.%22%2C%22Last%22:%22Smith%22%7D%2C%22Address%22:%7B%22Street%22:%2212%20Hollow%20Street%22%2C%22City%22:%22Philadelphia%22%2C%22State%22:%22Pennsylvania%22%2C%22Country%22:%22United%20States%22%7D%7D%5D%7D", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel))
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             messageComplexObjectForPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
 
-            pubnub.Publish(channel, message, ReturnSuccessComplexObjectPublishCodeCallback, DummyErrorCallback);
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 310 * 1000 : 310 * 1000;
-            mreComplexObjectPublish.WaitOne(manualResetEventsWaitTimeout);
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
-            if (!isComplexObjectPublished)
+            publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            if (!receivedPublishMessage)
             {
-                Assert.IsTrue(isComplexObjectPublished, "Complex Object Publish Failed");
+                Assert.IsTrue(receivedPublishMessage, "Complex Object Publish Failed");
             }
             else
             {
-                Thread.Sleep(500);
-                Console.WriteLine("WhenAMessageIsPublished-ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo - Publish OK. Now checking detailed history");
-                pubnub.DetailedHistory(channel, -1, complexObjectPublishTimetoken, -1, false, false, CaptureComplexObjectDetailedHistoryCallback, DummyErrorCallback);
-                mreComplexObjectDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
+                receivedPublishMessage = false;
 
-                Assert.IsTrue(isComplexObjectDetailedHistory, "Unable to match the successful unencrypt object Publish");
+                Thread.Sleep(500);
+
+                expected = Resource.ComplexMessage;
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithParameter("count", "100")
+                        .WithParameter("end", "14715459088445832")
+                        .WithParameter("uuid", config.Uuid)
+                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+                Console.WriteLine("WhenAMessageIsPublished-ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo - Publish OK. Now checking detailed history");
+
+                historyManualEvent = new ManualResetEvent(false);
+
+                pubnub.History().Channel(channel)
+                    .End(PubnubCommon.EnableStubTest ? 14715459088445832 : complexObjectPublishTimetoken)
+                    .Reverse(false)
+                    .IncludeTimetoken(true)
+                    .Async(new UTHistoryResult());
+
+                historyManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+                Assert.IsTrue(receivedPublishMessage, "Unable to match the successful unencrypt object Publish");
             }
-            pubnub.EndPendingRequests(); 
+            pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
@@ -452,345 +729,133 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenDisableJsonEncodeShouldSendSerializedObjectMessage()
         {
-            isSerializedObjectMessagePublished = false;
-
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = "";
-            config.CiperKey = "";
-            config.Secure = false;
-
-            pubnub = new Pubnub(config);
-
-            pubnub.EnableJsonEncodingForPublish = false;
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenDisableJsonEncodeShouldSendSerializedObjectMessage";
-            pubnub.PubnubUnitTest = unitTest;
+            receivedPublishMessage = false;
+            publishTimetoken = 0;
+            currentTestCase = "ThenDisableJsonEncodeShouldSendSerializedObjectMessage";
 
             string channel = "hello_my_channel";
             object message = "{\"operation\":\"ReturnData\",\"channel\":\"Mobile1\",\"sequenceNumber\":0,\"data\":[\"ping 1.0.0.1\"]}";
+
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                EnableJsonEncodingForPublish = false,
+                Secure = false
+            };
+
+            pubnub = this.createPubNubInstance(config);
+
+            string expected = "[1,\"Sent\",\"14721410674316172\"]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/%7B%22operation%22%3A%22ReturnData%22%2C%22channel%22%3A%22Mobile1%22%2C%22sequenceNumber%22%3A0%2C%22data%22%3A%5B%22ping%201.0.0.1%22%5D%7D", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel))
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             serializedObjectMessageForPublish = message.ToString();
 
-            pubnub.Publish(channel, message, ReturnSuccessSerializedObjectMessageForPublishCallback, DummyErrorCallback);
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
-            mreSerializedObjectMessageForPublish.WaitOne(manualResetEventsWaitTimeout);
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
-            if (!isSerializedObjectMessagePublished)
+            publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            if (!receivedPublishMessage)
             {
-                Assert.IsTrue(isSerializedObjectMessagePublished, "Serialized Object Message Publish Failed");
+                Assert.IsTrue(receivedPublishMessage, "Serialized Object Message Publish Failed");
             }
             else
             {
-                Thread.Sleep(500);
-                pubnub.DetailedHistory(channel, -1, serializedMessagePublishTimetoken, -1, false, false, CaptureSerializedMessagePublishDetailedHistoryCallback, DummyErrorCallback);
-                mreSerializedMessagePublishDetailedHistory.WaitOne(manualResetEventsWaitTimeout);
-                Assert.IsTrue(isSerializedObjectMessageDetailedHistory, "Unable to match the successful serialized object message Publish");
+                receivedPublishMessage = false;
+
+                Thread.Sleep(1000);
+
+                expected = "[[{\"operation\":\"ReturnData\",\"channel\":\"Mobile1\",\"sequenceNumber\":0,\"data\":[\"ping 1.0.0.1\"]}],14721411498132384,14721411498132384]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithParameter("count", "100")
+                        .WithParameter("end", "14721411498132384")
+                        .WithParameter("uuid", config.Uuid)
+                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+                historyManualEvent = new ManualResetEvent(false);
+
+                pubnub.History().Channel(channel)
+                    .End(PubnubCommon.EnableStubTest ? 14721411498132384 : serializedMessagePublishTimetoken)
+                    .Reverse(false)
+                    .IncludeTimetoken(false)
+                    .Async(new UTHistoryResult());
+
+                historyManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+                Assert.IsTrue(receivedPublishMessage, "Unable to match the successful serialized object message Publish");
             }
-            pubnub.EndPendingRequests(); 
+
+            pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
 
-        [Test]
-        public void ThenLargeMessageShoudFailWithMessageTooLargeInfo()
-        {
-            isLargeMessagePublished = false;
+        //[Test]
+        //public void ThenLargeMessageShoudFailWithMessageTooLargeInfo()
+        //{
+        //    receivedPublishMessage = false;
+        //    publishTimetoken = 0;
+        //    currentTestCase = "ThenLargeMessageShoudFailWithMessageTooLargeInfo";
 
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = "";
-            config.CiperKey = "";
-            config.Secure = false;
+        //    string channel = "hello_my_channel";
+        //    string message = Resource.LargeMessage32K;
 
-            pubnub = new Pubnub(config);
+        //    PNConfiguration config = new PNConfiguration()
+        //    {
+        //        PublishKey = PubnubCommon.PublishKey,
+        //        SubscribeKey = PubnubCommon.SubscribeKey,
+        //        Uuid = "mytestuuid",
+        //    };
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenLargeMessageShoudFailWithMessageTooLargeInfo";
-            pubnub.PubnubUnitTest = unitTest;
+        //    pubnub = this.createPubNubInstance(config);
 
-            string channel = "hello_my_channel";
-            string message = messageLarge32K;
+        //    string expected = "[0,\"Message Too Large\",\"14714489901553535\"]";
 
-            pubnub.Publish(channel, message, DummyPublishMessageTooLargeInfoCallback, ReturnPublishMessageTooLargeErrorCallback);
-            manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 310 * 1000 : 310 * 1000;
-            mreLaregMessagePublish.WaitOne(manualResetEventsWaitTimeout);
+        //    server.AddRequest(new Request()
+        //            .WithMethod("GET")
+        //            .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, Resource.LargeMessage32KStatic))
+        //            .WithParameter("uuid", config.Uuid)
+        //            .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+        //            .WithResponse(expected)
+        //            .WithStatusCode(System.Net.HttpStatusCode.BadRequest));
 
-            pubnub.EndPendingRequests(); 
-            pubnub.PubnubUnitTest = null;
-            pubnub = null;
-            Assert.IsTrue(isLargeMessagePublished, "Message Too Large is not failing as expected.");
-        }
+        //    manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
-        void ThenPublishInitializeShouldReturnGrantMessage(GrantAck receivedMessage)
-        {
-            try
-            {
-                if (receivedMessage != null)
-                {
-                    var status = receivedMessage.StatusCode;
-                    if (status == 200)
-                    {
-                        receivedGrantMessage = true;
-                    }
-                }
-            }
-            catch { }
-            finally
-            {
-                grantManualEvent.Set();
-            }
-        }
+        //    publishManualEvent = new ManualResetEvent(false);
+        //    pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
+        //    publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-        private void ReturnSuccessUnencryptPublishCodeCallback(PublishAck result)
-        {
-            if (result != null)
-            {
-                int statusCode = result.StatusCode;
-                string statusMessage = result.StatusMessage;
-                if (statusCode == 1 && statusMessage.ToLower() == "sent")
-                {
-                    isUnencryptPublished = true;
-                    unEncryptPublishTimetoken = result.Timetoken;
-                }
-            }
-
-            mreUnencryptedPublish.Set();
-        }
-
-        private void ReturnSuccessUnencryptObjectPublishCodeCallback(PublishAck result)
-        {
-            if (result != null)
-            {
-                int statusCode = result.StatusCode;
-                string statusMessage = result.StatusMessage;
-                if (statusCode == 1 && statusMessage.ToLower() == "sent")
-                {
-                    isUnencryptObjectPublished = true;
-                    unEncryptObjectPublishTimetoken = result.Timetoken;
-                }
-            }
-
-            mreUnencryptObjectPublish.Set();
-        }
-
-        private void ReturnSuccessEncryptObjectPublishCodeCallback(PublishAck result)
-        {
-            if (result != null)
-            {
-                int statusCode = result.StatusCode;
-                string statusMessage = result.StatusMessage;
-                if (statusCode == 1 && statusMessage.ToLower() == "sent")
-                {
-                    isEncryptObjectPublished = true;
-                    encryptObjectPublishTimetoken = result.Timetoken;
-                }
-            }
-
-            mreEncryptObjectPublish.Set();
-        }
-
-        private void ReturnSuccessEncryptPublishCodeCallback(PublishAck result)
-        {
-            if (result != null)
-            {
-                int statusCode = result.StatusCode;
-                string statusMessage = result.StatusMessage;
-                if (statusCode == 1 && statusMessage.ToLower() == "sent")
-                {
-                    isEncryptPublished = true;
-                    encryptPublishTimetoken = result.Timetoken;
-                }
-            }
-
-            mreEncryptPublish.Set();
-        }
-
-        private void ReturnSuccessSecretEncryptPublishCodeCallback(PublishAck result)
-        {
-            if (result != null)
-            {
-                int statusCode = result.StatusCode;
-                string statusMessage = result.StatusMessage;
-                if (statusCode == 1 && statusMessage.ToLower() == "sent")
-                {
-                    isSecretEncryptPublished = true;
-                    secretEncryptPublishTimetoken = result.Timetoken;
-                }
-            }
-
-            mreSecretEncryptPublish.Set();
-        }
-
-        private void CaptureUnencryptDetailedHistoryCallback(DetailedHistoryAck result)
-        {
-            if (result != null)
-            {
-                object[] message = result.Message;
-                if (message != null && message.Length > 0 && message[0].ToString() == messageForUnencryptPublish)
-                {
-                    isUnencryptDetailedHistory = true;
-                }
-            }
-
-            mreUnencryptDetailedHistory.Set();
-        }
-
-        private void CaptureUnencryptObjectDetailedHistoryCallback(DetailedHistoryAck result)
-        {
-            if (result != null)
-            {
-                object[] message = result.Message;
-                if (message != null)
-                {
-                    string publishedMesaage = pubnub.JsonPluggableLibrary.SerializeToJsonString(message[0]);
-                    if (publishedMesaage == messageObjectForUnencryptPublish)
-                    {
-                        isUnencryptObjectDetailedHistory = true;
-                    }
-                }
-            }
-
-            mreUnencryptObjectDetailedHistory.Set();
-        }
-
-        private void CaptureEncryptObjectDetailedHistoryCallback(DetailedHistoryAck result)
-        {
-            if (result != null)
-            {
-                object[] message = result.Message;
-                if (message != null && message.Length > 0)
-                {
-                    string publishedMesaage = pubnub.JsonPluggableLibrary.SerializeToJsonString(message[0]);
-                    if (publishedMesaage == messageObjectForEncryptPublish)
-                    {
-                        isEncryptObjectDetailedHistory = true;
-                    }
-                }
-
-            }
-
-            mreEncryptObjectDetailedHistory.Set();
-        }
-
-        private void CaptureEncryptDetailedHistoryCallback(DetailedHistoryAck result)
-        {
-            if (result != null)
-            {
-                object[] message = result.Message;
-                if (message != null && message.Length > 0)
-                {
-                    string publishedMesaage = message[0].ToString();
-                    if (publishedMesaage == messageForEncryptPublish)
-                    {
-                        isEncryptDetailedHistory = true;
-                    }
-                }
-            }
-
-            mreEncryptDetailedHistory.Set();
-        }
-
-        private void CaptureSecretEncryptDetailedHistoryCallback(DetailedHistoryAck result)
-        {
-            if (result != null)
-            {
-                object[] message = result.Message;
-                if (message != null && message.Length > 0)
-                {
-                    string publishedMesaage = message[0].ToString();
-                    if (publishedMesaage == messageForSecretEncryptPublish)
-                    {
-                        isSecretEncryptDetailedHistory = true;
-                    }
-                }
-
-            }
-
-            mreSecretEncryptDetailedHistory.Set();
-        }
-
-        private void ReturnSuccessComplexObjectPublishCodeCallback(PublishAck result)
-        {
-            if (result != null)
-            {
-                int statusCode = result.StatusCode;
-                string statusMessage = result.StatusMessage;
-                if (statusCode == 1 && statusMessage.ToLower() == "sent")
-                {
-                    isComplexObjectPublished = true;
-                    complexObjectPublishTimetoken = result.Timetoken;
-                }
-            }
-
-            mreComplexObjectPublish.Set();
-
-        }
-
-        private void CaptureComplexObjectDetailedHistoryCallback(DetailedHistoryAck result)
-        {
-            Console.WriteLine("CaptureComplexObjectDetailedHistoryCallback = \n" + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-
-            if (result != null)
-            {
-                object[] message = result.Message;
-                if (message != null && message.Length > 0)
-                {
-                    string publishedMesaage = pubnub.JsonPluggableLibrary.SerializeToJsonString(message[0]);
-                    if (publishedMesaage == messageComplexObjectForPublish)
-                    {
-                        isComplexObjectDetailedHistory = true;
-                    }
-                }
-            }
-
-            mreComplexObjectDetailedHistory.Set();
-        }
-
-        private void ReturnPublishMessageTooLargeErrorCallback(PubnubClientError pubnubError)
-        {
-            Console.WriteLine(pubnubError);
-            if (pubnubError != null)
-            {
-                if (pubnubError.Message.ToLower().IndexOf("message too large") >= 0)
-                {
-                    isLargeMessagePublished = true;
-                }
-            }
-
-            mreLaregMessagePublish.Set();
-        }
-
-        private void DummyPublishMessageTooLargeInfoCallback(PublishAck result)
-        {
-            if (result != null)
-            {
-                int statusCode = result.StatusCode;
-                string statusMessage = result.StatusMessage;
-                if (statusCode == 0 && statusMessage.ToLower().IndexOf("message too large") >= 0)
-                {
-                    isLargeMessagePublished = true;
-                }
-            }
-
-            mreLaregMessagePublish.Set();
-        }
+        //    pubnub.Destroy();
+        //    pubnub.PubnubUnitTest = null;
+        //    pubnub = null;
+        //    Assert.IsTrue(isLargeMessagePublished, "Message Too Large is not failing as expected.");
+        //}
 
         [Test]
         public void ThenPubnubShouldGenerateUniqueIdentifier()
         {
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = "";
-            config.CiperKey = "";
-            config.Secure = false;
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+            };
 
-            pubnub = new Pubnub(config);
+            pubnub = this.createPubNubInstance(config);
 
             Assert.IsNotNull(pubnub.GenerateGuid());
             pubnub = null;
@@ -800,160 +865,512 @@ namespace PubNubMessaging.Tests
         [ExpectedException(typeof(MissingMemberException))]
         public void ThenPublishKeyShouldNotBeEmpty()
         {
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = "";
-            config.SecretKey = "";
-            config.CiperKey = "";
-            config.Secure = false;
-
-            pubnub = new Pubnub(config);
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenPublishKeyShouldNotBeEmpty";
-
-            pubnub.PubnubUnitTest = unitTest;
-
-
-            string channel = "hello_my_channel";
-            string message = "Pubnub API Usage Example";
-
-            pubnub.Publish(channel, message, null, DummyErrorCallback);
-            pubnub = null;
-
-        }
-
-
-        [Test]
-        public void ThenOptionalSecretKeyShouldBeProvidedInConstructor()
-        {
-            isPublished2 = false;
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = "";
-            config.CiperKey = "";
-            config.Secure = false;
-
-            pubnub = new Pubnub(config);
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "ThenOptionalSecretKeyShouldBeProvidedInConstructor";
-
-            pubnub.PubnubUnitTest = unitTest;
-
-
-            string channel = "hello_my_channel";
-            string message = "Pubnub API Usage Example";
-
-            pubnub.Publish(channel, message, ReturnSecretKeyPublishCallback, DummyErrorCallback);
-            mreOptionalSecretKeyPublish.WaitOne(310 * 1000);
-
-            pubnub.EndPendingRequests(); 
-            pubnub.PubnubUnitTest = null;
-            pubnub = null;
-            Assert.IsTrue(isPublished2, "Publish Failed with secret key");
-        }
-
-        private void ReturnSecretKeyPublishCallback(PublishAck result)
-        {
-            if (result != null)
+            PNConfiguration config = new PNConfiguration()
             {
-                int statusCode = result.StatusCode;
-                string statusMessage = result.StatusMessage;
-                if (statusCode == 1 && statusMessage.ToLower() == "sent")
-                {
-                    isPublished2 = true;
-                }
-            }
-            mreOptionalSecretKeyPublish.Set();
+                PublishKey = "",
+                SubscribeKey = PubnubCommon.SubscribeKey,
+            };
+
+            pubnub = this.createPubNubInstance(config);
+
+            string channel = "hello_my_channel";
+            string message = "Pubnub API Usage Example";
+
+            pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
+            pubnub = null;
+
         }
 
         [Test]
-        public void IfSSLNotProvidedThenDefaultShouldBeFalse()
+        public void ThenOptionalSecretKeyShouldBeProvidedInConfig()
         {
-            isPublished3 = false;
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = "";
-            config.CiperKey = "";
-            config.Secure = false;
+            receivedPublishMessage = false;
+            publishTimetoken = 0;
+            currentTestCase = "ThenOptionalSecretKeyShouldBeProvidedInConfig";
 
-            pubnub = new Pubnub(config);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Secure = false
+            };
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAMessageIsPublished";
-            unitTest.TestCaseName = "IfSSLNotProvidedThenDefaultShouldBeFalse";
-
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
 
-            pubnub.Publish(channel, message, ReturnNoSSLDefaultFalseCallback, DummyErrorCallback);
-            mreNoSslPublish.WaitOne(310 * 1000);
+            string expected = "[1,\"Sent\",\"14722277738126309\"]";
 
-            pubnub.EndPendingRequests(); 
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/154de00ed4a7a76b4dc4a83906d05bab/{2}/0/%22Pubnub%20API%20Usage%20Example%22", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+
+            publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(isPublished3, "Publish Failed with no SSL");
+            Assert.IsTrue(receivedPublishMessage, "Publish Failed with secret key");
         }
 
-        private void ReturnNoSSLDefaultFalseCallback(PublishAck result)
+        [Test]
+        public void IfSSLNotProvidedThenDefaultShouldBeTrue()
         {
-            if (result != null && result.StatusCode == 1 && result.StatusMessage.ToLower() == "sent")
+            receivedPublishMessage = false;
+            publishTimetoken = 0;
+            currentTestCase = "IfSSLNotProvidedThenDefaultShouldBeTrue";
+
+            string channel = "hello_my_channel";
+            string message = "Pubnub API Usage Example";
+
+            PNConfiguration config = new PNConfiguration()
             {
-                isPublished3 = true;
-            }
-            mreNoSslPublish.Set();
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+            };
+
+            pubnub = this.createPubNubInstance(config);
+
+            string expected = "[1,\"Sent\",\"14722484585147754\"]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/%22Pubnub%20API%20Usage%20Example%22", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel))
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+
+            publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedPublishMessage, "Publish Failed with no SSL");
         }
 
-        private void ReturnSuccessSerializedObjectMessageForPublishCallback(PublishAck result)
+        //void ThenPublishInitializeShouldReturnGrantMessage(PNAccessManagerGrantResult receivedMessage)
+        //{
+        //    try
+        //    {
+        //        if (receivedMessage != null)
+        //        {
+        //            var status = receivedMessage.StatusCode;
+        //            if (status == 200)
+        //            {
+        //                receivedGrantMessage = true;
+        //            }
+        //        }
+        //    }
+        //    catch { }
+        //    finally
+        //    {
+        //        grantManualEvent.Set();
+        //    }
+        //}
+
+        //private void ReturnSuccessUnencryptPublishCodeCallback(PNPublishResult result)
+        //{
+        //    if (result != null)
+        //    {
+        //        int statusCode = result.StatusCode;
+        //        string statusMessage = result.StatusMessage;
+        //        if (statusCode == 1 && statusMessage.ToLower() == "sent")
+        //        {
+        //            isUnencryptPublished = true;
+        //            unEncryptPublishTimetoken = result.Timetoken;
+        //        }
+        //    }
+
+        //    mreUnencryptedPublish.Set();
+        //}
+
+        //private void ReturnSuccessUnencryptObjectPublishCodeCallback(PNPublishResult result)
+        //{
+        //    if (result != null)
+        //    {
+        //        int statusCode = result.StatusCode;
+        //        string statusMessage = result.StatusMessage;
+        //        if (statusCode == 1 && statusMessage.ToLower() == "sent")
+        //        {
+        //            isUnencryptObjectPublished = true;
+        //            unEncryptObjectPublishTimetoken = result.Timetoken;
+        //        }
+        //    }
+
+        //    mreUnencryptObjectPublish.Set();
+        //}
+
+        //private void ReturnSuccessEncryptObjectPublishCodeCallback(PNPublishResult result)
+        //{
+        //    if (result != null)
+        //    {
+        //        int statusCode = result.StatusCode;
+        //        string statusMessage = result.StatusMessage;
+        //        if (statusCode == 1 && statusMessage.ToLower() == "sent")
+        //        {
+        //            isEncryptObjectPublished = true;
+        //            encryptObjectPublishTimetoken = result.Timetoken;
+        //        }
+        //    }
+
+        //    mreEncryptObjectPublish.Set();
+        //}
+
+        //private void ReturnSuccessEncryptPublishCodeCallback(PNPublishResult result)
+        //{
+        //    if (result != null)
+        //    {
+        //        int statusCode = result.StatusCode;
+        //        string statusMessage = result.StatusMessage;
+        //        if (statusCode == 1 && statusMessage.ToLower() == "sent")
+        //        {
+        //            isEncryptPublished = true;
+        //            encryptPublishTimetoken = result.Timetoken;
+        //        }
+        //    }
+
+        //    mreEncryptPublish.Set();
+        //}
+
+        //private void ReturnSuccessSecretEncryptPublishCodeCallback(PNPublishResult result)
+        //{
+        //    if (result != null)
+        //    {
+        //        int statusCode = result.StatusCode;
+        //        string statusMessage = result.StatusMessage;
+        //        if (statusCode == 1 && statusMessage.ToLower() == "sent")
+        //        {
+        //            isSecretEncryptPublished = true;
+        //            secretEncryptPublishTimetoken = result.Timetoken;
+        //        }
+        //    }
+
+        //    mreSecretEncryptPublish.Set();
+        //}
+
+        //private void CaptureUnencryptDetailedHistoryCallback(PNHistoryResult result)
+        //{
+        //    if (result != null)
+        //    {
+        //        object[] message = result.Message;
+        //        if (message != null && message.Length > 0 && message[0].ToString() == messageForUnencryptPublish)
+        //        {
+        //            isUnencryptDetailedHistory = true;
+        //        }
+        //    }
+
+        //    mreUnencryptDetailedHistory.Set();
+        //}
+
+        //private void CaptureUnencryptObjectDetailedHistoryCallback(PNHistoryResult result)
+        //{
+        //    if (result != null)
+        //    {
+        //        object[] message = result.Message;
+        //        if (message != null)
+        //        {
+        //            string publishedMesaage = pubnub.JsonPluggableLibrary.SerializeToJsonString(message[0]);
+        //            if (publishedMesaage == messageObjectForUnencryptPublish)
+        //            {
+        //                isUnencryptObjectDetailedHistory = true;
+        //            }
+        //        }
+        //    }
+
+        //    mreUnencryptObjectDetailedHistory.Set();
+        //}
+
+        //private void CaptureEncryptObjectDetailedHistoryCallback(PNHistoryResult result)
+        //{
+        //    if (result != null)
+        //    {
+        //        object[] message = result.Message;
+        //        if (message != null && message.Length > 0)
+        //        {
+        //            string publishedMesaage = pubnub.JsonPluggableLibrary.SerializeToJsonString(message[0]);
+        //            if (publishedMesaage == messageObjectForEncryptPublish)
+        //            {
+        //                isEncryptObjectDetailedHistory = true;
+        //            }
+        //        }
+
+        //    }
+
+        //    mreEncryptObjectDetailedHistory.Set();
+        //}
+
+        //private void CaptureEncryptDetailedHistoryCallback(PNHistoryResult result)
+        //{
+        //    if (result != null)
+        //    {
+        //        object[] message = result.Message;
+        //        if (message != null && message.Length > 0)
+        //        {
+        //            string publishedMesaage = message[0].ToString();
+        //            if (publishedMesaage == messageForEncryptPublish)
+        //            {
+        //                isEncryptDetailedHistory = true;
+        //            }
+        //        }
+        //    }
+
+        //    mreEncryptDetailedHistory.Set();
+        //}
+
+        //private void CaptureSecretEncryptDetailedHistoryCallback(PNHistoryResult result)
+        //{
+        //    if (result != null)
+        //    {
+        //        object[] message = result.Message;
+        //        if (message != null && message.Length > 0)
+        //        {
+        //            string publishedMesaage = message[0].ToString();
+        //            if (publishedMesaage == messageForSecretEncryptPublish)
+        //            {
+        //                isSecretEncryptDetailedHistory = true;
+        //            }
+        //        }
+
+        //    }
+
+        //    mreSecretEncryptDetailedHistory.Set();
+        //}
+
+        //private void ReturnSuccessComplexObjectPublishCodeCallback(PNPublishResult result)
+        //{
+        //    if (result != null)
+        //    {
+        //        int statusCode = result.StatusCode;
+        //        string statusMessage = result.StatusMessage;
+        //        if (statusCode == 1 && statusMessage.ToLower() == "sent")
+        //        {
+        //            isComplexObjectPublished = true;
+        //            complexObjectPublishTimetoken = result.Timetoken;
+        //        }
+        //    }
+
+        //    mreComplexObjectPublish.Set();
+
+        //}
+
+        //private void CaptureComplexObjectDetailedHistoryCallback(PNHistoryResult result)
+        //{
+        //    Console.WriteLine("CaptureComplexObjectDetailedHistoryCallback = \n" + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+
+        //    if (result != null)
+        //    {
+        //        object[] message = result.Message;
+        //        if (message != null && message.Length > 0)
+        //        {
+        //            string publishedMesaage = pubnub.JsonPluggableLibrary.SerializeToJsonString(message[0]);
+        //            if (publishedMesaage == messageComplexObjectForPublish)
+        //            {
+        //                isComplexObjectDetailedHistory = true;
+        //            }
+        //        }
+        //    }
+
+        //    mreComplexObjectDetailedHistory.Set();
+        //}
+
+        //private void ReturnPublishMessageTooLargeErrorCallback(PubnubClientError pubnubError)
+        //{
+        //    Console.WriteLine(pubnubError);
+        //    if (pubnubError != null)
+        //    {
+        //        if (pubnubError.Message.ToLower().IndexOf("message too large") >= 0)
+        //        {
+        //            isLargeMessagePublished = true;
+        //        }
+        //    }
+
+        //    mreLaregMessagePublish.Set();
+        //}
+
+        //private void DummyPublishMessageTooLargeInfoCallback(PNPublishResult result)
+        //{
+        //    if (result != null)
+        //    {
+        //        int statusCode = result.StatusCode;
+        //        string statusMessage = result.StatusMessage;
+        //        if (statusCode == 0 && statusMessage.ToLower().IndexOf("message too large") >= 0)
+        //        {
+        //            isLargeMessagePublished = true;
+        //        }
+        //    }
+
+        //    mreLaregMessagePublish.Set();
+        //}
+
+        //private void ReturnSecretKeyPublishCallback(PNPublishResult result)
+        //{
+        //    if (result != null)
+        //    {
+        //        int statusCode = result.StatusCode;
+        //        string statusMessage = result.StatusMessage;
+        //        if (statusCode == 1 && statusMessage.ToLower() == "sent")
+        //        {
+        //            isPublished2 = true;
+        //        }
+        //    }
+        //    mreOptionalSecretKeyPublish.Set();
+        //}
+
+        //private void ReturnNoSSLDefaultTrueCallback(PNPublishResult result)
+        //{
+        //    if (result != null && result.StatusCode == 1 && result.StatusMessage.ToLower() == "sent")
+        //    {
+        //        isPublished3 = true;
+        //    }
+        //    mreNoSslPublish.Set();
+        //}
+
+        //private void ReturnSuccessSerializedObjectMessageForPublishCallback(PNPublishResult result)
+        //{
+        //    if (result != null)
+        //    {
+        //        int statusCode = result.StatusCode;
+        //        string statusMessage = result.StatusMessage;
+        //        if (statusCode == 1 && statusMessage.ToLower() == "sent")
+        //        {
+        //            isSerializedObjectMessagePublished = true;
+        //            serializedMessagePublishTimetoken = result.Timetoken;
+        //        }
+        //    }
+
+        //    mreSerializedObjectMessageForPublish.Set();
+        //}
+
+        //private void CaptureSerializedMessagePublishDetailedHistoryCallback(PNHistoryResult result)
+        //{
+        //    if (result != null)
+        //    {
+        //        object[] message = result.Message;
+        //        if (message != null && message.Length > 0)
+        //        {
+        //            string publishedMesaage = pubnub.JsonPluggableLibrary.SerializeToJsonString(message[0]);
+        //            if (publishedMesaage == serializedObjectMessageForPublish)
+        //            {
+        //                isSerializedObjectMessageDetailedHistory = true;
+        //            }
+        //        }
+        //    }
+
+        //    mreSerializedMessagePublishDetailedHistory.Set();
+        //}
+
+
+        //private void DummyErrorCallback(PubnubClientError result)
+        //{
+        //    if (result != null)
+        //    {
+        //        Console.WriteLine(result.Message);
+        //    }
+        //}
+
+        private class UTGrantResult : PNCallback<PNAccessManagerGrantResult>
         {
-            if (result != null)
+            public override void OnResponse(PNAccessManagerGrantResult result, PNStatus status)
             {
-                int statusCode = result.StatusCode;
-                string statusMessage = result.StatusMessage;
-                if (statusCode == 1 && statusMessage.ToLower() == "sent")
+                try
                 {
-                    isSerializedObjectMessagePublished = true;
-                    serializedMessagePublishTimetoken = result.Timetoken;
-                }
-            }
+                    Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
 
-            mreSerializedObjectMessageForPublish.Set();
-        }
-
-        private void CaptureSerializedMessagePublishDetailedHistoryCallback(DetailedHistoryAck result)
-        {
-            if (result != null)
-            {
-                object[] message = result.Message;
-                if (message != null && message.Length > 0)
-                {
-                    string publishedMesaage = pubnub.JsonPluggableLibrary.SerializeToJsonString(message[0]);
-                    if (publishedMesaage == serializedObjectMessageForPublish)
+                    if (result != null)
                     {
-                        isSerializedObjectMessageDetailedHistory = true;
+                        Console.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        if (result.Channels != null && result.Channels.Count > 0)
+                        {
+                            var read = result.Channels[channel][authKey].ReadEnabled;
+                            var write = result.Channels[channel][authKey].WriteEnabled;
+                            if (read && write)
+                            {
+                                receivedGrantMessage = true;
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                }
+                finally
+                {
+                    grantManualEvent.Set();
+                }
+            }
+        }
+
+        public class UTPublishResult : PNCallback<PNPublishResult>
+        {
+            public override void OnResponse(PNPublishResult result, PNStatus status)
+            {
+                Console.WriteLine("Publish Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                Console.WriteLine("Publish PNStatus => Status = : " + status.StatusCode.ToString());
+                if (result != null && status.StatusCode == 200 && !status.Error)
+                {
+                    publishTimetoken = result.Timetoken;
+                    switch (currentTestCase)
+                    {
+                        case "ThenUnencryptPublishShouldReturnSuccessCodeAndInfo":
+                        case "ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo":
+                        case "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo":
+                        case "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfoWithSSL":
+                        case "ThenEncryptPublishShouldReturnSuccessCodeAndInfo":
+                        case "ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo":
+                        case "ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo":
+                        case "ThenDisableJsonEncodeShouldSendSerializedObjectMessage":
+                        case "ThenLargeMessageShoudFailWithMessageTooLargeInfo":
+                        case "ThenOptionalSecretKeyShouldBeProvidedInConfig":
+                        case "IfSSLNotProvidedThenDefaultShouldBeTrue":
+                            receivedPublishMessage = true;
+                            publishManualEvent.Set();
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
+        };
 
-            mreSerializedMessagePublishDetailedHistory.Set();
-        }
-
-
-        private void DummyErrorCallback(PubnubClientError result)
+        public class UTHistoryResult : PNCallback<PNHistoryResult>
         {
-            if (result != null)
+            public override void OnResponse(PNHistoryResult result, PNStatus status)
             {
-                Console.WriteLine(result.Message);
+                Console.WriteLine("History Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                Console.WriteLine("History PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                if (status.StatusCode == 200 && !status.Error)
+                {
+                    switch (currentTestCase)
+                    {
+                        case "ThenUnencryptPublishShouldReturnSuccessCodeAndInfo":
+                        case "ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo":
+                        case "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo":
+                        case "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfoWithSSL":
+                        case "ThenEncryptPublishShouldReturnSuccessCodeAndInfo":
+                        case "ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo":
+                        case "ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo":
+                        case "ThenDisableJsonEncodeShouldSendSerializedObjectMessage":
+                            receivedPublishMessage = true;
+                            historyManualEvent.Set();
+                            break;
+                        default:
+                            break;
+                    }
+                }
             }
-        }
-
-
+        };
     }
 }

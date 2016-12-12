@@ -1,55 +1,77 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using NUnit.Framework;
-using System.ComponentModel;
 using System.Threading;
-using System.Collections;
-//using Newtonsoft.Json;
-//using Newtonsoft.Json.Linq;
 using PubnubApi;
+using MockServer;
 
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
-    public class WhenAuditIsRequested
+    public class WhenAuditIsRequested : TestHarness
     {
-        ManualResetEvent auditManualEvent = new ManualResetEvent(false);
-        bool receivedAuditMessage = false;
-        string currentUnitTestCase = "";
+        private static ManualResetEvent auditManualEvent = new ManualResetEvent(false);
+        private static bool receivedAuditMessage = false;
+        private static string currentUnitTestCase = "";
+        private static Pubnub pubnub = null;
+        private Server server;
+        private UnitTestLog unitLog;
 
-        Pubnub pubnub = null;
+        [TestFixtureSetUp]
+        public void Init()
+        {
+            unitLog = new Tests.UnitTestLog();
+            unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
+            server = new Server(new Uri("https://" + PubnubCommon.StubOrign));
+            MockServer.LoggingMethod.MockServerLog = unitLog;
+            server.Start();
+        }
+
+        [TestFixtureTearDown]
+        public void Exit()
+        {
+            server.Stop();
+        }
 
         [Test]
         public void ThenSubKeyLevelShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenSubKeyLevelShouldReturnSuccess";
-
             receivedAuditMessage = false;
 
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = PubnubCommon.SecretKey;
-            config.CiperKey = "";
-            config.Secure = false;
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            pubnub = new Pubnub(config);
+            pubnub = this.createPubNubInstance(config);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAuditIsRequested";
-            unitTest.TestCaseName = "ThenSubKeyLevelShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"subkey\",\"subscribe_key\":\"demo-36\",\"channels\":{},\"objects\":{},\"channel-groups\":{}},\"service\":\"Access Manager\",\"status\":200}";
+
+            server.RunOnHttps(config.Secure);
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v2/auth/audit/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("signature", "SKDBGle-y_p_sh7G_nPPIAF6oVAoGPsQS1PqxRj3S8E=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.AuditAccess(AccessToSubKeyLevelCallback, DummyErrorCallback);
+                pubnub.Audit().Async(new AuditResult());
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();
 
-                pubnub.EndPendingRequests(); 
+                pubnub.Destroy();
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedAuditMessage, "WhenAuditIsRequested -> ThenSubKeyLevelShouldReturnSuccess failed.");
@@ -65,34 +87,45 @@ namespace PubNubMessaging.Tests
         public void ThenChannelLevelShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenChannelLevelShouldReturnSuccess";
+            string channel = "hello_my_channel";
 
             receivedAuditMessage = false;
 
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = PubnubCommon.SecretKey;
-            config.CiperKey = "";
-            config.Secure = false;
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            pubnub = new Pubnub(config);
+            pubnub = this.createPubNubInstance(config);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAuditIsRequested";
-            unitTest.TestCaseName = "ThenChannelLevelShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"demo-36\",\"channels\":{}},\"service\":\"Access Manager\",\"status\":200}";
 
-            string channel = "hello_my_channel";
+            server.RunOnHttps(config.Secure);
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v2/auth/audit/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithParameter("channel", channel)
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("signature", "baAWVdNKvELa07NaIA9kqk7eH7ittOXow0kPHRm4KAs=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
 
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.AuditAccess(channel, AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.Audit().Channel(channel).Async(new AuditResult());
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();
 
-                pubnub.EndPendingRequests(); 
+                pubnub.Destroy();
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedAuditMessage, "WhenAuditIsRequested -> ThenChannelLevelShouldReturnSuccess failed.");
@@ -107,34 +140,43 @@ namespace PubNubMessaging.Tests
         public void ThenChannelGroupLevelShouldReturnSuccess()
         {
             currentUnitTestCase = "ThenChannelGroupLevelShouldReturnSuccess";
-
+            string channelgroup = "hello_my_group";
             receivedAuditMessage = false;
 
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = PubnubCommon.SecretKey;
-            config.CiperKey = "";
-            config.Secure = false;
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            pubnub = new Pubnub(config);
+            pubnub = this.createPubNubInstance(config);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenAuditIsRequested";
-            unitTest.TestCaseName = "ThenChannelGroupLevelShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"demo-36\",\"channel-groups\":{}},\"service\":\"Access Manager\",\"status\":200}";
 
-            string channelgroup = "hello_my_group";
+            server.RunOnHttps(config.Secure);
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v2/auth/audit/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithParameter("channel-group", channelgroup)
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("signature", "mvBhczAANRNn1l0IR9FZmJaB8XUpnG8IWlihg9hmc2g=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.ChannelGroupAuditAccess(channelgroup, AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.Audit().ChannelGroup(channelgroup).Async(new AuditResult());
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();
 
-                pubnub.EndPendingRequests(); 
+                pubnub.Destroy();
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedAuditMessage, "WhenAuditIsRequested -> ThenChannelGroupLevelShouldReturnSuccess failed.");
@@ -145,73 +187,52 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void AccessToSubKeyLevelCallback(AuditAck receivedMessage)
+        private class AuditResult : PNCallback<PNAccessManagerAuditResult>
         {
-            try
+            public override void OnResponse(PNAccessManagerAuditResult result, PNStatus status)
             {
-                if (receivedMessage != null)
-                {
-                    int statusCode = receivedMessage.StatusCode;
-                    string statusMessage = receivedMessage.StatusMessage;
-                    if (statusCode == 200 && statusMessage.ToLower() == "success")
-                    {
-                        if (receivedMessage.Payload != null)
-                        {
-                            Dictionary<string, AuditAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
-                            if (channels != null && channels.Count >= 0)
-                            {
-                                Console.WriteLine("{0} - AccessToSubKeyLevelCallback - Audit Count = {1}", currentUnitTestCase, channels.Count);
-                            }
-                            string level = receivedMessage.Payload.Level;
-                            if (level == "subkey")
-                            {
-                                receivedAuditMessage = true;
-                            }
-                        }
-                    }
+                Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
 
-                }
-            }
-            catch { }
-            finally
-            {
-                auditManualEvent.Set();
-            }
-        }
-
-        void AccessToChannelLevelCallback(AuditAck receivedMessage)
-        {
-            try
-            {
-                if (receivedMessage != null)
+                try
                 {
-                    int statusCode = receivedMessage.StatusCode;
-                    string statusMessage = receivedMessage.StatusMessage;
-                    if (statusCode == 200 && statusMessage.ToLower() == "success")
+                    if (result != null)
                     {
-                        if (receivedMessage.Payload != null)
+                        Console.WriteLine("PNAccessManagerAuditResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        if (status.StatusCode == 200 && status.Error == false)
                         {
-                            string level = receivedMessage.Payload.Level;
-                            if (currentUnitTestCase == "ThenChannelLevelShouldReturnSuccess")
+                            if (currentUnitTestCase == "ThenSubKeyLevelShouldReturnSuccess")
                             {
-                                Dictionary<string, AuditAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
-                                if (channels != null && channels.Count >= 0)
+                                if (!String.IsNullOrEmpty(result.Channel))
                                 {
-                                    Console.WriteLine("{0} - AccessToChannelLevelCallback - Audit Channel Count = {1}", currentUnitTestCase, channels.Count);
+                                    var channels = result.Channel.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                                    Console.WriteLine("{0} - AccessToSubKeyLevelCallback - Audit Count = {1}", currentUnitTestCase, channels.Length);
                                 }
-                                if (level == "channel")
+
+                                if (result.Level == "subkey")
+                                {
+                                    receivedAuditMessage = true;
+                                }
+                            }
+                            else if (currentUnitTestCase == "ThenChannelLevelShouldReturnSuccess")
+                            {
+                                if (!String.IsNullOrEmpty(result.Channel))
+                                {
+                                    var channels = result.Channel.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                                    Console.WriteLine("{0} - AccessToChannelLevelCallback - Audit Channel Count = {1}", currentUnitTestCase, channels.Length);
+                                }
+                                if (result.Level.Contains("channel"))
                                 {
                                     receivedAuditMessage = true;
                                 }
                             }
                             else if (currentUnitTestCase == "ThenChannelGroupLevelShouldReturnSuccess")
                             {
-                                Dictionary<string, AuditAck.Data.ChannelGroupData> channelgroups = receivedMessage.Payload.channelgroups;
-                                if (channelgroups != null && channelgroups.Count >= 0)
+                                if (!String.IsNullOrEmpty(result.ChannelGroup))
                                 {
-                                    Console.WriteLine("{0} - AccessToChannelLevelCallback - Audit ChannelGroup Count = {1}", currentUnitTestCase, channelgroups.Count);
+                                    var channelgroups = result.ChannelGroup.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                                    Console.WriteLine("{0} - AccessToChannelLevelCallback - Audit ChannelGroup Count = {1}", currentUnitTestCase, channelgroups.Length);
                                 }
-                                if (level == "channel-group")
+                                if (result.Level.Contains("channel-group"))
                                 {
                                     receivedAuditMessage = true;
                                 }
@@ -219,17 +240,14 @@ namespace PubNubMessaging.Tests
                         }
                     }
                 }
+                catch
+                {
+                }
+                finally
+                {
+                    auditManualEvent.Set();
+                }
             }
-            catch { }
-            finally
-            {
-                auditManualEvent.Set();
-            }
-        }
-
-        private void DummyErrorCallback(PubnubClientError result)
-        {
-
         }
     }
 }

@@ -1,269 +1,48 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using NUnit.Framework;
-using System.ComponentModel;
 using System.Threading;
-using System.Collections;
-//using Newtonsoft.Json;
-//using Newtonsoft.Json.Linq;
 using PubnubApi;
+using MockServer;
+using System.Text;
+using System.Linq;
 
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
-    public class WhenGrantIsRequested
+    public class WhenGrantIsRequested : TestHarness
     {
+        private static ManualResetEvent grantManualEvent = new ManualResetEvent(false);
+        private static ManualResetEvent revokeManualEvent = new ManualResetEvent(false);
+        private static bool receivedGrantMessage = false;
+        private static bool receivedRevokeMessage = false;
+        private static int multipleChannelGrantCount = 5;
+        private static int multipleAuthGrantCount = 5;
+        private static string currentUnitTestCase = "";
+        private static string channel = "hello_my_channel";
+        private static string channelGroup = "myChannelGroup";
+        private static string authKey = "hello_my_authkey";
+        private static string[] channelBuilder;
+        private static string[] authKeyBuilder;
 
-        ManualResetEvent grantManualEvent = new ManualResetEvent(false);
-        ManualResetEvent revokeManualEvent = new ManualResetEvent(false);
-        bool receivedGrantMessage = false;
-        bool receivedRevokeMessage = false;
-        int multipleChannelGrantCount = 5;
-        int multipleAuthGrantCount = 5;
-        string currentUnitTestCase = "";
+        private static Pubnub pubnub = null;
 
-        Pubnub pubnub = null;
+        private Server server;
+        private UnitTestLog unitLog;
 
-        [Test]
-        public void ThenSubKeyLevelWithReadWriteShouldReturnSuccess()
+        [TestFixtureSetUp]
+        public void Init()
         {
-            currentUnitTestCase = "ThenSubKeyLevelWithReadWriteShouldReturnSuccess";
-
-            receivedGrantMessage = false;
-
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = PubnubCommon.SecretKey;
-            config.CiperKey = "";
-            config.Secure = false;
-
-            pubnub = new Pubnub(config);
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenSubKeyLevelWithReadWriteShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-            if (PubnubCommon.PAMEnabled)
-            {
-                grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess("", true, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
-
-                grantManualEvent.WaitOne();
-
-                pubnub.EndPendingRequests(); 
-                pubnub.PubnubUnitTest = null;
-                pubnub = null;
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithReadWriteShouldReturnSuccess failed.");
-            }
-            else
-            {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithReadWriteShouldReturnSuccess.");
-            }
+            unitLog = new Tests.UnitTestLog();
+            unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
+            server = new Server(new Uri("https://" + PubnubCommon.StubOrign));
+            MockServer.LoggingMethod.MockServerLog = unitLog;
+            server.Start();
         }
 
-        [Test]
-        public void ThenSubKeyLevelWithReadShouldReturnSuccess()
+        [TestFixtureTearDown]
+        public void Exit()
         {
-            currentUnitTestCase = "ThenSubKeyLevelWithReadShouldReturnSuccess";
-
-            receivedGrantMessage = false;
-
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = PubnubCommon.SecretKey;
-            config.CiperKey = "";
-            config.Secure = false;
-
-            pubnub = new Pubnub(config);
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenSubKeyLevelWithReadShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-            if (PubnubCommon.PAMEnabled)
-            {
-                grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess("", true, false, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
-
-                grantManualEvent.WaitOne();
-
-                pubnub.EndPendingRequests(); 
-                pubnub.PubnubUnitTest = null;
-                pubnub = null;
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithReadShouldReturnSuccess failed.");
-            }
-            else
-            {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithReadShouldReturnSuccess.");
-            }
-        }
-
-        [Test]
-        public void ThenSubKeyLevelWithWriteShouldReturnSuccess()
-        {
-            currentUnitTestCase = "ThenSubKeyLevelWithWriteShouldReturnSuccess";
-
-            receivedGrantMessage = false;
-
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = PubnubCommon.SecretKey;
-            config.CiperKey = "";
-            config.Secure = false;
-
-            pubnub = new Pubnub(config);
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenSubKeyLevelWithWriteShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-            if (PubnubCommon.PAMEnabled)
-            {
-                grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess("", false, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
-
-                grantManualEvent.WaitOne();
-
-                pubnub.EndPendingRequests(); 
-                pubnub.PubnubUnitTest = null;
-                pubnub = null;
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenSubKeyLevelWithWriteShouldReturnSuccess failed.");
-            }
-            else
-            {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenSubKeyLevelWithWriteShouldReturnSuccess.");
-            }
-        }
-
-        [Test]
-        public void ThenChannelLevelWithReadWriteShouldReturnSuccess()
-        {
-            currentUnitTestCase = "ThenChannelLevelWithReadWriteShouldReturnSuccess";
-
-            receivedGrantMessage = false;
-
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = PubnubCommon.SecretKey;
-            config.CiperKey = "";
-            config.Secure = false;
-
-            pubnub = new Pubnub(config);
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenChannelLevelWithReadWriteShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-
-            string channel = "hello_my_channel";
-            if (PubnubCommon.PAMEnabled)
-            {
-                grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess(channel, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
-
-                grantManualEvent.WaitOne();
-
-                pubnub.EndPendingRequests(); 
-                pubnub.PubnubUnitTest = null;
-                pubnub = null;
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithReadWriteShouldReturnSuccess failed.");
-            }
-            else
-            {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithReadWriteShouldReturnSuccess.");
-            }
-        }
-
-        [Test]
-        public void ThenChannelLevelWithReadShouldReturnSuccess()
-        {
-            currentUnitTestCase = "ThenChannelLevelWithReadShouldReturnSuccess";
-
-            receivedGrantMessage = false;
-
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = PubnubCommon.SecretKey;
-            config.CiperKey = "";
-            config.Secure = false;
-
-            pubnub = new Pubnub(config);
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenChannelLevelWithReadShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-
-            string channel = "hello_my_channel";
-            if (PubnubCommon.PAMEnabled)
-            {
-                grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess(channel, true, false, 5, AccessToChannelLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
-
-                grantManualEvent.WaitOne();
-
-                pubnub.EndPendingRequests(); 
-                pubnub.PubnubUnitTest = null;
-                pubnub = null;
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithReadShouldReturnSuccess failed.");
-            }
-            else
-            {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithReadShouldReturnSuccess.");
-            }
-        }
-
-        [Test]
-        public void ThenChannelLevelWithWriteShouldReturnSuccess()
-        {
-            currentUnitTestCase = "ThenChannelLevelWithWriteShouldReturnSuccess";
-
-            receivedGrantMessage = false;
-
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = PubnubCommon.SecretKey;
-            config.CiperKey = "";
-            config.Secure = false;
-
-            pubnub = new Pubnub(config);
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenChannelLevelWithWriteShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-
-            string channel = "hello_my_channel";
-            if (PubnubCommon.PAMEnabled)
-            {
-                grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess(channel, false, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
-                Thread.Sleep(1000);
-
-                grantManualEvent.WaitOne();
-
-                pubnub.EndPendingRequests(); 
-                pubnub.PubnubUnitTest = null;
-                pubnub = null;
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelLevelWithWriteShouldReturnSuccess failed.");
-            }
-            else
-            {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelLevelWithWriteShouldReturnSuccess.");
-            }
+            server.Stop();
         }
 
         [Test]
@@ -273,31 +52,45 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = PubnubCommon.SecretKey;
-            config.CiperKey = "";
-            config.Secure = false;
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            pubnub = new Pubnub(config);
+            pubnub = this.createPubNubInstance(config);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenUserLevelWithReadWriteShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":5,\"channel\":\"hello_my_channel\",\"auths\":{\"hello_my_authkey\":{\"r\":1,\"w\":1,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}";
 
-            string channel = "hello_my_authchannel";
-            string authKey = "hello_my_authkey";
+            server.RunOnHttps(config.Secure);
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithParameter("auth", authKey)
+                    .WithParameter("channel", channel)
+                    .WithParameter("m", "0")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("r", "1")
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("ttl", "5")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("w", "1")
+                    .WithParameter("signature", "1RdBzX6dQUW77mww32EFABJwSBmXow2zzZHblAhEW94=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess(channel, authKey, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(false).TTL(5).Async(new GrantResult());
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
 
-                pubnub.EndPendingRequests(); 
+                pubnub.Destroy();
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadWriteShouldReturnSuccess failed.");
@@ -315,31 +108,45 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = PubnubCommon.SecretKey;
-            config.CiperKey = "";
-            config.Secure = false;
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            pubnub = new Pubnub(config);
+            pubnub = this.createPubNubInstance(config);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenUserLevelWithReadShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":5,\"channel\":\"hello_my_channel\",\"auths\":{\"hello_my_authkey\":{\"r\":1,\"w\":0,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}";
 
-            string channel = "hello_my_authchannel";
-            string authKey = "hello_my_authkey";
+            server.RunOnHttps(config.Secure);
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithParameter("auth", authKey)
+                    .WithParameter("channel", channel)
+                    .WithParameter("m", "0")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("r", "1")
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("ttl", "5")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("w", "0")
+                    .WithParameter("signature", "UnOj3vJxF8vjwAhnAsMBPWCA-00OX6mvlP0cg2EyZvc=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess(channel, authKey, true, false, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(true).Write(false).Manage(false).TTL(5).Async(new GrantResult());
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
 
-                pubnub.EndPendingRequests(); 
+                pubnub.Destroy();
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithReadShouldReturnSuccess failed.");
@@ -357,31 +164,46 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = PubnubCommon.SecretKey;
-            config.CiperKey = "";
-            config.Secure = false;
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            pubnub = new Pubnub(config);
+            pubnub = this.createPubNubInstance(config);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenUserLevelWithWriteShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":5,\"channel\":\"hello_my_channel\",\"auths\":{\"hello_my_authkey\":{\"r\":0,\"w\":1,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}";
 
-            string channel = "hello_my_authchannel";
-            string authKey = "hello_my_authkey";
+            server.RunOnHttps(config.Secure);
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithParameter("auth", authKey)
+                    .WithParameter("channel", channel)
+                    .WithParameter("m", "0")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("r", "0")
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("ttl", "5")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("w", "1")
+                    .WithParameter("signature", "M-fkxW4ziBHpoTzDCNzNhGzcSGhYGy4a3bo5u6lmNs0=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess(channel, authKey, false, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(false).Write(true).Manage(false).TTL(5).Async(new GrantResult());
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
 
-                pubnub.EndPendingRequests(); 
+                pubnub.Destroy();
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUserLevelWithWriteShouldReturnSuccess failed.");
@@ -399,51 +221,52 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = PubnubCommon.SecretKey;
-            config.CiperKey = "";
-            config.Secure = false;
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            pubnub = new Pubnub(config);
+            pubnub = this.createPubNubInstance(config);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenMultipleChannelGrantShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            channelBuilder = new string[multipleChannelGrantCount];
 
-            StringBuilder channelBuilder = new StringBuilder();
             for (int index = 0; index < multipleChannelGrantCount; index++)
             {
-                if (index == multipleChannelGrantCount - 1)
-                {
-                    channelBuilder.AppendFormat("csharp-hello_my_channel-{0}", index);
-                }
-                else
-                {
-                    channelBuilder.AppendFormat("csharp-hello_my_channel-{0},", index);
-                }
+                channelBuilder[index] = String.Format("csharp-hello_my_channel-{0}", index);
             }
-            string channel = "";
-            if (!unitTest.EnableStubTest)
-            {
-                channel = channelBuilder.ToString();
-            }
-            else
-            {
-                multipleChannelGrantCount = 5;
-                channel = "csharp-hello_my_channel-0,csharp-hello_my_channel-1,csharp-hello_my_channel-2,csharp-hello_my_channel-3,csharp-hello_my_channel-4";
-            }
+
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":5,\"channels\":{\"csharp-hello_my_channel-0\":{\"auths\":{\"hello_my_authkey\":{\"r\":1,\"w\":1,\"m\":0}}},\"csharp-hello_my_channel-1\":{\"auths\":{\"hello_my_authkey\":{\"r\":1,\"w\":1,\"m\":0}}},\"csharp-hello_my_channel-2\":{\"auths\":{\"hello_my_authkey\":{\"r\":1,\"w\":1,\"m\":0}}},\"csharp-hello_my_channel-3\":{\"auths\":{\"hello_my_authkey\":{\"r\":1,\"w\":1,\"m\":0}}},\"csharp-hello_my_channel-4\":{\"auths\":{\"hello_my_authkey\":{\"r\":1,\"w\":1,\"m\":0}}}}},\"service\":\"Access Manager\",\"status\":200}";
+
+            server.RunOnHttps(config.Secure);
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithParameter("auth", authKey)
+                    .WithParameter("channel", "csharp-hello_my_channel-0%2Ccsharp-hello_my_channel-1%2Ccsharp-hello_my_channel-2%2Ccsharp-hello_my_channel-3%2Ccsharp-hello_my_channel-4")
+                    .WithParameter("m", "0")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("r", "1")
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("ttl", "5")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("w", "1")
+                    .WithParameter("signature", "LvAjwHf1hcYzTgnS1HjAPl5KH4zsOMZYZVhMcCaAiqQ=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess(channel, true, true, 5, AccessToMultiChannelGrantCallback, DummyErrorCallback);
+                pubnub.Grant().AuthKeys(new string[] { authKey }).Channels(channelBuilder).Read(true).Write(true).Manage(false).TTL(5).Async(new GrantResult());
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
 
-                pubnub.EndPendingRequests(); 
+                pubnub.Destroy();
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenMultipleChannelGrantShouldReturnSuccess failed.");
@@ -461,52 +284,54 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = PubnubCommon.SecretKey;
-            config.CiperKey = "";
-            config.Secure = false;
-
-            pubnub = new Pubnub(config);
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenMultipleAuthGrantShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-
-            StringBuilder authKeyBuilder = new StringBuilder();
-            for (int index = 0; index < multipleAuthGrantCount; index++)
+            PNConfiguration config = new PNConfiguration()
             {
-                if (index == multipleAuthGrantCount - 1)
-                {
-                    authKeyBuilder.AppendFormat("csharp-auth_key-{0}", index);
-                }
-                else
-                {
-                    authKeyBuilder.AppendFormat("csharp-auth_key-{0},", index);
-                }
-            }
-            string channel = "hello_my_channel";
-            string auth = "";
-            if (!unitTest.EnableStubTest)
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = this.createPubNubInstance(config);
+
+            channelBuilder = new string[multipleChannelGrantCount];
+            authKeyBuilder = new string[multipleChannelGrantCount];
+
+            for (int index = 0; index < multipleChannelGrantCount; index++)
             {
-                auth = authKeyBuilder.ToString();
+                channelBuilder[index] = String.Format("csharp-hello_my_channel-{0}", index);
+                authKeyBuilder[index] = String.Format("AuthKey-csharp-hello_my_channel-{0}", index);
             }
-            else
-            {
-                multipleAuthGrantCount = 5;
-                auth = "csharp-auth_key-0,csharp-auth_key-1,csharp-auth_key-2,csharp-auth_key-3,csharp-auth_key-4";
-            }
+
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":5,\"channels\":{\"csharp-hello_my_channel-0\":{\"auths\":{\"AuthKey-csharp-hello_my_channel-0\":{\"r\":1,\"w\":1,\"m\":0},\"AuthKey-csharp-hello_my_channel-1\":{\"r\":1,\"w\":1,\"m\":0},\"AuthKey-csharp-hello_my_channel-2\":{\"r\":1,\"w\":1,\"m\":0},\"AuthKey-csharp-hello_my_channel-3\":{\"r\":1,\"w\":1,\"m\":0},\"AuthKey-csharp-hello_my_channel-4\":{\"r\":1,\"w\":1,\"m\":0}}},\"csharp-hello_my_channel-1\":{\"auths\":{\"AuthKey-csharp-hello_my_channel-0\":{\"r\":1,\"w\":1,\"m\":0},\"AuthKey-csharp-hello_my_channel-1\":{\"r\":1,\"w\":1,\"m\":0},\"AuthKey-csharp-hello_my_channel-2\":{\"r\":1,\"w\":1,\"m\":0},\"AuthKey-csharp-hello_my_channel-3\":{\"r\":1,\"w\":1,\"m\":0},\"AuthKey-csharp-hello_my_channel-4\":{\"r\":1,\"w\":1,\"m\":0}}},\"csharp-hello_my_channel-2\":{\"auths\":{\"AuthKey-csharp-hello_my_channel-0\":{\"r\":1,\"w\":1,\"m\":0},\"AuthKey-csharp-hello_my_channel-1\":{\"r\":1,\"w\":1,\"m\":0},\"AuthKey-csharp-hello_my_channel-2\":{\"r\":1,\"w\":1,\"m\":0},\"AuthKey-csharp-hello_my_channel-3\":{\"r\":1,\"w\":1,\"m\":0},\"AuthKey-csharp-hello_my_channel-4\":{\"r\":1,\"w\":1,\"m\":0}}},\"csharp-hello_my_channel-3\":{\"auths\":{\"AuthKey-csharp-hello_my_channel-0\":{\"r\":1,\"w\":1,\"m\":0},\"AuthKey-csharp-hello_my_channel-1\":{\"r\":1,\"w\":1,\"m\":0},\"AuthKey-csharp-hello_my_channel-2\":{\"r\":1,\"w\":1,\"m\":0},\"AuthKey-csharp-hello_my_channel-3\":{\"r\":1,\"w\":1,\"m\":0},\"AuthKey-csharp-hello_my_channel-4\":{\"r\":1,\"w\":1,\"m\":0}}},\"csharp-hello_my_channel-4\":{\"auths\":{\"AuthKey-csharp-hello_my_channel-0\":{\"r\":1,\"w\":1,\"m\":0},\"AuthKey-csharp-hello_my_channel-1\":{\"r\":1,\"w\":1,\"m\":0},\"AuthKey-csharp-hello_my_channel-2\":{\"r\":1,\"w\":1,\"m\":0},\"AuthKey-csharp-hello_my_channel-3\":{\"r\":1,\"w\":1,\"m\":0},\"AuthKey-csharp-hello_my_channel-4\":{\"r\":1,\"w\":1,\"m\":0}}}}},\"service\":\"Access Manager\",\"status\":200}";
+
+            server.RunOnHttps(config.Secure);
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithParameter("auth", "AuthKey-csharp-hello_my_channel-0%2CAuthKey-csharp-hello_my_channel-1%2CAuthKey-csharp-hello_my_channel-2%2CAuthKey-csharp-hello_my_channel-3%2CAuthKey-csharp-hello_my_channel-4")
+                    .WithParameter("channel", "csharp-hello_my_channel-0%2Ccsharp-hello_my_channel-1%2Ccsharp-hello_my_channel-2%2Ccsharp-hello_my_channel-3%2Ccsharp-hello_my_channel-4")
+                    .WithParameter("m", "0")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("r", "1")
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("ttl", "5")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("w", "1")
+                    .WithParameter("signature", "yzzyAtub18jjBa6MZyHPExiyYw6XfEugPG7eFHP9InU=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess(channel, auth, true, true, 5, AccessToMultiAuthGrantCallback, DummyErrorCallback);
+                pubnub.Grant().Channels(channelBuilder).AuthKeys(authKeyBuilder).Read(true).Write(true).Manage(false).TTL(5).Async(new GrantResult());
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
 
-                pubnub.EndPendingRequests(); 
+                pubnub.Destroy();
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenMultipleAuthGrantShouldReturnSuccess failed.");
@@ -518,124 +343,6 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenRevokeAtSubKeyLevelReturnSuccess()
-        {
-            currentUnitTestCase = "ThenRevokeAtSubKeyLevelReturnSuccess";
-
-            receivedGrantMessage = false;
-            receivedRevokeMessage = false;
-
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = PubnubCommon.SecretKey;
-            config.CiperKey = "";
-            config.Secure = false;
-
-            pubnub = new Pubnub(config);
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenRevokeAtSubKeyLevelReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-            if (PubnubCommon.PAMEnabled)
-            {
-                if (!unitTest.EnableStubTest)
-                {
-                    grantManualEvent = new ManualResetEvent(false);
-                    pubnub.GrantAccess("", true, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
-                    grantManualEvent.WaitOne();
-                }
-                else
-                {
-                    receivedGrantMessage = true;
-                }
-                if (receivedGrantMessage)
-                {
-                    revokeManualEvent = new ManualResetEvent(false);
-                    Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess -> Grant ok..Now trying Revoke");
-                    pubnub.GrantAccess("", false, false, 5, RevokeToSubKeyLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
-                    revokeManualEvent.WaitOne();
-                    
-                    pubnub.EndPendingRequests(); 
-                    pubnub.PubnubUnitTest = null;
-                    pubnub = null;
-                    Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess -> Grant success but revoke failed.");
-                }
-                else
-                {
-                    Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess failed. -> Grant not occured, so is revoke");
-                }
-            }
-            else
-            {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess.");
-            }
-        }
-
-        [Test]
-        public void ThenRevokeAtChannelLevelReturnSuccess()
-        {
-            currentUnitTestCase = "ThenRevokeAtChannelLevelReturnSuccess";
-
-            receivedGrantMessage = false;
-            receivedRevokeMessage = false;
-
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = PubnubCommon.SecretKey;
-            config.CiperKey = "";
-            config.Secure = false;
-
-            pubnub = new Pubnub(config);
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenRevokeAtChannelLevelReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
-
-            string channel = "hello_my_channel";
-            if (PubnubCommon.PAMEnabled)
-            {
-                if (!unitTest.EnableStubTest)
-                {
-                    grantManualEvent = new ManualResetEvent(false);
-                    pubnub.GrantAccess(channel, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
-                    grantManualEvent.WaitOne(310*1000);
-                }
-                else
-                {
-                    receivedGrantMessage = true;
-                }
-                if (receivedGrantMessage)
-                {
-                    revokeManualEvent = new ManualResetEvent(false);
-                    Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess -> Grant ok..Now trying Revoke");
-                    pubnub.GrantAccess(channel, false, false, RevokeToChannelLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
-                    revokeManualEvent.WaitOne();
-
-                    pubnub.EndPendingRequests(); 
-                    pubnub.PubnubUnitTest = null;
-                    pubnub = null;
-                    Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess -> Grant success but revoke failed.");
-                }
-                else
-                {
-                    Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess failed. -> Grant not occured, so is revoke");
-                }
-            }
-            else
-            {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess.");
-            }
-        }
-
-        [Test]
         public void ThenRevokeAtUserLevelReturnSuccess()
         {
             currentUnitTestCase = "ThenRevokeAtUserLevelReturnSuccess";
@@ -643,44 +350,69 @@ namespace PubNubMessaging.Tests
             receivedGrantMessage = false;
             receivedRevokeMessage = false;
 
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = PubnubCommon.SecretKey;
-            config.CiperKey = "";
-            config.Secure = false;
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            pubnub = new Pubnub(config);
+            pubnub = this.createPubNubInstance(config);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenRevokeAtUserLevelReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            string expectedGrant = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":5,\"channel\":\"hello_my_channel\",\"auths\":{\"hello_my_authkey\":{\"r\":1,\"w\":1,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}";
+            string expectedRevoke = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":1,\"channel\":\"hello_my_channel\",\"auths\":{\"hello_my_authkey\":{\"r\":0,\"w\":0,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}";
 
-            string channel = "hello_my_authchannel";
-            string authKey = "hello_my_authkey";
+            server.RunOnHttps(config.Secure);
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithParameter("auth", authKey)
+                    .WithParameter("channel", channel)
+                    .WithParameter("m", "0")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("r", "1")
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("ttl", "5")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("w", "1")
+                    .WithParameter("signature", "1RdBzX6dQUW77mww32EFABJwSBmXow2zzZHblAhEW94=")
+                    .WithResponse(expectedGrant)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithParameter("auth", authKey)
+                    .WithParameter("channel", channel)
+                    .WithParameter("m", "0")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("r", "0")
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("ttl", "0")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("w", "0")
+                    .WithParameter("signature", "l1UMP2QuNGiatnQM7rZcYNjZao2s0sapAckO4-bhTBc=")
+                    .WithResponse(expectedRevoke)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             if (PubnubCommon.PAMEnabled)
             {
-                if (!unitTest.EnableStubTest)
-                {
-                    grantManualEvent = new ManualResetEvent(false);
-                    pubnub.GrantAccess(channel, authKey, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
-                    Thread.Sleep(1000);
-                    grantManualEvent.WaitOne();
-                }
-                else
-                {
-                    receivedGrantMessage = true;
-                }
+                grantManualEvent = new ManualResetEvent(false);
+                pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(false).TTL(5).Async(new GrantResult());
+                Thread.Sleep(1000);
+                grantManualEvent.WaitOne();
+
                 if (receivedGrantMessage)
                 {
                     revokeManualEvent = new ManualResetEvent(false);
                     Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant ok..Now trying Revoke");
-                    pubnub.GrantAccess(channel, authKey, false, false, 5, RevokeToUserLevelCallback, DummyErrorCallback);
+                    pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(false).Write(false).Manage(false).TTL(0).Async(new RevokeGrantResult());
                     Thread.Sleep(1000);
                     revokeManualEvent.WaitOne();
 
-                    pubnub.EndPendingRequests(); 
+                    pubnub.Destroy();
                     pubnub.PubnubUnitTest = null;
                     pubnub = null;
                     Assert.IsTrue(receivedRevokeMessage, "WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant success but revoke failed.");
@@ -703,30 +435,45 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = PubnubCommon.SecretKey;
-            config.CiperKey = "";
-            config.Secure = false;
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            pubnub = new Pubnub(config);
+            pubnub = this.createPubNubInstance(config);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenChannelGroupLevelWithReadManageShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group+auth\",\"subscribe_key\":\"demo-36\",\"ttl\":5,\"channel-groups\":\"myChannelGroup\",\"auths\":{\"hello_my_authkey\":{\"r\":1,\"w\":1,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
 
-            string channelgroup = "hello_my_group";
+            server.RunOnHttps(config.Secure);
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithParameter("auth", authKey)
+                    .WithParameter("channel-group", channelGroup)
+                    .WithParameter("m", "1")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("r", "1")
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("ttl", "5")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("w", "1")
+                    .WithParameter("signature", "QgXzDiTNmoFQnghvQ-QFN9p2IRGRPg2ds_1XagBnItk=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.ChannelGroupGrantAccess(channelgroup, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.Grant().ChannelGroups(new string[] { channelGroup }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(5).Async(new GrantResult());
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
 
-                pubnub.EndPendingRequests(); 
+                pubnub.Destroy();
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelGroupLevelWithReadManageShouldReturnSuccess failed.");
@@ -744,30 +491,45 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = PubnubCommon.SecretKey;
-            config.CiperKey = "";
-            config.Secure = false;
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
 
-            pubnub = new Pubnub(config);
+            pubnub = this.createPubNubInstance(config);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGrantIsRequested";
-            unitTest.TestCaseName = "ThenChannelGroupLevelWithReadShouldReturnSuccess";
-            pubnub.PubnubUnitTest = unitTest;
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group+auth\",\"subscribe_key\":\"demo-36\",\"ttl\":5,\"channel-groups\":\"myChannelGroup\",\"auths\":{\"hello_my_authkey\":{\"r\":1,\"w\":0,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}";
 
-            string channelgroup = "hello_my_group";
+            server.RunOnHttps(config.Secure);
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithParameter("auth", authKey)
+                    .WithParameter("channel-group", channelGroup)
+                    .WithParameter("m", "0")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("r", "1")
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("ttl", "5")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("w", "0")
+                    .WithParameter("signature", "wwRQ7MZoQ6d1VYGyW6SFVVT2wfhjiU196sktS8kNc7o=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.ChannelGroupGrantAccess(channelgroup, true, false, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.Grant().ChannelGroups(new string[] { channelGroup }).AuthKeys(new string[] { authKey }).Read(true).Write(false).Manage(false).TTL(5).Async(new GrantResult());
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
 
-                pubnub.EndPendingRequests(); 
+                pubnub.Destroy();
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenChannelGroupLevelWithReadShouldReturnSuccess failed.");
@@ -778,413 +540,183 @@ namespace PubNubMessaging.Tests
             }
         }
 
-
-        void AccessToSubKeyLevelCallback(GrantAck receivedMessage)
+        private class GrantResult : PNCallback<PNAccessManagerGrantResult>
         {
-            try
+            public override void OnResponse(PNAccessManagerGrantResult result, PNStatus status)
             {
-                if (receivedMessage != null)
+                try
                 {
-                    int statusCode = receivedMessage.StatusCode;
-                    string statusMessage = receivedMessage.StatusMessage;
-                    if (statusCode == 200 && statusMessage.ToLower() == "success")
-                    {
-                        if (receivedMessage.Payload != null && receivedMessage.Payload.Access != null)
-                        {
-                            bool read = receivedMessage.Payload.Access.read;
-                            bool write = receivedMessage.Payload.Access.write;
-                            string level = receivedMessage.Payload.Level;
-                            if (level == "subkey")
-                            {
-                                switch (currentUnitTestCase)
-                                {
-                                    case "ThenSubKeyLevelWithReadWriteShouldReturnSuccess":
-                                    case "ThenRevokeAtSubKeyLevelReturnSuccess":
-                                        if (read && write) receivedGrantMessage = true;
-                                        break;
-                                    case "ThenSubKeyLevelWithReadShouldReturnSuccess":
-                                        if (read && !write) receivedGrantMessage = true;
-                                        break;
-                                    case "ThenSubKeyLevelWithWriteShouldReturnSuccess":
-                                        if (!read && write) receivedGrantMessage = true;
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            catch { }
-            finally
-            {
-                grantManualEvent.Set();
-            }
-        }
+                    Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
 
-        void AccessToChannelLevelCallback(GrantAck receivedMessage)
-        {
-            try
-            {
-                
-                if (receivedMessage != null)
-                {
-                    int statusCode = receivedMessage.StatusCode;
-                    string statusMessage = receivedMessage.StatusMessage;
-                    if (statusCode == 200 && statusMessage.ToLower() == "success")
+                    if (result != null)
                     {
-                        if (receivedMessage.Payload != null)
+                        Console.WriteLine("PNAccessManagerAuditResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        switch (currentUnitTestCase)
                         {
-                            string level = receivedMessage.Payload.Level;
-                            if (level == "channel")
-                            {
-                                Dictionary<string, GrantAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
-                                if (channels != null && channels.Count > 0)
+                            case "ThenUserLevelWithReadWriteShouldReturnSuccess":
+                            case "ThenRevokeAtUserLevelReturnSuccess":
                                 {
-                                    string currentChannel = channels.Keys.ToList()[0];
-                                    if (channels[currentChannel].Access != null)
+                                    if (result.Channels != null && result.Channels.Count > 0)
                                     {
-                                        bool read = channels[currentChannel].Access.read;
-                                        bool write = channels[currentChannel].Access.write;
-                                        switch (currentUnitTestCase)
+                                        var read = result.Channels[channel][authKey].ReadEnabled;
+                                        var write = result.Channels[channel][authKey].WriteEnabled;
+                                        if (read && write)
                                         {
-                                            case "ThenChannelLevelWithReadWriteShouldReturnSuccess":
-                                            case "ThenRevokeAtChannelLevelReturnSuccess":
-                                                if (read && write) receivedGrantMessage = true;
-                                                break;
-                                            case "ThenChannelLevelWithReadShouldReturnSuccess":
-                                                if (read && !write) receivedGrantMessage = true;
-                                                break;
-                                            case "ThenChannelLevelWithWriteShouldReturnSuccess":
-                                                if (!read && write) receivedGrantMessage = true;
-                                                break;
-                                            default:
-                                                break;
+                                            receivedGrantMessage = true;
                                         }
                                     }
+                                    break;
                                 }
-                            }
-                            else if (level == "channel-group")
-                            {
-                                Dictionary<string, GrantAck.Data.ChannelGroupData> channelgroups = receivedMessage.Payload.channelgroups;
-                                if (channelgroups != null && channelgroups.Count > 0)
+                            case "ThenUserLevelWithReadShouldReturnSuccess":
                                 {
-                                    string currentChannelGroup = channelgroups.Keys.ToList()[0];
-                                    if (channelgroups[currentChannelGroup].Access != null)
-                                    {
-                                        bool read = channelgroups[currentChannelGroup].Access.read;
-                                        bool manage = channelgroups[currentChannelGroup].Access.manage;
-                                        switch (currentUnitTestCase)
-                                        {
-                                            case "ThenChannelGroupLevelWithReadManageShouldReturnSuccess":
-                                                if (read && manage) receivedGrantMessage = true;
-                                                break;
-                                            case "ThenChannelGroupLevelWithReadShouldReturnSuccess":
-                                                if (read && !manage) receivedGrantMessage = true;
-                                                break;
-                                            default:
-                                                break;
-                                        }
-                                    }
-                                }
-                            } //end of if
-                        }
-                    }
-                }
-            }
-            catch { }
-            finally
-            {
-                grantManualEvent.Set();
-            }
-        }
-
-        void AccessToUserLevelCallback(GrantAck receivedMessage)
-        {
-            try
-            {
-                if (receivedMessage != null)
-                {
-                    int statusCode = receivedMessage.StatusCode;
-                    string statusMessage = receivedMessage.StatusMessage;
-                    if (statusCode == 200 && statusMessage.ToLower() == "success")
-                    {
-                        if (receivedMessage.Payload != null)
-                        {
-                            string level = receivedMessage.Payload.Level;
-                            Dictionary<string, GrantAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
-                            foreach (string channel in channels.Keys)
-                            {
-                                GrantAck.Data.ChannelData channelData = channels[channel];
-                                if (channelData.auths != null)
-                                {
-                                    Dictionary<string, GrantAck.Data.ChannelData.AuthData> authDataDic = channelData.auths;
-                                    if (authDataDic != null)
-                                    {
-                                        foreach (string key in authDataDic.Keys)
-                                        {
-                                            GrantAck.Data.ChannelData.AuthData authData = authDataDic[key];
-                                            if (authData != null && authData.Access != null)
-                                            {
-                                                bool read = authData.Access.read;
-                                                bool write = authData.Access.write;
-                                                if (level == "user")
-                                                {
-                                                    switch (currentUnitTestCase)
-                                                    {
-                                                        case "ThenUserLevelWithReadWriteShouldReturnSuccess":
-                                                        case "ThenRevokeAtUserLevelReturnSuccess":
-                                                            if (read && write) receivedGrantMessage = true;
-                                                            break;
-                                                        case "ThenUserLevelWithReadShouldReturnSuccess":
-                                                            if (read && !write) receivedGrantMessage = true;
-                                                            break;
-                                                        case "ThenUserLevelWithWriteShouldReturnSuccess":
-                                                            if (!read && write) receivedGrantMessage = true;
-                                                            break;
-                                                        default:
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                        }
-                    }
-                }
-            }
-            catch { }
-            finally
-            {
-                grantManualEvent.Set();
-            }
-        }
-
-        void AccessToMultiChannelGrantCallback(GrantAck receivedMessage)
-        {
-            try
-            {
-                if (receivedMessage != null)
-                {
-                    int statusCode = receivedMessage.StatusCode;
-                    string statusMessage = receivedMessage.StatusMessage;
-                    if (statusCode == 200 && statusMessage.ToLower() == "success")
-                    {
-                        if (receivedMessage.Payload != null)
-                        {
-                            string level = receivedMessage.Payload.Level;
-                            Dictionary<string, GrantAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
-                            if (channels != null && channels.Count >= 0)
-                            {
-                                Console.WriteLine("{0} - AccessToMultiChannelGrantCallback - Grant MultiChannel Count (Received/Sent) = {1}/{2}", currentUnitTestCase, channels.Count, multipleChannelGrantCount);
-                                if (channels.Count == multipleChannelGrantCount)
-                                {
-                                    receivedGrantMessage = true;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            catch { }
-            finally
-            {
-                grantManualEvent.Set();
-            }
-        }
-
-        void AccessToMultiAuthGrantCallback(GrantAck receivedMessage)
-        {
-            try
-            {
-                if (receivedMessage != null)
-                {
-                    int statusCode = receivedMessage.StatusCode;
-                    string statusMessage = receivedMessage.StatusMessage;
-                    if (statusCode == 200 && statusMessage.ToLower() == "success")
-                    {
-                        if (receivedMessage.Payload != null)
-                        {
-                            string level = receivedMessage.Payload.Level;
-                            Dictionary<string, GrantAck.Data.ChannelData> channelsData = receivedMessage.Payload.channels;
-                            if (channelsData != null && channelsData.Count > 0)
-                            {
-                                List<string> channels = channelsData.Keys.ToList();
-                                string channel = channels[0];
-                                //string channel = 
-                                GrantAck.Data.ChannelData channelData = channelsData[channel];
-                                if (channelData != null && channelData.auths != null)
-                                {
-                                    Console.WriteLine("{0} - AccessToMultiAuthGrantCallback - Grant Auth Count (Received/Sent) = {1}/{2}", currentUnitTestCase, channelData.auths.Count, multipleAuthGrantCount);
-                                    if (channelData.auths.Count == multipleAuthGrantCount)
+                                    var read = result.Channels[channel][authKey].ReadEnabled;
+                                    var write = result.Channels[channel][authKey].WriteEnabled;
+                                    if (read && !write)
                                     {
                                         receivedGrantMessage = true;
                                     }
+                                    break;
                                 }
-                            }
-                        }
-                    }
-                }
-            }
-            catch { }
-            finally
-            {
-                grantManualEvent.Set();
-            }
-        }
-
-        void RevokeToSubKeyLevelCallback(GrantAck receivedMessage)
-        {
-            try
-            {
-                int statusCode = receivedMessage.StatusCode;
-                string statusMessage = receivedMessage.StatusMessage;
-                if (statusCode == 200 && statusMessage.ToLower() == "success")
-                {
-                    if (receivedMessage.Payload != null && receivedMessage.Payload.Access != null)
-                    {
-                        bool read = receivedMessage.Payload.Access.read;
-                        bool write = receivedMessage.Payload.Access.write;
-                        string level = receivedMessage.Payload.Level;
-                        if (level == "subkey")
-                        {
-                            switch (currentUnitTestCase)
-                            {
-                                case "ThenRevokeAtSubKeyLevelReturnSuccess":
-                                    if (!read && !write) receivedRevokeMessage = true;
-                                    break;
-                                case "ThenSubKeyLevelWithReadShouldReturnSuccess":
-                                    //if (read && !write) receivedGrantMessage = true;
-                                    break;
-                                case "ThenSubKeyLevelWithWriteShouldReturnSuccess":
-                                    //if (!read && write) receivedGrantMessage = true;
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                    }
-                }
-            }
-            catch { }
-            finally
-            {
-                revokeManualEvent.Set();
-            }
-        }
-
-        void RevokeToChannelLevelCallback(GrantAck receivedMessage)
-        {
-            try
-            {
-                if (receivedMessage != null)
-                {
-                    int statusCode = receivedMessage.StatusCode;
-                    string statusMessage = receivedMessage.StatusMessage;
-                    if (statusCode == 200 && statusMessage.ToLower() == "success")
-                    {
-                        if (receivedMessage.Payload != null)
-                        {
-                            string level = receivedMessage.Payload.Level;
-                            Dictionary<string, GrantAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
-                            if (channels != null && channels.Count > 0)
-                            {
-                                receivedRevokeMessage = true;
-                                foreach (string ch in channels.Keys)
+                            case "ThenUserLevelWithWriteShouldReturnSuccess":
                                 {
-                                    if (channels.ContainsKey(ch))
+                                    var read = result.Channels[channel][authKey].ReadEnabled;
+                                    var write = result.Channels[channel][authKey].WriteEnabled;
+                                    if (!read && write)
                                     {
-                                        Dictionary<string, object> channelContainer = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(channels[ch]);
-                                        if (channels[ch].Access != null)
+                                        receivedGrantMessage = true;
+                                    }
+                                    break;
+                                }
+                            case "ThenMultipleChannelGrantShouldReturnSuccess":
+                                {
+                                    if (result.Channels.Count==multipleAuthGrantCount)
+                                    {
+                                        receivedGrantMessage = true;
+                                    }
+                                    break;
+                                }
+                            case "ThenMultipleAuthGrantShouldReturnSuccess":
+                                {
+                                    if (result.Channels.Count == multipleAuthGrantCount)
+                                    {
+                                        if (result.Channels.ToList()[0].Value.Count == multipleAuthGrantCount)
                                         {
-                                            bool read = channels[ch].Access.read;
-                                            bool write = channels[ch].Access.write;
-                                            if (!read && !write)
-                                            {
-                                                receivedRevokeMessage = true;
-                                            }
-                                            break;
+                                            receivedGrantMessage = true;
                                         }
                                     }
+                                    break;
                                 }
-                            }
-                            else
-                            {
-                                receivedRevokeMessage = true;
-                            }
+                            case "ThenChannelGroupLevelWithReadManageShouldReturnSuccess":
+                                {
+                                    var read = result.ChannelGroups[channelGroup][authKey].ReadEnabled;
+                                    var write = result.ChannelGroups[channelGroup][authKey].WriteEnabled;
+                                    var manage = result.ChannelGroups[channelGroup][authKey].ManageEnabled;
+                                    if (read && write && manage)
+                                    {
+                                        receivedGrantMessage = true;
+                                    }
+                                    break;
+                                }
+                            case "ThenChannelGroupLevelWithReadShouldReturnSuccess":
+                                {
+                                    var read = result.ChannelGroups[channelGroup][authKey].ReadEnabled;
+                                    var write = result.ChannelGroups[channelGroup][authKey].WriteEnabled;
+                                    var manage = result.ChannelGroups[channelGroup][authKey].ManageEnabled;
+                                    if (read && !write && !manage)
+                                    {
+                                        receivedGrantMessage = true;
+                                    }
+                                    break;
+                                }
                         }
                     }
                 }
-            }
-            catch { }
-            finally
-            {
-                revokeManualEvent.Set();
-            }
-        }
-
-        void RevokeToUserLevelCallback(GrantAck receivedMessage)
-        {
-            try
-            {
-                if (receivedMessage != null)
+                catch
                 {
-                    int statusCode = receivedMessage.StatusCode;
-                    string statusMessage = receivedMessage.StatusMessage;
-                    if (statusCode == 200 && statusMessage.ToLower() == "success")
-                    {
-                        if (receivedMessage.Payload != null)
-                        {
-                            string level = receivedMessage.Payload.Level;
-                            Dictionary<string, GrantAck.Data.ChannelData> channelsDataDic = receivedMessage.Payload.channels;
-                            if (channelsDataDic != null && channelsDataDic.Count > 0)
-                            {
-                                List<string> channelKeyList = channelsDataDic.Keys.ToList();
-                                string channel = channelKeyList[0];
-
-                                GrantAck.Data.ChannelData channelData = channelsDataDic[channel];
-                                if (channelData != null)
-                                {
-                                    Dictionary<string, GrantAck.Data.ChannelData.AuthData> authDataDic = channelData.auths;
-                                    if (authDataDic != null && authDataDic.Count > 0)
-                                    {
-                                        receivedRevokeMessage = true;
-                                        foreach (string key in authDataDic.Keys)
-                                        {
-                                            GrantAck.Data.ChannelData.AuthData authData = authDataDic[key];
-                                            if (authData != null && authData.Access != null)
-                                            {
-                                                receivedRevokeMessage = true;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        receivedRevokeMessage = false;
-                                    }
-                                }
-                            }
-                        } //end of if payload
-                    }
+                }
+                finally
+                {
+                    grantManualEvent.Set();
                 }
             }
-            catch { }
-            finally
-            {
-                revokeManualEvent.Set();
-            }
         }
 
-        private void DummyErrorCallback(PubnubClientError result)
+
+        private class RevokeGrantResult : PNCallback<PNAccessManagerGrantResult>
         {
-            if (currentUnitTestCase == "ThenRevokeAtChannelLevelReturnSuccess")
+            public override void OnResponse(PNAccessManagerGrantResult result, PNStatus status)
             {
-                grantManualEvent.Set();
+                try
+                {
+                    Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+
+                    if (result != null)
+                    {
+                        Console.WriteLine("PNAccessManagerAuditResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        switch (currentUnitTestCase)
+                        {
+                            case "ThenRevokeAtUserLevelReturnSuccess":
+                                {
+                                    if (result.Channels != null && result.Channels.Count > 0)
+                                    {
+                                        var read = result.Channels[channel][authKey].ReadEnabled;
+                                        var write = result.Channels[channel][authKey].WriteEnabled;
+                                        if (!read && !write)
+                                        {
+                                            receivedRevokeMessage = true;
+                                        }
+                                    }
+                                    break;
+                                }
+                            case "ThenUserLevelWithReadShouldReturnSuccess":
+                                {
+                                    var read = result.Channels[channel][authKey].ReadEnabled;
+                                    var write = result.Channels[channel][authKey].WriteEnabled;
+                                    if (read && !write)
+                                    {
+                                        receivedGrantMessage = true;
+                                    }
+                                    break;
+                                }
+                            case "ThenUserLevelWithWriteShouldReturnSuccess":
+                                {
+                                    var read = result.Channels[channel][authKey].ReadEnabled;
+                                    var write = result.Channels[channel][authKey].WriteEnabled;
+                                    if (!read && write)
+                                    {
+                                        receivedGrantMessage = true;
+                                    }
+                                    break;
+                                }
+                            case "ThenMultipleChannelGrantShouldReturnSuccess":
+                                {
+                                    if (result.Channels.Count == multipleAuthGrantCount)
+                                    {
+                                        receivedGrantMessage = true;
+                                    }
+                                    break;
+                                }
+                            case "ThenMultipleAuthGrantShouldReturnSuccess":
+                                {
+                                    if (result.Channels.Count == multipleAuthGrantCount)
+                                    {
+                                        if (result.Channels.ToList()[0].Value.Count == multipleAuthGrantCount)
+                                        {
+                                            receivedGrantMessage = true;
+                                        }
+                                    }
+                                    break;
+                                }
+                        }
+                    }
+                }
+                catch
+                {
+                }
+                finally
+                {
+                    revokeManualEvent.Set();
+                }
             }
         }
 

@@ -1,188 +1,223 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using NUnit.Framework;
-using System.ComponentModel;
 using System.Threading;
-using System.Collections;
-//using Newtonsoft.Json;
-//using Newtonsoft.Json.Linq;
 using PubnubApi;
+using MockServer;
 
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
-    public class WhenGetRequestServerTime
+    public class WhenGetRequestServerTime : TestHarness
     {
-        ManualResetEvent mreTime = new ManualResetEvent(false);
-        ManualResetEvent mreProxy = new ManualResetEvent(false);
-        bool timeReceived = false;
-        bool timeReceivedWhenProxy = false;
+        private static ManualResetEvent mreTime = new ManualResetEvent(false);
+        private static bool timeReceived = false;
+        private static string currentUnitTestCase = "";
+        private static long expectedTime = 14725889985315301;
+        private static Pubnub pubnub = null;
 
-        Pubnub pubnub = null;
+        private Server server;
+        private UnitTestLog unitLog;
+
+        [TestFixtureSetUp]
+        public void Init()
+        {
+            unitLog = new Tests.UnitTestLog();
+            unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
+            server = new Server(new Uri("https://" + PubnubCommon.StubOrign));
+            MockServer.LoggingMethod.MockServerLog = unitLog;
+            server.Start();
+        }
+
+        [TestFixtureTearDown]
+        public void Exit()
+        {
+            server.Stop();
+        }
 
         [Test]
         public void ThenItShouldReturnTimeStamp()
         {
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = "";
-            config.CiperKey = "";
-            config.Secure = false;
+            currentUnitTestCase = "ThenItShouldReturnTimeStamp";
+            timeReceived = false;
+            mreTime = new ManualResetEvent(false);
 
-            pubnub = new Pubnub(config);
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false
+            };
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGetRequestServerTime";
-            unitTest.TestCaseName = "ThenItShouldReturnTimeStamp";
+            pubnub = this.createPubNubInstance(config);
 
-            pubnub.PubnubUnitTest = unitTest;
+            string expected = "[14725889985315301]";
 
-            pubnub.Time(ReturnTimeStampCallback, DummyErrorCallback);
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            pubnub.Time().Async(new TimeResult());
+                
             mreTime.WaitOne(310 * 1000);
-            pubnub.EndPendingRequests(); 
-            pubnub.PubnubUnitTest = null;
+
+            pubnub.Destroy();
             pubnub = null;
+
             Assert.IsTrue(timeReceived, "time() Failed");
         }
 
         [Test]
         public void ThenItShouldReturnTimeStampWithSSL()
         {
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = "";
-            config.CiperKey = "";
-            config.Secure = true;
+            currentUnitTestCase = "ThenItShouldReturnTimeStampWithSSL";
 
-            pubnub = new Pubnub(config);
+            timeReceived = false;
+            mreTime = new ManualResetEvent(false);
 
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGetRequestServerTime";
-            unitTest.TestCaseName = "ThenItShouldReturnTimeStamp";
+            PNConfiguration config = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
 
-            pubnub.PubnubUnitTest = unitTest;
+            pubnub = this.createPubNubInstance(config);
 
-            pubnub.Time(ReturnTimeStampCallback, DummyErrorCallback);
+            string expected = "[14725889985315301]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            pubnub.Time().Async(new TimeResult());
+
             mreTime.WaitOne(310 * 1000);
-            pubnub.EndPendingRequests(); 
-            pubnub.PubnubUnitTest = null;
+
+            pubnub.Destroy();
             pubnub = null;
+
             Assert.IsTrue(timeReceived, "time() with SSL Failed");
         }
-
 
         [Test]
         public void ThenWithProxyItShouldReturnTimeStamp()
         {
-            bool proxyConfigured = false;
+            currentUnitTestCase = "ThenWithProxyItShouldReturnTimeStamp";
 
-            PubnubProxy proxy = new PubnubProxy();
-            proxy.ProxyServer = "test.pandu.com";
-            proxy.ProxyPort = 808;
-            proxy.ProxyUserName = "tuvpnfreeproxy";
-            proxy.ProxyPassword = "Rx8zW78k";
+            IPubnubProxy proxy = new PubnubProxy();
+            proxy.Server = "test.pandu.com";
+            proxy.Port = 808;
+            proxy.UserName = "tuvpnfreeproxy";
+            proxy.Password = "Rx8zW78k";
 
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = "";
-            config.CiperKey = "";
-            config.Secure = false;
+            timeReceived = false;
+            mreTime = new ManualResetEvent(false);
 
-            pubnub = new Pubnub(config);
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGetRequestServerTime";
-            unitTest.TestCaseName = "ThenWithProxyItShouldReturnTimeStamp";
-            pubnub.PubnubUnitTest = unitTest;
-            
-            if (proxyConfigured)
+            PNConfiguration config = new PNConfiguration()
             {
-                pubnub.Proxy = proxy;
-                pubnub.Time(ReturnProxyPresenceTimeStampCallback, DummyErrorCallback);
-                mreProxy.WaitOne(310 * 1000);
-                pubnub.EndPendingRequests(); 
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                //Proxy = proxy,
+                Secure = false
+            };
+
+
+            pubnub = this.createPubNubInstance(config);
+
+            expectedTime = 14725889985315301;
+
+            if (config.Proxy != null)
+            {
+                pubnub.Time().Async(new TimeResult());
+
+                mreTime.WaitOne(310 * 1000);
+
+                pubnub.Destroy();
+
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
-                Assert.IsTrue(timeReceivedWhenProxy, "time() Failed");
+
+                Assert.IsTrue(timeReceived, "time() Failed");
             }
             else
             {
                 Assert.Ignore("Proxy setup not configured. After setup Set proxyConfigured to true");
             }
-
         }
 
         [Test]
         public void ThenWithProxyItShouldReturnTimeStampWithSSL()
         {
-            bool proxyConfigured = false;
+            IPubnubProxy proxy = new PubnubProxy();
+            proxy.Server = "test.pandu.com";
+            proxy.Port = 808;
+            proxy.UserName = "tuvpnfreeproxy";
+            proxy.Password = "Rx8zW78k";
 
-            PubnubProxy proxy = new PubnubProxy();
-            proxy.ProxyServer = "test.pandu.com";
-            proxy.ProxyPort = 808;
-            proxy.ProxyUserName = "tuvpnfreeproxy";
-            proxy.ProxyPassword = "Rx8zW78k";
+            timeReceived = false;
+            mreTime = new ManualResetEvent(false);
 
-            PNConfiguration config = new PNConfiguration();
-            config.SubscribeKey = PubnubCommon.SubscribeKey;
-            config.PublishKey = PubnubCommon.PublishKey;
-            config.SecretKey = "";
-            config.CiperKey = "";
-            config.Secure = true;
-
-            pubnub = new Pubnub(config);
-
-            PubnubUnitTest unitTest = new PubnubUnitTest();
-            unitTest.TestClassName = "WhenGetRequestServerTime";
-            unitTest.TestCaseName = "ThenWithProxyItShouldReturnTimeStamp";
-            pubnub.PubnubUnitTest = unitTest;
-
-            if (proxyConfigured)
+            PNConfiguration config = new PNConfiguration()
             {
-                pubnub.Proxy = proxy;
-                pubnub.Time(ReturnProxyPresenceTimeStampCallback, DummyErrorCallback);
-                mreProxy.WaitOne(310 * 1000);
-                pubnub.EndPendingRequests(); 
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                //Proxy = proxy
+            };
+
+            pubnub = this.createPubNubInstance(config);
+
+            string expected = "[14725889985315301]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+
+            if (config.Proxy != null)
+            {
+                pubnub.Time().Async(new TimeResult());
+
+                mreTime.WaitOne(310 * 1000);
+
+                pubnub.Destroy();
+
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;
-                Assert.IsTrue(timeReceivedWhenProxy, "time() with SSL through proxy Failed");
+
+                Assert.IsTrue(timeReceived, "time() with SSL through proxy Failed");
             }
             else
             {
                 Assert.Ignore("Proxy setup for SSL not configured. After setup Set proxyConfigured to true");
             }
-
-        }
-
-
-        private void ReturnTimeStampCallback(long result)
-        {
-            if (result > 0)
-            {
-                timeReceived = true;
-            }
-            mreTime.Set();
-        }
-
-        private void ReturnProxyPresenceTimeStampCallback(long result)
-        {
-            if (result > 0)
-            {
-                timeReceivedWhenProxy = true;
-            }
-            mreProxy.Set();
         }
 
         [Test]
         public void TranslateDateTimeToUnixTime()
         {
             //Test for 26th June 2012 GMT
-            DateTime dt = new DateTime(2012,6,26,0,0,0,DateTimeKind.Utc);
+            DateTime dt = new DateTime(2012, 6, 26, 0, 0, 0, DateTimeKind.Utc);
             long nanoSecondTime = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(dt);
             Assert.True(13406688000000000 == nanoSecondTime);
         }
@@ -196,9 +231,44 @@ namespace PubNubMessaging.Tests
             Assert.True(expectedDate == actualDate);
         }
 
-        void DummyErrorCallback(PubnubClientError result)
+        public class TimeResult : PNCallback<PNTimeResult>
         {
-        }
+            public override void OnResponse(PNTimeResult result, PNStatus status)
+            {
+                try
+                {
+                    Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+
+                    if (result != null)
+                    {
+                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+
+                        if (status.StatusCode == 200 && status.Error == false)
+                        {
+                            if (PubnubCommon.EnableStubTest)
+                            {
+                                if (expectedTime == result.Timetoken)
+                                {
+                                    timeReceived = true;
+                                }
+                            }
+                            else if (result.Timetoken > 0)
+                            {
+                                timeReceived = true;
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                }
+                finally
+                {
+                    mreTime.Set();
+                }
+
+            }
+        };
 
     }
 }
