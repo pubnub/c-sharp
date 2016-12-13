@@ -472,127 +472,9 @@ namespace PubnubApiDemo
             config.SubscribeKey = subscribeKey;
             config.PublishKey = publishKey;
             config.SecretKey = secretKey;
-            //config.ErrorLevel = PubnubErrorFilter.Level.Info;
 
             pubnub = new Pubnub(config);
             pubnub.AddListener(new DemoSubscribeCallback());
-
-            //Console.WriteLine("By default Resume On Reconnect is enabled. Do you want to disable it? ENTER Y for Yes, else N");
-            //string disableResumeOnReconnect = Console.ReadLine();
-            //Console.ForegroundColor = ConsoleColor.Blue;
-            //if (disableResumeOnReconnect.Trim().ToLower() == "y")
-            //{
-            //    Console.WriteLine("Resume On Reconnect Disabled");
-            //    pubnub.EnableResumeOnReconnect = false;
-            //}
-            //else
-            //{
-            //    Console.WriteLine("Resume On Reconnect Enabled by default");
-            //    pubnub.EnableResumeOnReconnect = true;
-            //}
-            //Console.ResetColor();
-            //Console.WriteLine();
-
-            //Console.WriteLine("Network Check MAX retries = 50 (default). Enter the value to change, else press ENTER");
-            //string networkCheckMaxRetriesEntry = Console.ReadLine();
-            //int networkCheckMaxRetries;
-            //Int32.TryParse(networkCheckMaxRetriesEntry, out networkCheckMaxRetries);
-            //Console.ForegroundColor = ConsoleColor.Blue;
-            //if (networkCheckMaxRetries > 0)
-            //{
-            //    Console.WriteLine("Network Check MAX retries = {0}", networkCheckMaxRetries);
-            //    pubnub.NetworkCheckMaxRetries = networkCheckMaxRetries;
-            //}
-            //else
-            //{
-            //    Console.WriteLine("Network Check MAX retries = {0} (default)", pubnub.NetworkCheckMaxRetries);
-            //}
-            //Console.ResetColor();
-            //Console.WriteLine();
-
-            //Console.WriteLine("Network Check Retry Interval = 10 seconds (default). Enter the value to change, else press ENTER");
-            //string networkCheckRetryIntervalEntry = Console.ReadLine();
-            //int networkCheckRetryInterval;
-            //Int32.TryParse(networkCheckRetryIntervalEntry, out networkCheckRetryInterval);
-            //Console.ForegroundColor = ConsoleColor.Blue;
-            //if (networkCheckRetryInterval > 0)
-            //{
-            //    Console.WriteLine("Network Check Retry Interval = {0} seconds", networkCheckRetryInterval);
-            //    pubnub.NetworkCheckRetryInterval = networkCheckRetryInterval;
-            //}
-            //else
-            //{
-            //    Console.WriteLine("Network Check Retry Interval = {0} seconds (default)", pubnub.NetworkCheckRetryInterval);
-            //}
-            //Console.ResetColor();
-            //Console.WriteLine();
-
-            //Console.WriteLine("Local Client Heartbeat Interval = 15 seconds (default). Enter the value to change, else press ENTER");
-            //string heartbeatIntervalEntry = Console.ReadLine();
-            //int localClientHeartbeatInterval;
-            //Int32.TryParse(heartbeatIntervalEntry, out localClientHeartbeatInterval);
-            //Console.ForegroundColor = ConsoleColor.Blue;
-            //if (localClientHeartbeatInterval > 0)
-            //{
-            //    Console.WriteLine("Heartbeat Interval = {0} seconds", localClientHeartbeatInterval);
-            //    pubnub.LocalClientHeartbeatInterval = localClientHeartbeatInterval;
-            //}
-            //else
-            //{
-            //    Console.WriteLine("Heartbeat Interval = {0} seconds (default)", pubnub.LocalClientHeartbeatInterval);
-            //}
-            //Console.ResetColor();
-            //Console.WriteLine();
-
-            //Console.WriteLine("HTTP Proxy Server with NTLM authentication(IP + username/pwd) exists? ENTER Y for Yes, else N");
-            //Console.ForegroundColor = ConsoleColor.Red;
-            //Console.WriteLine("NOTE: Pubnub example is being tested with CCProxy 7.3 Demo version");
-            //Console.ResetColor();
-            //string enableProxy = Console.ReadLine();
-            //if (enableProxy.Trim().ToLower() == "y")
-            //{
-            //    bool proxyAccepted = false;
-            //    while (!proxyAccepted)
-            //    {
-            //        Console.WriteLine("ENTER proxy server name or IP.");
-            //        string proxyServer = Console.ReadLine();
-            //        Console.WriteLine("ENTER port number of proxy server.");
-            //        string proxyPort = Console.ReadLine();
-            //        int port;
-            //        Int32.TryParse(proxyPort, out port);
-            //        Console.WriteLine("ENTER user name for proxy server authentication.");
-            //        string proxyUsername = Console.ReadLine();
-            //        Console.WriteLine("ENTER password for proxy server authentication.");
-            //        string proxyPassword = Console.ReadLine();
-
-            //        proxy = new PubnubProxy();
-            //        proxy.ProxyServer = proxyServer;
-            //        proxy.ProxyPort = port;
-            //        proxy.ProxyUserName = proxyUsername;
-            //        proxy.ProxyPassword = proxyPassword;
-            //        Console.ForegroundColor = ConsoleColor.Blue;
-            //        try
-            //        {
-            //            pubnub.Proxy = proxy;
-            //            proxyAccepted = true;
-            //            Console.WriteLine("Proxy details accepted");
-            //            Console.ResetColor();
-            //        }
-            //        catch (MissingFieldException mse)
-            //        {
-            //            Console.WriteLine(mse.Message);
-            //            Console.WriteLine("Please RE-ENTER Proxy Server details.");
-            //        }
-            //        Console.ResetColor();
-            //    }
-            //}
-            //else
-            //{
-            //    Console.ForegroundColor = ConsoleColor.Blue;
-            //    Console.WriteLine("No Proxy");
-            //    Console.ResetColor();
-            //}
-            //Console.WriteLine();
 
             Console.WriteLine("Display ErrorCallback messages? Enter Y for Yes, Else N for No.");
             Console.WriteLine("Default = N  ");
@@ -641,35 +523,23 @@ namespace PubnubApiDemo
                 {
                     Console.WriteLine("ENTER 1 FOR Subscribe channel/channelgroup");
                     Console.WriteLine("ENTER 2 FOR Publish");
-                    Console.WriteLine("ENTER 3 FOR Presence channel/channelgroup");
-                    Console.WriteLine("ENTER 4 FOR Detailed History");
-                    Console.WriteLine("ENTER 5 FOR Here_Now");
-                    Console.WriteLine("ENTER 6 FOR Unsubscribe");
-                    Console.WriteLine("ENTER 7 FOR Presence-Unsubscribe");
-                    Console.WriteLine("ENTER 8 FOR Time");
-                    Console.WriteLine("ENTER 9 FOR Disconnect/Reconnect existing Subscriber(s) (when internet is available)");
-                    Console.WriteLine("ENTER 10 TO Disable Network Connection (no internet)");
-                    Console.WriteLine("ENTER 11 TO Enable Network Connection (yes internet)");
-                    Console.WriteLine("ENTER 12 FOR Grant Access to channel/ChannelGroup");
-                    Console.WriteLine("ENTER 13 FOR Audit Access to channel/ChannelGroup");
-                    Console.WriteLine("ENTER 14 FOR Revoke Access to channel/ChannelGroup");
-                    Console.WriteLine("ENTER 15 FOR Grant Access to Presence Channel/ChannelGroup");
-                    Console.WriteLine("ENTER 16 FOR Audit Access to Presence Channel/ChannelGroup");
-                    Console.WriteLine("ENTER 17 FOR Revoke Access to Presence Channel/ChannelGroup");
-                    //Console.WriteLine("ENTER 18 FOR Change/Update Auth Key (Current value = {0})", config.AuthKey);
-                    Console.WriteLine("ENTER 19 TO Simulate Machine Sleep Mode");
-                    Console.WriteLine("ENTER 20 TO Simulate Machine Awake Mode");
-                    //Console.WriteLine("ENTER 21 TO Set Presence Heartbeat (Current value = {0} sec)", pubnub.PresenceHeartbeat);
-                    //Console.WriteLine("ENTER 22 TO Set Presence Heartbeat Interval (Current value = {0} sec)", pubnub.PresenceHeartbeatInterval);
-                    Console.WriteLine("Enter 23 TO Set User State by Add/Modify Key-Pair");
-                    Console.WriteLine("Enter 24 TO Set User State by Deleting existing Key-Pair");
-                    //Console.WriteLine("Enter 25 TO Set User State with direct json string");
-                    Console.WriteLine("Enter 26 TO Get User State");
-                    Console.WriteLine("Enter 27 FOR WhereNow");
-                    Console.WriteLine("Enter 28 FOR GlobalHere_Now");
-                    Console.WriteLine("Enter 29 TO change UUID. (Current value = {0})",  config.Uuid);
-                    Console.WriteLine("Enter 30 FOR Push - Register Device");
-                    Console.WriteLine("Enter 31 FOR Push - Unregister Device");
+                    Console.WriteLine("ENTER 3 FOR History");
+                    Console.WriteLine("ENTER 4 FOR Here_Now");
+                    Console.WriteLine("ENTER 5 FOR Unsubscribe");
+                    Console.WriteLine("ENTER 6 FOR Time");
+                    Console.WriteLine("ENTER 7 FOR Disconnect/Reconnect existing Subscriber(s) (when internet is available)");
+                    Console.WriteLine("ENTER 8 FOR Grant Access to channel/ChannelGroup");
+                    Console.WriteLine("ENTER 9 FOR Audit Access to channel/ChannelGroup");
+                    Console.WriteLine("ENTER 10 FOR Revoke Access to channel/ChannelGroup");
+                    Console.WriteLine("ENTER 11 TO Simulate Machine Sleep Mode");
+                    Console.WriteLine("ENTER 12 TO Simulate Machine Awake Mode");
+                    Console.WriteLine("Enter 13 TO Set User State by Add/Modify Key-Pair");
+                    Console.WriteLine("Enter 14 TO Set User State by Deleting existing Key-Pair");
+                    Console.WriteLine("Enter 15 TO Get User State");
+                    Console.WriteLine("Enter 16 FOR WhereNow");
+                    Console.WriteLine("Enter 17 TO change UUID. (Current value = {0})",  config.Uuid);
+
+                    Console.WriteLine("Enter 31 FOR Push - Register Device");
                     Console.WriteLine("Enter 32 FOR Push - Remove Channel");
                     Console.WriteLine("Enter 33 FOR Push - Get Current Channels");
                     Console.WriteLine("Enter 34 FOR Push - Publish Toast message");
@@ -854,9 +724,6 @@ namespace PubnubApiDemo
                         }
                         break;
                     case "3":
-                        Console.WriteLine("Presency only subscribe not available.");
-                        break;
-                    case "4":
                         Console.WriteLine("Enter CHANNEL name for History");
                         channel = Console.ReadLine();
 
@@ -873,7 +740,7 @@ namespace PubnubApiDemo
                             .IncludeTimetoken(true)
                             .Async(new DemoHistoryResult());
                         break;
-                    case "5":
+                    case "4":
                         bool showUUID = true;
                         bool includeUserState = false;
 
@@ -922,7 +789,7 @@ namespace PubnubApiDemo
                             .IncludeState(includeUserState)
                             .Async(new DemoHereNowResult());
                         break;
-                    case "6":
+                    case "5":
                         Console.WriteLine("Enter CHANNEL name for Unsubscribe. Use comma to enter multiple channels.");
                         Console.WriteLine("NOTE: If you want to consider only Channel Group, just hit ENTER");
                         channel = Console.ReadLine();
@@ -953,36 +820,17 @@ namespace PubnubApiDemo
 
                         }
                         break;
-                    case "7":
-                        Console.WriteLine("Presence-Unsubscribe not available");
-                        break;
-                    case "8":
+                    case "6":
                         Console.WriteLine("Running time()");
                         pubnub.Time()
                                 .Async(new DemoTimeResult());
                         break;
-                    case "9":
+                    case "7":
                         Console.WriteLine("Running Disconnect/auto-Reconnect Subscriber Request Connection");
                         pubnub.TerminateCurrentSubscriberRequest();
                         break;
-                    //case "10":
-                    //    Console.WriteLine("Disabling Network Connection (no internet)");
-                    //    Console.ForegroundColor = ConsoleColor.Red;
-                    //    Console.WriteLine("Initiating Simulation of Internet non-availability");
-                    //    Console.WriteLine("Until Choice=11 is entered, no operations will occur");
-                    //    Console.WriteLine("NOTE: Publish from other pubnub clients can occur and those will be ");
-                    //    Console.WriteLine("      captured upon choice=11 is entered provided resume on reconnect is enabled.");
-                    //    Console.ResetColor();
-                    //    pubnub.EnableSimulateNetworkFailForTestingOnly();
-                    //    break;
-                    //case "11":
-                    //    Console.WriteLine("Enabling Network Connection (yes internet)");
-                    //    Console.ForegroundColor = ConsoleColor.Red;
-                    //    Console.WriteLine("Stopping Simulation of Internet non-availability");
-                    //    Console.ResetColor();
-                    //    pubnub.DisableSimulateNetworkFailForTestingOnly();
-                    //    break;
-                    case "12":
+
+                    case "8":
                         Console.WriteLine("Enter CHANNEL name(s) for PAM Grant.");
                         channel = Console.ReadLine();
 
@@ -1073,7 +921,7 @@ namespace PubnubApiDemo
                             .TTL(grantTimeLimitInMinutes)
                             .Async(new DemoGrantResult());
                         break;
-                    case "13":
+                    case "9":
                         Console.WriteLine("Enter CHANNEL name for PAM Audit");
                         Console.WriteLine("To enter CHANNEL GROUP name, just hit ENTER");
                         channel = Console.ReadLine();
@@ -1122,7 +970,7 @@ namespace PubnubApiDemo
                             .AuthKeys(authKeyListAudit)
                             .Async(new  DemoAuditResult());
                         break;
-                    case "14":
+                    case "10":
                         Console.WriteLine("Enter CHANNEL name(s) for PAM Revoke");
                         channel = Console.ReadLine();
                         if (channel.Trim().Length <= 0)
@@ -1176,56 +1024,21 @@ namespace PubnubApiDemo
                             .Manage(false)
                             .Async(new DemoGrantResult());
                         break;
-                    //case "15":
-                    //    Console.WriteLine("Enter CHANNEL name for PAM Grant Presence.");
-                    //    Console.WriteLine();
-                    //    break;
-                    //case "18":
-                    //    Console.WriteLine("Enter Auth Key (applies to all subscribed channels).");
-                    //    Console.WriteLine("If you don't want to use Auth Key, Press ENTER Key");
-                    //    authKey = Console.ReadLine();
-                    //    pubnub.AuthenticationKey = authKey;
-
-                    //    Console.ForegroundColor = ConsoleColor.Blue;
-                    //    Console.WriteLine(string.Format("Auth Key = {0}", authKey));
-                    //    Console.ResetColor();
-                    //    Console.WriteLine();
-
-                    //    break;
-                    case "19":
+                    case "11":
                         Console.WriteLine("Enabling simulation of Sleep/Suspend Mode");
                         pubnub.EnableMachineSleepModeForTestingOnly();
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Machine Sleep Mode simulation activated");
                         Console.ResetColor();
                         break;
-                    case "20":
+                    case "12":
                         Console.WriteLine("Disabling simulation of Sleep/Suspend Mode");
                         pubnub.DisableMachineSleepModeForTestingOnly();
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Simulation going to awake mode");
                         Console.ResetColor();
                         break;
-                    //case "21":
-                    //    Console.WriteLine("Enter Presence Heartbeat in seconds");
-                    //    string pnHeartbeatInput = Console.ReadLine();
-                    //    Int32.TryParse(pnHeartbeatInput, out presenceHeartbeat);
-                    //    pubnub.PresenceHeartbeat = presenceHeartbeat;
-                    //    Console.ForegroundColor = ConsoleColor.Blue;
-                    //    Console.WriteLine(string.Format("Presence Heartbeat = {0}", presenceHeartbeat));
-                    //    Console.ResetColor();
-                    //    break;
-                    //case "22":
-                    //    Console.WriteLine("Enter Presence Heartbeat Interval in seconds");
-                    //    Console.WriteLine("NOTE: Ensure that it is less than Presence Heartbeat-3 seconds");
-                    //    string pnHeartbeatIntervalInput = Console.ReadLine();
-                    //    Int32.TryParse(pnHeartbeatIntervalInput, out presenceHeartbeatInterval);
-                    //    pubnub.PresenceHeartbeatInterval = presenceHeartbeatInterval;
-                    //    Console.ForegroundColor = ConsoleColor.Blue;
-                    //    Console.WriteLine(string.Format("Presence Heartbeat Interval = {0}", presenceHeartbeatInterval));
-                    //    Console.ResetColor();
-                    //    break;
-                    case "23":
+                    case "13":
                         Console.WriteLine("Enter channel name");
                         Console.WriteLine("NOTE: If you want to consider only Channel Group, just hit ENTER");
                         string userStateChannel = Console.ReadLine();
@@ -1275,7 +1088,7 @@ namespace PubnubApiDemo
                             .Async(new DemoPNSetStateResult());
 
                         break;
-                    case "24":
+                    case "14":
                         Console.WriteLine("Enter channel name");
                         Console.WriteLine("NOTE: If you want to consider only Channel Group, just hit ENTER");
                         string deleteChannelUserState = Console.ReadLine();
@@ -1301,7 +1114,7 @@ namespace PubnubApiDemo
                             .Async(new DemoPNSetStateResult());
 
                         break;
-                    case "26":
+                    case "15":
                         Console.WriteLine("Enter channel name");
                         Console.WriteLine("NOTE: If you want to consider only Channel Group, just hit ENTER");
                         string getUserStateChannel2 = Console.ReadLine();
@@ -1329,7 +1142,7 @@ namespace PubnubApiDemo
                             .Async(new DemoPNGetStateResult());
 
                         break;
-                    case "27":
+                    case "16":
                         Console.WriteLine("Enter uuid for WhereNow. To consider SessionUUID, just press ENTER");
                         string whereNowUuid = Console.ReadLine();
 
@@ -1343,10 +1156,7 @@ namespace PubnubApiDemo
                             .Uuid(whereNowUuid)
                             .Async(new DemoWhereNowResult());
                         break;
-                    case "28":
-                        Console.WriteLine("GlobalHereNow() merged with HereNow");
-                        break;
-                    case "29":
+                    case "17":
                         Console.WriteLine("ENTER UUID.");
                         string sessionUUID = Console.ReadLine();
                         pubnub.ChangeUUID(sessionUUID);
@@ -1354,7 +1164,7 @@ namespace PubnubApiDemo
                         Console.WriteLine("UUID = {0}", config.Uuid);
                         Console.ResetColor();
                         break;
-                    case "30":
+                    case "31":
                         Console.WriteLine("Enter channel name");
                         string pushRegisterChannel = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
