@@ -39,7 +39,7 @@ namespace PubnubApi
 
         public string SecretKey { get; set; }
 
-        public string CiperKey { get; set; }
+        public string CipherKey { get; set; }
 
         public string AuthKey { get; set; }
 
@@ -112,7 +112,7 @@ namespace PubnubApi
             this.SubscribeTimeout = 310;
             this.ConnectTimeout = 5;
             //this.LogVerbosity = LoggingMethod.Level.Off;
-            this.CiperKey = "";
+            this.CipherKey = "";
             this.PublishKey = "";
             this.SubscribeKey = "";
             this.SecretKey = "";

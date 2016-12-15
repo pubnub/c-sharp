@@ -464,10 +464,10 @@ namespace PubnubApi
                                 }
                                 else
                                 {
-                                    if (pubnubConfig.CiperKey.Length > 0) //decrypt the subscriber message if cipherkey is available
+                                    if (pubnubConfig.CipherKey.Length > 0) //decrypt the subscriber message if cipherkey is available
                                     {
                                         string decryptMessage = "";
-                                        PubnubCrypto aes = new PubnubCrypto(pubnubConfig.CiperKey);
+                                        PubnubCrypto aes = new PubnubCrypto(pubnubConfig.CipherKey);
                                         try
                                         {
                                             decryptMessage = aes.Decrypt(payload.ToString());

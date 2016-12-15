@@ -275,9 +275,9 @@ namespace PubnubApi
                     pubnubConfig.SecretKey = "";
                 }
 
-                if (string.IsNullOrEmpty(pubnubConfig.CiperKey))
+                if (string.IsNullOrEmpty(pubnubConfig.CipherKey))
                 {
-                    pubnubConfig.CiperKey = "";
+                    pubnubConfig.CipherKey = "";
                 }
             }
         }

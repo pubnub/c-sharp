@@ -24,9 +24,9 @@ namespace PubnubApi
         public List<object> DecodeDecryptLoop<T>(List<object> message, string[] channels, string[] channelGroups, PNCallback<T> errorCallback)
         {
             List<object> returnMessage = new List<object>();
-            if (config.CiperKey.Length > 0)
+            if (config.CipherKey.Length > 0)
             {
-                PubnubCrypto aes = new PubnubCrypto(config.CiperKey);
+                PubnubCrypto aes = new PubnubCrypto(config.CipherKey);
                 var myObjectArray = (from item in message
                                      select item as object).ToArray();
                 IEnumerable enumerable = myObjectArray[0] as IEnumerable;

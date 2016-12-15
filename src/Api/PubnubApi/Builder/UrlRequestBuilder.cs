@@ -726,7 +726,7 @@ namespace PubnubApi
             string_to_sign.Append(partialUrl.ToString()).Append("\n");
             string_to_sign.Append(queryStringToSign);
 
-            PubnubCrypto pubnubCrypto = new PubnubCrypto(this.pubnubConfig.CiperKey);
+            PubnubCrypto pubnubCrypto = new PubnubCrypto(this.pubnubConfig.CipherKey);
             signature = pubnubCrypto.PubnubAccessManagerSign(this.pubnubConfig.SecretKey, string_to_sign.ToString());
             System.Diagnostics.Debug.WriteLine("string_to_sign = " + string_to_sign.ToString());
             System.Diagnostics.Debug.WriteLine("signature = " + signature);
@@ -826,9 +826,9 @@ namespace PubnubApi
         {
             string message = jsonLib.SerializeToJsonString(originalMessage);
 
-            if (pubnubConfig.CiperKey.Length > 0)
+            if (pubnubConfig.CipherKey.Length > 0)
             {
-                PubnubCrypto aes = new PubnubCrypto(pubnubConfig.CiperKey);
+                PubnubCrypto aes = new PubnubCrypto(pubnubConfig.CipherKey);
                 string encryptMessage = aes.Encrypt(message);
                 message = jsonLib.SerializeToJsonString(encryptMessage);
             }
