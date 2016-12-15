@@ -330,7 +330,7 @@ namespace PubNubMessaging.Tests
                     if (result != null)
                     {
                         Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                        if (status.StatusCode == 200 && result.Message.ToLower() == "ok" && result.Service == "channel-registry" && status.Error == false && result.ChannelGroup.Substring(1) == channelGroupName)
+                        if (status.StatusCode == 200 && result.Message.ToLower() == "ok" && result.Service == "channel-registry" && status.Error == false && result.ChannelGroup == channelGroupName)
                         {
                             receivedChannelGroupMessage = true;
                         }
