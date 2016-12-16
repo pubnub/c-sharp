@@ -105,7 +105,7 @@ namespace PubnubApi
 
         public PNConfiguration()
         {
-            this.Origin = "pubsub.pubnub.com";
+            this.Origin = "ps.pndsn.com";
             this.presenceHeartbeatTimeout = 300;
             this.uuid = Guid.NewGuid().ToString();
             this.NonSubscribeRequestTimeout = 10;
