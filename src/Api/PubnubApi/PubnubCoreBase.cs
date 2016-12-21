@@ -284,7 +284,7 @@ namespace PubnubApi
                     ChannelInternetStatus[channel] = networkConnection;
                     ChannelGroupInternetStatus[channelGroup] = networkConnection;
 
-                    LoggingMethod.WriteToLog(string.Format("DateTime: {0}, OnPubnubLocalClientHeartBeatTimeoutCallback - Internet connection = {1}", DateTime.Now.ToString(), networkConnection), PNLogVerbosity.BODY);
+                    LoggingMethod.WriteToLog(string.Format("DateTime: {0}, OnPubnubLocalClientHeartBeatTimeoutCallback - Internet connection = {1}", DateTime.Now.ToString(), networkConnection), pubnubConfig.LogVerbosity);
                     if (!networkConnection)
                     {
                         if (pubnubConfig.ReconnectionPolicy == PNReconnectionPolicy.NONE)
@@ -467,7 +467,7 @@ namespace PubnubApi
                                     if (pubnubConfig.CipherKey.Length > 0) //decrypt the subscriber message if cipherkey is available
                                     {
                                         string decryptMessage = "";
-                                        PubnubCrypto aes = new PubnubCrypto(pubnubConfig.CipherKey);
+                                        PubnubCrypto aes = new PubnubCrypto(pubnubConfig.CipherKey, pubnubConfig);
                                         try
                                         {
                                             decryptMessage = aes.Decrypt(payload.ToString());
@@ -686,13 +686,13 @@ namespace PubnubApi
                     request = pubnubHttp.SetServicePointSetTcpKeepAlive(request);
                 }
 
-                LoggingMethod.WriteToLog(string.Format("DateTime {0}, Request={1}", DateTime.Now.ToString(), requestUri.ToString()), PNLogVerbosity.BODY);
+                LoggingMethod.WriteToLog(string.Format("DateTime {0}, Request={1}", DateTime.Now.ToString(), requestUri.ToString()), pubnubConfig.LogVerbosity);
 
                 Task<string> jsonResponse = pubnubHttp.SendRequestAndGetJsonResponse(requestUri, pubnubRequestState, request);
 
                 string jsonString = jsonResponse.Result;
 
-                LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON= {1} for request={2}", DateTime.Now.ToString(), jsonString, requestUri), PNLogVerbosity.BODY);
+                LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON= {1} for request={2}", DateTime.Now.ToString(), jsonString, requestUri), pubnubConfig.LogVerbosity);
                 return jsonString;
             }
             catch (Exception ex)
@@ -734,7 +734,7 @@ namespace PubnubApi
                         Announce(status);
                     }
 
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0} PubnubBaseCore UrlProcessRequest Exception={1}", DateTime.Now.ToString(), webEx != null ? webEx.ToString() : exceptionMessage), PNLogVerbosity.BODY);
+                    LoggingMethod.WriteToLog(string.Format("DateTime {0} PubnubBaseCore UrlProcessRequest Exception={1}", DateTime.Now.ToString(), webEx != null ? webEx.ToString() : exceptionMessage), pubnubConfig.LogVerbosity);
                 }
 
                 return "";
@@ -1214,11 +1214,11 @@ namespace PubnubApi
                     bool removeKey = ChannelRequest.TryRemove(channel, out removedRequest);
                     if (removeKey)
                     {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0} Remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString(), channel), PNLogVerbosity.BODY);
+                        LoggingMethod.WriteToLog(string.Format("DateTime {0} Remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString(), channel), pubnubConfig.LogVerbosity);
                     }
                     else
                     {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString(), channel), PNLogVerbosity.BODY);
+                        LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString(), channel), pubnubConfig.LogVerbosity);
                     }
                 }
             }
@@ -1236,11 +1236,11 @@ namespace PubnubApi
                             bool removeKey = ChannelRequest.TryRemove(key, out currentRequest);
                             if (removeKey)
                             {
-                                LoggingMethod.WriteToLog(string.Format("DateTime {0} Remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString(), key), PNLogVerbosity.BODY);
+                                LoggingMethod.WriteToLog(string.Format("DateTime {0} Remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
                             }
                             else
                             {
-                                LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString(), key), PNLogVerbosity.BODY);
+                                LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
                             }
                         }
                     }
@@ -1267,11 +1267,11 @@ namespace PubnubApi
                         bool removeKey = ChannelLocalUserState.TryRemove(key, out tempUserState);
                         if (removeKey)
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveUserState from local user state dictionary for channel= {1}", DateTime.Now.ToString(), key), PNLogVerbosity.BODY);
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveUserState from local user state dictionary for channel= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
                         }
                         else
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveUserState from local user state dictionary for channel= {1}", DateTime.Now.ToString(), key), PNLogVerbosity.BODY);
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveUserState from local user state dictionary for channel= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
                         }
                     }
                 }
@@ -1288,11 +1288,11 @@ namespace PubnubApi
                         bool removeKey = ChannelUserState.TryRemove(key, out tempUserState);
                         if (removeKey)
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveUserState from user state dictionary for channel= {1}", DateTime.Now.ToString(), key), PNLogVerbosity.BODY);
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveUserState from user state dictionary for channel= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
                         }
                         else
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveUserState from user state dictionary for channel= {1}", DateTime.Now.ToString(), key), PNLogVerbosity.BODY);
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveUserState from user state dictionary for channel= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
                         }
                     }
                 }
@@ -1309,11 +1309,11 @@ namespace PubnubApi
                         bool removeKey = ChannelGroupLocalUserState.TryRemove(key, out tempUserState);
                         if (removeKey)
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveUserState from local user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), PNLogVerbosity.BODY);
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveUserState from local user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
                         }
                         else
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveUserState from local user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), PNLogVerbosity.BODY);
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveUserState from local user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
                         }
                     }
                 }
@@ -1331,11 +1331,11 @@ namespace PubnubApi
                         bool removeKey = ChannelGroupUserState.TryRemove(key, out tempUserState);
                         if (removeKey)
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveUserState from user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), PNLogVerbosity.BODY);
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveUserState from user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
                         }
                         else
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveUserState from user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), PNLogVerbosity.BODY);
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveUserState from user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
                         }
                     }
                 }
@@ -1378,11 +1378,11 @@ namespace PubnubApi
                         bool removed = ChannelLocalClientHeartbeatTimer.TryRemove(requestUri, out removedTimer);
                         if (removed)
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString(), requestUri.ToString()), PNLogVerbosity.BODY);
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString(), requestUri.ToString()), pubnubConfig.LogVerbosity);
                         }
                         else
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString(), requestUri.ToString()), PNLogVerbosity.BODY);
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString(), requestUri.ToString()), pubnubConfig.LogVerbosity);
                         }
                     }
                 }
@@ -1406,7 +1406,7 @@ namespace PubnubApi
                                 bool removed = ChannelLocalClientHeartbeatTimer.TryRemove(key, out removedTimer);
                                 if (!removed)
                                 {
-                                    LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateLocalClientHeartbeatTimer(null) - Unable to remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString(), key.ToString()), PNLogVerbosity.BODY);
+                                    LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateLocalClientHeartbeatTimer(null) - Unable to remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString(), key.ToString()), pubnubConfig.LogVerbosity);
                                 }
                             }
                         }
@@ -1426,13 +1426,13 @@ namespace PubnubApi
                 {
                     timerInterval = MINEXPONENTIALBACKOFF;
                     ConnectionErrors = 1;
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0}, EXPONENTIAL timerInterval > MAXEXPONENTIALBACKOFF", DateTime.Now.ToString()), PNLogVerbosity.BODY);
+                    LoggingMethod.WriteToLog(string.Format("DateTime {0}, EXPONENTIAL timerInterval > MAXEXPONENTIALBACKOFF", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
                 }
                 else if (timerInterval < 1)
                 {
                     timerInterval = MINEXPONENTIALBACKOFF;
                 }
-                LoggingMethod.WriteToLog(string.Format("DateTime {0}, EXPONENTIAL timerInterval = {1}", DateTime.Now.ToString(), timerInterval.ToString()), PNLogVerbosity.BODY);
+                LoggingMethod.WriteToLog(string.Format("DateTime {0}, EXPONENTIAL timerInterval = {1}", DateTime.Now.ToString(), timerInterval.ToString()), pubnubConfig.LogVerbosity);
             }
             else if (pubnubConfig.ReconnectionPolicy == PNReconnectionPolicy.LINEAR)
             {
@@ -1463,7 +1463,7 @@ namespace PubnubApi
                         bool removed = ChannelReconnectTimer.TryRemove(key, out removedTimer);
                         if (!removed)
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channel reconnect timer reference from collection for {1}", DateTime.Now.ToString(), key.ToString()), PNLogVerbosity.BODY);
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channel reconnect timer reference from collection for {1}", DateTime.Now.ToString(), key.ToString()), pubnubConfig.LogVerbosity);
                         }
                     }
                 }
@@ -1484,7 +1484,7 @@ namespace PubnubApi
                         bool removed = ChannelGroupReconnectTimer.TryRemove(groupKey, out removedTimer);
                         if (!removed)
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channelgroup reconnect timer reference from collection for {1}", DateTime.Now.ToString(), groupKey.ToString()), PNLogVerbosity.BODY);
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channelgroup reconnect timer reference from collection for {1}", DateTime.Now.ToString(), groupKey.ToString()), pubnubConfig.LogVerbosity);
                         }
                     }
                 }
@@ -1548,7 +1548,7 @@ namespace PubnubApi
                 HttpWebRequest request = ChannelRequest.ContainsKey(multiChannel) ? ChannelRequest[multiChannel] : null;
                 if (request != null)
                 {
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateCurrentSubsciberRequest {1}", DateTime.Now.ToString(), request.RequestUri.ToString()), PNLogVerbosity.BODY);
+                    LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateCurrentSubsciberRequest {1}", DateTime.Now.ToString(), request.RequestUri.ToString()), pubnubConfig.LogVerbosity);
                     request.Abort();
                 }
             }

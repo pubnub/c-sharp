@@ -726,7 +726,7 @@ namespace PubnubApi
             string_to_sign.Append(partialUrl.ToString()).Append("\n");
             string_to_sign.Append(queryStringToSign);
 
-            PubnubCrypto pubnubCrypto = new PubnubCrypto(this.pubnubConfig.CipherKey);
+            PubnubCrypto pubnubCrypto = new PubnubCrypto(this.pubnubConfig.CipherKey, this.pubnubConfig);
             signature = pubnubCrypto.PubnubAccessManagerSign(this.pubnubConfig.SecretKey, string_to_sign.ToString());
             System.Diagnostics.Debug.WriteLine("string_to_sign = " + string_to_sign.ToString());
             System.Diagnostics.Debug.WriteLine("signature = " + signature);
@@ -828,7 +828,7 @@ namespace PubnubApi
 
             if (pubnubConfig.CipherKey.Length > 0)
             {
-                PubnubCrypto aes = new PubnubCrypto(pubnubConfig.CipherKey);
+                PubnubCrypto aes = new PubnubCrypto(pubnubConfig.CipherKey, pubnubConfig);
                 string encryptMessage = aes.Encrypt(message);
                 message = jsonLib.SerializeToJsonString(encryptMessage);
             }
@@ -840,7 +840,7 @@ namespace PubnubApi
         private void ForceCanonicalPathAndQuery(Uri requestUri)
         {
 #if !NETSTANDARD10 && !NETSTANDARD11 && !NETSTANDARD12 && !WP81 && !PORTABLE111
-            LoggingMethod.WriteToLog("Inside ForceCanonicalPathAndQuery = " + requestUri.ToString(), PNLogVerbosity.BODY);
+            LoggingMethod.WriteToLog("Inside ForceCanonicalPathAndQuery = " + requestUri.ToString(), pubnubConfig.LogVerbosity);
             try
             {
                 FieldInfo flagsFieldInfo = typeof(Uri).GetField("m_Flags", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -853,7 +853,7 @@ namespace PubnubApi
             }
             catch (Exception ex)
             {
-                LoggingMethod.WriteToLog("Exception Inside ForceCanonicalPathAndQuery = " + ex.ToString(), PNLogVerbosity.BODY);
+                LoggingMethod.WriteToLog("Exception Inside ForceCanonicalPathAndQuery = " + ex.ToString(), pubnubConfig.LogVerbosity);
             }
 #endif
         }

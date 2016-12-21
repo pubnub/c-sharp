@@ -15,6 +15,14 @@ namespace PubnubApi
 {
     public class PubnubCrypto : PubnubCryptoBase
     {
+        private PNConfiguration config = null;
+
+        public PubnubCrypto(string cipher_key, PNConfiguration pubnubConfig)
+            : base(cipher_key)
+        {
+            this.config = pubnubConfig;
+        }
+
         public PubnubCrypto(string cipher_key)
             : base(cipher_key)
         {
@@ -117,9 +125,12 @@ namespace PubnubApi
                 }
                 catch (Exception ex)
                 {
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0} Decrypt Error. {1}", DateTime.Now.ToString(), ex.ToString()), PNLogVerbosity.BODY);
+                    if (config != null)
+                    {
+                        LoggingMethod.WriteToLog(string.Format("DateTime {0} Decrypt Error. {1}", DateTime.Now.ToString(), ex.ToString()), config.LogVerbosity);
+                    }
                     throw ex;
-                    //LoggingMethod.WriteToLog(string.Format("DateTime {0} Decrypt Error. {1}", DateTime.Now.ToString(), ex.ToString()), PNLogVerbosity.BODY);
+                    //LoggingMethod.WriteToLog(string.Format("DateTime {0} Decrypt Error. {1}", DateTime.Now.ToString(), ex.ToString()), pubnubConfig.LogVerbosity);
                     //return "**DECRYPT ERROR**";
                 }
             }

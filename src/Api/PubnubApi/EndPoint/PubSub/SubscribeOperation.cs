@@ -114,7 +114,7 @@ namespace PubnubApi.EndPoint
             string channel = (channels != null) ? string.Join(",", channels) : "";
             string channelGroup = (channelGroups != null) ? string.Join(",", channelGroups) : "";
 
-            LoggingMethod.WriteToLog(string.Format("DateTime {0}, requested subscribe for channel(s)={1} and channel group(s)={2}", DateTime.Now.ToString(), channel, channelGroup), PNLogVerbosity.BODY);
+            LoggingMethod.WriteToLog(string.Format("DateTime {0}, requested subscribe for channel(s)={1} and channel group(s)={2}", DateTime.Now.ToString(), channel, channelGroup), config.LogVerbosity);
 
             string[] arrayChannel = new string[] { };
             string[] arrayChannelGroup = new string[] { };
@@ -167,7 +167,7 @@ namespace PubnubApi.EndPoint
         //    string channel = (channels != null) ? string.Join(",", channels) : "";
         //    string channelGroup = (channelGroups != null) ? string.Join(",", channelGroups) : "";
 
-        //    LoggingMethod.WriteToLog(string.Format("DateTime {0}, requested presence for channel={1} and channel group={2}", DateTime.Now.ToString(), channel, channelGroup), PNLogVerbosity.BODY);
+        //    LoggingMethod.WriteToLog(string.Format("DateTime {0}, requested presence for channel={1} and channel group={2}", DateTime.Now.ToString(), channel, channelGroup), pubnubConfig.LogVerbosity);
         //    //string[] arrayChannel = new string[] { };
         //    //string[] arrayChannelGroup = new string[] { };
 

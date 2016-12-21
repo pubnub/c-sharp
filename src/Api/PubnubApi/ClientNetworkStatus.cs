@@ -75,7 +75,7 @@ namespace PubnubApi
             {
                 if (isInternetCheckRunning)
                 {
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0} InternetCheckRunning Already running", DateTime.Now.ToString()), PNLogVerbosity.BODY);
+                    LoggingMethod.WriteToLog(string.Format("DateTime {0} InternetCheckRunning Already running", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
                     return networkStatus;
                 }
             }
@@ -140,7 +140,7 @@ namespace PubnubApi
                             {
                                 if (resp != null && resp.StatusCode == HttpStatusCode.OK)
                                 {
-                                    LoggingMethod.WriteToLog(string.Format("DateTime {0} CheckSocketConnect Resp {1}", DateTime.Now.ToString(), HttpStatusCode.OK.ToString()), PNLogVerbosity.BODY);
+                                    LoggingMethod.WriteToLog(string.Format("DateTime {0} CheckSocketConnect Resp {1}", DateTime.Now.ToString(), HttpStatusCode.OK.ToString()), pubnubConfig.LogVerbosity);
                                     networkStatus = true;
                                     t.TrySetResult(true);
                                 }
@@ -151,7 +151,7 @@ namespace PubnubApi
                             networkStatus = false;
                             t.TrySetResult(false);
                             ParseCheckSocketConnectException<T>(ex, type, channels, channelGroups, pubnubCallback, internalCallback);
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} CheckSocketConnect Failed {1}", DateTime.Now.ToString(), ex.ToString()), PNLogVerbosity.BODY);
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0} CheckSocketConnect Failed {1}", DateTime.Now.ToString(), ex.ToString()), pubnubConfig.LogVerbosity);
                         }
                         finally
                         {
@@ -190,7 +190,7 @@ namespace PubnubApi
                 callback.OnResponse(default(T), status);
             }
 
-			LoggingMethod.WriteToLog(string.Format("DateTime {0} checkInternetStatus Error. {1}", DateTime.Now.ToString(), ex.ToString()), PNLogVerbosity.BODY);
+			LoggingMethod.WriteToLog(string.Format("DateTime {0} checkInternetStatus Error. {1}", DateTime.Now.ToString(), ex.ToString()), pubnubConfig.LogVerbosity);
 			internalcallback(false);
 		}
 
