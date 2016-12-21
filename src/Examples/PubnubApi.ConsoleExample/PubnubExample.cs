@@ -468,7 +468,7 @@ namespace PubnubApiDemo
             config.Origin = origin;
 
             config.Secure = (enableSSL.Trim().ToLower() == "y") ? true : false;
-            config.CiperKey = cipherKey;
+            config.CipherKey = cipherKey;
             config.SubscribeKey = subscribeKey;
             config.PublishKey = publishKey;
             config.SecretKey = secretKey;

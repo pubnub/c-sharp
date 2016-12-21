@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using PubnubApi.Interface;
+using System.Threading.Tasks;
 
 namespace PubnubApi.EndPoint
 {
@@ -84,6 +85,18 @@ namespace PubnubApi.EndPoint
             Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, callback);
         }
 
+        private static System.Threading.ManualResetEvent syncEvent = new System.Threading.ManualResetEvent(false);
+        public PNPublishResult Sync()
+        {
+            syncEvent = new System.Threading.ManualResetEvent(false);
+            Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, new SyncPublishResult());
+            syncEvent.WaitOne(config.NonSubscribeRequestTimeout*1000);
+
+            return SyncResult;
+        }
+
+        private static PNPublishResult SyncResult { get; set; }
+
         private void Publish(string channel, object message, bool storeInHistory, int ttl, string jsonUserMetaData, PNCallback<PNPublishResult> callback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
@@ -133,5 +146,13 @@ namespace PubnubApi.EndPoint
             }
         }
 
+        private class SyncPublishResult : PNCallback<PNPublishResult>
+        {
+            public override void OnResponse(PNPublishResult result, PNStatus status)
+            {
+                SyncResult = result;
+                syncEvent.Set();
+            }
+        };
     }
 }
