@@ -30,7 +30,6 @@ namespace PubnubApiDemo
 
         public class PlatformPubnubLog : IPubnubLog
         {
-            //LoggingMethod.Level.Info => To  capture verbose info
             private string logFilePath = "";
 
             public PlatformPubnubLog()
@@ -419,14 +418,15 @@ namespace PubnubApiDemo
             Console.ForegroundColor = ConsoleColor.Blue;
             if (enableLoggingString.Trim().ToLower() == "n")
             {
+                config.LogVerbosity = PNLogVerbosity.NONE;
                 config.PubnubLog = null;
                 Console.WriteLine("Disabled internal logging");
             }
             else
             {
+                config.LogVerbosity = PNLogVerbosity.BODY;
                 config.PubnubLog = new PlatformPubnubLog();
                 Console.WriteLine("Enabled internal logging");
-
             }
             Console.ResetColor();
             Console.WriteLine();
