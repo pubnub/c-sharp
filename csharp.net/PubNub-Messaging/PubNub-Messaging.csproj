@@ -165,17 +165,11 @@
     <Compile Include="PubnubWin.cs" />
     <Compile Include="ReconnectState.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="v4.0\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="v3.5\Notes.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="JsonFx, Version=2.0.1209.2802, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>v4.0\JsonFx.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.6.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
