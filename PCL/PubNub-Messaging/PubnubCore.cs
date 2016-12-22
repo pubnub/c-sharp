@@ -96,13 +96,13 @@ namespace PubNubMessaging.Core
 
 		private static long lastSubscribeTimetoken = 0;
 		// Pubnub Core API implementation
-		private string _origin = "ps.pndsn.com";
+		protected string _origin = "ps.pndsn.com";
         protected string publishKey = "";
 		protected string subscribeKey = "";
 		protected string secretKey = "";
 		protected string cipherKey = "";
 		protected bool ssl = false;
-        private string _pnsdkVersion = "PubNub-CSharp-.NET/3.8.4";
+        private string _pnsdkVersion = "PubNub-CSharp-.NET/3.8.5";
         private string _pushServiceName = "push.pubnub.com";
         private bool _addPayloadToPublishResponse = false;
 

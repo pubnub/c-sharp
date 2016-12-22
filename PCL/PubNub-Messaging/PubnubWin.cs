@@ -31,10 +31,6 @@ namespace PubNubMessaging.Core
 		protected bool pubnubEnableProxyConfig = true;
 		#endif
 		
-		#if (__MonoCS__)
-		protected string _domainName = Origin;
-		#endif
-
         private object _reconnectFromSuspendMode = null;
 
 		#endregion
