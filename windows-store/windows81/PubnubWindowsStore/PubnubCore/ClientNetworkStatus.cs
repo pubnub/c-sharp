@@ -31,6 +31,12 @@ namespace PubNubMessaging.Core
 			}
 		}
 
+        internal static string Origin
+        {
+            get;
+            set;
+        }
+
 		#if (SILVERLIGHT  || WINDOWS_PHONE)
 		private static ManualResetEvent mres = new ManualResetEvent(false);
 		private static ManualResetEvent mreSocketAsync = new ManualResetEvent(false);
@@ -144,12 +150,12 @@ namespace PubNubMessaging.Core
             string[] channelGroups = state.ChannelGroups;
 			try
 			{
-				#if (SILVERLIGHT || WINDOWS_PHONE)
+#if (SILVERLIGHT || WINDOWS_PHONE)
 				using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
 				{
 					SocketAsyncEventArgs sae = new SocketAsyncEventArgs();
 					sae.UserToken = state;
-					sae.RemoteEndPoint = new DnsEndPoint("pubsub.pubnub.com", 80);
+					sae.RemoteEndPoint = new DnsEndPoint(Origin, 80);
 					sae.Completed += new EventHandler<SocketAsyncEventArgs>(socketAsync_Completed<T>);
 					bool test = socket.ConnectAsync(sae);
 
@@ -157,10 +163,10 @@ namespace PubNubMessaging.Core
 					sae.Completed -= new EventHandler<SocketAsyncEventArgs>(socketAsync_Completed<T>);
 					socket.Close();
 				}
-                #elif NETFX_CORE
+#elif NETFX_CORE
                 CheckSocketConnectAsync();
-                #elif (UNITY_IOS || UNITY_ANDROID)
-				request = (HttpWebRequest)WebRequest.Create("http://pubsub.pubnub.com");
+#elif (UNITY_IOS || UNITY_ANDROID)
+				request = (HttpWebRequest)WebRequest.Create("http://" + Origin);
 				if(request!= null){
 					request.Timeout = HeartbeatInterval * 1000;
 					request.ContentType = "application/json";
@@ -183,8 +189,8 @@ namespace PubNubMessaging.Core
 						}
 					} 
 				}
-				#elif(__MonoCS__)
-				udp = new UdpClient("pubsub.pubnub.com", 80);
+#elif (__MonoCS__)
+				udp = new UdpClient(Origin, 80);
 				IPAddress localAddress = ((IPEndPoint)udp.Client.LocalEndPoint).Address;
 				if(udp != null && udp.Client != null){
 					EndPoint remotepoint = udp.Client.RemoteEndPoint;
@@ -193,8 +199,8 @@ namespace PubNubMessaging.Core
 					_status =true;
 					callback(true);
 				}
-				#else
-				using (UdpClient udp = new UdpClient("pubsub.pubnub.com", 80))
+#else
+                using (UdpClient udp = new UdpClient(Origin, 80))
 				{
 					IPAddress localAddress = ((IPEndPoint)udp.Client.LocalEndPoint).Address;
 					EndPoint remotepoint = udp.Client.RemoteEndPoint;
@@ -257,7 +263,7 @@ namespace PubNubMessaging.Core
             try
             {
                 DatagramSocket socket = new DatagramSocket();
-                await socket.ConnectAsync(new HostName("pubsub.pubnub.com"), "80");
+                await socket.ConnectAsync(new HostName(Origin), "80");
             }
             catch { }
         }

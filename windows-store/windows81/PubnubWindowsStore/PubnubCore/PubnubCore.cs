@@ -1,4 +1,4 @@
-//Build Date: Nov 03, 2016
+//Build Date: Dec 22, 2016
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -31,15 +31,9 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-#if USE_JSONFX || USE_JSONFX_UNITY
-using JsonFx.Json;
-#elif (USE_DOTNET_SERIALIZATION)
+#if (USE_DOTNET_SERIALIZATION)
 using System.Runtime.Serialization.Json;
 using System.Web.Script.Serialization;
-#elif (USE_MiniJSON)
-using MiniJSON;
-#elif (USE_JSONFX_UNITY_IOS)
-using Pathfinding.Serialization.JsonFx;
 #else
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -111,7 +105,7 @@ namespace PubNubMessaging.Core
 
 		private static long lastSubscribeTimetoken = 0;
 		// Pubnub Core API implementation
-		private string _origin = "pubsub.pubnub.com";
+		private string _origin = "ps.pndsn.com";
         protected string publishKey = "";
 		protected string subscribeKey = "";
 		protected string secretKey = "";
@@ -301,6 +295,7 @@ namespace PubNubMessaging.Core
             set 
             {
 				_origin = value;
+                ClientNetworkStatus.Origin = _origin;
 			}
 		}
 
@@ -466,6 +461,8 @@ namespace PubNubMessaging.Core
 			this.secretKey = secretKey;
 			this.cipherKey = cipherKey;
 			this.ssl = sslOn;
+
+            ClientNetworkStatus.Origin = _origin;
 
 			VerifyOrSetSessionUUID();
 		}

@@ -1,4 +1,4 @@
-﻿//Build Date: June 25, 2016
+﻿//Build Date: Dec 22, 2016
 using System;
 using System.Text;
 using System.IO;
@@ -39,11 +39,11 @@ namespace PubNubMessaging.Core
 
 		#if (!SILVERLIGHT && !WINDOWS_PHONE)
 		protected bool pubnubEnableProxyConfig = true;
-		#endif
-		
-		#if (__MonoCS__)
-		protected string _domainName = "pubsub.pubnub.com";
-		#endif
+#endif
+
+#if (__MonoCS__)
+		protected string _domainName = Origin;
+#endif
 
         private object _reconnectFromSuspendMode = null;
 

@@ -59,7 +59,7 @@
         <TextBlock HorizontalAlignment="Left" Margin="124,257,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Text="Session UUID" FontSize="14"/>
         <TextBox x:Name="txtSessionUUID" HorizontalAlignment="Left" Margin="213,246,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="313" Text="winstoreuuid"/>
         <TextBlock HorizontalAlignment="Left" Margin="124,305,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Text="Origin" FontSize="14"/>
-        <TextBox x:Name="txtOrigin" HorizontalAlignment="Left" Margin="213,294,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="313" Text="pubsub.pubnub.com"/>
+        <TextBox x:Name="txtOrigin" HorizontalAlignment="Left" Margin="213,294,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="313" Text="ps.pndsn.com"/>
         <TextBlock HorizontalAlignment="Left" Margin="124,353,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Text="Auth Key" FontSize="14"/>
         <TextBox x:Name="txtAuthKey" HorizontalAlignment="Left" Margin="213,342,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="313"/>
         <CheckBox x:Name="chkHideErrors" Content="Hide Error Callback Messages" HorizontalAlignment="Left" Margin="156,391,0,0" Grid.Row="1" VerticalAlignment="Top" IsChecked="True"/>
