@@ -1,4 +1,4 @@
-﻿//Build Date: Mar 28, 2016
+﻿//Build Date: Dec 22, 2016
 using System;
 using System.Text;
 using System.IO;
@@ -32,7 +32,7 @@ namespace PubNubMessaging.Core
 		#endif
 		
 		#if (__MonoCS__)
-		protected string _domainName = "pubsub.pubnub.com";
+		protected string _domainName = Origin;
 		#endif
 
         private object _reconnectFromSuspendMode = null;

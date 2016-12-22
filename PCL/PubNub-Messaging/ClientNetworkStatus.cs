@@ -24,6 +24,12 @@ namespace PubNubMessaging.Core
 			}
 		}
 
+        internal static string Origin
+        {
+            get;
+            set;
+        }
+
         private static ManualResetEvent mres = new ManualResetEvent(false);
         private static ManualResetEvent mreSocketAsync = new ManualResetEvent(false);
 
@@ -132,7 +138,7 @@ namespace PubNubMessaging.Core
 
                 mreSocketAsync = new ManualResetEvent(false);
 
-                myRequest = (HttpWebRequest)System.Net.WebRequest.Create("https://pubsub.pubnub.com/time/0");
+                myRequest = (HttpWebRequest)System.Net.WebRequest.Create(string.Format("https://{0}/time/0", Origin));
 				myRequest.BeginGetResponse(cb => 
 					{
 						try
