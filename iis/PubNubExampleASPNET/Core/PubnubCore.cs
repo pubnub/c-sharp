@@ -111,7 +111,7 @@ namespace PubNubMessaging.Core
 		protected string secretKey = "";
 		protected string cipherKey = "";
 		protected bool ssl = false;
-        private string _pnsdkVersion = "PubNub-CSharp-.NET/3.8.4";
+        private string _pnsdkVersion = "PubNub-CSharp-.NET/3.8.5";
         private string _pushServiceName = "push.pubnub.com";
         private bool _addPayloadToPublishResponse = false;
 

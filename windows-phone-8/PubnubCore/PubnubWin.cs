@@ -42,7 +42,7 @@ namespace PubNubMessaging.Core
 #endif
 
 #if (__MonoCS__)
-		protected string _domainName = Origin;
+		protected string _domainName = "" //Not in use for non-pcl c# sdk;
 #endif
 
         private object _reconnectFromSuspendMode = null;
