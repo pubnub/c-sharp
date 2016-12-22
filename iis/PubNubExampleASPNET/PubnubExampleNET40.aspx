@@ -162,7 +162,7 @@
                                                                     Origin
                                                                 </td>
                                                                 <td>
-                                                                    <asp:TextBox ID="txtOrigin" runat="server" Text="pubsub.pubnub.com" Width="150"
+                                                                    <asp:TextBox ID="txtOrigin" runat="server" Text="ps.pndsn.com" Width="150"
                                                                         AutoPostBack="false" />
                                                                 </td>
                                                             </tr>
