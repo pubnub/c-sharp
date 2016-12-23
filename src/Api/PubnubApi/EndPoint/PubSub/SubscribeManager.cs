@@ -901,9 +901,9 @@ namespace PubnubApi.EndPoint
                 presenceHeartbeatState.Request = null;
                 presenceHeartbeatState.Response = null;
 
-                if (config.PresenceHeartbeatInterval > 0)
+                if (config.PresenceInterval > 0)
                 {
-                    PresenceHeartbeatTimer = new Timer(OnPresenceHeartbeatIntervalTimeout<T>, presenceHeartbeatState, config.PresenceHeartbeatInterval * 1000, config.PresenceHeartbeatInterval * 1000);
+                    PresenceHeartbeatTimer = new Timer(OnPresenceHeartbeatIntervalTimeout<T>, presenceHeartbeatState, config.PresenceInterval * 1000, config.PresenceInterval * 1000);
                 }
             }
         }

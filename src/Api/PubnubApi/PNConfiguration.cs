@@ -15,15 +15,19 @@ namespace PubnubApi
 
         public int SubscribeTimeout { get; set; }
 
-        public int PresenceHeartbeatTimeout
+        public int PresenceTimeout
         {
             get
             {
                 return presenceHeartbeatTimeout;
             }
+            set
+            {
+                presenceHeartbeatTimeout = value;
+            }
         }
 
-        public int PresenceHeartbeatInterval
+        public int PresenceInterval
         {
             get
             {
@@ -120,7 +124,7 @@ namespace PubnubApi
             this.EnableJsonEncodingForPublish = true;
         }
 
-        public PNConfiguration SetPresenceHeartbeatTimeoutWithCustomInterval(int timeout, int interval)
+        public PNConfiguration SetPresenceTimeoutWithCustomInterval(int timeout, int interval)
         {
             this.presenceHeartbeatTimeout = timeout;
             this.presenceHeartbeatInterval = interval;
@@ -128,11 +132,11 @@ namespace PubnubApi
             return this;
         }
 
-        public PNConfiguration SetPresenceHeartbeatTimeout(int timeout)
+        public PNConfiguration SetPresenceTimeout(int timeout)
         {
             this.presenceHeartbeatTimeout = timeout;
 
-            return SetPresenceHeartbeatTimeoutWithCustomInterval(timeout, (timeout / 2) - 1);
+            return SetPresenceTimeoutWithCustomInterval(timeout, (timeout / 2) - 1);
         }
 
 

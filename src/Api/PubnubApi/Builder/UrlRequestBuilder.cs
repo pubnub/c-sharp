@@ -69,9 +69,9 @@ namespace PubnubApi
                 requestQueryStringParams.Add("tt", timetoken.ToString());
             }
 
-            if (pubnubConfig.PresenceHeartbeatTimeout != 0)
+            if (pubnubConfig.PresenceTimeout != 0)
             {
-                requestQueryStringParams.Add("heartbeat", pubnubConfig.PresenceHeartbeatTimeout.ToString());
+                requestQueryStringParams.Add("heartbeat", pubnubConfig.PresenceTimeout.ToString());
             }
 
             if (channelGroups != null && channelGroups.Length > 0 && channelGroups[0] != "")
@@ -106,9 +106,9 @@ namespace PubnubApi
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
-            if (pubnubConfig.PresenceHeartbeatTimeout != 0)
+            if (pubnubConfig.PresenceTimeout != 0)
             {
-                requestQueryStringParams.Add("heartbeat", pubnubConfig.PresenceHeartbeatTimeout.ToString());
+                requestQueryStringParams.Add("heartbeat", pubnubConfig.PresenceTimeout.ToString());
             }
 
             string channelsJsonState = jsonUserState;
@@ -677,9 +677,9 @@ namespace PubnubApi
                 requestQueryStringParams.Add("channel-group", string.Join(",", channelGroups));
             }
 
-            if (pubnubConfig.PresenceHeartbeatTimeout != 0)
+            if (pubnubConfig.PresenceTimeout != 0)
             {
-                requestQueryStringParams.Add("heartbeat", pubnubConfig.PresenceHeartbeatTimeout.ToString());
+                requestQueryStringParams.Add("heartbeat", pubnubConfig.PresenceTimeout.ToString());
             }
 
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
