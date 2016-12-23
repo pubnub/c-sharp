@@ -3,6 +3,13 @@ changelog:
   - 
     changes: 
       - 
+        text: "Default origin changed"
+        type: improvement
+    date: ~
+    version: v3.8.5
+  - 
+    changes: 
+      - 
         text: "Added publish message ttl"
         type: feature
     date: ~
