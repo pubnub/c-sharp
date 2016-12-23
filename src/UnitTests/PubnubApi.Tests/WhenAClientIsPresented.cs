@@ -1265,7 +1265,7 @@ namespace PubNubMessaging.Tests
                 Secure = false
             };
 
-            config.SetPresenceHeartbeatTimeout(5);
+            config.SetPresenceTimeout(5);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
@@ -1280,7 +1280,7 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new string[] { channel }).WithPresence().Execute();
             presenceManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            Thread.Sleep(pubnub.PNConfig.PresenceHeartbeatTimeout + 3 * 1000);
+            Thread.Sleep(pubnub.PNConfig.PresenceTimeout + 3 * 1000);
 
             pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
             Thread.Sleep(2000);
