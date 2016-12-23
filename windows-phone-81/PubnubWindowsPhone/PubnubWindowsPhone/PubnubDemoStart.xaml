@@ -46,7 +46,7 @@
             <TextBlock HorizontalAlignment="Left" Margin="8,257,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Session UUID" FontSize="14"/>
             <TextBox x:Name="txtSessionUUID" HorizontalAlignment="Left" Margin="97,246,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="265" Text="winphoneuuid"/>
             <TextBlock HorizontalAlignment="Left" Margin="8,305,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Origin" FontSize="14"/>
-            <TextBox x:Name="txtOrigin" HorizontalAlignment="Left" Margin="97,294,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="265" Text="pubsub.pubnub.com"/>
+            <TextBox x:Name="txtOrigin" HorizontalAlignment="Left" Margin="97,294,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="265" Text="ps.pndsn.com"/>
             <TextBlock HorizontalAlignment="Left" Margin="8,353,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Auth Key" FontSize="14"/>
             <TextBox x:Name="txtAuthKey" HorizontalAlignment="Left" Margin="97,342,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="265"/>
             <CheckBox x:Name="chkHideErrors" Content="Hide Error Callback Messages" HorizontalAlignment="Left" Margin="40,378,0,0" VerticalAlignment="Top" IsChecked="True"/>

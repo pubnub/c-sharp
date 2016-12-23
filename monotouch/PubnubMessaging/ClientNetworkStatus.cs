@@ -22,6 +22,10 @@ namespace PubNubMessaging.Core
                 _jsonPluggableLibrary = value;
             }
         }
+        internal static string Origin {
+            get;
+            set;
+        }
         #if (SILVERLIGHT  || WINDOWS_PHONE)
         private static ManualResetEvent mres = new ManualResetEvent(false);
         private static ManualResetEvent mreSocketAsync = new ManualResetEvent(false);
@@ -127,7 +131,7 @@ namespace PubNubMessaging.Core
                 {
                     SocketAsyncEventArgs sae = new SocketAsyncEventArgs();
                     sae.UserToken = state;
-                    sae.RemoteEndPoint = new DnsEndPoint("pubsub.pubnub.com", 80);
+                    sae.RemoteEndPoint = new DnsEndPoint(Origin, 80);
                     sae.Completed += new EventHandler<SocketAsyncEventArgs>(socketAsync_Completed<T>);
                     bool test = socket.ConnectAsync(sae);
 
@@ -140,7 +144,7 @@ namespace PubNubMessaging.Core
                     request.Abort();
                     request = null;
                 }
-                request = (HttpWebRequest)WebRequest.Create("http://pubsub.pubnub.com");
+                request = (HttpWebRequest)WebRequest.Create("http://" + Origin);
                 if(request!= null){
                     request.Timeout = HeartbeatInterval * 1000;
                     request.ContentType = "application/json";
@@ -168,7 +172,7 @@ namespace PubNubMessaging.Core
                     } 
                 }
                 #elif(__MonoCS__)
-                using (UdpClient udp = new UdpClient ("pubsub.pubnub.com", 80)) {
+                using (UdpClient udp = new UdpClient (Origin, 80)) {
                     IPAddress localAddress = ((IPEndPoint)udp.Client.LocalEndPoint).Address;
                     if (udp != null && udp.Client != null && udp.Client.RemoteEndPoint != null) {
                         udp.Client.SendTimeout = HeartbeatInterval * 1000;
@@ -181,7 +185,7 @@ namespace PubNubMessaging.Core
                     }
                 }
                 #else
-                using (UdpClient udp = new UdpClient("pubsub.pubnub.com", 80))
+                using (UdpClient udp = new UdpClient(Origin, 80))
                 {
                     IPAddress localAddress = ((IPEndPoint)udp.Client.LocalEndPoint).Address;
                     EndPoint remotepoint = udp.Client.RemoteEndPoint;

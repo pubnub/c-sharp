@@ -1,4 +1,4 @@
-﻿//Build Date: June 25, 2016
+﻿//Build Date: Dec 23, 2016
 using System;
 using System.Text;
 using System.IO;
@@ -39,11 +39,11 @@ namespace PubNubMessaging.Core
 
 		#if (!SILVERLIGHT && !WINDOWS_PHONE)
 		protected bool pubnubEnableProxyConfig = true;
-		#endif
-		
-		#if (__MonoCS__)
-		protected string _domainName = "pubsub.pubnub.com";
-		#endif
+#endif
+
+#if (__MonoCS__)
+		protected string _domainName = "" //Not in use for non-pcl c# sdk;
+#endif
 
         private object _reconnectFromSuspendMode = null;
 
@@ -225,6 +225,7 @@ namespace PubNubMessaging.Core
 		protected override bool InternetConnectionStatus<T> (string channel, string channelGroup, Action<PubnubClientError> errorCallback, string[] rawChannels, string[] rawChannelGroups)
 		{
             bool networkConnection;
+            ClientNetworkStatus.Origin = Origin;
             networkConnection = ClientNetworkStatus.CheckInternetStatus<T>(pubnetSystemActive, errorCallback, rawChannels, rawChannelGroups);
             return networkConnection;
         }

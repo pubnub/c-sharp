@@ -1,4 +1,4 @@
-//Build Date: June 25,2016
+//Build Date: Dec 23,2016
 //#define USE_JSONFX
 using System;
 using System.Text;
@@ -25,7 +25,7 @@ namespace PubNubMessaging.Core
         const LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Info;
         const PubnubErrorFilter.Level errorLevel = PubnubErrorFilter.Level.Info;
         protected bool pubnubEnableProxyConfig = true;
-        protected string _domainName = "pubsub.pubnub.com";
+        protected string _domainName = "ps.pndsn.com";
         private object _reconnectFromSuspendMode = null;
 
         #endregion
@@ -741,12 +741,14 @@ namespace PubNubMessaging.Core
         protected override bool InternetConnectionStatus<T>(string channel, string channelGroup, Action<PubnubClientError> errorCallback, string[] rawChannels, string[] rawChannelGroups)
         {
             bool networkConnection;
+            ClientNetworkStatus.Origin = Origin;
             networkConnection = ClientNetworkStatus.GetInternetStatus();
             return networkConnection;
         }
 
         protected override bool CheckInternetConnectionStatus<T>(bool systemActive, Action<PubnubClientError> errorCallback, string[] channels, string[] channelGroups)
         {
+            ClientNetworkStatus.Origin = Origin;
 			return ClientNetworkStatus.CheckInternetStatusUnity<T> (PubnubCore.pubnetSystemActive, errorCallback, channels, channelGroups, base.LocalClientHeartbeatInterval);
         }
 
