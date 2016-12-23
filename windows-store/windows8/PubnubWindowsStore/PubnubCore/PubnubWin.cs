@@ -1,4 +1,4 @@
-﻿//Build Date: Dec 22, 2016
+﻿//Build Date: Dec 23, 2016
 using System;
 using System.Text;
 using System.IO;
@@ -225,6 +225,7 @@ namespace PubNubMessaging.Core
 		protected override bool InternetConnectionStatus<T> (string channel, string channelGroup, Action<PubnubClientError> errorCallback, string[] rawChannels, string[] rawChannelGroups)
 		{
             bool networkConnection;
+            ClientNetworkStatus.Origin = Origin;
             networkConnection = ClientNetworkStatus.CheckInternetStatus<T>(pubnetSystemActive, errorCallback, rawChannels, rawChannelGroups);
             return networkConnection;
         }
