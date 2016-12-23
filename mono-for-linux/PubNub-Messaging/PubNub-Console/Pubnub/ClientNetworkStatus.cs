@@ -25,7 +25,11 @@ namespace PubNubMessaging.Core
 				_jsonPluggableLibrary = value;
 			}
 		}
-
+		internal static string Origin
+		{
+			get;
+			set;
+		}
 		#if (SILVERLIGHT  || WINDOWS_PHONE)
 		private static ManualResetEvent mres = new ManualResetEvent(false);
 		private static ManualResetEvent mreSocketAsync = new ManualResetEvent(false);
@@ -159,7 +163,7 @@ namespace PubNubMessaging.Core
                     request.Abort();
                     request = null;
                 }
-				request = (HttpWebRequest)WebRequest.Create("http://pubsub.pubnub.com");
+				request = (HttpWebRequest)WebRequest.Create(Origin);
 				if(request!= null){
 					request.Timeout = HeartbeatInterval * 1000;
 					request.ContentType = "application/json";
@@ -187,7 +191,7 @@ namespace PubNubMessaging.Core
 					} 
 				}
 #elif(__MonoCS__)
-				using (UdpClient udp = new UdpClient ("pubsub.pubnub.com", 80)) {
+				using (UdpClient udp = new UdpClient (Origin, 80)) {
                     IPAddress localAddress = ((IPEndPoint)udp.Client.LocalEndPoint).Address;
                     if (udp != null && udp.Client != null && udp.Client.RemoteEndPoint != null) {
                         udp.Client.SendTimeout = HeartbeatInterval * 1000;
@@ -200,7 +204,7 @@ namespace PubNubMessaging.Core
                     }
                 }
 #else
-                using (UdpClient udp = new UdpClient("pubsub.pubnub.com", 80))
+                using (UdpClient udp = new UdpClient(Origin, 80))
                 {
                     IPAddress localAddress = ((IPEndPoint)udp.Client.LocalEndPoint).Address;
                     EndPoint remotepoint = udp.Client.RemoteEndPoint;
@@ -260,7 +264,7 @@ namespace PubNubMessaging.Core
             try
             {
                 DatagramSocket socket = new DatagramSocket();
-                await socket.ConnectAsync(new HostName("pubsub.pubnub.com"), "80");
+                await socket.ConnectAsync(new HostName(Origin), "80");
             }
             catch { }
         }

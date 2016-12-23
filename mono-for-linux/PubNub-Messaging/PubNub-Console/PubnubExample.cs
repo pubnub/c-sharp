@@ -41,13 +41,13 @@ namespace PubNubMessaging.Core
             Console.WriteLine("      NETWORK ERROR MESSAGE WILL BE SENT");
             Console.WriteLine();
 
-            Console.WriteLine("Enter Pubnub Origin. Default Origin = pubsub.pubnub.com"); //TODO
+            Console.WriteLine("Enter Pubnub Origin. Default Origin = ps.pndsn.com"); //TODO
             Console.WriteLine("If you want to accept default value, press ENTER.");
             string origin = Console.ReadLine();
             Console.ForegroundColor = ConsoleColor.Blue;
             if (origin.Trim() == "")
             {
-                origin = "pubsub.pubnub.com";
+                origin = "ps.pndsn.com";
                 Console.WriteLine("Default Origin selected");
             }
             else
