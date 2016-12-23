@@ -1,4 +1,4 @@
-﻿//Build Date: Dec 22, 2016
+﻿//Build Date: Dec 23, 2016
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -778,6 +778,7 @@ namespace PubNubMessaging.Core
         protected virtual bool InternetConnectionStatus<T>(string channel, string channelGroup, Action<PubnubClientError> errorCallback, string[] rawChannels, string[] rawChannelGroups)
 		{
 			bool networkConnection;
+            ClientNetworkStatus.Origin = _origin;
 			networkConnection = ClientNetworkStatus.CheckInternetStatus<T>(pubnetSystemActive, errorCallback, rawChannels, rawChannelGroups);
 			return networkConnection;
 		}
@@ -5243,7 +5244,8 @@ namespace PubNubMessaging.Core
 
 		protected virtual bool CheckInternetConnectionStatus<T> (bool systemActive, Action<PubnubClientError> errorCallback, string[] channels, string[] channelGroups)
 		{
-			return ClientNetworkStatus.CheckInternetStatus<T> (pubnetSystemActive, errorCallback, channels, channelGroups);
+            ClientNetworkStatus.Origin = _origin;
+            return ClientNetworkStatus.CheckInternetStatus<T> (pubnetSystemActive, errorCallback, channels, channelGroups);
 		}
 
 		protected void OnPresenceHeartbeatIntervalTimeout<T> (System.Object presenceHeartbeatState)
