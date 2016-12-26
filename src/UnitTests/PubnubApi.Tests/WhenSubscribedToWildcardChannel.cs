@@ -141,7 +141,7 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = secretKey,
-                CiperKey = cipherKey,
+                CipherKey = cipherKey,
                 Uuid = "mytestuuid",
                 Secure = ssl
             };
@@ -255,7 +255,7 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = secretKey,
-                CiperKey = cipherKey,
+                CipherKey = cipherKey,
                 Uuid = "mytestuuid",
                 Secure = ssl
             };

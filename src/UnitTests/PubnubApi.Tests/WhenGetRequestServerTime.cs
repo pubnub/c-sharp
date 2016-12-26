@@ -48,6 +48,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
+            server.RunOnHttps(false);
 
             pubnub = this.createPubNubInstance(config);
 
@@ -88,6 +89,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
+            server.RunOnHttps(true);
             pubnub = this.createPubNubInstance(config);
 
             string expected = "[14725889985315301]";
@@ -131,10 +133,10 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
-                //Proxy = proxy,
+                Proxy = proxy,
                 Secure = false
             };
-
+            server.RunOnHttps(false);
 
             pubnub = this.createPubNubInstance(config);
 
@@ -176,8 +178,9 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
-                //Proxy = proxy
+                Proxy = proxy
             };
+            server.RunOnHttps(true);
 
             pubnub = this.createPubNubInstance(config);
 
