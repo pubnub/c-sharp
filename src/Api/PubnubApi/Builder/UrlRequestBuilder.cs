@@ -128,7 +128,7 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, currentType, uuid, queryParams);
         }
 
-        Uri IUrlRequestBuilder.BuildPublishRequest(string channel, object originalMessage, bool storeInHistory, int ttl, string jsonUserMetaData, Dictionary<string, string> additionalUrlParams)
+        Uri IUrlRequestBuilder.BuildPublishRequest(string channel, object originalMessage, bool storeInHistory, int ttl, string jsonUserMetaData, bool usePOST, Dictionary<string, string> additionalUrlParams)
         {
             PNOperationType currentType = PNOperationType.PNPublishOperation;
             string message = pubnubConfig.EnableJsonEncodingForPublish ? JsonEncodePublishMsg(originalMessage) : originalMessage.ToString();
@@ -140,7 +140,10 @@ namespace PubnubApi
             url.Add("0");
             url.Add(channel);
             url.Add("0");
-            url.Add(message);
+            if (!usePOST)
+            {
+                url.Add(message);
+            }
 
             if (additionalUrlParams == null)
             {

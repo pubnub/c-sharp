@@ -621,8 +621,12 @@ namespace PubnubApi
         #endregion
 
         #region "Build, process and send request"
-
         internal protected string UrlProcessRequest<T>(Uri requestUri, RequestState<T> pubnubRequestState, bool terminateCurrentSubRequest)
+        {
+            return UrlProcessRequest(requestUri, pubnubRequestState, terminateCurrentSubRequest, "");
+        }
+
+        internal protected string UrlProcessRequest<T>(Uri requestUri, RequestState<T> pubnubRequestState, bool terminateCurrentSubRequest, string jsonPostData)
         {
             string channel = "";
             string channelGroup = "";
@@ -688,9 +692,17 @@ namespace PubnubApi
 
                 LoggingMethod.WriteToLog(string.Format("DateTime {0}, Request={1}", DateTime.Now.ToString(), requestUri.ToString()), pubnubConfig.LogVerbosity);
 
-                Task<string> jsonResponse = pubnubHttp.SendRequestAndGetJsonResponse(requestUri, pubnubRequestState, request);
-
-                string jsonString = jsonResponse.Result;
+                string jsonString = "";
+                if (pubnubRequestState.UsePostMethod)
+                {
+                    Task<string> jsonResponse = pubnubHttp.SendRequestAndGetJsonResponseWithPOST(requestUri, pubnubRequestState, request, jsonPostData);
+                    jsonString = jsonResponse.Result;
+                }
+                else
+                {
+                    Task<string> jsonResponse = pubnubHttp.SendRequestAndGetJsonResponse(requestUri, pubnubRequestState, request);
+                    jsonString = jsonResponse.Result;
+                }
 
                 LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON= {1} for request={2}", DateTime.Now.ToString(), jsonString, requestUri), pubnubConfig.LogVerbosity);
                 return jsonString;

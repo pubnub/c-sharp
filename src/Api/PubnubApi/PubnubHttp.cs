@@ -145,6 +145,82 @@ namespace PubnubApi
             */
         }
 
+        async Task<string> IPubnubHttp.SendRequestAndGetJsonResponseWithPOST<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request, string postData)
+        {
+            //HttpWebResponse response = null;
+            System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Before Task.Factory.FromAsync With POST", DateTime.Now.ToString()));
+            try
+            {
+                request.Method = "POST";
+                request.ContentType = "application/json";
+
+                byte[] data = Encoding.UTF8.GetBytes(postData);
+                //request.ContentLength = data.Length;
+                using (var requestStream = await Task<Stream>.Factory.FromAsync(request.BeginGetRequestStream, request.EndGetRequestStream, pubnubRequestState))
+                {
+#if NET35
+                    requestStream.Write(data, 0, data.Length);
+                    requestStream.Flush();
+#else
+                    await requestStream.WriteAsync(data, 0, data.Length);
+                    await requestStream.FlushAsync();
+#endif
+
+                }
+
+                WebResponse response = await Task.Factory.FromAsync(request.BeginGetResponse, request.EndGetResponse, pubnubRequestState);
+                pubnubRequestState.Response = response as HttpWebResponse;
+                System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Got PubnubWebResponse With POST for {1}", DateTime.Now.ToString(), request.RequestUri.ToString()));
+                using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
+                {
+                    //Need to return this response 
+#if NET35
+                    string jsonString = streamReader.ReadToEnd();
+#else
+                    string jsonString = await streamReader.ReadToEndAsync();
+#endif
+                    System.Diagnostics.Debug.WriteLine(jsonString);
+                    System.Diagnostics.Debug.WriteLine("");
+                    System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON With POST", DateTime.Now.ToString()));
+                    return jsonString;
+                }
+            }
+            catch (WebException ex)
+            {
+                if (ex.Response != null)
+                {
+                    pubnubRequestState.Response = ex.Response as HttpWebResponse;
+                    using (StreamReader streamReader = new StreamReader(ex.Response.GetResponseStream()))
+                    {
+                        //Need to return this response 
+                        string jsonString = streamReader.ReadToEnd();
+                        System.Diagnostics.Debug.WriteLine(jsonString);
+                        System.Diagnostics.Debug.WriteLine("");
+                        System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON  With POST from WebException response", DateTime.Now.ToString()));
+                        return jsonString;
+                    }
+                }
+
+                if (ex.Message.IndexOf("The request was aborted: The request was canceled") == -1
+                                && ex.Message.IndexOf("Machine suspend mode enabled. No request will be processed.") == -1)
+                {
+                    if (pubnubRequestState != null && pubnubRequestState.PubnubCallback != null)
+                    {
+                        PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(ex.Status, ex.Message);
+                        StatusBuilder statusBuilder = new StatusBuilder(pubnubConfig, jsonLib);
+                        statusBuilder.CreateStatusResponse<T>(pubnubRequestState.ResponseType, category, pubnubRequestState, (int)HttpStatusCode.NotFound, ex);
+                    }
+                    LoggingMethod.WriteToLog(string.Format("DateTime {0} Exception  With POST ={1}", DateTime.Now.ToString(), ex.ToString()), pubnubConfig.LogVerbosity);
+                    //UrlRequestCommonExceptionHandler<T>(pubnubRequestState.ResponseType, pubnubRequestState.Channels, pubnubRequestState.ChannelGroups, false, pubnubRequestState.SubscribeRegularCallback, pubnubRequestState.PresenceRegularCallback, pubnubRequestState.ConnectCallback, pubnubRequestState.WildcardPresenceCallback, pubnubRequestState.ErrorCallback, false);
+                }
+                return "";
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         //private string ReadStreamFromResponse(HttpWebResponse response)
         //{
         //    System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Got PubnubWebResponse", DateTime.Now.ToString()));

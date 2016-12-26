@@ -130,7 +130,7 @@ namespace PubnubApi.EndPoint
             }
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
-            Uri request = urlBuilder.BuildPublishRequest(channel, message, storeInHistory, ttl, jsonUserMetaData, null);
+            Uri request = urlBuilder.BuildPublishRequest(channel, message, storeInHistory, ttl, jsonUserMetaData, httpPost, null);
 
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
             requestState.Channels = new string[] { channel };
@@ -138,7 +138,21 @@ namespace PubnubApi.EndPoint
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
 
-            string json = UrlProcessRequest<PNPublishResult>(request, requestState, false);
+            string json = "";
+
+            if (this.httpPost)
+            {
+                requestState.UsePostMethod = true;
+                Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
+                messageEnvelope.Add("message", message);
+                string postMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
+                json = UrlProcessRequest<PNPublishResult>(request, requestState, false, postMessage);
+            }
+            else
+            {
+                json = UrlProcessRequest<PNPublishResult>(request, requestState, false);
+            }
+
             if (!string.IsNullOrEmpty(json))
             {
                 List<object> result = ProcessJsonResponse<PNPublishResult>(requestState, json);

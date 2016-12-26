@@ -13,7 +13,7 @@ namespace PubnubApi.Interface
 
         Uri BuildMultiChannelLeaveRequest(string[] channels, string[] channelGroups, string uuid, string jsonUserState);
 
-        Uri BuildPublishRequest(string channel, object originalMessage, bool storeInHistory, int ttl, string jsonUserMetaData, Dictionary<string, string> additionalUrlParams);
+        Uri BuildPublishRequest(string channel, object originalMessage, bool storeInHistory, int ttl, string jsonUserMetaData, bool usePOST, Dictionary<string, string> additionalUrlParams);
 
         Uri BuildHereNowRequest(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState);
 

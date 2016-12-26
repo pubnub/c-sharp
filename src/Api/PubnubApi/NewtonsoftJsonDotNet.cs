@@ -604,10 +604,14 @@ namespace PubnubApi
             else if (typeof(T) == typeof(PNPublishResult))
             {
 #region "PNPublishResult"
-                var result = new PNPublishResult
+                PNPublishResult result = null;
+                if (listObject.Count >= 2)
                 {
-                    Timetoken = Int64.Parse(listObject[2].ToString()),
-                };
+                    result = new PNPublishResult
+                    {
+                        Timetoken = Int64.Parse(listObject[2].ToString()),
+                    };
+                }
 
                 ret = (T)Convert.ChangeType(result, typeof(PNPublishResult), CultureInfo.InvariantCulture);
 #endregion
