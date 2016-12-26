@@ -10,6 +10,7 @@ namespace PubnubApi
 	{
         private static IJsonPluggableLibrary jsonLib;
         private static PNConfiguration pubnubConfig;
+        private static IPubnubUnitTest unit = null;
 
         private bool networkStatus = true;
 		private static bool machineSuspendMode = false;
@@ -20,6 +21,12 @@ namespace PubnubApi
             jsonLib = jsonPluggableLibrary;
         }
 
+        public ClientNetworkStatus(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit)
+        {
+            pubnubConfig = config;
+            jsonLib = jsonPluggableLibrary;
+            unit = pubnubUnit;
+        }
 
         private static ManualResetEvent mres = new ManualResetEvent(false);
         private static ManualResetEvent mreSocketAsync = new ManualResetEvent(false);
@@ -129,7 +136,7 @@ namespace PubnubApi
 
                 //mreSocketAsync = new ManualResetEvent(false);
 
-                PubnubApi.Interface.IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(pubnubConfig, jsonLib);
+                PubnubApi.Interface.IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(pubnubConfig, jsonLib, unit);
                 Uri requestUri = urlBuilder.BuildTimeRequest();
                 myRequest = (HttpWebRequest)System.Net.WebRequest.Create(requestUri);
 				myRequest.BeginGetResponse(cb => 

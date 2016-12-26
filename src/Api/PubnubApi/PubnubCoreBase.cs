@@ -43,6 +43,7 @@ namespace PubnubApi
         private static IPubnubHttp pubnubHttp = null;
         private static PNConfiguration pubnubConfig = null;
         private static IJsonPluggableLibrary jsonLib = null;
+        private static IPubnubUnitTest unitTest = null;
         private static bool clientNetworkStatusInternetStatus = true;
 
 
@@ -162,10 +163,10 @@ namespace PubnubApi
                 throw new ArgumentException("PNConfiguration missing");
             }
 
-            InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet());
+            InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(), null);
         }
 
-        public PubnubCoreBase(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary)
+        public PubnubCoreBase(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest)
         {
             if (pubnubConfiguation == null)
             {
@@ -173,18 +174,19 @@ namespace PubnubApi
             }
             if (jsonPluggableLibrary == null)
             {
-                InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet());
+                InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(), pubnubUnitTest);
             }
             else
             {
-                InternalConstructor(pubnubConfiguation, jsonPluggableLibrary);
+                InternalConstructor(pubnubConfiguation, jsonPluggableLibrary, pubnubUnitTest);
             }
         }
 
-        private void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary)
+        private void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest)
         {
             pubnubConfig = pubnubConfiguation;
             jsonLib = jsonPluggableLibrary;
+            unitTest = pubnubUnitTest;
 
             CurrentUuid = pubnubConfig.Uuid;
 
@@ -259,7 +261,7 @@ namespace PubnubApi
 
         protected bool CheckInternetConnectionStatus<T>(bool systemActive, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
         {
-            ClientNetworkStatus clientNetworkStatus = new ClientNetworkStatus(pubnubConfig, jsonLib);
+            ClientNetworkStatus clientNetworkStatus = new ClientNetworkStatus(pubnubConfig, jsonLib, unitTest);
             if (!clientNetworkStatus.IsInternetCheckRunning())
             {
                 clientNetworkStatusInternetStatus = clientNetworkStatus.CheckInternetStatus<T>(PubnetSystemActive, type, callback, channels, channelGroups);
