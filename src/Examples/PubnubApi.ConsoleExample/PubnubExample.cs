@@ -639,24 +639,24 @@ namespace PubnubApiDemo
                             }
                         }
 
-                        Console.WriteLine("Publishing message as direct JSON String? Enter Y for Yes or N for No. To accept default(N), just press ENTER");
-                        string directJson = Console.ReadLine();
-                        bool jsonPublish = false;
-                        if (directJson.ToLower() == "y")
-                        {
-                            jsonPublish = true;
-                            config.EnableJsonEncodingForPublish = false;
-                            //pubnub.EnableJsonEncodingForPublish = false;
-                        }
-                        else
-                        {
-                            config.EnableJsonEncodingForPublish = true;
-                            //pubnub.EnableJsonEncodingForPublish = true;
-                        }
+                        //Console.WriteLine("Publishing message as direct JSON String? Enter Y for Yes or N for No. To accept default(N), just press ENTER");
+                        //string directJson = Console.ReadLine();
+                        //bool jsonPublish = false;
+                        //if (directJson.ToLower() == "y")
+                        //{
+                        //    jsonPublish = true;
+                        //    config.EnableJsonEncodingForPublish = false;
+                        //    //pubnub.EnableJsonEncodingForPublish = false;
+                        //}
+                        //else
+                        //{
+                        //    config.EnableJsonEncodingForPublish = true;
+                        //    //pubnub.EnableJsonEncodingForPublish = true;
+                        //}
 
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("Direct JSON String = {0}", jsonPublish));
-                        Console.ResetColor();
+                        //Console.ForegroundColor = ConsoleColor.Blue;
+                        //Console.WriteLine(string.Format("Direct JSON String = {0}", jsonPublish));
+                        //Console.ResetColor();
 
 
 

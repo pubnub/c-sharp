@@ -93,7 +93,7 @@ namespace PubnubApi
         public Collection<Uri> PushRemoteImageDomainUri { get; set; }
 
         //For publishing direct JSON string
-        public bool EnableJsonEncodingForPublish { get; set; }
+        //public bool EnableJsonEncodingForPublish { get; set; }
 
         public bool AddPayloadToPublishResponse { get; set; }
 
@@ -121,7 +121,7 @@ namespace PubnubApi
             this.SubscribeKey = "";
             this.SecretKey = "";
             this.Secure = true;
-            this.EnableJsonEncodingForPublish = true;
+            //this.EnableJsonEncodingForPublish = true;
         }
 
         public PNConfiguration SetPresenceTimeoutWithCustomInterval(int timeout, int interval)

@@ -726,84 +726,84 @@ namespace PubNubMessaging.Tests
             pubnub = null;
         }
 
-        [Test]
-        public void ThenDisableJsonEncodeShouldSendSerializedObjectMessage()
-        {
-            receivedPublishMessage = false;
-            publishTimetoken = 0;
-            currentTestCase = "ThenDisableJsonEncodeShouldSendSerializedObjectMessage";
+        //[Test]
+        //public void ThenDisableJsonEncodeShouldSendSerializedObjectMessage()
+        //{
+        //    receivedPublishMessage = false;
+        //    publishTimetoken = 0;
+        //    currentTestCase = "ThenDisableJsonEncodeShouldSendSerializedObjectMessage";
 
-            string channel = "hello_my_channel";
-            object message = "{\"operation\":\"ReturnData\",\"channel\":\"Mobile1\",\"sequenceNumber\":0,\"data\":[\"ping 1.0.0.1\"]}";
+        //    string channel = "hello_my_channel";
+        //    object message = "{\"operation\":\"ReturnData\",\"channel\":\"Mobile1\",\"sequenceNumber\":0,\"data\":[\"ping 1.0.0.1\"]}";
 
-            PNConfiguration config = new PNConfiguration()
-            {
-                PublishKey = PubnubCommon.PublishKey,
-                SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
-                EnableJsonEncodingForPublish = false,
-                Secure = false
-            };
+        //    PNConfiguration config = new PNConfiguration()
+        //    {
+        //        PublishKey = PubnubCommon.PublishKey,
+        //        SubscribeKey = PubnubCommon.SubscribeKey,
+        //        Uuid = "mytestuuid",
+        //        EnableJsonEncodingForPublish = false,
+        //        Secure = false
+        //    };
 
-            pubnub = this.createPubNubInstance(config);
+        //    pubnub = this.createPubNubInstance(config);
 
-            string expected = "[1,\"Sent\",\"14721410674316172\"]";
+        //    string expected = "[1,\"Sent\",\"14721410674316172\"]";
 
-            server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/%7B%22operation%22%3A%22ReturnData%22%2C%22channel%22%3A%22Mobile1%22%2C%22sequenceNumber%22%3A0%2C%22data%22%3A%5B%22ping%201.0.0.1%22%5D%7D", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel))
-                    .WithParameter("uuid", config.Uuid)
-                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+        //    server.AddRequest(new Request()
+        //            .WithMethod("GET")
+        //            .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/%7B%22operation%22%3A%22ReturnData%22%2C%22channel%22%3A%22Mobile1%22%2C%22sequenceNumber%22%3A0%2C%22data%22%3A%5B%22ping%201.0.0.1%22%5D%7D", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel))
+        //            .WithParameter("uuid", config.Uuid)
+        //            .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+        //            .WithResponse(expected)
+        //            .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            serializedObjectMessageForPublish = message.ToString();
+        //    serializedObjectMessageForPublish = message.ToString();
 
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+        //    manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
-            publishManualEvent = new ManualResetEvent(false);
-            pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
-            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+        //    publishManualEvent = new ManualResetEvent(false);
+        //    pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
+        //    publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            if (!receivedPublishMessage)
-            {
-                Assert.IsTrue(receivedPublishMessage, "Serialized Object Message Publish Failed");
-            }
-            else
-            {
-                receivedPublishMessage = false;
+        //    if (!receivedPublishMessage)
+        //    {
+        //        Assert.IsTrue(receivedPublishMessage, "Serialized Object Message Publish Failed");
+        //    }
+        //    else
+        //    {
+        //        receivedPublishMessage = false;
 
-                Thread.Sleep(1000);
+        //        Thread.Sleep(1000);
 
-                expected = "[[{\"operation\":\"ReturnData\",\"channel\":\"Mobile1\",\"sequenceNumber\":0,\"data\":[\"ping 1.0.0.1\"]}],14721411498132384,14721411498132384]";
+        //        expected = "[[{\"operation\":\"ReturnData\",\"channel\":\"Mobile1\",\"sequenceNumber\":0,\"data\":[\"ping 1.0.0.1\"]}],14721411498132384,14721411498132384]";
 
-                server.AddRequest(new Request()
-                        .WithMethod("GET")
-                        .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
-                        .WithParameter("count", "100")
-                        .WithParameter("end", "14721411498132384")
-                        .WithParameter("uuid", config.Uuid)
-                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
-                        .WithResponse(expected)
-                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+        //        server.AddRequest(new Request()
+        //                .WithMethod("GET")
+        //                .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+        //                .WithParameter("count", "100")
+        //                .WithParameter("end", "14721411498132384")
+        //                .WithParameter("uuid", config.Uuid)
+        //                .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+        //                .WithResponse(expected)
+        //                .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                historyManualEvent = new ManualResetEvent(false);
+        //        historyManualEvent = new ManualResetEvent(false);
 
-                pubnub.History().Channel(channel)
-                    .End(PubnubCommon.EnableStubTest ? 14721411498132384 : serializedMessagePublishTimetoken)
-                    .Reverse(false)
-                    .IncludeTimetoken(false)
-                    .Async(new UTHistoryResult());
+        //        pubnub.History().Channel(channel)
+        //            .End(PubnubCommon.EnableStubTest ? 14721411498132384 : serializedMessagePublishTimetoken)
+        //            .Reverse(false)
+        //            .IncludeTimetoken(false)
+        //            .Async(new UTHistoryResult());
 
-                historyManualEvent.WaitOne(manualResetEventWaitTimeout);
+        //        historyManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-                Assert.IsTrue(receivedPublishMessage, "Unable to match the successful serialized object message Publish");
-            }
+        //        Assert.IsTrue(receivedPublishMessage, "Unable to match the successful serialized object message Publish");
+        //    }
 
-            pubnub.Destroy();
-            pubnub.PubnubUnitTest = null;
-            pubnub = null;
-        }
+        //    pubnub.Destroy();
+        //    pubnub.PubnubUnitTest = null;
+        //    pubnub = null;
+        //}
 
         //[Test]
         //public void ThenLargeMessageShoudFailWithMessageTooLargeInfo()

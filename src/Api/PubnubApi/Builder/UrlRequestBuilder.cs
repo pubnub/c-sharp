@@ -135,8 +135,8 @@ namespace PubnubApi
 
         Uri IUrlRequestBuilder.BuildPublishRequest(string channel, object originalMessage, bool storeInHistory, int ttl, Dictionary<string, object> userMetaData, bool usePOST, Dictionary<string, string> additionalUrlParams)
         {
+            bool enableJsonEncodingForPublish = true; //by default. added placeholder for future for direct json input
             PNOperationType currentType = PNOperationType.PNPublishOperation;
-            string message = pubnubConfig.EnableJsonEncodingForPublish ? JsonEncodePublishMsg(originalMessage) : originalMessage.ToString();
 
             List<string> url = new List<string>();
             url.Add("publish");
@@ -147,6 +147,7 @@ namespace PubnubApi
             url.Add("0");
             if (!usePOST)
             {
+                string message = enableJsonEncodingForPublish ? JsonEncodePublishMsg(originalMessage) : originalMessage.ToString();
                 url.Add(message);
             }
 
