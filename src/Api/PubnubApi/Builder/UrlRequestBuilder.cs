@@ -64,6 +64,11 @@ namespace PubnubApi
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>(initialSubscribeUrlParams);
 
+            if (!requestQueryStringParams.ContainsKey("filter-expr") && !string.IsNullOrEmpty(pubnubConfig.FilterExpression))
+            {
+                requestQueryStringParams.Add("filter-expr", new UriUtil().EncodeUriComponent(pubnubConfig.FilterExpression, currentType, false, false));
+            }
+
             if (!requestQueryStringParams.ContainsKey("tt"))
             {
                 requestQueryStringParams.Add("tt", timetoken.ToString());
@@ -128,7 +133,7 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, currentType, uuid, queryParams);
         }
 
-        Uri IUrlRequestBuilder.BuildPublishRequest(string channel, object originalMessage, bool storeInHistory, int ttl, string jsonUserMetaData, bool usePOST, Dictionary<string, string> additionalUrlParams)
+        Uri IUrlRequestBuilder.BuildPublishRequest(string channel, object originalMessage, bool storeInHistory, int ttl, Dictionary<string, object> userMetaData, bool usePOST, Dictionary<string, string> additionalUrlParams)
         {
             PNOperationType currentType = PNOperationType.PNPublishOperation;
             string message = pubnubConfig.EnableJsonEncodingForPublish ? JsonEncodePublishMsg(originalMessage) : originalMessage.ToString();
@@ -152,9 +157,10 @@ namespace PubnubApi
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>(additionalUrlParams);
 
-            if (!string.IsNullOrEmpty(jsonUserMetaData) && jsonLib != null && jsonLib.IsDictionaryCompatible(jsonUserMetaData))
+            if (userMetaData != null)
             {
-                requestQueryStringParams.Add("meta", new UriUtil().EncodeUriComponent(jsonUserMetaData, currentType, false, false));
+                string jsonMetaData = jsonLib.SerializeToJsonString(userMetaData);
+                requestQueryStringParams.Add("meta", new UriUtil().EncodeUriComponent(jsonMetaData, currentType, false, false));
             }
 
             if (storeInHistory && ttl >= 0)

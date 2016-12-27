@@ -16,7 +16,7 @@ namespace PubnubApi.EndPoint
         private string channelName = "";
         private bool storeInHistory = false;
         private bool httpPost = false;
-        private string userMetadata = "";
+        private Dictionary<string, object> userMetadata = null;
         private int ttl = -1;
 
         public FireOperation(PNConfiguration pubnubConfig) : base(pubnubConfig)
@@ -55,9 +55,9 @@ namespace PubnubApi.EndPoint
         //    return this;
         //}
 
-        public FireOperation Meta(string jsonMetadata)
+        public FireOperation Meta(Dictionary<string, object> metadata)
         {
-            this.userMetadata = jsonMetadata;
+            this.userMetadata = metadata;
             return this;
         }
 
@@ -83,7 +83,7 @@ namespace PubnubApi.EndPoint
             Fire(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, callback);
         }
 
-        private void Fire(string channel, object message, bool storeInHistory, int ttl, string jsonUserMetaData, PNCallback<PNPublishResult> callback)
+        private void Fire(string channel, object message, bool storeInHistory, int ttl, Dictionary<string, object> metaData, PNCallback<PNPublishResult> callback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
             {
@@ -110,16 +110,11 @@ namespace PubnubApi.EndPoint
                 }
             }
 
-            if (string.IsNullOrEmpty(jsonUserMetaData) || jsonLibrary.IsDictionaryCompatible(jsonUserMetaData))
-            {
-                jsonUserMetaData = "";
-            }
-
             Dictionary<string, string> urlParam = new Dictionary<string, string>();
             urlParam.Add("norep", "true");
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
-            Uri request = urlBuilder.BuildPublishRequest(channel, message, storeInHistory, ttl, jsonUserMetaData, httpPost, urlParam);
+            Uri request = urlBuilder.BuildPublishRequest(channel, message, storeInHistory, ttl, metaData, httpPost, urlParam);
 
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
             requestState.Channels = new string[] { channel };

@@ -17,7 +17,7 @@ namespace PubnubApi.EndPoint
         private string channelName = "";
         private bool storeInHistory = true;
         private bool httpPost = false;
-        private string userMetadata = "";
+        private Dictionary<string, object> userMetadata = null;
         private int ttl = -1;
 
         public PublishOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
@@ -57,9 +57,9 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
-        public PublishOperation Meta(string jsonMetadata)
+        public PublishOperation Meta(Dictionary<string, object> metadata)
         {
-            this.userMetadata = jsonMetadata;
+            this.userMetadata = metadata;
             return this;
         }
 
@@ -97,7 +97,7 @@ namespace PubnubApi.EndPoint
 
         private static PNPublishResult SyncResult { get; set; }
 
-        private void Publish(string channel, object message, bool storeInHistory, int ttl, string jsonUserMetaData, PNCallback<PNPublishResult> callback)
+        private void Publish(string channel, object message, bool storeInHistory, int ttl, Dictionary<string,object> metaData, PNCallback<PNPublishResult> callback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
             {
@@ -124,13 +124,8 @@ namespace PubnubApi.EndPoint
                 }
             }
 
-            if (string.IsNullOrEmpty(jsonUserMetaData) || jsonLibrary.IsDictionaryCompatible(jsonUserMetaData))
-            {
-                jsonUserMetaData = "";
-            }
-
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
-            Uri request = urlBuilder.BuildPublishRequest(channel, message, storeInHistory, ttl, jsonUserMetaData, httpPost, null);
+            Uri request = urlBuilder.BuildPublishRequest(channel, message, storeInHistory, ttl, metaData, httpPost, null);
 
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
             requestState.Channels = new string[] { channel };
