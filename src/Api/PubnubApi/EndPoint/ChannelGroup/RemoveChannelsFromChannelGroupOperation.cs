@@ -12,6 +12,7 @@ namespace PubnubApi.EndPoint
 
         private string channelGroupName = "";
         private string[] channelNames = null;
+        private PNCallback<PNChannelGroupsRemoveChannelResult> savedCallback = null;
 
         public RemoveChannelsFromChannelGroupOperation(PNConfiguration pubnubConfig) : base(pubnubConfig)
         {
@@ -45,7 +46,13 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNChannelGroupsRemoveChannelResult> callback)
         {
+            this.savedCallback = callback;
             RemoveChannelsFromChannelGroup(this.channelNames, "", this.channelGroupName, callback);
+        }
+
+        internal void Retry()
+        {
+            RemoveChannelsFromChannelGroup(this.channelNames, "", this.channelGroupName, savedCallback);
         }
 
         internal void RemoveChannelsFromChannelGroup(string[] channels, string nameSpace, string groupName, PNCallback<PNChannelGroupsRemoveChannelResult> callback)
@@ -78,6 +85,7 @@ namespace PubnubApi.EndPoint
             requestState.ChannelGroups = new string[] { groupName };
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
 
             string json = UrlProcessRequest<PNChannelGroupsRemoveChannelResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))

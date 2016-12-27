@@ -13,6 +13,7 @@ namespace PubnubApi.EndPoint
         private IPubnubUnitTest unit = null;
 
         private string whereNowUUID = "";
+        private PNCallback<PNWhereNowResult> savedCallback = null;
 
         public WhereNowOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
         {
@@ -40,7 +41,13 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNWhereNowResult> callback)
         {
+            this.savedCallback = callback;
             WhereNow(this.whereNowUUID, callback);
+        }
+
+        internal void Retry()
+        {
+            WhereNow(this.whereNowUUID, savedCallback);
         }
 
         internal void WhereNow(string uuid, PNCallback<PNWhereNowResult> callback)
@@ -63,6 +70,7 @@ namespace PubnubApi.EndPoint
             requestState.ResponseType = PNOperationType.PNWhereNowOperation;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
 
             string json = UrlProcessRequest<PNWhereNowResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))

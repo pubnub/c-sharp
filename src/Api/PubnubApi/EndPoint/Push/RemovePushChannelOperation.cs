@@ -15,6 +15,7 @@ namespace PubnubApi.EndPoint
         private PNPushType pubnubPushType;
         private string[] channelNames = null;
         private string deviceTokenId = "";
+        private PNCallback<PNPushRemoveChannelResult> savedCallback = null;
 
         public RemovePushChannelOperation(PNConfiguration pubnubConfig) : base(pubnubConfig)
         {
@@ -54,7 +55,13 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNPushRemoveChannelResult> callback)
         {
+            this.savedCallback = callback;
             RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, callback);
+        }
+
+        internal void Retry()
+        {
+            RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, savedCallback);
         }
 
         internal void RemoveChannelForDevice(string[] channels, PNPushType pushType, string pushToken, PNCallback<PNPushRemoveChannelResult> callback)
@@ -79,6 +86,7 @@ namespace PubnubApi.EndPoint
             requestState.ResponseType = PNOperationType.PushRemove;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
 
             string json = UrlProcessRequest<PNPushRemoveChannelResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))

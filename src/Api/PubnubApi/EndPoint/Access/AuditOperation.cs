@@ -14,6 +14,7 @@ namespace PubnubApi.EndPoint
         private string channelName = null;
         private string channelGroupName = null;
         private string[] authenticationKeys = null;
+        private PNCallback<PNAccessManagerAuditResult> savedCallback = null;
 
         public AuditOperation(PNConfiguration pubnubConfig):base(pubnubConfig)
         {
@@ -53,7 +54,13 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNAccessManagerAuditResult> callback)
         {
+            this.savedCallback = callback;
             AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, callback);
+        }
+
+        internal void Retry()
+        {
+            AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, savedCallback);
         }
 
         internal void AuditAccess(string channel, string channelGroup, string[] authKeys, PNCallback<PNAccessManagerAuditResult> callback)
@@ -80,6 +87,7 @@ namespace PubnubApi.EndPoint
             requestState.ResponseType = PNOperationType.PNAccessManagerAudit;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
 
             string json = UrlProcessRequest<PNAccessManagerAuditResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))

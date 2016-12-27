@@ -18,7 +18,7 @@ namespace PubnubApi.EndPoint
         private bool grantRead = false;
         private bool grantManage = false;
         private long grantTTL = -1;
-
+        private PNCallback<PNAccessManagerGrantResult> savedCallback = null;
 
         public GrantOperation(PNConfiguration pubnubConfig):base(pubnubConfig)
         {
@@ -82,7 +82,13 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNAccessManagerGrantResult> callback)
         {
+            this.savedCallback = callback;
             GrantAccess(this.channelNames, this.channelGroupNames, this.authenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, callback);
+        }
+
+        internal void Retry()
+        {
+            GrantAccess(this.channelNames, this.channelGroupNames, this.authenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, savedCallback);
         }
 
         internal void GrantAccess(string[] channels, string[] channelGroups, string[] authKeys, bool read, bool write, bool manage, long ttl, PNCallback<PNAccessManagerGrantResult> callback)
@@ -133,6 +139,7 @@ namespace PubnubApi.EndPoint
             requestState.ResponseType = PNOperationType.PNAccessManagerGrant;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
 
             string json = UrlProcessRequest<PNAccessManagerGrantResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))

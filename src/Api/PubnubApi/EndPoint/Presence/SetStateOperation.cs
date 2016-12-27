@@ -16,6 +16,7 @@ namespace PubnubApi.EndPoint
         private string[] channelGroupNames = null;
         private Dictionary<string, object> userState = null;
         private string channelUUID = "";
+        private PNCallback<PNSetStateResult> savedCallback = null;
 
         public SetStateOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
         {
@@ -61,8 +62,15 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNSetStateResult> callback)
         {
+            this.savedCallback = callback;
             string serializedState = jsonLibrary.SerializeToJsonString(this.userState);
             SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, callback);
+        }
+
+        internal void Retry()
+        {
+            string serializedState = jsonLibrary.SerializeToJsonString(this.userState);
+            SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, savedCallback);
         }
 
         internal void SetUserState(string[] channels, string[] channelGroups, string uuid, string jsonUserState, PNCallback<PNSetStateResult> callback)
@@ -380,6 +388,7 @@ namespace PubnubApi.EndPoint
             requestState.ResponseType = PNOperationType.PNSetStateOperation;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
 
             //Set TerminateSubRequest to true to bounce the long-polling subscribe requests to update user state
             string json = UrlProcessRequest<PNSetStateResult>(request, requestState, true);

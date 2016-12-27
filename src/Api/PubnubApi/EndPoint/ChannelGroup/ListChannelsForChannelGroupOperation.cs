@@ -11,6 +11,7 @@ namespace PubnubApi.EndPoint
         private IPubnubUnitTest unit = null;
 
         private string channelGroupName = "";
+        private PNCallback<PNChannelGroupsAllChannelsResult> savedCallback = null;
 
         public ListChannelsForChannelGroupOperation(PNConfiguration pubnubConfig) : base(pubnubConfig)
         {
@@ -39,7 +40,13 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNChannelGroupsAllChannelsResult> callback)
         {
+            this.savedCallback = callback;
             GetChannelsForChannelGroup(this.channelGroupName, callback);
+        }
+
+        internal void Retry()
+        {
+            GetChannelsForChannelGroup(this.channelGroupName, savedCallback);
         }
 
         internal void GetChannelsForChannelGroup(string groupName, PNCallback<PNChannelGroupsAllChannelsResult> callback)
@@ -58,6 +65,7 @@ namespace PubnubApi.EndPoint
             requestState.ChannelGroups = new string[] { groupName };
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
 
             string json = UrlProcessRequest<PNChannelGroupsAllChannelsResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))

@@ -19,6 +19,7 @@ namespace PubnubApi.EndPoint
         private int historyCount = -1;
 
         private string channelName = "";
+        private PNCallback<PNHistoryResult> savedCallback = null;
 
         public HistoryOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
         {
@@ -76,9 +77,14 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNHistoryResult> callback)
         {
+            this.savedCallback = callback;
             History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, callback);
         }
 
+        internal void Retry()
+        {
+            History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, savedCallback);
+        }
 
         internal void History(string channel, long start, long end, int count, bool reverse, bool includeToken, PNCallback<PNHistoryResult> callback)
         {
@@ -95,6 +101,7 @@ namespace PubnubApi.EndPoint
             requestState.ResponseType = PNOperationType.PNHistoryOperation;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
 
             string json = UrlProcessRequest< PNHistoryResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))

@@ -16,6 +16,7 @@ namespace PubnubApi.EndPoint
         private string[] channelGroupNames = null;
         private bool includeUserState = false;
         private bool includeChannelUUIDs = true;
+        private PNCallback<PNHereNowResult> savedCallback = null;
 
         public HereNowOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
         {
@@ -61,7 +62,13 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNHereNowResult> callback)
         {
+            this.savedCallback = callback;
             HereNow(this.channelNames, this.channelGroupNames, this.includeChannelUUIDs, this.includeUserState, callback);
+        }
+
+        internal void Retry()
+        {
+            HereNow(this.channelNames, this.channelGroupNames, this.includeChannelUUIDs, this.includeUserState, savedCallback);
         }
 
         internal void HereNow(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, PNCallback<PNHereNowResult> callback)
@@ -76,6 +83,7 @@ namespace PubnubApi.EndPoint
             requestState.ResponseType = PNOperationType.PNHereNowOperation;
             requestState.Reconnect = false;
             requestState.PubnubCallback = callback;
+            requestState.EndPointOperation = this;
 
             string json = UrlProcessRequest<PNHereNowResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))

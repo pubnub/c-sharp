@@ -15,6 +15,7 @@ namespace PubnubApi.EndPoint
         private string[] channelNames = null;
         private string[] channelGroupNames = null;
         private string channelUUID = "";
+        private PNCallback<PNGetStateResult> savedCallback = null;
 
         public GetStateOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
         {
@@ -54,7 +55,13 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNGetStateResult> callback)
         {
+            this.savedCallback = callback;
             GetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, callback);
+        }
+
+        internal void Retry()
+        {
+            GetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, savedCallback);
         }
 
         internal void GetUserState(string[] channels, string[] channelGroups, string uuid, PNCallback<PNGetStateResult> callback)
@@ -86,6 +93,7 @@ namespace PubnubApi.EndPoint
             requestState.ResponseType = PNOperationType.PNGetStateOperation;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
 
             string json = UrlProcessRequest<PNGetStateResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))

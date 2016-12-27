@@ -18,6 +18,8 @@ namespace PubnubApi.EndPoint
         private bool httpPost = false;
         private Dictionary<string, object> userMetadata = null;
         private int ttl = -1;
+        private PNCallback<PNPublishResult> savedCallback = null;
+        private bool syncRequest = false;
 
         public FireOperation(PNConfiguration pubnubConfig) : base(pubnubConfig)
         {
@@ -80,7 +82,30 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNPublishResult> callback)
         {
+            syncRequest = false;
+            this.savedCallback = callback;
             Fire(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, callback);
+        }
+
+        private static System.Threading.ManualResetEvent syncEvent = new System.Threading.ManualResetEvent(false);
+        public PNPublishResult Sync()
+        {
+            syncRequest = true;
+            syncEvent = new System.Threading.ManualResetEvent(false);
+            Fire(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, new SyncPublishResult());
+            syncEvent.WaitOne(config.NonSubscribeRequestTimeout * 1000);
+
+            return SyncResult;
+        }
+
+        private static PNPublishResult SyncResult { get; set; }
+
+        internal void Retry()
+        {
+            if (!syncRequest)
+            {
+                Fire(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, savedCallback);
+            }
         }
 
         private void Fire(string channel, object message, bool storeInHistory, int ttl, Dictionary<string, object> metaData, PNCallback<PNPublishResult> callback)
@@ -118,9 +143,10 @@ namespace PubnubApi.EndPoint
 
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
             requestState.Channels = new string[] { channel };
-            requestState.ResponseType = PNOperationType.PNPublishOperation;
+            requestState.ResponseType = PNOperationType.PNFireOperation;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
 
             string json = "";
 
@@ -141,6 +167,15 @@ namespace PubnubApi.EndPoint
             {
                 List<object> result = ProcessJsonResponse<PNPublishResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
+            }
+        }
+
+        private class SyncPublishResult : PNCallback<PNPublishResult>
+        {
+            public override void OnResponse(PNPublishResult result, PNStatus status)
+            {
+                SyncResult = result;
+                syncEvent.Set();
             }
         }
     }

@@ -16,6 +16,7 @@ namespace PubnubApi.EndPoint
         private PNPushType pubnubPushType;
         private string[] channelNames = null;
         private string deviceTokenId = "";
+        private PNCallback<PNPushAddChannelResult> savedCallback = null;
 
         public AddPushChannelOperation(PNConfiguration pubnubConfig):base(pubnubConfig)
         {
@@ -55,7 +56,13 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNPushAddChannelResult> callback)
         {
+            this.savedCallback = callback;
             RegisterDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, callback);
+        }
+
+        internal void Retry()
+        {
+            RegisterDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, savedCallback);
         }
 
         internal void RegisterDevice(string[] channels, PNPushType pushType, string pushToken, PNCallback<PNPushAddChannelResult> callback)
@@ -80,6 +87,7 @@ namespace PubnubApi.EndPoint
             requestState.ResponseType = PNOperationType.PushRegister;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
 
             string json = UrlProcessRequest<PNPushAddChannelResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))

@@ -7,6 +7,7 @@ namespace PubnubApi
         PNSubscribeOperation,
         PNUnsubscribeOperation,
         PNPublishOperation,
+        PNFireOperation,
         PNHistoryOperation,
         PNWhereNowOperation,
 
@@ -27,6 +28,7 @@ namespace PubnubApi
         PushGet,
         PushUnregister,
         ChannelGroupGet,
+        ChannelGroupAllGet,
         ChannelGroupGrantAccess,
         ChannelGroupAuditAccess,
         ChannelGroupRevokeAccess,

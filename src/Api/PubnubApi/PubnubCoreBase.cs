@@ -544,6 +544,7 @@ namespace PubnubApi
                     break;
                 case PNOperationType.PNTimeOperation:
                 case PNOperationType.PNPublishOperation:
+                case PNOperationType.PNFireOperation:
                 case PNOperationType.PNHistoryOperation:
                 case PNOperationType.PNHereNowOperation:
                 case PNOperationType.PNWhereNowOperation:
@@ -563,6 +564,7 @@ namespace PubnubApi
                 case PNOperationType.PNRemoveChannelsFromGroupOperation:
                 case PNOperationType.PNRemoveGroupOperation:
                 case PNOperationType.ChannelGroupGet:
+                case PNOperationType.ChannelGroupAllGet:
                     if (result != null && result.Count > 0)
                     {
                         ResponseBuilder responseBuilder = new ResponseBuilder(pubnubConfig, jsonLib);
@@ -907,6 +909,7 @@ namespace PubnubApi
                             case PNOperationType.PNTimeOperation:
                                 break;
                             case PNOperationType.PNPublishOperation:
+                            case PNOperationType.PNFireOperation:
                                 #region "Publish"
                                 result.Add(multiChannel);
                                 if (pubnubConfig.AddPayloadToPublishResponse && request != null & request.RequestUri != null)
@@ -995,6 +998,7 @@ namespace PubnubApi
                             case PNOperationType.PNRemoveChannelsFromGroupOperation:
                             case PNOperationType.PNRemoveGroupOperation:
                             case PNOperationType.ChannelGroupGet:
+                            case PNOperationType.ChannelGroupAllGet:
                                 Dictionary<string, object> channelGroupDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
                                 result = new List<object>();
                                 result.Add(channelGroupDictionary);

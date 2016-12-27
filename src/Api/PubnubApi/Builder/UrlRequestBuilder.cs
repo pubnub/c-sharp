@@ -551,7 +551,7 @@ namespace PubnubApi
 
         Uri IUrlRequestBuilder.BuildGetAllChannelGroupRequest()
         {
-            PNOperationType currentType = PNOperationType.ChannelGroupGet;
+            PNOperationType currentType = PNOperationType.ChannelGroupAllGet;
 
             List<string> url = new List<string>();
             url.Add("v1");

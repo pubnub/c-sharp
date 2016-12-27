@@ -19,7 +19,7 @@ namespace PubnubApi
 
         public PNStatus CreateStatusResponse<T>(PNOperationType type, PNStatusCategory category, RequestState<T> asyncRequestState, int statusCode, Exception throwable)
         {
-            PNStatus status = new PNStatus();
+            PNStatus status = new PNStatus(asyncRequestState != null ? asyncRequestState.EndPointOperation : null);
             status.Category = category;
             status.Operation = type;
 

@@ -11,6 +11,7 @@ namespace PubnubApi.EndPoint
         private static PNConfiguration config = null;
         private static IJsonPluggableLibrary jsonLibrary = null;
         private IPubnubUnitTest unit = null;
+        private PNCallback<PNTimeResult> savedCallback = null;
 
         public TimeOperation(PNConfiguration pubnubConfig):base(pubnubConfig)
         {
@@ -33,7 +34,13 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNTimeResult> callback)
         {
+            this.savedCallback = callback;
             Time(callback);
+        }
+
+        internal void Retry()
+        {
+            Time(savedCallback);
         }
 
         internal void Time(PNCallback<PNTimeResult> callback)
@@ -46,6 +53,7 @@ namespace PubnubApi.EndPoint
             requestState.ResponseType = PNOperationType.PNTimeOperation;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
 
             string json = UrlProcessRequest<PNTimeResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
