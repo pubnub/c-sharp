@@ -472,6 +472,7 @@ namespace PubnubApiDemo
             config.SubscribeKey = subscribeKey;
             config.PublishKey = publishKey;
             config.SecretKey = secretKey;
+            //config.FilterExpression = "uuid == '" + config.Uuid +  "'";
 
             pubnub = new Pubnub(config);
             pubnub.AddListener(new DemoSubscribeCallback());
@@ -623,10 +624,20 @@ namespace PubnubApiDemo
                         string jsonUserMetaData = Console.ReadLine();
 
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine(string.Format("User Meta Data = {0}", jsonUserMetaData));
+                        Console.WriteLine(string.Format("Entered User Meta Data = {0}", jsonUserMetaData));
                         Console.ResetColor();
 
-
+                        Dictionary<string, object> meta = null;
+                        if (!string.IsNullOrEmpty(jsonUserMetaData))
+                        {
+                            meta = pubnub.JsonPluggableLibrary.DeserializeToObject<Dictionary<string, object>>(jsonUserMetaData);
+                            if (meta == null)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("INVALID META DATA");
+                                Console.ResetColor();
+                            }
+                        }
 
                         Console.WriteLine("Publishing message as direct JSON String? Enter Y for Yes or N for No. To accept default(N), just press ENTER");
                         string directJson = Console.ReadLine();
@@ -687,11 +698,11 @@ namespace PubnubApiDemo
                         int intData;
                         if (int.TryParse(publishMsg, out intData)) //capture numeric data
                         {
-                            pubnub.Publish().Channel(channel).Message(intData).Meta(jsonUserMetaData).ShouldStore(store).Async(new DemoPublishResult());
+                            pubnub.Publish().Channel(channel).Message(intData).Meta(meta).ShouldStore(store).Async(new DemoPublishResult());
                         }
                         else if (double.TryParse(publishMsg, out doubleData)) //capture numeric data
                         {
-                            pubnub.Publish().Channel(channel).Message(doubleData).Meta(jsonUserMetaData).ShouldStore(store).Async(new DemoPublishResult());
+                            pubnub.Publish().Channel(channel).Message(doubleData).Meta(meta).ShouldStore(store).Async(new DemoPublishResult());
                         }
                         else
                         {
@@ -701,15 +712,15 @@ namespace PubnubApiDemo
                                 string strMsg = publishMsg.Substring(1, publishMsg.Length - 2);
                                 if (int.TryParse(strMsg, out intData))
                                 {
-                                    pubnub.Publish().Channel(channel).Message(strMsg).Meta(jsonUserMetaData).ShouldStore(store).Async(new DemoPublishResult());
+                                    pubnub.Publish().Channel(channel).Message(strMsg).Meta(meta).ShouldStore(store).Async(new DemoPublishResult());
                                 }
                                 else if (double.TryParse(strMsg, out doubleData))
                                 {
-                                    pubnub.Publish().Channel(channel).Message(strMsg).Meta(jsonUserMetaData).ShouldStore(store).Async(new DemoPublishResult());
+                                    pubnub.Publish().Channel(channel).Message(strMsg).Meta(meta).ShouldStore(store).Async(new DemoPublishResult());
                                 }
                                 else
                                 {
-                                    pubnub.Publish().Channel(channel).Message(publishMsg).Meta(jsonUserMetaData).ShouldStore(store).Async(new DemoPublishResult());
+                                    pubnub.Publish().Channel(channel).Message(publishMsg).Meta(meta).ShouldStore(store).Async(new DemoPublishResult());
                                 }
                             }
                             else
@@ -717,7 +728,7 @@ namespace PubnubApiDemo
                                 pubnub.Publish()
                                     .Channel(channel)
                                     .Message(publishMsg)
-                                    .Meta(jsonUserMetaData)
+                                    .Meta(meta)
                                     .ShouldStore(store)
                                     .Async(new DemoPublishResult());
                             }
