@@ -134,8 +134,6 @@ namespace PubnubApi
                     channelGroups = state.ChannelGroups;
                 }
 
-                //mreSocketAsync = new ManualResetEvent(false);
-
                 PubnubApi.Interface.IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(pubnubConfig, jsonLib, unit);
                 Uri requestUri = urlBuilder.BuildTimeRequest();
                 myRequest = (HttpWebRequest)System.Net.WebRequest.Create(requestUri);
@@ -162,25 +160,18 @@ namespace PubnubApi
                         }
                         finally
                         {
-                            //mreSocketAsync.Set();
+                            isInternetCheckRunning = false;
                         }
 
 					}, null);
 
-                //mreSocketAsync.WaitOne(330);
-
 			}
 			catch (Exception ex)
 			{
-				
-				networkStatus = false;
+                isInternetCheckRunning = false;
+                networkStatus = false;
                 t.TrySetResult(false);
                 ParseCheckSocketConnectException<T>(ex, type, channels, channelGroups, pubnubCallback, internalCallback);
-			}
-			finally
-			{
-                isInternetCheckRunning = false;
-                //mres.Set();
 			}
             return t.Task;
 		}
