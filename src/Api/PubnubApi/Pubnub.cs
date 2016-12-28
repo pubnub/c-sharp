@@ -198,6 +198,40 @@ namespace PubnubApi
             EndPoint.OtherOperation endpoint = new EndPoint.OtherOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
             endpoint.EndPendingRequests();
         }
+
+        public string Decrypt(string inputString)
+        {
+            if (string.IsNullOrEmpty(inputString)) throw new ArgumentException("inputString is not valid");
+            if (pubnubConfig == null || string.IsNullOrEmpty(pubnubConfig.CipherKey)) throw new Exception("CipherKey missing");
+
+            PubnubCrypto pc = new PubnubCrypto(pubnubConfig.CipherKey);
+            return pc.Decrypt(inputString);
+        }
+
+        public string Decrypt(string inputString, string cipherKey)
+        {
+            if (string.IsNullOrEmpty(inputString)) throw new ArgumentException("inputString is not valid");
+
+            PubnubCrypto pc = new PubnubCrypto(cipherKey);
+            return pc.Decrypt(inputString);
+        }
+
+        public string Encrypt(string inputString)
+        {
+            if (string.IsNullOrEmpty(inputString)) throw new ArgumentException("inputString is not valid");
+            if (pubnubConfig == null || string.IsNullOrEmpty(pubnubConfig.CipherKey)) throw new Exception("CipherKey missing");
+
+            PubnubCrypto pc = new PubnubCrypto(pubnubConfig.CipherKey);
+            return pc.Encrypt(inputString);
+        }
+
+        public string Encrypt(string inputString, string cipherKey)
+        {
+            if (string.IsNullOrEmpty(inputString)) throw new ArgumentException("inputString is not valid");
+
+            PubnubCrypto pc = new PubnubCrypto(cipherKey);
+            return pc.Encrypt(inputString);
+        }
         //public void SetErrorFilterLevel(PubnubErrorFilter.Level errorLevel)
         //{
         //    pubnub.PubnubErrorLevel = errorLevel;

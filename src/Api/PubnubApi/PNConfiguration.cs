@@ -103,7 +103,7 @@ namespace PubnubApi
 
         public bool IncludeRequestIdentifier { get; set; }
 
-        public PNReconnectionPolicy ReconnectionPolicy { get; set; } = PNReconnectionPolicy.EXPONENTIAL;
+        public PNReconnectionPolicy ReconnectionPolicy { get; set; } = PNReconnectionPolicy.LINEAR;
 
         public int RequestMessageCountThreshold { get; set; } = 100;
 
@@ -115,12 +115,14 @@ namespace PubnubApi
             this.NonSubscribeRequestTimeout = 10;
             this.SubscribeTimeout = 310;
             this.ConnectTimeout = 5;
-            //this.LogVerbosity = LoggingMethod.Level.Off;
+            this.LogVerbosity = PNLogVerbosity.NONE;
             this.CipherKey = "";
             this.PublishKey = "";
             this.SubscribeKey = "";
             this.SecretKey = "";
             this.Secure = true;
+            this.ReconnectionPolicy = PNReconnectionPolicy.NONE;
+            this.HeartbeatNotificationOption = PNHeartbeatNotificationOption.Failures;
             //this.EnableJsonEncodingForPublish = true;
         }
 
