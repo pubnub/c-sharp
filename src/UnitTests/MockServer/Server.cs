@@ -184,7 +184,7 @@ namespace MockServer
 
                         string[] lines = strData.Split(new string[] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
                         string path = lines[0].Substring(0, lines[0].LastIndexOf(" "));
-                        System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("***MM/dd/yyyy HH:mm:ss:fff") + " - " + path);
+                        System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("        ###  MM/dd/yyyy HH:mm:ss:fff") + " - " + path);
 
                         try
                         {
