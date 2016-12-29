@@ -70,7 +70,11 @@ namespace PubnubApi
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
                 {
                     //Need to return this response 
+#if NET35
                     string jsonString = streamReader.ReadToEnd();
+#else
+                    string jsonString = await streamReader.ReadToEndAsync();
+#endif
                     System.Diagnostics.Debug.WriteLine(jsonString);
                     System.Diagnostics.Debug.WriteLine("");
                     System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON", DateTime.Now.ToString()));
@@ -85,7 +89,11 @@ namespace PubnubApi
                     using (StreamReader streamReader = new StreamReader(ex.Response.GetResponseStream()))
                     {
                         //Need to return this response 
+#if NET35
                         string jsonString = streamReader.ReadToEnd();
+#else
+                        string jsonString = await streamReader.ReadToEndAsync();
+#endif
                         System.Diagnostics.Debug.WriteLine(jsonString);
                         System.Diagnostics.Debug.WriteLine("");
                         System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON from WebException response", DateTime.Now.ToString()));
@@ -96,14 +104,7 @@ namespace PubnubApi
                 if (ex.Message.IndexOf("The request was aborted: The request was canceled") == -1
                                 && ex.Message.IndexOf("Machine suspend mode enabled. No request will be processed.") == -1)
                 {
-                    if (pubnubRequestState != null && pubnubRequestState.PubnubCallback != null)
-                    {
-                        PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(ex.Status, ex.Message);
-                        StatusBuilder statusBuilder = new StatusBuilder(pubnubConfig, jsonLib);
-                        statusBuilder.CreateStatusResponse<T>(pubnubRequestState.ResponseType, category, pubnubRequestState, (int)HttpStatusCode.NotFound, ex);
-                    }
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0} Exception={1}", DateTime.Now.ToString(), ex.ToString()), pubnubConfig.LogVerbosity);
-                    //UrlRequestCommonExceptionHandler<T>(pubnubRequestState.ResponseType, pubnubRequestState.Channels, pubnubRequestState.ChannelGroups, false, pubnubRequestState.SubscribeRegularCallback, pubnubRequestState.PresenceRegularCallback, pubnubRequestState.ConnectCallback, pubnubRequestState.WildcardPresenceCallback, pubnubRequestState.ErrorCallback, false);
+                    throw ex;
                 }
                 return "";
             }
@@ -194,7 +195,11 @@ namespace PubnubApi
                     using (StreamReader streamReader = new StreamReader(ex.Response.GetResponseStream()))
                     {
                         //Need to return this response 
+#if NET35
                         string jsonString = streamReader.ReadToEnd();
+#else
+                        string jsonString = await streamReader.ReadToEndAsync();
+#endif
                         System.Diagnostics.Debug.WriteLine(jsonString);
                         System.Diagnostics.Debug.WriteLine("");
                         System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON  With POST from WebException response", DateTime.Now.ToString()));
@@ -205,14 +210,7 @@ namespace PubnubApi
                 if (ex.Message.IndexOf("The request was aborted: The request was canceled") == -1
                                 && ex.Message.IndexOf("Machine suspend mode enabled. No request will be processed.") == -1)
                 {
-                    if (pubnubRequestState != null && pubnubRequestState.PubnubCallback != null)
-                    {
-                        PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(ex.Status, ex.Message);
-                        StatusBuilder statusBuilder = new StatusBuilder(pubnubConfig, jsonLib);
-                        statusBuilder.CreateStatusResponse<T>(pubnubRequestState.ResponseType, category, pubnubRequestState, (int)HttpStatusCode.NotFound, ex);
-                    }
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0} Exception  With POST ={1}", DateTime.Now.ToString(), ex.ToString()), pubnubConfig.LogVerbosity);
-                    //UrlRequestCommonExceptionHandler<T>(pubnubRequestState.ResponseType, pubnubRequestState.Channels, pubnubRequestState.ChannelGroups, false, pubnubRequestState.SubscribeRegularCallback, pubnubRequestState.PresenceRegularCallback, pubnubRequestState.ConnectCallback, pubnubRequestState.WildcardPresenceCallback, pubnubRequestState.ErrorCallback, false);
+                    throw ex;
                 }
                 return "";
             }

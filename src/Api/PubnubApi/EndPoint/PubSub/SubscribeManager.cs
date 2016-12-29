@@ -119,11 +119,20 @@ namespace PubnubApi.EndPoint
                         if (!MultiChannelSubscribe.ContainsKey(channelName))
                         {
                             PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNUnexpectedDisconnectCategory, null, (int)HttpStatusCode.NotFound, null);
+                            if (!status.AffectedChannels.Contains(channelName))
+                            {
+                                status.AffectedChannels.Add(channelName);
+                            }
                             Announce(status);
                         }
                         else
                         {
                             validChannels.Add(channelName);
+                            string presenceChannelName = string.Format("{0}-pnpres", channelName);
+                            if (MultiChannelSubscribe.ContainsKey(presenceChannelName))
+                            {
+                                validChannels.Add(presenceChannelName);
+                            }
                         }
                     }
                 }
@@ -141,11 +150,20 @@ namespace PubnubApi.EndPoint
                         if (!MultiChannelGroupSubscribe.ContainsKey(channelGroupName))
                         {
                             PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNUnexpectedDisconnectCategory, null, (int)HttpStatusCode.NotFound, null);
+                            if (!status.AffectedChannelGroups.Contains(channelGroupName))
+                            {
+                                status.AffectedChannelGroups.Add(channelGroupName);
+                            }
                             Announce(status);
                         }
                         else
                         {
                             validChannelGroups.Add(channelGroupName);
+                            string presenceChannelGroupName = string.Format("{0}-pnpres", channelGroupName);
+                            if (MultiChannelGroupSubscribe.ContainsKey(presenceChannelGroupName))
+                            {
+                                validChannelGroups.Add(presenceChannelGroupName);
+                            }
                         }
                     }
                 }
@@ -215,31 +233,38 @@ namespace PubnubApi.EndPoint
                 Dictionary<string, long> originalMultiChannelSubscribe = MultiChannelSubscribe.Count > 0 ? MultiChannelSubscribe.ToDictionary(kvp => kvp.Key, kvp => kvp.Value) : null;
                 Dictionary<string, long> originalMultiChannelGroupSubscribe = MultiChannelGroupSubscribe.Count > 0 ? MultiChannelGroupSubscribe.ToDictionary(kvp => kvp.Key, kvp => kvp.Value) : null;
 
+                PNStatus successStatus = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNDisconnectedCategory, null, (int)HttpStatusCode.OK, null);
+                PNStatus failStatus = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNDisconnectedCategory, null, (int)HttpStatusCode.NotFound, new Exception("Unsubscribe Error. Please retry unsubscribe operation"));
+                bool successExist = false;
+                bool failExist = false;
+
                 //Remove the valid channels from subscribe list for unsubscribe 
                 for (int index = 0; index < validChannels.Count; index++)
                 {
                     long timetokenValue;
                     string channelToBeRemoved = validChannels[index].ToString();
                     bool unsubscribeStatus = MultiChannelSubscribe.TryRemove(channelToBeRemoved, out timetokenValue);
+                    if (channelToBeRemoved.Contains("-pnpres"))
+                    {
+                        continue; //Do not send status for -pnpres channels
+                    }
                     if (unsubscribeStatus)
                     {
-                        PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNDisconnectedCategory, null, (int)HttpStatusCode.OK, null);
-                        if (!status.AffectedChannels.Contains(channelToBeRemoved))
+                        successExist = true;
+                        if (!successStatus.AffectedChannels.Contains(channelToBeRemoved))
                         {
-                            status.AffectedChannels.Add(channelToBeRemoved);
+                            successStatus.AffectedChannels.Add(channelToBeRemoved);
                         }
-                        Announce(status);
 
                         base.DeleteLocalChannelUserState(channelToBeRemoved);
                     }
                     else
                     {
-                        PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNDisconnectedCategory, null, (int)HttpStatusCode.NotFound, new Exception("Unsubscribe Error. Please retry the channel unsubscribe operation"));
-                        if (!status.AffectedChannels.Contains(channelToBeRemoved))
+                        failExist = true;
+                        if (!failStatus.AffectedChannels.Contains(channelToBeRemoved))
                         {
-                            status.AffectedChannels.Add(channelToBeRemoved);
+                            failStatus.AffectedChannels.Add(channelToBeRemoved);
                         }
-                        Announce(status);
                     }
                 }
                 for (int index = 0; index < validChannelGroups.Count; index++)
@@ -247,26 +272,38 @@ namespace PubnubApi.EndPoint
                     long timetokenValue;
                     string channelGroupToBeRemoved = validChannelGroups[index].ToString();
                     bool unsubscribeStatus = MultiChannelGroupSubscribe.TryRemove(channelGroupToBeRemoved, out timetokenValue);
+                    if (channelGroupToBeRemoved.Contains("-pnpres"))
+                    {
+                        continue; //Do not send status for -pnpres channel-groups
+                    }
                     if (unsubscribeStatus)
                     {
-                        PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNDisconnectedCategory, null, (int)HttpStatusCode.OK, null);
-                        if (!status.AffectedChannelGroups.Contains(channelGroupToBeRemoved))
+                        successExist = true;
+                        if (!successStatus.AffectedChannelGroups.Contains(channelGroupToBeRemoved))
                         {
-                            status.AffectedChannelGroups.Add(channelGroupToBeRemoved);
+                            successStatus.AffectedChannelGroups.Add(channelGroupToBeRemoved);
                         }
-                        Announce(status);
 
                         base.DeleteLocalChannelGroupUserState(channelGroupToBeRemoved);
                     }
                     else
                     {
-                        PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNDisconnectedCategory, null, (int)HttpStatusCode.NotFound, new Exception("Unsubscribe Error. Please retry the channelgroup unsubscribe operation"));
-                        if (!status.AffectedChannelGroups.Contains(channelGroupToBeRemoved))
+                        failExist = true;
+                        if (!failStatus.AffectedChannelGroups.Contains(channelGroupToBeRemoved))
                         {
-                            status.AffectedChannelGroups.Add(channelGroupToBeRemoved);
+                            failStatus.AffectedChannelGroups.Add(channelGroupToBeRemoved);
                         }
-                        Announce(status);
                     }
+                }
+
+                if (successExist)
+                {
+                    Announce(successStatus);
+                }
+
+                if (failExist)
+                {
+                    Announce(failStatus);
                 }
 
                 //Get all the channels
@@ -332,9 +369,9 @@ namespace PubnubApi.EndPoint
             List<string> validChannels = new List<string>();
             List<string> validChannelGroups = new List<string>();
 
-            bool networkConnection = InternetConnectionStatusInitialCheck<T>(responseType, null, rawChannels, rawChannelGroups);
+           // bool networkConnection = InternetConnectionStatusInitialCheck<T>(responseType, null, rawChannels, rawChannelGroups);
 
-            if (rawChannels.Length > 0 && networkConnection)
+            if (rawChannels.Length > 0)
             {
                 if (rawChannels.Length != rawChannels.Distinct().Count())
                 {
@@ -354,7 +391,7 @@ namespace PubnubApi.EndPoint
                 }
             }
 
-            if (rawChannelGroups != null && rawChannelGroups.Length > 0 && networkConnection)
+            if (rawChannelGroups != null && rawChannelGroups.Length > 0)
             {
                 if (rawChannelGroups.Length != rawChannelGroups.Distinct().Count())
                 {
@@ -451,6 +488,12 @@ namespace PubnubApi.EndPoint
 
         private void MultiChannelSubscribeRequest<T>(PNOperationType type, string[] channels, string[] channelGroups, object timetoken, bool reconnect, Dictionary<string, string> initialSubscribeUrlParams)
         {
+            if (SubscribeDisconnected)
+            {
+                LoggingMethod.WriteToLog(string.Format("DateTime {0}, SubscribeDisconnected. Exiting MultiChannelSubscribeRequest", DateTime.Now.ToString()), config.LogVerbosity);
+                return;
+            }
+
             //Exit if the channel is unsubscribed
             if (MultiChannelSubscribe != null && MultiChannelSubscribe.Count <= 0 && MultiChannelGroupSubscribe != null && MultiChannelGroupSubscribe.Count <= 0)
             {
@@ -479,7 +522,7 @@ namespace PubnubApi.EndPoint
                 || (multiChannelGroup != "" && ChannelGroupInternetStatus.ContainsKey(multiChannelGroup) && !ChannelGroupInternetStatus[multiChannelGroup]))
                 && PubnetSystemActive)
             {
-                if (ReconnectNetworkIfOverrideTcpKeepAlive<T>(type, channels, channelGroups, timetoken))
+                if (ReconnectNetworkIfOverrideTcpKeepAlive<T>(type, channels, channelGroups, timetoken, networkConnection))
                 {
                     return;
                 }
@@ -683,23 +726,33 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        private bool ReconnectNetworkIfOverrideTcpKeepAlive<T>(PNOperationType type, string[] channels, string[] channelGroups, object timetoken)
+        private bool ReconnectNetworkIfOverrideTcpKeepAlive<T>(PNOperationType type, string[] channels, string[] channelGroups, object timetoken, bool networkAvailable)
         {
             if (OverrideTcpKeepAlive)
             {
+                ReconnectState<T> netState = new ReconnectState<T>();
+                netState.Channels = channels;
+                netState.ChannelGroups = channelGroups;
+                netState.ResponseType = type;
+                netState.Timetoken = timetoken;
+
                 if (config.ReconnectionPolicy != PNReconnectionPolicy.NONE)
                 {
                     LoggingMethod.WriteToLog(string.Format("DateTime {0}, Subscribe - No internet connection for channel={1} and channelgroup={2}", DateTime.Now.ToString(), string.Join(",", channels), channelGroups != null ? string.Join(",", channelGroups) : ""), config.LogVerbosity);
-                    ReconnectState<T> netState = new ReconnectState<T>();
-                    netState.Channels = channels;
-                    netState.ChannelGroups = channelGroups;
-                    netState.ResponseType = type;
-                    netState.Timetoken = timetoken;
                     ReconnectNetwork<T>(netState);
                 }
                 else
                 {
                     LoggingMethod.WriteToLog(string.Format("DateTime {0}, reconnection policy is DISABLED, please handle reconnection manually.", DateTime.Now.ToString()), config.LogVerbosity);
+                    if (!networkAvailable)
+                    {
+                        PNStatusCategory errorCategory =  PNStatusCategory.PNNetworkIssuesCategory;
+                        PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, errorCategory, null, (int)HttpStatusCode.NotFound, new Exception("SDK Network related error"));
+                        status.AffectedChannels.AddRange(channels);
+                        status.AffectedChannels.AddRange(channelGroups);
+                        Announce(status);
+
+                    }
                 }
                 return true;
             }
@@ -727,6 +780,24 @@ namespace PubnubApi.EndPoint
                     ChannelGroupReconnectTimer.AddOrUpdate(string.Join(",", netState.ChannelGroups), timer, (key, oldState) => timer);
                 }
             }
+        }
+
+        internal void Reconnect<T>()
+        {
+            LoggingMethod.WriteToLog(string.Format("DateTime {0}, SubscribeManager Manual Reconnect", DateTime.Now.ToString()), config.LogVerbosity);
+            SubscribeDisconnected = false;
+
+            System.Threading.Tasks.Task.Factory.StartNew(() =>
+            {
+                MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, GetCurrentSubscriberChannels(), GetCurrentSubscriberChannelGroups(), LastSubscribeTimetoken, false, null);
+            });
+        }
+
+        internal void Disconnect<T>()
+        {
+            LoggingMethod.WriteToLog(string.Format("DateTime {0}, SubscribeManager Manual Disconnect", DateTime.Now.ToString()), config.LogVerbosity);
+            SubscribeDisconnected = true;
+            TerminateCurrentSubscriberRequest();
         }
 
         protected void ReconnectNetworkCallback<T>(System.Object reconnectState)

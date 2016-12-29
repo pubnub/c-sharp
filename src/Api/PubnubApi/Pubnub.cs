@@ -11,12 +11,15 @@ namespace PubnubApi
         private PNConfiguration pubnubConfig = null;
         private IJsonPluggableLibrary jsonPluggableLibrary = null;
         private IPubnubUnitTest pubnubUnitTest = null;
+        private object savedSubscribeOperation = null;
 
         #region "PubNub API Channel Methods"
 
         public EndPoint.SubscribeOperation<T> Subscribe<T>()
 		{
-            return new EndPoint.SubscribeOperation<T>(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            EndPoint.SubscribeOperation<T> subscribeOperation = new EndPoint.SubscribeOperation<T>(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
+            savedSubscribeOperation = subscribeOperation;
+            return subscribeOperation;
         }
 
         public EndPoint.UnsubscribeOperation<T> Unsubscribe<T>()
@@ -195,8 +198,33 @@ namespace PubnubApi
 
         public void Destroy()
         {
+            savedSubscribeOperation = null;
             EndPoint.OtherOperation endpoint = new EndPoint.OtherOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest);
             endpoint.EndPendingRequests();
+        }
+
+        public void Reconnect<T>()
+        {
+            if (savedSubscribeOperation != null && savedSubscribeOperation is EndPoint.SubscribeOperation<T>)
+            {
+                EndPoint.SubscribeOperation<T> subscibeOperationInstance = savedSubscribeOperation as EndPoint.SubscribeOperation<T>;
+                if (subscibeOperationInstance != null)
+                {
+                    subscibeOperationInstance.Retry(true);
+                }
+            }
+        }
+
+        public void Disconnect<T>()
+        {
+            if (savedSubscribeOperation != null && savedSubscribeOperation is EndPoint.SubscribeOperation<T>)
+            {
+                EndPoint.SubscribeOperation<T> subscibeOperationInstance = savedSubscribeOperation as EndPoint.SubscribeOperation<T>;
+                if (subscibeOperationInstance != null)
+                {
+                    subscibeOperationInstance.Retry(false);
+                }
+            }
         }
 
         public string Decrypt(string inputString)

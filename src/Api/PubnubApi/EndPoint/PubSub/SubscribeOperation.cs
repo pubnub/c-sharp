@@ -19,6 +19,7 @@ namespace PubnubApi.EndPoint
         private List<string> presenceChannelGroupNames = new List<string>();
         private long subscribeTimetoken = -1;
         private bool presenceSubscribeEnabled = false;
+        private SubscribeManager manager = null;
 
         public SubscribeOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
         {
@@ -142,50 +143,21 @@ namespace PubnubApi.EndPoint
 
             System.Threading.Tasks.Task.Factory.StartNew(() =>
             {
-                SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit);
+                manager = new SubscribeManager(config, jsonLibrary, unit);
                 manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups, initialSubscribeUrlParams);
             });
         }
 
-        //private void Presence(string[] channels, string[] channelGroups, Action<PNPresenceEventResult> presenceCallback, Action<ConnectOrDisconnectAck> connectCallback, Action<ConnectOrDisconnectAck> disconnectCallback, Action<PubnubClientError> errorCallback)
-        //{
-        //    //if ((string.IsNullOrEmpty(channel) || channel.Trim().Length <= 0) && (string.IsNullOrEmpty(channelGroup) || channelGroup.Trim().Length <= 0))
-        //    //{
-        //    //    throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
-        //    //}
-
-        //    if (presenceCallback == null)
-        //    {
-        //        throw new ArgumentException("Missing presenceCallback");
-        //    }
-
-        //    if (errorCallback == null)
-        //    {
-        //        throw new ArgumentException("Missing errorCallback");
-        //    }
-
-        //    string channel = (channels != null) ? string.Join(",", channels) : "";
-        //    string channelGroup = (channelGroups != null) ? string.Join(",", channelGroups) : "";
-
-        //    LoggingMethod.WriteToLog(string.Format("DateTime {0}, requested presence for channel={1} and channel group={2}", DateTime.Now.ToString(), channel, channelGroup), pubnubConfig.LogVerbosity);
-        //    //string[] arrayChannel = new string[] { };
-        //    //string[] arrayChannelGroup = new string[] { };
-
-        //    //if (!string.IsNullOrEmpty(channel) && channel.Trim().Length > 0)
-        //    //{
-        //    //    arrayChannel = channel.Trim().Split(',');
-        //    //}
-
-        //    //if (!string.IsNullOrEmpty(channelGroup) && channelGroup.Trim().Length > 0)
-        //    //{
-        //    //    arrayChannelGroup = channelGroup.Trim().Split(',');
-        //    //}
-
-        //    System.Threading.Tasks.Task.Factory.StartNew(() =>
-        //    {
-        //        SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unitTest);
-        //        manager.MultiChannelSubscribeInit<T>(ResponseType.Presence, channels, channelGroups, null, presenceCallback, connectCallback, disconnectCallback, null, errorCallback);
-        //    });
-        //}
+        internal void Retry(bool reconnect)
+        {
+            if (reconnect)
+            {
+                manager.Reconnect<T>();
+            }
+            else
+            {
+                manager.Disconnect<T>();
+            }
+        }
     }
 }

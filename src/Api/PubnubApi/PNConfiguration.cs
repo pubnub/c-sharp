@@ -103,7 +103,7 @@ namespace PubnubApi
 
         public bool IncludeRequestIdentifier { get; set; }
 
-        public PNReconnectionPolicy ReconnectionPolicy { get; set; } = PNReconnectionPolicy.LINEAR;
+        public PNReconnectionPolicy ReconnectionPolicy { get; set; } = PNReconnectionPolicy.NONE;
 
         public int RequestMessageCountThreshold { get; set; } = 100;
 

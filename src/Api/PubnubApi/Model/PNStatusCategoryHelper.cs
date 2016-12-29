@@ -29,18 +29,11 @@ namespace PubnubApi
                     ret = PNStatusCategory.PNNetworkIssuesCategory;
                     break;
                 default:
-#if NETFX_CORE
-                if (webExceptionStatus.ToString() == "NameResolutionFailure")
-                {
-                    ret = PNStatusCategory.PNNetworkIssuesCategory;
-                }
-                else
-                {
-                    Debug.WriteLine("ATTENTION: webExceptionStatus = " + webExceptionStatus.ToString());
-                    ret = PNStatusCategory.PNUnknownCategory;
-                }
-#else
                     if (webExceptionStatus.ToString() == "SecureChannelFailure")
+                    {
+                        ret = PNStatusCategory.PNNetworkIssuesCategory;
+                    }
+                    else if (webExceptionStatus.ToString() == "NameResolutionFailure")
                     {
                         ret = PNStatusCategory.PNNetworkIssuesCategory;
                     }
@@ -49,7 +42,6 @@ namespace PubnubApi
                         Debug.WriteLine("ATTENTION: webExceptionStatus = " + webExceptionStatus.ToString());
                         ret = PNStatusCategory.PNUnknownCategory;
                     }
-#endif
                     break;
             }
             return ret;
@@ -123,6 +115,10 @@ namespace PubnubApi
             else if (errorType == "System.ArgumentException" && errorMessage.Contains("cannot be converted to type"))
             {
                 ret = PNStatusCategory.PNMalformedResponseCategory;
+            }
+            else if (errorMessage.Contains("Disconnected"))
+            {
+                ret = PNStatusCategory.PNDisconnectedCategory;
             }
             else
             {

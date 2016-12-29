@@ -29,7 +29,7 @@ namespace PubnubApi
         private static bool enableResumeOnReconnect = true;
         protected static bool OverrideTcpKeepAlive { get; set; } = true;
         protected static ConcurrentDictionary<Uri, Timer> ChannelLocalClientHeartbeatTimer { get; set; } = new ConcurrentDictionary<Uri, Timer>();
-        protected static System.Threading.Timer LocalClientHeartBeatTimer { get; set; } = null;
+        //protected static System.Threading.Timer LocalClientHeartBeatTimer { get; set; } = null;
         protected static System.Threading.Timer PresenceHeartbeatTimer { get; set; } = null;
         protected static bool PubnetSystemActive { get; set; } = true;
         protected Collection<Uri> PushRemoteImageDomainUri { get; set; } = new Collection<Uri>();
@@ -45,7 +45,7 @@ namespace PubnubApi
         private static IJsonPluggableLibrary jsonLib = null;
         private static IPubnubUnitTest unitTest = null;
         private static bool clientNetworkStatusInternetStatus = true;
-
+        protected bool SubscribeDisconnected = false;
 
         protected static Pubnub PubnubInstance
         {
@@ -71,17 +71,6 @@ namespace PubnubApi
             set;
         }
 
-        //protected static int PubnubNetworkTcpCheckIntervalInSeconds
-        //{
-        //    get
-        //    {
-        //        return pubnubNetworkTcpCheckIntervalInSeconds;
-        //    }
-        //    set
-        //    {
-        //        pubnubNetworkTcpCheckIntervalInSeconds = value;
-        //    }
-        //}
         protected static int PubnubNetworkTcpCheckIntervalInSeconds { get; set; } = 3;
 
         protected static List<SubscribeCallback> SubscribeCallbackListenerList
@@ -289,18 +278,18 @@ namespace PubnubApi
                     LoggingMethod.WriteToLog(string.Format("DateTime: {0}, OnPubnubLocalClientHeartBeatTimeoutCallback - Internet connection = {1}", DateTime.Now.ToString(), networkConnection), pubnubConfig.LogVerbosity);
                     if (!networkConnection)
                     {
-                        if (pubnubConfig.ReconnectionPolicy == PNReconnectionPolicy.NONE)
-                        {
-                            if (LocalClientHeartBeatTimer != null)
-                            {
-                                try
-                                {
-                                    LocalClientHeartBeatTimer.Change(Timeout.Infinite, Timeout.Infinite);
-                                    LocalClientHeartBeatTimer.Dispose();
-                                }
-                                catch { }
-                            }
-                        }
+                        //if (pubnubConfig.ReconnectionPolicy == PNReconnectionPolicy.NONE)
+                        //{
+                        //    if (LocalClientHeartBeatTimer != null)
+                        //    {
+                        //        try
+                        //        {
+                        //            LocalClientHeartBeatTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                        //            LocalClientHeartBeatTimer.Dispose();
+                        //        }
+                        //        catch { }
+                        //    }
+                        //}
                         TerminatePendingWebRequest(currentState);
                     }
                 }
@@ -512,13 +501,15 @@ namespace PubnubApi
                                     }
                                 }
                                 payloadContainer.Add(messageTimetoken);
+
+                                if (!string.IsNullOrEmpty(currentMessageChannelGroup)) //Add cg first before channel
+                                {
+                                    payloadContainer.Add(currentMessageChannelGroup);
+                                }
+
                                 if (!string.IsNullOrEmpty(currentMessageChannel))
                                 {
                                     payloadContainer.Add(currentMessageChannel);
-                                }
-                                if (!string.IsNullOrEmpty(currentMessageChannelGroup))
-                                {
-                                    payloadContainer.Add(currentMessageChannelGroup);
                                 }
 
                                 if (currentMessageChannel.Contains("-pnpres"))
@@ -675,19 +666,19 @@ namespace PubnubApi
                 if (OverrideTcpKeepAlive) //overrideTcpKeepAlive must be true
                 {
                     //Eventhough heart-beat is disabled, run one time to check internet connection by setting dueTime=0
-                    if (LocalClientHeartBeatTimer != null)
-                    {
-                        try
-                        {
-                            LocalClientHeartBeatTimer.Dispose();
-                        }
-                        catch { }
-                    }
+                    //if (LocalClientHeartBeatTimer != null)
+                    //{
+                    //    try
+                    //    {
+                    //        LocalClientHeartBeatTimer.Dispose();
+                    //    }
+                    //    catch { }
+                    //}
 
-                    LocalClientHeartBeatTimer = new System.Threading.Timer(
-                        new TimerCallback(OnPubnubLocalClientHeartBeatTimeoutCallback<T>), pubnubRequestState, 0,
-                        (-1 == PubnubNetworkTcpCheckIntervalInSeconds) ? Timeout.Infinite : PubnubNetworkTcpCheckIntervalInSeconds * 1000);
-                    ChannelLocalClientHeartbeatTimer.AddOrUpdate(requestUri, LocalClientHeartBeatTimer, (key, oldState) => LocalClientHeartBeatTimer);
+                    //LocalClientHeartBeatTimer = new System.Threading.Timer(
+                    //    new TimerCallback(OnPubnubLocalClientHeartBeatTimeoutCallback<T>), pubnubRequestState, 0,
+                    //    (-1 == PubnubNetworkTcpCheckIntervalInSeconds) ? Timeout.Infinite : PubnubNetworkTcpCheckIntervalInSeconds * 1000);
+                    //ChannelLocalClientHeartbeatTimer.AddOrUpdate(requestUri, LocalClientHeartBeatTimer, (key, oldState) => LocalClientHeartBeatTimer);
                 }
                 else
                 {
@@ -706,6 +697,12 @@ namespace PubnubApi
                 {
                     Task<string> jsonResponse = pubnubHttp.SendRequestAndGetJsonResponse(requestUri, pubnubRequestState, request);
                     jsonString = jsonResponse.Result;
+                }
+
+                if (SubscribeDisconnected)
+                {
+                    LoggingMethod.WriteToLog(string.Format("DateTime {0},Received JSON but SubscribeDisconnected = {1} for request={2}", DateTime.Now.ToString(), jsonString, requestUri), pubnubConfig.LogVerbosity);
+                    throw new Exception("Disconnected");
                 }
 
                 LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON= {1} for request={2}", DateTime.Now.ToString(), jsonString, requestUri), pubnubConfig.LogVerbosity);
@@ -739,7 +736,7 @@ namespace PubnubApi
                 if (exceptionMessage.IndexOf("The request was aborted: The request was canceled") == -1
                 && exceptionMessage.IndexOf("Machine suspend mode enabled. No request will be processed.") == -1)
                 {
-                    PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(webEx);
+                    PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(webEx == null ? innerEx : webEx);
                     PNStatus status = new StatusBuilder(pubnubConfig, jsonLib).CreateStatusResponse<T>(pubnubRequestState.ResponseType, category, pubnubRequestState, (int)HttpStatusCode.NotFound, ex);
                     if (pubnubRequestState != null && pubnubRequestState.PubnubCallback != null)
                     {
@@ -1464,7 +1461,7 @@ namespace PubnubApi
             PubnubNetworkTcpCheckIntervalInSeconds = timerInterval;
         }
 
-        private void TerminateReconnectTimer()
+        protected void TerminateReconnectTimer()
         {
             ConcurrentDictionary<string, Timer> channelReconnectCollection = ChannelReconnectTimer;
             ICollection<string> keyCollection = channelReconnectCollection.Keys;
