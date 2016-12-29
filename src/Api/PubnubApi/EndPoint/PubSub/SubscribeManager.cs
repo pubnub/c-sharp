@@ -362,6 +362,7 @@ namespace PubnubApi.EndPoint
         internal void MultiChannelSubscribeInit<T>(PNOperationType responseType, string[] rawChannels, string[] rawChannelGroups, Dictionary<string, string> initialSubscribeUrlParams)
         {
             bool channelGroupSubscribeOnly = false;
+            SubscribeDisconnected = false;
 
             string channel = (rawChannels != null) ? string.Join(",", rawChannels) : "";
             string channelGroup = (rawChannelGroups != null) ? string.Join(",", rawChannelGroups) : "";
@@ -784,6 +785,10 @@ namespace PubnubApi.EndPoint
 
         internal void Reconnect<T>()
         {
+            if (!SubscribeDisconnected) //Check if disconnect is done before
+            {
+                return;
+            }
             LoggingMethod.WriteToLog(string.Format("DateTime {0}, SubscribeManager Manual Reconnect", DateTime.Now.ToString()), config.LogVerbosity);
             SubscribeDisconnected = false;
 

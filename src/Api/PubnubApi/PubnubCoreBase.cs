@@ -1,4 +1,4 @@
-﻿//Build Date: June 06, 2016
+﻿//Build Date: December 29, 2016
 #region "Header"
 #if (__MonoCS__)
 #define TRACE
@@ -1540,7 +1540,7 @@ namespace PubnubApi
             return userStateDeleted;
         }
 
-        public void EndPendingRequests()
+        internal void EndPendingRequests()
         {
             SubscribeCallbackListenerList.Clear();
 
@@ -1562,7 +1562,7 @@ namespace PubnubApi
             PubnubInstance = null;
         }
 
-        public void TerminateCurrentSubscriberRequest()
+        internal void TerminateCurrentSubscriberRequest()
         {
             string[] channels = GetCurrentSubscriberChannels();
             if (channels != null)
@@ -1579,7 +1579,7 @@ namespace PubnubApi
 
         #endregion
 
-        public void Announce(PNStatus status)
+        internal void Announce(PNStatus status)
         {
             for (int listenerIndex=0; listenerIndex < SubscribeCallbackListenerList.Count; listenerIndex++)
             {
@@ -1587,7 +1587,7 @@ namespace PubnubApi
             }
         }
 
-        public void Announce<T>(PNMessageResult<T> message)
+        internal void Announce<T>(PNMessageResult<T> message)
         {
             for (int listenerIndex = 0; listenerIndex < SubscribeCallbackListenerList.Count; listenerIndex++)
             {
@@ -1595,7 +1595,7 @@ namespace PubnubApi
             }
         }
 
-        public void Announce(PNPresenceEventResult presence)
+        internal void Announce(PNPresenceEventResult presence)
         {
             for (int listenerIndex = 0; listenerIndex < SubscribeCallbackListenerList.Count; listenerIndex++)
             {

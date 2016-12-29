@@ -653,10 +653,28 @@ namespace PubnubApi
                     ack.Uuid = presenceDicObj["uuid"].ToString();
                     ack.Occupancy = Int32.Parse(presenceDicObj["occupancy"].ToString());
 
-                    //ack.Timetoken = Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(listObject[1].ToString()),
+                    if (presenceDicObj.ContainsKey("data"))
+                    {
+                        Dictionary<string, object> stateDic = presenceDicObj["data"] as Dictionary<string, object>;
+                        if (stateDic != null)
+                        {
+                            ack.State = stateDic;
+                        }
+                    }
+
                     ack.Timetoken = Convert.ToInt64(listObject[2].ToString());
                     //ack.ChannelGroupName = (listObject.Count == 4) ? listObject[2].ToString() : "";
                     ack.Channel = (listObject.Count == 5) ? listObject[4].ToString() : listObject[3].ToString();
+
+                    if (listObject.Count == 5)
+                    {
+                        ack.Subscription = listObject[3].ToString();
+                    }
+
+                    if (listObject[1] != null)
+                    {
+                        ack.UserMetadata = listObject[1];
+                    }
                 }
 
                 ret = (T)Convert.ChangeType(ack, typeof(PNPresenceEventResult), CultureInfo.InvariantCulture);
