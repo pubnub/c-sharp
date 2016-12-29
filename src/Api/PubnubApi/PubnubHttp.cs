@@ -39,11 +39,9 @@ namespace PubnubApi
 
         HttpWebRequest IPubnubHttp.SetTimeout<T>(RequestState<T> pubnubRequestState, HttpWebRequest request)
         {
-            //REVISIT
-            //#if (!SILVERLIGHT && !WINDOWS_PHONE && !NETFX_CORE)
-            //            //request.Timeout = GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000;
-            //#endif
-            //No Timeout setting for WP7
+#if NET35 || NET40
+            request.Timeout = GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000;
+#endif
             return request;
         }
 

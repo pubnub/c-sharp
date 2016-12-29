@@ -11,6 +11,11 @@ namespace PubnubApi
         private PNConfiguration pubnubConfig = null;
         private IJsonPluggableLibrary jsonPluggableLibrary = null;
         private IPubnubUnitTest pubnubUnitTest = null;
+
+        private string instanceId = "";
+
+        private static string sdkVersion = "PubNub CSharp 4.0.1.1";
+
         private object savedSubscribeOperation = null;
 
         #region "PubNub API Channel Methods"
@@ -260,10 +265,6 @@ namespace PubnubApi
             PubnubCrypto pc = new PubnubCrypto(cipherKey);
             return pc.Encrypt(inputString);
         }
-        //public void SetErrorFilterLevel(PubnubErrorFilter.Level errorLevel)
-        //{
-        //    pubnub.PubnubErrorLevel = errorLevel;
-        //}  
 
         #endregion
 
@@ -296,6 +297,22 @@ namespace PubnubApi
 			}
 		}
 
+        public static string Version
+        {
+            get
+            {
+                return sdkVersion;
+            }
+        }
+
+        public string InstanceId
+        {
+            get
+            {
+                return instanceId;
+            }
+        }
+
         #endregion
 
         #region "Constructors"
@@ -305,6 +322,7 @@ namespace PubnubApi
             pubnubConfig = config;
             jsonPluggableLibrary = new NewtonsoftJsonDotNet();
             CheckRequiredConfigValues();
+            instanceId = Guid.NewGuid().ToString();
         }
 
         //public Pubnub(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary)

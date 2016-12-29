@@ -711,7 +711,7 @@ namespace PubnubApi
 
             Dictionary<string, string> ret = new Dictionary<string, string>();
             ret.Add("uuid", this.pubnubConfig.Uuid);
-            ret.Add("pnsdk", new UriUtil().EncodeUriComponent(this.pubnubConfig.SdkVersion, PNOperationType.PNSubscribeOperation, false, true));
+            ret.Add("pnsdk", new UriUtil().EncodeUriComponent(Pubnub.Version, PNOperationType.PNSubscribeOperation, false, true));
             ret.Add("requestid", requestid);
             ret.Add("timestamp", timeStamp.ToString());
 

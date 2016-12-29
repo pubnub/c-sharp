@@ -690,7 +690,7 @@ namespace PubnubApi
                 }
                 else
                 {
-                    request = pubnubHttp.SetServicePointSetTcpKeepAlive(request);
+                    request = pubnubHttp.SetServicePointSetTcpKeepAlive(request); //To be removed.
                 }
 
                 LoggingMethod.WriteToLog(string.Format("DateTime {0}, Request={1}", DateTime.Now.ToString(), requestUri.ToString()), pubnubConfig.LogVerbosity);
@@ -917,40 +917,6 @@ namespace PubnubApi
                             case PNOperationType.PNFireOperation:
                                 #region "Publish"
                                 result.Add(multiChannel);
-                                if (pubnubConfig.AddPayloadToPublishResponse && request != null & request.RequestUri != null)
-                                {
-                                    Uri webUri = request.RequestUri;
-                                    string absolutePath = webUri.AbsolutePath.ToString();
-                                    int posLastSlash = absolutePath.LastIndexOf("/");
-                                    if (posLastSlash > 1)
-                                    {
-                                        bool stringType = false;
-                                        string publishPayload = absolutePath.Substring(posLastSlash + 1);
-                                        int posOfStartDQ = publishPayload.IndexOf("%22");
-                                        int posOfEndDQ = publishPayload.LastIndexOf("%22");
-                                        if (posOfStartDQ == 0 && posOfEndDQ + 3 == publishPayload.Length)
-                                        {
-                                            publishPayload = publishPayload.Remove(posOfEndDQ).Remove(posOfStartDQ, 3);
-                                            stringType = true;
-                                        }
-                                        string publishMsg = System.Uri.UnescapeDataString(publishPayload);
-
-                                        double doubleData;
-                                        int intData;
-                                        if (!stringType && int.TryParse(publishMsg, out intData)) //capture numeric data
-                                        {
-                                            result.Add(intData);
-                                        }
-                                        else if (!stringType && double.TryParse(publishMsg, out doubleData)) //capture numeric data
-                                        {
-                                            result.Add(doubleData);
-                                        }
-                                        else
-                                        {
-                                            result.Add(publishMsg);
-                                        }
-                                    }
-                                }
                                 #endregion
                                 break;
                             case PNOperationType.PNHistoryOperation:

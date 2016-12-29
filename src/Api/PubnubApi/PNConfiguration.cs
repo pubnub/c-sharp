@@ -10,11 +10,8 @@ namespace PubnubApi
         private int presenceHeartbeatTimeout;
         private int presenceHeartbeatInterval;
         private string uuid = "";
-        private string sdkVersion = "PubNub CSharp 4.0.1.1";
 
         public string Origin { get; set; }
-
-        public int SubscribeTimeout { get; set; }
 
         public int PresenceTimeout
         {
@@ -67,42 +64,25 @@ namespace PubnubApi
             }
         }
 
-        public string SdkVersion
-        {
-            get
-            {
-                return sdkVersion;
-            }
-        }
-
         public PNLogVerbosity LogVerbosity { get; set; }
 
         public IPubnubLog PubnubLog { get; set; }
 
         public IPubnubProxy Proxy { get; set; }
 
-        public int ConnectTimeout { get; set; }
+        //public int ConnectTimeout { get; set; } //How long to wait before giving up connection to client.
 
-        public int NonSubscribeRequestTimeout { get; set; }
+        public int SubscribeTimeout { get; set; } //How long to keep the subscribe loop running before disconnect.
+
+        public int NonSubscribeRequestTimeout { get; set; } //On non subscribe operations, how long to wait for server response.
 
         public PNHeartbeatNotificationOption HeartbeatNotificationOption { get; set; }
 
-        public string PushServiceName { get; set; }
-
-        public bool EnableDebugForPushPublish { get; set; }
-
-        public Collection<Uri> PushRemoteImageDomainUri { get; set; }
-
-        //For publishing direct JSON string
-        //public bool EnableJsonEncodingForPublish { get; set; }
-
-        public bool AddPayloadToPublishResponse { get; set; }
-
         public string FilterExpression { get; set; }
 
-        public bool IncludeInstanceIdentifier { get; set; }
+        //public bool IncludeInstanceIdentifier { get; set; }
 
-        public bool IncludeRequestIdentifier { get; set; }
+        //public bool IncludeRequestIdentifier { get; set; }
 
         public PNReconnectionPolicy ReconnectionPolicy { get; set; } = PNReconnectionPolicy.NONE;
 
@@ -115,7 +95,7 @@ namespace PubnubApi
             this.uuid = Guid.NewGuid().ToString();
             this.NonSubscribeRequestTimeout = 10;
             this.SubscribeTimeout = 310;
-            this.ConnectTimeout = 5;
+            //this.ConnectTimeout = 5;
             this.LogVerbosity = PNLogVerbosity.NONE;
             this.CipherKey = "";
             this.PublishKey = "";

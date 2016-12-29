@@ -127,16 +127,6 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing userCallback");
             }
 
-            if (config.EnableDebugForPushPublish)
-            {
-                if (message is Dictionary<string, object>)
-                {
-                    Dictionary<string, object> dicMessage = message as Dictionary<string, object>;
-                    dicMessage.Add("pn_debug", true);
-                    message = dicMessage;
-                }
-            }
-
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
             Uri request = urlBuilder.BuildPublishRequest(channel, message, storeInHistory, ttl, metaData, httpPost, null);
 
