@@ -131,7 +131,9 @@ namespace PubnubApiDemo
             public override void Status(Pubnub pubnub, PNStatus status)
             {
                 //Console.WriteLine("SubscribeCallback: PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-                Console.WriteLine("SubscribeCallback: PNStatus: " + status.StatusCode.ToString());
+                string msg = string.Format("SubscribeCallback: Category: {0};  StatusCode: {1}", status.Category, status.StatusCode);
+                Console.WriteLine(msg);
+
                 if (status.StatusCode != 200 || status.Error)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
@@ -539,7 +541,8 @@ namespace PubnubApiDemo
                     Console.WriteLine("Enter 15 TO Get User State");
                     Console.WriteLine("Enter 16 FOR WhereNow");
                     Console.WriteLine("Enter 17 TO change UUID. (Current value = {0})",  config.Uuid);
-
+                    Console.WriteLine("Enter 18 FOR Disconnect");
+                    Console.WriteLine("Enter 19 FOR Reconnect");
                     Console.WriteLine("Enter 31 FOR Push - Register Device");
                     Console.WriteLine("Enter 32 FOR Push - Remove Channel");
                     Console.WriteLine("Enter 33 FOR Push - Get Current Channels");
@@ -1174,6 +1177,14 @@ namespace PubnubApiDemo
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine("UUID = {0}", config.Uuid);
                         Console.ResetColor();
+                        break;
+                    case "18":
+                        Console.WriteLine("Disconnect");
+                        pubnub.Disconnect<string>();
+                        break;
+                    case "19":
+                        Console.WriteLine("Re-connect");
+                        pubnub.Reconnect<string>();
                         break;
                     case "31":
                         Console.WriteLine("Enter channel name");
