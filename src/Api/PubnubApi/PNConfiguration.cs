@@ -10,6 +10,7 @@ namespace PubnubApi
         private int presenceHeartbeatTimeout;
         private int presenceHeartbeatInterval;
         private string uuid = "";
+        private string sdkVersion = "PubNub CSharp 4.0.1.1";
 
         public string Origin { get; set; }
 
@@ -70,7 +71,7 @@ namespace PubnubApi
         {
             get
             {
-                return "PubNub CSharp 4.0";
+                return sdkVersion;
             }
         }
 
