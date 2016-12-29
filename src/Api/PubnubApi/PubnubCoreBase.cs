@@ -448,7 +448,7 @@ namespace PubnubApi
                                 {
                                     payload = messageDic["d"];
                                 }
-                                List<object> payloadContainer = new List<object>();
+                                List<object> payloadContainer = new List<object>(); //First item always message
                                 if (currentMessageChannel.Contains("-pnpres") || currentMessageChannel.Contains(".*-pnpres"))
                                 {
                                     payloadContainer.Add(payload);
@@ -500,7 +500,15 @@ namespace PubnubApi
                                         }
                                     }
                                 }
-                                payloadContainer.Add(messageTimetoken);
+
+                                object userMetaData = null;
+                                if (messageDic.ContainsKey("u"))
+                                {
+                                    userMetaData = messageDic["u"];
+                                }
+                                payloadContainer.Add(userMetaData); //Second one always user meta data
+
+                                payloadContainer.Add(messageTimetoken); //Third one always Timetoken
 
                                 if (!string.IsNullOrEmpty(currentMessageChannelGroup)) //Add cg first before channel
                                 {

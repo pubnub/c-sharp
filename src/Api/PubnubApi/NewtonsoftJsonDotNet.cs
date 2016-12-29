@@ -210,15 +210,26 @@ namespace PubnubApi
                 //Set Time
                 PropertyInfo timeProp = specific.GetProperty("Timetoken");
                 long timetoken;
-                Int64.TryParse(listObject[1].ToString(), out timetoken);
+                Int64.TryParse(listObject[2].ToString(), out timetoken);
                 timeProp.SetValue(message, timetoken, null);
 
                 // Set ChannelName
                 PropertyInfo channelNameProp = specific.GetProperty("Channel");
-                channelNameProp.SetValue(message, (listObject.Count == 4) ? listObject[3].ToString() : listObject[2].ToString(), null);
+                channelNameProp.SetValue(message, (listObject.Count == 5) ? listObject[4].ToString() : listObject[3].ToString(), null);
 
-                //PropertyInfo typeProp = specific.GetProperty("Type");
-                //typeProp.SetValue(message, dataType, null);
+                // Set ChannelGroup
+                if (listObject.Count == 5)
+                {
+                    PropertyInfo subsciptionProp = specific.GetProperty("Subscription");
+                    subsciptionProp.SetValue(message, listObject[3].ToString(), null);
+                }
+                
+                //Set Metadata list second position, index=1
+                if (listObject[1] != null)
+                {
+                    PropertyInfo userMetadataProp = specific.GetProperty("UserMetadata");
+                    userMetadataProp.SetValue(message, listObject[1], null);
+                }
 
                 ret = (T)Convert.ChangeType(message, specific, CultureInfo.InvariantCulture);
             }
@@ -274,15 +285,26 @@ namespace PubnubApi
                 //Set Time
                 PropertyInfo timeProp = specific.GetRuntimeProperty("Timetoken");
                 long timetoken;
-                Int64.TryParse(listObject[1].ToString(), out timetoken);
+                Int64.TryParse(listObject[2].ToString(), out timetoken);
                 timeProp.SetValue(message, timetoken, null);
 
                 // Set ChannelName
                 PropertyInfo channelNameProp = specific.GetRuntimeProperty("Channel");
-                channelNameProp.SetValue(message, (listObject.Count == 4) ? listObject[3].ToString() : listObject[2].ToString(), null);
+                channelNameProp.SetValue(message, (listObject.Count == 5) ? listObject[4].ToString() : listObject[3].ToString(), null);
 
-                //PropertyInfo typeProp = specific.GetProperty("Type");
-                //typeProp.SetValue(message, dataType, null);
+                // Set ChannelGroup
+                if (listObject.Count == 5)
+                {
+                    PropertyInfo subsciptionProp = specific.GetProperty("Subscription");
+                    subsciptionProp.SetValue(message, listObject[3].ToString(), null);
+                }
+                
+                //Set Metadata list second position, index=1
+                if (listObject[1] != null)
+                {
+                    PropertyInfo userMetadataProp = specific.GetProperty("UserMetadata");
+                    userMetadataProp.SetValue(message, listObject[1], null);
+                }
 
                 ret = (T)Convert.ChangeType(message, specific, CultureInfo.InvariantCulture);
             }
@@ -632,9 +654,9 @@ namespace PubnubApi
                     ack.Occupancy = Int32.Parse(presenceDicObj["occupancy"].ToString());
 
                     //ack.Timetoken = Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(listObject[1].ToString()),
-                    ack.Timetoken = Convert.ToInt64(listObject[1].ToString());
+                    ack.Timetoken = Convert.ToInt64(listObject[2].ToString());
                     //ack.ChannelGroupName = (listObject.Count == 4) ? listObject[2].ToString() : "";
-                    ack.Channel = (listObject.Count == 4) ? listObject[3].ToString() : listObject[2].ToString();
+                    ack.Channel = (listObject.Count == 5) ? listObject[4].ToString() : listObject[3].ToString();
                 }
 
                 ret = (T)Convert.ChangeType(ack, typeof(PNPresenceEventResult), CultureInfo.InvariantCulture);
