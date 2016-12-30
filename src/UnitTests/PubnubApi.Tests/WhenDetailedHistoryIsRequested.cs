@@ -334,6 +334,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        [ExpectedException(typeof(MissingMemberException))]
         public void DetailHistoryWithNullKeysReturnsError()
         {
             receivedMessage = false;
