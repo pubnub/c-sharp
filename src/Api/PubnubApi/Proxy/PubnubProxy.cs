@@ -1,64 +1,41 @@
 ﻿using System;
+using System.Net;
 
 namespace PubnubApi
 {
-    public class PubnubProxy: IPubnubProxy
+    public class Proxy
+#if !NETSTANDARD10
+        : IWebProxy
+#endif
     {
-        private string proxyServer = "";
-        private int proxyPort;
-        private string proxyUserName = "";
-        private string proxyPassword = "";
-
-        string IPubnubProxy.Server
+#if NETSTANDARD10
+        public Proxy()
         {
-            get
-            {
-                return proxyServer;
-            }
+            throw new NotSupportedException("NETStandard 1.0 not supported");
+        }
+#else 
+        private readonly Uri pubnubProxyUri;
 
-            set
-            {
-                proxyServer = value;
-            }
+        public Proxy(Uri proxyUri)
+        {
+            pubnubProxyUri = proxyUri;
         }
 
-        int IPubnubProxy.Port
+        public ICredentials Credentials
         {
-            get
-            {
-                return proxyPort;
-            }
-
-            set
-            {
-                proxyPort = value;
-            }
+            get;
+            set;
         }
 
-        string IPubnubProxy.UserName
+        public Uri GetProxy(Uri destination)
         {
-            get
-            {
-                return proxyUserName;
-            }
-
-            set
-            {
-                proxyUserName = value;
-            }
+            return pubnubProxyUri;
         }
 
-        string IPubnubProxy.Password
+        public bool IsBypassed(Uri host)
         {
-            get
-            {
-                return proxyPassword;
-            }
-
-            set
-            {
-                proxyPassword = value;
-            }
+            return false;
         }
+#endif
     }
 }

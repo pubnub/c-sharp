@@ -68,7 +68,7 @@ namespace PubnubApi
 
         public IPubnubLog PubnubLog { get; set; }
 
-        public IPubnubProxy Proxy { get; set; }
+        public Proxy Proxy { get; set; }
 
         //public int ConnectTimeout { get; set; } //How long to wait before giving up connection to client.
 

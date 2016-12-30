@@ -295,14 +295,14 @@ namespace PubnubApi
                 // Set ChannelGroup
                 if (listObject.Count == 5)
                 {
-                    PropertyInfo subsciptionProp = specific.GetProperty("Subscription");
+                    PropertyInfo subsciptionProp = specific.GetRuntimeProperty("Subscription");
                     subsciptionProp.SetValue(message, listObject[3].ToString(), null);
                 }
                 
                 //Set Metadata list second position, index=1
                 if (listObject[1] != null)
                 {
-                    PropertyInfo userMetadataProp = specific.GetProperty("UserMetadata");
+                    PropertyInfo userMetadataProp = specific.GetRuntimeProperty("UserMetadata");
                     userMetadataProp.SetValue(message, listObject[1], null);
                 }
 

@@ -23,17 +23,12 @@ namespace PubnubApi
 
         HttpWebRequest IPubnubHttp.SetProxy<T>(HttpWebRequest request)
         {
-            //REVISIT
-            //#if (!SILVERLIGHT && !WINDOWS_PHONE && !NETFX_CORE)
-            //            if (_pnConfig.EnableProxy && _pubnubProxy != null)
-            //            {
-            //                //                LoggingMethod.WriteToLog(string.Format("DateTime {0}, ProxyServer={1}; ProxyPort={2}; ProxyUserName={3}", DateTime.Now.ToString(), _pubnubProxy.ProxyServer, _pubnubProxy.ProxyPort, _pubnubProxy.ProxyUserName), pubnubConfig.LogVerbosity);
-            //                //                WebProxy webProxy = new WebProxy(_pubnubProxy.ProxyServer, _pubnubProxy.ProxyPort);
-            //                //                webProxy.Credentials = new NetworkCredential(_pubnubProxy.ProxyUserName, _pubnubProxy.ProxyPassword);
-            //                //                request.Proxy = webProxy;
-            //            }
-            //#endif
-            //No proxy setting for WP7
+#if !NETSTANDARD10
+            if (pubnubConfig.Proxy != null)
+            {
+                request.Proxy = pubnubConfig.Proxy;
+            }
+#endif
             return request;
         }
 
