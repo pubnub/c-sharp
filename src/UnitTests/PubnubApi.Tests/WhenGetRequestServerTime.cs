@@ -119,11 +119,8 @@ namespace PubNubMessaging.Tests
         {
             currentUnitTestCase = "ThenWithProxyItShouldReturnTimeStamp";
 
-            IPubnubProxy proxy = new PubnubProxy();
-            proxy.Server = "test.pandu.com";
-            proxy.Port = 808;
-            proxy.UserName = "tuvpnfreeproxy";
-            proxy.Password = "Rx8zW78k";
+            Proxy proxy = new Proxy(new Uri("test.pandu.com:808"));
+            proxy.Credentials = new System.Net.NetworkCredential("tuvpnfreeproxy", "Rx8zW78k");
 
             timeReceived = false;
             mreTime = new ManualResetEvent(false);
@@ -164,11 +161,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenWithProxyItShouldReturnTimeStampWithSSL()
         {
-            IPubnubProxy proxy = new PubnubProxy();
-            proxy.Server = "test.pandu.com";
-            proxy.Port = 808;
-            proxy.UserName = "tuvpnfreeproxy";
-            proxy.Password = "Rx8zW78k";
+            Proxy proxy = new Proxy(new Uri("test.pandu.com:808"));
+            proxy.Credentials = new System.Net.NetworkCredential("tuvpnfreeproxy", "Rx8zW78k");
 
             timeReceived = false;
             mreTime = new ManualResetEvent(false);

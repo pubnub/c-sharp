@@ -103,8 +103,7 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
-                Secure = false,
-                EnableDebugForPushPublish = true
+                Secure = false
             };
 
             pubnub = this.createPubNubInstance(config);
@@ -139,8 +138,7 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
-                Secure = false,
-                EnableDebugForPushPublish = true
+                Secure = false
             };
 
             pubnub = this.createPubNubInstance(config);
@@ -179,8 +177,7 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
-                Secure = false,
-                EnableDebugForPushPublish = true
+                Secure = false
             };
 
             pubnub = this.createPubNubInstance(config);
@@ -219,8 +216,7 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
-                Secure = false,
-                EnableDebugForPushPublish = true
+                Secure = false
             };
 
             pubnub = this.createPubNubInstance(config);

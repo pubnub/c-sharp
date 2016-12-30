@@ -237,9 +237,6 @@
     <Compile Include="..\..\Api\PubnubApi\Interface\IPubnubLog.cs">
       <Link>LinkedSourceCode\Interface\IPubnubLog.cs</Link>
     </Compile>
-    <Compile Include="..\..\Api\PubnubApi\Interface\IPubnubProxy.cs">
-      <Link>LinkedSourceCode\Interface\IPubnubProxy.cs</Link>
-    </Compile>
     <Compile Include="..\..\Api\PubnubApi\Interface\IPubnubUnitTest.cs">
       <Link>LinkedSourceCode\Interface\IPubnubUnitTest.cs</Link>
     </Compile>
