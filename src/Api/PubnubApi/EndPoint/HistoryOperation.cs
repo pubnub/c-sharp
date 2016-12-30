@@ -77,6 +77,10 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNHistoryResult> callback)
         {
+            if (string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length == 0)
+            {
+                throw new MissingMemberException("Invalid Subscribe Key");
+            }
             this.savedCallback = callback;
             History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, callback);
         }
