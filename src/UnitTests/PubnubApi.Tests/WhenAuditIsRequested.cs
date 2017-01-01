@@ -59,7 +59,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
-                    .WithParameter("signature", "SKDBGle-y_p_sh7G_nPPIAF6oVAoGPsQS1PqxRj3S8E=")
+                    .WithParameter("signature", "ZJ66W5n7gvddvaa3anwWH0lkGXXgUSf3NfFccm6ZbLg=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -112,7 +112,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
-                    .WithParameter("signature", "baAWVdNKvELa07NaIA9kqk7eH7ittOXow0kPHRm4KAs=")
+                    .WithParameter("signature", "pYVeEZ7oraDyMvIvlR1EmM_53ycMvd2rTPKQ7_GEuNg=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -164,7 +164,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
-                    .WithParameter("signature", "mvBhczAANRNn1l0IR9FZmJaB8XUpnG8IWlihg9hmc2g=")
+                    .WithParameter("signature", "QaAB4et_50R3iNGOAbeVJhDfpgA-R8uz4tHg08EL8U4=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 

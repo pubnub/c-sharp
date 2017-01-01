@@ -271,7 +271,6 @@ namespace PubnubApiDemo
         {
             PNConfiguration config = new PNConfiguration();
             AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionTrapper;
-            PubnubProxy proxy = null;
 
             Console.WriteLine("HINT: TO TEST RE-CONNECT AND CATCH-UP,");
             Console.WriteLine("      DISCONNECT YOUR MACHINE FROM NETWORK/INTERNET AND ");

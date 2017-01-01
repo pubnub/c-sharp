@@ -22,17 +22,11 @@ namespace PubNubMessaging.Tests
         [TestFixtureSetUp]
         public void Init()
         {
-            unitLog = new Tests.UnitTestLog();
-            unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
-            server = new Server(new Uri("https://" + PubnubCommon.StubOrign));
-            MockServer.LoggingMethod.MockServerLog = unitLog;
-            server.Start();
         }
 
         [TestFixtureTearDown]
         public void Exit()
         {
-            server.Stop();
         }
 
         [Test]

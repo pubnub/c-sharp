@@ -78,7 +78,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("ttl", "5")
                     .WithParameter("uuid", config.Uuid)
                     .WithParameter("w", "1")
-                    .WithParameter("signature", "1RdBzX6dQUW77mww32EFABJwSBmXow2zzZHblAhEW94=")
+                    .WithParameter("signature", "2q434EdLu221AYa4s8hCl1P3qIODRgUppeLK4g9L9NE=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -134,7 +134,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("ttl", "5")
                     .WithParameter("uuid", config.Uuid)
                     .WithParameter("w", "0")
-                    .WithParameter("signature", "UnOj3vJxF8vjwAhnAsMBPWCA-00OX6mvlP0cg2EyZvc=")
+                    .WithParameter("signature", "oB5eIygauTsyhPLS2VWzPNYtKvZUOdCC7fUM0ga7sF0=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -190,7 +190,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("ttl", "5")
                     .WithParameter("uuid", config.Uuid)
                     .WithParameter("w", "1")
-                    .WithParameter("signature", "M-fkxW4ziBHpoTzDCNzNhGzcSGhYGy4a3bo5u6lmNs0=")
+                    .WithParameter("signature", "p-3HjCpxMaIi7Q_omJ_WaqudX_K1Jeawb-jhJr5iVTg=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -254,7 +254,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("ttl", "5")
                     .WithParameter("uuid", config.Uuid)
                     .WithParameter("w", "1")
-                    .WithParameter("signature", "LvAjwHf1hcYzTgnS1HjAPl5KH4zsOMZYZVhMcCaAiqQ=")
+                    .WithParameter("signature", "tAgGwtvIFOV1XIk9GrHhGuolWmnbBm22t799aaOBN3E=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -319,7 +319,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("ttl", "5")
                     .WithParameter("uuid", config.Uuid)
                     .WithParameter("w", "1")
-                    .WithParameter("signature", "yzzyAtub18jjBa6MZyHPExiyYw6XfEugPG7eFHP9InU=")
+                    .WithParameter("signature", "Y2SJicV_EIvbzkUXFFBSbsIEMd71nURr_TU-7RT4oTM=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -377,7 +377,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("ttl", "5")
                     .WithParameter("uuid", config.Uuid)
                     .WithParameter("w", "1")
-                    .WithParameter("signature", "1RdBzX6dQUW77mww32EFABJwSBmXow2zzZHblAhEW94=")
+                    .WithParameter("signature", "2q434EdLu221AYa4s8hCl1P3qIODRgUppeLK4g9L9NE=")
                     .WithResponse(expectedGrant)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
             server.AddRequest(new Request()
@@ -393,7 +393,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("ttl", "0")
                     .WithParameter("uuid", config.Uuid)
                     .WithParameter("w", "0")
-                    .WithParameter("signature", "l1UMP2QuNGiatnQM7rZcYNjZao2s0sapAckO4-bhTBc=")
+                    .WithParameter("signature", "GxPAhyWs1mJmxUY0RnLSa5_yrKM8r5dV8ncAdeTG98E=")
                     .WithResponse(expectedRevoke)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -461,7 +461,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("ttl", "5")
                     .WithParameter("uuid", config.Uuid)
                     .WithParameter("w", "1")
-                    .WithParameter("signature", "QgXzDiTNmoFQnghvQ-QFN9p2IRGRPg2ds_1XagBnItk=")
+                    .WithParameter("signature", "bIv98O5YLEdhBPxUYAnUaQjslXuS3dARfGougdoqduQ=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -517,7 +517,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("ttl", "5")
                     .WithParameter("uuid", config.Uuid)
                     .WithParameter("w", "0")
-                    .WithParameter("signature", "wwRQ7MZoQ6d1VYGyW6SFVVT2wfhjiU196sktS8kNc7o=")
+                    .WithParameter("signature", "lpR2etL5C7Mm_8PbWkcqUhgh2cruMXGPZM69L1NxPv8=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 

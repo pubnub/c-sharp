@@ -117,14 +117,6 @@ namespace MockServer
             {
             }
 
-            try
-            {
-                trf.Abort();
-            }
-            catch
-            {
-            }
-
             trf = null;
 
             LoggingMethod.WriteToLog("Server was stoped.", LoggingMethod.LevelInfo);
@@ -151,6 +143,10 @@ namespace MockServer
                     data = new byte[MAXBUFFER];
 
                     var clientSocket = listener.AcceptSocket();
+                    if (finalizeServer)
+                    {
+                        break;
+                    }
 
                     LoggingMethod.WriteToLog(String.Format("Client accepted: {0}", ((IPEndPoint)clientSocket.LocalEndPoint).ToString()), LoggingMethod.LevelInfo);
 
