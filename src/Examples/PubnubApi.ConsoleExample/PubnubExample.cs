@@ -131,7 +131,7 @@ namespace PubnubApiDemo
             public override void Status(Pubnub pubnub, PNStatus status)
             {
                 //Console.WriteLine("SubscribeCallback: PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-                string msg = string.Format("SubscribeCallback: Category: {0};  StatusCode: {1}", status.Category, status.StatusCode);
+                string msg = string.Format("SubscribeCallback: Operation: {0}; Category: {1};  StatusCode: {2}", status.Operation, status.Category, status.StatusCode);
                 Console.WriteLine(msg);
 
                 if (status.StatusCode != 200 || status.Error)
@@ -466,6 +466,22 @@ namespace PubnubApiDemo
             Console.ResetColor();
             Console.WriteLine();
 
+            /*  */
+            Console.WriteLine("Presence Heartbeat Timeout disabled by default. (default). Enter the value to enable, else press ENTER");
+            string presenceHeartbeatTimeoutEntry = Console.ReadLine();
+            int presenceHeartbeatTimeout;
+            Int32.TryParse(presenceHeartbeatTimeoutEntry, out presenceHeartbeatTimeout);
+            Console.ForegroundColor = ConsoleColor.Blue;
+            if (presenceHeartbeatTimeout > 0)
+            {
+                Console.WriteLine("Presence Timeout = {0}", presenceHeartbeatTimeout);
+                config.PresenceTimeout = presenceHeartbeatTimeout;
+            }
+            config.HeartbeatNotificationOption = PNHeartbeatNotificationOption.Failures;
+
+            Console.ResetColor();
+            Console.WriteLine();
+
             config.Origin = origin;
 
             config.Secure = (enableSSL.Trim().ToLower() == "y") ? true : false;
@@ -477,41 +493,6 @@ namespace PubnubApiDemo
 
             pubnub = new Pubnub(config);
             pubnub.AddListener(new DemoSubscribeCallback());
-
-            Console.WriteLine("Display ErrorCallback messages? Enter Y for Yes, Else N for No.");
-            Console.WriteLine("Default = N  ");
-            string displayErrMessage = Console.ReadLine();
-            Console.ForegroundColor = ConsoleColor.Blue;
-            if (displayErrMessage.Trim().ToLower() == "y")
-            {
-                showErrorMessageSegments = true;
-                Console.WriteLine("ErrorCallback messages will  be displayed");
-            }
-            else
-            {
-                showErrorMessageSegments = false;
-                Console.WriteLine("ErrorCallback messages will NOT be displayed.");
-            }
-            Console.ResetColor();
-            Console.WriteLine();
-
-            Console.WriteLine("Display Debug Info in ErrorCallback messages? Enter Y for Yes, Else N for No.");
-            Console.WriteLine("Default = Y  ");
-            string debugMessage = Console.ReadLine();
-            Console.ForegroundColor = ConsoleColor.Blue;
-            if (debugMessage.Trim().ToLower() == "n")
-            {
-                showDebugMessages = false;
-                Console.WriteLine("ErrorCallback messages will NOT  be displayed");
-            }
-            else
-            {
-                showDebugMessages = true;
-                Console.WriteLine("Debug messages will be displayed.");
-            }
-            Console.ResetColor();
-            Console.WriteLine();
-
 
             bool exitFlag = false;
             string channel = "";
