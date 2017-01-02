@@ -390,6 +390,7 @@
     <Compile Include="CleanupGrant.cs" />
     <Compile Include="EncryptionTests.cs" />
     <Compile Include="GenerateSampleGrant.cs" />
+    <Compile Include="LinkedSourceCode\Model\PNHeartbeatResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PubnubCommon.cs" />
     <Compile Include="PubnubUnitTest.cs" />
