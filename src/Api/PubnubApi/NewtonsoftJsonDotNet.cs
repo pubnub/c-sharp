@@ -1176,6 +1176,31 @@ namespace PubnubApi
                 ret = (T)Convert.ChangeType(result, typeof(PNPushRemoveAllChannelsResult), CultureInfo.InvariantCulture);
 #endregion
             }
+            else if (typeof(T) == typeof(PNHeartbeatResult))
+            {
+#region "PNHeartbeatResult"
+                Dictionary<string, object> heartbeatDicObj = ConvertToDictionaryObject(listObject[0]);
+                PNHeartbeatResult result = null;
+
+                if (heartbeatDicObj != null && heartbeatDicObj.ContainsKey("status"))
+                {
+                    result = new PNHeartbeatResult();
+
+                    int statusCode;
+                    if (int.TryParse(heartbeatDicObj["status"].ToString(), out statusCode))
+                    {
+                        result.Status = statusCode;
+                    }
+
+                    if (heartbeatDicObj.ContainsKey("message"))
+                    {
+                        result.Message = heartbeatDicObj["message"].ToString();
+                    }
+                }
+
+                ret = (T)Convert.ChangeType(result, typeof(PNHeartbeatResult), CultureInfo.InvariantCulture);
+#endregion
+            }
             else
             {
                 ret = (T)(object)listObject;

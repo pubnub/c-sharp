@@ -803,6 +803,7 @@ namespace PubnubApi.EndPoint
             LoggingMethod.WriteToLog(string.Format("DateTime {0}, SubscribeManager Manual Disconnect", DateTime.Now.ToString()), config.LogVerbosity);
             SubscribeDisconnected = true;
             TerminateCurrentSubscriberRequest();
+            TerminatePresenceHeartbeatTimer();
         }
 
         protected void ReconnectNetworkCallback<T>(System.Object reconnectState)
@@ -1002,15 +1003,20 @@ namespace PubnubApi.EndPoint
                         IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
                         Uri request = urlBuilder.BuildPresenceHeartbeatRequest(subscriberChannels, subscriberChannelGroups, channelsJsonState);
 
-                        RequestState<T> requestState = new RequestState<T>();
+                        RequestState<PNHeartbeatResult> requestState = new RequestState<PNHeartbeatResult>();
                         requestState.Channels = currentState.Channels;
                         requestState.ChannelGroups = currentState.ChannelGroups;
                         requestState.ResponseType = PNOperationType.PNHeartbeatOperation;
-                        requestState.PubnubCallback = currentState.PubnubCallback;
+                        requestState.PubnubCallback = null;
                         requestState.Reconnect = false;
                         requestState.Response = null;
 
-                        string json = UrlProcessRequest<T>(request, requestState, false);
+                        string json = UrlProcessRequest<PNHeartbeatResult>(request, requestState, false);
+                        if (!string.IsNullOrEmpty(json))
+                        {
+                            List<object> result = ProcessJsonResponse<PNHeartbeatResult>(requestState, json);
+                            ProcessResponseCallbacks(result, requestState);
+                        }
                     }
                 }
 

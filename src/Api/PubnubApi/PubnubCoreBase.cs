@@ -47,29 +47,13 @@ namespace PubnubApi
         private static bool clientNetworkStatusInternetStatus = true;
         protected bool SubscribeDisconnected = false;
 
-        protected static Pubnub PubnubInstance
-        {
-            get;
-            set;
-        } = null;
+        protected static Pubnub PubnubInstance { get; set; } = null;
 
-        protected static bool UuidChanged
-        {
-            get;
-            set;
-        }
+        protected static bool UuidChanged { get; set; }
 
-        protected static string CurrentUuid
-        {
-            get;
-            set;
-        }
+        protected static string CurrentUuid { get; set; }
 
-        protected static long LastSubscribeTimetoken
-        {
-            get;
-            set;
-        }
+        protected static long LastSubscribeTimetoken { get; set; }
 
         protected static int PubnubNetworkTcpCheckIntervalInSeconds { get; set; } = 3;
 
@@ -355,7 +339,6 @@ namespace PubnubApi
                 {
                     List<object> message = GetMessageFromMultiplexResult(result);
                     Uri restUri = asyncRequestState.Request.RequestUri;
-                    //List<object> segments = restUri.AbsolutePath.Split('/').Where(s => s.ToString() != "").ToList<object>();
                     IEnumerable<string> segmentsEnumerable = restUri.AbsolutePath.Split('/').Where(s => s.ToString() != "");
                     List<object> segments = (segmentsEnumerable != null) ? segmentsEnumerable.Cast<object>().ToList() : null;
                     HttpValueCollection restUriQueryCollection = HttpUtility.ParseQueryString(restUri.Query);
@@ -576,6 +559,42 @@ namespace PubnubApi
                         {
                             userCallback.OnResponse(userResult, status);
                         }
+                    }
+                    break;
+                case PNOperationType.PNHeartbeatOperation:
+                    if (result != null && result.Count > 0)
+                    {
+                        ResponseBuilder responseBuilder = new ResponseBuilder(pubnubConfig, jsonLib);
+                        PNHeartbeatResult userResult = responseBuilder.JsonToObject<PNHeartbeatResult>(result, true);
+
+                        if (userResult != null)
+                        {
+                            if (pubnubConfig.HeartbeatNotificationOption == PNHeartbeatNotificationOption.All)
+                            {
+                                StatusBuilder statusBuilder = new StatusBuilder(pubnubConfig, jsonLib);
+                                PNStatus status = null;
+
+                                Exception ex = null;
+                                if (userResult != null && userResult.Status == 200)
+                                {
+                                    status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNAcknowledgmentCategory, asyncRequestState, (int)HttpStatusCode.OK, null);
+                                }
+                                else
+                                {
+                                    ex = new Exception(userResult.Message);
+                                    status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNAcknowledgmentCategory, asyncRequestState, userResult.Status, null);
+                                }
+
+                                Announce(status);
+                            }
+                            else if (pubnubConfig.HeartbeatNotificationOption == PNHeartbeatNotificationOption.Failures && userResult.Status != 200)
+                            {
+                                StatusBuilder statusBuilder = new StatusBuilder(pubnubConfig, jsonLib);
+                                PNStatus status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNAcknowledgmentCategory, asyncRequestState, userResult.Status, new Exception(userResult.Message));
+                                Announce(status);
+                            }
+                        }
+
                     }
                     break;
                 default:
@@ -909,6 +928,12 @@ namespace PubnubApi
                                 }
                                 break;
                             case PNOperationType.Leave:
+                                result.Add(multiChannel);
+                                break;
+                            case PNOperationType.PNHeartbeatOperation:
+                                Dictionary<string, object> heartbeatadictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                                result = new List<object>();
+                                result.Add(heartbeatadictionary);
                                 result.Add(multiChannel);
                                 break;
                             case PNOperationType.PNTimeOperation:

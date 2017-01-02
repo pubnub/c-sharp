@@ -22,6 +22,7 @@ namespace PubnubApi
             set
             {
                 presenceHeartbeatTimeout = value;
+                SetPresenceTimeoutWithCustomInterval(presenceHeartbeatTimeout, (presenceHeartbeatTimeout / 2) - 1);
             }
         }
 
@@ -114,14 +115,6 @@ namespace PubnubApi
 
             return this;
         }
-
-        public PNConfiguration SetPresenceTimeout(int timeout)
-        {
-            this.presenceHeartbeatTimeout = timeout;
-
-            return SetPresenceTimeoutWithCustomInterval(timeout, (timeout / 2) - 1);
-        }
-
 
     }
 }

@@ -30,8 +30,16 @@ namespace PubnubApi
 
             if (throwable != null)
             {
-                PNErrorData errorData = new PNErrorData(throwable.Message, throwable);
-                status.ErrorData = errorData;
+                if (throwable.InnerException != null)
+                {
+                    PNErrorData errorData = new PNErrorData(throwable.InnerException.Message, throwable);
+                    status.ErrorData = errorData;
+                }
+                else
+                {
+                    PNErrorData errorData = new PNErrorData(throwable.Message, throwable);
+                    status.ErrorData = errorData;
+                }
             }
 
             if (asyncRequestState != null)
