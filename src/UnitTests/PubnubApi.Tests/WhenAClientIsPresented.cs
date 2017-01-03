@@ -166,7 +166,15 @@ namespace PubNubMessaging.Tests
             pubnub.AddListener(listenerSubCallack);
 
             string channel = "hello_my_channel";
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            string expected = "{\"t\":{\"t\":\"14833694874957031\",\"r\":7},\"m\":[{\"a\":\"4\",\"f\":512,\"p\":{\"t\":\"14833694873794045\",\"r\":2},\"k\":\"demo-36\",\"c\":\"hello_my_channel-pnpres\",\"d\":{\"action\": \"join\", \"timestamp\": 1483369487, \"uuid\": \"mylocalmachine.mydomain.com\", \"occupancy\": 1},\"b\":\"hello_my_channel-pnpres\"}]}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1},{2}/0", PubnubCommon.SubscribeKey, channel, channel + "-pnpres"))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             presenceManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>().Channels(new string[] { channel }).WithPresence().Execute();
@@ -198,6 +206,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = true
             };
+            server.RunOnHttps(true);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
@@ -205,7 +214,15 @@ namespace PubNubMessaging.Tests
 
 
             string channel = "hello_my_channel";
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            string expected = "{\"t\":{\"t\":\"14833694874957031\",\"r\":7},\"m\":[{\"a\":\"4\",\"f\":512,\"p\":{\"t\":\"14833694873794045\",\"r\":2},\"k\":\"demo-36\",\"c\":\"hello_my_channel-pnpres\",\"d\":{\"action\": \"join\", \"timestamp\": 1483369487, \"uuid\": \"mylocalmachine.mydomain.com\", \"occupancy\": 1},\"b\":\"hello_my_channel-pnpres\"}]}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1},{2}/0", PubnubCommon.SubscribeKey, channel, channel + "-pnpres"))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             presenceManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>().Channels(new string[] { channel }).WithPresence().Execute();
@@ -237,22 +254,30 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
+            server.RunOnHttps(false);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             string channel = "hello_my_channel";
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = 310 * 1000;
 
             presenceManualEvent = new ManualResetEvent(false);
             pubnub.ChangeUUID(customUUID);
+
+            string expected = "{\"t\":{\"t\":\"14833694874957031\",\"r\":7},\"m\":[{\"a\":\"4\",\"f\":512,\"p\":{\"t\":\"14833694873794045\",\"r\":2},\"k\":\"demo-36\",\"c\":\"hello_my_channel-pnpres\",\"d\":{\"action\": \"join\", \"timestamp\": 1483369487, \"uuid\": \"mylocalmachine.mydomain.com\", \"occupancy\": 1},\"b\":\"hello_my_channel-pnpres\"}]}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1},{2}/0", PubnubCommon.SubscribeKey, channel,channel+"-pnpres"))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             pubnub.Subscribe<string>().Channels(new string[] { channel }).WithPresence().Execute();
             presenceManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             Thread.Sleep(1000);
-
-            
 
             pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
             Thread.Sleep(2000);
@@ -285,7 +310,7 @@ namespace PubNubMessaging.Tests
             pubnub.AddListener(listenerSubCallack);
 
             string channel = "hello_my_channel";
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = 310 * 1000;
 
             string expected = "{\"t\":{\"t\":\"14828455563482572\",\"r\":7},\"m\":[]}";
 
@@ -420,7 +445,7 @@ namespace PubNubMessaging.Tests
             pubnub.AddListener(listenerSubCallack);
 
             string channel = "hello_my_channel";
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = 310 * 1000;
 
             string expected = "{\"t\":{\"t\":\"14828455563482572\",\"r\":7},\"m\":[]}";
 
@@ -488,7 +513,7 @@ namespace PubNubMessaging.Tests
             pubnub.AddListener(listenerSubCallack);
 
             string channel = "hello_my_channel";
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = 310 * 1000;
 
             string expected = "{\"t\":{\"t\":\"14828455563482572\",\"r\":7},\"m\":[]}";
 
@@ -556,7 +581,7 @@ namespace PubNubMessaging.Tests
             pubnub.AddListener(listenerSubCallack);
 
             string channel = "hello_my_channel";
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest ? 2000 : 310 * 1000);
 
             string expected = "{\"t\":{\"t\":\"14828455563482572\",\"r\":7},\"m\":[]}";
 
@@ -623,7 +648,7 @@ namespace PubNubMessaging.Tests
             pubnub.AddListener(listenerSubCallack);
 
             string channel = "hello_my_channel";
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = 310 * 1000;
 
             string expected = "{\"t\":{\"t\":\"14828455563482572\",\"r\":7},\"m\":[]}";
 
@@ -690,7 +715,7 @@ namespace PubNubMessaging.Tests
             pubnub.AddListener(listenerSubCallack);
 
             string channel = "hello_my_channel";
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = 310 * 1000;
 
             string expected = "{\"t\":{\"t\":\"14828455563482572\",\"r\":7},\"m\":[]}";
 
@@ -750,22 +775,20 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = true
             };
+            server.RunOnHttps(true);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             string channel = "hello_my_channel";
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = 310 * 1000;
 
-            string expected = "[[],\"14742283085315695\"]";
+            string expected = "{\"t\":{\"t\":\"14828455563482572\",\"r\":7},\"m\":[]}";
 
             server.AddRequest(new Request()
                     .WithMethod("GET")
-                    .WithPath(String.Format("/subscribe/{0}/{1}/0/0", PubnubCommon.SubscribeKey, channel))
-                    .WithParameter("uuid", config.Uuid)
-                    .WithParameter("heartbeat", "300")
-                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, channel))
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -775,15 +798,11 @@ namespace PubNubMessaging.Tests
 
             Thread.Sleep(2000);
 
-            expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"Presence\", \"uuids\": [\"mytestuuid\"], \"occupancy\": 1}";
+            expected = "{\"TotalChannels\":1,\"TotalOccupancy\":1,\"Channels\":{\"hello_my_channel\":{\"ChannelName\":\"hello_my_channel\",\"Occupancy\":1,\"Occupants\":[{\"Uuid\":\"mytestuuid\",\"State\":null}]}}}";
 
             server.AddRequest(new Request()
                     .WithMethod("GET")
                     .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
-                    .WithParameter("disable_uuids", "0")
-                    .WithParameter("state", "0")
-                    .WithParameter("uuid", config.Uuid)
-                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -796,9 +815,6 @@ namespace PubNubMessaging.Tests
             server.AddRequest(new Request()
                     .WithMethod("GET")
                     .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/leave", PubnubCommon.SubscribeKey, channel))
-                    .WithParameter("uuid", config.Uuid)
-                    .WithParameter("heartbeat", "300")
-                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -825,13 +841,22 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
+            server.RunOnHttps(false);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             string channel = "hello_my_channel";
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            string expected = "{\"t\":{\"t\":\"14828455563482572\",\"r\":7},\"m\":[]}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, channel))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             subscribeManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute();
@@ -843,11 +868,39 @@ namespace PubNubMessaging.Tests
             dicState = new Dictionary<string, object>();
             dicState.Add("testkey", "testval");
 
+            expected = "{\"status\": 200, \"message\": \"OK\", \"payload\": {\"testkey\": \"testval\"}, \"service\": \"Presence\"}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/uuid/{2}/data", PubnubCommon.SubscribeKey, channel, config.Uuid))
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("state", "%7B%22testkey%22%3A%22testval%22%7D")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+
             pubnub.SetPresenceState()
                             .Channels(new string[] { channel })
                             .State(dicState)
                             .Async(new UTPNSetStateResult());
             userStateManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"Presence\", \"uuids\": [{\"state\": {\"testkey\": \"testval\"}, \"uuid\": \"mytestuuid\"}], \"occupancy\": 1}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                    .WithParameter("disable_uuids", "0")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("state", "1")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             hereNowManualEvent = new ManualResetEvent(false);
             pubnub.HereNow().Channels(new string[] { channel })
@@ -855,6 +908,14 @@ namespace PubNubMessaging.Tests
                     .IncludeUUIDs(true)
                     .Async(new UTHereNowResult());
             hereNowManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            expected = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/leave", PubnubCommon.SubscribeKey, channel))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
             Thread.Sleep(2000);
@@ -886,7 +947,7 @@ namespace PubNubMessaging.Tests
             pubnub.AddListener(listenerSubCallack);
 
             string channel = "hello_my_channel";
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = 310 * 1000;
 
             string expected = "{\"t\":{\"t\":\"14827658395446362\",\"r\":7},\"m\":[]}";
             server.AddRequest(new Request()
@@ -989,7 +1050,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest ? 2000 : 310 * 1000);
 
             subscribeManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute();
@@ -1069,7 +1130,7 @@ namespace PubNubMessaging.Tests
             pubnub.AddListener(listenerSubCallack);
 
             string channel = "hello_my_channel";
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest ? 2000 : 310 * 1000);
 
             string expected = "{\"t\":{\"t\":\"14827658395446362\",\"r\":7},\"m\":[]}";
             server.AddRequest(new Request()
@@ -1150,7 +1211,7 @@ namespace PubNubMessaging.Tests
             pubnub = this.createPubNubInstance(config);
             pubnub.ChangeUUID(customUUID);
 
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest ? 2000 : 310 * 1000);
             string channel = "hello_my_channel";
 
             userStateManualEvent = new ManualResetEvent(false);
@@ -1215,7 +1276,7 @@ namespace PubNubMessaging.Tests
             pubnub = this.createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest ? 2000 : 310 * 1000);
             string channel = "hello_my_channel";
 
             userStateManualEvent = new ManualResetEvent(false);
@@ -1337,8 +1398,6 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(false);
 
 
-            config.SetPresenceTimeout(5);
-
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
@@ -1346,7 +1405,7 @@ namespace PubNubMessaging.Tests
             presenceManualEvent = new ManualResetEvent(false);
 
             string channel = "hello_my_channel";
-            manualResetEventWaitTimeout = 310 * 1000;
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest ? 2000 : 310 * 1000);
 
             string expected = "{\"t\":{\"t\":\"14828440156769626\",\"r\":7},\"m\":[{\"a\":\"4\",\"f\":512,\"p\":{\"t\":\"14828440155770431\",\"r\":2},\"k\":\"demo-36\",\"c\":\"hello_my_channel-pnpres\",\"d\":{\"action\": \"join\", \"timestamp\": 1482844015, \"uuid\": \"mytestuuid\", \"occupancy\": 1},\"b\":\"hello_my_channel-pnpres\"}]}";
             server.AddRequest(new Request()
