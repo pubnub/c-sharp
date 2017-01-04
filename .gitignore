@@ -105,6 +105,22 @@ src/Examples/PubnubApiPCL.XamariniMacExample/obj/*
 
 /src/*.userprefs
 
+/monotouch/packages/*
+/monotouch/PubnubMessagingExample/bin/*
+/monotouch/PubnubMessagingExample/obj/*
+
+/src/Examples/monotouch/packages/*
+/src/Examples/monotouch/PubnubMessagingExample/bin/*
+/src/Examples/monotouch/PubnubMessagingExample/obj/*
+/src/Examples/monotouch/*.userprefs
+
+/src/Examples/mono-for-android/Components/*
+/src/Examples/mono-for-android/packages/*
+/src/Examples/mono-for-android/*.userprefs
+/src/Examples/mono-for-android/PubNubMessaging.Example/bin/*
+/src/Examples/mono-for-android/PubNubMessaging.Example/obj/*
+/src/Examples/mono-for-android/PubNubMessaging.Example/Jars/*
+
 .DS_Store
 *.cache
 *.suo
