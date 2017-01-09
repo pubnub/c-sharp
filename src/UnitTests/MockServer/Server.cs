@@ -116,14 +116,6 @@ namespace MockServer
             {
             }
 
-            try
-            {
-                trf.Abort();
-            }
-            catch
-            {
-            }
-
             trf = null;
 
             LoggingMethod.WriteToLog("Server was stoped.", LoggingMethod.LevelInfo);
