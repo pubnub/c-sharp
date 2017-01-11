@@ -11,6 +11,13 @@ namespace PubnubApi
 {
     public class NewtonsoftJsonDotNet : IJsonPluggableLibrary
     {
+        private PNConfiguration config = null;
+
+        public NewtonsoftJsonDotNet(PNConfiguration pubnubConfig)
+        {
+            this.config = pubnubConfig;
+        }
+
         #region IJsonPlugableLibrary methods implementation
         private bool IsValidJson(string jsonString)
         {
@@ -144,13 +151,14 @@ namespace PubnubApi
                 ret = true;
             }
             System.Diagnostics.Debug.WriteLine("NET35/40 IsGenericTypeForMessage = {0}", ret.ToString());
-#elif NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12 || NETSTANDARD13 || NETSTANDARD14 || UAP || NETFX_CORE || WINDOWS_UWP 
+#elif NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12 || NETSTANDARD13 || NETSTANDARD14 || UAP || NETFX_CORE || WINDOWS_UWP
             if (typeof(T).GetTypeInfo().IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(PNMessageResult<>))
             {
                 ret = true;
             }
             System.Diagnostics.Debug.WriteLine("PCL/CORE IsGenericTypeForMessage = {0}", ret.ToString());
 #endif
+            LoggingMethod.WriteToLog(string.Format("DateTime: {0}, IsGenericTypeForMessage = {1}", DateTime.Now.ToString(), ret.ToString()), config.LogVerbosity);
             return ret;
         }
 
@@ -1203,7 +1211,12 @@ namespace PubnubApi
             }
             else
             {
-                ret = (T)(object)listObject;
+                System.Diagnostics.Debug.WriteLine("DeserializeToObject<T>(list) => NO MATCH");
+                try
+                {
+                    ret = (T)(object)listObject;
+                }
+                catch { }
             }
 
             return ret;

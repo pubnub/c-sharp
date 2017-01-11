@@ -136,7 +136,7 @@ namespace PubnubApi
                 throw new ArgumentException("PNConfiguration missing");
             }
 
-            InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(), null);
+            InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(pubnubConfiguation), null);
         }
 
         public PubnubCoreBase(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest)
@@ -147,7 +147,7 @@ namespace PubnubApi
             }
             if (jsonPluggableLibrary == null)
             {
-                InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(), pubnubUnitTest);
+                InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(pubnubConfiguation), pubnubUnitTest);
             }
             else
             {
@@ -513,6 +513,7 @@ namespace PubnubApi
                                 }
                                 else
                                 {
+                                    LoggingMethod.WriteToLog(string.Format("DateTime: {0}, ResponseToUserCallback - payload = {1}", DateTime.Now.ToString(), jsonLib.SerializeToJsonString(payloadContainer)), pubnubConfig.LogVerbosity);
                                     ResponseBuilder responseBuilder = new ResponseBuilder(pubnubConfig, jsonLib);
                                     PNMessageResult<T> userMessage = responseBuilder.JsonToObject<PNMessageResult<T>>(payloadContainer, true);
 

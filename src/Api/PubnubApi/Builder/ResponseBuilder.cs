@@ -26,7 +26,7 @@ namespace PubnubApi
             }
             else
             {
-                NewtonsoftJsonDotNet jsonLib = new NewtonsoftJsonDotNet();
+                NewtonsoftJsonDotNet jsonLib = new NewtonsoftJsonDotNet(this.config);
                 ret = jsonLib.DeserializeToObject<T>(result);
             }
 

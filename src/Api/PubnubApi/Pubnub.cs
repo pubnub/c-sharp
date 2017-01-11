@@ -320,7 +320,7 @@ namespace PubnubApi
         public Pubnub(PNConfiguration config)
         {
             pubnubConfig = config;
-            jsonPluggableLibrary = new NewtonsoftJsonDotNet();
+            jsonPluggableLibrary = new NewtonsoftJsonDotNet(config);
             CheckRequiredConfigValues();
             instanceId = Guid.NewGuid().ToString();
         }

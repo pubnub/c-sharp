@@ -1,28 +1,25 @@
 .settings
 *~
+/src/Api/PubnubApiPCL/bin/*
 /src/Api/PubnubApiPCL/obj/Debug/*
 /src/Api/PubnubApiPCL/obj/Release/*
 /src/Api/PubnubApiPCL/bin/Debug/*
 /src/Api/PubnubApiPCL/bin/Release/*
 /src/Api/PubnubApiPCL/*.user
 
+/src/Api/PubnubApi/bin/*
 /src/Api/PubnubApi/bin/Debug/*
 /src/Api/PubnubApi/obj/Debug/*
 /src/Api/PubnubApi/bin/Release/*
 /src/Api/PubnubApi/obj/Release/*
 /src/Api/PubnubApi/*.user
 
-/src/Api/PubnubApi.NET35/bin/Debug/*
-/src/Api/PubnubApi.NET35/obj/Debug/*
-/src/Api/PubnubApi.NET35/bin/Release/*
-/src/Api/PubnubApi.NET35/obj/Release/*
-/src/Api/PubnubApi.NET35/*.user
-
-/src/Api/PubnubApi.SL5/bin/Debug/*
-/src/Api/PubnubApi.SL5/obj/Debug/*
-/src/Api/PubnubApi.SL5/bin/Release/*
-/src/Api/PubnubApi.SL5/obj/Release/*
-/src/Api/PubnubApi.SL5/*.user
+/src/Api/PubnubApiUWP/bin/*
+/src/Api/PubnubApiUWP/bin/Debug/*
+/src/Api/PubnubApiUWP/obj/Debug/*
+/src/Api/PubnubApiUWP/bin/Release/*
+/src/Api/PubnubApiUWP/obj/Release/*
+/src/Api/PubnubApiUWP/*.user
 
 /src/packages/*
 
@@ -54,11 +51,9 @@
 /src/Examples/PubnubApiPCL.ConsoleExample/obj/Release/*
 /src/Examples/PubnubApiPCL.ConsoleExample/*.user
 
-/src/Examples/PubnubApiPCL.Silverlight5Example/bin/Debug/*
-/src/Examples/PubnubApiPCL.Silverlight5Example/obj/Debug/*
-/src/Examples/PubnubApiPCL.Silverlight5Example/bin/Release/*
-/src/Examples/PubnubApiPCL.Silverlight5Example/obj/Release/*
-/src/Examples/PubnubApiPCL.Silverlight5Example/*.user
+/src/Examples/WindowsUniversalApp/bin/*
+/src/Examples/WindowsUniversalApp/obj/*
+/src/Examples/WindowsUniversalApp/*.user
 
 /src/Examples/PubnubApiPCL.Windows10UWPExample/bin/*
 /src/Examples/PubnubApiPCL.Windows10UWPExample/obj/*
