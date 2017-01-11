@@ -1,0 +1,80 @@
+﻿<Page
+    x:Class="WindowsUniversalApp.PubnubOperation"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:WindowsUniversalApp"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.ChildrenTransitions>
+            <TransitionCollection>
+                <EntranceThemeTransition/>
+            </TransitionCollection>
+        </Grid.ChildrenTransitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title Panel -->
+        <StackPanel Grid.Row="0" Margin="19,-8,0,8">
+            <TextBlock Style="{ThemeResource TitleTextBlockStyle}" Margin="0,12,0,0" Text="PubNub C# SDK  - Demo"/>
+        </StackPanel>
+
+        <!--TODO: Content should be placed within the following grid-->
+        <Grid Grid.Row="1" x:Name="ContentRoot" Margin="19,4,19,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0*"/>
+                <ColumnDefinition Width="5*"/>
+                <ColumnDefinition Width="185*"/>
+                <ColumnDefinition Width="0*"/>
+                <ColumnDefinition Width="7*"/>
+                <ColumnDefinition Width="0*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Grid.ColumnSpan="5" Margin="0,-4,0,19">
+                <TextBlock Height="39" HorizontalAlignment="Left" Margin="34,16,0,0" x:Name="lblChannel" Text="Channel" VerticalAlignment="Top" Width="80" FontSize="15" />
+                <TextBox Height="45" HorizontalAlignment="Left" x:Name="txtChannel" Text="my_channel_pandu" VerticalAlignment="Top" Width="267" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"  Margin="10,44,-20,46" Grid.ColumnSpan="4" Grid.Column="2">
+                <TextBlock Height="39" HorizontalAlignment="Left" x:Name="lblChannelGroup" Text="ChannelGroup =" VerticalAlignment="Top" Width="120" FontSize="15" Margin="0,10,0,0" />
+                <TextBox Height="45" HorizontalAlignment="Left" x:Name="txtChannelGroup" Text="my_channel_group" VerticalAlignment="Top" Width="266" />
+            </StackPanel>
+            <Button Content="Subscribe" Height="40" HorizontalAlignment="Left" Margin="4,100,0,0" Name="btnSubscribeConnect" VerticalAlignment="Top" Width="100" Click="btnSubscribe_Click" FontSize="15" Grid.ColumnSpan="2" Grid.Column="1" />
+            <Button Content="Publish" Height="40" HorizontalAlignment="Left" Margin="101,100,0,0" Name="btnPublish" VerticalAlignment="Top" Width="100" Click="btnPublish_Click" FontSize="15" Grid.Column="2" />
+            <Button Content="Time" Height="40" HorizontalAlignment="Left" Margin="206,100,0,0" Name="btnTime" VerticalAlignment="Top" Width="100" Click="btnTime_Click" FontSize="15" Grid.Column="2" />
+
+            <Button Content="History" Height="40" HorizontalAlignment="Left" Margin="4,145,0,0" Name="btnDetailedHistory" VerticalAlignment="Top" Width="100" Click="btnHistory_Click" FontSize="15" Grid.ColumnSpan="2" Grid.Column="1" />
+            <Button Content="HereNow" Height="40" HorizontalAlignment="Left" Margin="98,145,0,0" Name="btnHereNow" VerticalAlignment="Top" Width="103" Click="btnHereNow_Click" FontSize="15" Grid.Column="2" RenderTransformOrigin="1.08,0.365" />
+            <Button Content="WhereNow" Height="40" HorizontalAlignment="Left" Margin="206,145,0,0" Name="btnWhereNow" VerticalAlignment="Top" Width="100" FontSize="15" Click="btnWhereNow_Click" Grid.Column="2" />
+
+            <Button Content="Unsub" Height="40" HorizontalAlignment="Left" Margin="4,190,0,0" Name="btnUnsubscribe" VerticalAlignment="Top" Width="80" Click="btnUnsubscribe_Click" FontSize="15" MinWidth="80" Grid.ColumnSpan="2" Grid.Column="1" />
+
+            <Button Content="Change UUID" Height="40" HorizontalAlignment="Left" Margin="79,190,0,0" Name="btnChangeUUID" VerticalAlignment="Top" Width="170" FontSize="15" Click="btnChangeUUID_Click" Grid.Column="2" />
+
+
+            <!--<Button Content="Grant" Height="60" HorizontalAlignment="Left" Margin="5,295,0,0" Name="btnGrant" VerticalAlignment="Top" Width="110" FontSize="15" Click="btnGrant_Click" />-->
+            <!--<Button Content="Audit" Height="60" HorizontalAlignment="Left" Margin="132,295,0,0" Name="btnAudit" VerticalAlignment="Top" Width="110" FontSize="15" Click="btnAudit_Click" />
+            <Button Content="Revoke" Height="60" HorizontalAlignment="Left" Margin="256,295,-4,0" Name="btnRevoke" VerticalAlignment="Top" Width="110" FontSize="15" Click="btnRevoke_Click" />-->
+
+            <!--<Button Content="Grant Presence" Height="60" HorizontalAlignment="Left" Margin="5,346,0,0" Name="btnGrantPresence" VerticalAlignment="Top" Width="170" FontSize="15" Click="btnGrantPresence_Click" />
+            <Button Content="Audit Presence" Height="60" HorizontalAlignment="Left" Margin="190,346,0,0" Name="btnAuditPresence" VerticalAlignment="Top" Width="170" FontSize="15" Click="btnAuditPresence_Click" />-->
+
+            <Button Content="PAM" Height="40" HorizontalAlignment="Left" Margin="5,235,0,0" Name="btnPAMChannel" VerticalAlignment="Top" Width="80" FontSize="15" Click="btnPAMChannel_Click" Grid.ColumnSpan="2" Grid.Column="1" />
+            <Button Content="PAM CG" Height="40" HorizontalAlignment="Left" Margin="180,235,90,0" Name="btnPAMChannelGroup" VerticalAlignment="Top" FontSize="15" Click="btnPAMChannelGroup_Click" Grid.Column="2" />
+            <Button Content="User State" Height="40" HorizontalAlignment="Left" Margin="80,235,0,0" Name="btnUserState" VerticalAlignment="Top" Width="95" FontSize="15" Click="btnUserState_Click" Grid.Column="2" />
+
+            <Button Content="GlobalHereNow" Height="40" HorizontalAlignment="Left" Margin="5,285,0,0" Name="btnGlobalHereNow" VerticalAlignment="Top" Width="126" FontSize="15" Click="btnGlobalHereNow_Click" Grid.ColumnSpan="2" Grid.Column="1" />
+            <Button Content="ChannelGroup" Height="40" HorizontalAlignment="Left" Margin="126,285,0,0" x:Name="btnPAMChannel_Copy" VerticalAlignment="Top" Width="117" FontSize="15" Click="btnChannelGroup_Click" Grid.Column="2" />
+
+            <TextBox HorizontalAlignment="Left" Margin="0,330,0,0" TextWrapping="Wrap" Name="txtResult" Text="" VerticalAlignment="Top" Width="350" Height="210" IsReadOnly="True" DoubleTapped="txtResult_DoubleTapped" IsHoldingEnabled="False" IsRightTapEnabled="False" Grid.Column="2"/>
+
+            <!--<ScrollViewer Height="210" HorizontalAlignment="Stretch" Margin="23.5,472,23.5,0" Name="scrollViewerResult" VerticalAlignment="Top" Width="420" Background="#FFCCC6C6" BorderThickness="2" Foreground="#FF0D0D0D" ManipulationMode="Control" UseLayoutRounding="False" BorderBrush="SteelBlue" VerticalScrollBarVisibility="Visible" DoubleTap="scrollViewerResult_DoubleTap">
+                <StackPanel Name="messageStackPanel" Orientation="Vertical"></StackPanel>
+            </ScrollViewer>-->
+
+        </Grid>
+    </Grid>
+</Page>
