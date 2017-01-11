@@ -73,10 +73,30 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
+            server.RunOnHttps(false);
 
             pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
+
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":20,\"channel\":\"hello_my_channel\",\"auths\":{\"myAuth\":{\"r\":1,\"w\":1,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithParameter("auth", authKey)
+                    .WithParameter("channel", channel)
+                    .WithParameter("m", "1")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("r", "1")
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("ttl", "20")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("w", "1")
+                    .WithParameter("signature", "xtE5RzNNCma_Dy-4JqVyROrVEnkjIzJ6N9Wl5GNjfBA=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
 
@@ -88,6 +108,12 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "WhenDetailedHistoryIsRequested Grant access failed.");
+        }
+
+        [TestFixtureTearDown]
+        public void Exit()
+        {
+            server.Stop();
         }
 
         [Test]
@@ -104,15 +130,30 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
+            server.RunOnHttps(false);
 
             pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
             string message = messageForNoStorePublish;
 
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 2000 : 310 * 1000;
 
             publishManualEvent = new ManualResetEvent(false);
+
+            string expected = "[1,\"Sent\",\"14715322883933786\"]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, "%22Pubnub%20Messaging%20With%20No%20Storage%22"))
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("store","0")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             pubnub.Publish().Channel(channel).Message(message).ShouldStore(false).Async(new UTPublishResult());
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -127,6 +168,19 @@ namespace PubNubMessaging.Tests
                 Thread.Sleep(1000);
 
                 historyManualEvent = new ManualResetEvent(false);
+
+                expected = "[[\"Pubnub Messaging API 1\"],14715432709547189,14715432709547189]";
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithParameter("count", "100")
+                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                        .WithParameter("requestid", "myRequestId")
+                        .WithParameter("start", "14715322883933786")
+                        .WithParameter("timestamp", "1356998400")
+                        .WithParameter("uuid", config.Uuid)
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
 
                 pubnub.History().Channel(channel)
                     .Start(publishTimetoken)
@@ -158,15 +212,29 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
+            server.RunOnHttps(false);
 
             pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
             string message = messageForPublish;
 
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 2000 : 310 * 1000;
 
             publishManualEvent = new ManualResetEvent(false);
+
+            string expected = "[1,\"Sent\",\"14715322883933786\"]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, "%22f42pIQcWZ9zbTbH8cyLwByD%2FGsviOE0vcREIEVPARR0%3D%22"))
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             pubnub.Publish().Channel(channel).Message(message).ShouldStore(true).Async(new UTPublishResult());
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -181,6 +249,21 @@ namespace PubNubMessaging.Tests
                 Thread.Sleep(1000);
 
                 historyManualEvent = new ManualResetEvent(false);
+
+                expected = "[[{\"message\":\"f42pIQcWZ9zbTbH8cyLwByD/GsviOE0vcREIEVPARR0=\",\"timetoken\":14715322883933786}],14834460344901569,14834460344901569]";
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithParameter("count", "1")
+                        .WithParameter("end", "14715322883933786")
+                        .WithParameter("include_token","true")
+                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                        .WithParameter("requestid", "myRequestId")
+                        .WithParameter("start", "14715322883933785")
+                        .WithParameter("timestamp", "1356998400")
+                        .WithParameter("uuid", config.Uuid)
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
 
                 pubnub.History()
                     .Channel(channel)
@@ -213,6 +296,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
+            server.RunOnHttps(false);
 
             pubnub = this.createPubNubInstance(config);
 
@@ -220,6 +304,19 @@ namespace PubNubMessaging.Tests
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
             historyManualEvent = new ManualResetEvent(false);
+
+            string expected = expected = "[[\"Pubnub Messaging API 1\",\"Pubnub Messaging API 2\",\"Pubnub Messaging API 3\",\"Pubnub Messaging API 4\",\"Pubnub Messaging API 5\",\"Pubnub Messaging API 6\",\"Pubnub Messaging API 7\",\"Pubnub Messaging API 8\",\"Pubnub Messaging API 9\",\"Pubnub Messaging API 10\"],14715432709547189,14715432709547189]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                    .WithParameter("count", "10")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             pubnub.History().Channel(channel)
                 .Count(10)
@@ -247,12 +344,27 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
+            server.RunOnHttps(false);
 
             pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
 
             historyManualEvent = new ManualResetEvent(false);
+
+            string expected = expected = "[[\"Pubnub Messaging API 1\",\"Pubnub Messaging API 2\",\"Pubnub Messaging API 3\",\"Pubnub Messaging API 4\",\"Pubnub Messaging API 5\",\"Pubnub Messaging API 6\",\"Pubnub Messaging API 7\",\"Pubnub Messaging API 8\",\"Pubnub Messaging API 9\",\"Pubnub Messaging API 10\"],14715432709547189,14715432709547189]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                    .WithParameter("count", "10")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("reverse","true")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             pubnub.History().Channel(channel)
                 .Count(10)
@@ -282,16 +394,29 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
+            server.RunOnHttps(false);
 
             pubnub = this.createPubNubInstance(config);
 
             string channel = "hello_my_channel";
 
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 2000 : 310 * 1000;
 
             currentTimetoken = 0;
 
             timeManualEvent = new ManualResetEvent(false);
+            string expected = "[1356998400]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             pubnub.Time().Async(new TimeResult());
             timeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -301,6 +426,18 @@ namespace PubNubMessaging.Tests
             {
                 receivedMessage = false;
                 publishManualEvent = new ManualResetEvent(false);
+
+                expected = "[1,\"Sent\",\"14715322883933786\"]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, String.Format("%22DetailedHistoryStartTimeWithReverseTrue%20{0}%22",index)))
+                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                        .WithParameter("requestid", "myRequestId")
+                        .WithParameter("timestamp", "1356998400")
+                        .WithParameter("uuid", config.Uuid)
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
 
                 pubnub.Publish().Channel(channel)
                     .Message(string.Format("DetailedHistoryStartTimeWithReverseTrue {0}", index))
@@ -318,6 +455,20 @@ namespace PubNubMessaging.Tests
                 Thread.Sleep(2000);
 
                 historyManualEvent = new ManualResetEvent(false);
+
+                expected = expected = "[[\"Pubnub Messaging API 1\",\"Pubnub Messaging API 2\",\"Pubnub Messaging API 3\",\"Pubnub Messaging API 4\",\"Pubnub Messaging API 5\",\"Pubnub Messaging API 6\",\"Pubnub Messaging API 7\",\"Pubnub Messaging API 8\",\"Pubnub Messaging API 9\",\"Pubnub Messaging API 10\"],14715432709547189,14715432709547189]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithParameter("count", "100")
+                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                        .WithParameter("requestid", "myRequestId")
+                        .WithParameter("start", "1356998400")
+                        .WithParameter("timestamp", "1356998400")
+                        .WithParameter("uuid", config.Uuid)
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
 
                 pubnub.History().Channel(channel)
                     .Start(currentTimetoken)
@@ -349,6 +500,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
+            server.RunOnHttps(false);
 
             pubnub = this.createPubNubInstance(config);
 
@@ -453,6 +605,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = ssl
             };
+            server.RunOnHttps(ssl);
 
             pubnub = this.createPubNubInstance(config);
 
@@ -461,6 +614,15 @@ namespace PubNubMessaging.Tests
             currentTimetoken = 0;
 
             timeManualEvent = new ManualResetEvent(false);
+
+            string expected = "[1356998400]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             pubnub.Time().Async(new TimeResult());
             timeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -474,9 +636,18 @@ namespace PubNubMessaging.Tests
                 object message = index;
                 firstPublishSet.Add(index);
 
-                manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+                manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 2000 : 310 * 1000;
 
                 publishManualEvent = new ManualResetEvent(false);
+
+                expected = "[1,\"Sent\",\"14715322883933786\"]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, index))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
                 pubnub.Publish().Channel(channel).Message(message).ShouldStore(true).Async(new UTPublishResult());
                 publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -486,6 +657,15 @@ namespace PubNubMessaging.Tests
             currentTimetoken = 0;
 
             timeManualEvent = new ManualResetEvent(false);
+
+            expected = "[1356998400]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             pubnub.Time().Async(new TimeResult());
             timeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -503,9 +683,18 @@ namespace PubNubMessaging.Tests
                 secondPublishSet.Add((double)index + 0.1D);
                 arrayIndex++;
 
-                manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+                manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 2000 : 310 * 1000;
 
                 publishManualEvent = new ManualResetEvent(false);
+
+                expected = "[1,\"Sent\",\"14715322883933786\"]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, message))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
                 pubnub.Publish().Channel(channel).Message(message).ShouldStore(true).Async(new UTPublishResult());
                 publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -515,6 +704,15 @@ namespace PubNubMessaging.Tests
             currentTimetoken = 0;
 
             timeManualEvent = new ManualResetEvent(false);
+
+            expected = "[1356998400]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             pubnub.Time().Async(new TimeResult());
             timeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -527,6 +725,14 @@ namespace PubNubMessaging.Tests
             Console.WriteLine("Detailed History with Start & End");
 
             historyManualEvent = new ManualResetEvent(false);
+
+            expected = "[[\"kvIeHmojsLyV1KMBo82DYQ==\",\"Ld0rZfbe4yN0Qj4V7o2BuQ==\",\"zNlnhYco9o6a646+Ox6ksg==\",\"mR8EEMx154BBHU3OOa+YjQ==\",\"v+viLoq0Gj2docUMAYyoYg==\"],14835539837820376,14835539843298232]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             pubnub.History().Channel(channel)
                 .Start(starttime)
@@ -562,6 +768,14 @@ namespace PubNubMessaging.Tests
 
                 historyManualEvent = new ManualResetEvent(false);
 
+                expected = "[[\"F2ZPfJnzuU34VKe24ds81A==\",\"2K/TO5WADvJRhvX7Zk0IpQ==\",\"oWOYyGxkWFJ1gpJxhcyzjA==\",\"LwEzvPCHdM8Yagg6oKknvg==\",\"/jjH/PT4NrK5HHjDT2KAlQ==\"],14835549524365492,14835549537755368]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
                 pubnub.History().Channel(channel)
                     .Start(midtime)
                     .Count(totalMessages / 2)
@@ -593,6 +807,15 @@ namespace PubNubMessaging.Tests
                 {
                     Console.WriteLine("DetailedHistory with start & reverse = false");
                     historyManualEvent = new ManualResetEvent(false);
+
+                    expected = expected = "[[\"kvIeHmojsLyV1KMBo82DYQ==\",\"Ld0rZfbe4yN0Qj4V7o2BuQ==\",\"zNlnhYco9o6a646+Ox6ksg==\",\"mR8EEMx154BBHU3OOa+YjQ==\",\"v+viLoq0Gj2docUMAYyoYg==\"],14835550731714499,14835550737165103]";
+
+                    server.AddRequest(new Request()
+                            .WithMethod("GET")
+                            .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                            .WithResponse(expected)
+                            .WithStatusCode(System.Net.HttpStatusCode.OK));
+
                     pubnub.History().Channel(channel)
                         .Start(midtime - 1)
                         .Count(totalMessages / 2)
@@ -640,6 +863,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = ssl
             };
+            server.RunOnHttps(ssl);
 
             pubnub = this.createPubNubInstance(config);
 
@@ -648,6 +872,15 @@ namespace PubNubMessaging.Tests
             currentTimetoken = 0;
 
             timeManualEvent = new ManualResetEvent(false);
+
+            string expected = "[1356998400]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             pubnub.Time().Async(new TimeResult());
             timeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -663,9 +896,18 @@ namespace PubNubMessaging.Tests
                 object message = index;
                 firstPublishSet.Add(index);
 
-                manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+                manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 2000 : 310 * 1000;
 
                 publishManualEvent = new ManualResetEvent(false);
+
+                expected = "[1,\"Sent\",\"14715322883933786\"]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, index))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
                 pubnub.Publish().Channel(channel).Message(message).ShouldStore(true).Async(new UTPublishResult());
                 publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -675,6 +917,15 @@ namespace PubNubMessaging.Tests
             currentTimetoken = 0;
 
             timeManualEvent = new ManualResetEvent(false);
+
+            expected = "[1356998400]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             pubnub.Time().Async(new TimeResult());
             timeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -692,9 +943,18 @@ namespace PubNubMessaging.Tests
                 secondPublishSet.Add((double)index + 0.1D);
                 arrayIndex++;
 
-                manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+                manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 2000 : 310 * 1000;
 
                 publishManualEvent = new ManualResetEvent(false);
+
+                expected = "[1,\"Sent\",\"14715322883933786\"]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, message))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
                 pubnub.Publish().Channel(channel).Message(message).ShouldStore(true).Async(new UTPublishResult());
                 publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -704,6 +964,15 @@ namespace PubNubMessaging.Tests
             currentTimetoken = 0;
 
             timeManualEvent = new ManualResetEvent(false);
+
+            expected = "[1356998400]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             pubnub.Time().Async(new TimeResult());
             timeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -716,6 +985,14 @@ namespace PubNubMessaging.Tests
             Console.WriteLine("Detailed History with Start & End");
 
             historyManualEvent = new ManualResetEvent(false);
+
+            expected = expected = "[[0,1,2,3,4],14715432709547189,14715432709547189]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             pubnub.History().Channel(channel)
                 .Start(starttime)
@@ -750,6 +1027,15 @@ namespace PubNubMessaging.Tests
                 Console.WriteLine("DetailedHistory with start & reverse = true");
 
                 historyManualEvent = new ManualResetEvent(false);
+
+                expected = expected = "[[5.1,6.1,7.1,8.1,9.1],14715432709547189,14715432709547189]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
                 pubnub.History().Channel(channel)
                     .Start(midtime - 1)
                     .Count(totalMessages / 2)
@@ -781,6 +1067,14 @@ namespace PubNubMessaging.Tests
                 {
                     Console.WriteLine("DetailedHistory with start & reverse = false");
                     historyManualEvent = new ManualResetEvent(false);
+
+                    expected = expected = "[[5.1,6.1,7.1,8.1,9.1],14715432709547189,14715432709547189]";
+
+                    server.AddRequest(new Request()
+                            .WithMethod("GET")
+                            .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                            .WithResponse(expected)
+                            .WithStatusCode(System.Net.HttpStatusCode.OK));
 
                     pubnub.History().Channel(channel)
                         .Start(midtime - 1)
