@@ -279,6 +279,7 @@ namespace PubnubApiDemo
             config.SubscribeKey = subscribeKey;
             config.PublishKey = publishKey;
             config.SecretKey = secretKey;
+            config.ReconnectionPolicy = PNReconnectionPolicy.LINEAR;
             //config.FilterExpression = "uuid == '" + config.Uuid +  "'";
 
             pubnub = new Pubnub(config);
