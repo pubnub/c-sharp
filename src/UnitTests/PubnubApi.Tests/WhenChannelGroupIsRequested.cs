@@ -89,6 +89,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenAddChannelShouldReturnSuccess()
         {
+            server.ClearRequests();
+
             currentUnitTestCase = "ThenAddChannelShouldReturnSuccess";
             receivedChannelGroupMessage = false;
 
@@ -133,6 +135,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenRemoveChannelShouldReturnSuccess()
         {
+            server.ClearRequests();
+
             currentUnitTestCase = "ThenRemoveChannelShouldReturnSuccess";
             string channelName = "hello_my_channel";
             receivedChannelGroupMessage = false;
@@ -179,6 +183,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenGetChannelListShouldReturnSuccess()
         {
+            server.ClearRequests();
+
             currentUnitTestCase = "ThenGetChannelListShouldReturnSuccess";
 
             receivedChannelGroupMessage = false;
@@ -223,6 +229,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenGetAllChannelGroupShouldReturnSuccess()
         {
+            server.ClearRequests();
+
             currentUnitTestCase = "ThenGetAllChannelGroupShouldReturnSuccess";
 
             receivedChannelGroupMessage = false;

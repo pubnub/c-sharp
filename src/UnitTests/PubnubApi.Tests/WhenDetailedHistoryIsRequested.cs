@@ -119,6 +119,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void DetailHistoryNoStoreShouldNotGetMessage()
         {
+            server.ClearRequests();
+
             receivedMessage = true;
             publishTimetoken = 0;
             currentTestCase = "DetailHistoryNoStoreShouldNotGetMessage";
@@ -200,6 +202,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void DetailHistoryShouldReturnDecryptMessage()
         {
+            server.ClearRequests();
+
             receivedMessage = false;
             publishTimetoken = 0;
             currentTestCase = "DetailHistoryShouldReturnDecryptMessage";
@@ -286,6 +290,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void DetailHistoryCount10ReturnsRecords()
         {
+            server.ClearRequests();
+
             receivedMessage = false;
             currentTestCase = "DetailHistoryCount10ReturnsRecords";
 
@@ -334,6 +340,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void DetailHistoryCount10ReverseTrueReturnsRecords()
         {
+            server.ClearRequests();
+
             receivedMessage = false;
             currentTestCase = "DetailHistoryCount10ReverseTrueReturnsRecords";
 
@@ -383,6 +391,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void DetailedHistoryStartWithReverseTrue()
         {
+            server.ClearRequests();
+
             receivedMessage = false;
             publishTimetoken = 0;
             currentTestCase = "DetailedHistoryStartWithReverseTrue";
@@ -488,6 +498,8 @@ namespace PubNubMessaging.Tests
         [ExpectedException(typeof(MissingMemberException))]
         public void DetailHistoryWithNullKeysReturnsError()
         {
+            server.ClearRequests();
+
             receivedMessage = false;
             currentTestCase = "DetailHistoryWithNullKeysReturnsError";
 
@@ -527,6 +539,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void DetailHistoryShouldReturnUnencrypedSecretMessage()
         {
+            server.ClearRequests();
+
             currentTestCase = "DetailHistoryShouldReturnUnencrypedSecretMessage";
             CommonDetailedHistoryShouldReturnUnencryptedMessageBasedOnParams(PubnubCommon.SecretKey, "", false);
             Assert.IsTrue(receivedMessage, "DetailHistoryShouldReturnUnencrypedSecretMessage - Detailed History Result not expected");
@@ -535,6 +549,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void DetailHistoryShouldReturnUnencrypedMessage()
         {
+            server.ClearRequests();
+
             currentTestCase = "DetailHistoryShouldReturnUnencrypedMessage";
             CommonDetailedHistoryShouldReturnUnencryptedMessageBasedOnParams("", "", false);
             Assert.IsTrue(receivedMessage, "DetailHistoryShouldReturnUnencrypedMessage - Detailed History Result not expected");
@@ -543,6 +559,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void DetailHistoryShouldReturnUnencrypedSecretSSLMessage()
         {
+            server.ClearRequests();
+
             currentTestCase = "DetailHistoryShouldReturnUnencrypedSecretSSLMessage";
             CommonDetailedHistoryShouldReturnUnencryptedMessageBasedOnParams(PubnubCommon.SecretKey, "", true);
             Assert.IsTrue(receivedMessage, "DetailHistoryShouldReturnUnencrypedSecretSSLMessage - Detailed History Result not expected");
@@ -551,6 +569,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void DetailHistoryShouldReturnUnencrypedSSLMessage()
         {
+            server.ClearRequests();
+
             currentTestCase = "DetailHistoryShouldReturnUnencrypedSSLMessage";
             CommonDetailedHistoryShouldReturnUnencryptedMessageBasedOnParams("", "", true);
             Assert.IsTrue(receivedMessage, "DetailHistoryShouldReturnUnencrypedSSLMessage - Detailed History Result not expected");
@@ -559,6 +579,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void DetailHistoryShouldReturnEncrypedMessage()
         {
+            server.ClearRequests();
+
             currentTestCase = "DetailHistoryShouldReturnEncrypedMessage";
             CommonDetailedHistoryShouldReturnEncryptedMessageBasedOnParams("", "enigma", false);
             Assert.IsTrue(receivedMessage, "DetailHistoryShouldReturnEncrypedMessage - Detailed History Result not expected");
@@ -567,6 +589,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void DetailHistoryShouldReturnEncrypedSecretMessage()
         {
+            server.ClearRequests();
+
             currentTestCase = "DetailHistoryShouldReturnEncrypedSecretMessage";
             CommonDetailedHistoryShouldReturnEncryptedMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", false);
             Assert.IsTrue(receivedMessage, "DetailHistoryShouldReturnEncrypedSecretMessage - Detailed History Result not expected");
@@ -575,6 +599,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void DetailHistoryShouldReturnEncrypedSecretSSLMessage()
         {
+            server.ClearRequests();
+
             currentTestCase = "DetailHistoryShouldReturnEncrypedSecretSSLMessage";
             CommonDetailedHistoryShouldReturnEncryptedMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", true);
             Assert.IsTrue(receivedMessage, "DetailHistoryShouldReturnEncrypedSecretSSLMessage - Detailed History Result not expected");
@@ -583,6 +609,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void DetailHistoryShouldReturnEncrypedSSLMessage()
         {
+            server.ClearRequests();
+
             currentTestCase = "DetailHistoryShouldReturnEncrypedSSLMessage";
             CommonDetailedHistoryShouldReturnEncryptedMessageBasedOnParams("", "enigma", true);
             Assert.IsTrue(receivedMessage, "DetailHistoryShouldReturnEncrypedSSLMessage - Detailed History Result not expected");
@@ -590,6 +618,8 @@ namespace PubNubMessaging.Tests
 
         private void CommonDetailedHistoryShouldReturnEncryptedMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
         {
+            server.ClearRequests();
+
             receivedMessage = false;
             int totalMessages = 10;
             starttime = 0;

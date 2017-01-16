@@ -49,8 +49,28 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
+            server.RunOnHttps(false);
 
             pubnub = this.createPubNubInstance(config);
+
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":20,\"channel-group\":\"hello_my_group\",\"auths\":{\"myAuth\":{\"r\":1,\"w\":1,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithParameter("auth", authKey)
+                    .WithParameter("channel-group", channelGroupName)
+                    .WithParameter("m", "1")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("r", "1")
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("ttl", "20")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("w", "1")
+                    .WithParameter("signature", "I85s62T11x9zVOk_wbhQKijvwdeZVyMNUxhOa8FnXes=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             pubnub.Grant().ChannelGroups(new string[] { channelGroupName }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
             Thread.Sleep(1000);
@@ -64,9 +84,17 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedGrantMessage, "WhenUnsubscribedToAChannelGroup Grant access failed.");
         }
 
+        [TestFixtureTearDown]
+        public void Exit()
+        {
+            server.Stop();
+        }
+
         [Test]
         public void ThenShouldReturnUnsubscribedMessage()
         {
+            server.RunOnHttps(false);
+
             currentTestCase = "ThenShouldReturnUnsubscribedMessage";
             receivedMessage = false;
 
@@ -78,6 +106,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
+            server.RunOnHttps(false);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
@@ -86,9 +115,24 @@ namespace PubNubMessaging.Tests
             channelGroupName = "hello_my_group";
             string channelName = "hello_my_channel";
 
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = 310 * 1000;
 
             cgManualEvent = new ManualResetEvent(false);
+
+            string expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v1/channel-registration/sub-key/{0}/channel-group/{1}", PubnubCommon.SubscribeKey, channelGroupName))
+                    .WithParameter("add", channelName)
+                    .WithParameter("auth", config.AuthKey)
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             pubnub.AddChannelsToChannelGroup().Channels(new string[] { channelName }).ChannelGroup(channelGroupName).Async(new ChannelGroupAddChannelResult());
             cgManualEvent.WaitOne(manualResetEventWaitTimeout); 
 
@@ -96,6 +140,26 @@ namespace PubNubMessaging.Tests
             {
                 receivedMessage = false;
                 subscribeManualEvent = new ManualResetEvent(false);
+
+                expected = "{\"t\":{\"t\":\"14839022442039237\",\"r\":7},\"m\":[]}";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, ","))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+                expected = "[14827611897607991]";
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath("/time/0")
+                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                        .WithParameter("requestid", "myRequestId")
+                        .WithParameter("timestamp", "1356998400")
+                        .WithParameter("uuid", config.Uuid)
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
                 pubnub.Subscribe<string>().ChannelGroups(new string[] { channelGroupName }).Execute();
                 subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
@@ -103,6 +167,15 @@ namespace PubNubMessaging.Tests
                 {
                     receivedMessage = false;
                     subscribeManualEvent = new ManualResetEvent(false);
+
+                    expected = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
+
+                    server.AddRequest(new Request()
+                            .WithMethod("GET")
+                            .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/leave", PubnubCommon.SubscribeKey, channelGroupName))
+                            .WithResponse(expected)
+                            .WithStatusCode(System.Net.HttpStatusCode.OK));
+
                     pubnub.Unsubscribe<string>().ChannelGroups(new string[] { channelGroupName }).Execute();
                     subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
                 }

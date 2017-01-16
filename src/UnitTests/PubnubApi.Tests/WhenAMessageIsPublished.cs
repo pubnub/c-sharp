@@ -149,6 +149,8 @@ namespace PubNubMessaging.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void ThenNullMessageShouldReturnException()
         {
+            server.ClearRequests();
+
             string channel = "hello_my_channel";
             object message = null;
 
@@ -185,6 +187,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenUnencryptPublishShouldReturnSuccessCodeAndInfo()
         {
+            server.ClearRequests();
+
             receivedPublishMessage = false;
             publishTimetoken = 0;
             currentTestCase = "ThenUnencryptPublishShouldReturnSuccessCodeAndInfo";
@@ -265,6 +269,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo()
         {
+            server.ClearRequests();
+
             receivedPublishMessage = false;
             publishTimetoken = 0;
             currentTestCase = "ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo";
@@ -347,6 +353,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo()
         {
+            server.ClearRequests();
+
             receivedPublishMessage = false;
             publishTimetoken = 0;
             currentTestCase = "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo";
@@ -431,6 +439,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfoWithSSL()
         {
+            server.ClearRequests();
+
             receivedPublishMessage = false;
             publishTimetoken = 0;
             currentTestCase = "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfoWithSSL";
@@ -515,6 +525,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenEncryptPublishShouldReturnSuccessCodeAndInfo()
         {
+            server.ClearRequests();
+
             receivedPublishMessage = false;
             publishTimetoken = 0;
             currentTestCase = "ThenEncryptPublishShouldReturnSuccessCodeAndInfo";
@@ -598,6 +610,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo()
         {
+            server.ClearRequests();
+
             receivedPublishMessage = false;
             publishTimetoken = 0;
             currentTestCase = "ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo";
@@ -683,6 +697,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo()
         {
+            server.ClearRequests();
+
             receivedPublishMessage = false;
             publishTimetoken = 0;
             currentTestCase = "ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo";
@@ -923,6 +939,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenOptionalSecretKeyShouldBeProvidedInConfig()
         {
+            server.ClearRequests();
+
             receivedPublishMessage = false;
             publishTimetoken = 0;
             currentTestCase = "ThenOptionalSecretKeyShouldBeProvidedInConfig";
@@ -970,6 +988,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void IfSSLNotProvidedThenDefaultShouldBeTrue()
         {
+            server.ClearRequests();
+
             receivedPublishMessage = false;
             publishTimetoken = 0;
             currentTestCase = "IfSSLNotProvidedThenDefaultShouldBeTrue";

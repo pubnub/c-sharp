@@ -105,6 +105,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenComplexMessageSubscribeShouldReturnReceivedMessage()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenComplexMessageSubscribeShouldReturnReceivedMessage";
             CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams("", "", false);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageSubscribeShouldReturnReceivedMessage Failed");
@@ -112,6 +114,8 @@ namespace PubNubMessaging.Tests
 
         private void CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
         {
+            server.ClearRequests();
+
             receivedMessage = false;
 
             PNConfiguration config = new PNConfiguration()
@@ -131,7 +135,7 @@ namespace PubNubMessaging.Tests
             pubnub.AddListener(listenerSubCallack);
 
             string channel = "hello_my_channel";
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 2000 : 310 * 1000;
+            manualResetEventWaitTimeout = 310 * 1000;
 
             subscribeManualEvent = new ManualResetEvent(false);
 
@@ -166,8 +170,6 @@ namespace PubNubMessaging.Tests
 
             pubnub.Publish().Channel(channel).Message(publishedMessage).Async(new UTPublishResult());
 
-            subscribeManualEvent = new ManualResetEvent(false);
-            subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for message
 
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -188,6 +190,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenComplexMessageSSLSubscribeShouldReturnReceivedMessage()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenComplexMessageSSLSubscribeShouldReturnReceivedMessage";
             CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams("", "", true);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageSSLSubscribeShouldReturnReceivedMessage Failed");
@@ -196,6 +200,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenComplexMessageSecretSubscribeShouldReturnReceivedMessage()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenComplexMessageSecretSubscribeShouldReturnReceivedMessage";
             CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(PubnubCommon.SecretKey, "", false);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageSecretSubscribeShouldReturnReceivedMessage Failed");
@@ -204,6 +210,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenComplexMessageSecretSSLSubscribeShouldReturnReceivedMessage()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenComplexMessageSecretSSLSubscribeShouldReturnReceivedMessage";
             CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(PubnubCommon.SecretKey, "", true);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageSecretSSLSubscribeShouldReturnReceivedMessage Failed");
@@ -212,6 +220,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenComplexMessageCipherSubscribeShouldReturnReceivedMessage()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenComplexMessageCipherSubscribeShouldReturnReceivedMessage";
             CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams("", "enigma", false);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageCipherSubscribeShouldReturnReceivedMessage Failed");
@@ -220,6 +230,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenComplexMessageCipherSSLSubscribeShouldReturnReceivedMessage()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenComplexMessageCipherSSLSubscribeShouldReturnReceivedMessage";
             CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams("", "enigma", true);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageCipherSSLSubscribeShouldReturnReceivedMessage Failed");
@@ -228,6 +240,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenComplexMessageCipherSecretSubscribeShouldReturnReceivedMessage()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenComplexMessageCipherSecretSubscribeShouldReturnReceivedMessage";
             CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", false);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageCipherSecretSubscribeShouldReturnReceivedMessage Failed");
@@ -236,6 +250,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenComplexMessageCipherSecretSSLSubscribeShouldReturnReceivedMessage()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenComplexMessageCipherSecretSSLSubscribeShouldReturnReceivedMessage";
             CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", true);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageCipherSecretSSLSubscribeShouldReturnReceivedMessage Failed");
@@ -244,6 +260,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSubscribeShouldReturnConnectStatus()
         {
+            server.ClearRequests();
+
             receivedMessage = false;
             currentTestCase = "ThenSubscribeShouldReturnConnectStatus";
 
@@ -261,7 +279,7 @@ namespace PubNubMessaging.Tests
             pubnub.AddListener(listenerSubCallack);
 
             string channel = "hello_my_channel";
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 2000 : 310 * 1000;
+            manualResetEventWaitTimeout = 310 * 1000;
 
             subscribeManualEvent = new ManualResetEvent(false);
 
@@ -290,6 +308,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenMultiSubscribeShouldReturnConnectStatus()
         {
+            server.ClearRequests();
+
             receivedMessage = false;
             currentTestCase = "ThenMultiSubscribeShouldReturnConnectStatus";
 
@@ -371,6 +391,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenMultiSubscribeShouldReturnConnectStatusSSL()
         {
+            server.ClearRequests();
+
             receivedMessage = false;
             currentTestCase = "ThenMultiSubscribeShouldReturnConnectStatusSSL";
 
@@ -451,6 +473,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSubscriberShouldBeAbleToReceiveManyMessages()
         {
+            server.ClearRequests();
+
             receivedMessage = false;
             currentTestCase = "ThenSubscriberShouldBeAbleToReceiveManyMessages";
 
@@ -467,7 +491,7 @@ namespace PubNubMessaging.Tests
             pubnub = this.createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = 310 * 1000;
 
             string channel = "hello_my_channel";
             numberOfReceivedMessages = 0;
@@ -516,7 +540,6 @@ namespace PubNubMessaging.Tests
                     publishManualEvent.WaitOne(manualResetEventWaitTimeout);
                 }
 
-                subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
             }
 
             pubnub.RemoveListener(listenerSubCallack);

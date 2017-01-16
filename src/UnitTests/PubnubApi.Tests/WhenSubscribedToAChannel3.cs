@@ -53,8 +53,28 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
+            server.RunOnHttps(false);
 
             pubnub = this.createPubNubInstance(config);
+
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":20,\"channel\":\"hello_my_channel\",\"auths\":{\"myAuth\":{\"r\":1,\"w\":1,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithParameter("auth", authKey)
+                    .WithParameter("channel", "hello_my_channel%2Chello_my_channel1%2Chello_my_channel2")
+                    .WithParameter("m", "1")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("r", "1")
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("ttl", "20")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("w", "1")
+                    .WithParameter("signature", "8vqx49WZp61OpeEa-cr7UsP3mfw97JpYZKX_D6Zrowk=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             pubnub.Grant().Channels(channelsGrant).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
 
@@ -84,6 +104,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSubscribeShouldReturnUnicodeMessage()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenSubscribeShouldReturnUnicodeMessage";
             CommonSubscribeShouldReturnUnicodeMessageBasedOnParams("", "", false);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnUnicodeMessage Failed");
@@ -103,14 +125,42 @@ namespace PubNubMessaging.Tests
                 AuthKey = authKey,
                 Secure = ssl
             };
+            server.RunOnHttps(ssl);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = 310 * 1000;
 
             subscribeManualEvent = new ManualResetEvent(false);
+
+            string expected = "{\"t\":{\"t\":\"14839022442039237\",\"r\":7},\"m\":[]}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, channel))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            expected = "[14827611897607991]";
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"Presence\"}";
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/heartbeat", PubnubCommon.SubscribeKey, channel))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
@@ -118,9 +168,22 @@ namespace PubNubMessaging.Tests
             subscribeManualEvent = new ManualResetEvent(false);
 
             publishedMessage = "Text with ÜÖ漢語";
-            pubnub.Publish().Channel(channel).Message(publishedMessage).Async(new UTPublishResult());
 
-            subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for message
+            expected = "[1,\"Sent\",\"14722484585147754\"]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/%22Text%20with%20%C3%9C%C3%96%E6%BC%A2%E8%AA%9E%22", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/%22QoHwTga0QtOCtJRQ6sqtyateB%2FVotNt%2F50y23yXW7rpCbZdJLUAVKKbf01SpN6zghA6MqQaaHRXoYqAf84RF56C7Ky6Oi6jLqN2I5%2FlXSCw%3D%22", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            pubnub.Publish().Channel(channel).Message(publishedMessage).Async(new UTPublishResult());
 
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -136,6 +199,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSubscribeShouldReturnUnicodeMessageSSL()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenSubscribeShouldReturnUnicodeMessageSSL";
             CommonSubscribeShouldReturnUnicodeMessageBasedOnParams("", "", true);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnUnicodeMessageSSL Failed");
@@ -144,6 +209,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSubscribeShouldReturnForwardSlashMessage()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenSubscribeShouldReturnForwardSlashMessage";
             CommonSubscribeReturnForwardSlashMessageBasedOnParams("", "", false);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessage Failed");
@@ -163,14 +230,42 @@ namespace PubNubMessaging.Tests
                 AuthKey = authKey,
                 Secure = ssl
             };
+            server.RunOnHttps(ssl);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout =  310 * 1000;
 
             subscribeManualEvent = new ManualResetEvent(false);
+
+            string expected = "{\"t\":{\"t\":\"14839022442039237\",\"r\":7},\"m\":[]}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, channel))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            expected = "[14827611897607991]";
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"Presence\"}";
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/heartbeat", PubnubCommon.SubscribeKey, channel))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
@@ -178,9 +273,23 @@ namespace PubNubMessaging.Tests
             subscribeManualEvent = new ManualResetEvent(false);
 
             publishedMessage = "Text with /";
+
+            expected = "[1,\"Sent\",\"14722484585147754\"]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/%22Text%20with%20%2F%22", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/%22s98XlGoA68ypX1Z7A7mOwQ%3D%3D%22", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             pubnub.Publish().Channel(channel).Message(publishedMessage).Async(new UTPublishResult());
 
-            subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for message
 
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -196,6 +305,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSubscribeShouldReturnForwardSlashMessageSSL()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenSubscribeShouldReturnForwardSlashMessageSSL";
             CommonSubscribeReturnForwardSlashMessageBasedOnParams("", "", true);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessageSSL Failed");
@@ -204,6 +315,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSubscribeShouldReturnForwardSlashMessageCipher()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenSubscribeShouldReturnForwardSlashMessageCipher";
             CommonSubscribeReturnForwardSlashMessageBasedOnParams("", "enigma", false);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessageCipher Failed");
@@ -212,6 +325,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSubscribeShouldReturnForwardSlashMessageCipherSSL()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenSubscribeShouldReturnForwardSlashMessageCipherSSL";
             CommonSubscribeReturnForwardSlashMessageBasedOnParams("", "enigma", true);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessageCipherSSL Failed");
@@ -220,6 +335,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSubscribeShouldReturnForwardSlashMessageSecret()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenSubscribeShouldReturnForwardSlashMessageSecret";
             CommonSubscribeReturnForwardSlashMessageBasedOnParams(PubnubCommon.SecretKey, "", false);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessageSecret Failed");
@@ -228,6 +345,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSubscribeShouldReturnForwardSlashMessageCipherSecret()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenSubscribeShouldReturnForwardSlashMessageCipherSecret";
             CommonSubscribeReturnForwardSlashMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", false);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessageCipherSecret Failed");
@@ -236,6 +355,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSubscribeShouldReturnForwardSlashMessageCipherSecretSSL()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenSubscribeShouldReturnForwardSlashMessageCipherSecretSSL";
             CommonSubscribeReturnForwardSlashMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", true);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessageCipherSecretSSL Failed");
@@ -244,6 +365,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSubscribeShouldReturnForwardSlashMessageSecretSSL()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenSubscribeShouldReturnForwardSlashMessageSecretSSL";
             CommonSubscribeReturnForwardSlashMessageBasedOnParams(PubnubCommon.SecretKey, "", true);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnForwardSlashMessageSecretSSL Failed");
@@ -252,6 +375,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSubscribeShouldReturnSpecialCharMessage()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenSubscribeShouldReturnSpecialCharMessage";
             CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams("", "", false);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessage Failed");
@@ -271,14 +396,42 @@ namespace PubNubMessaging.Tests
                 AuthKey = authKey,
                 Secure = ssl
             };
+            server.RunOnHttps(ssl);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout =  310 * 1000;
 
             subscribeManualEvent = new ManualResetEvent(false);
+
+            string expected = "{\"t\":{\"t\":\"14839022442039237\",\"r\":7},\"m\":[]}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, channel))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            expected = "[14827611897607991]";
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"Presence\"}";
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/heartbeat", PubnubCommon.SubscribeKey, channel))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
             pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
@@ -286,9 +439,22 @@ namespace PubNubMessaging.Tests
             subscribeManualEvent = new ManualResetEvent(false);
 
             publishedMessage = "Text with '\"";
-            pubnub.Publish().Channel(channel).Message(publishedMessage).Async(new UTPublishResult());
 
-            subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for message
+            expected = "[1,\"Sent\",\"14722484585147754\"]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/%22Text%20with%20%27%5C%22%22", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/%22kl7vmPUMMz6UdliN7t6XYw%3D%3D%22", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            pubnub.Publish().Channel(channel).Message(publishedMessage).Async(new UTPublishResult());
 
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -304,6 +470,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSubscribeShouldReturnSpecialCharMessageSSL()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenSubscribeShouldReturnSpecialCharMessageSSL";
             CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams("", "", true);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessageSSL Failed");
@@ -312,6 +480,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSubscribeShouldReturnSpecialCharMessageCipher()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenSubscribeShouldReturnSpecialCharMessageCipher";
             CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams("", "enigma", false);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessageCipher Failed");
@@ -320,6 +490,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSubscribeShouldReturnSpecialCharMessageCipherSSL()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenSubscribeShouldReturnSpecialCharMessageCipherSSL";
             CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams("", "enigma", true);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessageCipherSSL Failed");
@@ -328,6 +500,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSubscribeShouldReturnSpecialCharMessageSecret()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenSubscribeShouldReturnSpecialCharMessageSecret";
             CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams(PubnubCommon.SecretKey, "", false);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessageSecret Failed");
@@ -336,6 +510,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSubscribeShouldReturnSpecialCharMessageCipherSecret()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenSubscribeShouldReturnSpecialCharMessageCipherSecret";
             CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", false);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessageCipherSecret Failed");
@@ -344,6 +520,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSubscribeShouldReturnSpecialCharMessageCipherSecretSSL()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenSubscribeShouldReturnSpecialCharMessageCipherSecretSSL";
             CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", true);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessageCipherSecretSSL Failed");
@@ -352,6 +530,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSubscribeShouldReturnSpecialCharMessageSecretSSL()
         {
+            server.ClearRequests();
+
             currentTestCase = "ThenSubscribeShouldReturnSpecialCharMessageSecretSSL";
             CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams(PubnubCommon.SecretKey, "", true);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessageSecretSSL Failed");

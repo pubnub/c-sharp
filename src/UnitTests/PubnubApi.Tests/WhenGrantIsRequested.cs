@@ -48,6 +48,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenUserLevelWithReadWriteShouldReturnSuccess()
         {
+            server.ClearRequests();
+
             currentUnitTestCase = "ThenUserLevelWithReadWriteShouldReturnSuccess";
 
             receivedGrantMessage = false;
@@ -104,6 +106,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenUserLevelWithReadShouldReturnSuccess()
         {
+            server.ClearRequests();
+
             currentUnitTestCase = "ThenUserLevelWithReadShouldReturnSuccess";
 
             receivedGrantMessage = false;
@@ -160,6 +164,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenUserLevelWithWriteShouldReturnSuccess()
         {
+            server.ClearRequests();
+
             currentUnitTestCase = "ThenUserLevelWithWriteShouldReturnSuccess";
 
             receivedGrantMessage = false;
@@ -217,6 +223,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenMultipleChannelGrantShouldReturnSuccess()
         {
+            server.ClearRequests();
+
             currentUnitTestCase = "ThenMultipleChannelGrantShouldReturnSuccess";
 
             receivedGrantMessage = false;
@@ -280,6 +288,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenMultipleAuthGrantShouldReturnSuccess()
         {
+            server.ClearRequests();
+
             currentUnitTestCase = "ThenMultipleAuthGrantShouldReturnSuccess";
 
             receivedGrantMessage = false;
@@ -345,6 +355,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenRevokeAtUserLevelReturnSuccess()
         {
+            server.ClearRequests();
+
             currentUnitTestCase = "ThenRevokeAtUserLevelReturnSuccess";
 
             receivedGrantMessage = false;
@@ -431,6 +443,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenChannelGroupLevelWithReadManageShouldReturnSuccess()
         {
+            server.ClearRequests();
+
             currentUnitTestCase = "ThenChannelGroupLevelWithReadManageShouldReturnSuccess";
 
             receivedGrantMessage = false;
@@ -487,6 +501,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenChannelGroupLevelWithReadShouldReturnSuccess()
         {
+            server.ClearRequests();
+
             currentUnitTestCase = "ThenChannelGroupLevelWithReadShouldReturnSuccess";
 
             receivedGrantMessage = false;

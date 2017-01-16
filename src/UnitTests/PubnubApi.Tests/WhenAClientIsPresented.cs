@@ -148,6 +148,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenPresenceShouldReturnReceivedMessage()
         {
+            server.ClearRequests();
+
             receivedPresenceMessage = false;
             currentTestCase = "ThenPresenceShouldReturnReceivedMessage";
 
@@ -195,6 +197,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenPresenceShouldReturnReceivedMessageSSL()
         {
+            server.ClearRequests();
+
             receivedPresenceMessage = false;
             currentTestCase = "ThenPresenceShouldReturnReceivedMessageSSL";
 
@@ -243,6 +247,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenPresenceShouldReturnCustomUUID()
         {
+            server.ClearRequests();
+
             receivedCustomUUID = false;
             currentTestCase = "ThenPresenceShouldReturnCustomUUID";
 
@@ -292,6 +298,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void IfHereNowIsCalledThenItShouldReturnInfo()
         {
+            server.ClearRequests();
+
             receivedHereNowMessage = false;
             currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfo";
 
@@ -359,6 +367,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void IfHereNowIsCalledThenItShouldReturnInfoCipher()
         {
+            server.ClearRequests();
+
             receivedHereNowMessage = false;
             currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoCipher";
 
@@ -427,6 +437,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void IfHereNowIsCalledThenItShouldReturnInfoCipherSecret()
         {
+            server.ClearRequests();
+
             receivedHereNowMessage = false;
             currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoCipherSecret";
 
@@ -494,6 +506,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void IfHereNowIsCalledThenItShouldReturnInfoCipherSecretSSL()
         {
+            server.ClearRequests();
+
             receivedHereNowMessage = false;
             currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoCipherSecretSSL";
 
@@ -562,6 +576,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void IfHereNowIsCalledThenItShouldReturnInfoCipherSSL()
         {
+            server.ClearRequests();
+
             receivedHereNowMessage = false;
             currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoCipherSSL";
 
@@ -630,6 +646,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void IfHereNowIsCalledThenItShouldReturnInfoSecret()
         {
+            server.ClearRequests();
+
             receivedHereNowMessage = false;
             currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoSecret";
 
@@ -697,6 +715,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void IfHereNowIsCalledThenItShouldReturnInfoSecretSSL()
         {
+            server.ClearRequests();
+
             receivedHereNowMessage = false;
             currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoSecretSSL";
 
@@ -764,6 +784,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void IfHereNowIsCalledThenItShouldReturnInfoSSL()
         {
+            server.ClearRequests();
+
             receivedHereNowMessage = false;
             currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoSSL";
 
@@ -831,6 +853,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void IfHereNowIsCalledThenItShouldReturnInfoWithUserState()
         {
+            server.ClearRequests();
+
             receivedHereNowMessage = false;
             currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoWithUserState";
 
@@ -930,6 +954,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void IfGlobalHereNowIsCalledThenItShouldReturnInfo()
         {
+            server.ClearRequests();
+
             receivedHereNowMessage = false;
             currentTestCase = "IfGlobalHereNowIsCalledThenItShouldReturnInfo";
 
@@ -1014,6 +1040,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void IfGlobalHereNowIsCalledThenItShouldReturnInfoWithUserState()
         {
+            server.ClearRequests();
+
             receivedHereNowMessage = false;
             currentTestCase = "IfGlobalHereNowIsCalledThenItShouldReturnInfoWithUserState";
 
@@ -1113,6 +1141,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void IfWhereNowIsCalledThenItShouldReturnInfo()
         {
+            server.ClearRequests();
+
             receivedWhereNowMessage = false;
             currentTestCase = "IfWhereNowIsCalledThenItShouldReturnInfo";
 
@@ -1196,6 +1226,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void IfSetAndGetUserStateThenItShouldReturnInfo()
         {
+            server.ClearRequests();
+
             receivedUserStateMessage = false;
             currentTestCase = "IfSetAndGetUserStateThenItShouldReturnInfo";
 
@@ -1259,6 +1291,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void IfSetAndDeleteUserStateThenItShouldReturnInfo()
         {
+            server.ClearRequests();
+
             Request getRequest = new Request();
             receivedUserStateMessage = false;
             currentTestCase = "IfSetAndDeleteUserStateThenItShouldReturnInfo";
@@ -1384,6 +1418,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenPresenceHeartbeatShouldReturnMessage()
         {
+            server.ClearRequests();
+
             receivedPresenceMessage = false;
             currentTestCase = "ThenPresenceHeartbeatShouldReturnMessage";
 
