@@ -37,6 +37,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void AtUserLevel()
         {
+            server.ClearRequests();
+
             currentUnitTestCase = "AtUserLevel";
 
             if (!PubnubCommon.PAMEnabled)
@@ -96,6 +98,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void AtChannelLevel()
         {
+            server.ClearRequests();
+
             currentUnitTestCase = "AtChannelLevel";
 
             if (!PubnubCommon.PAMEnabled)

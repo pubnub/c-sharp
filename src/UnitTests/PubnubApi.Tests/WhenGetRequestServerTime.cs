@@ -37,6 +37,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenItShouldReturnTimeStamp()
         {
+            server.ClearRequests();
+
             currentUnitTestCase = "ThenItShouldReturnTimeStamp";
             timeReceived = false;
             mreTime = new ManualResetEvent(false);
@@ -77,6 +79,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenItShouldReturnTimeStampWithSSL()
         {
+            server.ClearRequests();
+
             currentUnitTestCase = "ThenItShouldReturnTimeStampWithSSL";
 
             timeReceived = false;
@@ -117,6 +121,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenWithProxyItShouldReturnTimeStamp()
         {
+            server.ClearRequests();
+
             currentUnitTestCase = "ThenWithProxyItShouldReturnTimeStamp";
 
             Proxy proxy = new Proxy(new Uri("test.pandu.com:808"));
@@ -138,6 +144,17 @@ namespace PubNubMessaging.Tests
             pubnub = this.createPubNubInstance(config);
 
             expectedTime = 14725889985315301;
+            string expected = "[14725889985315301]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             if (config.Proxy != null)
             {
@@ -161,6 +178,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenWithProxyItShouldReturnTimeStampWithSSL()
         {
+            server.ClearRequests();
+
             Proxy proxy = new Proxy(new Uri("test.pandu.com:808"));
             proxy.Credentials = new System.Net.NetworkCredential("tuvpnfreeproxy", "Rx8zW78k");
 

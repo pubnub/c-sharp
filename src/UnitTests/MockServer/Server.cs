@@ -52,6 +52,16 @@ namespace MockServer
         }
 
         /// <summary>
+        /// Remove all Requests
+        /// </summary>
+        /// <returns></returns>
+        public Server ClearRequests()
+        {
+            this.requests.Clear();
+            return this;
+        }
+
+        /// <summary>
         /// Add a request to server
         /// </summary>
         /// <param name="request">Request</param>
@@ -94,7 +104,8 @@ namespace MockServer
             {
                 trf = new Thread(new ThreadStart(ServerFunction));
                 trf.IsBackground = true;
-                trf.SetApartmentState(ApartmentState.MTA);
+                trf.Priority = ThreadPriority.Highest;
+                ///trf.SetApartmentState(ApartmentState.MTA);
                 trf.Start();
             }
         }
@@ -193,8 +204,31 @@ namespace MockServer
                             {
                                 item = new MockServer.Request();
                                 item.Method = "GET";
-                                item.Response = "";
-                                item.StatusCode = HttpStatusCode.OK;
+                                if (path.Contains("GET /v2/presence/"))
+                                {
+                                    item.Response = "{\"t\":{\"t\":\"14844074079055214\",\"r\":7},\"m\":[]}";
+                                    item.StatusCode = HttpStatusCode.OK;
+                                }
+                                else if (path.Contains("GET /time/0"))
+                                {
+                                    item.Response = "[14827611897607991]";
+                                    item.StatusCode = HttpStatusCode.OK;
+                                }
+                                else if (path.Contains("/leave?"))
+                                {
+                                    item.Response = "{\"t\":{\"t\":\"14844074079055214\",\"r\":7},\"m\":[]}";
+                                    item.StatusCode = HttpStatusCode.OK;
+                                }
+                                else if (path.Contains("GET /publish/"))
+                                {
+                                    item.Response = "[1,\"Sent\",\"14715322883933786\"]";
+                                    item.StatusCode = HttpStatusCode.OK;
+                                }
+                                else
+                                {
+                                    item.Response = "";
+                                    item.StatusCode = HttpStatusCode.NotFound;
+                                }
                             }
                         }
 

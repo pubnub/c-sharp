@@ -36,6 +36,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenSubKeyLevelShouldReturnSuccess()
         {
+            server.ClearRequests();
+
             currentUnitTestCase = "ThenSubKeyLevelShouldReturnSuccess";
             receivedAuditMessage = false;
 
@@ -86,6 +88,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenChannelLevelShouldReturnSuccess()
         {
+            server.ClearRequests();
+
             currentUnitTestCase = "ThenChannelLevelShouldReturnSuccess";
             string channel = "hello_my_channel";
 
@@ -139,6 +143,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenChannelGroupLevelShouldReturnSuccess()
         {
+            server.ClearRequests();
+
             currentUnitTestCase = "ThenChannelGroupLevelShouldReturnSuccess";
             string channelgroup = "hello_my_group";
             receivedAuditMessage = false;

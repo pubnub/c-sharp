@@ -101,6 +101,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenPublishMpnsToastShouldReturnSuccess()
         {
+            server.ClearRequests();
+
             receivedPublishMessage = false;
             publishTimetoken = 0;
             currentTestCase = "ThenPublishMpnsToastShouldReturnSuccess";
@@ -149,6 +151,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenPublishMpnsFlipTileShouldReturnSuccess()
         {
+            server.ClearRequests();
+
             receivedPublishMessage = false;
             publishTimetoken = 0;
             currentTestCase = "ThenPublishMpnsFlipTileShouldReturnSuccess";
@@ -202,6 +206,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenPublishMpnsCycleTileShouldReturnSuccess()
         {
+            server.ClearRequests();
+
             receivedPublishMessage = false;
             publishTimetoken = 0;
             currentTestCase = "ThenPublishMpnsCycleTileShouldReturnSuccess";
@@ -255,6 +261,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public void ThenPublishMpnsIconicTileShouldReturnSuccess()
         {
+            server.ClearRequests();
+
             receivedPublishMessage = false;
             publishTimetoken = 0;
             currentTestCase = "ThenPublishMpnsIconicTileShouldReturnSuccess";
