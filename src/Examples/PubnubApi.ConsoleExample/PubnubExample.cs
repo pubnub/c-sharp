@@ -283,7 +283,12 @@ namespace PubnubApiDemo
             //config.FilterExpression = "uuid == '" + config.Uuid +  "'";
 
             pubnub = new Pubnub(config);
-            pubnub.AddListener(new DemoSubscribeCallback(Display));
+            pubnub.AddListener(new SubscribeCallbackExt(
+                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, p) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(p)); },
+                (o, s) => {
+                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                }));
 
             bool exitFlag = false;
             string channel = "";
@@ -311,7 +316,7 @@ namespace PubnubApiDemo
                     Console.WriteLine("Enter 14 TO Set User State by Deleting existing Key-Pair");
                     Console.WriteLine("Enter 15 TO Get User State");
                     Console.WriteLine("Enter 16 FOR WhereNow");
-                    Console.WriteLine("Enter 17 TO change UUID. (Current value = {0})",  config.Uuid);
+                    Console.WriteLine("Enter 17 TO change UUID. (Current value = {0})", config.Uuid);
                     Console.WriteLine("Enter 18 FOR Disconnect");
                     Console.WriteLine("Enter 19 FOR Reconnect");
                     Console.WriteLine("Enter 31 FOR Push - Register Device");
@@ -362,7 +367,7 @@ namespace PubnubApiDemo
                         {
                             Console.WriteLine("Running subscribe()");
 
-                            pubnub.Subscribe<string>()
+                            pubnub.Subscribe<object>()
                                 .WithPresence()
                                 .Channels(channel.Split(','))
                                 .ChannelGroups(channelGroup.Split(','))
@@ -413,26 +418,6 @@ namespace PubnubApiDemo
                             }
                         }
 
-                        //Console.WriteLine("Publishing message as direct JSON String? Enter Y for Yes or N for No. To accept default(N), just press ENTER");
-                        //string directJson = Console.ReadLine();
-                        //bool jsonPublish = false;
-                        //if (directJson.ToLower() == "y")
-                        //{
-                        //    jsonPublish = true;
-                        //    config.EnableJsonEncodingForPublish = false;
-                        //    //pubnub.EnableJsonEncodingForPublish = false;
-                        //}
-                        //else
-                        //{
-                        //    config.EnableJsonEncodingForPublish = true;
-                        //    //pubnub.EnableJsonEncodingForPublish = true;
-                        //}
-
-                        //Console.ForegroundColor = ConsoleColor.Blue;
-                        //Console.WriteLine(string.Format("Direct JSON String = {0}", jsonPublish));
-                        //Console.ResetColor();
-
-
 
                         /* TO TEST SMALL TEXT PUBLISH ONLY */
                         Console.WriteLine("Enter the message for publish and press ENTER key to submit");
@@ -463,20 +448,22 @@ namespace PubnubApiDemo
                         //pubnub.Publish()
                         //    .Channel(channel)
                         //    .Message(userCreated)
-                        //    .Meta(jsonUserMetaData)
+                        //    .Meta(meta)
                         //    .ShouldStore(store)
-                        //    .Async(new DemoPublishResult());
+                        //    .Async(new PNPublishResultExt((r, s) => { Console.WriteLine(r.Timetoken); }));
 
 
                         double doubleData;
                         int intData;
                         if (int.TryParse(publishMsg, out intData)) //capture numeric data
                         {
-                            pubnub.Publish().Channel(channel).Message(intData).Meta(meta).ShouldStore(store).Async(new DemoPublishResult(Display));
+                            pubnub.Publish().Channel(channel).Message(intData).Meta(meta).ShouldStore(store)
+                                .Async(new PNPublishResultExt((r, s) => { Console.WriteLine(r.Timetoken); }));
                         }
                         else if (double.TryParse(publishMsg, out doubleData)) //capture numeric data
                         {
-                            pubnub.Publish().Channel(channel).Message(doubleData).Meta(meta).ShouldStore(store).Async(new DemoPublishResult(Display));
+                            pubnub.Publish().Channel(channel).Message(doubleData).Meta(meta).ShouldStore(store)
+                                .Async(new PNPublishResultExt((r, s) => { Console.WriteLine(r.Timetoken); }));
                         }
                         else
                         {
@@ -486,15 +473,18 @@ namespace PubnubApiDemo
                                 string strMsg = publishMsg.Substring(1, publishMsg.Length - 2);
                                 if (int.TryParse(strMsg, out intData))
                                 {
-                                    pubnub.Publish().Channel(channel).Message(strMsg).Meta(meta).ShouldStore(store).Async(new DemoPublishResult(Display));
+                                    pubnub.Publish().Channel(channel).Message(strMsg).Meta(meta).ShouldStore(store)
+                                        .Async(new PNPublishResultExt((r, s) => { Console.WriteLine(r.Timetoken); }));
                                 }
                                 else if (double.TryParse(strMsg, out doubleData))
                                 {
-                                    pubnub.Publish().Channel(channel).Message(strMsg).Meta(meta).ShouldStore(store).Async(new DemoPublishResult(Display));
+                                    pubnub.Publish().Channel(channel).Message(strMsg).Meta(meta).ShouldStore(store)
+                                        .Async(new PNPublishResultExt((r, s) => { Console.WriteLine(r.Timetoken); }));
                                 }
                                 else
                                 {
-                                    pubnub.Publish().Channel(channel).Message(publishMsg).Meta(meta).ShouldStore(store).Async(new DemoPublishResult(Display));
+                                    pubnub.Publish().Channel(channel).Message(publishMsg).Meta(meta).ShouldStore(store)
+                                        .Async(new PNPublishResultExt((r, s) => { Console.WriteLine(r.Timetoken); }));
                                 }
                             }
                             else
@@ -504,7 +494,7 @@ namespace PubnubApiDemo
                                     .Message(publishMsg)
                                     .Meta(meta)
                                     .ShouldStore(store)
-                                    .Async(new DemoPublishResult(Display));
+                                    .Async(new PNPublishResultExt((r, s) => { Console.WriteLine(r.Timetoken); }));
                             }
                         }
                         break;
@@ -523,7 +513,11 @@ namespace PubnubApiDemo
                             .Reverse(false)
                             .Count(100)
                             .IncludeTimetoken(true)
-                            .Async(new DemoHistoryResult(Display));
+                            .Async(new PNHistoryResultExt(
+                                (r, s) =>
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                }));
                         break;
                     case "4":
                         bool showUUID = true;
@@ -572,7 +566,10 @@ namespace PubnubApiDemo
                             .ChannelGroups(channelGroup.Split(','))
                             .IncludeUUIDs(showUUID)
                             .IncludeState(includeUserState)
-                            .Async(new DemoHereNowResult(Display));
+                            .Async(new PNHereNowResultEx(
+                                (r, s) => {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                }));
                         break;
                     case "5":
                         Console.WriteLine("Enter CHANNEL name for Unsubscribe. Use comma to enter multiple channels.");
@@ -608,7 +605,12 @@ namespace PubnubApiDemo
                     case "6":
                         Console.WriteLine("Running time()");
                         pubnub.Time()
-                                .Async(new DemoTimeResult(Display));
+                                .Async(
+                                    new PNTimeResultExt(
+                                        (r, s) => {
+                                            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                    ));
                         break;
                     case "7":
                         Console.WriteLine("Running Disconnect/auto-Reconnect Subscriber Request Connection");
@@ -704,7 +706,19 @@ namespace PubnubApiDemo
                             .Write(write)
                             .Manage(manage)
                             .TTL(grantTimeLimitInMinutes)
-                            .Async(new DemoGrantResult(Display));
+                            .Async(new PNAccessManagerGrantResultExt(
+                                (r, s) =>
+                                {
+                                    if (r != null)
+                                    {
+                                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    }
+                                    else if (s != null)
+                                    {
+                                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
+                                    }
+                                })
+                                );
                         break;
                     case "9":
                         Console.WriteLine("Enter CHANNEL name for PAM Audit");
@@ -753,7 +767,18 @@ namespace PubnubApiDemo
                             .Channel(channel)
                             .ChannelGroup(channelGroup)
                             .AuthKeys(authKeyListAudit)
-                            .Async(new  DemoAuditResult(Display));
+                            .Async(new PNAccessManagerAuditResultExt(
+                                (r, s) => {
+                                    if (r != null)
+                                    {
+                                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    }
+                                    else if (s != null)
+                                    {
+                                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
+                                    }
+                                })
+                             );
                         break;
                     case "10":
                         Console.WriteLine("Enter CHANNEL name(s) for PAM Revoke");
@@ -807,7 +832,19 @@ namespace PubnubApiDemo
                             .Read(false)
                             .Write(false)
                             .Manage(false)
-                            .Async(new DemoGrantResult(Display));
+                            .Async(new PNAccessManagerGrantResultExt(
+                                (r, s) =>
+                                {
+                                    if (r != null)
+                                    {
+                                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    }
+                                    else if (s != null)
+                                    {
+                                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
+                                    }
+                                })
+                                );
                         break;
                     case "11":
                         Console.WriteLine("Enabling simulation of Sleep/Suspend Mode");
@@ -870,7 +907,10 @@ namespace PubnubApiDemo
                             .Channels(userStateChannel.Split(','))
                             .ChannelGroups(userStateChannelGroup.Split(','))
                             .State(addOrModifystate)
-                            .Async(new DemoPNSetStateResult(Display));
+                            .Async(new PNSetStateResultExt(
+                                (r, s) => {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                }));
 
                         break;
                     case "14":
@@ -896,7 +936,10 @@ namespace PubnubApiDemo
                             .Channels(new string[] { deleteChannelUserState })
                             .ChannelGroups(new string[] { deleteChannelGroupUserState })
                             .State(deleteDic)
-                            .Async(new DemoPNSetStateResult(Display));
+                            .Async(new PNSetStateResultExt(
+                                (r, s) => {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                }));
 
                         break;
                     case "15":
@@ -924,7 +967,10 @@ namespace PubnubApiDemo
                             .Channels(getUserStateChannel2List)
                             .ChannelGroups(getUserStateChannelGroup2List)
                             .Uuid(uuid2)
-                            .Async(new DemoPNGetStateResult(Display));
+                            .Async(new PNGetStateResultExt(
+                                (r, s) => {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                }));
 
                         break;
                     case "16":
@@ -939,7 +985,10 @@ namespace PubnubApiDemo
                         Console.WriteLine("Running Where_Now()");
                         pubnub.WhereNow()
                             .Uuid(whereNowUuid)
-                            .Async(new DemoWhereNowResult(Display));
+                            .Async(new PNWhereNowResultExt(
+                                (r, s) => {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                }));
                         break;
                     case "17":
                         Console.WriteLine("ENTER UUID.");
@@ -974,7 +1023,10 @@ namespace PubnubApiDemo
                         pubnub.AddPushNotificationsOnChannels().Channels(new string[] { pushRegisterChannel })
                             .PushType(PNPushType.MPNS)
                             .DeviceId(pushToken)
-                            .Async(new DemoPushAddChannel(Display));
+                            .Async(new PNPushAddChannelResultExt(
+                                (r, s) => {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                }));
                         break;
                     case "32":
                         Console.WriteLine("Enter channel name");
@@ -994,7 +1046,10 @@ namespace PubnubApiDemo
                             .Channels(new string[] { pushRemoveChannel })
                             .PushType(PNPushType.MPNS)
                             .DeviceId(pushTokenRemove)
-                            .Async(new DemoPushRemoveChannel(Display));
+                            .Async(new PNPushRemoveChannelResultExt(
+                                (r, s) => {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                }));
                         break;
                     case "33":
                         Console.WriteLine("Enter Push Token for MPNS");
@@ -1007,7 +1062,10 @@ namespace PubnubApiDemo
                         pubnub.AuditPushChannelProvisions()
                             .PushType(PNPushType.MPNS)
                             .DeviceId(pushTokenGetChannel)
-                            .Async(new DemoPushListProvisionChannel(Display));
+                            .Async(new PNPushListProvisionsResultExt(
+                                (r, s) => {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                }));
                         break;
 
                     case "38":
@@ -1027,7 +1085,10 @@ namespace PubnubApiDemo
                         pubnub.AddChannelsToChannelGroup()
                             .ChannelGroup(addChannelGroupName)
                             .Channels(channel.Split(','))
-                            .Async(new DemoChannelGroupAddChannel(Display));
+                            .Async(new PNChannelGroupsAddChannelResultExt(
+                                (r, s) => {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                }));
                         break;
                     case "39":
                         Console.WriteLine("Enter channel group name");
@@ -1047,7 +1108,10 @@ namespace PubnubApiDemo
                         {
                             pubnub.DeleteChannelGroup()
                                 .ChannelGroup(removeChannelGroupName)
-                                .Async(new DemoChannelGroupDeleteGroup(Display));
+                                .Async(new PNChannelGroupsDeleteGroupResultExt(
+                                    (r, s) => {
+                                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    }));
                             break;
                         }
 
@@ -1060,7 +1124,10 @@ namespace PubnubApiDemo
                         pubnub.RemoveChannelsFromChannelGroup()
                             .ChannelGroup(removeChannelGroupName)
                             .Channels(channel.Split(','))
-                            .Async(new DemoChannelGroupRemoveChannel(Display));
+                            .Async(new PNChannelGroupsRemoveChannelResultExt(
+                                (r, s) => {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                }));
                         break;
                     case "40":
                         Console.WriteLine("Do you want to get all existing channel group names? Default is No. Enter Y for Yes, Else just hit ENTER key");
@@ -1068,7 +1135,10 @@ namespace PubnubApiDemo
                         if (getExistingGroupNames.ToLower() == "y")
                         {
                             pubnub.ListChannelGroups()
-                                .Async(new DemoChannelGroupAll(Display));
+                                .Async(new PNChannelGroupsListAllResultExt(
+                                    (r, s) => {
+                                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    }));
                             break;
                         }
 
@@ -1080,7 +1150,10 @@ namespace PubnubApiDemo
 
                         pubnub.ListChannelsForChannelGroup()
                             .ChannelGroup(channelGroupName)
-                            .Async(new DemoChannelGroupAllChannels(Display));
+                            .Async(new PNChannelGroupsAllChannelsResultExt(
+                                (r, s) => {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                }));
                         break;
                     default:
                         Console.ForegroundColor = ConsoleColor.Red;

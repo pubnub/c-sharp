@@ -195,9 +195,6 @@
     <Compile Include="..\..\Api\PubnubApi\Enum\PNOperationType.cs">
       <Link>LinkedSourceCode\Enum\PNOperationType.cs</Link>
     </Compile>
-    <Compile Include="..\..\Api\PubnubApi\Enum\PNOperationType_TBR.cs">
-      <Link>LinkedSourceCode\Enum\PNOperationType_TBR.cs</Link>
-    </Compile>
     <Compile Include="..\..\Api\PubnubApi\Enum\PNReconnectionPolicy.cs">
       <Link>LinkedSourceCode\Enum\PNReconnectionPolicy.cs</Link>
     </Compile>
@@ -326,6 +323,57 @@
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Push\PNPushRemoveChannelResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\Push\PNPushRemoveChannelResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\AccessManager\PNAccessManagerAuditResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\AccessManager\PNAccessManagerAuditResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\AccessManager\PNAccessManagerGrantResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\AccessManager\PNAccessManagerGrantResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsAddChannelResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\ChannelGroup\PNChannelGroupsAddChannelResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsAllChannelsResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\ChannelGroup\PNChannelGroupsAllChannelsResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsDeleteGroupResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\ChannelGroup\PNChannelGroupsDeleteGroupResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsListAllResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\ChannelGroup\PNChannelGroupsListAllResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsRemoveChannelResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\ChannelGroup\PNChannelGroupsRemoveChannelResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\History\PNHistoryResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\History\PNHistoryResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Presence\PNGetStateResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Presence\PNGetStateResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Presence\PNHereNowResultEx.cs">
+      <Link>LinkedSourceCode\Model\Derived\Presence\PNHereNowResultEx.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Presence\PNSetStateResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Presence\PNSetStateResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Presence\PNWhereNowResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Presence\PNWhereNowResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Pubsub\PNPublishResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Pubsub\PNPublishResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Pubsub\SubscribeCallbackExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Pubsub\SubscribeCallbackExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Push\PNPushAddChannelResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Push\PNPushAddChannelResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Push\PNPushListProvisionsResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Push\PNPushListProvisionsResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Push\PNPushRemoveChannelResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Push\PNPushRemoveChannelResultExt.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\InternetState.cs">
       <Link>LinkedSourceCode\Model\InternetState.cs</Link>
