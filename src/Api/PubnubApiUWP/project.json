@@ -1,6 +1,6 @@
 ﻿{
   "name": "PubnubUWP",
-  "version": "4.0.1.2",
+  "version": "4.0.1.3",
   "title": "PubNub C# .NET - Web Data Push API",
   "authors": [
     "Pandu Masabathula"
@@ -15,7 +15,7 @@
     "repository": {
       "url": "https://github.com/pubnub/c-sharp/"
     },
-    "releaseNotes": "Release 4.0.1.2. Cipher typo, Origin change. ***ATTENTION*** Major changes in SDK V4.*. All methods and signatures changed. Auto-upgrade NOT recommended",
+    "releaseNotes": "Derived classes for inline coding. ***ATTENTION*** Major changes in SDK V4.*. All methods and signatures changed. Auto-upgrade NOT recommended",
     "tags": [
       "Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing"
     ],
