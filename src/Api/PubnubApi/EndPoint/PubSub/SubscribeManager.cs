@@ -723,7 +723,10 @@ namespace PubnubApi.EndPoint
             if (message != null && message.Count >= 3)
             {
                 long timetoken = GetTimetokenFromMultiplexResult(message);
-                MultiChannelSubscribeRequest<T>(type, channels, channelGroups, timetoken, false, null);
+                System.Threading.Tasks.Task.Factory.StartNew(() => 
+                {
+                    MultiChannelSubscribeRequest<T>(type, channels, channelGroups, timetoken, false, null);
+                });
             }
         }
 

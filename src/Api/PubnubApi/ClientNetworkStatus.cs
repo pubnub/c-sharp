@@ -45,7 +45,11 @@ namespace PubnubApi
 
 		internal bool CheckInternetStatus<T>(bool systemActive, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
 		{
-			if (machineSuspendMode)
+            if (unit != null)
+            {
+                return unit.InternetAvailable;
+            }
+            else if (machineSuspendMode)
 			{
 				//Only to simulate network fail
 				return false;

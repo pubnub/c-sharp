@@ -19,5 +19,11 @@ namespace PubnubApi
             get;
             set;
         }
+
+        bool InternetAvailable
+        {
+            get;
+            set;
+        }
     }
 }
