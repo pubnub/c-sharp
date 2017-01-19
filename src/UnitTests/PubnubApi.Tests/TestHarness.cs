@@ -17,6 +17,7 @@ namespace PubNubMessaging.Tests
                 IPubnubUnitTest unitTest = new PubnubUnitTest();
                 unitTest.Timetoken = 1356998400;
                 unitTest.RequestId = "myRequestId";
+                unitTest.InternetAvailable = true;
 
                 pubnub = new Pubnub(pnConfiguration);
 

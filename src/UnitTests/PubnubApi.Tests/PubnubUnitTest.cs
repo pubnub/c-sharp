@@ -15,6 +15,7 @@ namespace PubNubMessaging.Tests
     {
         private long pubnubTimetoken;
         private string requestId;
+        private bool internetAvailable;
 
         long IPubnubUnitTest.Timetoken
         {
@@ -41,5 +42,17 @@ namespace PubNubMessaging.Tests
             }
         }
 
+        bool IPubnubUnitTest.InternetAvailable
+        {
+            get
+            {
+                return internetAvailable;
+            }
+
+            set
+            {
+                internetAvailable = value;
+            }
+        }
     }
 }
