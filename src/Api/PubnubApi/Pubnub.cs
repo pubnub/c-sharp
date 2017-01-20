@@ -10,7 +10,7 @@ namespace PubnubApi
 	{
         private PNConfiguration pubnubConfig = null;
         private IJsonPluggableLibrary jsonPluggableLibrary = null;
-        private IPubnubUnitTest pubnubUnitTest = null;
+        private static IPubnubUnitTest pubnubUnitTest = null;
 
         private string instanceId = "";
 
@@ -301,7 +301,14 @@ namespace PubnubApi
         {
             get
             {
-                return sdkVersion;
+                if (pubnubUnitTest != null)
+                {
+                    return pubnubUnitTest.SdkVersion;
+                }
+                else
+                {
+                    return sdkVersion;
+                }
             }
         }
 

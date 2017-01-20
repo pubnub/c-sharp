@@ -25,5 +25,11 @@ namespace PubnubApi
             get;
             set;
         }
+
+        string SdkVersion
+        {
+            get;
+            set;
+        }
     }
 }
