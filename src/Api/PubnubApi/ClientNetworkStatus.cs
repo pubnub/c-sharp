@@ -12,7 +12,7 @@ namespace PubnubApi
         private static PNConfiguration pubnubConfig;
         private static IPubnubUnitTest unit = null;
 
-        private bool networkStatus = true;
+        private static bool networkStatus = true;
 		private static bool machineSuspendMode = false;
 
         public ClientNetworkStatus(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary)

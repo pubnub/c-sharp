@@ -94,7 +94,7 @@ namespace System.Threading
                         status = false;
                         break;
                     }
-                    Task.Run(() => tuple.Item1(tuple.Item2));
+                    await Task.Run(() => tuple.Item1(tuple.Item2));
                     await Task.Delay((int)period);
 
                     status = true;
