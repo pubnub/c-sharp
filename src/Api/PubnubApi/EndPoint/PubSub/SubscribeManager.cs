@@ -743,6 +743,7 @@ namespace PubnubApi.EndPoint
                 if (config.ReconnectionPolicy != PNReconnectionPolicy.NONE)
                 {
                     LoggingMethod.WriteToLog(string.Format("DateTime {0}, Subscribe - No internet connection for channel={1} and channelgroup={2}", DateTime.Now.ToString(), string.Join(",", channels.OrderBy(x => x).ToArray()), channelGroups != null ? string.Join(",", channelGroups) : ""), config.LogVerbosity);
+                    TerminateReconnectTimer();
                     ReconnectNetwork<T>(netState);
                 }
                 else
@@ -803,10 +804,15 @@ namespace PubnubApi.EndPoint
 
         internal void Disconnect<T>()
         {
+            if (SubscribeDisconnected)
+            {
+                return;
+            }
             LoggingMethod.WriteToLog(string.Format("DateTime {0}, SubscribeManager Manual Disconnect", DateTime.Now.ToString()), config.LogVerbosity);
             SubscribeDisconnected = true;
             TerminateCurrentSubscriberRequest();
             TerminatePresenceHeartbeatTimer();
+            TerminateReconnectTimer();
         }
 
         protected void ReconnectNetworkCallback<T>(System.Object reconnectState)
@@ -840,6 +846,7 @@ namespace PubnubApi.EndPoint
                             else
                             {
                                 ChannelInternetStatus.AddOrUpdate(channel, networkConnection, (key, oldValue) => networkConnection);
+
                                 ConnectionErrors++;
                                 UpdatePubnubNetworkTcpCheckIntervalInSeconds();
 
@@ -860,12 +867,8 @@ namespace PubnubApi.EndPoint
                         {
                             if (ChannelReconnectTimer.ContainsKey(channel))
                             {
-                                try
-                                {
-                                    ChannelReconnectTimer[channel].Change(Timeout.Infinite, Timeout.Infinite);
-                                    ChannelReconnectTimer[channel].Dispose();
-                                }
-                                catch { }
+                                LoggingMethod.WriteToLog(string.Format("DateTime {0}, {1} {2} terminating reconnectimer", DateTime.Now.ToString(), channel, netState.ResponseType), config.LogVerbosity);
+                                TerminateReconnectTimer();
                             }
 
                             PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.OK, null);
@@ -924,12 +927,8 @@ namespace PubnubApi.EndPoint
                         {
                             if (ChannelGroupReconnectTimer.ContainsKey(channelGroup))
                             {
-                                try
-                                {
-                                    ChannelGroupReconnectTimer[channelGroup].Change(Timeout.Infinite, Timeout.Infinite);
-                                    ChannelGroupReconnectTimer[channelGroup].Dispose();
-                                }
-                                catch { }
+                                LoggingMethod.WriteToLog(string.Format("DateTime {0}, {1} {2} terminating reconnectimer", DateTime.Now.ToString(), channelGroup, netState.ResponseType), config.LogVerbosity);
+                                TerminateReconnectTimer();
                             }
 
                             PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.OK, null);

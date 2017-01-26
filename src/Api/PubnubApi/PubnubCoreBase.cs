@@ -45,7 +45,7 @@ namespace PubnubApi
         private static IJsonPluggableLibrary jsonLib = null;
         private static IPubnubUnitTest unitTest = null;
         private static bool clientNetworkStatusInternetStatus = true;
-        protected bool SubscribeDisconnected = false;
+        protected static bool SubscribeDisconnected = false;
 
         protected static Pubnub PubnubInstance { get; set; } = null;
 
@@ -232,7 +232,7 @@ namespace PubnubApi
 
         #region "Callbacks"
 
-        protected bool CheckInternetConnectionStatus<T>(bool systemActive, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
+        protected static bool CheckInternetConnectionStatus<T>(bool systemActive, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
         {
             ClientNetworkStatus clientNetworkStatus = new ClientNetworkStatus(pubnubConfig, jsonLib, unitTest);
             if (!clientNetworkStatus.IsInternetCheckRunning())

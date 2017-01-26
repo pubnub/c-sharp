@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Net;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace PubnubApi
 {
@@ -60,7 +61,16 @@ namespace PubnubApi
 
                 tasks[0] = Task.Factory.StartNew(async() => await CheckClientNetworkAvailability(CallbackClientNetworkStatus, type, callback, channels, channelGroups));
 
-                Task.WaitAll(tasks);
+                try
+                {
+                    Task.WaitAll(tasks);
+                }
+                catch (AggregateException ae) {
+                    foreach (var ie in ae.InnerExceptions)
+                    {
+                        LoggingMethod.WriteToLog(string.Format("DateTime {0} CheckInternetStatus Error: {1} {2} ", DateTime.Now.ToString(), ie.GetType().Name, ie.Message), pubnubConfig.LogVerbosity);
+                    }
+                }
 
                 return networkStatus;
 			}
@@ -110,7 +120,7 @@ namespace PubnubApi
 
 		}
 
-		private Task<bool> CheckSocketConnect<T>(object internetState)
+		private async Task<bool> CheckSocketConnect<T>(object internetState)
 		{
             lock (internetCheckLock)
             {
@@ -126,58 +136,70 @@ namespace PubnubApi
 
             var t = new TaskCompletionSource<bool>();
 
+            InternetState<T> state = internetState as InternetState<T>;
+            if (state != null)
+            {
+                internalCallback = state.InternalCallback;
+                type = state.ResponseType;
+                pubnubCallback = state.PubnubCallbacck;
+                channels = state.Channels;
+                channelGroups = state.ChannelGroups;
+            }
+
+            PubnubApi.Interface.IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(pubnubConfig, jsonLib, unit);
+            Uri requestUri = urlBuilder.BuildTimeRequest();
+
+            myRequest = (HttpWebRequest)System.Net.WebRequest.Create(requestUri);
             try
-			{
-                InternetState<T> state = internetState as InternetState<T>;
-                if (state != null)
+            {
+                myRequest.Method = "GET";
+                using (HttpWebResponse response = await Task.Factory.FromAsync<HttpWebResponse>(myRequest.BeginGetResponse, asyncPubnubResult => (HttpWebResponse)myRequest.EndGetResponse(asyncPubnubResult), null))
                 {
-                    internalCallback = state.InternalCallback;
-                    type = state.ResponseType;
-                    pubnubCallback = state.PubnubCallbacck;
-                    channels = state.Channels;
-                    channelGroups = state.ChannelGroups;
+                    if (response != null && response.StatusCode == HttpStatusCode.OK)
+                    {
+                        LoggingMethod.WriteToLog(string.Format("DateTime {0} CheckSocketConnect Resp {1}", DateTime.Now.ToString(), response.StatusCode.ToString()), pubnubConfig.LogVerbosity);
+                        networkStatus = true;
+                        t.TrySetResult(true);
+                    }
                 }
-
-                PubnubApi.Interface.IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(pubnubConfig, jsonLib, unit);
-                Uri requestUri = urlBuilder.BuildTimeRequest();
-                myRequest = (HttpWebRequest)System.Net.WebRequest.Create(requestUri);
-				myRequest.BeginGetResponse(cb => 
-					{
-						try
-						{
-                            using (HttpWebResponse resp = myRequest.EndGetResponse(cb) as HttpWebResponse)
-                            {
-                                if (resp != null && resp.StatusCode == HttpStatusCode.OK)
-                                {
-                                    LoggingMethod.WriteToLog(string.Format("DateTime {0} CheckSocketConnect Resp {1}", DateTime.Now.ToString(), HttpStatusCode.OK.ToString()), pubnubConfig.LogVerbosity);
-                                    networkStatus = true;
-                                    t.TrySetResult(true);
-                                }
-                            }
-						}
-						catch(Exception ex)
-						{
-                            networkStatus = false;
-                            t.TrySetResult(false);
-                            ParseCheckSocketConnectException<T>(ex, type, channels, channelGroups, pubnubCallback, internalCallback);
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} CheckSocketConnect Failed {1}", DateTime.Now.ToString(), ex.ToString()), pubnubConfig.LogVerbosity);
-                        }
-                        finally
-                        {
-                            isInternetCheckRunning = false;
-                        }
-
-					}, null);
-
-			}
-			catch (Exception ex)
-			{
-                isInternetCheckRunning = false;
+            }
+            catch (Exception ex)
+            {
                 networkStatus = false;
-                t.TrySetResult(false);
-                ParseCheckSocketConnectException<T>(ex, type, channels, channelGroups, pubnubCallback, internalCallback);
-			}
-            return t.Task;
+                LoggingMethod.WriteToLog(string.Format("DateTime {0} CheckSocketConnect Failed {1}", DateTime.Now.ToString(), ex.Message), pubnubConfig.LogVerbosity);
+//#if !PORTABLE111 && !NETSTANDARD10
+//                try
+//                {
+//                    using (System.Net.Sockets.UdpClient udp = new System.Net.Sockets.UdpClient(80))
+//                    {
+//                        IPAddress localAddress = ((IPEndPoint)udp.Client.LocalEndPoint).Address;
+//                        if (udp != null && udp.Client != null && udp.Client.RemoteEndPoint != null)
+//                        {
+//                            udp.Client.SendTimeout = pubnubConfig.NonSubscribeRequestTimeout * 1000;
+//                            System.Net.EndPoint remotepoint = udp.Client.RemoteEndPoint;
+//                            string remoteAddress = (remotepoint != null) ? remotepoint.ToString() : "";
+//                            LoggingMethod.WriteToLog(string.Format("DateTime {0} checkInternetStatus LocalIP: {1}, RemoteEndPoint:{2}", DateTime.Now.ToString(), localAddress.ToString(), remoteAddress), pubnubConfig.LogVerbosity);
+//                            networkStatus = true;
+//                            t.TrySetResult(true);
+//                        }
+//                    }
+//                }
+//                catch {
+//                    networkStatus = false;
+//                }
+//#endif
+                if (!networkStatus)
+                {
+                    isInternetCheckRunning = false;
+                    t.TrySetResult(false);
+                    ParseCheckSocketConnectException<T>(ex, type, channels, channelGroups, pubnubCallback, internalCallback);
+                }
+            }
+            finally
+            {
+                isInternetCheckRunning = false;
+            }
+            return await t.Task;
 		}
 
 
@@ -192,7 +214,7 @@ namespace PubnubApi
                 callback.OnResponse(default(T), status);
             }
 
-			LoggingMethod.WriteToLog(string.Format("DateTime {0} checkInternetStatus Error. {1}", DateTime.Now.ToString(), ex.ToString()), pubnubConfig.LogVerbosity);
+			LoggingMethod.WriteToLog(string.Format("DateTime {0} checkInternetStatus Error. {1}", DateTime.Now.ToString(), ex.Message), pubnubConfig.LogVerbosity);
 			internalcallback(false);
 		}
 
@@ -238,6 +260,6 @@ namespace PubnubApi
 		}
 
 	}
-	#endregion
+#endregion
 }
 
