@@ -417,36 +417,39 @@ namespace PubnubApi.EndPoint
 
                 if (currentChannels != null && currentChannels.Length >= 0)
                 {
-                    string multiChannelName = (currentChannels.Length > 0) ? string.Join(",", currentChannels.OrderBy(x => x).ToArray()) : ",";
                     string multiChannelGroupName = (currentChannelGroups.Length > 0) ? string.Join(",", currentChannelGroups.OrderBy(x => x).ToArray()) : "";
+                    foreach (string multiChannelName in ChannelRequest.Keys) {
+                        //string multiChannelName = (currentChannels.Length > 0) ? string.Join(",", currentChannels.OrderBy(x => x).ToArray()) : ",";
 
-                    if (ChannelRequest.ContainsKey(multiChannelName))
-                    {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0}, Aborting previous subscribe/presence requests having channel(s)={1}; channelgroup(s)={2}", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), config.LogVerbosity);
-                        HttpWebRequest webRequest = ChannelRequest[multiChannelName];
-                        ChannelRequest[multiChannelName] = null;
-
-                        if (webRequest != null)
-                            TerminateLocalClientHeartbeatTimer(webRequest.RequestUri);
-
-                        HttpWebRequest removedRequest;
-                        ChannelRequest.TryRemove(multiChannelName, out removedRequest);
-                        bool removedChannel = ChannelRequest.TryRemove(multiChannelName, out removedRequest);
-                        if (removedChannel)
+                        if (ChannelRequest.ContainsKey(multiChannelName))
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0}, Success to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelSubscribeInit).", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), config.LogVerbosity);
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0}, Aborting previous subscribe/presence requests having channel(s)={1}; channelgroup(s)={2}", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), config.LogVerbosity);
+                            HttpWebRequest webRequest = ChannelRequest[multiChannelName];
+                            ChannelRequest[multiChannelName] = null;
+
+                            if (webRequest != null)
+                                TerminateLocalClientHeartbeatTimer(webRequest.RequestUri);
+
+                            HttpWebRequest removedRequest;
+                            ChannelRequest.TryRemove(multiChannelName, out removedRequest);
+                            bool removedChannel = ChannelRequest.TryRemove(multiChannelName, out removedRequest);
+                            if (removedChannel)
+                            {
+                                LoggingMethod.WriteToLog(string.Format("DateTime {0}, Success to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelSubscribeInit).", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), config.LogVerbosity);
+                            }
+                            else
+                            {
+                                LoggingMethod.WriteToLog(string.Format("DateTime {0}, Unable to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelSubscribeInit).", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), config.LogVerbosity);
+                            }
+                            if (webRequest != null)
+                                TerminatePendingWebRequest(webRequest);
                         }
                         else
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0}, Unable to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelSubscribeInit).", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), config.LogVerbosity);
+                            LoggingMethod.WriteToLog(string.Format("DateTime {0}, Unable to capture channel(s)={1}; channelgroup(s)={2} from _channelRequest to abort request.", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), config.LogVerbosity);
                         }
-                        if (webRequest != null)
-                            TerminatePendingWebRequest(webRequest);
                     }
-                    else
-                    {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0}, Unable to capture channel(s)={1}; channelgroup(s)={2} from _channelRequest to abort request.", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), config.LogVerbosity);
-                    }
+                    
                 }
 
                 //Add the valid channels to the channels subscribe list for tracking
