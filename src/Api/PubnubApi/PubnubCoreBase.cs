@@ -200,8 +200,8 @@ namespace PubnubApi
             if (channels == null && channelGroups == null)
                 return;
 
-            string multiChannel = (channels != null) ? string.Join(",", channels) : "";
-            string multiChannelGroup = (channelGroups != null) ? string.Join(",", channelGroups) : "";
+            string multiChannel = (channels != null) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
+            string multiChannelGroup = (channelGroups != null) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
 
             if (multiChannel != "")
             {
@@ -247,8 +247,8 @@ namespace PubnubApi
             RequestState<T> currentState = heartbeatState as RequestState<T>;
             if (currentState != null)
             {
-                string channel = (currentState.Channels != null) ? string.Join(",", currentState.Channels) : "";
-                string channelGroup = (currentState.ChannelGroups != null) ? string.Join(",", currentState.ChannelGroups) : "";
+                string channel = (currentState.Channels != null) ? string.Join(",", currentState.Channels.OrderBy(x => x).ToArray()) : "";
+                string channelGroup = (currentState.ChannelGroups != null) ? string.Join(",", currentState.ChannelGroups.OrderBy(x => x).ToArray()) : "";
 
                 if ((ChannelInternetStatus.ContainsKey(channel) || ChannelGroupInternetStatus.ContainsKey(channelGroup))
                         && (currentState.ResponseType == PNOperationType.PNSubscribeOperation || currentState.ResponseType == PNOperationType.Presence || currentState.ResponseType == PNOperationType.PNHeartbeatOperation)
@@ -663,11 +663,11 @@ namespace PubnubApi
             {
                 if (pubnubRequestState.Channels != null)
                 {
-                    channel = (pubnubRequestState.Channels.Length > 0) ? string.Join(",", pubnubRequestState.Channels) : ",";
+                    channel = (pubnubRequestState.Channels.Length > 0) ? string.Join(",", pubnubRequestState.Channels.OrderBy(x => x).ToArray()) : ",";
                 }
                 if (pubnubRequestState.ChannelGroups != null)
                 {
-                    channelGroup = string.Join(",", pubnubRequestState.ChannelGroups);
+                    channelGroup = string.Join(",", pubnubRequestState.ChannelGroups.OrderBy(x => x).ToArray());
                 }
             }
 
@@ -793,11 +793,11 @@ namespace PubnubApi
             {
                 if (asyncRequestState.Channels != null)
                 {
-                    channel = (asyncRequestState.Channels.Length > 0) ? string.Join(",", asyncRequestState.Channels) : ",";
+                    channel = (asyncRequestState.Channels.Length > 0) ? string.Join(",", asyncRequestState.Channels.OrderBy(x => x).ToArray()) : ",";
                 }
                 if (asyncRequestState.ChannelGroups != null)
                 {
-                    channelGroup = string.Join(",", asyncRequestState.ChannelGroups);
+                    channelGroup = string.Join(",", asyncRequestState.ChannelGroups.OrderBy(x => x).ToArray());
                 }
                 type = asyncRequestState.ResponseType;
             }
@@ -851,8 +851,8 @@ namespace PubnubApi
 
             try
             {
-                string multiChannel = (channels != null) ? string.Join(",", channels) : "";
-                string multiChannelGroup = (channelGroups != null) ? string.Join(",", channelGroups) : "";
+                string multiChannel = (channels != null) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
+                string multiChannelGroup = (channelGroups != null) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
 
                 if (!string.IsNullOrEmpty(jsonString))
                 {
@@ -1221,7 +1221,7 @@ namespace PubnubApi
         {
             if (state != null && state.Request != null)
             {
-                string channel = (state.Channels != null) ? string.Join(",", state.Channels) : ",";
+                string channel = (state.Channels != null) ? string.Join(",", state.Channels.OrderBy(x => x).ToArray()) : ",";
 
                 if (ChannelRequest.ContainsKey(channel))
                 {
@@ -1559,7 +1559,7 @@ namespace PubnubApi
             string[] channels = GetCurrentSubscriberChannels();
             if (channels != null)
             {
-                string multiChannel = (channels.Length > 0) ? string.Join(",", channels) : ",";
+                string multiChannel = (channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : ",";
                 HttpWebRequest request = ChannelRequest.ContainsKey(multiChannel) ? ChannelRequest[multiChannel] : null;
                 if (request != null)
                 {

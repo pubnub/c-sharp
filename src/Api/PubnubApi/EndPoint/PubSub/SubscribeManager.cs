@@ -44,8 +44,8 @@ namespace PubnubApi.EndPoint
 
             if (currentChannels != null && currentChannels.Length >= 0)
             {
-                string multiChannelName = (currentChannels.Length > 0) ? string.Join(",", currentChannels) : ",";
-                string multiChannelGroupName = (currentChannelGroups.Length > 0) ? string.Join(",", currentChannelGroups) : "";
+                string multiChannelName = (currentChannels.Length > 0) ? string.Join(",", currentChannels.OrderBy(x => x).ToArray()) : ",";
+                string multiChannelGroupName = (currentChannelGroups.Length > 0) ? string.Join(",", currentChannelGroups.OrderBy(x => x).ToArray()) : "";
 
                 System.Threading.Tasks.Task.Factory.StartNew(() =>
                 {
@@ -177,8 +177,8 @@ namespace PubnubApi.EndPoint
 
                 if (currentChannels != null && currentChannels.Length >= 0)
                 {
-                    string multiChannelName = (currentChannels.Length > 0) ? string.Join(",", currentChannels) : ",";
-                    string multiChannelGroupName = (currentChannelGroups.Length > 0) ? string.Join(",", currentChannelGroups) : "";
+                    string multiChannelName = (currentChannels.Length > 0) ? string.Join(",", currentChannels.OrderBy(x => x).ToArray()) : ",";
+                    string multiChannelGroupName = (currentChannelGroups.Length > 0) ? string.Join(",", currentChannelGroups.OrderBy(x => x).ToArray()) : "";
 
                     System.Threading.Tasks.Task.Factory.StartNew(() =>
                     {
@@ -334,7 +334,7 @@ namespace PubnubApi.EndPoint
 
                 if (channels.Length > 0 || channelGroups.Length > 0)
                 {
-                    string multiChannel = (channels.Length > 0) ? string.Join(",", channels) : ",";
+                    string multiChannel = (channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : ",";
 
                     RequestState<T> state = new RequestState<T>();
                     ChannelRequest.AddOrUpdate(multiChannel, state.Request, (key, oldValue) => state.Request);
@@ -364,8 +364,8 @@ namespace PubnubApi.EndPoint
             bool channelGroupSubscribeOnly = false;
             SubscribeDisconnected = false;
 
-            string channel = (rawChannels != null) ? string.Join(",", rawChannels) : "";
-            string channelGroup = (rawChannelGroups != null) ? string.Join(",", rawChannelGroups) : "";
+            string channel = (rawChannels != null) ? string.Join(",", rawChannels.OrderBy(x => x).ToArray()) : "";
+            string channelGroup = (rawChannelGroups != null) ? string.Join(",", rawChannelGroups.OrderBy(x => x).ToArray()) : "";
 
             List<string> validChannels = new List<string>();
             List<string> validChannelGroups = new List<string>();
@@ -417,8 +417,8 @@ namespace PubnubApi.EndPoint
 
                 if (currentChannels != null && currentChannels.Length >= 0)
                 {
-                    string multiChannelName = (currentChannels.Length > 0) ? string.Join(",", currentChannels) : ",";
-                    string multiChannelGroupName = (currentChannelGroups.Length > 0) ? string.Join(",", currentChannelGroups) : "";
+                    string multiChannelName = (currentChannels.Length > 0) ? string.Join(",", currentChannels.OrderBy(x => x).ToArray()) : ",";
+                    string multiChannelGroupName = (currentChannelGroups.Length > 0) ? string.Join(",", currentChannelGroups.OrderBy(x => x).ToArray()) : "";
 
                     if (ChannelRequest.ContainsKey(multiChannelName))
                     {
@@ -479,7 +479,7 @@ namespace PubnubApi.EndPoint
                 }
                 else
                 {
-                    ChannelRequest.AddOrUpdate(string.Join(",", channels), state.Request, (key, oldValue) => state.Request);
+                    ChannelRequest.AddOrUpdate(string.Join(",", channels.OrderBy(x => x).ToArray()), state.Request, (key, oldValue) => state.Request);
                 }
 
                 ResetInternetCheckSettings(channels, channelGroups);
@@ -502,8 +502,8 @@ namespace PubnubApi.EndPoint
                 return;
             }
 
-            string multiChannel = (channels != null && channels.Length > 0) ? string.Join(",", channels) : ",";
-            string multiChannelGroup = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups) : "";
+            string multiChannel = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : ",";
+            string multiChannelGroup = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
             if (!ChannelRequest.ContainsKey(multiChannel))
             {
                 return;
@@ -624,7 +624,7 @@ namespace PubnubApi.EndPoint
             }
             catch (Exception ex)
             {
-                LoggingMethod.WriteToLog(string.Format("DateTime {0} method:_subscribe \n channel={1} \n timetoken={2} \n Exception Details={3}", DateTime.Now.ToString(), string.Join(",", channels), timetoken.ToString(), ex.ToString()), config.LogVerbosity);
+                LoggingMethod.WriteToLog(string.Format("DateTime {0} method:_subscribe \n channel={1} \n timetoken={2} \n Exception Details={3}", DateTime.Now.ToString(), string.Join(",", channels.OrderBy(x => x).ToArray()), timetoken.ToString(), ex.ToString()), config.LogVerbosity);
 
                 PNStatusCategory errorCategory = PNStatusCategoryHelper.GetPNStatusCategory(ex);
                 PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, errorCategory, pubnubRequestState, (int)HttpStatusCode.NotFound, ex);
@@ -656,11 +656,11 @@ namespace PubnubApi.EndPoint
             string channelGroup = "";
             if (channels != null)
             {
-                channel = string.Join(",", channels);
+                channel = string.Join(",", channels.OrderBy(x => x).ToArray());
             }
             if (channelGroups != null)
             {
-                channelGroup = string.Join(",", channelGroups);
+                channelGroup = string.Join(",", channelGroups.OrderBy(x => x).ToArray());
             }
 
             List<object> result = new List<object>();
@@ -742,7 +742,7 @@ namespace PubnubApi.EndPoint
 
                 if (config.ReconnectionPolicy != PNReconnectionPolicy.NONE)
                 {
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0}, Subscribe - No internet connection for channel={1} and channelgroup={2}", DateTime.Now.ToString(), string.Join(",", channels), channelGroups != null ? string.Join(",", channelGroups) : ""), config.LogVerbosity);
+                    LoggingMethod.WriteToLog(string.Format("DateTime {0}, Subscribe - No internet connection for channel={1} and channelgroup={2}", DateTime.Now.ToString(), string.Join(",", channels.OrderBy(x => x).ToArray()), channelGroups != null ? string.Join(",", channelGroups) : ""), config.LogVerbosity);
                     ReconnectNetwork<T>(netState);
                 }
                 else
@@ -777,11 +777,11 @@ namespace PubnubApi.EndPoint
 
                 if (netState.Channels != null && netState.Channels.Length > 0)
                 {
-                    ChannelReconnectTimer.AddOrUpdate(string.Join(",", netState.Channels), timer, (key, oldState) => timer);
+                    ChannelReconnectTimer.AddOrUpdate(string.Join(",", netState.Channels.OrderBy(x => x).ToArray()), timer, (key, oldState) => timer);
                 }
                 if (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)
                 {
-                    ChannelGroupReconnectTimer.AddOrUpdate(string.Join(",", netState.ChannelGroups), timer, (key, oldState) => timer);
+                    ChannelGroupReconnectTimer.AddOrUpdate(string.Join(",", netState.ChannelGroups.OrderBy(x => x).ToArray()), timer, (key, oldState) => timer);
                 }
             }
         }
@@ -821,7 +821,7 @@ namespace PubnubApi.EndPoint
                 {
                     if (netState.Channels != null && netState.Channels.Length > 0)
                     {
-                        channel = (netState.Channels.Length > 0) ? string.Join(",", netState.Channels) : ",";
+                        channel = (netState.Channels.Length > 0) ? string.Join(",", netState.Channels.OrderBy(x=>x).ToArray()) : ",";
 
                         if (ChannelInternetStatus.ContainsKey(channel)
                             && (netState.ResponseType == PNOperationType.PNSubscribeOperation || netState.ResponseType == PNOperationType.Presence))
@@ -887,7 +887,7 @@ namespace PubnubApi.EndPoint
                     }
                     else if (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)
                     {
-                        channelGroup = string.Join(",", netState.ChannelGroups);
+                        channelGroup = string.Join(",", netState.ChannelGroups.OrderBy(x => x).ToArray());
 
                         if (channelGroup != "" && ChannelGroupInternetStatus.ContainsKey(channelGroup)
                             && (netState.ResponseType == PNOperationType.PNSubscribeOperation || netState.ResponseType == PNOperationType.Presence))
@@ -959,8 +959,8 @@ namespace PubnubApi.EndPoint
             {
                 if (netState != null)
                 {
-                    string multiChannel = (netState.Channels != null) ? string.Join(",", netState.Channels) : "";
-                    string multiChannelGroup = (netState.ChannelGroups != null) ? string.Join(",", netState.ChannelGroups) : "";
+                    string multiChannel = (netState.Channels != null) ? string.Join(",", netState.Channels.OrderBy(x => x).ToArray()) : "";
+                    string multiChannelGroup = (netState.ChannelGroups != null) ? string.Join(",", netState.ChannelGroups.OrderBy(x => x).ToArray()) : "";
 
                     PNStatusCategory errorCategory = PNStatusCategoryHelper.GetPNStatusCategory(ex);
                     PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, errorCategory, null, (int)HttpStatusCode.NotFound, ex);

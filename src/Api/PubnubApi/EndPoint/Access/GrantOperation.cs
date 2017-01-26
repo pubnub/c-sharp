@@ -126,9 +126,9 @@ namespace PubnubApi.EndPoint
                 authList = authList.Where(auth => !string.IsNullOrEmpty(auth) && auth.Trim().Length > 0).Distinct<string>().ToList();
             }
 
-            string channelsCommaDelimited = string.Join(",", channelList.ToArray());
-            string channelGroupsCommaDelimited = string.Join(",", channelGroupList.ToArray());
-            string authKeysCommaDelimited = string.Join(",", authList.ToArray());
+            string channelsCommaDelimited = string.Join(",", channelList.ToArray().OrderBy(x => x).ToArray());
+            string channelGroupsCommaDelimited = string.Join(",", channelGroupList.ToArray().OrderBy(x => x).ToArray());
+            string authKeysCommaDelimited = string.Join(",", authList.ToArray().OrderBy(x => x).ToArray());
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
             Uri request = urlBuilder.BuildGrantAccessRequest(channelsCommaDelimited, channelGroupsCommaDelimited, authKeysCommaDelimited, read, write, manage, ttl);

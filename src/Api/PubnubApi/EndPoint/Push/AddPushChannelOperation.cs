@@ -77,7 +77,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing deviceId");
             }
 
-            string channel = string.Join(",", channels);
+            string channel = string.Join(",", channels.OrderBy(x => x).ToArray());
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
             Uri request = urlBuilder.BuildRegisterDevicePushRequest(channel, pushType, pushToken);

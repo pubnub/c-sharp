@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace PubnubApi.EndPoint
 {
@@ -55,8 +56,8 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
             }
 
-            string channel = (channels != null) ? string.Join(",", channels) : "";
-            string channelGroup = (channelGroups != null) ? string.Join(",", channelGroups) : "";
+            string channel = (channels != null) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
+            string channelGroup = (channelGroups != null) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
 
             LoggingMethod.WriteToLog(string.Format("DateTime {0}, requested unsubscribe for channel(s)={1}", DateTime.Now.ToString(), channel), config.LogVerbosity);
             System.Threading.Tasks.Task.Factory.StartNew(() =>

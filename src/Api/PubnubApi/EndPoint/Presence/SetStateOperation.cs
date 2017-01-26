@@ -103,8 +103,8 @@ namespace PubnubApi.EndPoint
                 channelGroups = channelGroupList.ToArray();
             }
 
-            string commaDelimitedChannel = (channels != null && channels.Length > 0) ? string.Join(",", channels) : "";
-            string commaDelimitedChannelGroup = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups) : "";
+            string commaDelimitedChannel = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
+            string commaDelimitedChannelGroup = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
 
             if (!jsonLibrary.IsDictionaryCompatible(jsonUserState))
             {
@@ -189,8 +189,8 @@ namespace PubnubApi.EndPoint
                 channelGroups = channelGroupList.ToArray();
             }
 
-            string commaDelimitedChannel = (channels != null && channels.Length > 0) ? string.Join(",", channels) : "";
-            string commaDelimitedChannelGroup = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups) : "";
+            string commaDelimitedChannel = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
+            string commaDelimitedChannelGroup = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
 
             string key = keyValuePair.Key;
 
@@ -305,8 +305,8 @@ namespace PubnubApi.EndPoint
                 channelGroups = channelGroupList.ToArray();
             }
 
-            string commaDelimitedChannels = (channels != null && channels.Length > 0) ? string.Join(",", channels) : "";
-            string commaDelimitedChannelGroups = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups) : "";
+            string commaDelimitedChannels = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
+            string commaDelimitedChannelGroups = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
 
             if (string.IsNullOrEmpty(uuid))
             {

@@ -1,6 +1,7 @@
 ﻿using System;
 using PubnubApi.Interface;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PubnubApi.EndPoint
 {
@@ -74,7 +75,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
 
-            string channelsCommaDelimited = channels != null && channels.Length > 0 ? string.Join(",", channels) : "";
+            string channelsCommaDelimited = channels != null && channels.Length > 0 ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
 
             Uri request = urlBuilder.BuildAddChannelsToChannelGroupRequest(channelsCommaDelimited, nameSpace, groupName);
 

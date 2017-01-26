@@ -48,7 +48,7 @@ namespace PubnubApi
         Uri IUrlRequestBuilder.BuildMultiChannelSubscribeRequest(string[] channels, string[] channelGroups, long timetoken, string channelsJsonState, Dictionary<string, string> initialSubscribeUrlParams)
         {
             PNOperationType currentType = PNOperationType.PNSubscribeOperation;
-            string channelForUrl = (channels.Length > 0) ? string.Join(",", channels) : ",";
+            string channelForUrl = (channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : ",";
 
             List<string> url = new List<string>();
             url.Add("v2");
@@ -81,7 +81,7 @@ namespace PubnubApi
 
             if (channelGroups != null && channelGroups.Length > 0 && channelGroups[0] != "")
             {
-                requestQueryStringParams.Add("channel-group", string.Join(",", channelGroups));
+                requestQueryStringParams.Add("channel-group", string.Join(",", channelGroups.OrderBy(x => x).ToArray()));
             }
 
             if (channelsJsonState != "{}" && channelsJsonState != "")
@@ -98,7 +98,7 @@ namespace PubnubApi
         Uri IUrlRequestBuilder.BuildMultiChannelLeaveRequest(string[] channels, string[] channelGroups, string uuid, string jsonUserState)
         {
             PNOperationType currentType = PNOperationType.Leave;
-            string multiChannel = (channels != null && channels.Length > 0) ? string.Join(",", channels) : ",";
+            string multiChannel = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : ",";
 
             List<string> url = new List<string>();
             url.Add("v2");
@@ -124,7 +124,7 @@ namespace PubnubApi
 
             if (channelGroups != null && channelGroups.Length > 0)
             {
-                requestQueryStringParams.Add("channel-group", string.Join(",", channelGroups));
+                requestQueryStringParams.Add("channel-group", string.Join(",", channelGroups.OrderBy(x => x).ToArray()));
             }
 
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
@@ -183,7 +183,7 @@ namespace PubnubApi
         Uri IUrlRequestBuilder.BuildHereNowRequest(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState)
         {
             PNOperationType currentType = PNOperationType.PNHereNowOperation;
-            string channel = (channels != null && channels.Length > 0) ? string.Join(",", channels) : "";
+            string channel = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
 
             List<string> url = new List<string>();
             url.Add("v2");
@@ -201,7 +201,7 @@ namespace PubnubApi
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
-            string channelGroup = (channelGroups != null) ? string.Join(",", channelGroups) : "";
+            string channelGroup = (channelGroups != null) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
             if (!string.IsNullOrEmpty(channelGroup) && channelGroup.Trim().Length > 0)
             {
                 requestQueryStringParams.Add("channel-group", channelGroup);
@@ -663,7 +663,7 @@ namespace PubnubApi
         {
             PNOperationType currentType = PNOperationType.PNHeartbeatOperation;
 
-            string multiChannel = (channels != null && channels.Length > 0) ? string.Join(",", channels) : ",";
+            string multiChannel = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : ",";
 
             List<string> url = new List<string>();
             url.Add("v2");
@@ -684,7 +684,7 @@ namespace PubnubApi
 
             if (channelGroups != null && channelGroups.Length > 0)
             {
-                requestQueryStringParams.Add("channel-group", string.Join(",", channelGroups));
+                requestQueryStringParams.Add("channel-group", string.Join(",", channelGroups.OrderBy(x => x).ToArray()));
             }
 
             if (pubnubConfig.PresenceTimeout != 0)
