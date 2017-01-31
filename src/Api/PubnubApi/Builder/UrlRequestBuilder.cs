@@ -713,7 +713,10 @@ namespace PubnubApi
             ret.Add("uuid", this.pubnubConfig.Uuid);
             ret.Add("pnsdk", new UriUtil().EncodeUriComponent(Pubnub.Version, PNOperationType.PNSubscribeOperation, false, true));
             ret.Add("requestid", requestid);
-            ret.Add("timestamp", timeStamp.ToString());
+            if (!string.IsNullOrEmpty(pubnubConfig.SecretKey))
+            {
+                ret.Add("timestamp", timeStamp.ToString());
+            }
 
             if (type != PNOperationType.PNTimeOperation
                     && type != PNOperationType.PNAccessManagerGrant && type != PNOperationType.ChannelGroupGrantAccess
