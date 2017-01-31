@@ -418,9 +418,10 @@ namespace PubnubApi.EndPoint
                 if (currentChannels != null && currentChannels.Length >= 0)
                 {
                     string multiChannelGroupName = (currentChannelGroups.Length > 0) ? string.Join(",", currentChannelGroups.OrderBy(x => x).ToArray()) : "";
-                    foreach (string multiChannelName in ChannelRequest.Keys) {
-                        //string multiChannelName = (currentChannels.Length > 0) ? string.Join(",", currentChannels.OrderBy(x => x).ToArray()) : ",";
-
+                    List<string> keysList = ChannelRequest.Keys.ToList();
+                    for (int keyIndex=0; keyIndex < keysList.Count; keyIndex++)
+                    {
+                        string multiChannelName = keysList[keyIndex];
                         if (ChannelRequest.ContainsKey(multiChannelName))
                         {
                             LoggingMethod.WriteToLog(string.Format("DateTime {0}, Aborting previous subscribe/presence requests having channel(s)={1}; channelgroup(s)={2}", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), config.LogVerbosity);
@@ -449,7 +450,7 @@ namespace PubnubApi.EndPoint
                             LoggingMethod.WriteToLog(string.Format("DateTime {0}, Unable to capture channel(s)={1}; channelgroup(s)={2} from _channelRequest to abort request.", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), config.LogVerbosity);
                         }
                     }
-                    
+                   
                 }
 
                 //Add the valid channels to the channels subscribe list for tracking
