@@ -167,4 +167,4 @@ features:
 name: c-sharp
 schema: 1
 scm: github.com/pubnub/c-sharp
-version: "3.8.3"
+version: "3.8.5"
