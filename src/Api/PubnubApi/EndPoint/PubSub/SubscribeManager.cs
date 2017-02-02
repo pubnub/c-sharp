@@ -584,40 +584,50 @@ namespace PubnubApi.EndPoint
                 string json = UrlProcessRequest<T>(request, pubnubRequestState, false);
                 if (!string.IsNullOrEmpty(json))
                 {
-                    List<object> result = ProcessJsonResponse<T>(pubnubRequestState, json);
-                    ProcessResponseCallbacks<T>(result, pubnubRequestState);
+                    string subscribedChannels = (MultiChannelSubscribe.Count > 0) ? MultiChannelSubscribe.Keys.OrderBy(x=>x).Aggregate((x, y) => x + "," + y) : "";
+                    string currentChannels = (channels != null && channels.Length > 0) ? channels.OrderBy(x => x).Aggregate((x, y) => x + "," + y) : "";
 
-                    if ((pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation || pubnubRequestState.ResponseType == PNOperationType.Presence) && (result != null) && (result.Count > 0))
+                    string subscribedChannelGroups = (MultiChannelGroupSubscribe.Count > 0) ? MultiChannelGroupSubscribe.Keys.OrderBy(x => x).Aggregate((x, y) => x + "," + y) : "";
+                    string currentChannelGroups = (channelGroups != null && channelGroups.Length > 0) ? channelGroups.OrderBy(x => x).Aggregate((x, y) => x + "," + y) : "";
+
+                    if (subscribedChannels == currentChannels && subscribedChannelGroups == currentChannelGroups)
                     {
-                        long jsonTimetoken = GetTimetokenFromMultiplexResult(result);
+                        List<object> result = ProcessJsonResponse<T>(pubnubRequestState, json);
+                        ProcessResponseCallbacks<T>(result, pubnubRequestState);
 
-                        if (jsonTimetoken > 0)
+                        if ((pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation || pubnubRequestState.ResponseType == PNOperationType.Presence) && (result != null) && (result.Count > 0))
                         {
-                            if (pubnubRequestState.Channels != null)
+                            long jsonTimetoken = GetTimetokenFromMultiplexResult(result);
+
+                            if (jsonTimetoken > 0)
                             {
-                                foreach (string currentChannel in pubnubRequestState.Channels)
+                                if (pubnubRequestState.Channels != null)
                                 {
-                                    MultiChannelSubscribe.AddOrUpdate(currentChannel, jsonTimetoken, (key, oldValue) => jsonTimetoken);
+                                    foreach (string currentChannel in pubnubRequestState.Channels)
+                                    {
+                                        MultiChannelSubscribe.AddOrUpdate(currentChannel, jsonTimetoken, (key, oldValue) => jsonTimetoken);
+                                    }
                                 }
-                            }
-                            if (pubnubRequestState.ChannelGroups != null && pubnubRequestState.ChannelGroups.Length > 0)
-                            {
-                                foreach (string currentChannelGroup in pubnubRequestState.ChannelGroups)
+                                if (pubnubRequestState.ChannelGroups != null && pubnubRequestState.ChannelGroups.Length > 0)
                                 {
-                                    MultiChannelGroupSubscribe.AddOrUpdate(currentChannelGroup, jsonTimetoken, (key, oldValue) => jsonTimetoken);
+                                    foreach (string currentChannelGroup in pubnubRequestState.ChannelGroups)
+                                    {
+                                        MultiChannelGroupSubscribe.AddOrUpdate(currentChannelGroup, jsonTimetoken, (key, oldValue) => jsonTimetoken);
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    switch (pubnubRequestState.ResponseType)
-                    {
-                        case PNOperationType.PNSubscribeOperation:
-                        case PNOperationType.Presence:
-                            MultiplexInternalCallback<T>(pubnubRequestState.ResponseType, result);
-                            break;
-                        default:
-                            break;
+                        switch (pubnubRequestState.ResponseType)
+                        {
+                            case PNOperationType.PNSubscribeOperation:
+                            case PNOperationType.Presence:
+                                MultiplexInternalCallback<T>(pubnubRequestState.ResponseType, result);
+                                break;
+                            default:
+                                break;
+                        }
+
                     }
 
                 }
@@ -827,13 +837,35 @@ namespace PubnubApi.EndPoint
             ReconnectState<T> netState = reconnectState as ReconnectState<T>;
             try
             {
+                string subscribedChannels = (MultiChannelSubscribe.Count > 0) ? MultiChannelSubscribe.Keys.OrderBy(x => x).Aggregate((x, y) => x + "," + y) : "";
+                string subscribedChannelGroups = (MultiChannelGroupSubscribe.Count > 0) ? MultiChannelGroupSubscribe.Keys.OrderBy(x => x).Aggregate((x, y) => x + "," + y) : "";
+                List<string> channelRequestKeyList = ChannelRequest.Keys.ToList();
+                for(int keyIndex= 0; keyIndex < channelRequestKeyList.Count; keyIndex++)
+                {
+                    string keyChannel = channelRequestKeyList[keyIndex];
+                    if (keyChannel != subscribedChannels)
+                    {
+                        if (ChannelRequest.ContainsKey(keyChannel))
+                        {
+                            if (ChannelRequest[keyChannel] != null)
+                            {
+                                ChannelRequest[keyChannel].Abort();
+                                ChannelRequest[keyChannel] = null;
+                            }
+                            HttpWebRequest tempValue;
+                            ChannelRequest.TryRemove(keyChannel, out tempValue);
+                        }
+                    }
+                }
+
+
                 if (netState != null && ((netState.Channels != null && netState.Channels.Length > 0) || (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)))
                 {
                     if (netState.Channels != null && netState.Channels.Length > 0)
                     {
                         channel = (netState.Channels.Length > 0) ? string.Join(",", netState.Channels.OrderBy(x=>x).ToArray()) : ",";
 
-                        if (ChannelInternetStatus.ContainsKey(channel)
+                        if (channel == subscribedChannels && ChannelInternetStatus.ContainsKey(channel)
                             && (netState.ResponseType == PNOperationType.PNSubscribeOperation || netState.ResponseType == PNOperationType.Presence))
                         {
                             bool networkConnection = CheckInternetConnectionStatus(PubnetSystemActive, netState.ResponseType, netState.PubnubCallback, netState.Channels, netState.ChannelGroups);
@@ -896,7 +928,7 @@ namespace PubnubApi.EndPoint
                     {
                         channelGroup = string.Join(",", netState.ChannelGroups.OrderBy(x => x).ToArray());
 
-                        if (channelGroup != "" && ChannelGroupInternetStatus.ContainsKey(channelGroup)
+                        if (subscribedChannelGroups == channelGroup && channelGroup != "" && ChannelGroupInternetStatus.ContainsKey(channelGroup)
                             && (netState.ResponseType == PNOperationType.PNSubscribeOperation || netState.ResponseType == PNOperationType.Presence))
                         {
                             bool networkConnection = CheckInternetConnectionStatus(PubnetSystemActive, netState.ResponseType, netState.PubnubCallback, netState.Channels, netState.ChannelGroups);
