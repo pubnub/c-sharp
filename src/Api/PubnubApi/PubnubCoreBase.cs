@@ -681,6 +681,7 @@ namespace PubnubApi
                 // Create Request
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(requestUri);
 
+                request = pubnubHttp.SetNoCache<T>(request);
                 request = pubnubHttp.SetProxy<T>(request);
                 request = pubnubHttp.SetTimeout<T>(pubnubRequestState, request);
 

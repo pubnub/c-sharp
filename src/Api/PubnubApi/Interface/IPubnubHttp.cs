@@ -10,6 +10,8 @@ namespace PubnubApi
 
         HttpWebRequest SetTimeout<T>(RequestState<T> pubnubRequestState, HttpWebRequest request);
 
+        HttpWebRequest SetNoCache<T>(HttpWebRequest request);
+
         HttpWebRequest SetServicePointSetTcpKeepAlive(HttpWebRequest request);
 
         //void SendRequestAndGetResult<T>(Uri requestUri, RequestState<T> pubnubRequestState, PubnubWebRequest request);

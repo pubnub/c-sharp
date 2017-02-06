@@ -40,6 +40,14 @@ namespace PubnubApi
             return request;
         }
 
+        HttpWebRequest IPubnubHttp.SetNoCache<T>(HttpWebRequest request)
+        {
+            request.Headers["Cache-Control"] = "no-cache";
+            request.Headers["Pragma"] = "no-cache";
+
+            return request;
+        }
+
 
         HttpWebRequest IPubnubHttp.SetServicePointSetTcpKeepAlive(HttpWebRequest request)
         {
