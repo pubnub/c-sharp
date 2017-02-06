@@ -18,6 +18,7 @@ namespace PubNubMessaging.Tests
                 unitTest.Timetoken = 1356998400;
                 unitTest.RequestId = "myRequestId";
                 unitTest.InternetAvailable = true;
+                unitTest.SdkVersion = "PubNub CSharp";
 
                 pubnub = new Pubnub(pnConfiguration);
 

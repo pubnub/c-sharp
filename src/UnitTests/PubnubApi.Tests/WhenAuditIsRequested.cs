@@ -22,7 +22,7 @@ namespace PubNubMessaging.Tests
         {
             unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
-            server = new Server(new Uri("https://" + PubnubCommon.StubOrign));
+            server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
         }
@@ -61,7 +61,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
-                    .WithParameter("signature", "ZJ66W5n7gvddvaa3anwWH0lkGXXgUSf3NfFccm6ZbLg=")
+                    .WithParameter("signature", "zNRxtKgMlbcnwlamcfesFaXmG9DK2wirgob3a37Xyo0=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -116,7 +116,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
-                    .WithParameter("signature", "pYVeEZ7oraDyMvIvlR1EmM_53ycMvd2rTPKQ7_GEuNg=")
+                    .WithParameter("signature", "EdYHODFD_SaOGUkN8_QT3GpcjYdAzA71xvJfFXq2sUU=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -170,7 +170,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
-                    .WithParameter("signature", "QaAB4et_50R3iNGOAbeVJhDfpgA-R8uz4tHg08EL8U4=")
+                    .WithParameter("signature", "0xTp9FTQGMLn9cKlxqhTagtzc1r2BfaOlOym0XJ9qiQ=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 

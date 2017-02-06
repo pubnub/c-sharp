@@ -37,7 +37,7 @@ namespace PubNubMessaging.Tests
         {
             unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
-            server = new Server(new Uri("https://" + PubnubCommon.StubOrign));
+            server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
 
@@ -78,7 +78,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("ttl", "20")
                     .WithParameter("uuid", config.Uuid)
                     .WithParameter("w", "1")
-                    .WithParameter("signature", "KbxVA-PAWyStTzuuWSe9GUa9BuMoEaGeOGBscYGiHEM=")
+                    .WithParameter("signature", "0OiQ1k5uyR4Y56XBmpCfMFtMkUiJKMf6k-OZEs5ea5c=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -108,7 +108,7 @@ namespace PubNubMessaging.Tests
                         .WithParameter("ttl", "20")
                         .WithParameter("uuid", config.Uuid)
                         .WithParameter("w", "1")
-                        .WithParameter("signature", "GcYIgFtC6-HdFzschLJ22bMSZSo55TPdVW9caIYJbow=")
+                        .WithParameter("signature", "aIQJHjVxSH626VLkW7ULvBcifLYGyZBWGQ-Nbpss4Qw=")
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -139,7 +139,7 @@ namespace PubNubMessaging.Tests
                         .WithParameter("ttl", "20")
                         .WithParameter("uuid", config.Uuid)
                         .WithParameter("w", "1")
-                        .WithParameter("signature", "xtE5RzNNCma_Dy-4JqVyROrVEnkjIzJ6N9Wl5GNjfBA=")
+                        .WithParameter("signature", "JMQKzXgfqNo-HaHuabC0gq0X6IkVMHa9AWBCg6BGN1Q=")
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -170,7 +170,7 @@ namespace PubNubMessaging.Tests
                         .WithParameter("ttl", "20")
                         .WithParameter("uuid", config.Uuid)
                         .WithParameter("w", "1")
-                        .WithParameter("signature", "VUEPoUQ5Zj88ShkDNP8hwfeO8oDf63ULqwYDlhJdkbM=")
+                        .WithParameter("signature", "FVeU4RXzcxTzOf7xvmMyEPllc388HDpDfdT5lnGcLVE=")
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -201,7 +201,7 @@ namespace PubNubMessaging.Tests
                         .WithParameter("ttl", "20")
                         .WithParameter("uuid", config.Uuid)
                         .WithParameter("w", "1")
-                        .WithParameter("signature", "I85s62T11x9zVOk_wbhQKijvwdeZVyMNUxhOa8FnXes=")
+                        .WithParameter("signature", "mnWJN7WSbajMt_LWpuiXGhcs3NUcVbU3L_MZpb9_blU=")
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -265,17 +265,33 @@ namespace PubNubMessaging.Tests
             server.AddRequest(new Request()
                     .WithMethod("GET")
                     .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, "foo.%2A"))
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
-
-            expected = "[14827611897607991]";
-            server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath("/time/0")
+                    .WithParameter("heartbeat", "300")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
+                    .WithParameter("tt", "0")
                     .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, "foo.%2A"))
+                    .WithParameter("heartbeat", "300")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("tt", "0")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("signature", "5yl-J1ci5xJzHDTctEWusTxwvwRPuZ_JNAALf_zBvJU=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            expected = "{}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, channel))
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -299,19 +315,15 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Publish().Channel(publishChannel).Message(publishedMessage).Async(new UTPublishResult());
+            Thread.Sleep(1000);
 
-            ////subscribeManualEvent = new ManualResetEvent(false);
-            ////subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for message
+            pubnub.Publish().Channel(publishChannel).Message(publishedMessage).Async(new UTPublishResult());
 
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            if (receivedMessage)
-            {
-                Thread.Sleep(1000);
-                pubnub.Unsubscribe<string>().Channels(new string[] { wildCardSubscribeChannel }).Execute();
-                Thread.Sleep(2000);
-            }
+            pubnub.Unsubscribe<string>().Channels(new string[] { wildCardSubscribeChannel }).Execute();
+
+            Thread.Sleep(1000);
 
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
@@ -417,17 +429,34 @@ namespace PubNubMessaging.Tests
             server.AddRequest(new Request()
                     .WithMethod("GET")
                     .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, "foo.%2A"))
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
-
-            expected = "[14827611897607991]";
-            server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath("/time/0")
+                    .WithParameter("auth", authKey)
+                    .WithParameter("heartbeat", "300")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
+                    .WithParameter("tt", "0")
                     .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, "foo.%2A"))
+                    .WithParameter("heartbeat", "300")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("tt", "0")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("signature", "5yl-J1ci5xJzHDTctEWusTxwvwRPuZ_JNAALf_zBvJU=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            expected = "{}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, channel))
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -451,18 +480,16 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Publish().Channel(publishChannel).Message(publishedMessage).Async(new UTPublishResult());
+            Thread.Sleep(1000);
 
-            subscribeManualEvent = new ManualResetEvent(false);
-            subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for message
-            Console.WriteLine("subscribeManualEvent.WaitOne DONE");
+            pubnub.Publish().Channel(publishChannel).Message(publishedMessage).Async(new UTPublishResult());
 
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
             Console.WriteLine("publishManualEvent.WaitOne DONE");
 
-            Thread.Sleep(1000);
             pubnub.Unsubscribe<string>().Channels(new string[] { wildCardSubscribeChannel }).Execute();
-            Thread.Sleep(2000);
+
+            Thread.Sleep(1000);
 
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
@@ -565,18 +592,23 @@ namespace PubNubMessaging.Tests
 
             server.AddRequest(new Request()
                     .WithMethod("GET")
-                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, "hello_my_channel,foo.%2A"))
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
-
-            expected = "[14827611897607991]";
-            server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath("/time/0")
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, "foo.%2A,hello_my_channel"))
+                    .WithParameter("auth", authKey)
+                    .WithParameter("channel-group", channelGroupName)
+                    .WithParameter("heartbeat", "300")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
+                    .WithParameter("tt", "0")
                     .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            expected = "{}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, "foo.%2A,hello_my_channel"))
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -585,6 +617,7 @@ namespace PubNubMessaging.Tests
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             publishManualEvent = new ManualResetEvent(false);
+
             publishedMessage = "Test for cg";
 
             expected = "[1,\"Sent\",\"14722484585147754\"]";
@@ -595,11 +628,9 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Publish().Channel(channelAddForGroup).Message(publishedMessage).Async(new UTPublishResult());
+            Thread.Sleep(1000);
 
-            subscribeManualEvent = new ManualResetEvent(false);
-            subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for message
-            Console.WriteLine("subscribeManualEvent.WaitOne DONE");
+            pubnub.Publish().Channel(channelAddForGroup).Message(publishedMessage).Async(new UTPublishResult());
 
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
             Console.WriteLine("publishManualEvent.WaitOne DONE");
@@ -623,10 +654,9 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.Publish().Channel(pubWildChannelName).Message(publishedMessage).Async(new UTPublishResult());
+                Thread.Sleep(1000);
 
-                subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for message
-                Console.WriteLine("subscribeManualEvent.WaitOne DONE");
+                pubnub.Publish().Channel(pubWildChannelName).Message(publishedMessage).Async(new UTPublishResult());
 
                 publishManualEvent.WaitOne(manualResetEventWaitTimeout);
                 Console.WriteLine("publishManualEvent.WaitOne DONE");
@@ -636,7 +666,6 @@ namespace PubNubMessaging.Tests
             {
                 receivedMessage = false;
 
-                Thread.Sleep(1000);
                 publishManualEvent = new ManualResetEvent(false);
                 publishedMessage = "Test for normal ch";
 
@@ -648,15 +677,17 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
+                Thread.Sleep(1000);
+
                 pubnub.Publish().Channel(subChannelName).Message(publishedMessage).Async(new UTPublishResult());
 
                 publishManualEvent.WaitOne(manualResetEventWaitTimeout);
                 Console.WriteLine("publishManualEvent.WaitOne DONE");
             }
 
-            Thread.Sleep(1000);
             pubnub.Unsubscribe<string>().Channels(commaDelimitedChannel).ChannelGroups(new string[] { channelGroupName }).Execute();
-            Thread.Sleep(2000);
+
+            Thread.Sleep(1000);
 
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
@@ -697,26 +728,33 @@ namespace PubNubMessaging.Tests
             server.AddRequest(new Request()
                     .WithMethod("GET")
                     .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, "foo.%2A"))
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
-
-            expected = "[14827611897607991]";
-            server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath("/time/0")
+                    .WithParameter("auth", authKey)
+                    .WithParameter("channel-group",channelGroupName)
+                    .WithParameter("heartbeat", "300")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
+                    .WithParameter("tt", "0")
                     .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            expected = "{}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, "foo.%2A"))
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             pubnub.Subscribe<string>().Channels(new string[] { wildCardSubscribeChannel }).ChannelGroups(new string[] { channelGroupName }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            Thread.Sleep(1000); 
+            Thread.Sleep(1000);
+
             pubnub.Unsubscribe<string>().Channels(new string[] { wildCardSubscribeChannel }).ChannelGroups(new string[] { channelGroupName }).Execute();
-            Thread.Sleep(2000);
+
+            Thread.Sleep(1000);
 
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
