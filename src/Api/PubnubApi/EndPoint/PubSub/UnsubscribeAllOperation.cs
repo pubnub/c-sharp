@@ -8,25 +8,16 @@ namespace PubnubApi.EndPoint
         private static IJsonPluggableLibrary jsonLibrary = null;
         private IPubnubUnitTest unit = null;
 
-        public UnsubscribeAllOperation(PNConfiguration pubnubConfig) : base(pubnubConfig)
-        {
-            config = pubnubConfig;
-        }
-
-        public UnsubscribeAllOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary) : base(pubnubConfig, jsonPluggableLibrary, null)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-        }
-
         public UnsubscribeAllOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
+
+            UnsubscribeAll();
         }
 
-        public void UnsubscribeAll()
+        private void UnsubscribeAll()
         {
             System.Threading.Tasks.Task.Factory.StartNew(() =>
             {
