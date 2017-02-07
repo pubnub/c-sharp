@@ -7,6 +7,10 @@ using System.IO;
 using System.Net;
 using System.Collections;
 using System.Threading.Tasks;
+#if !NET35 && !NET40 && !NETSTANDARD10
+using System.Net.Http;
+using System.Net.Http.Headers;
+#endif
 
 namespace PubnubApi
 {
@@ -34,7 +38,7 @@ namespace PubnubApi
 
         HttpWebRequest IPubnubHttp.SetTimeout<T>(RequestState<T> pubnubRequestState, HttpWebRequest request)
         {
-#if NET35 || NET40
+#if NET35 || NET40 || NET45 || NET461
             request.Timeout = GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000;
 #endif
             return request;
@@ -60,92 +64,11 @@ namespace PubnubApi
 
         async Task<string> IPubnubHttp.SendRequestAndGetJsonResponse<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request)
         {
-            HttpWebResponse response = null;
-            System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Before Task.Factory.FromAsync", DateTime.Now.ToString()));
-            try
-            {
-                request.Method = "GET";
-                response = await Task.Factory.FromAsync<HttpWebResponse>(request.BeginGetResponse, asyncPubnubResult => (HttpWebResponse)request.EndGetResponse(asyncPubnubResult), pubnubRequestState);
-                pubnubRequestState.Response = response;
-                System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Got PubnubWebResponse for {1}", DateTime.Now.ToString(), request.RequestUri.ToString()));
-                using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
-                {
-                    //Need to return this response 
-#if NET35
-                    string jsonString = streamReader.ReadToEnd();
+#if !NET35 && !NET40 && !NETSTANDARD10
+            return await SendRequestAndGetJsonResponseHttpClient(requestUri, pubnubRequestState, request);
 #else
-                    string jsonString = await streamReader.ReadToEndAsync();
+            return await SendRequestAndGetJsonResponseTaskFactory(requestUri, pubnubRequestState, request);
 #endif
-                    System.Diagnostics.Debug.WriteLine(jsonString);
-                    System.Diagnostics.Debug.WriteLine("");
-                    System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON", DateTime.Now.ToString()));
-                    return jsonString;
-                }
-            }
-            catch (WebException ex)
-            {
-                if (ex.Response != null)
-                {
-                    pubnubRequestState.Response = ex.Response as HttpWebResponse;
-                    using (StreamReader streamReader = new StreamReader(ex.Response.GetResponseStream()))
-                    {
-                        //Need to return this response 
-#if NET35
-                        string jsonString = streamReader.ReadToEnd();
-#else
-                        string jsonString = await streamReader.ReadToEndAsync();
-#endif
-                        System.Diagnostics.Debug.WriteLine(jsonString);
-                        System.Diagnostics.Debug.WriteLine("");
-                        System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON from WebException response", DateTime.Now.ToString()));
-                        return jsonString;
-                    }
-                }
-
-                if (ex.Message.IndexOf("The request was aborted: The request was canceled") == -1
-                                && ex.Message.IndexOf("Machine suspend mode enabled. No request will be processed.") == -1)
-                {
-                    throw ex;
-                }
-                return "";
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            //return task.ContinueWith(t => ReadStreamFromResponse(t.Result));
-
-            /*
-            System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Before BeginGetResponse", DateTime.Now.ToString()));
-            var taskComplete = new TaskCompletionSource<string>();
-
-            IAsyncResult asyncResult = request.BeginGetResponse(new AsyncCallback(
-                (asynchronousResult) => {
-                    RequestState<T> asyncRequestState = asynchronousResult.AsyncState as RequestState<T>;
-                    PubnubWebRequest asyncWebRequest = asyncRequestState.Request as PubnubWebRequest;
-                    if (asyncWebRequest != null)
-                    {
-                        System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Before EndGetResponse", DateTime.Now.ToString()));
-                        PubnubWebResponse asyncWebResponse = (PubnubWebResponse)asyncWebRequest.EndGetResponse(asynchronousResult);
-                        System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, After EndGetResponse", DateTime.Now.ToString()));
-                        using (StreamReader streamReader = new StreamReader(asyncWebResponse.GetResponseStream()))
-                        {
-                            System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Inside StreamReader", DateTime.Now.ToString()));
-                            //Need to return this response 
-                            string jsonString = streamReader.ReadToEnd();
-                            System.Diagnostics.Debug.WriteLine(jsonString);
-                            System.Diagnostics.Debug.WriteLine("");
-                            System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON", DateTime.Now.ToString()));
-                            taskComplete.TrySetResult(jsonString);
-                        }
-                    }
-                }
-                ), pubnubRequestState);
-
-            Timer webRequestTimer = new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000, Timeout.Infinite);
-
-            return taskComplete.Task;
-            */
         }
 
         async Task<string> IPubnubHttp.SendRequestAndGetJsonResponseWithPOST<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request, string postData)
@@ -234,6 +157,145 @@ namespace PubnubApi
         //        return jsonString;
         //    }
         //}
+#if !NET35 && !NET40 && !NETSTANDARD10
+        async Task<string> SendRequestAndGetJsonResponseHttpClient<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request)
+        {
+            string jsonString = "";
+            HttpResponseMessage response = null;
+            try
+            {
+                System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, SendRequestAndGetJsonResponseHttpClient Before httpClient.GetAsync", DateTime.Now.ToString()));
+                HttpClient httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Accept.Clear();
+                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                httpClient.Timeout = TimeSpan.FromSeconds(GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType));
+                response = await httpClient.GetAsync(requestUri);
+                response.EnsureSuccessStatusCode();
+                var stream = await response.Content.ReadAsStreamAsync();
+                using (StreamReader streamReader = new StreamReader(stream))
+                {
+                    jsonString = await streamReader.ReadToEndAsync();
+                }
+
+                System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Got HttpResponseMessage for {1}", DateTime.Now.ToString(), requestUri));
+                //jsonString = await response.Content.ReadAsStringAsync();
+                //if (response.IsSuccessStatusCode)
+                //{
+                //}
+                //else
+                //{
+                //    var errorContent = await response.Content.ReadAsStringAsync();
+                //    if (errorContent != null)
+                //    {
+                //        System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, SendRequestAndGetJsonResponseHttpClient errorContent = {1}", DateTime.Now.ToString(), errorContent));
+                //    }
+
+                //}
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (response != null && response.Content != null)
+                {
+                    response.Content.Dispose();
+                }
+            }
+            return jsonString;
+        }
+#endif
+
+        async Task<string> SendRequestAndGetJsonResponseTaskFactory<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request)
+        {
+            HttpWebResponse response = null;
+            System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Before Task.Factory.FromAsync", DateTime.Now.ToString()));
+            try
+            {
+                request.Method = "GET";
+                response = await Task.Factory.FromAsync<HttpWebResponse>(request.BeginGetResponse, asyncPubnubResult => (HttpWebResponse)request.EndGetResponse(asyncPubnubResult), pubnubRequestState);
+                pubnubRequestState.Response = response;
+                System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Got PubnubWebResponse for {1}", DateTime.Now.ToString(), request.RequestUri.ToString()));
+                using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
+                {
+                    //Need to return this response 
+#if NET35
+                    string jsonString = streamReader.ReadToEnd();
+#else
+                    string jsonString = await streamReader.ReadToEndAsync();
+#endif
+                    System.Diagnostics.Debug.WriteLine(jsonString);
+                    System.Diagnostics.Debug.WriteLine("");
+                    System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON", DateTime.Now.ToString()));
+                    return jsonString;
+                }
+            }
+            catch (WebException ex)
+            {
+                if (ex.Response != null)
+                {
+                    pubnubRequestState.Response = ex.Response as HttpWebResponse;
+                    using (StreamReader streamReader = new StreamReader(ex.Response.GetResponseStream()))
+                    {
+                        //Need to return this response 
+#if NET35
+                        string jsonString = streamReader.ReadToEnd();
+#else
+                        string jsonString = await streamReader.ReadToEndAsync();
+#endif
+                        System.Diagnostics.Debug.WriteLine(jsonString);
+                        System.Diagnostics.Debug.WriteLine("");
+                        System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON from WebException response", DateTime.Now.ToString()));
+                        return jsonString;
+                    }
+                }
+
+                if (ex.Message.IndexOf("The request was aborted: The request was canceled") == -1
+                                && ex.Message.IndexOf("Machine suspend mode enabled. No request will be processed.") == -1)
+                {
+                    throw ex;
+                }
+                return "";
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            //return task.ContinueWith(t => ReadStreamFromResponse(t.Result));
+
+            /*
+            System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Before BeginGetResponse", DateTime.Now.ToString()));
+            var taskComplete = new TaskCompletionSource<string>();
+
+            IAsyncResult asyncResult = request.BeginGetResponse(new AsyncCallback(
+                (asynchronousResult) => {
+                    RequestState<T> asyncRequestState = asynchronousResult.AsyncState as RequestState<T>;
+                    PubnubWebRequest asyncWebRequest = asyncRequestState.Request as PubnubWebRequest;
+                    if (asyncWebRequest != null)
+                    {
+                        System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Before EndGetResponse", DateTime.Now.ToString()));
+                        PubnubWebResponse asyncWebResponse = (PubnubWebResponse)asyncWebRequest.EndGetResponse(asynchronousResult);
+                        System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, After EndGetResponse", DateTime.Now.ToString()));
+                        using (StreamReader streamReader = new StreamReader(asyncWebResponse.GetResponseStream()))
+                        {
+                            System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Inside StreamReader", DateTime.Now.ToString()));
+                            //Need to return this response 
+                            string jsonString = streamReader.ReadToEnd();
+                            System.Diagnostics.Debug.WriteLine(jsonString);
+                            System.Diagnostics.Debug.WriteLine("");
+                            System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON", DateTime.Now.ToString()));
+                            taskComplete.TrySetResult(jsonString);
+                        }
+                    }
+                }
+                ), pubnubRequestState);
+
+            Timer webRequestTimer = new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000, Timeout.Infinite);
+
+            return taskComplete.Task;
+            */
+        }
 
         protected void OnPubnubWebRequestTimeout<T>(object state, bool timeout)
         {

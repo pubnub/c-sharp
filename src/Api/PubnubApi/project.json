@@ -47,11 +47,20 @@
       }
     },
 
-    "net461": {
-      "buildOptions": { "define": [ "NET40" ] },
+    "net4.5": {
+      "buildOptions": { "define": [ "NET45" ] },
       "dependencies": {
         "Portable.BouncyCastle": "1.8.1.1",
-        "Microsoft.Bcl.Async": "1.0.168"
+        "System.Net.Http": "4.0.0"
+      }
+    },
+
+    "net461": {
+      "buildOptions": { "define": [ "NET461" ] },
+      "dependencies": {
+        "Portable.BouncyCastle": "1.8.1.1",
+        "System.Net.Http": "4.3.0",
+        "System.Net.Primitives": "4.0.10"
       }
     }
   }
