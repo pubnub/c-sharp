@@ -94,6 +94,9 @@ namespace PubnubApi.EndPoint
                     requestState.Reconnect = false;
 
                     string json = UrlProcessRequest<T>(request, requestState, false);
+
+                    MultiChannelSubscribe.Clear();
+                    MultiChannelGroupSubscribe.Clear();
                 }
             }
 
@@ -343,7 +346,7 @@ namespace PubnubApi.EndPoint
 
 
                     //Continue with any remaining channels for subscribe/presence
-                    MultiChannelSubscribeRequest<T>(type, channels, channelGroups, 0, false, null);
+                    MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups, 0, false, null);
                 }
                 else
                 {
@@ -386,7 +389,10 @@ namespace PubnubApi.EndPoint
                         string channelName = rawChannels[index].Trim();
                         if (!string.IsNullOrEmpty(channelName))
                         {
-                            validChannels.Add(channelName);
+                            if (!MultiChannelSubscribe.ContainsKey(channelName))
+                            {
+                                validChannels.Add(channelName);
+                            }
                         }
                     }
                 }
@@ -404,7 +410,10 @@ namespace PubnubApi.EndPoint
                     if (rawChannelGroups[index].Trim().Length > 0)
                     {
                         string channelGroupName = rawChannelGroups[index].Trim();
-                        validChannelGroups.Add(channelGroupName);
+                        if (!MultiChannelGroupSubscribe.ContainsKey(channelGroupName))
+                        {
+                            validChannelGroups.Add(channelGroupName);
+                        }
                     }
                 }
             }
@@ -432,7 +441,6 @@ namespace PubnubApi.EndPoint
                                 TerminateLocalClientHeartbeatTimer(webRequest.RequestUri);
 
                             HttpWebRequest removedRequest;
-                            ChannelRequest.TryRemove(multiChannelName, out removedRequest);
                             bool removedChannel = ChannelRequest.TryRemove(multiChannelName, out removedRequest);
                             if (removedChannel)
                             {
@@ -452,6 +460,8 @@ namespace PubnubApi.EndPoint
                     }
                    
                 }
+
+                TerminateCurrentSubscriberRequest();
 
                 //Add the valid channels to the channels subscribe list for tracking
                 for (int index = 0; index < validChannels.Count; index++)
@@ -621,7 +631,6 @@ namespace PubnubApi.EndPoint
                         switch (pubnubRequestState.ResponseType)
                         {
                             case PNOperationType.PNSubscribeOperation:
-                            case PNOperationType.Presence:
                                 MultiplexInternalCallback<T>(pubnubRequestState.ResponseType, result);
                                 break;
                             default:
@@ -642,8 +651,16 @@ namespace PubnubApi.EndPoint
 
                 PNStatusCategory errorCategory = PNStatusCategoryHelper.GetPNStatusCategory(ex);
                 PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, errorCategory, pubnubRequestState, (int)HttpStatusCode.NotFound, ex);
-                status.AffectedChannels.AddRange(channels);
-                status.AffectedChannels.AddRange(channelGroups);
+                if (channels != null)
+                {
+                    status.AffectedChannels.AddRange(channels);
+                }
+
+                if (channelGroups != null)
+                {
+                    status.AffectedChannels.AddRange(channelGroups);
+                }
+
                 Announce(status);
 
                 MultiChannelSubscribeRequest<T>(type, channels, channelGroups, LastSubscribeTimetoken, false, null);

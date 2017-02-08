@@ -145,7 +145,7 @@ namespace PubnubApi
         private bool IsGenericTypeForMessage<T>()
         {
             bool ret = false;
-#if NET35 || NET40
+#if NET35 || NET40 || NET45 || NET461
             if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(PNMessageResult<>))
             {
                 ret = true;
@@ -166,7 +166,7 @@ namespace PubnubApi
         {
             T ret = default(T);
 
-#if NET35 || NET40
+#if NET35 || NET40 || NET45 || NET461
             Type dataType = typeof(T).GetGenericArguments()[0];
             Type generic = typeof(PNMessageResult<>);
             Type specific = generic.MakeGenericType(dataType);

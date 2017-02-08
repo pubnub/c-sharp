@@ -137,6 +137,10 @@ namespace PubnubApi.EndPoint
             LoggingMethod.WriteToLog(string.Format("DateTime {0} PLATFORM = NET35", DateTime.Now.ToString()), config.LogVerbosity);
 #elif NET40
             LoggingMethod.WriteToLog(string.Format("DateTime {0} PLATFORM = NET40", DateTime.Now.ToString()), config.LogVerbosity);
+#elif NET45
+            LoggingMethod.WriteToLog(string.Format("DateTime {0} PLATFORM = NET45", DateTime.Now.ToString()), config.LogVerbosity);
+#elif NET461
+            LoggingMethod.WriteToLog(string.Format("DateTime {0} PLATFORM = NET461", DateTime.Now.ToString()), config.LogVerbosity);
 #endif
 
             LoggingMethod.WriteToLog(string.Format("DateTime {0}, requested subscribe for channel(s)={1} and channel group(s)={2}", DateTime.Now.ToString(), channel, channelGroup), config.LogVerbosity);

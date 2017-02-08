@@ -7,6 +7,7 @@ namespace PubnubApi
     {
         public HttpWebRequest Request { get; set; }
         public HttpWebResponse Response { get; set; }
+        public bool GotJsonResponse { get; set; }
         public PNOperationType ResponseType { get; set; }
         public string[] Channels { get; set; }
         public string[] ChannelGroups { get; set; }

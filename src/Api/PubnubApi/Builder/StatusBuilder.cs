@@ -23,7 +23,7 @@ namespace PubnubApi
             status.Category = category;
             status.Operation = type;
 
-            if ((asyncRequestState != null && asyncRequestState.Response == null) || throwable != null)
+            if ((asyncRequestState != null && !asyncRequestState.GotJsonResponse) || throwable != null)
             {
                 status.Error = true;
             }

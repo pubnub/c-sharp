@@ -348,7 +348,13 @@ namespace PubnubApi
                         string timetoken = restUriQueryCollection["tt"].ToString();
                         if (req == "v2/subscribe" && timetoken == "0" && message != null && message.Count == 0)
                         {
-                            ret = true;
+                            IEnumerable<string> newChannels = from channel in MultiChannelSubscribe
+                                                              where channel.Value == 0
+                                                              select channel.Key;
+                            if (newChannels != null && newChannels.Count() > 0)
+                            {
+                                ret = true;
+                            }
                         }
                     }
                 }
@@ -368,8 +374,10 @@ namespace PubnubApi
                 IEnumerable<string> newChannels = from channel in MultiChannelSubscribe
                                                   where channel.Value == 0
                                                   select channel.Key;
-                status.AffectedChannels.AddRange(newChannels.ToList());
-                status.AffectedChannels = status.AffectedChannels.Distinct().ToList();
+                if (newChannels != null && newChannels.Count() > 0)
+                {
+                    status.AffectedChannels = newChannels.ToList();
+                }
             }
 
             if (channelGroups != null && channelGroups.Length > 0)
@@ -378,8 +386,10 @@ namespace PubnubApi
                                                        where channelGroup.Value == 0
                                                        select channelGroup.Key;
 
-                status.AffectedChannelGroups.AddRange(newChannelGroups.ToList());
-                status.AffectedChannelGroups = status.AffectedChannelGroups.Distinct().ToList();
+                if (newChannelGroups != null && newChannelGroups.Count() > 0)
+                {
+                    status.AffectedChannelGroups = newChannelGroups.ToList();
+                }
             }
 
             Announce(status);
@@ -508,16 +518,20 @@ namespace PubnubApi
                                     Dictionary<string, object> presencePayload = payload as Dictionary<string, object>;
                                     ResponseBuilder responseBuilder = new ResponseBuilder(pubnubConfig, jsonLib);
                                     PNPresenceEventResult presenceEvent = responseBuilder.JsonToObject<PNPresenceEventResult>(payloadContainer, true);
-
-                                    Announce(presenceEvent);
+                                    if (presenceEvent != null)
+                                    {
+                                        Announce(presenceEvent);
+                                    }
                                 }
                                 else
                                 {
                                     LoggingMethod.WriteToLog(string.Format("DateTime: {0}, ResponseToUserCallback - payload = {1}", DateTime.Now.ToString(), jsonLib.SerializeToJsonString(payloadContainer)), pubnubConfig.LogVerbosity);
                                     ResponseBuilder responseBuilder = new ResponseBuilder(pubnubConfig, jsonLib);
                                     PNMessageResult<T> userMessage = responseBuilder.JsonToObject<PNMessageResult<T>>(payloadContainer, true);
-
-                                    Announce(userMessage);
+                                    if (userMessage != null)
+                                    {
+                                        Announce(userMessage);
+                                    }
                                 }
 
                             }
