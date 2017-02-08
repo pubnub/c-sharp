@@ -319,6 +319,9 @@ namespace PubnubApiDemo
                     Console.WriteLine("Enter 17 TO change UUID. (Current value = {0})", config.Uuid);
                     Console.WriteLine("Enter 18 FOR Disconnect");
                     Console.WriteLine("Enter 19 FOR Reconnect");
+                    Console.WriteLine("Enter 20 FOR UnsubscribeAll");
+                    Console.WriteLine("Enter 21 FOR GetSubscribeChannels");
+                    Console.WriteLine("Enter 22 FOR GetSubscribeChannelGroups");
                     Console.WriteLine("Enter 31 FOR Push - Register Device");
                     Console.WriteLine("Enter 32 FOR Push - Remove Channel");
                     Console.WriteLine("Enter 33 FOR Push - Get Current Channels");
@@ -387,6 +390,29 @@ namespace PubnubApiDemo
                             Console.WriteLine("Invalid CHANNEL name");
                             break;
                         }
+
+                        bool usePost = false;
+                        Console.WriteLine("UsePOST? Enter Y for Yes or N for NO. To accept default(N), just press ENTER");
+                        string userPostString = Console.ReadLine();
+                        if (userPostString.ToLower() == "y")
+                        {
+                            usePost = true;
+                        }
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("UsePOST = {0}", usePost.ToString()));
+                        Console.ResetColor();
+
+                        bool useSync = false;
+                        Console.WriteLine("Use Sync? Enter Y for Yes or N for NO. To accept default(N), just press ENTER");
+                        string useSyncString = Console.ReadLine();
+                        if (useSyncString.ToLower() == "y")
+                        {
+                            useSync = true;
+                        }
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Sync = {0}", usePost.ToString()));
+                        Console.ResetColor();
+
                         Console.WriteLine("Store In History? Enter Y for Yes or N for No. To accept default(Y), just press ENTER");
                         string storeInHistory = Console.ReadLine();
                         bool store = true;
@@ -449,7 +475,7 @@ namespace PubnubApiDemo
                         //    .Channel(channel)
                         //    .Message(userCreated)
                         //    .Meta(meta)
-                        //    .ShouldStore(store)
+                        //    .ShouldStore(store).UsePOST(usePost)
                         //    .Async(new PNPublishResultExt((r, s) => { Console.WriteLine(r.Timetoken); }));
 
 
@@ -457,12 +483,12 @@ namespace PubnubApiDemo
                         int intData;
                         if (int.TryParse(publishMsg, out intData)) //capture numeric data
                         {
-                            pubnub.Publish().Channel(channel).Message(intData).Meta(meta).ShouldStore(store)
+                            pubnub.Publish().Channel(channel).Message(intData).Meta(meta).ShouldStore(store).UsePOST(usePost)
                                 .Async(new PNPublishResultExt((r, s) => { Console.WriteLine(r.Timetoken); }));
                         }
                         else if (double.TryParse(publishMsg, out doubleData)) //capture numeric data
                         {
-                            pubnub.Publish().Channel(channel).Message(doubleData).Meta(meta).ShouldStore(store)
+                            pubnub.Publish().Channel(channel).Message(doubleData).Meta(meta).ShouldStore(store).UsePOST(usePost)
                                 .Async(new PNPublishResultExt((r, s) => { Console.WriteLine(r.Timetoken); }));
                         }
                         else
@@ -473,28 +499,42 @@ namespace PubnubApiDemo
                                 string strMsg = publishMsg.Substring(1, publishMsg.Length - 2);
                                 if (int.TryParse(strMsg, out intData))
                                 {
-                                    pubnub.Publish().Channel(channel).Message(strMsg).Meta(meta).ShouldStore(store)
+                                    pubnub.Publish().Channel(channel).Message(strMsg).Meta(meta).ShouldStore(store).UsePOST(usePost)
                                         .Async(new PNPublishResultExt((r, s) => { Console.WriteLine(r.Timetoken); }));
                                 }
                                 else if (double.TryParse(strMsg, out doubleData))
                                 {
-                                    pubnub.Publish().Channel(channel).Message(strMsg).Meta(meta).ShouldStore(store)
+                                    pubnub.Publish().Channel(channel).Message(strMsg).Meta(meta).ShouldStore(store).UsePOST(usePost)
                                         .Async(new PNPublishResultExt((r, s) => { Console.WriteLine(r.Timetoken); }));
                                 }
                                 else
                                 {
-                                    pubnub.Publish().Channel(channel).Message(publishMsg).Meta(meta).ShouldStore(store)
+                                    pubnub.Publish().Channel(channel).Message(publishMsg).Meta(meta).ShouldStore(store).UsePOST(usePost)
                                         .Async(new PNPublishResultExt((r, s) => { Console.WriteLine(r.Timetoken); }));
                                 }
                             }
                             else
                             {
-                                pubnub.Publish()
-                                    .Channel(channel)
-                                    .Message(publishMsg)
-                                    .Meta(meta)
-                                    .ShouldStore(store)
-                                    .Async(new PNPublishResultExt((r, s) => { Console.WriteLine(r.Timetoken); }));
+                                if (useSync)
+                                {
+                                    PNPublishResult pubRes = pubnub.Publish()
+                                        .Channel(channel)
+                                        .Message(publishMsg)
+                                        .Meta(meta)
+                                        .ShouldStore(store)
+                                        .UsePOST(usePost).Sync();
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(pubRes));
+                                }
+                                else
+                                {
+                                    pubnub.Publish()
+                                        .Channel(channel)
+                                        .Message(publishMsg)
+                                        .Meta(meta)
+                                        .ShouldStore(store)
+                                        .UsePOST(usePost)
+                                        .Async(new PNPublishResultExt((r, s) => { Console.WriteLine(r.Timetoken); }));
+                                }
                             }
                         }
                         break;
@@ -1000,11 +1040,39 @@ namespace PubnubApiDemo
                         break;
                     case "18":
                         Console.WriteLine("Disconnect");
-                        pubnub.Disconnect<string>();
+                        pubnub.Disconnect<object>();
                         break;
                     case "19":
                         Console.WriteLine("Re-connect");
-                        pubnub.Reconnect<string>();
+                        pubnub.Reconnect<object>();
+                        break;
+                    case "20":
+                        Console.WriteLine("UnsubscribeAll");
+                        pubnub.UnsubscribeAll<object>();
+                        break;
+                    case "21":
+                        Console.WriteLine("GetSubscribedChannels");
+                        List<string> chList = pubnub.GetSubscribedChannels();
+                        if (chList != null && chList.Count > 0)
+                        {
+                            Console.WriteLine(chList.Aggregate((x,y)=> x + "," + y));
+                        }
+                        else
+                        {
+                            Console.WriteLine("No channels");
+                        }
+                        break;
+                    case "22":
+                        Console.WriteLine("GetSubscribedChannelGroups");
+                        List<string> cgList = pubnub.GetSubscribedChannelGroups();
+                        if (cgList != null && cgList.Count > 0)
+                        {
+                            Console.WriteLine(cgList.Aggregate((x, y) => x + "," + y));
+                        }
+                        else
+                        {
+                            Console.WriteLine("No channelgroups");
+                        }
                         break;
                     case "31":
                         Console.WriteLine("Enter channel name");
