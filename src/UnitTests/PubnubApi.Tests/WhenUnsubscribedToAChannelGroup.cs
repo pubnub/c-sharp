@@ -32,7 +32,7 @@ namespace PubNubMessaging.Tests
         {
             unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
-            server = new Server(new Uri("https://" + PubnubCommon.StubOrign));
+            server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
 
@@ -68,7 +68,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("ttl", "20")
                     .WithParameter("uuid", config.Uuid)
                     .WithParameter("w", "1")
-                    .WithParameter("signature", "I85s62T11x9zVOk_wbhQKijvwdeZVyMNUxhOa8FnXes=")
+                    .WithParameter("signature", "mnWJN7WSbajMt_LWpuiXGhcs3NUcVbU3L_MZpb9_blU=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -146,17 +146,22 @@ namespace PubNubMessaging.Tests
                 server.AddRequest(new Request()
                         .WithMethod("GET")
                         .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, ","))
-                        .WithResponse(expected)
-                        .WithStatusCode(System.Net.HttpStatusCode.OK));
-
-                expected = "[14827611897607991]";
-                server.AddRequest(new Request()
-                        .WithMethod("GET")
-                        .WithPath("/time/0")
+                        .WithParameter("auth", authKey)
+                        .WithParameter("channel-group", channelGroupName)
+                        .WithParameter("heartbeat", "300")
                         .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                         .WithParameter("requestid", "myRequestId")
                         .WithParameter("timestamp", "1356998400")
+                        .WithParameter("tt", "0")
                         .WithParameter("uuid", config.Uuid)
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+                expected = "{}";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, "," ))
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 

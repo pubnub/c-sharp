@@ -39,7 +39,7 @@ namespace PubNubMessaging.Tests
         {
             unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
-            server = new Server(new Uri("https://" + PubnubCommon.StubOrign));
+            server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
 
@@ -75,7 +75,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("ttl", "20")
                     .WithParameter("uuid", config.Uuid)
                     .WithParameter("w", "1")
-                    .WithParameter("signature", "xtE5RzNNCma_Dy-4JqVyROrVEnkjIzJ6N9Wl5GNjfBA=")
+                    .WithParameter("signature", "JMQKzXgfqNo-HaHuabC0gq0X6IkVMHa9AWBCg6BGN1Q=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 

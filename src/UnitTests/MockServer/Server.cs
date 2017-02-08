@@ -12,6 +12,7 @@ namespace MockServer
 {
     public class Server
     {
+        static private Server server = null;
         private X509Certificate2 certificate;
         private TcpListener listener;
         private const int MAXBUFFER = 1024 * 64;
@@ -21,9 +22,21 @@ namespace MockServer
         private readonly Uri uri;
         private Thread trf = null;
         private Dictionary<string, Request> requests = new Dictionary<string, Request>();
+        private List<string> responses = new List<string>();
         private int read;
         private bool finalizeServer = false;
         private bool secure = false;
+        private bool IsRunning = false;
+
+        static public Server Instance()
+        {
+            if (server==null)
+            {
+                server = new MockServer.Server(new Uri("https://localhost:9191"));
+            }
+
+            return server;
+        }
 
         /// <summary>
         /// Mock Web Server
@@ -52,12 +65,22 @@ namespace MockServer
         }
 
         /// <summary>
+        /// Return the cache responses
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetResponses()
+        {
+            return responses;
+        }
+
+        /// <summary>
         /// Remove all Requests
         /// </summary>
         /// <returns></returns>
         public Server ClearRequests()
         {
             this.requests.Clear();
+            this.responses.Clear();
             return this;
         }
 
@@ -105,7 +128,7 @@ namespace MockServer
                 trf = new Thread(new ThreadStart(ServerFunction));
                 trf.IsBackground = true;
                 trf.Priority = ThreadPriority.Highest;
-                ///trf.SetApartmentState(ApartmentState.MTA);
+                trf.SetApartmentState(ApartmentState.MTA);
                 trf.Start();
             }
         }
@@ -127,9 +150,19 @@ namespace MockServer
             {
             }
 
+            try
+            {
+                trf.Abort();
+            }
+            catch
+            {
+            }
+
             trf = null;
 
             LoggingMethod.WriteToLog("Server was stoped.", LoggingMethod.LevelInfo);
+
+            IsRunning = false;
         }
 
         /// <summary>
@@ -137,6 +170,8 @@ namespace MockServer
         /// </summary>
         private void ServerFunction()
         {
+            IsRunning = true;
+
             LoggingMethod.WriteToLog("Starting Server...", LoggingMethod.LevelInfo);
 
             SslStream sslStream = null;
@@ -149,13 +184,18 @@ namespace MockServer
                 var ipEndPoint = new IPEndPoint(IPAddress.Any, uri.Port);
                 listener = new TcpListener(ipEndPoint);
 
-                listener.Start(255);
+                listener.Start();
 
                 while (true)
                 {
                     data = new byte[MAXBUFFER];
 
                     var clientSocket = listener.AcceptTcpClient();
+
+                    if (finalizeServer)
+                    {
+                        break;
+                    }
 
                     stream = clientSocket.GetStream();
 
@@ -165,7 +205,8 @@ namespace MockServer
                     {
                         if (secure)
                         {
-                            sslStream = new SslStream(stream, false, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
+                            sslStream = new SslStream(stream, true, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
+                            ////sslStream = new SslStream(stream, false, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
                             sslStream.AuthenticateAsServer(certificate, true, System.Security.Authentication.SslProtocols.Default, false);
                             strData = ReadMessage(sslStream);
                             stream = sslStream;
@@ -185,6 +226,7 @@ namespace MockServer
 
                     string[] lines = strData.Split(new string[] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
                     string path = lines[0].Substring(0, lines[0].LastIndexOf(" "));
+                    responses.Add(path);
                     System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("        ###  MM/dd/yyyy HH:mm:ss:fff") + " - " + path);
 
                     try
@@ -194,19 +236,27 @@ namespace MockServer
                         {
                             item = requests[path];
                         }
-                        catch
+                        catch (Exception error)
                         {
                             try
                             {
                                 item = requests[path.Substring(0, path.IndexOf("?"))];
                             }
-                            catch
+                            catch (Exception errorNotFound)
                             {
                                 item = new MockServer.Request();
                                 item.Method = "GET";
-                                if (path.Contains("GET /v2/presence/"))
+                                //////item.StatusCode = HttpStatusCode.OK;
+                                //////item.Response = "";
+
+                                if (path.Contains("GET /v2/presence/") && !path.Contains("/leave?"))
                                 {
                                     item.Response = "{\"t\":{\"t\":\"14844074079055214\",\"r\":7},\"m\":[]}";
+                                    item.StatusCode = HttpStatusCode.OK;
+                                }
+                                else if (path.Contains("GET /v2/subscribe/"))
+                                {
+                                    item.Response = "{}";
                                     item.StatusCode = HttpStatusCode.OK;
                                 }
                                 else if (path.Contains("GET /time/0"))
@@ -216,7 +266,7 @@ namespace MockServer
                                 }
                                 else if (path.Contains("/leave?"))
                                 {
-                                    item.Response = "{\"t\":{\"t\":\"14844074079055214\",\"r\":7},\"m\":[]}";
+                                    item.Response = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
                                     item.StatusCode = HttpStatusCode.OK;
                                 }
                                 else if (path.Contains("GET /publish/"))
@@ -227,7 +277,7 @@ namespace MockServer
                                 else
                                 {
                                     item.Response = "";
-                                    item.StatusCode = HttpStatusCode.NotFound;
+                                    item.StatusCode = HttpStatusCode.OK;    //// HttpStatusCode.NotFound;
                                 }
                             }
                         }
@@ -290,9 +340,11 @@ namespace MockServer
 
                     if (sslStream != null)
                     {
+                        sslStream.Flush();
                         sslStream.Close();
                     }
 
+                    stream.Flush();
                     stream.Close();
                     clientSocket.Close();
                 }
@@ -343,7 +395,22 @@ namespace MockServer
                 messageData.Append(chars);
                 if (messageData.ToString().Contains("\r\n\r\n"))
                 {
-                    break;
+                    string msg = messageData.ToString();
+                    int index = msg.ToLower().IndexOf("content-length: ");
+                    if (index != -1)
+                    {
+                        int indexlast = msg.IndexOf("\r\n\r\n");
+                        int value = Convert.ToInt32(msg.Substring(index + 16, msg.IndexOf("\r\n", index) - index - 16));
+
+                        if (msg.Length == indexlast + 4 + value)
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
             while (bytes != 0);

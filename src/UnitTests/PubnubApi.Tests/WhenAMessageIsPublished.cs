@@ -87,7 +87,7 @@ namespace PubNubMessaging.Tests
         {
             unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
-            server = new Server(new Uri("https://" + PubnubCommon.StubOrign));
+            server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
 
@@ -123,7 +123,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("ttl", "20")
                     .WithParameter("uuid", config.Uuid)
                     .WithParameter("w", "1")
-                    .WithParameter("signature", "xtE5RzNNCma_Dy-4JqVyROrVEnkjIzJ6N9Wl5GNjfBA=")
+                    .WithParameter("signature", "JMQKzXgfqNo-HaHuabC0gq0X6IkVMHa9AWBCg6BGN1Q=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -218,7 +218,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = 310 * 1000;
 
             publishManualEvent = new ManualResetEvent(false);
             pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
@@ -302,7 +302,7 @@ namespace PubNubMessaging.Tests
 
             messageObjectForUnencryptPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
 
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = 310 * 1000;
 
             publishManualEvent = new ManualResetEvent(false);
             pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
@@ -641,7 +641,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
-                    .WithParameter("signature", "EinZeCW5WWQxJ8ZwsSR5jTydBL6uYrKn4ioU0X73hgw=")
+                    .WithParameter("signature", "tcFpCYsp1uiqyWCZxvdJp7KXEXjyvCFnH6F4UjJ6mds=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -672,7 +672,7 @@ namespace PubNubMessaging.Tests
                         .WithParameter("requestid", "myRequestId")
                         .WithParameter("timestamp", "1356998400")
                         .WithParameter("uuid", config.Uuid)
-                        .WithParameter("signature", "2KYPv9nJTAaYsOP1FJzEO7-enKHuC0W19_lHqWDoKAE=")
+                        .WithParameter("signature", "WyHIBPHildY1gtERK5uDGqX8RyKnrqQFegoOoHizsV4=")
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -731,7 +731,7 @@ namespace PubNubMessaging.Tests
 
             messageComplexObjectForPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
 
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = 310 * 1000;
 
             publishManualEvent = new ManualResetEvent(false);
             pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
@@ -969,11 +969,11 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
-                    .WithParameter("signature", "DxvmRW4b6ZiQkCOcsm6Sy9CA3cw0Vfqzbwyut_L1TmY=")
+                    .WithParameter("signature", "CkHf9ur70OxnkkPvzc9PCPbSbq_SHq2hfYbfDHXh90Q=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+            manualResetEventWaitTimeout = 310 * 1000;
 
             publishManualEvent = new ManualResetEvent(false);
             pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());

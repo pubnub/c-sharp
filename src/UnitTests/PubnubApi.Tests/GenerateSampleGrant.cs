@@ -23,7 +23,7 @@ namespace PubNubMessaging.Tests
         {
             unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
-            server = new Server(new Uri("https://" + PubnubCommon.StubOrign));
+            server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
         }
@@ -81,7 +81,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
                     .WithParameter("w", "1")
-                    .WithParameter("signature", "jh4eVTES5KnitL9XrbERGKQ9AStSsC5BfqbZk9RG5IQ=")
+                    .WithParameter("signature", "tCnUUS8KPeTmepj_b2mLoEny3shgtxX1JzhbIIyA0wU=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -140,13 +140,14 @@ namespace PubNubMessaging.Tests
                         .WithParameter("timestamp", "1356998400")
                         .WithParameter("uuid", config.Uuid)
                         .WithParameter("w", "1")
-                        .WithParameter("signature", "0FOL9hZ9ZhPD66_Otg1m3x1-fPw6dndmbcM8eaLJ6yU=")
+                        .WithParameter("signature", "gumjPtSDtaYGB7Pj-fFUY-ZFD_jKuu7n9sQEBhNbAKg=")
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
                 pubnub.Grant().Channels(new string[] { channelName }).Read(true).Write(true).Manage(false).Async(new GrantResult());
                 grantManualEvent.WaitOne();
             }
+
 
             pubnub.Destroy();
             pubnub = null;

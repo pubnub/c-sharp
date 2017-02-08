@@ -30,7 +30,7 @@ namespace PubNubMessaging.Tests
         {
             unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
-            server = new Server(new Uri("https://" + PubnubCommon.StubOrign));
+            server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
 
@@ -64,7 +64,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("ttl", "20")
                     .WithParameter("uuid", config.Uuid)
                     .WithParameter("w", "1")
-                    .WithParameter("signature", "I85s62T11x9zVOk_wbhQKijvwdeZVyMNUxhOa8FnXes=")
+                    .WithParameter("signature", "mnWJN7WSbajMt_LWpuiXGhcs3NUcVbU3L_MZpb9_blU=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -114,7 +114,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
-                    .WithParameter("signature", "rbv0UFja4qOZZNfKBa9LqUhigo5P9fno7xTb35Oz-v8=")
+                    .WithParameter("signature", "yo21VoxIksrH3Iozeaz5Zw4BX18N3vU9PLa-zVxRXsU=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -161,7 +161,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
-                    .WithParameter("signature", "6fBUgecbnrkYmhdvAaHz0ZBA4b_hXs9s0SLES1sx6tc=")
+                    .WithParameter("signature", "pYkBCwerq5oLuWExyW6z9_ygroklA4X2vvnYJCbwnjA=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -208,7 +208,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
-                    .WithParameter("signature", "kcavRCfA-3POaQivNszOdyUGmnxtc3lpkP82zjjLe-Q=")
+                    .WithParameter("signature", "03YaQgvhwhQ9wMg3RLSYolTDzOpuuGoRzE5a7sEMLds=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -254,7 +254,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
-                    .WithParameter("signature", "yeLq9JwUP8xNQPrO6wCUl-EYZ9Mk8UYP36CLb_4A21k=")
+                    .WithParameter("signature", "qnMQZkath89WEZaFGFmYaODIJqscq97l4TlvkVKHx_0=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
