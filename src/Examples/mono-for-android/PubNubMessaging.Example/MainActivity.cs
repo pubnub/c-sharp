@@ -24,7 +24,14 @@ namespace PubNubMessaging.Example
     {
         Pubnub pubnub = null;
         PNConfiguration config = null;
-        DemoSubscribeCallback listener = null;
+        SubscribeCallbackExt listener = null;
+        public class LocalLog : IPubnubLog
+        {
+            void IPubnubLog.WriteToLog (string logText)
+            {
+                Console.WriteLine (logText);
+            }
+        }
 
         string channel {
             get;
@@ -228,8 +235,25 @@ namespace PubNubMessaging.Example
             string head = String.Format ("{0}{1}", ssl, cipher);
 
             pubnub = LaunchScreen.pubnub;
+
             config = pubnub.PNConfig;
-            listener = new DemoSubscribeCallback (Display);
+            config.PubnubLog = new LocalLog ();
+            config.LogVerbosity = PNLogVerbosity.BODY;
+            config.ReconnectionPolicy = PNReconnectionPolicy.LINEAR;
+
+            listener = new SubscribeCallbackExt (
+                (o, m) => 
+                {
+                    if (m != null) Display (pubnub.JsonPluggableLibrary.SerializeToJsonString(m.Message));
+                }, 
+                (o, p) => 
+                {
+                    if (p != null) Display (p.Event);
+                }, 
+                (o, s) => 
+                {
+                    if (s != null) Display (s.Category + " " + s.Operation + " " + s.StatusCode);
+                });
 
             Title = head; 
             this.m_Title = this.m_DrawerTitle = this.Title;
@@ -340,7 +364,7 @@ namespace PubNubMessaging.Example
             ThreadPool.QueueUserWorkItem (o => {
                 pubnub.AddListener (listener);
 
-                pubnub.Subscribe<string> ()
+                pubnub.Subscribe<object> ()
                         .Channels (new string [] { channel })
                         .ChannelGroups (new string [] { channelGroup })
                       .WithPresence ().Execute ();
