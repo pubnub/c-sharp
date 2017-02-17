@@ -309,9 +309,10 @@ namespace PubnubApi
             return jsonTimetoken;
         }
 
-        protected List<object> GetMessageFromMultiplexResult(List<object> result)
+        private List<SubscribeMessage> GetMessageFromMultiplexResult(List<object> result)
         {
             List<object> jsonMessageList = null;
+            List<SubscribeMessage> msgList = new List<SubscribeMessage>(); 
 
             Dictionary<string, object> messageDicObj = jsonLib.ConvertToDictionaryObject(result[1]);
             if (messageDicObj != null && messageDicObj.Count > 0 && messageDicObj.ContainsKey("m"))
@@ -327,7 +328,104 @@ namespace PubnubApi
                 }
             }
 
-            return jsonMessageList;
+            if (jsonMessageList != null && jsonMessageList.Count > 0)
+            {
+                foreach (Dictionary<string, object> dicItem in jsonMessageList)
+                {
+                    if (dicItem.Count > 0)
+                    {
+                        SubscribeMessage msg = new SubscribeMessage();
+                        foreach (string key in dicItem.Keys)
+                        {
+                            switch (key.ToLower())
+                            {
+                                case "a":
+                                    msg.Shard = dicItem[key].ToString();
+                                    break;
+                                case "b":
+                                    msg.SubscriptionMatch = dicItem[key].ToString();
+                                    break;
+                                case "c":
+                                    msg.Channel = dicItem[key].ToString();
+                                    break;
+                                case "d":
+                                    msg.Payload = dicItem[key];
+                                    break;
+                                case "f":
+                                    msg.Flags = dicItem[key].ToString();
+                                    break;
+                                case "i":
+                                    msg.IssuingClientId = dicItem[key].ToString();
+                                    break;
+                                case "k":
+                                    msg.SubscribeKey = dicItem[key].ToString();
+                                    break;
+                                case "s":
+                                    int seqNum;
+                                    Int32.TryParse(dicItem[key].ToString(), out seqNum);
+                                    msg.SequenceNumber = seqNum;
+                                    break;
+                                case "o":
+                                    Dictionary<string, object> ttOriginMetaData = jsonLib.ConvertToDictionaryObject(dicItem[key]);
+                                    if (ttOriginMetaData != null && ttOriginMetaData.Count > 0)
+                                    {
+                                        TimetokenMetadata ttMeta = new TimetokenMetadata();
+
+                                        foreach (string metaKey in ttOriginMetaData.Keys)
+                                        {
+                                            switch (metaKey.ToLower())
+                                            {
+                                                case "t":
+                                                    long timetoken;
+                                                    Int64.TryParse(ttOriginMetaData[metaKey].ToString(), out timetoken);
+                                                    ttMeta.Timetoken = timetoken;
+                                                    break;
+                                                case "r":
+                                                    ttMeta.Region = ttOriginMetaData[metaKey].ToString();
+                                                    break;
+                                            }
+                                        }
+                                        msg.OriginatingTimetoken = ttMeta;
+                                    }
+                                    break;
+                                case "p":
+                                    Dictionary<string, object> ttPublishMetaData = jsonLib.ConvertToDictionaryObject(dicItem[key]);
+                                    if (ttPublishMetaData != null && ttPublishMetaData.Count > 0)
+                                    {
+                                        TimetokenMetadata ttMeta = new TimetokenMetadata();
+
+                                        foreach (string metaKey in ttPublishMetaData.Keys)
+                                        {
+                                            switch (metaKey.ToLower())
+                                            {
+                                                case "t":
+                                                    long timetoken;
+                                                    Int64.TryParse(ttPublishMetaData[metaKey].ToString(), out timetoken);
+                                                    ttMeta.Timetoken = timetoken;
+                                                    break;
+                                                case "r":
+                                                    ttMeta.Region = ttPublishMetaData[metaKey].ToString();
+                                                    break;
+                                            }
+                                        }
+                                        msg.PublishTimetokenMetadata = ttMeta;
+                                    }
+                                    //TimetokenMetadata ttMeta = new TimetokenMetadata();
+                                    //msg.PublishTimetokenMetadata = dicItem[key] as TimetokenMetadata;
+                                    break;
+                                case "u":
+                                    //TimetokenMetadata ttMeta = new TimetokenMetadata();
+                                    msg.UserMetadata = dicItem[key];
+                                    break;
+                            }
+                        }
+
+                        msgList.Add(msg);
+                    }
+                }
+            }
+
+            return msgList;
         }
 
         private bool IsZeroTimeTokenRequest<T>(RequestState<T> asyncRequestState, List<object> result)
@@ -337,7 +435,7 @@ namespace PubnubApi
             {
                 if (asyncRequestState != null && asyncRequestState.Request != null && result != null && result.Count > 0)
                 {
-                    List<object> message = GetMessageFromMultiplexResult(result);
+                    List<SubscribeMessage> message = GetMessageFromMultiplexResult(result);
                     Uri restUri = asyncRequestState.Request.RequestUri;
                     IEnumerable<string> segmentsEnumerable = restUri.AbsolutePath.Split('/').Where(s => s.ToString() != "");
                     List<object> segments = (segmentsEnumerable != null) ? segmentsEnumerable.Cast<object>().ToList() : null;
@@ -351,7 +449,14 @@ namespace PubnubApi
                             IEnumerable<string> newChannels = from channel in MultiChannelSubscribe
                                                               where channel.Value == 0
                                                               select channel.Key;
+                            IEnumerable<string> newChannelGroups = from channelGroup in MultiChannelGroupSubscribe
+                                                              where channelGroup.Value == 0
+                                                              select channelGroup.Key;
                             if (newChannels != null && newChannels.Count() > 0)
+                            {
+                                ret = true;
+                            }
+                            else if (newChannelGroups != null && newChannelGroups.Count() > 0)
                             {
                                 ret = true;
                             }
@@ -402,7 +507,7 @@ namespace PubnubApi
             {
                 case PNOperationType.PNSubscribeOperation:
                 case PNOperationType.Presence:
-                    List<object> messageList = GetMessageFromMultiplexResult(result);
+                    List<SubscribeMessage> messageList = GetMessageFromMultiplexResult(result);
                     long messageTimetoken = GetTimetokenFromMultiplexResult(result);
 
                     if (messageList != null && messageList.Count > 0)
@@ -416,31 +521,20 @@ namespace PubnubApi
 
                         for (int messageIndex=0; messageIndex < messageList.Count; messageIndex++)
                         {
-                            Dictionary<string, object> messageDic = jsonLib.ConvertToDictionaryObject(messageList[messageIndex]);
-                            if (messageDic != null && messageDic.Count > 0)
+                            SubscribeMessage currentMessage = messageList[messageIndex];
+                            //Dictionary<string, object> messageDic = jsonLib.ConvertToDictionaryObject(messageList[messageIndex]);
+                            if (currentMessage != null)
                             {
-                                string currentMessageChannel = "";
-                                string currentMessageChannelGroup = "";
-                                if (messageDic.ContainsKey("c"))
-                                {
-                                    currentMessageChannel = messageDic["c"].ToString();
-                                }
+                                string currentMessageChannel = currentMessage.Channel;
+                                string currentMessageChannelGroup = currentMessage.SubscriptionMatch;
 
-                                if (messageDic.ContainsKey("b"))
-                                {
-                                    currentMessageChannelGroup = messageDic["b"].ToString();
-                                }
-
-                                if (currentMessageChannel == currentMessageChannelGroup)
+                                if (currentMessageChannel.Replace("-pnpres","") == currentMessageChannelGroup.Replace("-pnpres", ""))
                                 {
                                     currentMessageChannelGroup = "";
                                 }
 
-                                object payload = null;
-                                if (messageDic.ContainsKey("d"))
-                                {
-                                    payload = messageDic["d"];
-                                }
+                                object payload = currentMessage.Payload;
+
                                 List<object> payloadContainer = new List<object>(); //First item always message
                                 if (currentMessageChannel.Contains("-pnpres") || currentMessageChannel.Contains(".*-pnpres"))
                                 {
@@ -494,14 +588,11 @@ namespace PubnubApi
                                     }
                                 }
 
-                                object userMetaData = null;
-                                if (messageDic.ContainsKey("u"))
-                                {
-                                    userMetaData = messageDic["u"];
-                                }
+                                object userMetaData = currentMessage.UserMetadata;
+
                                 payloadContainer.Add(userMetaData); //Second one always user meta data
 
-                                payloadContainer.Add(messageTimetoken); //Third one always Timetoken
+                                payloadContainer.Add(currentMessage.PublishTimetokenMetadata.Timetoken); //Third one always Timetoken
 
                                 if (!string.IsNullOrEmpty(currentMessageChannelGroup)) //Add cg first before channel
                                 {

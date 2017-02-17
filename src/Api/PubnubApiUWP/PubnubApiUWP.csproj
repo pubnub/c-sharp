@@ -342,6 +342,60 @@
     <Compile Include="..\PubnubApi\Model\Consumer\Push\PNPushRemoveChannelResult.cs">
       <Link>Model\Consumer\Push\PNPushRemoveChannelResult.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerAuditResultExt.cs">
+      <Link>Model\Derived\AccessManager\PNAccessManagerAuditResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerGrantResultExt.cs">
+      <Link>Model\Derived\AccessManager\PNAccessManagerGrantResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsAddChannelResultExt.cs">
+      <Link>Model\Derived\ChannelGroup\PNChannelGroupsAddChannelResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsAllChannelsResultExt.cs">
+      <Link>Model\Derived\ChannelGroup\PNChannelGroupsAllChannelsResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsDeleteGroupResultExt.cs">
+      <Link>Model\Derived\ChannelGroup\PNChannelGroupsDeleteGroupResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsListAllResultExt.cs">
+      <Link>Model\Derived\ChannelGroup\PNChannelGroupsListAllResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsRemoveChannelResultExt.cs">
+      <Link>Model\Derived\ChannelGroup\PNChannelGroupsRemoveChannelResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\History\PNHistoryResultExt.cs">
+      <Link>Model\Derived\History\PNHistoryResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\PNTimeResultExt.cs">
+      <Link>Model\Derived\PNTimeResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\Presence\PNGetStateResultExt.cs">
+      <Link>Model\Derived\Presence\PNGetStateResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\Presence\PNHereNowResultEx.cs">
+      <Link>Model\Derived\Presence\PNHereNowResultEx.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\Presence\PNSetStateResultExt.cs">
+      <Link>Model\Derived\Presence\PNSetStateResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\Presence\PNWhereNowResultExt.cs">
+      <Link>Model\Derived\Presence\PNWhereNowResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\Pubsub\PNPublishResultExt.cs">
+      <Link>Model\Derived\Pubsub\PNPublishResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\Pubsub\SubscribeCallbackExt.cs">
+      <Link>Model\Derived\Pubsub\SubscribeCallbackExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\Push\PNPushAddChannelResultExt.cs">
+      <Link>Model\Derived\Push\PNPushAddChannelResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\Push\PNPushListProvisionsResultExt.cs">
+      <Link>Model\Derived\Push\PNPushListProvisionsResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\Push\PNPushRemoveChannelResultExt.cs">
+      <Link>Model\Derived\Push\PNPushRemoveChannelResultExt.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\Model\InternetState.cs">
       <Link>Model\InternetState.cs</Link>
     </Compile>
@@ -356,6 +410,15 @@
     </Compile>
     <Compile Include="..\PubnubApi\Model\RequestState.cs">
       <Link>Model\RequestState.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Server\SubscribeEnvelope.cs">
+      <Link>Model\Server\SubscribeEnvelope.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Server\SubscribeMessage.cs">
+      <Link>Model\Server\SubscribeMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Server\TimetokenMetadata.cs">
+      <Link>Model\Server\TimetokenMetadata.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\NewtonsoftJsonDotNet.cs">
       <Link>NewtonsoftJsonDotNet.cs</Link>

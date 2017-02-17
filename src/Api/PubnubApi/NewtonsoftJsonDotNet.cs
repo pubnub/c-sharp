@@ -673,10 +673,12 @@ namespace PubnubApi
                     ack.Timetoken = Convert.ToInt64(listObject[2].ToString());
                     //ack.ChannelGroupName = (listObject.Count == 4) ? listObject[2].ToString() : "";
                     ack.Channel = (listObject.Count == 5) ? listObject[4].ToString() : listObject[3].ToString();
+                    ack.Channel = ack.Channel.Replace("-pnpres", "");
 
                     if (listObject.Count == 5)
                     {
                         ack.Subscription = listObject[3].ToString();
+                        ack.Subscription = ack.Subscription.Replace("-pnpres", "");
                     }
 
                     if (listObject[1] != null)
