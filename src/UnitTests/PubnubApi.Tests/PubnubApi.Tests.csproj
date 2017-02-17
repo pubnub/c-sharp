@@ -348,6 +348,9 @@
     <Compile Include="..\..\Api\PubnubApi\Model\Derived\History\PNHistoryResultExt.cs">
       <Link>LinkedSourceCode\Model\Derived\History\PNHistoryResultExt.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\PNTimeResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\PNTimeResultExt.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Derived\Presence\PNGetStateResultExt.cs">
       <Link>LinkedSourceCode\Model\Derived\Presence\PNGetStateResultExt.cs</Link>
     </Compile>
@@ -386,6 +389,15 @@
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\RequestState.cs">
       <Link>LinkedSourceCode\Model\RequestState.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Server\SubscribeEnvelope.cs">
+      <Link>LinkedSourceCode\Model\Server\SubscribeEnvelope.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Server\SubscribeMessage.cs">
+      <Link>LinkedSourceCode\Model\Server\SubscribeMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Server\TimetokenMetadata.cs">
+      <Link>LinkedSourceCode\Model\Server\TimetokenMetadata.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\NewtonsoftJsonDotNet.cs">
       <Link>LinkedSourceCode\NewtonsoftJsonDotNet.cs</Link>
