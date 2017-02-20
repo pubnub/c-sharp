@@ -261,6 +261,9 @@
     <Compile Include="..\PubnubApi\Log\LoggingMethod.cs">
       <Link>Log\LoggingMethod.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Log\PNPlatform.cs">
+      <Link>Log\PNPlatform.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerAuditResult.cs">
       <Link>Model\Consumer\AccessManager\PNAccessManagerAuditResult.cs</Link>
     </Compile>

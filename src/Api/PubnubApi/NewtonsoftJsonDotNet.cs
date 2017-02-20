@@ -145,18 +145,25 @@ namespace PubnubApi
         private bool IsGenericTypeForMessage<T>()
         {
             bool ret = false;
-#if NET35 || NET40 || NET45 || NET461
+            PNPlatform.Print(config);
+
+#if (NET35 || NET40 || NET45 || NET461)
             if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(PNMessageResult<>))
             {
                 ret = true;
             }
-            System.Diagnostics.Debug.WriteLine("NET35/40 IsGenericTypeForMessage = {0}", ret.ToString());
-#elif NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12 || NETSTANDARD13 || NETSTANDARD14 || UAP || NETFX_CORE || WINDOWS_UWP
+            LoggingMethod.WriteToLog(string.Format("DateTime: {0}, NET35/40 IsGenericTypeForMessage = {1}", DateTime.Now.ToString(), ret.ToString()), config.LogVerbosity);
+#elif (PORTABLE111 || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12 || NETSTANDARD13 || NETSTANDARD14 || UAP || NETFX_CORE || WINDOWS_UWP)
             if (typeof(T).GetTypeInfo().IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(PNMessageResult<>))
             {
                 ret = true;
             }
-            System.Diagnostics.Debug.WriteLine("PCL/CORE IsGenericTypeForMessage = {0}", ret.ToString());
+            LoggingMethod.WriteToLog(string.Format("DateTime: {0}, typeof(T).GetTypeInfo().IsGenericType = {1}", DateTime.Now.ToString(), typeof(T).GetTypeInfo().IsGenericType.ToString()), config.LogVerbosity);
+            if (typeof(T).GetTypeInfo().IsGenericType)
+            {
+                LoggingMethod.WriteToLog(string.Format("DateTime: {0}, typeof(T).GetGenericTypeDefinition() = {1}", DateTime.Now.ToString(), typeof(T).GetGenericTypeDefinition().ToString()), config.LogVerbosity);
+            }
+            LoggingMethod.WriteToLog(string.Format("DateTime: {0}, PCL/CORE IsGenericTypeForMessage = {1}", DateTime.Now.ToString(), ret.ToString()), config.LogVerbosity);
 #endif
             LoggingMethod.WriteToLog(string.Format("DateTime: {0}, IsGenericTypeForMessage = {1}", DateTime.Now.ToString(), ret.ToString()), config.LogVerbosity);
             return ret;
@@ -241,7 +248,7 @@ namespace PubnubApi
 
                 ret = (T)Convert.ChangeType(message, specific, CultureInfo.InvariantCulture);
             }
-#elif NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12 || NETSTANDARD13 || NETSTANDARD14 || UAP || NETFX_CORE || WINDOWS_UWP
+#elif PORTABLE111 || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12 || NETSTANDARD13 || NETSTANDARD14 || UAP || NETFX_CORE || WINDOWS_UWP
             Type dataType = typeof(T).GetTypeInfo().GenericTypeArguments[0];
             Type generic = typeof(PNMessageResult<>);
             Type specific = generic.MakeGenericType(dataType);
@@ -332,7 +339,7 @@ namespace PubnubApi
 
             if (IsGenericTypeForMessage<T>())
             {
-                #region "Subscribe Message<>"
+#region "Subscribe Message<>"
                 return DeserializeMessageToObjectBasedOnPlatform<T>(listObject);
 #endregion
             }
