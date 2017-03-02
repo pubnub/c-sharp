@@ -3,6 +3,13 @@ changelog:
   - 
     changes: 
       - 
+        text: "Added pn- prefix to default uuid"
+        type: improvement
+    date: ~
+    version: v3.8.6
+  - 
+    changes: 
+      - 
         text: "Default origin changed"
         type: improvement
     date: ~

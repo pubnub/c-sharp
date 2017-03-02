@@ -1,4 +1,4 @@
-﻿//Build Date: Dec 23, 2016
+﻿//Build Date: Feb 27, 2017
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -5931,7 +5931,7 @@ namespace PubNubMessaging.Core
 		protected void VerifyOrSetSessionUUID ()
 		{
 			if (string.IsNullOrEmpty (this.sessionUUID) || string.IsNullOrEmpty (this.sessionUUID.Trim ())) {
-				this.sessionUUID = Guid.NewGuid ().ToString ();
+				this.sessionUUID = string.Format("pn-{0}", Guid.NewGuid().ToString());
 			}
 		}
 
