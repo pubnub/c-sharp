@@ -15,7 +15,7 @@
     "repository": {
       "url": "https://github.com/pubnub/c-sharp/"
     },
-    "releaseNotes": "pcl profile 111 subscribe message fix. ***ATTENTION*** Major changes in SDK V4.*. All methods and signatures changed compared to V3. Auto-upgrade NOT recommended",
+    "releaseNotes": "added pn- prefix to default uuid. ***ATTENTION*** Major changes in SDK V4.*. All methods and signatures changed compared to V3. Auto-upgrade NOT recommended",
     "tags": [
       "Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing"
     ],
