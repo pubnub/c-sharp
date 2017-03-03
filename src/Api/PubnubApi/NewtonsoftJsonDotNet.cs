@@ -714,15 +714,17 @@ namespace PubnubApi
                         Dictionary<string, object> dicMessageTimetoken = ConvertToDictionaryObject(message);
                         if (dicMessageTimetoken != null)
                         {
-                            if (dicMessageTimetoken.ContainsKey("message"))
+                            if (dicMessageTimetoken.ContainsKey("message") && dicMessageTimetoken.ContainsKey("timetoken"))
                             {
                                 result.Entry = dicMessageTimetoken["message"];
-                            }
-                            if (dicMessageTimetoken.ContainsKey("timetoken"))
-                            {
+
                                 long messageTimetoken;
                                 Int64.TryParse(dicMessageTimetoken["timetoken"].ToString(), out messageTimetoken);
                                 result.Timetoken = messageTimetoken;
+                            }
+                            else
+                            {
+                                result.Entry = dicMessageTimetoken;
                             }
                         }
                         else
