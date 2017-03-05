@@ -54,3 +54,29 @@ features:
     - SUBSCRIBE-WILDCARD
     - SUBSCRIBE-FILTER-EXPRESSION
     - SUBSCRIBE-PUBLISHER-UUID
+supported-platforms:
+  - 
+    version: Pubnub C# v4.0.1.3
+    platforms:
+      - Windows 10 and up
+      - Windows Server 2008 and up
+    frameworks:
+      - .Net Framework 3.5
+      - .Net Framework 4.0
+      - .Net Framework 4.5
+      - .Net Framework 4.6.1
+  - 
+    version: PubnubPCL C# v4.0.1.3
+    platforms:
+      - Xamarin.Android
+      - Xamarin.iOS
+      - Xamarin.Mac
+      - Windows 10
+      - Mac OS X 10 and up
+      - Windows Server 2008 and up
+  - 
+    version: PubnubUWP C# v4.0.1.3
+    platforms:
+      - Windows Phone 10
+      - Universal Windows Apps
+      - Windows 10
