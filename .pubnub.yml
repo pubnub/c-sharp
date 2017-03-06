@@ -179,8 +179,6 @@ supported-platforms:
       - Windows 8.1 Store Apps
       - Windows 7 and up
       - Windows Server 2008 and up
-      - Windows Phone 8.1
-      - Windows 8.1 Store Apps
     frameworks:
       - .Net Framework 3.5
       - .Net Framework 4.0
