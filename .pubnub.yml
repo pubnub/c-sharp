@@ -173,7 +173,7 @@ features:
     - TIME-TIME
 supported-platforms:
   - 
-    version: Pubnub C# 3.8.6
+    version: Pubnub 'C#' 3.8.6
     platforms:
       - Windows Phone 8.1
       - Windows 8.1 Store Apps
