@@ -179,6 +179,8 @@ supported-platforms:
       - Windows 8.1 Store Apps
       - Windows 7 and up
       - Windows Server 2008 and up
+      - Windows Phone 8.1
+      - Windows 8.1 Store Apps
     frameworks:
       - .Net Framework 3.5
       - .Net Framework 4.0
@@ -197,6 +199,8 @@ supported-platforms:
       - .Net Framework 4.0
       - .Net Framework 4.5
       - .Net Framework 4.6.1
+      - Mono 4.8.0
+      - PCL Profile 136
   - 
     version: PubnubNetPlatform 3.8.6
     platforms:
@@ -211,6 +215,10 @@ supported-platforms:
       - .Net Framework 4.0
       - .Net Framework 4.5
       - .Net Framework 4.6.1
+      - Mono 4.8.0
+      - PCL Profile 111
+      - PCL Profile 136
+      - PCL Profile 259
 name: c-sharp
 schema: 1
 scm: github.com/pubnub/c-sharp
