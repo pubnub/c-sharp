@@ -210,7 +210,8 @@ supported-platforms:
       - .Net Framework 3.5
       - .Net Framework 4.0
       - .Net Framework 4.5
-      - .Net Framework 4.6.1name: c-sharp
+      - .Net Framework 4.6.1
+name: c-sharp
 schema: 1
 scm: github.com/pubnub/c-sharp
 version: "3.8.6"
