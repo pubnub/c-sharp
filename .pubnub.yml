@@ -102,6 +102,7 @@ supported-platforms:
       - Windows 10
       - Mac OS X 10 and up
       - Windows Server 2008 and up
+    frameworks:      
       - Mono 4.8.0
       - PCL Profile 111
   - 
