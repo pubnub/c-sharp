@@ -74,6 +74,8 @@ supported-platforms:
       - Windows 10
       - Mac OS X 10 and up
       - Windows Server 2008 and up
+      - Mono 4.8.0
+      - PCL Profile 111
   - 
     version: PubnubUWP C# v4.0.1.3
     platforms:
