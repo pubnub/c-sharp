@@ -3,6 +3,16 @@ changelog:
   - 
     changes: 
       - 
+        text: "Comma encoding fix for multi channelgroups"
+        type: bug fix
+      - 
+        text: "Fixed channel remove from channelgroup"
+        type: bug fix
+    date: ~
+    version: v3.8.7
+  - 
+    changes: 
+      - 
         text: "Added pn- prefix to default uuid"
         type: improvement
     date: ~
@@ -220,4 +230,4 @@ supported-platforms:
 name: c-sharp
 schema: 1
 scm: github.com/pubnub/c-sharp
-version: "3.8.6"
+version: "3.8.7"
