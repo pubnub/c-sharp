@@ -243,6 +243,9 @@
     <Compile Include="..\..\Api\PubnubApi\Log\LoggingMethod.cs">
       <Link>LinkedSourceCode\Log\LoggingMethod.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Log\PNPlatform.cs">
+      <Link>LinkedSourceCode\Log\PNPlatform.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerAuditResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\AccessManager\PNAccessManagerAuditResult.cs</Link>
     </Compile>

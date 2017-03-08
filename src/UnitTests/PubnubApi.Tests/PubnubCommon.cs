@@ -3,7 +3,7 @@
     public static class PubnubCommon
     {
 		public const bool PAMEnabled = true;
-		public const bool EnableStubTest = false;
+		public const bool EnableStubTest = true;
 
         //USE demo-36 keys for unit tests
         public static readonly string PublishKey = "demo-36";
@@ -11,7 +11,7 @@
         public static readonly string SecretKey = "demo-36";
 
         public static readonly string StubOrign = "localhost:9191";
-        public static readonly string EncodedSDK = "PubNub%20CSharp%204.0.1.1";
+        public static readonly string EncodedSDK = "PubNub%20CSharp";
 
         static PubnubCommon()
         {

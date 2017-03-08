@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Security;
@@ -16,8 +17,6 @@ namespace MockServer
         private X509Certificate2 certificate;
         private TcpListener listener;
         private const int MAXBUFFER = 1024 * 64;
-        private byte[] data = new byte[MAXBUFFER];
-        private string strData;
         private string notFoundContent = "<html><head><title>Not Found</title></head><body>Sorry, the object you requested was not found.</body><html>";
         private readonly Uri uri;
         private Thread trf = null;
@@ -30,7 +29,7 @@ namespace MockServer
 
         static public Server Instance()
         {
-            if (server==null)
+            if (server == null)
             {
                 server = new MockServer.Server(new Uri("https://localhost:9191"));
             }
@@ -170,12 +169,7 @@ namespace MockServer
         /// </summary>
         private void ServerFunction()
         {
-            IsRunning = true;
-
             LoggingMethod.WriteToLog("Starting Server...", LoggingMethod.LevelInfo);
-
-            SslStream sslStream = null;
-            Stream stream = null;
 
         Start:
 
@@ -188,165 +182,187 @@ namespace MockServer
 
                 while (true)
                 {
-                    data = new byte[MAXBUFFER];
+                    var clientSocket = listener.AcceptSocket();
 
-                    var clientSocket = listener.AcceptTcpClient();
+                    LoggingMethod.WriteToLog(String.Format("Client accepted: {0}", ((IPEndPoint)clientSocket.LocalEndPoint).ToString()), LoggingMethod.LevelInfo);
 
-                    if (finalizeServer)
+                    SocketInformation socketInfo = clientSocket.DuplicateAndClose(Process.GetCurrentProcess().Id);
+
+                    Thread trfS = new Thread(new ParameterizedThreadStart((object obj) =>
                     {
-                        break;
-                    }
+                        string strData;
+                        byte[] data = new byte[MAXBUFFER];
 
-                    stream = clientSocket.GetStream();
+                        //var sock = (Socket)obj;
+                        var sock = new Socket((SocketInformation)obj);
+                        SslStream sslStream = null;
+                        Stream stream = new NetworkStream(sock);
 
-                    LoggingMethod.WriteToLog(String.Format("Client accepted: {0}", clientSocket.Client.LocalEndPoint.ToString()), LoggingMethod.LevelInfo);
-
-                    try
-                    {
-                        if (secure)
-                        {
-                            sslStream = new SslStream(stream, true, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
-                            ////sslStream = new SslStream(stream, false, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
-                            sslStream.AuthenticateAsServer(certificate, true, System.Security.Authentication.SslProtocols.Default, false);
-                            strData = ReadMessage(sslStream);
-                            stream = sslStream;
-                        }
-                        else
-                        {
-                            strData = ReadMessage(stream);
-                        }
-
-                        LoggingMethod.WriteToLog(String.Format("Request: {0}", strData), LoggingMethod.LevelVerbose);
-                    }
-                    catch (Exception error)
-                    {
-                        LoggingMethod.WriteToLog(String.Format("Error: {0}", error.Message), LoggingMethod.LevelError);
-                        throw error;
-                    }
-
-                    string[] lines = strData.Split(new string[] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-                    string path = lines[0].Substring(0, lines[0].LastIndexOf(" "));
-                    responses.Add(path);
-                    System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("        ###  MM/dd/yyyy HH:mm:ss:fff") + " - " + path);
-
-                    try
-                    {
-                        Request item = null;
                         try
                         {
-                            item = requests[path];
+                            if (secure)
+                            {
+                                /////sslStream = new SslStream(stream, true, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
+                                sslStream = new SslStream(stream, false, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
+                                sslStream.AuthenticateAsServer(certificate, true, System.Security.Authentication.SslProtocols.Default, false);
+                                strData = ReadMessage(sslStream);
+                                stream = sslStream;
+                            }
+                            else
+                            {
+                                strData = ReadMessage(stream);
+                            }
+
+                            ////try
+                            ////{
+                            ////    ////sslStream = new SslStream(stream, true, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
+                            ////    sslStream = new SslStream(stream, false, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
+                            ////    sslStream.AuthenticateAsServer(certificate, true, System.Security.Authentication.SslProtocols.Default, false);
+                            ////    strData = ReadMessage(sslStream);
+                            ////    stream = sslStream;
+                            ////}
+                            ////catch
+                            ////{
+                            ////    strData = ReadMessage(stream);
+                            ////    strData = "GET /" + strData;
+                            ////}
+
+                            LoggingMethod.WriteToLog(String.Format("Request: {0}", strData), LoggingMethod.LevelVerbose);
                         }
                         catch (Exception error)
                         {
+                            LoggingMethod.WriteToLog(String.Format("Error: {0}", error.Message), LoggingMethod.LevelError);
+                            throw error;
+                        }
+
+                        string[] lines = strData.Split(new string[] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                        string path = lines[0].Substring(0, lines[0].LastIndexOf(" "));
+                        responses.Add(path);
+                        System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("        ###  MM/dd/yyyy HH:mm:ss:fff") + " - " + path);
+
+                        try
+                        {
+                            Request item = null;
                             try
                             {
-                                item = requests[path.Substring(0, path.IndexOf("?"))];
+                                item = requests[path];
                             }
-                            catch (Exception errorNotFound)
+                            catch
                             {
-                                item = new MockServer.Request();
-                                item.Method = "GET";
-                                //////item.StatusCode = HttpStatusCode.OK;
-                                //////item.Response = "";
+                                try
+                                {
+                                    item = requests[path.Substring(0, path.IndexOf("?"))];
+                                }
+                                catch
+                                {
+                                    item = new MockServer.Request();
+                                    item.Method = "GET";
 
-                                if (path.Contains("GET /v2/presence/") && !path.Contains("/leave?"))
-                                {
-                                    item.Response = "{\"t\":{\"t\":\"14844074079055214\",\"r\":7},\"m\":[]}";
-                                    item.StatusCode = HttpStatusCode.OK;
-                                }
-                                else if (path.Contains("GET /v2/subscribe/"))
-                                {
-                                    item.Response = "{}";
-                                    item.StatusCode = HttpStatusCode.OK;
-                                }
-                                else if (path.Contains("GET /time/0"))
-                                {
-                                    item.Response = "[14827611897607991]";
-                                    item.StatusCode = HttpStatusCode.OK;
-                                }
-                                else if (path.Contains("/leave?"))
-                                {
-                                    item.Response = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
-                                    item.StatusCode = HttpStatusCode.OK;
-                                }
-                                else if (path.Contains("GET /publish/"))
-                                {
-                                    item.Response = "[1,\"Sent\",\"14715322883933786\"]";
-                                    item.StatusCode = HttpStatusCode.OK;
-                                }
-                                else
-                                {
-                                    item.Response = "";
-                                    item.StatusCode = HttpStatusCode.OK;    //// HttpStatusCode.NotFound;
+                                    if (path.Contains("GET /v2/presence/") && !path.Contains("/leave?"))
+                                    {
+                                        item.Response = "{\"t\":{\"t\":\"14844074079055214\",\"r\":7},\"m\":[]}";
+                                        item.StatusCode = HttpStatusCode.OK;
+                                    }
+                                    else if (path.Contains("GET /v2/subscribe/"))
+                                    {
+                                        item.Response = "{}";
+                                        item.StatusCode = HttpStatusCode.OK;
+                                    }
+                                    else if (path.Contains("GET /time/0"))
+                                    {
+                                        item.Response = "[14827611897607991]";
+                                        item.StatusCode = HttpStatusCode.OK;
+                                    }
+                                    else if (path.Contains("/leave?"))
+                                    {
+                                        item.Response = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
+                                        item.StatusCode = HttpStatusCode.OK;
+                                    }
+                                    else if (path.Contains("GET /publish/"))
+                                    {
+                                        item.Response = "[1,\"Sent\",\"14715322883933786\"]";
+                                        item.StatusCode = HttpStatusCode.OK;
+                                    }
+                                    else
+                                    {
+                                        item.Response = "";
+                                        item.StatusCode = HttpStatusCode.OK;    //// HttpStatusCode.NotFound;
+                                    }
                                 }
                             }
+
+                            LoggingMethod.WriteToLog(String.Format("Response: {0}", item.Response), LoggingMethod.LevelVerbose);
+
+                            switch (item.StatusCode)
+                            {
+                                case HttpStatusCode.OK:
+                                    {
+                                        string statusOK = "HTTP/1.1 200 OK\r\n";
+                                        statusOK += "Content-type: text/html\r\n";
+                                        statusOK += String.Format("Content-length: {0}\r\n\r\n", item.Response.Length.ToString());
+                                        statusOK += item.Response;
+                                        stream.Write(System.Text.Encoding.UTF8.GetBytes(statusOK), 0, statusOK.Length);
+                                        Thread.Sleep(10);
+
+                                        break;
+                                    }
+
+                                case HttpStatusCode.BadRequest:
+                                default:
+                                    {
+                                        string statusBadRequest = "HTTP/1.1 400 Bad Request\r\n";
+                                        statusBadRequest += "Content-type: text/html\r\n";
+                                        statusBadRequest += String.Format("Content-length: {0}\r\n\r\n", item.Response.Length.ToString());
+                                        statusBadRequest += item.Response;
+                                        stream.Write(System.Text.Encoding.UTF8.GetBytes(statusBadRequest), 0, statusBadRequest.Length);
+                                        Thread.Sleep(10);
+                                        break;
+                                    }
+
+                                case HttpStatusCode.Unauthorized:
+                                    break;
+                                case HttpStatusCode.Forbidden:
+                                    break;
+                                case HttpStatusCode.NotFound:
+                                    {
+                                        string statusNotFound = "HTTP/1.1 404 Not Found\r\n";
+                                        statusNotFound = "HTTP/1.1 404 Not Found\r\n";
+                                        statusNotFound += "Content-type: text/html\r\n";
+                                        statusNotFound += String.Format("Content-length: {0}\r\n\r\n", item.Response.Length.ToString());
+                                        statusNotFound += item.Response;
+                                        stream.Write(System.Text.Encoding.UTF8.GetBytes(statusNotFound), 0, statusNotFound.Length);
+                                        Thread.Sleep(10);
+                                        break;
+                                    }
+                            }
                         }
-
-                        LoggingMethod.WriteToLog(String.Format("Response: {0}", item.Response), LoggingMethod.LevelVerbose);
-
-                        switch (item.StatusCode)
+                        catch (Exception eHttp)
                         {
-                            case HttpStatusCode.OK:
-                                {
-                                    string statusOK = "HTTP/1.1 200 OK\r\n";
-                                    statusOK += "Content-type: text/html\r\n";
-                                    statusOK += String.Format("Content-length: {0}\r\n\r\n", item.Response.Length.ToString());
-                                    statusOK += item.Response;
-                                    stream.Write(System.Text.Encoding.UTF8.GetBytes(statusOK), 0, statusOK.Length);
-                                    Thread.Sleep(10);
-                                    break;
-                                }
-
-                            case HttpStatusCode.BadRequest:
-                            default:
-                                {
-                                    string statusBadRequest = "HTTP/1.1 400 Bad Request\r\n";
-                                    statusBadRequest += "Content-type: text/html\r\n";
-                                    statusBadRequest += String.Format("Content-length: {0}\r\n\r\n", item.Response.Length.ToString());
-                                    statusBadRequest += item.Response;
-                                    stream.Write(System.Text.Encoding.UTF8.GetBytes(statusBadRequest), 0, statusBadRequest.Length);
-                                    Thread.Sleep(10);
-                                    break;
-                                }
-
-                            case HttpStatusCode.Unauthorized:
-                                break;
-                            case HttpStatusCode.Forbidden:
-                                break;
-                            case HttpStatusCode.NotFound:
-                                {
-                                    string statusNotFound = "HTTP/1.1 404 Not Found\r\n";
-                                    statusNotFound = "HTTP/1.1 404 Not Found\r\n";
-                                    statusNotFound += "Content-type: text/html\r\n";
-                                    statusNotFound += String.Format("Content-length: {0}\r\n\r\n", item.Response.Length.ToString());
-                                    statusNotFound += item.Response;
-                                    stream.Write(System.Text.Encoding.UTF8.GetBytes(statusNotFound), 0, statusNotFound.Length);
-                                    Thread.Sleep(10);
-                                    break;
-                                }
+                            LoggingMethod.WriteToLog(String.Format("Path not found: {0}", strData), LoggingMethod.LevelError);
+                            string statusNotFound = "HTTP/1.1 404 Not Found\r\n";
+                            statusNotFound = "HTTP/1.1 404 Not Found\r\n";
+                            statusNotFound += "Content-type: text/html\r\n";
+                            statusNotFound += String.Format("Content-length: {0}\r\n\r\n", notFoundContent.Length.ToString());
+                            statusNotFound += notFoundContent;
+                            stream.Write(System.Text.Encoding.UTF8.GetBytes(statusNotFound), 0, statusNotFound.Length);
+                            Thread.Sleep(10);
                         }
-                    }
-                    catch (Exception eHttp)
-                    {
-                        LoggingMethod.WriteToLog(String.Format("Path not found: {0}", strData), LoggingMethod.LevelError);
-                        string statusNotFound = "HTTP/1.1 404 Not Found\r\n";
-                        statusNotFound = "HTTP/1.1 404 Not Found\r\n";
-                        statusNotFound += "Content-type: text/html\r\n";
-                        statusNotFound += String.Format("Content-length: {0}\r\n\r\n", notFoundContent.Length.ToString());
-                        statusNotFound += notFoundContent;
-                        stream.Write(System.Text.Encoding.UTF8.GetBytes(statusNotFound), 0, statusNotFound.Length);
-                        Thread.Sleep(10);
-                    }
 
-                    if (sslStream != null)
-                    {
-                        sslStream.Flush();
-                        sslStream.Close();
-                    }
+                        if (sslStream != null)
+                        {
+                            sslStream.Flush();
+                            sslStream.Close();
+                        }
 
-                    stream.Flush();
-                    stream.Close();
-                    clientSocket.Close();
+                        stream.Flush();
+                        stream.Close();
+                        clientSocket.Close();
+                    }));
+
+                    trfS.IsBackground = true;
+                    trfS.SetApartmentState(ApartmentState.MTA);
+
+                    trfS.Start(socketInfo);
                 }
             }
             catch (Exception error)
