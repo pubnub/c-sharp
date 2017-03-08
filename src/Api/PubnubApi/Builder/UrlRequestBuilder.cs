@@ -81,7 +81,7 @@ namespace PubnubApi
 
             if (channelGroups != null && channelGroups.Length > 0 && channelGroups[0] != "")
             {
-                requestQueryStringParams.Add("channel-group", string.Join(",", channelGroups.OrderBy(x => x).ToArray()));
+                requestQueryStringParams.Add("channel-group", new UriUtil().EncodeUriComponent(string.Join(",", channelGroups.OrderBy(x => x).ToArray()), currentType, false, false));
             }
 
             if (channelsJsonState != "{}" && channelsJsonState != "")
@@ -124,7 +124,7 @@ namespace PubnubApi
 
             if (channelGroups != null && channelGroups.Length > 0)
             {
-                requestQueryStringParams.Add("channel-group", string.Join(",", channelGroups.OrderBy(x => x).ToArray()));
+                requestQueryStringParams.Add("channel-group", new UriUtil().EncodeUriComponent(string.Join(",", channelGroups.OrderBy(x => x).ToArray()),currentType, false, false));
             }
 
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
@@ -201,10 +201,10 @@ namespace PubnubApi
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
-            string channelGroup = (channelGroups != null) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
-            if (!string.IsNullOrEmpty(channelGroup) && channelGroup.Trim().Length > 0)
+            string commaDelimitedchannelGroup = (channelGroups != null) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
+            if (!string.IsNullOrEmpty(commaDelimitedchannelGroup) && commaDelimitedchannelGroup.Trim().Length > 0)
             {
-                requestQueryStringParams.Add("channel-group", channelGroup);
+                requestQueryStringParams.Add("channel-group", new UriUtil().EncodeUriComponent(commaDelimitedchannelGroup, currentType, false, false));
             }
 
             requestQueryStringParams.Add("disable_uuids", disableUUID.ToString());
@@ -440,7 +440,7 @@ namespace PubnubApi
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
-            requestQueryStringParams.Add("add", channelsCommaDelimited);
+            requestQueryStringParams.Add("add", new UriUtil().EncodeUriComponent(channelsCommaDelimited, currentType,false,false));
 
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
@@ -491,7 +491,7 @@ namespace PubnubApi
             if (!String.IsNullOrEmpty(channelsCommaDelimited))
             {
                 channelAvaiable = true;
-                requestQueryStringParams.Add("remove", channelsCommaDelimited);
+                requestQueryStringParams.Add("remove", new UriUtil().EncodeUriComponent(channelsCommaDelimited, currentType, false, false));
             }
 
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
@@ -684,7 +684,7 @@ namespace PubnubApi
 
             if (channelGroups != null && channelGroups.Length > 0)
             {
-                requestQueryStringParams.Add("channel-group", string.Join(",", channelGroups.OrderBy(x => x).ToArray()));
+                requestQueryStringParams.Add("channel-group", new UriUtil().EncodeUriComponent(string.Join(",", channelGroups.OrderBy(x => x).ToArray()), currentType, false,false));
             }
 
             if (pubnubConfig.PresenceTimeout != 0)
