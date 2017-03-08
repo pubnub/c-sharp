@@ -1,4 +1,4 @@
-//Build Date: Feb 27, 2017
+//Build Date: Mar 08, 2017
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -111,7 +111,7 @@ namespace PubNubMessaging.Core
 		protected string secretKey = "";
 		protected string cipherKey = "";
 		protected bool ssl = false;
-        private string _pnsdkVersion = "PubNub-CSharp-.NET/3.8.5";
+        private string _pnsdkVersion = "PubNub-CSharp-.NET/3.8.7";
         private string _pushServiceName = "push.pubnub.com";
         private bool _addPayloadToPublishResponse = false;
 
@@ -2282,7 +2282,7 @@ namespace PubNubMessaging.Core
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
-            requestQueryStringParams.Add("add", string.Join(",",channels));
+            requestQueryStringParams.Add("add", EncodeUricomponent(string.Join(",",channels), currentType, false, false));
 
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
@@ -2309,12 +2309,19 @@ namespace PubNubMessaging.Core
                 url.Add("namespace");
                 url.Add(nameSpace);
             }
+
             if (!string.IsNullOrEmpty(groupName) && groupName.Trim().Length > 0)
             {
                 groupNameAvailable = true;
                 url.Add("channel-group");
                 url.Add(groupName);
             }
+
+            if (channels != null && channels.Length > 0)
+            {
+                channelAvaiable = true;
+            }
+
             if (nameSpaceAvailable && groupNameAvailable && !channelAvaiable)
             {
                 url.Add("remove");
@@ -2330,10 +2337,9 @@ namespace PubNubMessaging.Core
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
-            if (channels != null && channels.Length > 0)
+            if (channelAvaiable)
             {
-                channelAvaiable = true;
-                requestQueryStringParams.Add("remove", string.Join(",", channels));
+                requestQueryStringParams.Add("remove", EncodeUricomponent(string.Join(",", channels), currentType, false, false));
             }
 
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
@@ -3228,7 +3234,7 @@ namespace PubNubMessaging.Core
 
             if (channelGroups != null && channelGroups.Length > 0 && channelGroups[0] != "")
             {
-                requestQueryStringParams.Add("channel-group", string.Join(",", channelGroups));
+                requestQueryStringParams.Add("channel-group", EncodeUricomponent(string.Join(",", channelGroups), currentType, false, false));
             }
 
             string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
@@ -3804,7 +3810,7 @@ namespace PubNubMessaging.Core
 
             if (channelGroups != null && channelGroups.Length > 0)
             {
-                requestQueryStringParams.Add("channel-group", string.Join(",", channelGroups));
+                requestQueryStringParams.Add("channel-group", EncodeUricomponent(string.Join(",", channelGroups), currentType, false, false));
             }
 
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
@@ -3904,7 +3910,7 @@ namespace PubNubMessaging.Core
 			}
             if (channelGroups != null && channelGroups.Length > 0)
             {
-                requestQueryStringParams.Add("channel-group", string.Join(",", channelGroups));
+                requestQueryStringParams.Add("channel-group", EncodeUricomponent(string.Join(",", channelGroups), currentType, false, false));
             }
             if (_pubnubPresenceHeartbeatInSeconds != 0)
             {
