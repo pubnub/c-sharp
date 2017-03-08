@@ -467,12 +467,19 @@ namespace PubnubApi
                 url.Add("namespace");
                 url.Add(nameSpace);
             }
+
             if (!string.IsNullOrEmpty(groupName) && groupName.Trim().Length > 0)
             {
                 groupNameAvailable = true;
                 url.Add("channel-group");
                 url.Add(groupName);
             }
+
+            if (!String.IsNullOrEmpty(channelsCommaDelimited))
+            {
+                channelAvaiable = true;
+            }
+
             if (nameSpaceAvailable && groupNameAvailable && !channelAvaiable)
             {
                 url.Add("remove");
@@ -488,9 +495,8 @@ namespace PubnubApi
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
-            if (!String.IsNullOrEmpty(channelsCommaDelimited))
+            if (channelAvaiable)
             {
-                channelAvaiable = true;
                 requestQueryStringParams.Add("remove", new UriUtil().EncodeUriComponent(channelsCommaDelimited, currentType, false, false));
             }
 
