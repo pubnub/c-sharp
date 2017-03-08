@@ -15,7 +15,7 @@
     "repository": {
       "url": "https://github.com/pubnub/c-sharp/"
     },
-    "releaseNotes": "message fix for history when timetoken=false. ***ATTENTION*** Major changes in SDK V4.*. All methods and signatures changed compared to V3. Auto-upgrade NOT recommended",
+    "releaseNotes": "comma encoding fix for multi channelgroups. ***ATTENTION*** Major changes in SDK V4.*. All methods and signatures changed compared to V3. Auto-upgrade NOT recommended",
     "tags": [
       "Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing"
     ],
