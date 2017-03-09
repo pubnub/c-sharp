@@ -74,23 +74,12 @@ namespace PubNubMessaging.Tests
             server.AddRequest(new Request()
                     .WithMethod("GET")
                     .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
-                    //.WithParameter("auth", authKey)
-                    //.WithParameter("channel", channel)
-                    //.WithParameter("m", "1")
-                    //.WithParameter("pnsdk", PubnubCommon.EncodedSDK)
-                    //.WithParameter("r", "1")
-                    //.WithParameter("requestid", "myRequestId")
-                    //.WithParameter("timestamp", "1356998400")
-                    //.WithParameter("ttl", "20")
-                    //.WithParameter("uuid", config.Uuid)
-                    //.WithParameter("w", "1")
-                    //.WithParameter("signature", "xtE5RzNNCma_Dy-4JqVyROrVEnkjIzJ6N9Wl5GNjfBA=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
 
-            Thread.Sleep(1000);
+            Thread.Sleep(100);
 
             grantManualEvent.WaitOne();
 
@@ -183,7 +172,7 @@ namespace PubNubMessaging.Tests
         //            .WithStatusCode(System.Net.HttpStatusCode.OK));
 
         //    pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
-        //    Thread.Sleep(2000);
+        //    Thread.Sleep(200);
 
         //    pubnub.RemoveListener(listenerSubCallack);
         //    pubnub.Destroy();
@@ -248,11 +237,13 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new string[] { channel }).WithPresence().Execute();
             presenceManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            Thread.Sleep(1000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+            else Thread.Sleep(100);
 
             pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
 
-            Thread.Sleep(1000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+            else Thread.Sleep(100);
 
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
@@ -314,11 +305,13 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new string[] { channel }).WithPresence().Execute();
             presenceManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            Thread.Sleep(1000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+            else Thread.Sleep(100);
 
             pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
 
-            Thread.Sleep(1000);
+            //if (!PubnubCommon.EnableStubTest) Thread.Sleep(100);
+            Thread.Sleep(100);
 
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
@@ -381,11 +374,13 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new string[] { channel }).WithPresence().Execute();
             presenceManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            Thread.Sleep(1000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+            else Thread.Sleep(100);
 
             pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
 
-            Thread.Sleep(1000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+            else Thread.Sleep(100);
 
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
@@ -427,7 +422,6 @@ namespace PubNubMessaging.Tests
                     .WithParameter("heartbeat", "300")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
-                    .WithParameter("timestamp", "1356998400")
                     .WithParameter("tt", "0")
                     .WithParameter("uuid", config.Uuid)
                     .WithResponse(expected)
@@ -445,7 +439,8 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            Thread.Sleep(2000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
+            else Thread.Sleep(200);
 
             expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"Presence\", \"uuids\": [\"mytestuuid\"], \"occupancy\": 1}";
 
@@ -469,7 +464,8 @@ namespace PubNubMessaging.Tests
 
             pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
 
-            Thread.Sleep(1000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+            else Thread.Sleep(100);
 
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
@@ -512,7 +508,6 @@ namespace PubNubMessaging.Tests
                     .WithParameter("heartbeat", "300")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
-                    .WithParameter("timestamp", "1356998400")
                     .WithParameter("tt", "0")
                     .WithParameter("uuid", config.Uuid)
                     .WithResponse(expected)
@@ -530,7 +525,8 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            Thread.Sleep(2000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
+            else Thread.Sleep(200);
 
             expected = "{\"TotalChannels\":1,\"TotalOccupancy\":1,\"Channels\":{\"hello_my_channel\":{\"ChannelName\":\"hello_my_channel\",\"Occupancy\":1,\"Occupants\":[{\"Uuid\":\"mytestuuid\",\"State\":null}]}}}";
 
@@ -554,7 +550,8 @@ namespace PubNubMessaging.Tests
 
             pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
 
-            Thread.Sleep(1000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+            else Thread.Sleep(100);
 
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
@@ -615,7 +612,8 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            Thread.Sleep(2000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
+            else Thread.Sleep(200);
 
             expected = "{\"TotalChannels\":1,\"TotalOccupancy\":1,\"Channels\":{\"hello_my_channel\":{\"ChannelName\":\"hello_my_channel\",\"Occupancy\":1,\"Occupants\":[{\"Uuid\":\"mytestuuid\",\"State\":null}]}}}";
 
@@ -639,7 +637,8 @@ namespace PubNubMessaging.Tests
 
             pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
 
-            Thread.Sleep(1000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+            else Thread.Sleep(100);
 
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
@@ -701,7 +700,8 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            Thread.Sleep(2000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
+            else Thread.Sleep(200);
 
             expected = "{\"TotalChannels\":1,\"TotalOccupancy\":1,\"Channels\":{\"hello_my_channel\":{\"ChannelName\":\"hello_my_channel\",\"Occupancy\":1,\"Occupants\":[{\"Uuid\":\"mytestuuid\",\"State\":null}]}}}";
 
@@ -725,7 +725,8 @@ namespace PubNubMessaging.Tests
 
             pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
 
-            Thread.Sleep(1000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+            else Thread.Sleep(100);
 
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
@@ -768,7 +769,6 @@ namespace PubNubMessaging.Tests
                     .WithParameter("heartbeat", "300")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
-                    .WithParameter("timestamp", "1356998400")
                     .WithParameter("tt", "0")
                     .WithParameter("uuid", config.Uuid)
                     .WithResponse(expected)
@@ -786,7 +786,8 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            Thread.Sleep(2000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
+            else Thread.Sleep(200);
 
             expected = "{\"TotalChannels\":1,\"TotalOccupancy\":1,\"Channels\":{\"hello_my_channel\":{\"ChannelName\":\"hello_my_channel\",\"Occupancy\":1,\"Occupants\":[{\"Uuid\":\"mytestuuid\",\"State\":null}]}}}";
 
@@ -810,7 +811,8 @@ namespace PubNubMessaging.Tests
 
             pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
 
-            Thread.Sleep(1000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+            else Thread.Sleep(100);
 
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
@@ -871,7 +873,8 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            Thread.Sleep(2000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
+            else Thread.Sleep(200);
 
             expected = "{\"TotalChannels\":1,\"TotalOccupancy\":1,\"Channels\":{\"hello_my_channel\":{\"ChannelName\":\"hello_my_channel\",\"Occupancy\":1,\"Occupants\":[{\"Uuid\":\"mytestuuid\",\"State\":null}]}}}";
 
@@ -895,7 +898,8 @@ namespace PubNubMessaging.Tests
 
             pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
 
-            Thread.Sleep(1000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+            else Thread.Sleep(100);
 
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
@@ -956,7 +960,8 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            Thread.Sleep(2000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
+            else Thread.Sleep(200);
 
             expected = "{\"TotalChannels\":1,\"TotalOccupancy\":1,\"Channels\":{\"hello_my_channel\":{\"ChannelName\":\"hello_my_channel\",\"Occupancy\":1,\"Occupants\":[{\"Uuid\":\"mytestuuid\",\"State\":null}]}}}";
 
@@ -980,7 +985,8 @@ namespace PubNubMessaging.Tests
 
             pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
 
-            Thread.Sleep(1000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+            else Thread.Sleep(100);
 
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
@@ -1022,7 +1028,6 @@ namespace PubNubMessaging.Tests
                     .WithParameter("heartbeat", "300")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
-                    .WithParameter("timestamp", "1356998400")
                     .WithParameter("tt", "0")
                     .WithParameter("uuid", config.Uuid)
                     .WithResponse(expected)
@@ -1040,7 +1045,8 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            Thread.Sleep(2000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
+            else Thread.Sleep(200);
 
             expected = "{\"TotalChannels\":1,\"TotalOccupancy\":1,\"Channels\":{\"hello_my_channel\":{\"ChannelName\":\"hello_my_channel\",\"Occupancy\":1,\"Occupants\":[{\"Uuid\":\"mytestuuid\",\"State\":null}]}}}";
 
@@ -1064,7 +1070,8 @@ namespace PubNubMessaging.Tests
 
             pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
 
-            Thread.Sleep(1000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+            else Thread.Sleep(100);
 
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
@@ -1105,7 +1112,6 @@ namespace PubNubMessaging.Tests
                     .WithParameter("heartbeat", "300")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
-                    .WithParameter("timestamp", "1356998400")
                     .WithParameter("tt", "0")
                     .WithParameter("uuid", config.Uuid)
                     .WithResponse(expected)
@@ -1123,7 +1129,8 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            Thread.Sleep(2000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
+            else Thread.Sleep(200);
 
             userStateManualEvent = new ManualResetEvent(false);
             dicState = new Dictionary<string, object>();
@@ -1180,7 +1187,8 @@ namespace PubNubMessaging.Tests
 
             pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
 
-            Thread.Sleep(1000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+            else Thread.Sleep(100);
 
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
@@ -1204,6 +1212,12 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
+
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+
             server.RunOnHttps(false);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
@@ -1223,6 +1237,18 @@ namespace PubNubMessaging.Tests
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("tt", "0")
                     .WithParameter("uuid", config.Uuid)
+                    .WithParameter("signature", "o3VANfuhvrxfff1jsBMOc6EQ4LCe8LXHGaDh58QBZFA=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, channel))
+                    .WithParameter("heartbeat", "300")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("tt", "0")
+                    .WithParameter("uuid", config.Uuid)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -1238,7 +1264,8 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            Thread.Sleep(2000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
+            else Thread.Sleep(200);
 
             expected = "{\"status\": 200, \"message\": \"OK\", \"payload\": {\"channels\": {}, \"total_channels\": 0, \"total_occupancy\": 0}, \"service\": \"Presence\"}";
 
@@ -1269,7 +1296,8 @@ namespace PubNubMessaging.Tests
 
             pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
 
-            Thread.Sleep(1000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+            else Thread.Sleep(100);
 
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
@@ -1308,7 +1336,6 @@ namespace PubNubMessaging.Tests
                     .WithParameter("heartbeat", "300")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
-                    .WithParameter("timestamp", "1356998400")
                     .WithParameter("tt", "0")
                     .WithParameter("uuid", config.Uuid)
                     .WithResponse(expected)
@@ -1383,7 +1410,8 @@ namespace PubNubMessaging.Tests
 
             pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
 
-            Thread.Sleep(1000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+            else Thread.Sleep(100);
 
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
@@ -1423,7 +1451,6 @@ namespace PubNubMessaging.Tests
                     .WithParameter("heartbeat", "300")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
-                    .WithParameter("timestamp", "1356998400")
                     .WithParameter("tt", "0")
                     .WithParameter("uuid", config.Uuid)
                     .WithResponse(expected)
@@ -1441,7 +1468,8 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            Thread.Sleep(2000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
+            else Thread.Sleep(200);
 
             expected = "{\"status\": 200, \"message\": \"OK\", \"payload\": {\"channels\": {}, \"total_channels\": 0, \"total_occupancy\": 0}, \"service\": \"Presence\"}";
 
@@ -1469,7 +1497,8 @@ namespace PubNubMessaging.Tests
 
             pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
 
-            Thread.Sleep(1000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+            else Thread.Sleep(100);
 
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
@@ -1521,7 +1550,9 @@ namespace PubNubMessaging.Tests
 
             if (receivedUserStateMessage)
             {
-                Thread.Sleep(2000);
+                if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
+                else Thread.Sleep(200);
+
                 receivedUserStateMessage = false;
                 userStateManualEvent = new ManualResetEvent(false);
 
@@ -1591,7 +1622,8 @@ namespace PubNubMessaging.Tests
 
             userStateManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            Thread.Sleep(2000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
+            else Thread.Sleep(200);
 
             if (receivedUserStateMessage)
             {
@@ -1615,7 +1647,8 @@ namespace PubNubMessaging.Tests
 
                 userStateManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-                Thread.Sleep(2000);
+                if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
+                else Thread.Sleep(200);
             }
 
             if (receivedUserStateMessage)
@@ -1645,7 +1678,8 @@ namespace PubNubMessaging.Tests
 
                 userStateManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-                Thread.Sleep(2000);
+                if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
+                else Thread.Sleep(200);
             }
 
             if (receivedUserStateMessage)
@@ -1724,11 +1758,12 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new string[] { channel }).WithPresence().Execute();
             presenceManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            Thread.Sleep(pubnub.PNConfig.PresenceTimeout + 3 * 1000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(pubnub.PNConfig.PresenceTimeout + (3 * 1000));
 
             pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
 
-            Thread.Sleep(1000);
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+            else Thread.Sleep(100);
 
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();

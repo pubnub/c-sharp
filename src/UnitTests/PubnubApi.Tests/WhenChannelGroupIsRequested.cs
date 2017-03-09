@@ -155,13 +155,13 @@ namespace PubNubMessaging.Tests
 
             server.AddRequest(new Request()
                     .WithMethod("GET")
-                    .WithPath(string.Format("/v1/channel-registration/sub-key/{0}/channel-group/{1}/remove", PubnubCommon.SubscribeKey, channelGroupName))
+                    .WithPath(string.Format("/v1/channel-registration/sub-key/{0}/channel-group/{1}", PubnubCommon.SubscribeKey, channelGroupName))
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("remove", channelName)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
-                    .WithParameter("signature", "pYkBCwerq5oLuWExyW6z9_ygroklA4X2vvnYJCbwnjA=")
+                    .WithParameter("signature", "bTwraHYh6dEMi44y-WgHslZdKSltsMySX5cg0uHt9tE=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 

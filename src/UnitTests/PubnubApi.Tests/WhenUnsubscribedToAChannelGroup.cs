@@ -128,7 +128,6 @@ namespace PubNubMessaging.Tests
                     .WithParameter("auth", config.AuthKey)
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
-                    .WithParameter("timestamp", "1356998400")
                     .WithParameter("uuid", config.Uuid)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
@@ -151,7 +150,6 @@ namespace PubNubMessaging.Tests
                         .WithParameter("heartbeat", "300")
                         .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                         .WithParameter("requestid", "myRequestId")
-                        .WithParameter("timestamp", "1356998400")
                         .WithParameter("tt", "0")
                         .WithParameter("uuid", config.Uuid)
                         .WithResponse(expected)
