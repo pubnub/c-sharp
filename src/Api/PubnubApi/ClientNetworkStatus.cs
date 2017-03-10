@@ -3,7 +3,7 @@ using System.Threading;
 using System.Net;
 using System.Threading.Tasks;
 using System.IO;
-#if !NET35 && !NET40 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
 using System.Net.Http;
 using System.Net.Http.Headers;
 #endif
@@ -154,7 +154,7 @@ namespace PubnubApi
             Uri requestUri = urlBuilder.BuildTimeRequest();
             try
             {
-#if !NET35 && !NET40 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
                 HttpClient httpClient = new HttpClient();
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

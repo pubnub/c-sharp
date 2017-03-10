@@ -7,7 +7,7 @@ using System.IO;
 using System.Net;
 using System.Collections;
 using System.Threading.Tasks;
-#if !NET35 && !NET40 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
 using System.Net.Http;
 using System.Net.Http.Headers;
 #endif
@@ -64,7 +64,7 @@ namespace PubnubApi
 
         async Task<string> IPubnubHttp.SendRequestAndGetJsonResponse<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request)
         {
-#if !NET35 && !NET40 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
             return await SendRequestAndGetJsonResponseHttpClient(requestUri, pubnubRequestState, request);
 #else
             return await SendRequestAndGetJsonResponseTaskFactory(requestUri, pubnubRequestState, request);
@@ -73,27 +73,27 @@ namespace PubnubApi
 
         async Task<string> IPubnubHttp.SendRequestAndGetJsonResponseWithPOST<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request, string postData)
         {
-#if !NET35 && !NET40 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
             return await SendRequestAndGetJsonResponseHttpClientWithPOST(requestUri, pubnubRequestState, request, postData);
 #else
             return await SendRequestAndGetJsonResponseTaskFactoryWithPOST(requestUri, pubnubRequestState, request, postData);
 #endif
         }
 
-            //private string ReadStreamFromResponse(HttpWebResponse response)
-            //{
-            //    System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Got PubnubWebResponse", DateTime.Now.ToString()));
-            //    using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
-            //    {
-            //        //Need to return this response 
-            //        string jsonString = streamReader.ReadToEnd();
-            //        System.Diagnostics.Debug.WriteLine(jsonString);
-            //        System.Diagnostics.Debug.WriteLine("");
-            //        System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON", DateTime.Now.ToString()));
-            //        return jsonString;
-            //    }
-            //}
-#if !NET35 && !NET40 && !NETSTANDARD10
+        //private string ReadStreamFromResponse(HttpWebResponse response)
+        //{
+        //    System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Got PubnubWebResponse", DateTime.Now.ToString()));
+        //    using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
+        //    {
+        //        //Need to return this response 
+        //        string jsonString = streamReader.ReadToEnd();
+        //        System.Diagnostics.Debug.WriteLine(jsonString);
+        //        System.Diagnostics.Debug.WriteLine("");
+        //        System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON", DateTime.Now.ToString()));
+        //        return jsonString;
+        //    }
+        //}
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
         async Task<string> SendRequestAndGetJsonResponseHttpClient<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request)
         {
             string jsonString = "";
