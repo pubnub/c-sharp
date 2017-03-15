@@ -280,6 +280,7 @@ namespace PubnubApiDemo
             config.PublishKey = publishKey;
             config.SecretKey = secretKey;
             config.ReconnectionPolicy = PNReconnectionPolicy.LINEAR;
+            //config.UseClassicHttpWebRequest = true;
             //config.FilterExpression = "uuid == '" + config.Uuid +  "'";
 
             pubnub = new Pubnub(config);
