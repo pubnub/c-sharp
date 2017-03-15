@@ -271,6 +271,11 @@ namespace PubNubMessaging.Core
 
         static void ParseCheckSocketConnectException<T> (Exception ex, string[] channels, string[] channelGroups, Action<PubnubClientError> errorCallback, Action<bool> callback)
 		{
+            if(channelGroups == null)
+            {
+                channelGroups = new string[0];
+            }
+
 			PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(ex);
 			int statusCode = (int)errorType;
 			string errorDescription = PubnubErrorCodeDescription.GetStatusCodeDescription(errorType);
