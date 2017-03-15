@@ -64,20 +64,35 @@ namespace PubnubApi
 
         async Task<string> IPubnubHttp.SendRequestAndGetJsonResponse<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request)
         {
+            if (pubnubConfig.UseClassicHttpWebRequest)
+            {
+                return await SendRequestAndGetJsonResponseClassicHttp(requestUri, pubnubRequestState, request);
+            }
+            else
+            {
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
-            return await SendRequestAndGetJsonResponseHttpClient(requestUri, pubnubRequestState, request);
+                return await SendRequestAndGetJsonResponseHttpClient(requestUri, pubnubRequestState, request);
 #else
-            return await SendRequestAndGetJsonResponseTaskFactory(requestUri, pubnubRequestState, request);
+                return await SendRequestAndGetJsonResponseTaskFactory(requestUri, pubnubRequestState, request);
 #endif
+            }
+
         }
 
         async Task<string> IPubnubHttp.SendRequestAndGetJsonResponseWithPOST<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request, string postData)
         {
+            if (pubnubConfig.UseClassicHttpWebRequest)
+            {
+                return await SendRequestAndGetJsonResponseClassicHttpWithPOST(requestUri, pubnubRequestState, request, postData);
+            }
+            else
+            {
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
-            return await SendRequestAndGetJsonResponseHttpClientWithPOST(requestUri, pubnubRequestState, request, postData);
+                return await SendRequestAndGetJsonResponseHttpClientWithPOST(requestUri, pubnubRequestState, request, postData);
 #else
-            return await SendRequestAndGetJsonResponseTaskFactoryWithPOST(requestUri, pubnubRequestState, request, postData);
+                return await SendRequestAndGetJsonResponseTaskFactoryWithPOST(requestUri, pubnubRequestState, request, postData);
 #endif
+            }
         }
 
         //private string ReadStreamFromResponse(HttpWebResponse response)
@@ -100,7 +115,7 @@ namespace PubnubApi
             HttpResponseMessage response = null;
             try
             {
-                System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, SendRequestAndGetJsonResponseHttpClient Before httpClient.GetAsync", DateTime.Now.ToString()));
+                LoggingMethod.WriteToLog(string.Format("DateTime: {0}, Inside SendRequestAndGetJsonResponseHttpClient", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
                 HttpClient httpClient = new HttpClient();
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -171,7 +186,7 @@ namespace PubnubApi
         async Task<string> SendRequestAndGetJsonResponseTaskFactory<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request)
         {
             HttpWebResponse response = null;
-            System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Before Task.Factory.FromAsync", DateTime.Now.ToString()));
+            LoggingMethod.WriteToLog(string.Format("DateTime: {0}, Inside SendRequestAndGetJsonResponseTaskFactory", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
             try
             {
                 request.Method = "GET";
@@ -329,6 +344,162 @@ namespace PubnubApi
             catch (Exception ex)
             {
                 throw ex;
+            }
+        }
+
+        async Task<string> SendRequestAndGetJsonResponseClassicHttp<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request)
+        {
+            //HttpWebResponse response = null;
+            LoggingMethod.WriteToLog(string.Format("DateTime: {0}, Inside SendRequestAndGetJsonResponseClassicHttp", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
+            var taskComplete = new TaskCompletionSource<string>();
+            try
+            {
+                request.Method = "GET";
+                System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Before BeginGetResponse", DateTime.Now.ToString()));
+                IAsyncResult asyncResult = request.BeginGetResponse(new AsyncCallback(
+                    (asynchronousResult) => {
+                        RequestState<T> asyncRequestState = asynchronousResult.AsyncState as RequestState<T>;
+                        HttpWebRequest asyncWebRequest = asyncRequestState.Request as HttpWebRequest;
+                        if (asyncWebRequest != null)
+                        {
+                            System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Before EndGetResponse", DateTime.Now.ToString()));
+                            HttpWebResponse asyncWebResponse = (HttpWebResponse)asyncWebRequest.EndGetResponse(asynchronousResult);
+                            System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, After EndGetResponse", DateTime.Now.ToString()));
+                            using (StreamReader streamReader = new StreamReader(asyncWebResponse.GetResponseStream()))
+                            {
+                                System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Inside StreamReader", DateTime.Now.ToString()));
+                                //Need to return this response 
+                                string jsonString = streamReader.ReadToEnd();
+                                System.Diagnostics.Debug.WriteLine(jsonString);
+                                System.Diagnostics.Debug.WriteLine("");
+                                System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON", DateTime.Now.ToString()));
+                                taskComplete.TrySetResult(jsonString);
+                            }
+                        }
+                    }
+                    ), pubnubRequestState);
+
+                Timer webRequestTimer = new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000, Timeout.Infinite);
+                return taskComplete.Task.Result;
+            }
+            catch (WebException ex)
+            {
+                if (ex.Response != null)
+                {
+                    pubnubRequestState.Response = ex.Response as HttpWebResponse;
+                    using (StreamReader streamReader = new StreamReader(ex.Response.GetResponseStream()))
+                    {
+                        //Need to return this response 
+#if NET35
+                        await Task.Factory.StartNew(() => { });
+                        string jsonString = streamReader.ReadToEnd();
+#else
+                        string jsonString = await streamReader.ReadToEndAsync();
+#endif
+                        System.Diagnostics.Debug.WriteLine(jsonString);
+                        System.Diagnostics.Debug.WriteLine("");
+                        System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON from WebException response", DateTime.Now.ToString()));
+                        return jsonString;
+                    }
+                }
+                
+                if (ex.Message.IndexOf("The request was aborted: The request was canceled") == -1
+                                && ex.Message.IndexOf("Machine suspend mode enabled. No request will be processed.") == -1)
+                {
+                    taskComplete.TrySetException(ex);
+                }
+                return "";
+            }
+            catch (Exception ex)
+            {
+                taskComplete.TrySetException(ex);
+                return "";
+            }
+        }
+
+        async Task<string> SendRequestAndGetJsonResponseClassicHttpWithPOST<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request, string postData)
+        {
+            LoggingMethod.WriteToLog(string.Format("DateTime: {0}, Inside SendRequestAndGetJsonResponseClassicHttpWithPOST", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
+            var taskComplete = new TaskCompletionSource<string>();
+            try
+            {
+                request.Method = "POST";
+                request.ContentType = "application/json";
+
+                byte[] data = Encoding.UTF8.GetBytes(postData);
+                //request.ContentLength = data.Length;
+#if !NET35 && !NET40 && !NET45 && !NET461
+                using (var requestStream = await Task<Stream>.Factory.FromAsync(request.BeginGetRequestStream, request.EndGetRequestStream, pubnubRequestState))
+                {
+                    requestStream.Write(data, 0, data.Length);
+                    requestStream.Flush();
+                }
+#else
+                using (var requestStream = request.GetRequestStream())
+                {
+                    requestStream.Write(data, 0, data.Length);
+                    requestStream.Flush();
+                }
+#endif
+
+                IAsyncResult asyncResult = request.BeginGetResponse(new AsyncCallback(
+                    (asynchronousResult) => {
+                        RequestState<T> asyncRequestState = asynchronousResult.AsyncState as RequestState<T>;
+                        HttpWebRequest asyncWebRequest = asyncRequestState.Request as HttpWebRequest;
+                        if (asyncWebRequest != null)
+                        {
+                            System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Before EndGetResponse With POST ", DateTime.Now.ToString()));
+                            HttpWebResponse asyncWebResponse = (HttpWebResponse)asyncWebRequest.EndGetResponse(asynchronousResult);
+                            System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, After EndGetResponse With POST ", DateTime.Now.ToString()));
+                            using (StreamReader streamReader = new StreamReader(asyncWebResponse.GetResponseStream()))
+                            {
+                                System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Inside StreamReader With POST ", DateTime.Now.ToString()));
+                                //Need to return this response 
+                                string jsonString = streamReader.ReadToEnd();
+                                System.Diagnostics.Debug.WriteLine(jsonString);
+                                System.Diagnostics.Debug.WriteLine("");
+                                System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON With POST ", DateTime.Now.ToString()));
+                                taskComplete.TrySetResult(jsonString);
+                            }
+                        }
+                    }
+                    ), pubnubRequestState);
+
+                Timer webRequestTimer = new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000, Timeout.Infinite);
+                return taskComplete.Task.Result;
+            }
+            catch (WebException ex)
+            {
+                if (ex.Response != null)
+                {
+                    pubnubRequestState.Response = ex.Response as HttpWebResponse;
+                    using (StreamReader streamReader = new StreamReader(ex.Response.GetResponseStream()))
+                    {
+                        //Need to return this response 
+#if NET35
+                        await Task.Factory.StartNew(() => { });
+                        string jsonString = streamReader.ReadToEnd();
+#else
+                        string jsonString = await streamReader.ReadToEndAsync();
+#endif
+                        System.Diagnostics.Debug.WriteLine(jsonString);
+                        System.Diagnostics.Debug.WriteLine("");
+                        System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON  With POST from WebException response", DateTime.Now.ToString()));
+                        return jsonString;
+                    }
+                }
+
+                if (ex.Message.IndexOf("The request was aborted: The request was canceled") == -1
+                                && ex.Message.IndexOf("Machine suspend mode enabled. No request will be processed.") == -1)
+                {
+                    taskComplete.TrySetException(ex);
+                }
+                return "";
+            }
+            catch (Exception ex)
+            {
+                taskComplete.TrySetException(ex);
+                return "";
             }
         }
 

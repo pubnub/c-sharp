@@ -15,7 +15,7 @@
     "repository": {
       "url": "https://github.com/pubnub/c-sharp/"
     },
-    "releaseNotes": "replaced httpclient with compatible lib for .net 4.5/4.61 to support VS 2013. ***ATTENTION*** Major changes in SDK V4.*. All methods and signatures changed compared to V3. Auto-upgrade NOT recommended",
+    "releaseNotes": "support for asp.net and mvc projecct templates. ***ATTENTION*** Major changes in SDK V4.*. All methods and signatures changed compared to V3. Auto-upgrade NOT recommended",
     "tags": [
       "Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing"
     ],

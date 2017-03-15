@@ -89,6 +89,8 @@ namespace PubnubApi
 
         public int RequestMessageCountThreshold { get; set; } = 100;
 
+        public bool UseClassicHttpWebRequest { get; set; } = false;
+
         public PNConfiguration()
         {
             this.Origin = "ps.pndsn.com";
