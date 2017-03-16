@@ -9,7 +9,7 @@
     "iconUrl": "http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png",
     "requireLicenseAcceptance": true,
     "repository": { "url": "https://github.com/pubnub/c-sharp/" },
-    "releaseNotes": "support for asp.net and mvc projecct templates. ***ATTENTION*** Major changes in SDK V4.*. All methods and signatures changed compared to V3. Auto-upgrade NOT recommended",
+    "releaseNotes": "fixed false alert log and timeout messages. ***ATTENTION*** Major changes in SDK V4.*. All methods and signatures changed compared to V3. Auto-upgrade NOT recommended",
     "tags": [ "Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing" ],
     "summary": "PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously"
   },

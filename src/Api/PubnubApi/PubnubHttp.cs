@@ -205,6 +205,16 @@ namespace PubnubApi
                     pubnubRequestState.GotJsonResponse = true; 
                     System.Diagnostics.Debug.WriteLine("");
                     System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON", DateTime.Now.ToString()));
+
+                    if (pubnubRequestState.Response != null)
+                    {
+#if NET35 || NET40 || NET45 || NET461
+                        pubnubRequestState.Response.Close();
+#endif
+                        pubnubRequestState.Response = null;
+                        pubnubRequestState.Request = null;
+                    }
+
                     return jsonString;
                 }
             }
@@ -311,6 +321,16 @@ namespace PubnubApi
                     System.Diagnostics.Debug.WriteLine("");
                     System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON With POST", DateTime.Now.ToString()));
                     pubnubRequestState.GotJsonResponse = true;
+
+                    if (pubnubRequestState.Response != null)
+                    {
+#if NET35 || NET40 || NET45 || NET461
+                        pubnubRequestState.Response.Close();
+#endif
+                        pubnubRequestState.Response = null;
+                        pubnubRequestState.Request = null;
+                    }
+
                     return jsonString;
                 }
             }
@@ -364,16 +384,27 @@ namespace PubnubApi
                         {
                             System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Before EndGetResponse", DateTime.Now.ToString()));
                             HttpWebResponse asyncWebResponse = (HttpWebResponse)asyncWebRequest.EndGetResponse(asynchronousResult);
+                            asyncRequestState.Response = asyncWebResponse;
                             System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, After EndGetResponse", DateTime.Now.ToString()));
                             using (StreamReader streamReader = new StreamReader(asyncWebResponse.GetResponseStream()))
                             {
                                 System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Inside StreamReader", DateTime.Now.ToString()));
                                 //Need to return this response 
                                 string jsonString = streamReader.ReadToEnd();
+                                asyncRequestState.GotJsonResponse = true;
+
                                 System.Diagnostics.Debug.WriteLine(jsonString);
                                 System.Diagnostics.Debug.WriteLine("");
                                 System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON", DateTime.Now.ToString()));
                                 taskComplete.TrySetResult(jsonString);
+                            }
+                            if (asyncRequestState.Response != null)
+                            {
+#if NET35 || NET40 || NET45 || NET461
+                                pubnubRequestState.Response.Close();
+#endif
+                                asyncRequestState.Response = null;
+                                asyncRequestState.Request = null;
                             }
                         }
                     }
@@ -450,17 +481,29 @@ namespace PubnubApi
                         {
                             System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Before EndGetResponse With POST ", DateTime.Now.ToString()));
                             HttpWebResponse asyncWebResponse = (HttpWebResponse)asyncWebRequest.EndGetResponse(asynchronousResult);
+                            asyncRequestState.Response = asyncWebResponse;
                             System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, After EndGetResponse With POST ", DateTime.Now.ToString()));
                             using (StreamReader streamReader = new StreamReader(asyncWebResponse.GetResponseStream()))
                             {
                                 System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Inside StreamReader With POST ", DateTime.Now.ToString()));
                                 //Need to return this response 
                                 string jsonString = streamReader.ReadToEnd();
+                                asyncRequestState.GotJsonResponse = true;
+
                                 System.Diagnostics.Debug.WriteLine(jsonString);
                                 System.Diagnostics.Debug.WriteLine("");
                                 System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON With POST ", DateTime.Now.ToString()));
                                 taskComplete.TrySetResult(jsonString);
                             }
+                            if (asyncRequestState.Response != null)
+                            {
+#if NET35 || NET40 || NET45 || NET461
+                                pubnubRequestState.Response.Close();
+#endif
+                                asyncRequestState.Response = null;
+                                asyncRequestState.Request = null;
+                            }
+
                         }
                     }
                     ), pubnubRequestState);
@@ -517,7 +560,7 @@ namespace PubnubApi
                         string currentMultiChannelGroup = (currentState.ChannelGroups == null) ? "" : string.Join(",", currentState.ChannelGroups.OrderBy(x => x).ToArray());
                         LoggingMethod.WriteToLog(string.Format("DateTime: {0}, OnPubnubWebRequestTimeout: client request timeout reached.Request abort for channel={1} ;channelgroup={2}", DateTime.Now.ToString(), currentMultiChannel, currentMultiChannelGroup), pubnubConfig.LogVerbosity);
                         currentState.Timeout = true;
-                        //TerminatePendingWebRequest(currentState);
+                        request.Abort();
                     }
                 }
                 else
@@ -533,7 +576,7 @@ namespace PubnubApi
             if (currentState != null && currentState.Response == null && currentState.Request != null)
             {
                 currentState.Timeout = true;
-                //TerminatePendingWebRequest(currentState);
+                currentState.Request.Abort();
                 LoggingMethod.WriteToLog(string.Format("DateTime: {0}, **WP7 OnPubnubWebRequestTimeout**", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
             }
         }
