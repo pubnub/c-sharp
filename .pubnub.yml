@@ -1,5 +1,5 @@
 name: c-sharp
-version: "v4.0.1.3"
+version: "v4.0.1.3-rc13"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
