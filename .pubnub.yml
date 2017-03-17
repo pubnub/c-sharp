@@ -1,55 +1,55 @@
 name: c-sharp
-version: "v4.0.1.3-rc13"
+version: "4.0.1.3-rc13"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
-  - version: v4.0.1.3-rc13
+  - version: 4.0.1.3-rc13
     changes:
       - type: Improvement
         text: Refactored to address false alert log and timeout messages.
-  - version: v4.0.1.3-rc12
+  - version: 4.0.1.3-rc12
     changes:
       - type: Improvement
         text: Support for ASP.NET/MVC project template projects.
-  - version: v4.0.1.3-rc11
+  - version: 4.0.1.3-rc11
     changes:
       - type: Improvement
         text: Replaced HttpClient with compatible lib for .net 4.5/4.61 to support VS 2013.
-  - version: v4.0.1.3-rc10
+  - version: 4.0.1.3-rc10
     changes:
       - type: bug fix
         text: Comma encoding fix for multi channelgroups
       - type: bug fix
         text: Fixed channel remove from channelgroup
-  - version: v4.0.1.3-rc9
+  - version: 4.0.1.3-rc9
     changes:
       - type: bug fix
         text: Message fix for history when timetoken=false.
-  - version: v4.0.1.3-rc8
+  - version: 4.0.1.3-rc8
     changes:
       - type: improvement
         text: Added pn- prefix to default uuid.
-  - version: v4.0.1.3-rc7
+  - version: 4.0.1.3-rc7
     changes:
       - type: bug fix
         text: pcl profile 111 subscribe message fix.
-  - version: v4.0.1.3-rc6
+  - version: 4.0.1.3-rc6
     changes:
       - type: bug fix
         text: Timetoken fix for subscribed messages.
-  - version: v4.0.1.3-rc5
+  - version: 4.0.1.3-rc5
     changes:
       - type: improvement and bug fix
         text: HttpClient to supported platforms. Fixed Unsubscribe issue.
-  - version: v4.0.1.3-rc1
+  - version: 4.0.1.3-rc1
     changes:
       - type: improvement
         text: Derived classes for inline coding.
-  - version: v4.0.1.2-rc1
+  - version: 4.0.1.2-rc1
     changes:
       - type: improvement
         text: Cipher typo, Origin change.
-  - version: v4.0.1.0-rc1
+  - version: 4.0.1.0-rc1
     changes:
       - type: improvement
         text: initial v4 version.
@@ -102,7 +102,7 @@ features:
     - SUBSCRIBE-PUBLISHER-UUID
 supported-platforms:
   - 
-    version: Pubnub 'C#' v4.0.1.3
+    version: Pubnub 'C#' 4.0.1.3
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
@@ -112,7 +112,7 @@ supported-platforms:
       - .Net Framework 4.5
       - .Net Framework 4.6.1
   - 
-    version: PubnubPCL 'C#' v4.0.1.3
+    version: PubnubPCL 'C#' 4.0.1.3
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -124,7 +124,7 @@ supported-platforms:
       - Mono 4.8.0
       - PCL Profile 111
   - 
-    version: PubnubUWP 'C#' v4.0.1.3
+    version: PubnubUWP 'C#' 4.0.1.3
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
