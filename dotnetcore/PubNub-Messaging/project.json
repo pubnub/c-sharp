@@ -1,0 +1,19 @@
+{
+  "version": "3.7.5",
+
+  "dependencies": {
+    "NETStandard.Library": "1.5.0-rc2-24027",
+    "Newtonsoft.Json": "8.0.3",
+    "Portable.BouncyCastle-Signed": "1.7.0.2",
+    "System.Dynamic.Runtime": "4.0.11-rc2-24027",
+    "System.Net.Requests": "4.0.10",
+    "System.Runtime.Serialization.Primitives": "4.1.1-rc2-24027",
+    "System.Threading.ThreadPool": "4.0.10-rc2-24027"
+  },
+
+  "frameworks": {
+    "netstandard1.5": {
+      "imports": "dnxcore50"
+    }
+  }
+}
