@@ -30,24 +30,26 @@ namespace PubnubApi
 
 		static public String GetMd5String(String source)
 		{
-			MD5 md = MD5CryptoServiceProvider.Create();
-			byte[] hash;
+            using (MD5 md = MD5CryptoServiceProvider.Create())
+            {
+                byte[] hash;
 
-			//Create a new instance of ASCIIEncoding to 
-			//convert the string into an array of Unicode bytes.
-			UTF8Encoding enc = new UTF8Encoding();
+                //Create a new instance of ASCIIEncoding to 
+                //convert the string into an array of Unicode bytes.
+                UTF8Encoding enc = new UTF8Encoding();
 
-			//Convert the string into an array of bytes.
-			byte[] buffer = enc.GetBytes(source);
+                //Convert the string into an array of bytes.
+                byte[] buffer = enc.GetBytes(source);
 
-			//Create the hash value from the array of bytes.
-			hash = md.ComputeHash(buffer);
+                //Create the hash value from the array of bytes.
+                hash = md.ComputeHash(buffer);
 
-			StringBuilder sb = new StringBuilder();
-			foreach (byte b in hash)
-				sb.Append(b.ToString("x2"));
-			return sb.ToString();
-		}
+                StringBuilder sb = new StringBuilder();
+                foreach (byte b in hash)
+                    sb.Append(b.ToString("x2"));
+                return sb.ToString();
+            }
+        }
 
 		static public MD5 Create()
 		{

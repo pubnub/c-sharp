@@ -50,19 +50,29 @@ namespace PubnubApi
             bool ret = false;
             if (IsValidJson(jsonString))
             {
-                JsonTextReader reader = new JsonTextReader(new StringReader(jsonString));
-                while (reader.Read())
+                try
                 {
-                    if (reader.LineNumber == 1 && reader.LinePosition == 1 && reader.TokenType == JsonToken.StartArray)
+                    using (StringReader strReader = new StringReader(jsonString))
                     {
-                        ret = true;
-                        break;
-                    }
-                    else
-                    {
-                        break;
+                        using (JsonTextReader jsonTxtreader = new JsonTextReader(strReader))
+                        {
+                            while (jsonTxtreader.Read())
+                            {
+                                if (jsonTxtreader.LineNumber == 1 && jsonTxtreader.LinePosition == 1 && jsonTxtreader.TokenType == JsonToken.StartArray)
+                                {
+                                    ret = true;
+                                    break;
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            jsonTxtreader.Close();
+                        }
                     }
                 }
+                catch { }
             }
             return ret;
         }
@@ -72,19 +82,30 @@ namespace PubnubApi
             bool ret = false;
             if (IsValidJson(jsonString))
             {
-                JsonTextReader reader = new JsonTextReader(new StringReader(jsonString));
-                while (reader.Read())
+                try
                 {
-                    if (reader.LineNumber == 1 && reader.LinePosition == 1 && reader.TokenType == JsonToken.StartObject)
+                    using (StringReader strReader = new StringReader(jsonString))
                     {
-                        ret = true;
-                        break;
-                    }
-                    else
-                    {
-                        break;
+                        using (JsonTextReader jsonTxtreader = new JsonTextReader(strReader))
+                        {
+                            while (jsonTxtreader.Read())
+                            {
+                                if (jsonTxtreader.LineNumber == 1 && jsonTxtreader.LinePosition == 1 && jsonTxtreader.TokenType == JsonToken.StartObject)
+                                {
+                                    ret = true;
+                                    break;
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            jsonTxtreader.Close();
+                        }
+                        strReader.Close();
                     }
                 }
+                catch { }
             }
             return ret;
         }

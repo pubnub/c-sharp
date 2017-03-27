@@ -879,16 +879,18 @@ namespace PubnubApi
 
         private static string Md5(string text)
         {
-            MD5 md5 = new MD5CryptoServiceProvider();
-            byte[] data = Encoding.Unicode.GetBytes(text);
-            byte[] hash = md5.ComputeHash(data);
-            string hexaHash = "";
-            foreach (byte b in hash)
+            using (MD5 md5 = new MD5CryptoServiceProvider())
             {
-                hexaHash += String.Format("{0:x2}", b);
-            }
+                byte[] data = Encoding.Unicode.GetBytes(text);
+                byte[] hash = md5.ComputeHash(data);
+                string hexaHash = "";
+                foreach (byte b in hash)
+                {
+                    hexaHash += String.Format("{0:x2}", b);
+                }
 
-            return hexaHash;
+                return hexaHash;
+            }
         }
 
         public static long TranslateUtcDateTimeToSeconds(DateTime dotNetUTCDateTime)
