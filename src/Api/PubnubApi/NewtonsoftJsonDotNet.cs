@@ -102,7 +102,9 @@ namespace PubnubApi
                             }
                             jsonTxtreader.Close();
                         }
+#if (NET35 || NET40 || NET45 || NET461)
                         strReader.Close();
+#endif
                     }
                 }
                 catch { }
