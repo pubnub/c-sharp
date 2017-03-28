@@ -114,7 +114,7 @@
     <Reference Include="System.Net.Primitives" />
     <Reference Include="System.Net.Requests" />
     <Reference Include="PubnubPCL">
-      <HintPath>..\packages\PubnubPCL.4.0.1.3-rc5\lib\netstandard1.4\PubnubPCL.dll</HintPath>
+      <HintPath>..\packages\PubnubPCL.4.0.1.3\lib\netstandard1.4\PubnubPCL.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
