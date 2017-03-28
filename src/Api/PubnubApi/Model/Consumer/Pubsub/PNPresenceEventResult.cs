@@ -24,5 +24,8 @@ namespace PubnubApi
 
         public long Timetoken { get; set; }
         public object UserMetadata { get; set; }
+        public string[] Join { get; set; } //New
+        public string[] Timeout { get; set; } //New
+        public string[] Leave { get; set; } //New
     }
 }

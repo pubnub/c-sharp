@@ -686,7 +686,10 @@ namespace PubnubApi
                     ack = new PNPresenceEventResult();
                     ack.Event = presenceDicObj["action"].ToString();
                     ack.Timestamp = Convert.ToInt64(presenceDicObj["timestamp"].ToString());
-                    ack.Uuid = presenceDicObj["uuid"].ToString();
+                    if (presenceDicObj.ContainsKey("uuid"))
+                    {
+                        ack.Uuid = presenceDicObj["uuid"].ToString();
+                    }
                     ack.Occupancy = Int32.Parse(presenceDicObj["occupancy"].ToString());
 
                     if (presenceDicObj.ContainsKey("data"))
@@ -712,6 +715,34 @@ namespace PubnubApi
                     if (listObject[1] != null)
                     {
                         ack.UserMetadata = listObject[1];
+                    }
+
+                    if (ack.Event != null && ack.Event.ToLower() == "interval")
+                    {
+                        if (presenceDicObj.ContainsKey("join"))
+                        {
+                            List<object> joinDeltaList = presenceDicObj["join"] as List<object>;
+                            if (joinDeltaList != null && joinDeltaList.Count > 0)
+                            {
+                                ack.Join = joinDeltaList.Select(x => x.ToString()).ToArray();
+                            }
+                        }
+                        if (presenceDicObj.ContainsKey("timeout"))
+                        {
+                            List<object> timeoutDeltaList = presenceDicObj["timeout"] as List<object>;
+                            if (timeoutDeltaList != null && timeoutDeltaList.Count > 0)
+                            {
+                                ack.Timeout = timeoutDeltaList.Select(x => x.ToString()).ToArray(); ;
+                            }
+                        }
+                        if (presenceDicObj.ContainsKey("leave"))
+                        {
+                            List<object> leaveDeltaList = presenceDicObj["leave"] as List<object>;
+                            if (leaveDeltaList != null && leaveDeltaList.Count > 0)
+                            {
+                                ack.Leave = leaveDeltaList.Select(x => x.ToString()).ToArray(); ;
+                            }
+                        }
                     }
                 }
 
