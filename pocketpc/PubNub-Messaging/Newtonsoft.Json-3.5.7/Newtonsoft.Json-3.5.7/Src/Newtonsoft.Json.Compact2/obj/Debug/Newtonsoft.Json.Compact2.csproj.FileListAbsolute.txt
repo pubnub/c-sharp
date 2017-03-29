@@ -1,6 +1,0 @@
-C:\Pandu\GitHub\c-sharp\pocketpc\PubNub-Messaging\Newtonsoft.Json-3.5.7\Newtonsoft.Json-3.5.7\Src\Newtonsoft.Json.Compact2\bin\Debug\Newtonsoft.Json.Compact2.dll
-C:\Pandu\GitHub\c-sharp\pocketpc\PubNub-Messaging\Newtonsoft.Json-3.5.7\Newtonsoft.Json-3.5.7\Src\Newtonsoft.Json.Compact2\bin\Debug\Newtonsoft.Json.Compact2.pdb
-C:\Pandu\GitHub\c-sharp\pocketpc\PubNub-Messaging\Newtonsoft.Json-3.5.7\Newtonsoft.Json-3.5.7\Src\Newtonsoft.Json.Compact2\bin\Debug\LinqBridge.dll
-C:\Pandu\GitHub\c-sharp\pocketpc\PubNub-Messaging\Newtonsoft.Json-3.5.7\Newtonsoft.Json-3.5.7\Src\Newtonsoft.Json.Compact2\obj\Debug\ResolveAssemblyReference.cache
-C:\Pandu\GitHub\c-sharp\pocketpc\PubNub-Messaging\Newtonsoft.Json-3.5.7\Newtonsoft.Json-3.5.7\Src\Newtonsoft.Json.Compact2\obj\Debug\Newtonsoft.Json.Compact2.dll
-C:\Pandu\GitHub\c-sharp\pocketpc\PubNub-Messaging\Newtonsoft.Json-3.5.7\Newtonsoft.Json-3.5.7\Src\Newtonsoft.Json.Compact2\obj\Debug\Newtonsoft.Json.Compact2.pdb

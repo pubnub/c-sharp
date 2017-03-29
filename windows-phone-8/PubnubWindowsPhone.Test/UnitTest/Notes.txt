@@ -1,1 +1,0 @@
-﻿Note: unit tests work only in off-line mode.

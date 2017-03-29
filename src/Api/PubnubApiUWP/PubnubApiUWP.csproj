@@ -1,0 +1,489 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{46972503-A02E-4A1E-AE6E-2409096D1A04}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PubnubApiUWP</RootNamespace>
+    <AssemblyName>PubnubApiUWP</AssemblyName>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
+    <TargetPlatformVersion>10.0.14393.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.10586.0</TargetPlatformMinVersion>
+    <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NETFX_CORE;WINDOWS_UWP;UAP</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP;UAP</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NETFX_CORE;WINDOWS_UWP;UAP</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP;UAP</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
+    <PlatformTarget>ARM</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\ARM\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NETFX_CORE;WINDOWS_UWP;UAP</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>ARM</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM'">
+    <PlatformTarget>ARM</PlatformTarget>
+    <OutputPath>bin\ARM\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP;UAP</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>ARM</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NETFX_CORE;WINDOWS_UWP;UAP</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP;UAP</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
+    <None Include="project.json" />
+    <Content Include="pubnub.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\PubnubApi\Builder\ResponseBuilder.cs">
+      <Link>Builder\ResponseBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Builder\StatusBuilder.cs">
+      <Link>Builder\StatusBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Builder\UriUtil.cs">
+      <Link>Builder\UriUtil.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Builder\UrlRequestBuilder.cs">
+      <Link>Builder\UrlRequestBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Callbacks\PNCallback.cs">
+      <Link>Callbacks\PNCallback.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Callbacks\SubscribeCallback.cs">
+      <Link>Callbacks\SubscribeCallback.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\ClientNetworkStatus.cs">
+      <Link>ClientNetworkStatus.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\ConcurrentDictionary.cs">
+      <Link>ConcurrentDictionary.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\Access\AuditOperation.cs">
+      <Link>EndPoint\Access\AuditOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\Access\GrantOperation.cs">
+      <Link>EndPoint\Access\GrantOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\ChannelGroup\AddChannelsToChannelGroupOperation.cs">
+      <Link>EndPoint\ChannelGroup\AddChannelsToChannelGroupOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\ChannelGroup\DeleteChannelGroupOperation.cs">
+      <Link>EndPoint\ChannelGroup\DeleteChannelGroupOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\ChannelGroup\ListAllChannelGroupOperation.cs">
+      <Link>EndPoint\ChannelGroup\ListAllChannelGroupOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\ChannelGroup\ListChannelsForChannelGroupOperation.cs">
+      <Link>EndPoint\ChannelGroup\ListChannelsForChannelGroupOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\ChannelGroup\RemoveChannelsFromChannelGroupOperation.cs">
+      <Link>EndPoint\ChannelGroup\RemoveChannelsFromChannelGroupOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\HistoryOperation.cs">
+      <Link>EndPoint\HistoryOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\OtherOperation.cs">
+      <Link>EndPoint\OtherOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\Presence\GetStateOperation.cs">
+      <Link>EndPoint\Presence\GetStateOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\Presence\HereNowOperation.cs">
+      <Link>EndPoint\Presence\HereNowOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\Presence\SetStateOperation.cs">
+      <Link>EndPoint\Presence\SetStateOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\Presence\WhereNowOperation.cs">
+      <Link>EndPoint\Presence\WhereNowOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\FireOperation.cs">
+      <Link>EndPoint\PubSub\FireOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\ListenerManager.cs">
+      <Link>EndPoint\PubSub\ListenerManager.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\PublishOperation.cs">
+      <Link>EndPoint\PubSub\PublishOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeManager.cs">
+      <Link>EndPoint\PubSub\SubscribeManager.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeOperation.cs">
+      <Link>EndPoint\PubSub\SubscribeOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeAllOperation.cs">
+      <Link>EndPoint\PubSub\UnsubscribeAllOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeOperation.cs">
+      <Link>EndPoint\PubSub\UnsubscribeOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\Push\AddPushChannelOperation.cs">
+      <Link>EndPoint\Push\AddPushChannelOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\Push\AuditPushChannelOperation.cs">
+      <Link>EndPoint\Push\AuditPushChannelOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\Push\RemovePushChannelOperation.cs">
+      <Link>EndPoint\Push\RemovePushChannelOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\TimeOperation.cs">
+      <Link>EndPoint\TimeOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Enum\PNHeartbeatNotificationOption.cs">
+      <Link>Enum\PNHeartbeatNotificationOption.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Enum\PNLogVerbosity.cs">
+      <Link>Enum\PNLogVerbosity.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Enum\PNOperationType.cs">
+      <Link>Enum\PNOperationType.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Enum\PNReconnectionPolicy.cs">
+      <Link>Enum\PNReconnectionPolicy.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Enum\PNStatusCategory.cs">
+      <Link>Enum\PNStatusCategory.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Enum\PubnubErrorCode.cs">
+      <Link>Enum\PubnubErrorCode.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Enum\PubnubErrorSeverity.cs">
+      <Link>Enum\PubnubErrorSeverity.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Enum\PubnubMessageSource.cs">
+      <Link>Enum\PubnubMessageSource.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Enum\PushTypeService.cs">
+      <Link>Enum\PushTypeService.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Enum\ResponseType.cs">
+      <Link>Enum\ResponseType.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\HttpUtility\HttpUtility.cs">
+      <Link>HttpUtility\HttpUtility.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\HttpUtility\HttpValue.cs">
+      <Link>HttpUtility\HttpValue.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\HttpUtility\HttpValueCollection.cs">
+      <Link>HttpUtility\HttpValueCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Interface\IJsonPluggableLibrary.cs">
+      <Link>Interface\IJsonPluggableLibrary.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Interface\IPubnubHttp.cs">
+      <Link>Interface\IPubnubHttp.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Interface\IPubnubLog.cs">
+      <Link>Interface\IPubnubLog.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Interface\IPubnubUnitTest.cs">
+      <Link>Interface\IPubnubUnitTest.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Interface\IUrlRequestBuilder.cs">
+      <Link>Interface\IUrlRequestBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Log\LoggingMethod.cs">
+      <Link>Log\LoggingMethod.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Log\PNPlatform.cs">
+      <Link>Log\PNPlatform.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerAuditResult.cs">
+      <Link>Model\Consumer\AccessManager\PNAccessManagerAuditResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerGrantResult.cs">
+      <Link>Model\Consumer\AccessManager\PNAccessManagerGrantResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerKeyData.cs">
+      <Link>Model\Consumer\AccessManager\PNAccessManagerKeyData.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerKeysData.cs">
+      <Link>Model\Consumer\AccessManager\PNAccessManagerKeysData.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\ChannelGroup\PNChannelGroupsAddChannelResult.cs">
+      <Link>Model\Consumer\ChannelGroup\PNChannelGroupsAddChannelResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\ChannelGroup\PNChannelGroupsAllChannelsResult.cs">
+      <Link>Model\Consumer\ChannelGroup\PNChannelGroupsAllChannelsResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\ChannelGroup\PNChannelGroupsDeleteGroupResult.cs">
+      <Link>Model\Consumer\ChannelGroup\PNChannelGroupsDeleteGroupResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\ChannelGroup\PNChannelGroupsListAllResult.cs">
+      <Link>Model\Consumer\ChannelGroup\PNChannelGroupsListAllResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\ChannelGroup\PNChannelGroupsRemoveChannelResult.cs">
+      <Link>Model\Consumer\ChannelGroup\PNChannelGroupsRemoveChannelResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\History\PNHistoryItemResult.cs">
+      <Link>Model\Consumer\History\PNHistoryItemResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\History\PNHistoryResult.cs">
+      <Link>Model\Consumer\History\PNHistoryResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\PNErrorData.cs">
+      <Link>Model\Consumer\PNErrorData.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\PNStatus.cs">
+      <Link>Model\Consumer\PNStatus.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\PNTimeResult.cs">
+      <Link>Model\Consumer\PNTimeResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Presence\PNGetStateResult.cs">
+      <Link>Model\Consumer\Presence\PNGetStateResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Presence\PNHereNowChannelData.cs">
+      <Link>Model\Consumer\Presence\PNHereNowChannelData.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Presence\PNHereNowOccupantData.cs">
+      <Link>Model\Consumer\Presence\PNHereNowOccupantData.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Presence\PNHereNowResult.cs">
+      <Link>Model\Consumer\Presence\PNHereNowResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Presence\PNSetStateResult.cs">
+      <Link>Model\Consumer\Presence\PNSetStateResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Presence\PNWhereNowResult.cs">
+      <Link>Model\Consumer\Presence\PNWhereNowResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Pubsub\PNMessageResult.cs">
+      <Link>Model\Consumer\Pubsub\PNMessageResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Pubsub\PNPresenceEventResult.cs">
+      <Link>Model\Consumer\Pubsub\PNPresenceEventResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Pubsub\PNPublishResult.cs">
+      <Link>Model\Consumer\Pubsub\PNPublishResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Push\PNPushAddChannelResult.cs">
+      <Link>Model\Consumer\Push\PNPushAddChannelResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Push\PNPushListProvisionsResult.cs">
+      <Link>Model\Consumer\Push\PNPushListProvisionsResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Push\PNPushRemoveAllChannelsResult.cs">
+      <Link>Model\Consumer\Push\PNPushRemoveAllChannelsResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Push\PNPushRemoveChannelResult.cs">
+      <Link>Model\Consumer\Push\PNPushRemoveChannelResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerAuditResultExt.cs">
+      <Link>Model\Derived\AccessManager\PNAccessManagerAuditResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerGrantResultExt.cs">
+      <Link>Model\Derived\AccessManager\PNAccessManagerGrantResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsAddChannelResultExt.cs">
+      <Link>Model\Derived\ChannelGroup\PNChannelGroupsAddChannelResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsAllChannelsResultExt.cs">
+      <Link>Model\Derived\ChannelGroup\PNChannelGroupsAllChannelsResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsDeleteGroupResultExt.cs">
+      <Link>Model\Derived\ChannelGroup\PNChannelGroupsDeleteGroupResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsListAllResultExt.cs">
+      <Link>Model\Derived\ChannelGroup\PNChannelGroupsListAllResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsRemoveChannelResultExt.cs">
+      <Link>Model\Derived\ChannelGroup\PNChannelGroupsRemoveChannelResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\History\PNHistoryResultExt.cs">
+      <Link>Model\Derived\History\PNHistoryResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\PNTimeResultExt.cs">
+      <Link>Model\Derived\PNTimeResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\Presence\PNGetStateResultExt.cs">
+      <Link>Model\Derived\Presence\PNGetStateResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\Presence\PNHereNowResultEx.cs">
+      <Link>Model\Derived\Presence\PNHereNowResultEx.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\Presence\PNSetStateResultExt.cs">
+      <Link>Model\Derived\Presence\PNSetStateResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\Presence\PNWhereNowResultExt.cs">
+      <Link>Model\Derived\Presence\PNWhereNowResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\Pubsub\PNPublishResultExt.cs">
+      <Link>Model\Derived\Pubsub\PNPublishResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\Pubsub\SubscribeCallbackExt.cs">
+      <Link>Model\Derived\Pubsub\SubscribeCallbackExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\Push\PNPushAddChannelResultExt.cs">
+      <Link>Model\Derived\Push\PNPushAddChannelResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\Push\PNPushListProvisionsResultExt.cs">
+      <Link>Model\Derived\Push\PNPushListProvisionsResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\Push\PNPushRemoveChannelResultExt.cs">
+      <Link>Model\Derived\Push\PNPushRemoveChannelResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\InternetState.cs">
+      <Link>Model\InternetState.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\PNHeartbeatResult.cs">
+      <Link>Model\PNHeartbeatResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\PNStatusCategoryHelper.cs">
+      <Link>Model\PNStatusCategoryHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\ReconnectState.cs">
+      <Link>Model\ReconnectState.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\RequestState.cs">
+      <Link>Model\RequestState.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Server\SubscribeEnvelope.cs">
+      <Link>Model\Server\SubscribeEnvelope.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Server\SubscribeMessage.cs">
+      <Link>Model\Server\SubscribeMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Server\TimetokenMetadata.cs">
+      <Link>Model\Server\TimetokenMetadata.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\NewtonsoftJsonDotNet.cs">
+      <Link>NewtonsoftJsonDotNet.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\PNConfiguration.cs">
+      <Link>PNConfiguration.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Proxy\PubnubProxy.cs">
+      <Link>Proxy\PubnubProxy.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Pubnub.cs">
+      <Link>Pubnub.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\PubnubCoreBase.cs">
+      <Link>PubnubCoreBase.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\PubnubHttp.cs">
+      <Link>PubnubHttp.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Push\Mpns\MpnsCycleTileNotification.cs">
+      <Link>Push\Mpns\MpnsCycleTileNotification.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Push\Mpns\MpnsFlipTileNotification.cs">
+      <Link>Push\Mpns\MpnsFlipTileNotification.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Push\Mpns\MpnsIconicTileNotification.cs">
+      <Link>Push\Mpns\MpnsIconicTileNotification.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Push\Mpns\MpnsToastNotification.cs">
+      <Link>Push\Mpns\MpnsToastNotification.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Security\MD5.cs">
+      <Link>Security\MD5.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Security\MD5CryptoServiceProvider.cs">
+      <Link>Security\MD5CryptoServiceProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Security\PubnubCrypto.cs">
+      <Link>Security\PubnubCrypto.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Security\PubnubCryptoBase.cs">
+      <Link>Security\PubnubCryptoBase.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Security\SecureMessage.cs">
+      <Link>Security\SecureMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Timer.cs">
+      <Link>Timer.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Properties\PubnubUWP.rd.xml" />
+  </ItemGroup>
+  <ItemGroup />
+  <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
+    <VisualStudioVersion>14.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,194 +1,117 @@
---- 
+name: c-sharp
+version: "4.0.1.3"
+schema: 1
+scm: github.com/pubnub/c-sharp
 changelog: 
-  - 
-    changes: 
-      - 
-        text: "Comma encoding fix for multi channelgroups"
-        type: bug fix
-      - 
-        text: "Fixed channel remove from channelgroup"
-        type: bug fix
-    date: ~
-    version: v3.8.7
-  - 
-    changes: 
-      - 
-        text: "Added pn- prefix to default uuid"
-        type: improvement
-    date: ~
-    version: v3.8.6
-  - 
-    changes: 
-      - 
-        text: "Default origin changed"
-        type: improvement
-    date: ~
-    version: v3.8.5
-  - 
-    changes: 
-      - 
-        text: "Added publish message ttl"
-        type: feature
-    date: ~
-    version: v3.8.4
-  - 
-    changes: 
-      - 
-        text: "Added PAM signature when secret key is provided"
-        type: feature
-    date: ~
-    version: v3.8.3
-  - 
-    changes: 
-      - 
-        text: "Added requestid url queryparam to avoid caching issues"
-        type: improvement
-    date: ~
-    version: v3.8.2
-  - 
-    changes: 
-      - 
-        text: "Improved error logging to handle network failure"
-        type: improvement
-      - 
-        text: "Applied strong naming to .net SDKS, PCL, NetPlatform SDKs"
-        type: improvement
-    date: ~
-    version: v3.8.1
-  - 
-    changes: 
-      - 
-        text: "Created NetPlatform SDK to support .net core and multi-PCL profile."
-        type: feature
-    date: ~
-    version: v3.8.0
-  - 
-    changes: 
-      - 
-        text: "Implemented Channel Groups for mono clients (mono-for-mac, monotouch, mono-for-android, mono-for-linux)."
-        type: feature
-      - 
-        text: "Refactored unit tests for mono clients to support offline testing in addition to online."
-        type: improvement
-      - 
-        text: "Migrated monotouch from Xamarin.iOS Classic to Xamarin.iOS Unified API."
-        type: improvement
-      - 
-        text: "Improved unit tests to avoid unwanted web requests."
-        type: improvement
-      - 
-        text: "Improved Pubnub Core file to cleanup callback variable when unsubscribed channel."
-        type: improvement
-      - 
-        text: "Used target android API 22 for mono-for-android client to test latest API."
-        type: improvement
-    date: ~
-    version: v3.7.6
-  - 
-    changes: 
-      - 
-        text: "Added pnsdk and UUID params."
-        type: feature
-      - 
-        text: "Provided option to store published message or not in history."
-        type: feature
-      - 
-        text: "Implemented Push notification feature supporting MPNS for windows phone 8 client.."
-        type: feature
-      - 
-        text: "Implemented Channel Groups."
-        type: feature
-      - 
-        text: "Fixed issue where null keys were not handled properly."
-        type: bug
-      - 
-        text: "Improved unit tests for Mono clients on friendly messages."
-        type: improvement
-      - 
-        text: "Fixed corner case issue where Xamarin.iOS UI could hang on complex object publish."
-        type: bug
-    date: ~
-    version: v3.7.0
-  - 
-    changes: 
-      - 
-        text: "Full support for new Presence features! Heartbeat, State, Where Now, Global Here Now."
-        type: feature
-      - 
-        text: "Windows Phone 8.1, Windows 8, and 8.1 Store Client Support (Surface)."
-        type: feature
-      - 
-        text: "Fixed potential for memory leak during device sleep."
-        type: bug
-      - 
-        text: "Use explicitly provided PAM keys when performing PAM calls, not consumer key."
-        type: improvement
-      - 
-        text: "Fixed an issue of delayed reconnect on Mono Touch."
-        type: bug
-      - 
-        text: "Only perform presence heartbeats when user sets heartbeat timeout."
-        type: bug
-      - 
-        text: "Clarify PAM TTLs are in minutes, not seconds, in variable names and comments."
-        type: improvement
-      - 
-        text: "Fixed subscribe callback issue on JSONFX."
-        type: bug
-      - 
-        text: "Better handling of non-200 responses."
-        type: bug
-      - 
-        text: "Added a new demo - ePoll."
-        type: improvement
-    date: ~
-    version: v3.6.0
+  - version: 4.0.1.3
+    changes:
+      - type: Improvement
+        text: Added code to handle presence interval event
+      - type: Improvement
+        text: Code refactor per CA2000 code analysis
+  - version: 4.0.1.3-rc13
+    changes:
+      - type: Improvement
+        text: Refactored to address false alert log and timeout messages.
+  - version: 4.0.1.3-rc12
+    changes:
+      - type: Improvement
+        text: Support for ASP.NET/MVC project template projects.
+  - version: 4.0.1.3-rc11
+    changes:
+      - type: Improvement
+        text: Replaced HttpClient with compatible lib for .net 4.5/4.61 to support VS 2013.
+  - version: 4.0.1.3-rc10
+    changes:
+      - type: bug fix
+        text: Comma encoding fix for multi channelgroups
+      - type: bug fix
+        text: Fixed channel remove from channelgroup
+  - version: 4.0.1.3-rc9
+    changes:
+      - type: bug fix
+        text: Message fix for history when timetoken=false.
+  - version: 4.0.1.3-rc8
+    changes:
+      - type: improvement
+        text: Added pn- prefix to default uuid.
+  - version: 4.0.1.3-rc7
+    changes:
+      - type: bug fix
+        text: pcl profile 111 subscribe message fix.
+  - version: 4.0.1.3-rc6
+    changes:
+      - type: bug fix
+        text: Timetoken fix for subscribed messages.
+  - version: 4.0.1.3-rc5
+    changes:
+      - type: improvement and bug fix
+        text: HttpClient to supported platforms. Fixed Unsubscribe issue.
+  - version: 4.0.1.3-rc1
+    changes:
+      - type: improvement
+        text: Derived classes for inline coding.
+  - version: 4.0.1.2-rc1
+    changes:
+      - type: improvement
+        text: Cipher typo, Origin change.
+  - version: 4.0.1.0-rc1
+    changes:
+      - type: improvement
+        text: initial v4 version.
 features: 
-  access: 
+  access:
     - ACCESS-GRANT
-    - ACCESS-SECRET-KEY-ALL-ACCESS
-  channel-groups: 
+    - ACCESS-SECRET-KEY-ALL-ACCESS    
+  channel-groups:
     - CHANNEL-GROUPS-ADD-CHANNELS
     - CHANNEL-GROUPS-REMOVE-CHANNELS
     - CHANNEL-GROUPS-REMOVE-GROUPS
     - CHANNEL-GROUPS-LIST-CHANNELS-IN-GROUP
-  presence: 
+  notify:
+    - REQUEST-MESSAGE-COUNT-EXCEEDED
+  push:
+    - PUSH-ADD-DEVICE-TO-CHANNELS
+    - PUSH-REMOVE-DEVICE-FROM-CHANNELS
+    - PUSH-LIST-CHANNELS-FROM-DEVICE
+    - PUSH-REMOVE-DEVICE
+  presence:
     - PRESENCE-HERE-NOW
     - PRESENCE-WHERE-NOW
     - PRESENCE-SET-STATE
     - PRESENCE-GET-STATE
     - PRESENCE-HEARTBEAT
-  publish: 
+  publish:
     - PUBLISH-STORE-FLAG
     - PUBLISH-RAW-JSON
     - PUBLISH-WITH-METADATA
     - PUBLISH-GET
+    - PUBLISH-POST
     - PUBLISH-ASYNC
-  push: 
-    - PUSH-ADD-DEVICE-TO-CHANNELS
-    - PUSH-REMOVE-DEVICE-FROM-CHANNELS
-    - PUSH-LIST-CHANNELS-FROM-DEVICE
-    - PUSH-REMOVE-DEVICE
-  storage: 
+    - PUBLISH-FIRE 
+    - PUBLISH-REPLICATION-FLAG
+    - PUBLISH-MESSAGE-TTL
+  storage:
     - STORAGE-REVERSE
     - STORAGE-INCLUDE-TIMETOKEN
     - STORAGE-START-END
     - STORAGE-COUNT
-  subscribe: 
+  time:
+    - TIME-TIME
+  subscribe:
     - SUBSCRIBE-CHANNELS
     - SUBSCRIBE-CHANNEL-GROUPS
     - SUBSCRIBE-PRESENCE-CHANNELS
     - SUBSCRIBE-PRESENCE-CHANNELS-GROUPS
+    - SUBSCRIBE-WITH-TIMETOKEN
     - SUBSCRIBE-WILDCARD
-  time: 
-    - TIME-TIME
+    - SUBSCRIBE-FILTER-EXPRESSION
+    - SUBSCRIBE-PUBLISHER-UUID
 supported-platforms:
   - 
-    version: Pubnub 'C#' 3.8.6
+    version: Pubnub 'C#' 4.0.1.3
     platforms:
-      - Windows Phone 8.1
-      - Windows 8.1 Store Apps
-      - Windows 7 and up
+      - Windows 10 and up
       - Windows Server 2008 and up
     frameworks:
       - .Net Framework 3.5
@@ -196,39 +119,20 @@ supported-platforms:
       - .Net Framework 4.5
       - .Net Framework 4.6.1
   - 
-    version: PubnubPCL 3.8.6
+    version: PubnubPCL 'C#' 4.0.1.3
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
       - Xamarin.Mac
-      - Windows 7 and up
+      - Windows 10
       - Mac OS X 10 and up
       - Windows Server 2008 and up
-    frameworks:
-      - .Net Framework 4.0
-      - .Net Framework 4.5
-      - .Net Framework 4.6.1
-      - Mono 4.8.0
-      - PCL Profile 136
-  - 
-    version: PubnubNetPlatform 3.8.6
-    platforms:
-      - Xamarin.Android
-      - Xamarin.iOS
-      - Xamarin.Mac
-      - Windows 7 and up
-      - Mac OS X 10 and up
-      - Windows Server 2008 and up
-    frameworks:
-      - .Net Framework 3.5
-      - .Net Framework 4.0
-      - .Net Framework 4.5
-      - .Net Framework 4.6.1
+    frameworks:      
       - Mono 4.8.0
       - PCL Profile 111
-      - PCL Profile 136
-      - PCL Profile 259
-name: c-sharp
-schema: 1
-scm: github.com/pubnub/c-sharp
-version: "3.8.7"
+  - 
+    version: PubnubUWP 'C#' 4.0.1.3
+    platforms:
+      - Windows Phone 10
+      - Universal Windows Apps
+      - Windows 10

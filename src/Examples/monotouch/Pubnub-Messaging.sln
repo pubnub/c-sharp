@@ -1,0 +1,47 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubnubMessagingExample", "PubnubMessagingExample\PubnubMessagingExample.csproj", "{3290BFAC-8440-42CF-A329-B75535500DFE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|iPhoneSimulator = Debug|iPhoneSimulator
+		Release|iPhoneSimulator = Release|iPhoneSimulator
+		Debug|iPhone = Debug|iPhone
+		Release|iPhone = Release|iPhone
+		Ad-Hoc|iPhone = Ad-Hoc|iPhone
+		AppStore|iPhone = AppStore|iPhone
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3290BFAC-8440-42CF-A329-B75535500DFE}.Ad-Hoc|iPhone.ActiveCfg = Ad-Hoc|iPhone
+		{3290BFAC-8440-42CF-A329-B75535500DFE}.Ad-Hoc|iPhone.Build.0 = Ad-Hoc|iPhone
+		{3290BFAC-8440-42CF-A329-B75535500DFE}.AppStore|iPhone.ActiveCfg = AppStore|iPhone
+		{3290BFAC-8440-42CF-A329-B75535500DFE}.AppStore|iPhone.Build.0 = AppStore|iPhone
+		{3290BFAC-8440-42CF-A329-B75535500DFE}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{3290BFAC-8440-42CF-A329-B75535500DFE}.Debug|iPhone.Build.0 = Debug|iPhone
+		{3290BFAC-8440-42CF-A329-B75535500DFE}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{3290BFAC-8440-42CF-A329-B75535500DFE}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{3290BFAC-8440-42CF-A329-B75535500DFE}.Release|iPhone.ActiveCfg = Release|iPhone
+		{3290BFAC-8440-42CF-A329-B75535500DFE}.Release|iPhone.Build.0 = Release|iPhone
+		{3290BFAC-8440-42CF-A329-B75535500DFE}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{3290BFAC-8440-42CF-A329-B75535500DFE}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.TextStylePolicy = $1
+		$1.inheritsSet = VisualStudio
+		$1.scope = text/plain
+		$1.FileWidth = 120
+		$1.inheritsScope = text/plain
+		$0.CSharpFormattingPolicy = $2
+		$2.AfterDelegateDeclarationParameterComma = True
+		$2.inheritsSet = Mono
+		$2.inheritsScope = text/x-csharp
+		$2.scope = text/x-csharp
+		$0.TextStylePolicy = $3
+		$3.FileWidth = 120
+		$3.inheritsSet = VisualStudio
+		$3.inheritsScope = text/plain
+		$3.scope = text/plain
+	EndGlobalSection
+EndGlobal
