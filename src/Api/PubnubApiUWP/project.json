@@ -15,7 +15,7 @@
     "repository": {
       "url": "https://github.com/pubnub/c-sharp/"
     },
-    "releaseNotes": "added presence interval event. improvement per CA2000 from code analysis",
+    "releaseNotes": "fix to support xamarin.android install using visual studio",
     "tags": [
       "Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing"
     ],
