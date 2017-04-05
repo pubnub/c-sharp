@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using PubnubApi.Interface;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace PubnubApi.EndPoint
 {
@@ -62,13 +64,19 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNHereNowResult> callback)
         {
-            this.savedCallback = callback;
-            HereNow(this.channelNames, this.channelGroupNames, this.includeChannelUUIDs, this.includeUserState, callback);
+            Task.Factory.StartNew(() =>
+            {
+                this.savedCallback = callback;
+                HereNow(this.channelNames, this.channelGroupNames, this.includeChannelUUIDs, this.includeUserState, callback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void Retry()
         {
-            HereNow(this.channelNames, this.channelGroupNames, this.includeChannelUUIDs, this.includeUserState, savedCallback);
+            Task.Factory.StartNew(() =>
+            {
+                HereNow(this.channelNames, this.channelGroupNames, this.includeChannelUUIDs, this.includeUserState, savedCallback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void HereNow(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, PNCallback<PNHereNowResult> callback)

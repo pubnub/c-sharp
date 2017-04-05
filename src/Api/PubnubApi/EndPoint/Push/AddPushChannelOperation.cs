@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using PubnubApi.Interface;
 using System.Net;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace PubnubApi.EndPoint
 {
@@ -56,13 +58,19 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNPushAddChannelResult> callback)
         {
-            this.savedCallback = callback;
-            RegisterDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, callback);
+            Task.Factory.StartNew(() =>
+            {
+                this.savedCallback = callback;
+                RegisterDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, callback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void Retry()
         {
-            RegisterDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, savedCallback);
+            Task.Factory.StartNew(() =>
+            {
+                RegisterDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, savedCallback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void RegisterDevice(string[] channels, PNPushType pushType, string pushToken, PNCallback<PNPushAddChannelResult> callback)

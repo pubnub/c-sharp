@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using PubnubApi.Interface;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace PubnubApi.EndPoint
 {
@@ -82,13 +84,19 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNAccessManagerGrantResult> callback)
         {
-            this.savedCallback = callback;
-            GrantAccess(this.channelNames, this.channelGroupNames, this.authenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, callback);
+            Task.Factory.StartNew(() =>
+            {
+                this.savedCallback = callback;
+                GrantAccess(this.channelNames, this.channelGroupNames, this.authenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, callback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void Retry()
         {
-            GrantAccess(this.channelNames, this.channelGroupNames, this.authenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, savedCallback);
+            Task.Factory.StartNew(() =>
+            {
+                GrantAccess(this.channelNames, this.channelGroupNames, this.authenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, savedCallback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void GrantAccess(string[] channels, string[] channelGroups, string[] authKeys, bool read, bool write, bool manage, long ttl, PNCallback<PNAccessManagerGrantResult> callback)

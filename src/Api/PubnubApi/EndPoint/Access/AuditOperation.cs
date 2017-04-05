@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using PubnubApi.Interface;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace PubnubApi.EndPoint
 {
@@ -54,13 +56,19 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNAccessManagerAuditResult> callback)
         {
-            this.savedCallback = callback;
-            AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, callback);
+            Task.Factory.StartNew(() =>
+            {
+                this.savedCallback = callback;
+                AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, callback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void Retry()
         {
-            AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, savedCallback);
+            System.Threading.Tasks.Task.Factory.StartNew(() =>
+            {
+                AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, savedCallback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void AuditAccess(string channel, string channelGroup, string[] authKeys, PNCallback<PNAccessManagerAuditResult> callback)

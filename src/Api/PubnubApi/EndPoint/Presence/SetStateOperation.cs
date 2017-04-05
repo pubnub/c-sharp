@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using PubnubApi.Interface;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace PubnubApi.EndPoint
 {
@@ -62,15 +64,21 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNSetStateResult> callback)
         {
-            this.savedCallback = callback;
-            string serializedState = jsonLibrary.SerializeToJsonString(this.userState);
-            SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, callback);
+            Task.Factory.StartNew(() =>
+            {
+                this.savedCallback = callback;
+                string serializedState = jsonLibrary.SerializeToJsonString(this.userState);
+                SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, callback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void Retry()
         {
-            string serializedState = jsonLibrary.SerializeToJsonString(this.userState);
-            SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, savedCallback);
+            Task.Factory.StartNew(() =>
+            {
+                string serializedState = jsonLibrary.SerializeToJsonString(this.userState);
+                SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, savedCallback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void SetUserState(string[] channels, string[] channelGroups, string uuid, string jsonUserState, PNCallback<PNSetStateResult> callback)

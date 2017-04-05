@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using PubnubApi.Interface;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace PubnubApi.EndPoint
 {
@@ -47,7 +48,7 @@ namespace PubnubApi.EndPoint
                 string multiChannelName = (currentChannels.Length > 0) ? string.Join(",", currentChannels.OrderBy(x => x).ToArray()) : ",";
                 string multiChannelGroupName = (currentChannelGroups.Length > 0) ? string.Join(",", currentChannelGroups.OrderBy(x => x).ToArray()) : "";
 
-                System.Threading.Tasks.Task.Factory.StartNew(() =>
+                Task.Factory.StartNew(() =>
                 {
                     if (ChannelRequest.ContainsKey(multiChannelName))
                     {
@@ -78,7 +79,7 @@ namespace PubnubApi.EndPoint
                     {
                         LoggingMethod.WriteToLog(string.Format("DateTime {0}, Unable to capture channel(s)={1}; channelgroup(s)={2} from _channelRequest to abort request.", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), config.LogVerbosity);
                     }
-                });
+                }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
 
                 if (type == PNOperationType.PNUnsubscribeOperation)
                 {
@@ -827,10 +828,10 @@ namespace PubnubApi.EndPoint
             LoggingMethod.WriteToLog(string.Format("DateTime {0}, SubscribeManager Manual Reconnect", DateTime.Now.ToString()), config.LogVerbosity);
             SubscribeDisconnected = false;
 
-            System.Threading.Tasks.Task.Factory.StartNew(() =>
+            Task.Factory.StartNew(() =>
             {
                 MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, GetCurrentSubscriberChannels(), GetCurrentSubscriberChannelGroups(), LastSubscribeTimetoken, false, null);
-            });
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void Disconnect<T>()
@@ -866,7 +867,11 @@ namespace PubnubApi.EndPoint
                         {
                             if (ChannelRequest[keyChannel] != null)
                             {
-                                ChannelRequest[keyChannel].Abort();
+                                try
+                                {
+                                    ChannelRequest[keyChannel].Abort();
+                                }
+                                catch { }
                                 ChannelRequest[keyChannel] = null;
                             }
                             HttpWebRequest tempValue;

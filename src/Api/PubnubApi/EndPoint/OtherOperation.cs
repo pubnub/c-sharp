@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using PubnubApi.Interface;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace PubnubApi.EndPoint
 {
@@ -38,35 +40,42 @@ namespace PubnubApi.EndPoint
                 return;
             }
 
-            UuidChanged = true;
-
-            string oldUUID = config.Uuid;
-
-            config.Uuid = newUUID;
-            CurrentUuid = newUUID;
-
-            string[] channels = GetCurrentSubscriberChannels();
-            string[] channelGroups = GetCurrentSubscriberChannelGroups();
-
-            channels = (channels != null) ? channels : new string[] { };
-            channelGroups = (channelGroups != null) ? channelGroups : new string[] { };
-
-            if (channels.Length > 0 || channelGroups.Length > 0)
+            Task.Factory.StartNew(() =>
             {
-                string channelsJsonState = BuildJsonUserState(channels.ToArray(), channelGroups.ToArray(), false);
-                IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
-                Uri request = urlBuilder.BuildMultiChannelLeaveRequest(channels, channelGroups, oldUUID, channelsJsonState);
+                try
+                {
+                    UuidChanged = true;
 
-                RequestState<string> requestState = new RequestState<string>();
-                requestState.Channels = channels;
-                requestState.ChannelGroups = channelGroups;
-                requestState.ResponseType = PNOperationType.Leave;
-                requestState.Reconnect = false;
+                    string oldUUID = config.Uuid;
 
-                string json = UrlProcessRequest(request, requestState, false); // connectCallback = null
-            }
+                    config.Uuid = newUUID;
+                    CurrentUuid = newUUID;
 
-            TerminateCurrentSubscriberRequest();
+                    string[] channels = GetCurrentSubscriberChannels();
+                    string[] channelGroups = GetCurrentSubscriberChannelGroups();
+
+                    channels = (channels != null) ? channels : new string[] { };
+                    channelGroups = (channelGroups != null) ? channelGroups : new string[] { };
+
+                    if (channels.Length > 0 || channelGroups.Length > 0)
+                    {
+                        string channelsJsonState = BuildJsonUserState(channels.ToArray(), channelGroups.ToArray(), false);
+                        IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
+                        Uri request = urlBuilder.BuildMultiChannelLeaveRequest(channels, channelGroups, oldUUID, channelsJsonState);
+
+                        RequestState<string> requestState = new RequestState<string>();
+                        requestState.Channels = channels;
+                        requestState.ChannelGroups = channelGroups;
+                        requestState.ResponseType = PNOperationType.Leave;
+                        requestState.Reconnect = false;
+
+                        string json = UrlProcessRequest(request, requestState, false); // connectCallback = null
+                    }
+
+                    TerminateCurrentSubscriberRequest();
+                }
+                catch { }
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
 
         }
 

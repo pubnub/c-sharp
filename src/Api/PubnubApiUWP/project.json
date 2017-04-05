@@ -1,6 +1,6 @@
 ﻿{
   "name": "PubnubUWP",
-  "version": "4.0.1.4",
+  "version": "4.0.1.5",
   "title": "PubNub C# .NET - Web Data Push API",
   "authors": [
     "Pandu Masabathula"
@@ -15,7 +15,7 @@
     "repository": {
       "url": "https://github.com/pubnub/c-sharp/"
     },
-    "releaseNotes": "fix to support xamarin.android install using visual studio",
+    "releaseNotes": "thread block fix",
     "tags": [
       "Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing"
     ],

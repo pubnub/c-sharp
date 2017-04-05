@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace PubnubApi.EndPoint
 {
@@ -19,11 +21,11 @@ namespace PubnubApi.EndPoint
 
         private void UnsubscribeAll()
         {
-            System.Threading.Tasks.Task.Factory.StartNew(() =>
+            Task.Factory.StartNew(() =>
             {
                 SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit);
                 manager.MultiChannelUnSubscribeAll<T>(PNOperationType.PNUnsubscribeOperation);
-            });
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
     }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using PubnubApi.Interface;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace PubnubApi.EndPoint
 {
@@ -48,13 +50,19 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNPushListProvisionsResult> callback)
         {
-            this.savedCallback = callback;
-            GetChannelsForDevice(this.pubnubPushType, this.deviceTokenId, callback);
+            Task.Factory.StartNew(() =>
+            {
+                this.savedCallback = callback;
+                GetChannelsForDevice(this.pubnubPushType, this.deviceTokenId, callback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void Retry()
         {
-            GetChannelsForDevice(this.pubnubPushType, this.deviceTokenId, savedCallback);
+            Task.Factory.StartNew(() =>
+            {
+                GetChannelsForDevice(this.pubnubPushType, this.deviceTokenId, savedCallback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void GetChannelsForDevice(PNPushType pushType, string pushToken, PNCallback<PNPushListProvisionsResult> callback)

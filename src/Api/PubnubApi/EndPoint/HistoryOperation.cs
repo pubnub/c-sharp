@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using PubnubApi.Interface;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace PubnubApi.EndPoint
 {
@@ -81,13 +83,19 @@ namespace PubnubApi.EndPoint
             {
                 throw new MissingMemberException("Invalid Subscribe Key");
             }
-            this.savedCallback = callback;
-            History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, callback);
+            Task.Factory.StartNew(() =>
+            {
+                this.savedCallback = callback;
+                History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, callback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void Retry()
         {
-            History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, savedCallback);
+            Task.Factory.StartNew(() =>
+            {
+                History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, savedCallback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void History(string channel, long start, long end, int count, bool reverse, bool includeToken, PNCallback<PNHistoryResult> callback)

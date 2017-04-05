@@ -1,6 +1,8 @@
 ﻿using System;
 using PubnubApi.Interface;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace PubnubApi.EndPoint
 {
@@ -40,13 +42,19 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNChannelGroupsAllChannelsResult> callback)
         {
-            this.savedCallback = callback;
-            GetChannelsForChannelGroup(this.channelGroupName, callback);
+            Task.Factory.StartNew(() =>
+            {
+                this.savedCallback = callback;
+                GetChannelsForChannelGroup(this.channelGroupName, callback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void Retry()
         {
-            GetChannelsForChannelGroup(this.channelGroupName, savedCallback);
+            Task.Factory.StartNew(() =>
+            {
+                GetChannelsForChannelGroup(this.channelGroupName, savedCallback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void GetChannelsForChannelGroup(string groupName, PNCallback<PNChannelGroupsAllChannelsResult> callback)

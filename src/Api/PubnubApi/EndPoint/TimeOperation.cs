@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using PubnubApi.Interface;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace PubnubApi.EndPoint
 {
@@ -34,13 +36,19 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNTimeResult> callback)
         {
-            this.savedCallback = callback;
-            Time(callback);
+            Task.Factory.StartNew(() =>
+            {
+                this.savedCallback = callback;
+                Time(callback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void Retry()
         {
-            Time(savedCallback);
+            Task.Factory.StartNew(() =>
+            {
+                Time(savedCallback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void Time(PNCallback<PNTimeResult> callback)

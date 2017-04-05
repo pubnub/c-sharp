@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using PubnubApi.Interface;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace PubnubApi.EndPoint
 {
@@ -41,13 +43,19 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNWhereNowResult> callback)
         {
-            this.savedCallback = callback;
-            WhereNow(this.whereNowUUID, callback);
+            Task.Factory.StartNew(() =>
+            {
+                this.savedCallback = callback;
+                WhereNow(this.whereNowUUID, callback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void Retry()
         {
-            WhereNow(this.whereNowUUID, savedCallback);
+            Task.Factory.StartNew(() =>
+            {
+                WhereNow(this.whereNowUUID, savedCallback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void WhereNow(string uuid, PNCallback<PNWhereNowResult> callback)

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using PubnubApi.Interface;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace PubnubApi.EndPoint
 {
@@ -55,13 +57,19 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNGetStateResult> callback)
         {
-            this.savedCallback = callback;
-            GetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, callback);
+            Task.Factory.StartNew(() =>
+            {
+                this.savedCallback = callback;
+                GetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, callback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void Retry()
         {
-            GetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, savedCallback);
+            Task.Factory.StartNew(() =>
+            {
+                GetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, savedCallback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void GetUserState(string[] channels, string[] channelGroups, string uuid, PNCallback<PNGetStateResult> callback)

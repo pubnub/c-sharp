@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using PubnubApi.Interface;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace PubnubApi.EndPoint
 {
@@ -55,13 +57,19 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNPushRemoveChannelResult> callback)
         {
-            this.savedCallback = callback;
-            RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, callback);
+            Task.Factory.StartNew(() =>
+            {
+                this.savedCallback = callback;
+                RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, callback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void Retry()
         {
-            RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, savedCallback);
+            Task.Factory.StartNew(() =>
+            {
+                RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, savedCallback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void RemoveChannelForDevice(string[] channels, PNPushType pushType, string pushToken, PNCallback<PNPushRemoveChannelResult> callback)

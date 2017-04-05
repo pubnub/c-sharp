@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using PubnubApi.Interface;
+using System.Threading.Tasks;
 
 namespace PubnubApi.EndPoint
 {
@@ -143,11 +144,11 @@ namespace PubnubApi.EndPoint
             }
 
 
-            System.Threading.Tasks.Task.Factory.StartNew(() =>
+            Task.Factory.StartNew(() =>
             {
                 manager = new SubscribeManager(config, jsonLibrary, unit);
                 manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups, initialSubscribeUrlParams);
-            });
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         internal void Retry(bool reconnect)

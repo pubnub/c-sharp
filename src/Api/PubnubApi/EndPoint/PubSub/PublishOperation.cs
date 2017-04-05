@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using PubnubApi.Interface;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace PubnubApi.EndPoint
 {
@@ -84,30 +85,40 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNPublishResult> callback)
         {
-            syncRequest = false;
-            this.savedCallback = callback;
-            Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, callback);
+            Task.Factory.StartNew(() =>
+            {
+                syncRequest = false;
+                this.savedCallback = callback;
+                Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, callback);
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         private static System.Threading.ManualResetEvent syncEvent = new System.Threading.ManualResetEvent(false);
         public PNPublishResult Sync()
         {
-            syncRequest = true;
-            syncEvent = new System.Threading.ManualResetEvent(false);
-            Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, new SyncPublishResult());
-            syncEvent.WaitOne(config.NonSubscribeRequestTimeout*1000);
+            Task<PNPublishResult> task = Task<PNPublishResult>.Factory.StartNew(() =>
+            {
+                syncRequest = true;
+                syncEvent = new System.Threading.ManualResetEvent(false);
+                Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, new SyncPublishResult());
+                syncEvent.WaitOne(config.NonSubscribeRequestTimeout * 1000);
 
-            return SyncResult;
+                return SyncResult;
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+            return task.Result;
         }
 
         private static PNPublishResult SyncResult { get; set; }
 
         internal void Retry()
         {
-            if (!syncRequest)
+            Task.Factory.StartNew(() =>
             {
-                Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, savedCallback);
-            }
+                if (!syncRequest)
+                {
+                    Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, savedCallback);
+                }
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         private void Publish(string channel, object message, bool storeInHistory, int ttl, Dictionary<string,object> metaData, PNCallback<PNPublishResult> callback)

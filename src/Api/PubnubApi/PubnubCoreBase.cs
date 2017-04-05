@@ -759,25 +759,25 @@ namespace PubnubApi
             string channel = "";
             string channelGroup = "";
 
-            if (terminateCurrentSubRequest)
-            {
-                TerminateCurrentSubscriberRequest();
-            }
-
-            if (pubnubRequestState != null)
-            {
-                if (pubnubRequestState.Channels != null)
-                {
-                    channel = (pubnubRequestState.Channels.Length > 0) ? string.Join(",", pubnubRequestState.Channels.OrderBy(x => x).ToArray()) : ",";
-                }
-                if (pubnubRequestState.ChannelGroups != null)
-                {
-                    channelGroup = string.Join(",", pubnubRequestState.ChannelGroups.OrderBy(x => x).ToArray());
-                }
-            }
-
             try
             {
+                if (terminateCurrentSubRequest)
+                {
+                    TerminateCurrentSubscriberRequest();
+                }
+
+                if (pubnubRequestState != null)
+                {
+                    if (pubnubRequestState.Channels != null)
+                    {
+                        channel = (pubnubRequestState.Channels.Length > 0) ? string.Join(",", pubnubRequestState.Channels.OrderBy(x => x).ToArray()) : ",";
+                    }
+                    if (pubnubRequestState.ChannelGroups != null)
+                    {
+                        channelGroup = string.Join(",", pubnubRequestState.ChannelGroups.OrderBy(x => x).ToArray());
+                    }
+                }
+
                 if (!ChannelRequest.ContainsKey(channel) && (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation || pubnubRequestState.ResponseType == PNOperationType.Presence))
                 {
                     return "";
@@ -1294,7 +1294,11 @@ namespace PubnubApi
         {
             if (state != null && state.Request != null)
             {
-                state.Request.Abort();
+                try
+                {
+                    state.Request.Abort();
+                }
+                catch { }
             }
             else
             {
@@ -1314,7 +1318,11 @@ namespace PubnubApi
         {
             if (request != null)
             {
-                request.Abort();
+                try
+                {
+                    request.Abort();
+                }
+                catch { }
             }
         }
 
@@ -1670,7 +1678,11 @@ namespace PubnubApi
                 if (request != null)
                 {
                     LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateCurrentSubsciberRequest {1}", DateTime.Now.ToString(), request.RequestUri.ToString()), pubnubConfig.LogVerbosity);
-                    request.Abort();
+                    try
+                    {
+                        request.Abort();
+                    }
+                    catch { }
                 }
             }
         }

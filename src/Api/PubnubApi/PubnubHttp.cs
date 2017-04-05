@@ -560,7 +560,11 @@ namespace PubnubApi
                         string currentMultiChannelGroup = (currentState.ChannelGroups == null) ? "" : string.Join(",", currentState.ChannelGroups.OrderBy(x => x).ToArray());
                         LoggingMethod.WriteToLog(string.Format("DateTime: {0}, OnPubnubWebRequestTimeout: client request timeout reached.Request abort for channel={1} ;channelgroup={2}", DateTime.Now.ToString(), currentMultiChannel, currentMultiChannelGroup), pubnubConfig.LogVerbosity);
                         currentState.Timeout = true;
-                        request.Abort();
+                        try
+                        {
+                            request.Abort();
+                        }
+                        catch { }
                     }
                 }
                 else
@@ -576,7 +580,11 @@ namespace PubnubApi
             if (currentState != null && currentState.Response == null && currentState.Request != null)
             {
                 currentState.Timeout = true;
-                currentState.Request.Abort();
+                try
+                {
+                    currentState.Request.Abort();
+                }
+                catch { }
                 LoggingMethod.WriteToLog(string.Format("DateTime: {0}, **WP7 OnPubnubWebRequestTimeout**", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
             }
         }
