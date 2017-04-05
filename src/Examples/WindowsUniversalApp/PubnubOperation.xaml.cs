@@ -30,7 +30,7 @@ namespace WindowsUniversalApp
         PubnubConfigData data = null;
         static Pubnub pubnub = null;
         static PNConfiguration config = null;
-        DemoSubscribeCallback listener = null;
+        SubscribeCallbackExt listener = null;
 
         Popup publishPopup = null;
         Popup hereNowPopup = null;
@@ -76,11 +76,24 @@ namespace WindowsUniversalApp
                 config.PresenceTimeout = data.presenceHeartbeat;
                 config.SubscribeTimeout = data.subscribeTimeout;
                 config.NonSubscribeRequestTimeout = data.nonSubscribeTimeout;
+                config.UseClassicHttpWebRequest = true;
 
                 config.PubnubLog = new PlatformPubnubLog();
                 config.LogVerbosity = PNLogVerbosity.BODY;
                 pubnub = new Pubnub(config);
-                listener = new DemoSubscribeCallback(PubnubCallbackResult);
+                listener = new SubscribeCallbackExt(
+                    (o, m) => 
+                    {
+                        DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(m));
+                    }, 
+                    (o, p) =>
+                    {
+                        DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(p));
+                    }, 
+                    (o, s) => 
+                    {
+                        DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
+                    });
                 //pubnub.NetworkCheckMaxRetries = data.maxRetries;
                 //pubnub.NetworkCheckRetryInterval = data.retryInterval;
                 //pubnub.LocalClientHeartbeatInterval = data.localClientHeartbeatInterval;
@@ -91,12 +104,16 @@ namespace WindowsUniversalApp
 
         }
 
-        private async void btnTime_Click(object sender, RoutedEventArgs e)
+        private void btnTime_Click(object sender, RoutedEventArgs e)
         {
-            await System.Threading.Tasks.Task.Run(() =>
-            {
-                pubnub.Time().Async(new DemoTimeResult(PubnubCallbackResult));
-            });
+            pubnub.Time().Async(new PNTimeResultExt(
+                (r,s) => 
+                {
+                    if (r != null)
+                    {
+                        DisplayMessageInTextBox(r.Timetoken.ToString());
+                    }
+                }));
         }
 
         /// <summary>
@@ -183,36 +200,48 @@ namespace WindowsUniversalApp
                             int intData;
                             if (int.TryParse(publishMsg, out intData)) //capture numeric data
                             {
-                                System.Threading.Tasks.Task.Run(() =>
-                                {
-                                    pubnub.Publish()
-                                    .Channel(channel)
-                                    .Message(intData)
-                                    .ShouldStore(storeInHistory)
-                                    .Async(new DemoPublishResult(PubnubCallbackResult));
-                                });
+                                pubnub.Publish()
+                                .Channel(channel)
+                                .Message(intData)
+                                .ShouldStore(storeInHistory)
+                                .Async(new PNPublishResultExt(
+                                    (r,s)=> 
+                                    {
+                                        if (r != null)
+                                        {
+                                            DisplayMessageInTextBox(r.Timetoken.ToString());
+                                        }
+                                    }));
                             }
                             else if (double.TryParse(publishMsg, out doubleData)) //capture numeric data
                             {
-                                System.Threading.Tasks.Task.Run(() =>
-                                {
-                                    pubnub.Publish()
-                                    .Channel(channel)
-                                    .Message(doubleData)
-                                    .ShouldStore(storeInHistory)
-                                    .Async(new DemoPublishResult(PubnubCallbackResult));
-                                });
+                                pubnub.Publish()
+                                .Channel(channel)
+                                .Message(doubleData)
+                                .ShouldStore(storeInHistory)
+                                .Async(new PNPublishResultExt(
+                                    (r, s) =>
+                                    {
+                                        if (r != null)
+                                        {
+                                            DisplayMessageInTextBox(r.Timetoken.ToString());
+                                        }
+                                    }));
                             }
                             else
                             {
-                                System.Threading.Tasks.Task.Run(() =>
-                                {
-                                    pubnub.Publish()
-                                    .Channel(channel)
-                                    .Message(publishMsg)
-                                    .ShouldStore(storeInHistory)
-                                    .Async(new DemoPublishResult(PubnubCallbackResult));
-                                });
+                                pubnub.Publish()
+                                .Channel(channel)
+                                .Message(publishMsg)
+                                .ShouldStore(storeInHistory)
+                                .Async(new PNPublishResultExt(
+                                    (r, s) =>
+                                    {
+                                        if (r != null)
+                                        {
+                                            DisplayMessageInTextBox(r.Timetoken.ToString());
+                                        }
+                                    }));
                             }
                         }
                     }
@@ -228,13 +257,17 @@ namespace WindowsUniversalApp
         {
             channel = txtChannel.Text;
             DisplayMessageInTextBox("Running Detailed History:");
-            System.Threading.Tasks.Task.Run(() =>
-            {
-                pubnub.History()
-                    .Channel(channel)
-                    .Count(100)
-                    .Async(new DemoHistoryResult(PubnubCallbackResult));
-            });
+            pubnub.History()
+                .Channel(channel)
+                .Count(100)
+                .Async(new PNHistoryResultExt(
+                    (r,s)=> 
+                    {
+                        if (r != null)
+                        {
+                            DisplayMessageInTextBox("Message Count = " + r.Messages.Count.ToString());
+                        }
+                    }));
         }
 
         private void btnGlobalHereNow_Click(object sender, RoutedEventArgs e)
@@ -273,14 +306,19 @@ namespace WindowsUniversalApp
                     CheckBox chkIncludeUserState = control.FindName("chkHereIncludeUserState") as CheckBox;
                     bool includeState = (chkIncludeUserState != null) ? chkIncludeUserState.IsChecked.Value : false;
 
-                    System.Threading.Tasks.Task.Run(() =>
-                    {
-                        DisplayMessageInTextBox("Running GlobalHereNow:");
-                        pubnub.HereNow()
-                        .IncludeUUIDs(showUUID)
-                        .IncludeState(includeState)
-                        .Async(new DemoHereNowResult(PubnubCallbackResult));
-                    });
+                    DisplayMessageInTextBox("Running GlobalHereNow:");
+                    pubnub.HereNow()
+                    .IncludeUUIDs(showUUID)
+                    .IncludeState(includeState)
+                    .Async(new PNHereNowResultEx(
+                        (r,s) => 
+                        {
+                            if (r != null)
+                            {
+                                DisplayMessageInTextBox("TotalChannels = " + r.TotalChannels.ToString());
+                                DisplayMessageInTextBox("TotalOccupancy = " + r.TotalOccupancy.ToString());
+                            }
+                        }));
                 }
                 globalHereNowPopup = null;
                 this.IsEnabled = true;
@@ -326,14 +364,19 @@ namespace WindowsUniversalApp
                     bool includeState = (chkIncludeUserState != null) ? chkIncludeUserState.IsChecked.Value : false;
 
                     DisplayMessageInTextBox("Running HereNow:");
-                    System.Threading.Tasks.Task.Run(() =>
-                    {
-                        pubnub.HereNow()
-                        .Channels(new string[] { channel })
-                        .IncludeUUIDs(showUUID)
-                        .IncludeState(includeState)
-                        .Async(new DemoHereNowResult(PubnubCallbackResult));
-                    });
+                    pubnub.HereNow()
+                    .Channels(new string[] { channel })
+                    .IncludeUUIDs(showUUID)
+                    .IncludeState(includeState)
+                    .Async(new PNHereNowResultEx(
+                        (r, s) =>
+                        {
+                            if (r != null)
+                            {
+                                DisplayMessageInTextBox("TotalChannels = " + r.TotalChannels.ToString());
+                                DisplayMessageInTextBox("TotalOccupancy = " + r.TotalOccupancy.ToString());
+                            }
+                        }));
                 }
                 hereNowPopup = null;
                 this.IsEnabled = true;
@@ -398,29 +441,36 @@ namespace WindowsUniversalApp
                     {
                         DisplayMessageInTextBox("Running GrantAccess:");
                         int ttlInMinutes = 1440;
-                        System.Threading.Tasks.Task.Run(() =>
+                        pubnub.Grant()
+                        .Channels(new string[] { pamUserChannelName })
+                        .AuthKeys(new string[] { pamAuthKey })
+                        .Read(true)
+                        .Write(true)
+                        .TTL(ttlInMinutes)
+                        .Async(new PNAccessManagerGrantResultExt((r,s)=> 
                         {
-                            pubnub.Grant()
-                            .Channels(new string[] { pamUserChannelName })
-                            .AuthKeys(new string[] { pamAuthKey })
-                            .Read(true)
-                            .Write(true)
-                            .TTL(ttlInMinutes)
-                            .Async(new DemoGrantResult(PubnubCallbackResult));
-                        });
+                            if (r != null)
+                            {
+                                DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                            }
+                        }));
                     }
 
                     RadioButton radAuditChannel = control.FindName("radAuditChannel") as RadioButton;
                     if (radAuditChannel != null && radAuditChannel.IsChecked.Value)
                     {
                         DisplayMessageInTextBox("Running AuditAccess:");
-                        System.Threading.Tasks.Task.Run(() =>
-                        {
-                            pubnub.Audit()
-                            .Channel(pamUserChannelName)
-                            .AuthKeys(new string[] { pamAuthKey })
-                            .Async(new DemoAuditResult(PubnubCallbackResult));
-                        });
+                        pubnub.Audit()
+                        .Channel(pamUserChannelName)
+                        .AuthKeys(new string[] { pamAuthKey })
+                        .Async(new PNAccessManagerAuditResultExt(
+                            (r,s)=> 
+                            {
+                                if (r != null)
+                                {
+                                    DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                }
+                            }));
                     }
 
                     RadioButton radRevokeChannel = control.FindName("radRevokeChannel") as RadioButton;
@@ -434,7 +484,13 @@ namespace WindowsUniversalApp
                             .AuthKeys(new string[] { pamAuthKey })
                             .Read(false)
                             .Write(false)
-                            .Async(new DemoGrantResult(PubnubCallbackResult));
+                            .Async(new PNAccessManagerGrantResultExt((r, s) =>
+                            {
+                                if (r != null)
+                                {
+                                    DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                }
+                            }));
                         });
                     }
 
@@ -502,45 +558,55 @@ namespace WindowsUniversalApp
                         if (radGrantPAMChannelGroup != null && radGrantPAMChannelGroup.IsChecked.Value)
                         {
                             DisplayMessageInTextBox("Running ChannelGroupGrantAccess:");
-                            System.Threading.Tasks.Task.Run(() =>
+                            pubnub.Grant()
+                            .ChannelGroups(new string[] { pamUserChannelGroup })
+                            .AuthKeys(new string[] { pamAuthKey })
+                            .Read(true)
+                            .Write(true)
+                            .TTL(ttlInMinutes)
+                            .Async(new PNAccessManagerGrantResultExt((r, s) =>
                             {
-                                pubnub.Grant()
-                                .ChannelGroups(new string[] { pamUserChannelGroup })
-                                .AuthKeys(new string[] { pamAuthKey })
-                                .Read(true)
-                                .Write(true)
-                                .TTL(ttlInMinutes)
-                                .Async(new DemoGrantResult(PubnubCallbackResult));
-                            });
+                                if (r != null)
+                                {
+                                    DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                }
+                            }));
                         }
 
                         RadioButton radAuditPAMChannelGroup = control.FindName("radAuditChannelGroup") as RadioButton;
                         if (radAuditPAMChannelGroup != null && radAuditPAMChannelGroup.IsChecked.Value)
                         {
                             DisplayMessageInTextBox("Running ChannelGroupAuditAccess:");
-                            System.Threading.Tasks.Task.Run(() =>
-                            {
-                                pubnub.Audit()
-                                .ChannelGroup(pamUserChannelGroup)
-                                .AuthKeys(new string[] { pamAuthKey })
-                                .Async(new DemoAuditResult(PubnubCallbackResult));
-                            });
+                            pubnub.Audit()
+                            .ChannelGroup(pamUserChannelGroup)
+                            .AuthKeys(new string[] { pamAuthKey })
+                            .Async(new PNAccessManagerAuditResultExt(
+                                (r, s) =>
+                                {
+                                    if (r != null)
+                                    {
+                                        DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    }
+                                }));
                         }
 
                         RadioButton radRevokePAMChannelGroup = control.FindName("radRevokeChannelGroup") as RadioButton;
                         if (radRevokePAMChannelGroup != null && radRevokePAMChannelGroup.IsChecked.Value)
                         {
                             DisplayMessageInTextBox("Running ChannelGroup Revoke Access:");
-                            System.Threading.Tasks.Task.Run(() =>
+                            pubnub.Grant()
+                            .ChannelGroups(new string[] { pamUserChannelGroup })
+                            .AuthKeys(new string[] { pamAuthKey })
+                            .Read(false)
+                            .Write(false)
+                            .TTL(ttlInMinutes)
+                            .Async(new PNAccessManagerGrantResultExt((r, s) =>
                             {
-                                pubnub.Grant()
-                                .ChannelGroups(new string[] { pamUserChannelGroup })
-                                .AuthKeys(new string[] { pamAuthKey })
-                                .Read(false)
-                                .Write(false)
-                                .TTL(ttlInMinutes)
-                                .Async(new DemoGrantResult(PubnubCallbackResult));
-                            });
+                                if (r != null)
+                                {
+                                    DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                }
+                            }));
                         }
                     }
                 }
@@ -610,42 +676,45 @@ namespace WindowsUniversalApp
                             Dictionary<string, object> dicInt = new Dictionary<string, object>();
                             dicInt.Add(userStateKey1, valueInt);
 
-                            System.Threading.Tasks.Task.Run(() =>
-                            {
-                                pubnub.SetPresenceState()
-                                .Channels(new string[] { channel })
-                                .ChannelGroups(new string[] { channelGroup })
-                                .State(dicInt)
-                                .Async(new DemoPNSetStateResult(PubnubCallbackResult));
-                            });
+                            pubnub.SetPresenceState()
+                            .Channels(new string[] { channel })
+                            .ChannelGroups(new string[] { channelGroup })
+                            .State(dicInt)
+                            .Async(new PNSetStateResultExt(
+                                (r,s)=> 
+                                {
+                                    DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                }));
                         }
                         else if (Double.TryParse(userStateValue1, out valueDouble))
                         {
                             Dictionary<string, object> dicDouble = new Dictionary<string, object>();
                             dicDouble.Add(userStateKey1, valueDouble);
 
-                            System.Threading.Tasks.Task.Run(() =>
-                            {
-                                pubnub.SetPresenceState()
-                                .Channels(new string[] { channel })
-                                .ChannelGroups(new string[] { channelGroup })
-                                .State(dicDouble)
-                                .Async(new DemoPNSetStateResult(PubnubCallbackResult));
-                            });
+                            pubnub.SetPresenceState()
+                            .Channels(new string[] { channel })
+                            .ChannelGroups(new string[] { channelGroup })
+                            .State(dicDouble)
+                            .Async(new PNSetStateResultExt(
+                                (r, s) =>
+                                {
+                                    DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                }));
                         }
                         else
                         {
                             Dictionary<string, object> dicObj = new Dictionary<string, object>();
                             dicObj.Add(userStateKey1, userStateValue1);
 
-                            System.Threading.Tasks.Task.Run(() =>
-                            {
-                                pubnub.SetPresenceState()
-                                .Channels(new string[] { channel })
-                                .ChannelGroups(new string[] { channelGroup })
-                                .State(dicObj)
-                                .Async(new DemoPNSetStateResult(PubnubCallbackResult));
-                            });
+                            pubnub.SetPresenceState()
+                            .Channels(new string[] { channel })
+                            .ChannelGroups(new string[] { channelGroup })
+                            .State(dicObj)
+                            .Async(new PNSetStateResultExt(
+                                (r, s) =>
+                                {
+                                    DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                }));
                         }
                     }
                     else if (control.IsGetUserState)
@@ -656,14 +725,15 @@ namespace WindowsUniversalApp
                             DisplayMessageInTextBox("Running Get User State:");
                             string userStateUUID = txtGetUserStateUUID.Text.Trim();
 
-                            System.Threading.Tasks.Task.Run(() =>
-                            {
-                                pubnub.GetPresenceState()
-                                .Channels(new string[] { channel })
-                                .ChannelGroups(new string[] { channelGroup })
-                                .Uuid(userStateUUID)
-                                .Async(new DemoPNGetStateResult(PubnubCallbackResult));
-                            });
+                            pubnub.GetPresenceState()
+                            .Channels(new string[] { channel })
+                            .ChannelGroups(new string[] { channelGroup })
+                            .Uuid(userStateUUID)
+                            .Async(new PNGetStateResultExt(
+                                (r, s) =>
+                                {
+                                    DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                }));
                         }
                     }
                 }
@@ -715,12 +785,12 @@ namespace WindowsUniversalApp
 
                         DisplayMessageInTextBox("Running WhereNow:");
 
-                        System.Threading.Tasks.Task.Run(() =>
+                        pubnub.WhereNow()
+                        .Uuid(whereNowUUID)
+                        .Async(new PNWhereNowResultExt((r,s) => 
                         {
-                            pubnub.WhereNow()
-                            .Uuid(whereNowUUID)
-                            .Async(new DemoWhereNowResult(PubnubCallbackResult));
-                        });
+                            DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                        }));
                     }
 
                 }
@@ -842,38 +912,38 @@ namespace WindowsUniversalApp
                         if (radGetChannelsOfChannelGroup != null && radGetChannelsOfChannelGroup.IsChecked.Value)
                         {
                             DisplayMessageInTextBox("Running GetChannelsForChannelGroup:");
-                            System.Threading.Tasks.Task.Run(() =>
+                            pubnub.ListChannelsForChannelGroup()
+                            .ChannelGroup(userChannelGroup)
+                            .Async(new PNChannelGroupsAllChannelsResultExt((r,s)=> 
                             {
-                                pubnub.ListChannelsForChannelGroup()
-                                .ChannelGroup(userChannelGroup)
-                                .Async(new DemoChannelGroupAllChannels(PubnubCallbackResult));
-                            });
+                                DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                            }));
                         }
 
                         RadioButton radAddChannelToChannelGroup = control.FindName("radAddChannelToChannelGroup") as RadioButton;
                         if (radAddChannelToChannelGroup != null && radAddChannelToChannelGroup.IsChecked.Value)
                         {
                             DisplayMessageInTextBox("Running AddChannelsToChannelGroup:");
-                            System.Threading.Tasks.Task.Run(() =>
+                            pubnub.AddChannelsToChannelGroup()
+                            .Channels(new string[] { userChannelName })
+                            .ChannelGroup(userChannelGroup)
+                            .Async(new PNChannelGroupsAddChannelResultExt((r, s) =>
                             {
-                                pubnub.AddChannelsToChannelGroup()
-                                .Channels(new string[] { userChannelName })
-                                .ChannelGroup(userChannelGroup)
-                                .Async(new DemoChannelGroupAddChannel(PubnubCallbackResult));
-                            });
+                                DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                            }));
                         }
 
                         RadioButton radRemoveChannelFromChannelGroup = control.FindName("radRemoveChannelFromChannelGroup") as RadioButton;
                         if (radRemoveChannelFromChannelGroup != null && radRemoveChannelFromChannelGroup.IsChecked.Value)
                         {
                             DisplayMessageInTextBox("Running RemoveChannelsFromChannelGroup:");
-                            System.Threading.Tasks.Task.Run(() =>
+                            pubnub.RemoveChannelsFromChannelGroup()
+                            .Channels(new string[] { userChannelName })
+                            .ChannelGroup(userChannelGroup)
+                            .Async(new PNChannelGroupsRemoveChannelResultExt((r, s) =>
                             {
-                                pubnub.RemoveChannelsFromChannelGroup()
-                                .Channels(new string[] { userChannelName })
-                                .ChannelGroup(userChannelGroup)
-                                .Async(new DemoChannelGroupRemoveChannel(PubnubCallbackResult));
-                            });
+                                DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                            }));
                         }
                     }
                 }
@@ -959,154 +1029,7 @@ namespace WindowsUniversalApp
             System.Diagnostics.Debug.WriteLine(log);
         }
     }
-    public class DemoTimeResult : PNCallback<PNTimeResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoTimeResult(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
 
-        public override void OnResponse(PNTimeResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    };
-
-    public class DemoPublishResult : PNCallback<PNPublishResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoPublishResult(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-
-        public override void OnResponse(PNPublishResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    };
-
-    public class DemoHistoryResult : PNCallback<PNHistoryResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoHistoryResult(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNHistoryResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    };
-
-    public class DemoHereNowResult : PNCallback<PNHereNowResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoHereNowResult(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNHereNowResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    };
-
-    public class DemoWhereNowResult : PNCallback<PNWhereNowResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoWhereNowResult(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNWhereNowResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    };
-
-    public class DemoPNGetStateResult : PNCallback<PNGetStateResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoPNGetStateResult(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNGetStateResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    };
-
-    public class DemoPNSetStateResult : PNCallback<PNSetStateResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoPNSetStateResult(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNSetStateResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    };
 
     public class DemoSubscribeCallback : SubscribeCallback
     {
@@ -1173,213 +1096,4 @@ namespace WindowsUniversalApp
         }
     }
 
-    public class DemoGrantResult : PNCallback<PNAccessManagerGrantResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoGrantResult(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNAccessManagerGrantResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    };
-
-    public class DemoAuditResult : PNCallback<PNAccessManagerAuditResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoAuditResult(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNAccessManagerAuditResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    };
-
-    public class DemoPushAddChannel : PNCallback<PNPushAddChannelResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoPushAddChannel(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNPushAddChannelResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    }
-
-    public class DemoPushRemoveChannel : PNCallback<PNPushRemoveChannelResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoPushRemoveChannel(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNPushRemoveChannelResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    }
-
-    public class DemoPushListProvisionChannel : PNCallback<PNPushListProvisionsResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoPushListProvisionChannel(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNPushListProvisionsResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    }
-
-    public class DemoChannelGroupAddChannel : PNCallback<PNChannelGroupsAddChannelResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoChannelGroupAddChannel(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNChannelGroupsAddChannelResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    }
-
-    public class DemoChannelGroupRemoveChannel : PNCallback<PNChannelGroupsRemoveChannelResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoChannelGroupRemoveChannel(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNChannelGroupsRemoveChannelResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    }
-
-    public class DemoChannelGroupDeleteGroup : PNCallback<PNChannelGroupsDeleteGroupResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoChannelGroupDeleteGroup(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNChannelGroupsDeleteGroupResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    }
-
-    public class DemoChannelGroupAll : PNCallback<PNChannelGroupsListAllResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoChannelGroupAll(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNChannelGroupsListAllResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    }
-
-    public class DemoChannelGroupAllChannels : PNCallback<PNChannelGroupsAllChannelsResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoChannelGroupAllChannels(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNChannelGroupsAllChannelsResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    }
 }
