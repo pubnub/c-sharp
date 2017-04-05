@@ -1,8 +1,12 @@
 name: c-sharp
-version: "4.0.1.4"
+version: "4.0.1.5"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
+  - version: 4.0.1.5
+    changes:
+      - type: Improvement
+        text: Refactored to handle thread blocking
   - version: 4.0.1.4
     changes:
       - type: Improvement
