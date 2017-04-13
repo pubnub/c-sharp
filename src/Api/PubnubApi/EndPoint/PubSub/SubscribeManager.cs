@@ -215,7 +215,7 @@ namespace PubnubApi.EndPoint
                         {
                             LoggingMethod.WriteToLog(string.Format("DateTime {0}, Unable to capture channel(s)={1}; channelgroup(s)={2} from _channelRequest to abort request.", DateTime.Now.ToString(), multiChannelName, multiChannelGroupName), config.LogVerbosity);
                         }
-                    });
+                    }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
 
                     if (type == PNOperationType.PNUnsubscribeOperation)
                     {
@@ -758,7 +758,7 @@ namespace PubnubApi.EndPoint
                 System.Threading.Tasks.Task.Factory.StartNew(() => 
                 {
                     MultiChannelSubscribeRequest<T>(type, channels, channelGroups, timetoken, false, null);
-                });
+                }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
             }
         }
 

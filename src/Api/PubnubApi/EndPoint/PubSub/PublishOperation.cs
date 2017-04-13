@@ -85,6 +85,16 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNPublishResult> callback)
         {
+            if (this.msg == null)
+            {
+                throw new ArgumentException("message cannot be null");
+            }
+
+            if (this.config == null || string.IsNullOrEmpty(this.config.PublishKey) || this.config.PublishKey.Trim().Length <= 0)
+            {
+                throw new MissingMemberException("publish key is required");
+            }
+
             Task.Factory.StartNew(() =>
             {
                 syncRequest = false;
@@ -96,6 +106,10 @@ namespace PubnubApi.EndPoint
         private static System.Threading.ManualResetEvent syncEvent = new System.Threading.ManualResetEvent(false);
         public PNPublishResult Sync()
         {
+            if (this.msg == null)
+            {
+                throw new ArgumentNullException("message");
+            }
             Task<PNPublishResult> task = Task<PNPublishResult>.Factory.StartNew(() =>
             {
                 syncRequest = true;

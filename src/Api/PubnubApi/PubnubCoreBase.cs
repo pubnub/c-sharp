@@ -1,4 +1,4 @@
-﻿//Build Date: December 29, 2016
+﻿//Build Date: April 13, 2017
 #region "Header"
 #if (__MonoCS__)
 #define TRACE
@@ -433,33 +433,24 @@ namespace PubnubApi
             bool ret = false;
             try
             {
-                if (asyncRequestState != null && asyncRequestState.Request != null && result != null && result.Count > 0)
+                if (asyncRequestState != null && asyncRequestState.ResponseType == PNOperationType.PNSubscribeOperation && result != null && result.Count > 0)
                 {
                     List<SubscribeMessage> message = GetMessageFromMultiplexResult(result);
-                    Uri restUri = asyncRequestState.Request.RequestUri;
-                    IEnumerable<string> segmentsEnumerable = restUri.AbsolutePath.Split('/').Where(s => s.ToString() != "");
-                    List<object> segments = (segmentsEnumerable != null) ? segmentsEnumerable.Cast<object>().ToList() : null;
-                    HttpValueCollection restUriQueryCollection = HttpUtility.ParseQueryString(restUri.Query);
-                    if (segments != null && restUriQueryCollection != null && restUriQueryCollection.Count > 0 && restUriQueryCollection.ContainsKey("tt"))
+                    if (message != null && message.Count == 0)
                     {
-                        string req = string.Format("{0}/{1}",segments[0].ToString().ToLower(), segments[1].ToString().ToLower());
-                        string timetoken = restUriQueryCollection["tt"].ToString();
-                        if (req == "v2/subscribe" && timetoken == "0" && message != null && message.Count == 0)
+                        IEnumerable<string> newChannels = from channel in MultiChannelSubscribe
+                                                          where channel.Value == 0
+                                                          select channel.Key;
+                        IEnumerable<string> newChannelGroups = from channelGroup in MultiChannelGroupSubscribe
+                                                               where channelGroup.Value == 0
+                                                               select channelGroup.Key;
+                        if (newChannels != null && newChannels.Count() > 0)
                         {
-                            IEnumerable<string> newChannels = from channel in MultiChannelSubscribe
-                                                              where channel.Value == 0
-                                                              select channel.Key;
-                            IEnumerable<string> newChannelGroups = from channelGroup in MultiChannelGroupSubscribe
-                                                              where channelGroup.Value == 0
-                                                              select channelGroup.Key;
-                            if (newChannels != null && newChannels.Count() > 0)
-                            {
-                                ret = true;
-                            }
-                            else if (newChannelGroups != null && newChannelGroups.Count() > 0)
-                            {
-                                ret = true;
-                            }
+                            ret = true;
+                        }
+                        else if (newChannelGroups != null && newChannelGroups.Count() > 0)
+                        {
+                            ret = true;
                         }
                     }
                 }

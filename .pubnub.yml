@@ -1,8 +1,14 @@
 name: c-sharp
-version: "4.0.1.5"
+version: "4.0.1.6"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
+  - version: 4.0.1.6
+    changes:
+      - type: Improvement
+        text: Fix for subscribe connect status callback
+      - type: Improvement
+        text: Message null value check for publish
   - version: 4.0.1.5
     changes:
       - type: Improvement

@@ -1,6 +1,6 @@
 ﻿{
   "name": "PubnubUWP",
-  "version": "4.0.1.5",
+  "version": "4.0.1.6",
   "title": "PubNub C# .NET - Web Data Push API",
   "authors": [
     "Pandu Masabathula"
@@ -15,7 +15,7 @@
     "repository": {
       "url": "https://github.com/pubnub/c-sharp/"
     },
-    "releaseNotes": "thread block fix",
+    "releaseNotes": "subscribe connect status callback. message null value check for publish",
     "tags": [
       "Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing"
     ],
