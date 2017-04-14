@@ -108,7 +108,7 @@ namespace PubnubApi.EndPoint
         {
             if (this.msg == null)
             {
-                throw new ArgumentNullException("message");
+                throw new ArgumentException("message cannot be null");
             }
             Task<PNPublishResult> task = Task<PNPublishResult>.Factory.StartNew(() =>
             {
