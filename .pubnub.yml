@@ -1,8 +1,14 @@
 name: c-sharp
-version: "4.0.1.6"
+version: "4.0.1.7"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
+  - version: 4.0.1.7
+    changes:
+      - type: Improvement
+        text: Fix for publish with UsePOST and cipher key
+      - type: Improvement
+        text: Handling object array for History response
   - version: 4.0.1.6
     changes:
       - type: Improvement
