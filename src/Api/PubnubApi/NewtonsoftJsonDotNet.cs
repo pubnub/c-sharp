@@ -759,6 +759,15 @@ namespace PubnubApi
                 ack.EndTimeToken = Convert.ToInt64(listObject[2].ToString());
                 //ack.ChannelName = listObject[3].ToString();
                 List<object> messagesContainer = listObject[0] as List<object>;
+                if (messagesContainer == null)
+                {
+                    object[] messagesCollection = listObject[0] as object[];
+                    if (messagesCollection != null && messagesCollection.Length > 0)
+                    {
+                        messagesContainer = messagesCollection.ToList();
+                    }
+                }
+
                 if (messagesContainer != null)
                 {
                     ack.Messages = new List<PNHistoryItemResult>();
