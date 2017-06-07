@@ -167,9 +167,7 @@ namespace PubnubApi.EndPoint
             if (this.httpPost)
             {
                 requestState.UsePostMethod = true;
-                Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
-                messageEnvelope.Add("message", message);
-                string postMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
+                string postMessage = JsonEncodePublishMsg(message);
                 json = UrlProcessRequest<PNPublishResult>(request, requestState, false, postMessage);
             }
             else
@@ -191,6 +189,20 @@ namespace PubnubApi.EndPoint
                 SyncResult = result;
                 syncEvent.Set();
             }
+        }
+
+        private string JsonEncodePublishMsg(object originalMessage)
+        {
+            string message = jsonLibrary.SerializeToJsonString(originalMessage);
+
+            if (config.CipherKey.Length > 0)
+            {
+                PubnubCrypto aes = new PubnubCrypto(config.CipherKey, config);
+                string encryptMessage = aes.Encrypt(message);
+                message = jsonLibrary.SerializeToJsonString(encryptMessage);
+            }
+
+            return message;
         }
     }
 }
