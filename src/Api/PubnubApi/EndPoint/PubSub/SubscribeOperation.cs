@@ -5,14 +5,16 @@ using System.Text;
 using System.Threading;
 using PubnubApi.Interface;
 using System.Threading.Tasks;
+using System.Net;
 
 namespace PubnubApi.EndPoint
 {
     public class SubscribeOperation<T> : PubnubCoreBase
     {
-        private static PNConfiguration config = null;
-        private static IJsonPluggableLibrary jsonLibrary = null;
+        private PNConfiguration config = null;
+        private IJsonPluggableLibrary jsonLibrary = null;
         private IPubnubUnitTest unit = null;
+        private IPubnubLog pubnubLog = null;
 
         private List<string> subscribeChannelNames = new List<string>();
         private List<string> subscribeChannelGroupNames = new List<string>();
@@ -22,22 +24,12 @@ namespace PubnubApi.EndPoint
         private bool presenceSubscribeEnabled = false;
         private SubscribeManager manager = null;
 
-        public SubscribeOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
-        {
-            config = pubnubConfig;
-        }
-
-        public SubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary):base(pubnubConfig, jsonPluggableLibrary, null)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-        }
-
-        public SubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
+        public SubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
+            pubnubLog = log;
         }
 
         public SubscribeOperation<T> Channels(string[] channels)
@@ -116,9 +108,9 @@ namespace PubnubApi.EndPoint
             string channel = (channels != null) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
             string channelGroup = (channelGroups != null) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
 
-            PNPlatform.Print(config);
+            PNPlatform.Print(config, pubnubLog);
 
-            LoggingMethod.WriteToLog(string.Format("DateTime {0}, requested subscribe for channel(s)={1} and channel group(s)={2}", DateTime.Now.ToString(), channel, channelGroup), config.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, requested subscribe for channel(s)={1} and channel group(s)={2}", DateTime.Now.ToString(), channel, channelGroup), config.LogVerbosity);
 
             string[] arrayChannel = new string[] { };
             string[] arrayChannelGroup = new string[] { };
@@ -146,7 +138,8 @@ namespace PubnubApi.EndPoint
 
             Task.Factory.StartNew(() =>
             {
-                manager = new SubscribeManager(config, jsonLibrary, unit);
+                manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog);
+                manager.CurrentPubnubInstance(PubnubInstance);
                 manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups, initialSubscribeUrlParams);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
@@ -160,6 +153,63 @@ namespace PubnubApi.EndPoint
             else
             {
                 manager.Disconnect<T>();
+            }
+        }
+
+        internal void CurrentPubnubInstance(Pubnub instance)
+        {
+            PubnubInstance = instance;
+            if (!MultiChannelSubscribe.ContainsKey(instance.InstanceId))
+            {
+                MultiChannelSubscribe.Add(instance.InstanceId, new ConcurrentDictionary<string, long>());
+            }
+            if (!MultiChannelGroupSubscribe.ContainsKey(instance.InstanceId))
+            {
+                MultiChannelGroupSubscribe.Add(instance.InstanceId, new ConcurrentDictionary<string, long>());
+            }
+            if (!ChannelRequest.ContainsKey(instance.InstanceId))
+            {
+                ChannelRequest.Add(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+            }
+            if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
+            {
+                ChannelInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
+            if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
+            {
+                ChannelGroupInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
+            if (!ChannelLocalUserState.ContainsKey(instance.InstanceId))
+            {
+                ChannelLocalUserState.Add(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
+            }
+            if (!ChannelGroupLocalUserState.ContainsKey(instance.InstanceId))
+            {
+                ChannelGroupLocalUserState.Add(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
+            }
+            if (!ChannelUserState.ContainsKey(instance.InstanceId))
+            {
+                ChannelUserState.Add(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
+            }
+            if (!ChannelGroupUserState.ContainsKey(instance.InstanceId))
+            {
+                ChannelGroupUserState.Add(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
+            }
+            if (!ChannelReconnectTimer.ContainsKey(instance.InstanceId))
+            {
+                ChannelReconnectTimer.Add(instance.InstanceId, new ConcurrentDictionary<string, Timer>());
+            }
+            if (!ChannelGroupReconnectTimer.ContainsKey(instance.InstanceId))
+            {
+                ChannelGroupReconnectTimer.Add(instance.InstanceId, new ConcurrentDictionary<string, Timer>());
+            }
+            if (!SubscribeDisconnected.ContainsKey(instance.InstanceId))
+            {
+                SubscribeDisconnected.Add(instance.InstanceId, false);
+            }
+            if (!LastSubscribeTimetoken.ContainsKey(instance.InstanceId))
+            {
+                LastSubscribeTimetoken.Add(instance.InstanceId, 0);
             }
         }
     }

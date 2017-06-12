@@ -5,6 +5,7 @@ using System.Text;
 using PubnubApi.Interface;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Net;
 
 namespace PubnubApi.EndPoint
 {
@@ -13,6 +14,7 @@ namespace PubnubApi.EndPoint
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
         private IPubnubUnitTest unit = null;
+        private IPubnubLog pubnubLog = null;
 
         private object msg = null;
         private string channelName = "";
@@ -23,22 +25,12 @@ namespace PubnubApi.EndPoint
         private PNCallback<PNPublishResult> savedCallback = null;
         private bool syncRequest = false;
 
-        public PublishOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
-        {
-            config = pubnubConfig;
-        }
-
-        public PublishOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary):base(pubnubConfig, jsonPluggableLibrary, null)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-        }
-
-        public PublishOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
+        public PublishOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
+            pubnubLog = log;
         }
 
 
@@ -152,7 +144,8 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing userCallback");
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
             Uri request = urlBuilder.BuildPublishRequest(channel, message, storeInHistory, ttl, metaData, httpPost, null);
 
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
@@ -191,13 +184,31 @@ namespace PubnubApi.EndPoint
             }
         }
 
+        internal void CurrentPubnubInstance(Pubnub instance)
+        {
+            PubnubInstance = instance;
+
+            if (!ChannelRequest.ContainsKey(instance.InstanceId))
+            {
+                ChannelRequest.Add(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+            }
+            if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
+            {
+                ChannelInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
+            if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
+            {
+                ChannelGroupInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
+        }
+
         private string JsonEncodePublishMsg(object originalMessage)
         {
             string message = jsonLibrary.SerializeToJsonString(originalMessage);
 
             if (config.CipherKey.Length > 0)
             {
-                PubnubCrypto aes = new PubnubCrypto(config.CipherKey, config);
+                PubnubCrypto aes = new PubnubCrypto(config.CipherKey, config, pubnubLog);
                 string encryptMessage = aes.Encrypt(message);
                 message = jsonLibrary.SerializeToJsonString(encryptMessage);
             }

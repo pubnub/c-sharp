@@ -5,6 +5,7 @@ using System.Text;
 using PubnubApi.Interface;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Net;
 
 namespace PubnubApi.EndPoint
 {
@@ -13,6 +14,7 @@ namespace PubnubApi.EndPoint
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
         private IPubnubUnitTest unit = null;
+        private IPubnubLog pubnubLog = null;
 
         private string[] channelNames = null;
         private string[] channelGroupNames = null;
@@ -20,22 +22,12 @@ namespace PubnubApi.EndPoint
         private bool includeChannelUUIDs = true;
         private PNCallback<PNHereNowResult> savedCallback = null;
 
-        public HereNowOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
-        {
-            config = pubnubConfig;
-        }
-
-        public HereNowOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary):base(pubnubConfig, jsonPluggableLibrary, null)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-        }
-
-        public HereNowOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
+        public HereNowOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
+            pubnubLog = log;
         }
 
         public HereNowOperation Channels(string[] channels)
@@ -82,7 +74,8 @@ namespace PubnubApi.EndPoint
         internal void HereNow(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, PNCallback<PNHereNowResult> callback)
         {
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
             Uri request = urlBuilder.BuildHereNowRequest(channels, channelGroups, showUUIDList, includeUserState);
 
             RequestState<PNHereNowResult> requestState = new RequestState<PNHereNowResult>();
@@ -101,7 +94,23 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        
+        internal void CurrentPubnubInstance(Pubnub instance)
+        {
+            PubnubInstance = instance;
+
+            if (!ChannelRequest.ContainsKey(instance.InstanceId))
+            {
+                ChannelRequest.Add(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+            }
+            if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
+            {
+                ChannelInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
+            if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
+            {
+                ChannelGroupInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
+        }
 
     }
 }

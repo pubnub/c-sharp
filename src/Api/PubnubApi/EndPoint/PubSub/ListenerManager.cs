@@ -9,28 +9,19 @@ namespace PubnubApi.EndPoint
 {
     public class ListenerManager : PubnubCoreBase
     {
-        private static PNConfiguration config = null;
-        private static IJsonPluggableLibrary jsonLibrary = null;
+        private PNConfiguration config = null;
+        private IJsonPluggableLibrary jsonLibrary = null;
         private IPubnubUnitTest unit = null;
+        private IPubnubLog pubnubLog = null;
 
         private object syncLockSubscribeCallback = new object();
 
-        public ListenerManager(PNConfiguration pubnubConfig) :base(pubnubConfig)
-        {
-            config = pubnubConfig;
-        }
-
-        public ListenerManager(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary):base(pubnubConfig, jsonPluggableLibrary, null)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-        }
-
-        public ListenerManager(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
+        public ListenerManager(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
+            pubnubLog = log;
         }
 
         internal void CurrentPubnubInstance(Pubnub instance)
@@ -44,7 +35,19 @@ namespace PubnubApi.EndPoint
             {
                 lock (syncLockSubscribeCallback)
                 {
-                    SubscribeCallbackListenerList.Add(listener);
+                    if (SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+                    {
+                        List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+                        callbackList.Add(listener);
+                        SubscribeCallbackListenerList[PubnubInstance.InstanceId] = callbackList;
+                    }
+                    else
+                    {
+                        List<SubscribeCallback> callbackList = new List<SubscribeCallback>();
+                        callbackList.Add(listener);
+                        SubscribeCallbackListenerList.Add(PubnubInstance.InstanceId, callbackList);
+                    }
+                    
                 }
             }
         }
@@ -55,7 +58,12 @@ namespace PubnubApi.EndPoint
             {
                 lock (syncLockSubscribeCallback)
                 {
-                    SubscribeCallbackListenerList.Remove(listener);
+                    if (SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+                    {
+                        List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+                        callbackList.Remove(listener);
+                        SubscribeCallbackListenerList[PubnubInstance.InstanceId] = callbackList;
+                    }
                 }
             }
         }

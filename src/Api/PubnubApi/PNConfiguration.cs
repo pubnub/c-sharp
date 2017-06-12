@@ -81,9 +81,9 @@ namespace PubnubApi
 
         public string FilterExpression { get; set; }
 
-        //public bool IncludeInstanceIdentifier { get; set; }
+        public bool IncludeInstanceIdentifier { get; set; }
 
-        //public bool IncludeRequestIdentifier { get; set; }
+        public bool IncludeRequestIdentifier { get; set; }
 
         public PNReconnectionPolicy ReconnectionPolicy { get; set; } = PNReconnectionPolicy.NONE;
 
@@ -107,6 +107,8 @@ namespace PubnubApi
             this.Secure = true;
             this.ReconnectionPolicy = PNReconnectionPolicy.NONE;
             this.HeartbeatNotificationOption = PNHeartbeatNotificationOption.Failures;
+            this.IncludeRequestIdentifier = true;
+            this.IncludeInstanceIdentifier = false;
             //this.EnableJsonEncodingForPublish = true;
         }
 

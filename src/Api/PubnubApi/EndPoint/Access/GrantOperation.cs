@@ -5,6 +5,7 @@ using System.Text;
 using PubnubApi.Interface;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Net;
 
 namespace PubnubApi.EndPoint
 {
@@ -13,6 +14,8 @@ namespace PubnubApi.EndPoint
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
         private IPubnubUnitTest unit;
+        private IPubnubLog pubnubLog = null;
+
         private string[] channelNames = null;
         private string[] channelGroupNames = null;
         private string[] authenticationKeys = null;
@@ -22,18 +25,7 @@ namespace PubnubApi.EndPoint
         private long grantTTL = -1;
         private PNCallback<PNAccessManagerGrantResult> savedCallback = null;
 
-        public GrantOperation(PNConfiguration pubnubConfig):base(pubnubConfig)
-        {
-            config = pubnubConfig;
-        }
-
-        public GrantOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary):base(pubnubConfig, jsonPluggableLibrary, null)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-        }
-
-        public GrantOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
+        public GrantOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
@@ -138,7 +130,8 @@ namespace PubnubApi.EndPoint
             string channelGroupsCommaDelimited = string.Join(",", channelGroupList.ToArray().OrderBy(x => x).ToArray());
             string authKeysCommaDelimited = string.Join(",", authList.ToArray().OrderBy(x => x).ToArray());
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
             Uri request = urlBuilder.BuildGrantAccessRequest(channelsCommaDelimited, channelGroupsCommaDelimited, authKeysCommaDelimited, read, write, manage, ttl);
 
             RequestState<PNAccessManagerGrantResult> requestState = new RequestState<PNAccessManagerGrantResult>();
@@ -154,6 +147,24 @@ namespace PubnubApi.EndPoint
             {
                 List<object> result = ProcessJsonResponse<PNAccessManagerGrantResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
+            }
+        }
+
+        internal void CurrentPubnubInstance(Pubnub instance)
+        {
+            PubnubInstance = instance;
+
+            if (!ChannelRequest.ContainsKey(instance.InstanceId))
+            {
+                ChannelRequest.Add(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+            }
+            if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
+            {
+                ChannelInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
+            if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
+            {
+                ChannelGroupInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
             }
         }
     }

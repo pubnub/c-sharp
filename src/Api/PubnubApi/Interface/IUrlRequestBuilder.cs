@@ -7,6 +7,12 @@ namespace PubnubApi.Interface
 {
     public interface IUrlRequestBuilder
     {
+        string PubnubInstanceId
+        {
+            get;
+            set;
+        }
+
         Uri BuildTimeRequest();
 
         Uri BuildMultiChannelSubscribeRequest(string[] channels, string[] channelGroups, long timetoken, string channelsJsonState, Dictionary<string, string> initialSubscribeUrlParams);

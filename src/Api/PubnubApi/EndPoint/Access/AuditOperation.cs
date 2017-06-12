@@ -5,6 +5,7 @@ using System.Text;
 using PubnubApi.Interface;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Net;
 
 namespace PubnubApi.EndPoint
 {
@@ -13,27 +14,19 @@ namespace PubnubApi.EndPoint
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
         private IPubnubUnitTest unit;
+        private IPubnubLog pubnubLog = null;
+
         private string channelName = null;
         private string channelGroupName = null;
         private string[] authenticationKeys = null;
         private PNCallback<PNAccessManagerAuditResult> savedCallback = null;
 
-        public AuditOperation(PNConfiguration pubnubConfig):base(pubnubConfig)
-        {
-            config = pubnubConfig;
-        }
-
-        public AuditOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary):base(pubnubConfig, jsonPluggableLibrary, null)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-        }
-
-        public AuditOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
+        public AuditOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
+            pubnubLog = log;
         }
 
         public AuditOperation Channel(string channel)
@@ -80,7 +73,8 @@ namespace PubnubApi.EndPoint
 
             string authKeysCommaDelimited = (authKeys != null && authKeys.Length > 0) ? string.Join(",", authKeys.OrderBy(x => x).ToArray()) : "";
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
             Uri request = urlBuilder.BuildAuditAccessRequest(channel, channelGroup, authKeysCommaDelimited);
 
             RequestState<PNAccessManagerAuditResult> requestState = new RequestState<PNAccessManagerAuditResult>();
@@ -102,6 +96,24 @@ namespace PubnubApi.EndPoint
             {
                 List<object> result = ProcessJsonResponse<PNAccessManagerAuditResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
+            }
+        }
+
+        internal void CurrentPubnubInstance(Pubnub instance)
+        {
+            PubnubInstance = instance;
+
+            if (!ChannelRequest.ContainsKey(instance.InstanceId))
+            {
+                ChannelRequest.Add(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+            }
+            if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
+            {
+                ChannelInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
+            if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
+            {
+                ChannelGroupInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
             }
         }
     }

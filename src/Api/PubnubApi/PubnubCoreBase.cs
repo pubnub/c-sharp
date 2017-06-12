@@ -26,120 +26,113 @@ namespace PubnubApi
     public abstract class PubnubCoreBase
     {
         #region "Class variables"
-        private static bool enableResumeOnReconnect = true;
-        protected static bool OverrideTcpKeepAlive { get; set; } = true;
-        protected static ConcurrentDictionary<Uri, Timer> ChannelLocalClientHeartbeatTimer { get; set; } = new ConcurrentDictionary<Uri, Timer>();
+        private bool enableResumeOnReconnect = true;
+        protected bool OverrideTcpKeepAlive { get; set; } = true;
         //protected static System.Threading.Timer LocalClientHeartBeatTimer { get; set; } = null;
-        protected static System.Threading.Timer PresenceHeartbeatTimer { get; set; } = null;
+        protected System.Threading.Timer PresenceHeartbeatTimer { get; set; } = null;
         protected static bool PubnetSystemActive { get; set; } = true;
         protected Collection<Uri> PushRemoteImageDomainUri { get; set; } = new Collection<Uri>();
-        protected static int ConnectionErrors { get; set; } = 0;
+        protected int ConnectionErrors { get; set; } = 0;
         #endregion
 
         private const int MINEXPONENTIALBACKOFF = 1;
         private const int MAXEXPONENTIALBACKOFF = 32;
         private const int INTERVAL = 3;
 
-        private static IPubnubHttp pubnubHttp = null;
-        private static PNConfiguration pubnubConfig = null;
-        private static IJsonPluggableLibrary jsonLib = null;
-        private static IPubnubUnitTest unitTest = null;
-        private static bool clientNetworkStatusInternetStatus = true;
-        protected static bool SubscribeDisconnected = false;
+        private IPubnubHttp pubnubHttp = null;
+        private PNConfiguration pubnubConfig = null;
+        private IJsonPluggableLibrary jsonLib = null;
+        private IPubnubUnitTest unitTest = null;
+        private IPubnubLog pubnubLog = null;
 
-        protected static Pubnub PubnubInstance { get; set; } = null;
+        private bool clientNetworkStatusInternetStatus = true;
+        protected static Dictionary<string, bool> SubscribeDisconnected = new Dictionary<string, bool>();
 
-        protected static bool UuidChanged { get; set; }
+        protected Pubnub PubnubInstance { get; set; } = null;
 
-        protected static string CurrentUuid { get; set; }
+        protected bool UuidChanged { get; set; }
 
-        protected static long LastSubscribeTimetoken { get; set; }
+        protected string CurrentUuid { get; set; }
 
-        protected static int PubnubNetworkTcpCheckIntervalInSeconds { get; set; } = 3;
+        protected static Dictionary<string, long> LastSubscribeTimetoken { get; set; } = new Dictionary<string, long>();
 
-        protected static List<SubscribeCallback> SubscribeCallbackListenerList
+        protected int PubnubNetworkTcpCheckIntervalInSeconds { get; set; } = 3;
+
+        protected static Dictionary<string, List<SubscribeCallback>> SubscribeCallbackListenerList
         {
             get;
             set;
-        } = new List<SubscribeCallback>();
+        } = new Dictionary<string, List<SubscribeCallback>>();
 
-        protected static ConcurrentDictionary<string, long> MultiChannelSubscribe
+        protected static Dictionary<string, ConcurrentDictionary<string, long>> MultiChannelSubscribe
         {
             get;
             set;
-        } = new ConcurrentDictionary<string, long>();
+        } = new Dictionary<string, ConcurrentDictionary<string, long>>();
 
-        protected static ConcurrentDictionary<string, long> MultiChannelGroupSubscribe
+        protected static Dictionary<string, ConcurrentDictionary<string, long>> MultiChannelGroupSubscribe
         {
             get;
             set;
-        } = new ConcurrentDictionary<string, long>();
+        } = new Dictionary<string, ConcurrentDictionary<string, long>>();
 
-        protected static ConcurrentDictionary<string, Timer> ChannelReconnectTimer
+        protected static Dictionary<string, ConcurrentDictionary<string, Timer>> ChannelReconnectTimer
         {
             get;
             set;
-        } = new ConcurrentDictionary<string, Timer>();
+        } = new Dictionary<string, ConcurrentDictionary<string, Timer>>();
 
-        protected static ConcurrentDictionary<string, Timer> ChannelGroupReconnectTimer
+        protected static Dictionary<string, ConcurrentDictionary<string, Timer>> ChannelGroupReconnectTimer
         {
             get;
             set;
-        } = new ConcurrentDictionary<string, Timer>();
+        } = new Dictionary<string, ConcurrentDictionary<string, Timer>>();
 
-        protected static ConcurrentDictionary<string, HttpWebRequest> ChannelRequest
+        protected static Dictionary<string, ConcurrentDictionary<string, HttpWebRequest>> ChannelRequest
         {
             get;
             set;
-        } = new ConcurrentDictionary<string, HttpWebRequest>();
+        } = new Dictionary<string, ConcurrentDictionary<string, HttpWebRequest>>();
 
-        protected static ConcurrentDictionary<string, bool> ChannelInternetStatus
+        protected static Dictionary<string, ConcurrentDictionary<string, bool>> ChannelInternetStatus
         {
             get;
             set;
-        } = new ConcurrentDictionary<string, bool>();
+        } = new Dictionary<string, ConcurrentDictionary<string, bool>>();
 
-        protected static ConcurrentDictionary<string, bool> ChannelGroupInternetStatus
+        protected static Dictionary<string, ConcurrentDictionary<string, bool>> ChannelGroupInternetStatus
         {
             get;
             set;
-        } = new ConcurrentDictionary<string, bool>();
+        } = new Dictionary<string, ConcurrentDictionary<string, bool>>();
 
-        protected static ConcurrentDictionary<string, Dictionary<string, object>> ChannelLocalUserState
+        protected static Dictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>> ChannelLocalUserState
         {
             get;
             set;
-        } = new ConcurrentDictionary<string, Dictionary<string, object>>();
+        } = new Dictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>>();
 
-        protected static ConcurrentDictionary<string, Dictionary<string, object>> ChannelUserState
+        protected static Dictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>> ChannelUserState
         {
             get;
             set;
-        } = new ConcurrentDictionary<string, Dictionary<string, object>>();
+        } = new Dictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>>();
 
-        protected static ConcurrentDictionary<string, Dictionary<string, object>> ChannelGroupLocalUserState
+        protected static Dictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>> ChannelGroupLocalUserState
         {
             get;
             set;
-        } = new ConcurrentDictionary<string, Dictionary<string, object>>();
+        } = new Dictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>>();
 
-        protected static ConcurrentDictionary<string, Dictionary<string, object>> ChannelGroupUserState
+        protected static Dictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>> ChannelGroupUserState
         {
             get;
             set;
-        } = new ConcurrentDictionary<string, Dictionary<string, object>>();
+        } = new Dictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>>();
 
-        public PubnubCoreBase(PNConfiguration pubnubConfiguation)
-        {
-            if (pubnubConfiguation == null)
-            {
-                throw new ArgumentException("PNConfiguration missing");
-            }
+        protected static Dictionary<string, ConcurrentDictionary<Uri, Timer>> ChannelLocalClientHeartbeatTimer { get; set; } = new Dictionary<string, ConcurrentDictionary<Uri, Timer>>();
 
-            InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(pubnubConfiguation), null);
-        }
-
-        public PubnubCoreBase(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest)
+        public PubnubCoreBase(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log)
         {
             if (pubnubConfiguation == null)
             {
@@ -147,28 +140,24 @@ namespace PubnubApi
             }
             if (jsonPluggableLibrary == null)
             {
-                InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(pubnubConfiguation), pubnubUnitTest);
+                InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(pubnubConfiguation,log), pubnubUnitTest, log);
             }
             else
             {
-                InternalConstructor(pubnubConfiguation, jsonPluggableLibrary, pubnubUnitTest);
+                InternalConstructor(pubnubConfiguation, jsonPluggableLibrary, pubnubUnitTest, log);
             }
         }
 
-        private void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest)
+        private void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log)
         {
             pubnubConfig = pubnubConfiguation;
             jsonLib = jsonPluggableLibrary;
             unitTest = pubnubUnitTest;
+            pubnubLog = log;
 
             CurrentUuid = pubnubConfig.Uuid;
 
-            pubnubHttp = new PubnubHttp(pubnubConfiguation, jsonLib);
-
-            if (pubnubConfig != null && pubnubConfig.PubnubLog != null)
-            {
-                LoggingMethod.PubnubLog = pubnubConfig.PubnubLog;
-            }
+            pubnubHttp = new PubnubHttp(pubnubConfiguation, jsonLib, pubnubLog);
 
             UpdatePubnubNetworkTcpCheckIntervalInSeconds();
             enableResumeOnReconnect = pubnubConfig.ReconnectionPolicy != PNReconnectionPolicy.NONE;
@@ -205,25 +194,25 @@ namespace PubnubApi
 
             if (multiChannel != "")
             {
-                if (ChannelInternetStatus.ContainsKey(multiChannel))
+                if (ChannelInternetStatus[PubnubInstance.InstanceId].ContainsKey(multiChannel))
                 {
-                    ChannelInternetStatus.AddOrUpdate(multiChannel, true, (key, oldValue) => true);
+                    ChannelInternetStatus[PubnubInstance.InstanceId].AddOrUpdate(multiChannel, true, (key, oldValue) => true);
                 }
                 else
                 {
-                    ChannelInternetStatus.GetOrAdd(multiChannel, true); //Set to true for internet connection
+                    ChannelInternetStatus[PubnubInstance.InstanceId].GetOrAdd(multiChannel, true); //Set to true for internet connection
                 }
             }
 
             if (multiChannelGroup != "")
             {
-                if (ChannelGroupInternetStatus.ContainsKey(multiChannelGroup))
+                if (ChannelGroupInternetStatus[PubnubInstance.InstanceId].ContainsKey(multiChannelGroup))
                 {
-                    ChannelGroupInternetStatus.AddOrUpdate(multiChannelGroup, true, (key, oldValue) => true);
+                    ChannelGroupInternetStatus[PubnubInstance.InstanceId].AddOrUpdate(multiChannelGroup, true, (key, oldValue) => true);
                 }
                 else
                 {
-                    ChannelGroupInternetStatus.GetOrAdd(multiChannelGroup, true); //Set to true for internet connection
+                    ChannelGroupInternetStatus[PubnubInstance.InstanceId].GetOrAdd(multiChannelGroup, true); //Set to true for internet connection
                 }
             }
         }
@@ -232,9 +221,9 @@ namespace PubnubApi
 
         #region "Callbacks"
 
-        protected static bool CheckInternetConnectionStatus<T>(bool systemActive, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
+        protected bool CheckInternetConnectionStatus<T>(bool systemActive, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
         {
-            ClientNetworkStatus clientNetworkStatus = new ClientNetworkStatus(pubnubConfig, jsonLib, unitTest);
+            ClientNetworkStatus clientNetworkStatus = new ClientNetworkStatus(pubnubConfig, jsonLib, unitTest, pubnubLog);
             if (!clientNetworkStatus.IsInternetCheckRunning())
             {
                 clientNetworkStatusInternetStatus = clientNetworkStatus.CheckInternetStatus<T>(PubnetSystemActive, type, callback, channels, channelGroups);
@@ -250,16 +239,16 @@ namespace PubnubApi
                 string channel = (currentState.Channels != null) ? string.Join(",", currentState.Channels.OrderBy(x => x).ToArray()) : "";
                 string channelGroup = (currentState.ChannelGroups != null) ? string.Join(",", currentState.ChannelGroups.OrderBy(x => x).ToArray()) : "";
 
-                if ((ChannelInternetStatus.ContainsKey(channel) || ChannelGroupInternetStatus.ContainsKey(channelGroup))
+                if ((ChannelInternetStatus[PubnubInstance.InstanceId].ContainsKey(channel) || ChannelInternetStatus[PubnubInstance.InstanceId].ContainsKey(channelGroup))
                         && (currentState.ResponseType == PNOperationType.PNSubscribeOperation || currentState.ResponseType == PNOperationType.Presence || currentState.ResponseType == PNOperationType.PNHeartbeatOperation)
                         && OverrideTcpKeepAlive)
                 {
                     bool networkConnection = CheckInternetConnectionStatus<T>(PubnetSystemActive, currentState.ResponseType, currentState.PubnubCallback, currentState.Channels, currentState.ChannelGroups);
 
-                    ChannelInternetStatus[channel] = networkConnection;
-                    ChannelGroupInternetStatus[channelGroup] = networkConnection;
+                    ChannelInternetStatus[PubnubInstance.InstanceId][channel] = networkConnection;
+                    ChannelGroupInternetStatus[PubnubInstance.InstanceId][channelGroup] = networkConnection;
 
-                    LoggingMethod.WriteToLog(string.Format("DateTime: {0}, OnPubnubLocalClientHeartBeatTimeoutCallback - Internet connection = {1}", DateTime.Now.ToString(), networkConnection), pubnubConfig.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, OnPubnubLocalClientHeartBeatTimeoutCallback - Internet connection = {1}", DateTime.Now.ToString(), networkConnection), pubnubConfig.LogVerbosity);
                     if (!networkConnection)
                     {
                         //if (pubnubConfig.ReconnectionPolicy == PNReconnectionPolicy.NONE)
@@ -438,10 +427,10 @@ namespace PubnubApi
                     List<SubscribeMessage> message = GetMessageFromMultiplexResult(result);
                     if (message != null && message.Count == 0)
                     {
-                        IEnumerable<string> newChannels = from channel in MultiChannelSubscribe
+                        IEnumerable<string> newChannels = from channel in MultiChannelSubscribe[PubnubInstance.InstanceId]
                                                           where channel.Value == 0
                                                           select channel.Key;
-                        IEnumerable<string> newChannelGroups = from channelGroup in MultiChannelGroupSubscribe
+                        IEnumerable<string> newChannelGroups = from channelGroup in MultiChannelGroupSubscribe[PubnubInstance.InstanceId]
                                                                where channelGroup.Value == 0
                                                                select channelGroup.Key;
                         if (newChannels != null && newChannels.Count() > 0)
@@ -467,7 +456,7 @@ namespace PubnubApi
             //Check callback exists and make sure previous timetoken = 0
             if (channels != null && channels.Length > 0)
             {
-                IEnumerable<string> newChannels = from channel in MultiChannelSubscribe
+                IEnumerable<string> newChannels = from channel in MultiChannelSubscribe[PubnubInstance.InstanceId]
                                                   where channel.Value == 0
                                                   select channel.Key;
                 if (newChannels != null && newChannels.Count() > 0)
@@ -478,7 +467,7 @@ namespace PubnubApi
 
             if (channelGroups != null && channelGroups.Length > 0)
             {
-                IEnumerable<string> newChannelGroups = from channelGroup in MultiChannelGroupSubscribe
+                IEnumerable<string> newChannelGroups = from channelGroup in MultiChannelGroupSubscribe[PubnubInstance.InstanceId]
                                                        where channelGroup.Value == 0
                                                        select channelGroup.Key;
 
@@ -536,7 +525,7 @@ namespace PubnubApi
                                     if (pubnubConfig.CipherKey.Length > 0) //decrypt the subscriber message if cipherkey is available
                                     {
                                         string decryptMessage = "";
-                                        PubnubCrypto aes = new PubnubCrypto(pubnubConfig.CipherKey, pubnubConfig);
+                                        PubnubCrypto aes = new PubnubCrypto(pubnubConfig.CipherKey, pubnubConfig, pubnubLog);
                                         try
                                         {
                                             decryptMessage = aes.Decrypt(payload.ToString());
@@ -598,7 +587,7 @@ namespace PubnubApi
                                 if (currentMessageChannel.Contains("-pnpres"))
                                 {
                                     Dictionary<string, object> presencePayload = payload as Dictionary<string, object>;
-                                    ResponseBuilder responseBuilder = new ResponseBuilder(pubnubConfig, jsonLib);
+                                    ResponseBuilder responseBuilder = new ResponseBuilder(pubnubConfig, jsonLib, pubnubLog);
                                     PNPresenceEventResult presenceEvent = responseBuilder.JsonToObject<PNPresenceEventResult>(payloadContainer, true);
                                     if (presenceEvent != null)
                                     {
@@ -607,8 +596,8 @@ namespace PubnubApi
                                 }
                                 else
                                 {
-                                    LoggingMethod.WriteToLog(string.Format("DateTime: {0}, ResponseToUserCallback - payload = {1}", DateTime.Now.ToString(), jsonLib.SerializeToJsonString(payloadContainer)), pubnubConfig.LogVerbosity);
-                                    ResponseBuilder responseBuilder = new ResponseBuilder(pubnubConfig, jsonLib);
+                                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, ResponseToUserCallback - payload = {1}", DateTime.Now.ToString(), jsonLib.SerializeToJsonString(payloadContainer)), pubnubConfig.LogVerbosity);
+                                    ResponseBuilder responseBuilder = new ResponseBuilder(pubnubConfig, jsonLib, pubnubLog);
                                     PNMessageResult<T> userMessage = responseBuilder.JsonToObject<PNMessageResult<T>>(payloadContainer, true);
                                     if (userMessage != null)
                                     {
@@ -646,7 +635,7 @@ namespace PubnubApi
                 case PNOperationType.ChannelGroupAllGet:
                     if (result != null && result.Count > 0)
                     {
-                        ResponseBuilder responseBuilder = new ResponseBuilder(pubnubConfig, jsonLib);
+                        ResponseBuilder responseBuilder = new ResponseBuilder(pubnubConfig, jsonLib, pubnubLog);
                         T userResult = responseBuilder.JsonToObject<T>(result, true);
 
                         StatusBuilder statusBuilder = new StatusBuilder(pubnubConfig, jsonLib);
@@ -661,7 +650,7 @@ namespace PubnubApi
                 case PNOperationType.PNHeartbeatOperation:
                     if (result != null && result.Count > 0)
                     {
-                        ResponseBuilder responseBuilder = new ResponseBuilder(pubnubConfig, jsonLib);
+                        ResponseBuilder responseBuilder = new ResponseBuilder(pubnubConfig, jsonLib, pubnubLog);
                         PNHeartbeatResult userResult = responseBuilder.JsonToObject<PNHeartbeatResult>(result, true);
 
                         if (userResult != null)
@@ -719,9 +708,9 @@ namespace PubnubApi
         protected string[] GetCurrentSubscriberChannels()
         {
             string[] channels = null;
-            if (MultiChannelSubscribe != null && MultiChannelSubscribe.Keys.Count > 0)
+            if (MultiChannelSubscribe != null && MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelSubscribe[PubnubInstance.InstanceId].Keys.Count > 0)
             {
-                channels = MultiChannelSubscribe.Keys.ToArray<string>();
+                channels = MultiChannelSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
             }
 
             return channels;
@@ -730,9 +719,9 @@ namespace PubnubApi
         protected string[] GetCurrentSubscriberChannelGroups()
         {
             string[] channelGroups = null;
-            if (MultiChannelGroupSubscribe != null && MultiChannelGroupSubscribe.Keys.Count > 0)
+            if (MultiChannelGroupSubscribe != null && MultiChannelGroupSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys.Count > 0)
             {
-                channelGroups = MultiChannelGroupSubscribe.Keys.ToArray<string>();
+                channelGroups = MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
             }
 
             return channelGroups;
@@ -769,7 +758,7 @@ namespace PubnubApi
                     }
                 }
 
-                if (!ChannelRequest.ContainsKey(channel) && (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation || pubnubRequestState.ResponseType == PNOperationType.Presence))
+                if (ChannelRequest.ContainsKey(PubnubInstance.InstanceId) && !ChannelRequest[PubnubInstance.InstanceId].ContainsKey(channel) && (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation || pubnubRequestState.ResponseType == PNOperationType.Presence))
                 {
                     return "";
                 }
@@ -785,7 +774,7 @@ namespace PubnubApi
 
                 if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation || pubnubRequestState.ResponseType == PNOperationType.Presence)
                 {
-                    ChannelRequest.AddOrUpdate(channel, pubnubRequestState.Request, (key, oldState) => pubnubRequestState.Request);
+                    ChannelRequest[PubnubInstance.InstanceId].AddOrUpdate(channel, pubnubRequestState.Request, (key, oldState) => pubnubRequestState.Request);
                 }
 
                 if (OverrideTcpKeepAlive) //overrideTcpKeepAlive must be true
@@ -810,7 +799,7 @@ namespace PubnubApi
                     request = pubnubHttp.SetServicePointSetTcpKeepAlive(request); //To be removed.
                 }
 
-                LoggingMethod.WriteToLog(string.Format("DateTime {0}, Request={1}", DateTime.Now.ToString(), requestUri.ToString()), pubnubConfig.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Request={1}", DateTime.Now.ToString(), requestUri.ToString()), pubnubConfig.LogVerbosity);
 
                 string jsonString = "";
                 if (pubnubRequestState.UsePostMethod)
@@ -824,13 +813,13 @@ namespace PubnubApi
                     jsonString = jsonResponse.Result;
                 }
 
-                if (SubscribeDisconnected)
+                if (SubscribeDisconnected.ContainsKey(PubnubInstance.InstanceId) && SubscribeDisconnected[PubnubInstance.InstanceId])
                 {
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0},Received JSON but SubscribeDisconnected = {1} for request={2}", DateTime.Now.ToString(), jsonString, requestUri), pubnubConfig.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0},Received JSON but SubscribeDisconnected = {1} for request={2}", DateTime.Now.ToString(), jsonString, requestUri), pubnubConfig.LogVerbosity);
                     throw new Exception("Disconnected");
                 }
 
-                LoggingMethod.WriteToLog(string.Format("DateTime {0}, JSON= {1} for request={2}", DateTime.Now.ToString(), jsonString, requestUri), pubnubConfig.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, JSON= {1} for request={2}", DateTime.Now.ToString(), jsonString, requestUri), pubnubConfig.LogVerbosity);
                 return jsonString;
             }
             catch (Exception ex)
@@ -872,7 +861,7 @@ namespace PubnubApi
                         Announce(status);
                     }
 
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0} PubnubBaseCore UrlProcessRequest Exception={1}", DateTime.Now.ToString(), webEx != null ? webEx.ToString() : exceptionMessage), pubnubConfig.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} PubnubBaseCore UrlProcessRequest Exception={1}", DateTime.Now.ToString(), webEx != null ? webEx.ToString() : exceptionMessage), pubnubConfig.LogVerbosity);
                 }
 
                 return "";
@@ -980,25 +969,25 @@ namespace PubnubApi
 
                                 long receivedTimetoken = GetTimetokenFromMultiplexResult(result);
 
-                                long minimumTimetoken1 = (MultiChannelSubscribe.Count > 0) ? MultiChannelSubscribe.Min(token => token.Value) : 0;
-                                long minimumTimetoken2 = (MultiChannelGroupSubscribe.Count > 0) ? MultiChannelGroupSubscribe.Min(token => token.Value) : 0;
+                                long minimumTimetoken1 = (MultiChannelSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelSubscribe[PubnubInstance.InstanceId].Min(token => token.Value) : 0;
+                                long minimumTimetoken2 = (MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Min(token => token.Value) : 0;
                                 long minimumTimetoken = Math.Max(minimumTimetoken1, minimumTimetoken2);
 
-                                long maximumTimetoken1 = (MultiChannelSubscribe.Count > 0) ? MultiChannelSubscribe.Max(token => token.Value) : 0;
-                                long maximumTimetoken2 = (MultiChannelGroupSubscribe.Count > 0) ? MultiChannelGroupSubscribe.Max(token => token.Value) : 0;
+                                long maximumTimetoken1 = (MultiChannelSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelSubscribe[PubnubInstance.InstanceId].Max(token => token.Value) : 0;
+                                long maximumTimetoken2 = (MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Max(token => token.Value) : 0;
                                 long maximumTimetoken = Math.Max(maximumTimetoken1, maximumTimetoken2);
 
                                 if (minimumTimetoken == 0 || lastTimetoken == 0)
                                 {
                                     if (maximumTimetoken == 0)
                                     {
-                                        LastSubscribeTimetoken = receivedTimetoken;
+                                        LastSubscribeTimetoken[PubnubInstance.InstanceId] = receivedTimetoken;
                                     }
                                     else
                                     {
                                         if (!enableResumeOnReconnect)
                                         {
-                                            LastSubscribeTimetoken = receivedTimetoken;
+                                            LastSubscribeTimetoken[PubnubInstance.InstanceId] = receivedTimetoken;
                                         }
                                         else
                                         {
@@ -1016,12 +1005,12 @@ namespace PubnubApi
                                         }
                                         else
                                         {
-                                            LastSubscribeTimetoken = receivedTimetoken;
+                                            LastSubscribeTimetoken[PubnubInstance.InstanceId] = receivedTimetoken;
                                         }
                                     }
                                     else
                                     {
-                                        LastSubscribeTimetoken = receivedTimetoken;
+                                        LastSubscribeTimetoken[PubnubInstance.InstanceId] = receivedTimetoken;
                                     }
                                 }
                                 break;
@@ -1043,7 +1032,7 @@ namespace PubnubApi
                                 #endregion
                                 break;
                             case PNOperationType.PNHistoryOperation:
-                                result = SecureMessage.Instance(pubnubConfig, jsonLib).DecodeDecryptLoop(result, channels, channelGroups, callback);
+                                result = SecureMessage.Instance(pubnubConfig, jsonLib, pubnubLog).DecodeDecryptLoop(result, channels, channelGroups, callback);
                                 result.Add(multiChannel);
                                 break;
                             case PNOperationType.PNHereNowOperation:
@@ -1155,24 +1144,24 @@ namespace PubnubApi
 
             if (local)
             {
-                if (!string.IsNullOrEmpty(channel) && ChannelLocalUserState.ContainsKey(channel))
+                if (!string.IsNullOrEmpty(channel) && ChannelLocalUserState[PubnubInstance.InstanceId].ContainsKey(channel))
                 {
-                    channelUserStateDictionary = ChannelLocalUserState[channel];
+                    channelUserStateDictionary = ChannelLocalUserState[PubnubInstance.InstanceId][channel];
                 }
-                if (!string.IsNullOrEmpty(channelGroup) && ChannelGroupLocalUserState.ContainsKey(channelGroup))
+                if (!string.IsNullOrEmpty(channelGroup) && ChannelGroupLocalUserState[PubnubInstance.InstanceId].ContainsKey(channelGroup))
                 {
-                    channelGroupUserStateDictionary = ChannelGroupLocalUserState[channelGroup];
+                    channelGroupUserStateDictionary = ChannelGroupLocalUserState[PubnubInstance.InstanceId][channelGroup];
                 }
             }
             else
             {
-                if (!string.IsNullOrEmpty(channel) && ChannelUserState.ContainsKey(channel))
+                if (!string.IsNullOrEmpty(channel) && ChannelUserState[PubnubInstance.InstanceId].ContainsKey(channel))
                 {
-                    channelUserStateDictionary = ChannelUserState[channel];
+                    channelUserStateDictionary = ChannelUserState[PubnubInstance.InstanceId][channel];
                 }
-                if (!string.IsNullOrEmpty(channelGroup) && ChannelGroupUserState.ContainsKey(channelGroup))
+                if (!string.IsNullOrEmpty(channelGroup) && ChannelGroupUserState[PubnubInstance.InstanceId].ContainsKey(channelGroup))
                 {
-                    channelGroupUserStateDictionary = ChannelGroupUserState[channelGroup];
+                    channelGroupUserStateDictionary = ChannelGroupUserState[PubnubInstance.InstanceId][channelGroup];
                 }
             }
 
@@ -1293,10 +1282,10 @@ namespace PubnubApi
             }
             else
             {
-                ICollection<string> keyCollection = ChannelRequest.Keys;
+                ICollection<string> keyCollection = ChannelRequest[PubnubInstance.InstanceId].Keys;
                 foreach (string key in keyCollection)
                 {
-                    HttpWebRequest currentRequest = ChannelRequest[key];
+                    HttpWebRequest currentRequest = ChannelRequest[PubnubInstance.InstanceId][key];
                     if (currentRequest != null)
                     {
                         TerminatePendingWebRequest(currentRequest);
@@ -1328,39 +1317,39 @@ namespace PubnubApi
             {
                 string channel = (state.Channels != null) ? string.Join(",", state.Channels.OrderBy(x => x).ToArray()) : ",";
 
-                if (ChannelRequest.ContainsKey(channel))
+                if (ChannelRequest[PubnubInstance.InstanceId].ContainsKey(channel))
                 {
                     HttpWebRequest removedRequest;
-                    bool removeKey = ChannelRequest.TryRemove(channel, out removedRequest);
+                    bool removeKey = ChannelRequest[PubnubInstance.InstanceId].TryRemove(channel, out removedRequest);
                     if (removeKey)
                     {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0} Remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString(), channel), pubnubConfig.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} Remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString(), channel), pubnubConfig.LogVerbosity);
                     }
                     else
                     {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString(), channel), pubnubConfig.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} Unable to remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString(), channel), pubnubConfig.LogVerbosity);
                     }
                 }
             }
             else
             {
-                ICollection<string> keyCollection = ChannelRequest.Keys;
+                ICollection<string> keyCollection = ChannelRequest[PubnubInstance.InstanceId].Keys;
                 if (keyCollection != null && keyCollection.Count > 0)
                 {
                     List<string> keysList = keyCollection.ToList();
                     foreach (string key in keysList)
                     {
-                        HttpWebRequest currentRequest = ChannelRequest[key];
+                        HttpWebRequest currentRequest = ChannelRequest[PubnubInstance.InstanceId][key];
                         if (currentRequest != null)
                         {
-                            bool removeKey = ChannelRequest.TryRemove(key, out currentRequest);
+                            bool removeKey = ChannelRequest[PubnubInstance.InstanceId].TryRemove(key, out currentRequest);
                             if (removeKey)
                             {
-                                LoggingMethod.WriteToLog(string.Format("DateTime {0} Remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
+                                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} Remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
                             }
                             else
                             {
-                                LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
+                                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} Unable to remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
                             }
                         }
                     }
@@ -1370,28 +1359,30 @@ namespace PubnubApi
 
         private void RemoveUserState()
         {
-            ICollection<string> channelLocalUserStateCollection = ChannelLocalUserState.Keys;
-            ICollection<string> channelUserStateCollection = ChannelUserState.Keys;
+            if (ChannelLocalUserState.Count == 0) return;
 
-            ICollection<string> channelGroupLocalUserStateCollection = ChannelGroupLocalUserState.Keys;
-            ICollection<string> channelGroupUserStateCollection = ChannelGroupUserState.Keys;
+            ICollection<string> channelLocalUserStateCollection = ChannelLocalUserState[PubnubInstance.InstanceId].Keys;
+            ICollection<string> channelUserStateCollection = ChannelUserState[PubnubInstance.InstanceId].Keys;
+
+            ICollection<string> channelGroupLocalUserStateCollection = ChannelGroupLocalUserState[PubnubInstance.InstanceId].Keys;
+            ICollection<string> channelGroupUserStateCollection = ChannelGroupUserState[PubnubInstance.InstanceId].Keys;
 
             if (channelLocalUserStateCollection != null && channelLocalUserStateCollection.Count > 0)
             {
                 List<string> channelLocalStateList = channelLocalUserStateCollection.ToList();
                 foreach (string key in channelLocalStateList)
                 {
-                    if (ChannelLocalUserState.ContainsKey(key))
+                    if (ChannelLocalUserState[PubnubInstance.InstanceId].ContainsKey(key))
                     {
                         Dictionary<string, object> tempUserState;
-                        bool removeKey = ChannelLocalUserState.TryRemove(key, out tempUserState);
+                        bool removeKey = ChannelLocalUserState[PubnubInstance.InstanceId].TryRemove(key, out tempUserState);
                         if (removeKey)
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveUserState from local user state dictionary for channel= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} RemoveUserState from local user state dictionary for channel= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
                         }
                         else
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveUserState from local user state dictionary for channel= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} Unable to RemoveUserState from local user state dictionary for channel= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
                         }
                     }
                 }
@@ -1402,17 +1393,17 @@ namespace PubnubApi
                 List<string> channelStateList = channelUserStateCollection.ToList();
                 foreach (string key in channelStateList)
                 {
-                    if (ChannelUserState.ContainsKey(key))
+                    if (ChannelUserState[PubnubInstance.InstanceId].ContainsKey(key))
                     {
                         Dictionary<string, object> tempUserState;
-                        bool removeKey = ChannelUserState.TryRemove(key, out tempUserState);
+                        bool removeKey = ChannelUserState[PubnubInstance.InstanceId].TryRemove(key, out tempUserState);
                         if (removeKey)
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveUserState from user state dictionary for channel= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} RemoveUserState from user state dictionary for channel= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
                         }
                         else
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveUserState from user state dictionary for channel= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} Unable to RemoveUserState from user state dictionary for channel= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
                         }
                     }
                 }
@@ -1423,17 +1414,17 @@ namespace PubnubApi
                 List<string> channelGroupLocalStateList = channelGroupLocalUserStateCollection.ToList();
                 foreach (string key in channelGroupLocalStateList)
                 {
-                    if (ChannelGroupLocalUserState.ContainsKey(key))
+                    if (ChannelGroupLocalUserState[PubnubInstance.InstanceId].ContainsKey(key))
                     {
                         Dictionary<string, object> tempUserState;
-                        bool removeKey = ChannelGroupLocalUserState.TryRemove(key, out tempUserState);
+                        bool removeKey = ChannelGroupLocalUserState[PubnubInstance.InstanceId].TryRemove(key, out tempUserState);
                         if (removeKey)
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveUserState from local user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} RemoveUserState from local user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
                         }
                         else
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveUserState from local user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} Unable to RemoveUserState from local user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
                         }
                     }
                 }
@@ -1445,17 +1436,17 @@ namespace PubnubApi
 
                 foreach (string key in channelGroupStateList)
                 {
-                    if (ChannelGroupUserState.ContainsKey(key))
+                    if (ChannelGroupUserState[PubnubInstance.InstanceId].ContainsKey(key))
                     {
                         Dictionary<string, object> tempUserState;
-                        bool removeKey = ChannelGroupUserState.TryRemove(key, out tempUserState);
+                        bool removeKey = ChannelGroupUserState[PubnubInstance.InstanceId].TryRemove(key, out tempUserState);
                         if (removeKey)
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} RemoveUserState from user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} RemoveUserState from user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
                         }
                         else
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to RemoveUserState from user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} Unable to RemoveUserState from user state dictionary for channelgroup= {1}", DateTime.Now.ToString(), key), pubnubConfig.LogVerbosity);
                         }
                     }
                 }
@@ -1478,12 +1469,14 @@ namespace PubnubApi
 
         protected virtual void TerminateLocalClientHeartbeatTimer(Uri requestUri)
         {
+            if (ChannelLocalClientHeartbeatTimer.Count == 0) return;
+
             if (requestUri != null)
             {
-                if (ChannelLocalClientHeartbeatTimer.ContainsKey(requestUri))
+                if (ChannelLocalClientHeartbeatTimer[PubnubInstance.InstanceId].ContainsKey(requestUri))
                 {
                     Timer requestHeatbeatTimer = null;
-                    if (ChannelLocalClientHeartbeatTimer.TryGetValue(requestUri, out requestHeatbeatTimer) && requestHeatbeatTimer != null)
+                    if (ChannelLocalClientHeartbeatTimer[PubnubInstance.InstanceId].TryGetValue(requestUri, out requestHeatbeatTimer) && requestHeatbeatTimer != null)
                     {
                         try
                         {
@@ -1495,38 +1488,38 @@ namespace PubnubApi
                         catch (ObjectDisposedException){ /*Known exception to be ignored*/ }
 
                         Timer removedTimer = null;
-                        bool removed = ChannelLocalClientHeartbeatTimer.TryRemove(requestUri, out removedTimer);
+                        bool removed = ChannelLocalClientHeartbeatTimer[PubnubInstance.InstanceId].TryRemove(requestUri, out removedTimer);
                         if (removed)
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString(), requestUri.ToString()), pubnubConfig.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} Remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString(), requestUri.ToString()), pubnubConfig.LogVerbosity);
                         }
                         else
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} Unable to remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString(), requestUri.ToString()), pubnubConfig.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} Unable to remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString(), requestUri.ToString()), pubnubConfig.LogVerbosity);
                         }
                     }
                 }
             }
             else
             {
-                ConcurrentDictionary<Uri, Timer> timerCollection = ChannelLocalClientHeartbeatTimer;
+                ConcurrentDictionary<Uri, Timer> timerCollection = ChannelLocalClientHeartbeatTimer[PubnubInstance.InstanceId];
                 ICollection<Uri> keyCollection = timerCollection.Keys;
                 if (keyCollection != null && keyCollection.Count > 0)
                 {
                     List<Uri> keyList = keyCollection.ToList();
                     foreach (Uri key in keyList)
                     {
-                        if (ChannelLocalClientHeartbeatTimer.ContainsKey(key))
+                        if (ChannelLocalClientHeartbeatTimer[PubnubInstance.InstanceId].ContainsKey(key))
                         {
                             Timer currentTimer = null;
-                            if (ChannelLocalClientHeartbeatTimer.TryGetValue(key, out currentTimer) && currentTimer != null)
+                            if (ChannelLocalClientHeartbeatTimer[PubnubInstance.InstanceId].TryGetValue(key, out currentTimer) && currentTimer != null)
                             {
                                 currentTimer.Dispose();
                                 Timer removedTimer = null;
-                                bool removed = ChannelLocalClientHeartbeatTimer.TryRemove(key, out removedTimer);
+                                bool removed = ChannelLocalClientHeartbeatTimer[PubnubInstance.InstanceId].TryRemove(key, out removedTimer);
                                 if (!removed)
                                 {
-                                    LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateLocalClientHeartbeatTimer(null) - Unable to remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString(), key.ToString()), pubnubConfig.LogVerbosity);
+                                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} TerminateLocalClientHeartbeatTimer(null) - Unable to remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString(), key.ToString()), pubnubConfig.LogVerbosity);
                                 }
                             }
                         }
@@ -1546,13 +1539,13 @@ namespace PubnubApi
                 {
                     timerInterval = MINEXPONENTIALBACKOFF;
                     ConnectionErrors = 1;
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0}, EXPONENTIAL timerInterval > MAXEXPONENTIALBACKOFF", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, EXPONENTIAL timerInterval > MAXEXPONENTIALBACKOFF", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
                 }
                 else if (timerInterval < 1)
                 {
                     timerInterval = MINEXPONENTIALBACKOFF;
                 }
-                LoggingMethod.WriteToLog(string.Format("DateTime {0}, EXPONENTIAL timerInterval = {1}", DateTime.Now.ToString(), timerInterval.ToString()), pubnubConfig.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, EXPONENTIAL timerInterval = {1}", DateTime.Now.ToString(), timerInterval.ToString()), pubnubConfig.LogVerbosity);
             }
             else if (pubnubConfig.ReconnectionPolicy == PNReconnectionPolicy.LINEAR)
             {
@@ -1568,7 +1561,8 @@ namespace PubnubApi
 
         protected void TerminateReconnectTimer()
         {
-            ConcurrentDictionary<string, Timer> channelReconnectCollection = ChannelReconnectTimer;
+            if (ChannelReconnectTimer.Count == 0) return;
+            ConcurrentDictionary<string, Timer> channelReconnectCollection = ChannelReconnectTimer[PubnubInstance.InstanceId];
             ICollection<string> keyCollection = channelReconnectCollection.Keys;
             if (keyCollection != null && keyCollection.Count > 0)
             {
@@ -1577,19 +1571,19 @@ namespace PubnubApi
                 {
                     if (ChannelReconnectTimer.ContainsKey(key))
                     {
-                        Timer currentTimer = ChannelReconnectTimer[key];
+                        Timer currentTimer = ChannelReconnectTimer[PubnubInstance.InstanceId][key];
                         currentTimer.Dispose();
                         Timer removedTimer = null;
-                        bool removed = ChannelReconnectTimer.TryRemove(key, out removedTimer);
+                        bool removed = ChannelReconnectTimer[PubnubInstance.InstanceId].TryRemove(key, out removedTimer);
                         if (!removed)
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channel reconnect timer reference from collection for {1}", DateTime.Now.ToString(), key.ToString()), pubnubConfig.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channel reconnect timer reference from collection for {1}", DateTime.Now.ToString(), key.ToString()), pubnubConfig.LogVerbosity);
                         }
                     }
                 }
             }
 
-            ConcurrentDictionary<string, Timer> channelGroupReconnectCollection = ChannelGroupReconnectTimer;
+            ConcurrentDictionary<string, Timer> channelGroupReconnectCollection = ChannelGroupReconnectTimer[PubnubInstance.InstanceId];
             ICollection<string> groupKeyCollection = channelGroupReconnectCollection.Keys;
             if (groupKeyCollection != null && groupKeyCollection.Count > 0)
             {
@@ -1598,13 +1592,13 @@ namespace PubnubApi
                 {
                     if (ChannelGroupReconnectTimer.ContainsKey(groupKey))
                     {
-                        Timer currentTimer = ChannelGroupReconnectTimer[groupKey];
+                        Timer currentTimer = ChannelGroupReconnectTimer[PubnubInstance.InstanceId][groupKey];
                         currentTimer.Dispose();
                         Timer removedTimer = null;
-                        bool removed = ChannelGroupReconnectTimer.TryRemove(groupKey, out removedTimer);
+                        bool removed = ChannelGroupReconnectTimer[PubnubInstance.InstanceId].TryRemove(groupKey, out removedTimer);
                         if (!removed)
                         {
-                            LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channelgroup reconnect timer reference from collection for {1}", DateTime.Now.ToString(), groupKey.ToString()), pubnubConfig.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channelgroup reconnect timer reference from collection for {1}", DateTime.Now.ToString(), groupKey.ToString()), pubnubConfig.LogVerbosity);
                         }
                     }
                 }
@@ -1615,10 +1609,10 @@ namespace PubnubApi
         {
             bool userStateDeleted = false;
 
-            if (ChannelLocalUserState.ContainsKey(channel))
+            if (ChannelLocalUserState[PubnubInstance.InstanceId].ContainsKey(channel))
             {
                 Dictionary<string, object> returnedUserState = null;
-                userStateDeleted = ChannelLocalUserState.TryRemove(channel, out returnedUserState);
+                userStateDeleted = ChannelLocalUserState[PubnubInstance.InstanceId].TryRemove(channel, out returnedUserState);
             }
 
             return userStateDeleted;
@@ -1628,10 +1622,10 @@ namespace PubnubApi
         {
             bool userStateDeleted = false;
 
-            if (ChannelGroupLocalUserState.ContainsKey(channelGroup))
+            if (ChannelGroupLocalUserState[PubnubInstance.InstanceId].ContainsKey(channelGroup))
             {
                 Dictionary<string, object> returnedUserState = null;
-                userStateDeleted = ChannelGroupLocalUserState.TryRemove(channelGroup, out returnedUserState);
+                userStateDeleted = ChannelGroupLocalUserState[PubnubInstance.InstanceId].TryRemove(channelGroup, out returnedUserState);
             }
 
             return userStateDeleted;
@@ -1648,13 +1642,35 @@ namespace PubnubApi
             RemoveUserState();
             TerminatePresenceHeartbeatTimer();
 
-            MultiChannelSubscribe.Clear();
-            MultiChannelGroupSubscribe.Clear();
+            if (MultiChannelSubscribe.Count > 0 && MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId))
+            {
+                MultiChannelSubscribe[PubnubInstance.InstanceId].Clear();
+            }
 
-            ChannelLocalUserState.Clear();
-            ChannelUserState.Clear();
-            ChannelGroupLocalUserState.Clear();
-            ChannelGroupUserState.Clear();
+            if (MultiChannelGroupSubscribe.Count > 0 && MultiChannelGroupSubscribe.ContainsKey(PubnubInstance.InstanceId))
+            {
+                MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Clear();
+            }
+
+            if (ChannelLocalUserState.Count > 0 && ChannelLocalUserState.ContainsKey(PubnubInstance.InstanceId))
+            {
+                ChannelLocalUserState[PubnubInstance.InstanceId].Clear();
+            }
+
+            if (ChannelUserState.Count > 0 && ChannelUserState.ContainsKey(PubnubInstance.InstanceId))
+            {
+                ChannelUserState[PubnubInstance.InstanceId].Clear();
+            }
+
+            if (ChannelGroupLocalUserState.Count > 0 && ChannelGroupLocalUserState.ContainsKey(PubnubInstance.InstanceId))
+            {
+                ChannelGroupLocalUserState[PubnubInstance.InstanceId].Clear();
+            }
+
+            if (ChannelGroupUserState.Count > 0 && ChannelGroupUserState.ContainsKey(PubnubInstance.InstanceId))
+            {
+                ChannelGroupUserState[PubnubInstance.InstanceId].Clear();
+            }
 
             PubnubInstance = null;
         }
@@ -1665,15 +1681,18 @@ namespace PubnubApi
             if (channels != null)
             {
                 string multiChannel = (channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : ",";
-                HttpWebRequest request = ChannelRequest.ContainsKey(multiChannel) ? ChannelRequest[multiChannel] : null;
-                if (request != null)
+                if (ChannelRequest.ContainsKey(PubnubInstance.InstanceId))
                 {
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0} TerminateCurrentSubsciberRequest {1}", DateTime.Now.ToString(), request.RequestUri.ToString()), pubnubConfig.LogVerbosity);
-                    try
+                    HttpWebRequest request = ChannelRequest[PubnubInstance.InstanceId].ContainsKey(multiChannel) ? ChannelRequest[PubnubInstance.InstanceId][multiChannel] : null;
+                    if (request != null)
                     {
-                        request.Abort();
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} TerminateCurrentSubsciberRequest {1}", DateTime.Now.ToString(), request.RequestUri.ToString()), pubnubConfig.LogVerbosity);
+                        try
+                        {
+                            request.Abort();
+                        }
+                        catch { }
                     }
-                    catch { }
                 }
             }
         }
@@ -1682,26 +1701,47 @@ namespace PubnubApi
 
         internal void Announce(PNStatus status)
         {
-            for (int listenerIndex=0; listenerIndex < SubscribeCallbackListenerList.Count; listenerIndex++)
+            if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
             {
-                SubscribeCallbackListenerList[listenerIndex].Status(PubnubInstance, status);
+                List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+                for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
+                {
+                    callbackList[listenerIndex].Status(PubnubInstance, status);
+                }
             }
+            
         }
 
         internal void Announce<T>(PNMessageResult<T> message)
         {
-            for (int listenerIndex = 0; listenerIndex < SubscribeCallbackListenerList.Count; listenerIndex++)
+            if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
             {
-                SubscribeCallbackListenerList[listenerIndex].Message(PubnubInstance, message);
+                List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+                for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
+                {
+                    callbackList[listenerIndex].Message(PubnubInstance, message);
+                }
             }
+            //for (int listenerIndex = 0; listenerIndex < SubscribeCallbackListenerList.Count; listenerIndex++)
+            //{
+            //    SubscribeCallbackListenerList[listenerIndex].Message(PubnubInstance, message);
+            //}
         }
 
         internal void Announce(PNPresenceEventResult presence)
         {
-            for (int listenerIndex = 0; listenerIndex < SubscribeCallbackListenerList.Count; listenerIndex++)
+            if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
             {
-                SubscribeCallbackListenerList[listenerIndex].Presence(PubnubInstance, presence);
+                List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+                for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
+                {
+                    callbackList[listenerIndex].Presence(PubnubInstance, presence);
+                }
             }
+            //for (int listenerIndex = 0; listenerIndex < SubscribeCallbackListenerList.Count; listenerIndex++)
+            //{
+            //    SubscribeCallbackListenerList[listenerIndex].Presence(PubnubInstance, presence);
+            //}
         }
     }
 }

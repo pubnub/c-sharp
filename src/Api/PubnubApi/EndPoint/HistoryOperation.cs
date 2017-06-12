@@ -5,6 +5,7 @@ using System.Text;
 using PubnubApi.Interface;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Net;
 
 namespace PubnubApi.EndPoint
 {
@@ -13,6 +14,7 @@ namespace PubnubApi.EndPoint
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
         private IPubnubUnitTest unit = null;
+        private IPubnubLog pubnubLog = null;
 
         private bool reverseOption = false;
         private bool includeTimetokenOption = false;
@@ -23,22 +25,12 @@ namespace PubnubApi.EndPoint
         private string channelName = "";
         private PNCallback<PNHistoryResult> savedCallback = null;
 
-        public HistoryOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
-        {
-            config = pubnubConfig;
-        }
-
-        public HistoryOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary):base(pubnubConfig, jsonPluggableLibrary,null)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-        }
-
-        public HistoryOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
+        public HistoryOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
+            pubnubLog = log;
         }
 
         public HistoryOperation Channel(string channel)
@@ -105,7 +97,8 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing Channel");
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
             Uri request = urlBuilder.BuildHistoryRequest(channel, start, end, count, reverse, includeToken);
 
             RequestState<PNHistoryResult> requestState = new RequestState<PNHistoryResult>();
@@ -123,5 +116,23 @@ namespace PubnubApi.EndPoint
             }
         }
 
+        internal void CurrentPubnubInstance(Pubnub instance)
+        {
+            PubnubInstance = instance;
+
+            if (!ChannelRequest.ContainsKey(instance.InstanceId))
+            {
+                ChannelRequest.Add(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+            }
+            if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
+            {
+                ChannelInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
+            if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
+            {
+                ChannelGroupInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
+
+        }
     }
 }
