@@ -7,13 +7,14 @@ using MockServer;
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
-    public class WhenGetRequestServerTime : TestHarness
+    public class WhenGetRequestServerTimeMultiInstance : TestHarness
     {
         private static ManualResetEvent mreTime = new ManualResetEvent(false);
-        private static bool timeReceived = false;
+        private static bool timeReceived1 = false;
         private static string currentUnitTestCase = "";
         private static long expectedTime = 14725889985315301;
-        private static Pubnub pubnub = null;
+        private static Pubnub pubnub1 = null;
+        private static Pubnub pubnub2 = null;
 
         private Server server;
         private UnitTestLog unitLog;
@@ -40,39 +41,65 @@ namespace PubNubMessaging.Tests
             server.ClearRequests();
 
             currentUnitTestCase = "ThenItShouldReturnTimeStamp";
-            timeReceived = false;
+            timeReceived1 = false;
             mreTime = new ManualResetEvent(false);
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config1 = new PNConfiguration()
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
+                Uuid = "mytestuuid1",
+                Secure = false
+            };
+            PNConfiguration config2 = new PNConfiguration()
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid2",
                 Secure = false
             };
             server.RunOnHttps(false);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub1 = this.createPubNubInstance(config1);
+            pubnub2 = this.createPubNubInstance(config2);
 
-            string expected = "[14725889985315301]";
+            string expected1 = "[14725889985315301]";
+            string expected2 = "[14725889985315302]";
 
             server.AddRequest(new Request()
                     .WithMethod("GET")
                     .WithPath("/time/0")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
-                    .WithParameter("requestid", "myRequestId")
-                    .WithParameter("uuid", config.Uuid)
-                    .WithResponse(expected)
+                    .WithParameter("requestid", "myRequestId1")
+                    .WithParameter("uuid", config1.Uuid)
+                    .WithParameter("instanceid", pubnub1.InstanceId)
+                    .WithResponse(expected1)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Time().Async(new TimeResult());
-                
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId2")
+                    .WithParameter("uuid", config2.Uuid)
+                    .WithParameter("instanceid", pubnub2.InstanceId)
+                    .WithResponse(expected2)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            pubnub1.Time().Async(new TimeResult());
             mreTime.WaitOne(310 * 1000);
 
-            pubnub.Destroy();
-            pubnub = null;
+            mreTime = new ManualResetEvent(false);
+            pubnub2.Time().Async(new TimeResult());
+            mreTime.WaitOne(310 * 1000);
 
-            Assert.IsTrue(timeReceived, "time() Failed");
+            pubnub1.Destroy();
+            pubnub2.Destroy();
+
+            pubnub1 = null;
+            pubnub2 = null;
+
+            Assert.IsTrue(timeReceived1, "time() Failed");
         }
 
         [Test]
@@ -82,7 +109,7 @@ namespace PubNubMessaging.Tests
 
             currentUnitTestCase = "ThenItShouldReturnTimeStampWithSSL";
 
-            timeReceived = false;
+            timeReceived1 = false;
             mreTime = new ManualResetEvent(false);
 
             PNConfiguration config = new PNConfiguration()
@@ -93,7 +120,7 @@ namespace PubNubMessaging.Tests
             };
 
             server.RunOnHttps(true);
-            pubnub = this.createPubNubInstance(config);
+            pubnub1 = this.createPubNubInstance(config);
 
             string expected = "[14725889985315301]";
 
@@ -106,14 +133,14 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Time().Async(new TimeResult());
+            pubnub1.Time().Async(new TimeResult());
 
             mreTime.WaitOne(310 * 1000);
 
-            pubnub.Destroy();
-            pubnub = null;
+            pubnub1.Destroy();
+            pubnub1 = null;
 
-            Assert.IsTrue(timeReceived, "time() with SSL Failed");
+            Assert.IsTrue(timeReceived1, "time() with SSL Failed");
         }
 
         [Test]
@@ -126,7 +153,7 @@ namespace PubNubMessaging.Tests
             Proxy proxy = new Proxy(new Uri("test.pandu.com:808"));
             proxy.Credentials = new System.Net.NetworkCredential("tuvpnfreeproxy", "Rx8zW78k");
 
-            timeReceived = false;
+            timeReceived1 = false;
             mreTime = new ManualResetEvent(false);
 
             PNConfiguration config = new PNConfiguration()
@@ -139,7 +166,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub1 = this.createPubNubInstance(config);
 
             expectedTime = 14725889985315301;
             string expected = "[14725889985315301]";
@@ -155,16 +182,16 @@ namespace PubNubMessaging.Tests
 
             if (config.Proxy != null)
             {
-                pubnub.Time().Async(new TimeResult());
+                pubnub1.Time().Async(new TimeResult());
 
                 mreTime.WaitOne(310 * 1000);
 
-                pubnub.Destroy();
+                pubnub1.Destroy();
 
-                pubnub.PubnubUnitTest = null;
-                pubnub = null;
+                pubnub1.PubnubUnitTest = null;
+                pubnub1 = null;
 
-                Assert.IsTrue(timeReceived, "time() Failed");
+                Assert.IsTrue(timeReceived1, "time() Failed");
             }
             else
             {
@@ -180,7 +207,7 @@ namespace PubNubMessaging.Tests
             Proxy proxy = new Proxy(new Uri("test.pandu.com:808"));
             proxy.Credentials = new System.Net.NetworkCredential("tuvpnfreeproxy", "Rx8zW78k");
 
-            timeReceived = false;
+            timeReceived1 = false;
             mreTime = new ManualResetEvent(false);
 
             PNConfiguration config = new PNConfiguration()
@@ -192,7 +219,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(true);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub1 = this.createPubNubInstance(config);
 
             string expected = "[14725889985315301]";
 
@@ -208,16 +235,16 @@ namespace PubNubMessaging.Tests
 
             if (config.Proxy != null)
             {
-                pubnub.Time().Async(new TimeResult());
+                pubnub1.Time().Async(new TimeResult());
 
                 mreTime.WaitOne(310 * 1000);
 
-                pubnub.Destroy();
+                pubnub1.Destroy();
 
-                pubnub.PubnubUnitTest = null;
-                pubnub = null;
+                pubnub1.PubnubUnitTest = null;
+                pubnub1 = null;
 
-                Assert.IsTrue(timeReceived, "time() with SSL through proxy Failed");
+                Assert.IsTrue(timeReceived1, "time() with SSL through proxy Failed");
             }
             else
             {
@@ -249,11 +276,11 @@ namespace PubNubMessaging.Tests
             {
                 try
                 {
-                    Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                    Console.WriteLine("PNStatus={0}", pubnub1.JsonPluggableLibrary.SerializeToJsonString(status));
 
                     if (result != null)
                     {
-                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        Console.WriteLine(pubnub1.JsonPluggableLibrary.SerializeToJsonString(result));
 
                         if (status.StatusCode == 200 && status.Error == false)
                         {
@@ -261,12 +288,12 @@ namespace PubNubMessaging.Tests
                             {
                                 if (expectedTime == result.Timetoken)
                                 {
-                                    timeReceived = true;
+                                    timeReceived1 = true;
                                 }
                             }
                             else if (result.Timetoken > 0)
                             {
-                                timeReceived = true;
+                                timeReceived1 = true;
                             }
                         }
                     }
