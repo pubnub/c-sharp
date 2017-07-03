@@ -98,12 +98,6 @@ namespace PubnubApi.EndPoint
                 throw new MissingMemberException("Invalid secret key");
             }
 
-            if ((channels == null && channelGroups == null) 
-                || (channels != null && channelGroups != null && channels.Length == 0 && channelGroups.Length == 0))
-            {
-                throw new MissingMemberException("Invalid Channels/ChannelGroups");
-            }
-
             List<string> channelList = new List<string>();
             List<string> channelGroupList = new List<string>();
             List<string> authList = new List<string>();
