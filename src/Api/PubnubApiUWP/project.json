@@ -15,7 +15,7 @@
     "repository": {
       "url": "https://github.com/pubnub/c-sharp/"
     },
-    "releaseNotes": "fix for publish with UsePOST. Handling object array for history response",
+    "releaseNotes": "refactored code for application level grant, to reuse HttpClient instance and to handle Pubnub multi-instancing",
     "tags": [
       "Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing"
     ],

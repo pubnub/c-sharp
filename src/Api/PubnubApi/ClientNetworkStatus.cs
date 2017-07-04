@@ -20,13 +20,31 @@ namespace PubnubApi
 
         private static bool networkStatus = true;
 		private static bool machineSuspendMode = false;
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+        private static HttpClient httpClient = null;
+#endif
 
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+        public ClientNetworkStatus(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, HttpClient refHttpClient)
+#else
         public ClientNetworkStatus(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log)
+#endif
         {
             pubnubConfig = config;
             jsonLib = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
+
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+            httpClient = refHttpClient;
+            if (httpClient == null)
+            {
+                httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Accept.Clear();
+                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                httpClient.Timeout = TimeSpan.FromSeconds(pubnubConfig.NonSubscribeRequestTimeout);
+            }
+#endif
         }
 
         private static ManualResetEvent mres = new ManualResetEvent(false);
@@ -151,11 +169,6 @@ namespace PubnubApi
             try
             {
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
-                HttpClient httpClient = new HttpClient();
-                httpClient.DefaultRequestHeaders.Accept.Clear();
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                httpClient.Timeout = TimeSpan.FromSeconds(pubnubConfig.NonSubscribeRequestTimeout);
-
                 var response = await httpClient.GetAsync(requestUri);
 
                 if (response.IsSuccessStatusCode)

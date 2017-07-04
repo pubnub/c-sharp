@@ -19,12 +19,30 @@ namespace PubnubApi
         private PNConfiguration pubnubConfig = null;
         private IJsonPluggableLibrary jsonLib = null;
         private IPubnubLog pubnubLog = null;
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+        private static HttpClient httpClientSubscribe = null;
+        private static HttpClient httpClientNonsubscribe = null;
+#endif
 
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+        public PubnubHttp(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log, HttpClient refHttpClientSubscribe, HttpClient refHttpClientNonsubscribe)
+#else
         public PubnubHttp(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log)
+#endif
         {
             pubnubConfig = config;
             jsonLib = jsonPluggableLibrary;
             pubnubLog = log;
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+            httpClientSubscribe = refHttpClientSubscribe;
+            httpClientNonsubscribe = refHttpClientNonsubscribe;
+            //if (httpClient == null)
+            //{
+            //    httpClient = new HttpClient();
+            //    httpClient.DefaultRequestHeaders.Accept.Clear();
+            //    httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            //}
+#endif
         }
 
         HttpWebRequest IPubnubHttp.SetProxy<T>(HttpWebRequest request)
@@ -118,11 +136,19 @@ namespace PubnubApi
             try
             {
                 LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Inside SendRequestAndGetJsonResponseHttpClient", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
-                HttpClient httpClient = new HttpClient();
-                httpClient.DefaultRequestHeaders.Accept.Clear();
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                httpClient.Timeout = TimeSpan.FromSeconds(GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType));
-                response = await httpClient.GetAsync(requestUri);
+                //HttpClient httpClient = new HttpClient();
+                //if (httpClient.Timeout != TimeSpan.FromSeconds(GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType)))
+                //{
+                //    httpClient.Timeout = TimeSpan.FromSeconds(GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType));
+                //}
+                if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
+                {
+                    response = await httpClientSubscribe.GetAsync(requestUri);
+                }
+                else
+                {
+                    response = await httpClientNonsubscribe.GetAsync(requestUri);
+                }
                 response.EnsureSuccessStatusCode();
                 var stream = await response.Content.ReadAsStreamAsync();
                 using (StreamReader streamReader = new StreamReader(stream))
@@ -154,12 +180,17 @@ namespace PubnubApi
             try
             {
                 System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, SendRequestAndGetJsonResponseHttpClientPOST Before httpClient.GetAsync", DateTime.Now.ToString()));
-                HttpClient httpClient = new HttpClient();
-                httpClient.DefaultRequestHeaders.Accept.Clear();
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                httpClient.Timeout = TimeSpan.FromSeconds(GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType));
+                //HttpClient httpClient = new HttpClient();
+                //httpClient.Timeout = TimeSpan.FromSeconds(GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType));
                 StringContent jsonPostString = new StringContent(postData, Encoding.UTF8);
-                response = await httpClient.PostAsync(requestUri, jsonPostString);
+                if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
+                {
+                    response = await httpClientSubscribe.PostAsync(requestUri, jsonPostString);
+                }
+                else
+                {
+                    response = await httpClientNonsubscribe.PostAsync(requestUri, jsonPostString);
+                }
                 response.EnsureSuccessStatusCode();
                 var stream = await response.Content.ReadAsStreamAsync();
                 using (StreamReader streamReader = new StreamReader(stream))

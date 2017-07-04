@@ -19,6 +19,10 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using PubnubApi.Interface;
 using System.Threading.Tasks;
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+using System.Net.Http;
+using System.Net.Http.Headers;
+#endif
 #endregion
 
 namespace PubnubApi
@@ -44,6 +48,11 @@ namespace PubnubApi
         private IJsonPluggableLibrary jsonLib = null;
         private IPubnubUnitTest unitTest = null;
         private IPubnubLog pubnubLog = null;
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+        private static HttpClient httpClientSubscribe = null;
+        private static HttpClient httpClientNonsubscribe = null;
+        private static HttpClient httpClientNetworkStatus = null;
+#endif
 
         private bool clientNetworkStatusInternetStatus = true;
         protected static Dictionary<string, bool> SubscribeDisconnected = new Dictionary<string, bool>();
@@ -157,7 +166,26 @@ namespace PubnubApi
 
             CurrentUuid = pubnubConfig.Uuid;
 
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+            if (httpClientSubscribe == null)
+            {
+                httpClientSubscribe = new HttpClient();
+                httpClientSubscribe.DefaultRequestHeaders.Accept.Clear();
+                httpClientSubscribe.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                httpClientSubscribe.Timeout = TimeSpan.FromSeconds(pubnubConfig.SubscribeTimeout);
+            }
+            if (httpClientNonsubscribe == null)
+            {
+                httpClientNonsubscribe = new HttpClient();
+                httpClientNonsubscribe.DefaultRequestHeaders.Accept.Clear();
+                httpClientNonsubscribe.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                httpClientNonsubscribe.Timeout = TimeSpan.FromSeconds(pubnubConfig.NonSubscribeRequestTimeout);
+            }
+            pubnubHttp = new PubnubHttp(pubnubConfiguation, jsonLib, pubnubLog, httpClientSubscribe, httpClientNonsubscribe);
+#else
             pubnubHttp = new PubnubHttp(pubnubConfiguation, jsonLib, pubnubLog);
+#endif
+
 
             UpdatePubnubNetworkTcpCheckIntervalInSeconds();
             enableResumeOnReconnect = pubnubConfig.ReconnectionPolicy != PNReconnectionPolicy.NONE;
@@ -223,7 +251,18 @@ namespace PubnubApi
 
         protected bool CheckInternetConnectionStatus<T>(bool systemActive, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
         {
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+            if (httpClientNetworkStatus == null)
+            {
+                httpClientNetworkStatus = new HttpClient();
+                httpClientNetworkStatus.DefaultRequestHeaders.Accept.Clear();
+                httpClientNetworkStatus.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                httpClientNetworkStatus.Timeout = TimeSpan.FromSeconds(pubnubConfig.NonSubscribeRequestTimeout);
+            }
+            ClientNetworkStatus clientNetworkStatus = new ClientNetworkStatus(pubnubConfig, jsonLib, unitTest, pubnubLog, httpClientNetworkStatus);
+#else
             ClientNetworkStatus clientNetworkStatus = new ClientNetworkStatus(pubnubConfig, jsonLib, unitTest, pubnubLog);
+#endif
             if (!clientNetworkStatus.IsInternetCheckRunning())
             {
                 clientNetworkStatusInternetStatus = clientNetworkStatus.CheckInternetStatus<T>(PubnetSystemActive, type, callback, channels, channelGroups);
@@ -1359,7 +1398,7 @@ namespace PubnubApi
 
         private void RemoveUserState()
         {
-            if (ChannelLocalUserState.Count == 0) return;
+            if (ChannelLocalUserState.Count == 0 || !ChannelLocalUserState.ContainsKey(PubnubInstance.InstanceId)) return;
 
             ICollection<string> channelLocalUserStateCollection = ChannelLocalUserState[PubnubInstance.InstanceId].Keys;
             ICollection<string> channelUserStateCollection = ChannelUserState[PubnubInstance.InstanceId].Keys;
@@ -1561,7 +1600,7 @@ namespace PubnubApi
 
         protected void TerminateReconnectTimer()
         {
-            if (ChannelReconnectTimer.Count == 0) return;
+            if (ChannelReconnectTimer.Count == 0 || !ChannelReconnectTimer.ContainsKey(PubnubInstance.InstanceId)) return;
             ConcurrentDictionary<string, Timer> channelReconnectCollection = ChannelReconnectTimer[PubnubInstance.InstanceId];
             ICollection<string> keyCollection = channelReconnectCollection.Keys;
             if (keyCollection != null && keyCollection.Count > 0)
@@ -1672,6 +1711,35 @@ namespace PubnubApi
                 ChannelGroupUserState[PubnubInstance.InstanceId].Clear();
             }
 
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+            if (httpClientNetworkStatus != null)
+            {
+                try{
+                    httpClientNetworkStatus.CancelPendingRequests();
+                    httpClientNetworkStatus.Dispose();
+                    httpClientNetworkStatus = null;
+                }
+                catch{}
+            }
+            if (httpClientSubscribe != null)
+            {
+                try{
+                    httpClientSubscribe.CancelPendingRequests();
+                    httpClientSubscribe.Dispose();
+                    httpClientSubscribe = null;
+                }
+                catch{}
+            }
+            if (httpClientNonsubscribe != null)
+            {
+                try{
+                    httpClientNonsubscribe.CancelPendingRequests();
+                    httpClientNonsubscribe.Dispose();
+                    httpClientNonsubscribe = null;
+                }
+                catch{}
+            }
+#endif
             PubnubInstance = null;
         }
 
@@ -1697,7 +1765,7 @@ namespace PubnubApi
             }
         }
 
-        #endregion
+#endregion
 
         internal void Announce(PNStatus status)
         {
