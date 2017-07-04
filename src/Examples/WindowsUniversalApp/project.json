@@ -1,7 +1,7 @@
 ﻿{
   "dependencies": {
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
-    "PubnubUWP": "4.0.1.7"
+    "PubnubUWP": "4.0.2"
   },
   "frameworks": {
     "uap10.0": {}
