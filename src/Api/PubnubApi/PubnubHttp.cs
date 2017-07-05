@@ -16,13 +16,33 @@ namespace PubnubApi
 {
     public class PubnubHttp : IPubnubHttp
     {
-        private static PNConfiguration pubnubConfig = null;
-        private static IJsonPluggableLibrary jsonLib = null;
+        private PNConfiguration pubnubConfig = null;
+        private IJsonPluggableLibrary jsonLib = null;
+        private IPubnubLog pubnubLog = null;
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+        private static HttpClient httpClientSubscribe = null;
+        private static HttpClient httpClientNonsubscribe = null;
+#endif
 
-        public PubnubHttp(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary)
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+        public PubnubHttp(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log, HttpClient refHttpClientSubscribe, HttpClient refHttpClientNonsubscribe)
+#else
+        public PubnubHttp(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log)
+#endif
         {
             pubnubConfig = config;
             jsonLib = jsonPluggableLibrary;
+            pubnubLog = log;
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+            httpClientSubscribe = refHttpClientSubscribe;
+            httpClientNonsubscribe = refHttpClientNonsubscribe;
+            //if (httpClient == null)
+            //{
+            //    httpClient = new HttpClient();
+            //    httpClient.DefaultRequestHeaders.Accept.Clear();
+            //    httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            //}
+#endif
         }
 
         HttpWebRequest IPubnubHttp.SetProxy<T>(HttpWebRequest request)
@@ -115,12 +135,20 @@ namespace PubnubApi
             HttpResponseMessage response = null;
             try
             {
-                LoggingMethod.WriteToLog(string.Format("DateTime: {0}, Inside SendRequestAndGetJsonResponseHttpClient", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
-                HttpClient httpClient = new HttpClient();
-                httpClient.DefaultRequestHeaders.Accept.Clear();
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                httpClient.Timeout = TimeSpan.FromSeconds(GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType));
-                response = await httpClient.GetAsync(requestUri);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Inside SendRequestAndGetJsonResponseHttpClient", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
+                //HttpClient httpClient = new HttpClient();
+                //if (httpClient.Timeout != TimeSpan.FromSeconds(GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType)))
+                //{
+                //    httpClient.Timeout = TimeSpan.FromSeconds(GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType));
+                //}
+                if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
+                {
+                    response = await httpClientSubscribe.GetAsync(requestUri);
+                }
+                else
+                {
+                    response = await httpClientNonsubscribe.GetAsync(requestUri);
+                }
                 response.EnsureSuccessStatusCode();
                 var stream = await response.Content.ReadAsStreamAsync();
                 using (StreamReader streamReader = new StreamReader(stream))
@@ -152,12 +180,17 @@ namespace PubnubApi
             try
             {
                 System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, SendRequestAndGetJsonResponseHttpClientPOST Before httpClient.GetAsync", DateTime.Now.ToString()));
-                HttpClient httpClient = new HttpClient();
-                httpClient.DefaultRequestHeaders.Accept.Clear();
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                httpClient.Timeout = TimeSpan.FromSeconds(GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType));
+                //HttpClient httpClient = new HttpClient();
+                //httpClient.Timeout = TimeSpan.FromSeconds(GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType));
                 StringContent jsonPostString = new StringContent(postData, Encoding.UTF8);
-                response = await httpClient.PostAsync(requestUri, jsonPostString);
+                if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
+                {
+                    response = await httpClientSubscribe.PostAsync(requestUri, jsonPostString);
+                }
+                else
+                {
+                    response = await httpClientNonsubscribe.PostAsync(requestUri, jsonPostString);
+                }
                 response.EnsureSuccessStatusCode();
                 var stream = await response.Content.ReadAsStreamAsync();
                 using (StreamReader streamReader = new StreamReader(stream))
@@ -186,7 +219,7 @@ namespace PubnubApi
         async Task<string> SendRequestAndGetJsonResponseTaskFactory<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request)
         {
             HttpWebResponse response = null;
-            LoggingMethod.WriteToLog(string.Format("DateTime: {0}, Inside SendRequestAndGetJsonResponseTaskFactory", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Inside SendRequestAndGetJsonResponseTaskFactory", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
             try
             {
                 request.Method = "GET";
@@ -370,7 +403,7 @@ namespace PubnubApi
         async Task<string> SendRequestAndGetJsonResponseClassicHttp<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request)
         {
             //HttpWebResponse response = null;
-            LoggingMethod.WriteToLog(string.Format("DateTime: {0}, Inside SendRequestAndGetJsonResponseClassicHttp", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Inside SendRequestAndGetJsonResponseClassicHttp", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
             var taskComplete = new TaskCompletionSource<string>();
             try
             {
@@ -450,7 +483,7 @@ namespace PubnubApi
 
         async Task<string> SendRequestAndGetJsonResponseClassicHttpWithPOST<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request, string postData)
         {
-            LoggingMethod.WriteToLog(string.Format("DateTime: {0}, Inside SendRequestAndGetJsonResponseClassicHttpWithPOST", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Inside SendRequestAndGetJsonResponseClassicHttpWithPOST", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
             var taskComplete = new TaskCompletionSource<string>();
             try
             {
@@ -558,7 +591,7 @@ namespace PubnubApi
                     {
                         string currentMultiChannel = (currentState.Channels == null) ? "" : string.Join(",", currentState.Channels.OrderBy(x => x).ToArray());
                         string currentMultiChannelGroup = (currentState.ChannelGroups == null) ? "" : string.Join(",", currentState.ChannelGroups.OrderBy(x => x).ToArray());
-                        LoggingMethod.WriteToLog(string.Format("DateTime: {0}, OnPubnubWebRequestTimeout: client request timeout reached.Request abort for channel={1} ;channelgroup={2}", DateTime.Now.ToString(), currentMultiChannel, currentMultiChannelGroup), pubnubConfig.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, OnPubnubWebRequestTimeout: client request timeout reached.Request abort for channel={1} ;channelgroup={2}", DateTime.Now.ToString(), currentMultiChannel, currentMultiChannelGroup), pubnubConfig.LogVerbosity);
                         currentState.Timeout = true;
                         try
                         {
@@ -569,7 +602,7 @@ namespace PubnubApi
                 }
                 else
                 {
-                    LoggingMethod.WriteToLog(string.Format("DateTime: {0}, OnPubnubWebRequestTimeout: client request timeout reached. However state is unknown", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, OnPubnubWebRequestTimeout: client request timeout reached. However state is unknown", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
                 }
             }
         }
@@ -585,7 +618,7 @@ namespace PubnubApi
                     currentState.Request.Abort();
                 }
                 catch { }
-                LoggingMethod.WriteToLog(string.Format("DateTime: {0}, **WP7 OnPubnubWebRequestTimeout**", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, **WP7 OnPubnubWebRequestTimeout**", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
             }
         }
 

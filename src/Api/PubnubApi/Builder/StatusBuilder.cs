@@ -8,8 +8,8 @@ namespace PubnubApi
 {
     public class StatusBuilder
     {
-        private static PNConfiguration config = null;
-        private static IJsonPluggableLibrary jsonLibrary = null;
+        private PNConfiguration config = null;
+        private IJsonPluggableLibrary jsonLibrary = null;
 
         public StatusBuilder(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary)
         {

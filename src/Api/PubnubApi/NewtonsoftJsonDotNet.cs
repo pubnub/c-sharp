@@ -12,10 +12,12 @@ namespace PubnubApi
     public class NewtonsoftJsonDotNet : IJsonPluggableLibrary
     {
         private PNConfiguration config = null;
+        private IPubnubLog pubnubLog = null;
 
-        public NewtonsoftJsonDotNet(PNConfiguration pubnubConfig)
+        public NewtonsoftJsonDotNet(PNConfiguration pubnubConfig, IPubnubLog log)
         {
             this.config = pubnubConfig;
+            this.pubnubLog = log;
         }
 
         #region IJsonPlugableLibrary methods implementation
@@ -168,27 +170,27 @@ namespace PubnubApi
         private bool IsGenericTypeForMessage<T>()
         {
             bool ret = false;
-            PNPlatform.Print(config);
+            PNPlatform.Print(config, pubnubLog);
 
 #if (NET35 || NET40 || NET45 || NET461)
             if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(PNMessageResult<>))
             {
                 ret = true;
             }
-            LoggingMethod.WriteToLog(string.Format("DateTime: {0}, NET35/40 IsGenericTypeForMessage = {1}", DateTime.Now.ToString(), ret.ToString()), config.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, NET35/40 IsGenericTypeForMessage = {1}", DateTime.Now.ToString(), ret.ToString()), config.LogVerbosity);
 #elif (PORTABLE111 || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12 || NETSTANDARD13 || NETSTANDARD14 || UAP || NETFX_CORE || WINDOWS_UWP)
             if (typeof(T).GetTypeInfo().IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(PNMessageResult<>))
             {
                 ret = true;
             }
-            LoggingMethod.WriteToLog(string.Format("DateTime: {0}, typeof(T).GetTypeInfo().IsGenericType = {1}", DateTime.Now.ToString(), typeof(T).GetTypeInfo().IsGenericType.ToString()), config.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, typeof(T).GetTypeInfo().IsGenericType = {1}", DateTime.Now.ToString(), typeof(T).GetTypeInfo().IsGenericType.ToString()), config.LogVerbosity);
             if (typeof(T).GetTypeInfo().IsGenericType)
             {
-                LoggingMethod.WriteToLog(string.Format("DateTime: {0}, typeof(T).GetGenericTypeDefinition() = {1}", DateTime.Now.ToString(), typeof(T).GetGenericTypeDefinition().ToString()), config.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, typeof(T).GetGenericTypeDefinition() = {1}", DateTime.Now.ToString(), typeof(T).GetGenericTypeDefinition().ToString()), config.LogVerbosity);
             }
-            LoggingMethod.WriteToLog(string.Format("DateTime: {0}, PCL/CORE IsGenericTypeForMessage = {1}", DateTime.Now.ToString(), ret.ToString()), config.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, PCL/CORE IsGenericTypeForMessage = {1}", DateTime.Now.ToString(), ret.ToString()), config.LogVerbosity);
 #endif
-            LoggingMethod.WriteToLog(string.Format("DateTime: {0}, IsGenericTypeForMessage = {1}", DateTime.Now.ToString(), ret.ToString()), config.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, IsGenericTypeForMessage = {1}", DateTime.Now.ToString(), ret.ToString()), config.LogVerbosity);
             return ret;
         }
 
@@ -767,7 +769,6 @@ namespace PubnubApi
                         messagesContainer = messagesCollection.ToList();
                     }
                 }
-
                 if (messagesContainer != null)
                 {
                     ack.Messages = new List<PNHistoryItemResult>();

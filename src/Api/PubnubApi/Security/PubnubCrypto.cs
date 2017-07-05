@@ -16,11 +16,13 @@ namespace PubnubApi
     public class PubnubCrypto : PubnubCryptoBase
     {
         private PNConfiguration config = null;
+        private IPubnubLog pubnubLog = null;
 
-        public PubnubCrypto(string cipher_key, PNConfiguration pubnubConfig)
+        public PubnubCrypto(string cipher_key, PNConfiguration pubnubConfig, IPubnubLog log)
             : base(cipher_key)
         {
             this.config = pubnubConfig;
+            this.pubnubLog = log;
         }
 
         public PubnubCrypto(string cipher_key)
@@ -127,7 +129,7 @@ namespace PubnubApi
                 {
                     if (config != null)
                     {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0} Decrypt Error. {1}", DateTime.Now.ToString(), ex.ToString()), config.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} Decrypt Error. {1}", DateTime.Now.ToString(), ex.ToString()), config.LogVerbosity);
                     }
                     throw ex;
                     //LoggingMethod.WriteToLog(string.Format("DateTime {0} Decrypt Error. {1}", DateTime.Now.ToString(), ex.ToString()), pubnubConfig.LogVerbosity);

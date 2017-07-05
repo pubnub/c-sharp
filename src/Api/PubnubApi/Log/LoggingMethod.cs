@@ -10,31 +10,16 @@ namespace PubnubApi
 
 	public class LoggingMethod
 	{
-		private static IPubnubLog pubnubLog = null;
-
-		public static IPubnubLog PubnubLog
+		public static void WriteToLog(IPubnubLog pubnubLog, string logText, PNLogVerbosity logVerbosity)
 		{
-			get{
-				return pubnubLog;
-			}
-			set {
-				pubnubLog = value;
-			}
-		}
-
-		public static void WriteToLog(string logText, PNLogVerbosity logVerbosity)
-		{
-			if (logVerbosity == PNLogVerbosity.BODY)
+			if (pubnubLog != null && logVerbosity == PNLogVerbosity.BODY)
             {
 				//System.Diagnostics.Debug.WriteLine(logText);
 				try
 				{
-					if (pubnubLog != null)
-					{
-						pubnubLog.WriteToLog(logText);
-					}
-				}
-				catch(Exception ex) {
+                    pubnubLog.WriteToLog(logText);
+                }
+                catch (Exception ex) {
 					System.Diagnostics.Debug.WriteLine(ex.ToString());
 				}
 			}

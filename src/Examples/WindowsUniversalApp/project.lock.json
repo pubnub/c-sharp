@@ -319,7 +319,7 @@
           "lib/netstandard1.3/crypto.dll": {}
         }
       },
-      "PubnubUWP/4.0.1.7": {
+      "PubnubUWP/4.0.2": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
@@ -2455,7 +2455,7 @@
           "lib/netstandard1.3/crypto.dll": {}
         }
       },
-      "PubnubUWP/4.0.1.7": {
+      "PubnubUWP/4.0.2": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
@@ -4752,7 +4752,7 @@
           "lib/netstandard1.3/crypto.dll": {}
         }
       },
-      "PubnubUWP/4.0.1.7": {
+      "PubnubUWP/4.0.2": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
@@ -7089,7 +7089,7 @@
           "lib/netstandard1.3/crypto.dll": {}
         }
       },
-      "PubnubUWP/4.0.1.7": {
+      "PubnubUWP/4.0.2": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
@@ -9395,7 +9395,7 @@
           "lib/netstandard1.3/crypto.dll": {}
         }
       },
-      "PubnubUWP/4.0.1.7": {
+      "PubnubUWP/4.0.2": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
@@ -11738,7 +11738,7 @@
           "lib/netstandard1.3/crypto.dll": {}
         }
       },
-      "PubnubUWP/4.0.1.7": {
+      "PubnubUWP/4.0.2": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
@@ -14044,7 +14044,7 @@
           "lib/netstandard1.3/crypto.dll": {}
         }
       },
-      "PubnubUWP/4.0.1.7": {
+      "PubnubUWP/4.0.2": {
         "type": "package",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
@@ -16466,12 +16466,12 @@
         "portable.bouncycastle.nuspec"
       ]
     },
-    "PubnubUWP/4.0.1.7": {
-      "sha512": "c1cdLkJRs1P3Qd0k7BEouGeKuOTC8hgDDy4MvwOPiZ1WelGKoAslkKeES90GS3NEFrv+eY5taAdaWoeplyOXgA==",
+    "PubnubUWP/4.0.2": {
+      "sha512": "peBrua+jr7CABNYnXBedZ4MKm7+r2yS/RvSpnMTwIbU8vuqoyyWBobsik97UDVZrLpBPeIxmCjQox27Edb0WtA==",
       "type": "package",
-      "path": "PubnubUWP/4.0.1.7",
+      "path": "PubnubUWP/4.0.2",
       "files": [
-        "PubnubUWP.4.0.1.7.nupkg.sha512",
+        "PubnubUWP.4.0.2.nupkg.sha512",
         "PubnubUWP.nuspec",
         "lib/uap10.0/PubnubUWP.dll"
       ]
@@ -22344,7 +22344,7 @@
   "projectFileDependencyGroups": {
     "": [
       "Microsoft.NETCore.UniversalWindowsPlatform >= 5.2.2",
-      "PubnubUWP >= 4.0.1.7"
+      "PubnubUWP >= 4.0.2"
     ],
     "UAP,Version=v10.0": []
   },

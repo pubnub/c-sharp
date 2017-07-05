@@ -5,6 +5,7 @@ using System.Text;
 using PubnubApi.Interface;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Net;
 
 namespace PubnubApi.EndPoint
 {
@@ -13,6 +14,7 @@ namespace PubnubApi.EndPoint
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLibrary = null;
         private IPubnubUnitTest unit = null;
+        private IPubnubLog pubnubLog = null;
 
         private string[] channelNames = null;
         private string[] channelGroupNames = null;
@@ -20,22 +22,12 @@ namespace PubnubApi.EndPoint
         private string channelUUID = "";
         private PNCallback<PNSetStateResult> savedCallback = null;
 
-        public SetStateOperation(PNConfiguration pubnubConfig) :base(pubnubConfig)
-        {
-            config = pubnubConfig;
-        }
-
-        public SetStateOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary):base(pubnubConfig, jsonPluggableLibrary, null)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-        }
-
-        public SetStateOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit)
+        public SetStateOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
+            pubnubLog = log;
         }
 
         public SetStateOperation Channels(string[] channels)
@@ -328,16 +320,16 @@ namespace PubnubApi.EndPoint
             {
                 string currentChannel = channelList[channelIndex];
 
-                ChannelUserState.AddOrUpdate(currentChannel.Trim(), deserializeChannelUserState, (oldState, newState) => deserializeChannelUserState);
-                ChannelLocalUserState.AddOrUpdate(currentChannel.Trim(), deserializeChannelUserState, (oldState, newState) => deserializeChannelUserState);
+                ChannelUserState[PubnubInstance.InstanceId].AddOrUpdate(currentChannel.Trim(), deserializeChannelUserState, (oldState, newState) => deserializeChannelUserState);
+                ChannelLocalUserState[PubnubInstance.InstanceId].AddOrUpdate(currentChannel.Trim(), deserializeChannelUserState, (oldState, newState) => deserializeChannelUserState);
             }
 
             for (int channelGroupIndex=0; channelGroupIndex < channelGroupList.Count; channelGroupIndex++)
             {
                 string currentChannelGroup = channelGroupList[channelGroupIndex];
 
-                ChannelGroupUserState.AddOrUpdate(currentChannelGroup.Trim(), deserializeChannelGroupUserState, (oldState, newState) => deserializeChannelGroupUserState);
-                ChannelGroupLocalUserState.AddOrUpdate(currentChannelGroup.Trim(), deserializeChannelGroupUserState, (oldState, newState) => deserializeChannelGroupUserState);
+                ChannelGroupUserState[PubnubInstance.InstanceId].AddOrUpdate(currentChannelGroup.Trim(), deserializeChannelGroupUserState, (oldState, newState) => deserializeChannelGroupUserState);
+                ChannelGroupLocalUserState[PubnubInstance.InstanceId].AddOrUpdate(currentChannelGroup.Trim(), deserializeChannelGroupUserState, (oldState, newState) => deserializeChannelGroupUserState);
             }
 
             string jsonUserState = "{}";
@@ -387,7 +379,8 @@ namespace PubnubApi.EndPoint
                 //jsonUserState = string.Format("{{\"{0}\":{{{1}}},\"{2}\":{{{3}}}}}", channel, jsonChannelUserState, channelGroup, jsonChannelGroupUserState);
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
             Uri request = urlBuilder.BuildSetUserStateRequest(commaDelimitedChannels, commaDelimitedChannelGroups, uuid, jsonUserState);
 
             RequestState<PNSetStateResult> requestState = new RequestState<PNSetStateResult>();
@@ -416,9 +409,9 @@ namespace PubnubApi.EndPoint
 
             if (!string.IsNullOrEmpty(channel) && channel.Trim().Length > 0)
             {
-                if (ChannelLocalUserState.ContainsKey(channel))
+                if (ChannelLocalUserState[PubnubInstance.InstanceId].ContainsKey(channel))
                 {
-                    channelUserStateDictionary = ChannelLocalUserState[channel];
+                    channelUserStateDictionary = ChannelLocalUserState[PubnubInstance.InstanceId][channel];
                     if (channelUserStateDictionary != null)
                     {
                         if (channelUserStateDictionary.ContainsKey(userStateKey))
@@ -446,7 +439,7 @@ namespace PubnubApi.EndPoint
                         channelUserStateDictionary.Add(userStateKey, userStateValue);
                     }
 
-                    ChannelLocalUserState.AddOrUpdate(channel, channelUserStateDictionary, (oldData, newData) => channelUserStateDictionary);
+                    ChannelLocalUserState[PubnubInstance.InstanceId].AddOrUpdate(channel, channelUserStateDictionary, (oldData, newData) => channelUserStateDictionary);
                 }
                 else
                 {
@@ -455,16 +448,16 @@ namespace PubnubApi.EndPoint
                         channelUserStateDictionary = new Dictionary<string, object>();
                         channelUserStateDictionary.Add(userStateKey, userStateValue);
 
-                        ChannelLocalUserState.AddOrUpdate(channel, channelUserStateDictionary, (oldData, newData) => channelUserStateDictionary);
+                        ChannelLocalUserState[PubnubInstance.InstanceId].AddOrUpdate(channel, channelUserStateDictionary, (oldData, newData) => channelUserStateDictionary);
                     }
                 }
             }
             //
             if (!string.IsNullOrEmpty(channelGroup) && channelGroup.Trim().Length > 0)
             {
-                if (ChannelGroupLocalUserState.ContainsKey(channelGroup))
+                if (ChannelGroupLocalUserState[PubnubInstance.InstanceId].ContainsKey(channelGroup))
                 {
-                    channelGroupUserStateDictionary = ChannelGroupLocalUserState[channelGroup];
+                    channelGroupUserStateDictionary = ChannelGroupLocalUserState[PubnubInstance.InstanceId][channelGroup];
                     if (channelGroupUserStateDictionary != null)
                     {
                         if (channelGroupUserStateDictionary.ContainsKey(userStateKey))
@@ -492,7 +485,7 @@ namespace PubnubApi.EndPoint
                         channelGroupUserStateDictionary.Add(userStateKey, userStateValue);
                     }
 
-                    ChannelGroupLocalUserState.AddOrUpdate(channelGroup, channelGroupUserStateDictionary, (oldData, newData) => channelGroupUserStateDictionary);
+                    ChannelGroupLocalUserState[PubnubInstance.InstanceId].AddOrUpdate(channelGroup, channelGroupUserStateDictionary, (oldData, newData) => channelGroupUserStateDictionary);
                 }
                 else
                 {
@@ -501,7 +494,7 @@ namespace PubnubApi.EndPoint
                         channelGroupUserStateDictionary = new Dictionary<string, object>();
                         channelGroupUserStateDictionary.Add(userStateKey, userStateValue);
 
-                        ChannelGroupLocalUserState.AddOrUpdate(channelGroup, channelGroupUserStateDictionary, (oldData, newData) => channelGroupUserStateDictionary);
+                        ChannelGroupLocalUserState[PubnubInstance.InstanceId].AddOrUpdate(channelGroup, channelGroupUserStateDictionary, (oldData, newData) => channelGroupUserStateDictionary);
                     }
                 }
             }
@@ -527,10 +520,10 @@ namespace PubnubApi.EndPoint
         //{
         //    bool userStateDeleted = false;
 
-        //    if (ChannelLocalUserState.ContainsKey(channel))
+        //    if (ChannelLocalUserState[PubnubInstance.InstanceId].ContainsKey(channel))
         //    {
         //        Dictionary<string, object> returnedUserState = null;
-        //        userStateDeleted = ChannelLocalUserState.TryRemove(channel, out returnedUserState);
+        //        userStateDeleted = ChannelLocalUserState[PubnubInstance.InstanceId].TryRemove(channel, out returnedUserState);
         //    }
 
         //    return userStateDeleted;
@@ -540,10 +533,10 @@ namespace PubnubApi.EndPoint
         //{
         //    bool userStateDeleted = false;
 
-        //    if (base.ChannelGroupLocalUserState.ContainsKey(channelGroup))
+        //    if (base.ChannelGroupLocalUserState[PubnubInstance.InstanceId].ContainsKey(channelGroup))
         //    {
         //        Dictionary<string, object> returnedUserState = null;
-        //        userStateDeleted = base.ChannelGroupLocalUserState.TryRemove(channelGroup, out returnedUserState);
+        //        userStateDeleted = base.ChannelGroupLocalUserState[PubnubInstance.InstanceId].TryRemove(channelGroup, out returnedUserState);
         //    }
 
         //    return userStateDeleted;
@@ -724,6 +717,38 @@ namespace PubnubApi.EndPoint
             return AddOrUpdateOrDeleteLocalUserState(channel, channelGroup, userStateKey, userStateValue);
         }
 
+        internal void CurrentPubnubInstance(Pubnub instance)
+        {
+            PubnubInstance = instance;
 
+            if (!ChannelRequest.ContainsKey(instance.InstanceId))
+            {
+                ChannelRequest.Add(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+            }
+            if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
+            {
+                ChannelInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
+            if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
+            {
+                ChannelGroupInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
+            if (!ChannelUserState.ContainsKey(instance.InstanceId))
+            {
+                ChannelUserState.Add(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
+            }
+            if (!ChannelGroupUserState.ContainsKey(instance.InstanceId))
+            {
+                ChannelGroupUserState.Add(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
+            }
+            if (!ChannelLocalUserState.ContainsKey(instance.InstanceId))
+            {
+                ChannelLocalUserState.Add(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
+            }
+            if (!ChannelGroupLocalUserState.ContainsKey(instance.InstanceId))
+            {
+                ChannelGroupLocalUserState.Add(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
+            }
+        }
     }
 }

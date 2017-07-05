@@ -16,21 +16,35 @@ namespace PubnubApi
         private static IJsonPluggableLibrary jsonLib;
         private static PNConfiguration pubnubConfig;
         private static IPubnubUnitTest unit = null;
+        private IPubnubLog pubnubLog = null;
 
         private static bool networkStatus = true;
 		private static bool machineSuspendMode = false;
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+        private static HttpClient httpClient = null;
+#endif
 
-        public ClientNetworkStatus(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary)
-        {
-            pubnubConfig = config;
-            jsonLib = jsonPluggableLibrary;
-        }
-
-        public ClientNetworkStatus(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit)
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+        public ClientNetworkStatus(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, HttpClient refHttpClient)
+#else
+        public ClientNetworkStatus(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log)
+#endif
         {
             pubnubConfig = config;
             jsonLib = jsonPluggableLibrary;
             unit = pubnubUnit;
+            pubnubLog = log;
+
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+            httpClient = refHttpClient;
+            if (httpClient == null)
+            {
+                httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Accept.Clear();
+                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                httpClient.Timeout = TimeSpan.FromSeconds(pubnubConfig.NonSubscribeRequestTimeout);
+            }
+#endif
         }
 
         private static ManualResetEvent mres = new ManualResetEvent(false);
@@ -72,7 +86,7 @@ namespace PubnubApi
                 catch (AggregateException ae) {
                     foreach (var ie in ae.InnerExceptions)
                     {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0} AggregateException CheckInternetStatus Error: {1} {2} ", DateTime.Now.ToString(), ie.GetType().Name, ie.Message), pubnubConfig.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} AggregateException CheckInternetStatus Error: {1} {2} ", DateTime.Now.ToString(), ie.GetType().Name, ie.Message), pubnubConfig.LogVerbosity);
                     }
                 }
 
@@ -100,7 +114,7 @@ namespace PubnubApi
             {
                 if (isInternetCheckRunning)
                 {
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0} InternetCheckRunning Already running", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} InternetCheckRunning Already running", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
                     return networkStatus;
                 }
             }
@@ -130,7 +144,7 @@ namespace PubnubApi
             {
                 isInternetCheckRunning = true;
             }
-            LoggingMethod.WriteToLog(string.Format("DateTime {0} CheckSocketConnect Entered", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} CheckSocketConnect Entered", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
 
             Action<bool> internalCallback = null;
             PNCallback<T> pubnubCallback = null;
@@ -150,27 +164,22 @@ namespace PubnubApi
                 channelGroups = state.ChannelGroups;
             }
 
-            PubnubApi.Interface.IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(pubnubConfig, jsonLib, unit);
+            PubnubApi.Interface.IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(pubnubConfig, jsonLib, unit, pubnubLog);
             Uri requestUri = urlBuilder.BuildTimeRequest();
             try
             {
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
-                HttpClient httpClient = new HttpClient();
-                httpClient.DefaultRequestHeaders.Accept.Clear();
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                httpClient.Timeout = TimeSpan.FromSeconds(pubnubConfig.NonSubscribeRequestTimeout);
-
                 var response = await httpClient.GetAsync(requestUri);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0} HttpClient CheckSocketConnect Resp {1}", DateTime.Now.ToString(), response.StatusCode.ToString()), pubnubConfig.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} HttpClient CheckSocketConnect Resp {1}", DateTime.Now.ToString(), response.StatusCode.ToString()), pubnubConfig.LogVerbosity);
                     networkStatus = true;
                     t.TrySetResult(true);
                 }
                 else
                 {
-                    LoggingMethod.WriteToLog(string.Format("DateTime {0} HttpClient CheckSocketConnect Resp {1}", DateTime.Now.ToString(), response.StatusCode.ToString()), pubnubConfig.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} HttpClient CheckSocketConnect Resp {1}", DateTime.Now.ToString(), response.StatusCode.ToString()), pubnubConfig.LogVerbosity);
                     networkStatus = false;
                     t.TrySetResult(false);
                 }
@@ -182,7 +191,7 @@ namespace PubnubApi
                 {
                     if (response != null && response.StatusCode == HttpStatusCode.OK)
                     {
-                        LoggingMethod.WriteToLog(string.Format("DateTime {0} WebRequest CheckSocketConnect Resp {1}", DateTime.Now.ToString(), response.StatusCode.ToString()), pubnubConfig.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} WebRequest CheckSocketConnect Resp {1}", DateTime.Now.ToString(), response.StatusCode.ToString()), pubnubConfig.LogVerbosity);
                         networkStatus = true;
                         t.TrySetResult(true);
                     }
@@ -192,7 +201,7 @@ namespace PubnubApi
             catch (Exception ex)
             {
                 networkStatus = false;
-                LoggingMethod.WriteToLog(string.Format("DateTime {0} CheckSocketConnect (HttpClient Or Task.Factory) Failed {1}", DateTime.Now.ToString(), ex.Message), pubnubConfig.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} CheckSocketConnect (HttpClient Or Task.Factory) Failed {1}", DateTime.Now.ToString(), ex.Message), pubnubConfig.LogVerbosity);
                 if (!networkStatus)
                 {
                     t.TrySetResult(false);
@@ -208,7 +217,7 @@ namespace PubnubApi
 		}
 
 
-        private static void ParseCheckSocketConnectException<T>(Exception ex, PNOperationType type, string[] channels, string[] channelGroups, PNCallback<T> callback, Action<bool> internalcallback)
+        private void ParseCheckSocketConnectException<T>(Exception ex, PNOperationType type, string[] channels, string[] channelGroups, PNCallback<T> callback, Action<bool> internalcallback)
 		{
             PNStatusCategory errorCategory = PNStatusCategoryHelper.GetPNStatusCategory(ex);
             StatusBuilder statusBuilder = new StatusBuilder(pubnubConfig, jsonLib);
@@ -219,7 +228,7 @@ namespace PubnubApi
                 callback.OnResponse(default(T), status);
             }
 
-			LoggingMethod.WriteToLog(string.Format("DateTime {0} ParseCheckSocketConnectException Error. {1}", DateTime.Now.ToString(), ex.Message), pubnubConfig.LogVerbosity);
+			LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} ParseCheckSocketConnectException Error. {1}", DateTime.Now.ToString(), ex.Message), pubnubConfig.LogVerbosity);
 			internalcallback(false);
 		}
 

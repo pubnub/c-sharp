@@ -11,13 +11,15 @@ namespace PubnubApi
     {
         private PNConfiguration config = null;
         private IJsonPluggableLibrary jsonLib = null;
+        private IPubnubLog pubnubLog = null;
         private static SecureMessage secureMessage;
 
-        public static SecureMessage Instance(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary)
+        public static SecureMessage Instance(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log)
         {
             secureMessage = new SecureMessage();
             secureMessage.config = pubnubConfig;
             secureMessage.jsonLib = jsonPluggableLibrary;
+            secureMessage.pubnubLog = log;
             return secureMessage;
         }
 
@@ -26,7 +28,7 @@ namespace PubnubApi
             List<object> returnMessage = new List<object>();
             if (config.CipherKey.Length > 0)
             {
-                PubnubCrypto aes = new PubnubCrypto(config.CipherKey, config);
+                PubnubCrypto aes = new PubnubCrypto(config.CipherKey, config, pubnubLog);
                 var myObjectArray = (from item in message
                                      select item as object).ToArray();
                 IEnumerable enumerable = myObjectArray[0] as IEnumerable;

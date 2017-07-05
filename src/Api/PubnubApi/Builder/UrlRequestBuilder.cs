@@ -12,24 +12,30 @@ namespace PubnubApi
         private PNConfiguration pubnubConfig = null;
         private IJsonPluggableLibrary jsonLib = null;
         private IPubnubUnitTest pubnubUnitTest = null;
+        private IPubnubLog pubnubLog = null;
+        private string pubnubInstanceId = "";
 
-        public UrlRequestBuilder(PNConfiguration config)
-        {
-            this.pubnubConfig = config;
-        }
-
-        public UrlRequestBuilder(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary)
-        {
-            this.pubnubConfig = config;
-            this.jsonLib = jsonPluggableLibrary;
-        }
-
-        public UrlRequestBuilder(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest)
+        public UrlRequestBuilder(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log)
         {
             this.pubnubConfig = config;
             this.jsonLib = jsonPluggableLibrary;
             this.pubnubUnitTest = pubnubUnitTest;
+            this.pubnubLog = log;
         }
+
+        string IUrlRequestBuilder.PubnubInstanceId
+        {
+            get
+            {
+                return pubnubInstanceId;
+            }
+
+            set
+            {
+                pubnubInstanceId = value;
+            }
+        }
+
 
         Uri IUrlRequestBuilder.BuildTimeRequest()
         {
@@ -718,7 +724,20 @@ namespace PubnubApi
             Dictionary<string, string> ret = new Dictionary<string, string>();
             ret.Add("uuid", this.pubnubConfig.Uuid);
             ret.Add("pnsdk", new UriUtil().EncodeUriComponent(Pubnub.Version, PNOperationType.PNSubscribeOperation, false, true));
-            ret.Add("requestid", requestid);
+
+            if (pubnubConfig != null)
+            {
+                if (pubnubConfig.IncludeRequestIdentifier)
+                {
+                    ret.Add("requestid", requestid);
+                }
+
+                if (pubnubConfig.IncludeInstanceIdentifier && !string.IsNullOrEmpty(pubnubInstanceId) && pubnubInstanceId.Trim().Length > 0)
+                {
+                    ret.Add("instanceid", pubnubInstanceId);
+                }
+            }
+
             if (!string.IsNullOrEmpty(pubnubConfig.SecretKey))
             {
                 ret.Add("timestamp", timeStamp.ToString());
@@ -745,7 +764,7 @@ namespace PubnubApi
             string_to_sign.Append(partialUrl.ToString()).Append("\n");
             string_to_sign.Append(queryStringToSign);
 
-            PubnubCrypto pubnubCrypto = new PubnubCrypto(this.pubnubConfig.CipherKey, this.pubnubConfig);
+            PubnubCrypto pubnubCrypto = new PubnubCrypto(this.pubnubConfig.CipherKey, this.pubnubConfig, this.pubnubLog);
             signature = pubnubCrypto.PubnubAccessManagerSign(this.pubnubConfig.SecretKey, string_to_sign.ToString());
             System.Diagnostics.Debug.WriteLine("string_to_sign = " + string_to_sign.ToString());
             System.Diagnostics.Debug.WriteLine("signature = " + signature);
@@ -847,7 +866,7 @@ namespace PubnubApi
 
             if (pubnubConfig.CipherKey.Length > 0)
             {
-                PubnubCrypto aes = new PubnubCrypto(pubnubConfig.CipherKey, pubnubConfig);
+                PubnubCrypto aes = new PubnubCrypto(pubnubConfig.CipherKey, pubnubConfig, pubnubLog);
                 string encryptMessage = aes.Encrypt(message);
                 message = jsonLib.SerializeToJsonString(encryptMessage);
             }
@@ -859,7 +878,7 @@ namespace PubnubApi
         private void ForceCanonicalPathAndQuery(Uri requestUri)
         {
 #if !NETSTANDARD10 && !NETSTANDARD11 && !NETSTANDARD12 && !WP81 && !PORTABLE111
-            LoggingMethod.WriteToLog("Inside ForceCanonicalPathAndQuery = " + requestUri.ToString(), pubnubConfig.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, "Inside ForceCanonicalPathAndQuery = " + requestUri.ToString(), pubnubConfig.LogVerbosity);
             try
             {
                 FieldInfo flagsFieldInfo = typeof(Uri).GetField("m_Flags", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -872,7 +891,7 @@ namespace PubnubApi
             }
             catch (Exception ex)
             {
-                LoggingMethod.WriteToLog("Exception Inside ForceCanonicalPathAndQuery = " + ex.ToString(), pubnubConfig.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, "Exception Inside ForceCanonicalPathAndQuery = " + ex.ToString(), pubnubConfig.LogVerbosity);
             }
 #endif
         }

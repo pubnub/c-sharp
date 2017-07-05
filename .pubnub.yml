@@ -1,8 +1,16 @@
 name: c-sharp
-version: "4.0.1.7"
+version: "4.0.2.0"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
+  - version: 4.0.2.0
+    changes:
+      - type: Improvement
+        text: Refactored code for application level grant
+      - type: Improvement
+        text: Refactored code to reuse HttpClient instance
+      - type: Improvement
+        text: Refactored code to handle Pubnub multi-instancing
   - version: 4.0.1.7
     changes:
       - type: Improvement
@@ -129,7 +137,7 @@ features:
     - SUBSCRIBE-PUBLISHER-UUID
 supported-platforms:
   - 
-    version: Pubnub 'C#' 4.0.1.3
+    version: Pubnub 'C#' 4.0.2.0
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
@@ -139,7 +147,7 @@ supported-platforms:
       - .Net Framework 4.5
       - .Net Framework 4.6.1
   - 
-    version: PubnubPCL 'C#' 4.0.1.3
+    version: PubnubPCL 'C#' 4.0.2.0
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -151,7 +159,7 @@ supported-platforms:
       - Mono 4.8.0
       - PCL Profile 111
   - 
-    version: PubnubUWP 'C#' 4.0.1.3
+    version: PubnubUWP 'C#' 4.0.2.0
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
