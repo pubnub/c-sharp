@@ -16,7 +16,7 @@ namespace PubnubApi
 
         private string instanceId = "";
 
-        private static string sdkVersion = "PubNubCSharp4.0.2.0";
+        private static string sdkVersion = "PubNubCSharp4.0.2.1";
 
         private object savedSubscribeOperation = null;
 

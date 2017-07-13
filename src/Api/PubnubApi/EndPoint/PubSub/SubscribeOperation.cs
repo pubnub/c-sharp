@@ -211,6 +211,10 @@ namespace PubnubApi.EndPoint
             {
                 LastSubscribeTimetoken.Add(instance.InstanceId, 0);
             }
+            if (!ChannelLocalClientHeartbeatTimer.ContainsKey(instance.InstanceId))
+            {
+                ChannelLocalClientHeartbeatTimer.Add(instance.InstanceId, new ConcurrentDictionary<Uri, Timer>());
+            }
         }
     }
 }

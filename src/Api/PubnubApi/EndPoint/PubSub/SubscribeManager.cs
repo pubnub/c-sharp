@@ -945,7 +945,7 @@ namespace PubnubApi.EndPoint
 
                         if (ChannelInternetStatus[PubnubInstance.InstanceId].ContainsKey(channel) && ChannelInternetStatus[PubnubInstance.InstanceId][channel])
                         {
-                            if (ChannelReconnectTimer.ContainsKey(channel))
+                            if (ChannelReconnectTimer[PubnubInstance.InstanceId].ContainsKey(channel))
                             {
                                 LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, {1} {2} terminating reconnectimer", DateTime.Now.ToString(), channel, netState.ResponseType), config.LogVerbosity);
                                 TerminateReconnectTimer();
