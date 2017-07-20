@@ -51,10 +51,10 @@ namespace PubnubApi.EndPoint
                         HttpWebRequest webRequest = ChannelRequest[PubnubInstance.InstanceId][multiChannelName];
                         ChannelRequest[PubnubInstance.InstanceId][multiChannelName] = null;
 
-                        if (webRequest != null)
-                        {
-                            TerminateLocalClientHeartbeatTimer(webRequest.RequestUri);
-                        }
+                        //if (webRequest != null)
+                        //{
+                        //    TerminateLocalClientHeartbeatTimer(webRequest.RequestUri);
+                        //}
 
                         HttpWebRequest removedRequest;
                         bool removedChannel = ChannelRequest[PubnubInstance.InstanceId].TryRemove(multiChannelName, out removedRequest);
@@ -188,10 +188,10 @@ namespace PubnubApi.EndPoint
                             HttpWebRequest webRequest = ChannelRequest[PubnubInstance.InstanceId][multiChannelName];
                             ChannelRequest[PubnubInstance.InstanceId][multiChannelName] = null;
 
-                            if (webRequest != null)
-                            {
-                                TerminateLocalClientHeartbeatTimer(webRequest.RequestUri);
-                            }
+                            //if (webRequest != null)
+                            //{
+                            //    TerminateLocalClientHeartbeatTimer(webRequest.RequestUri);
+                            //}
 
                             HttpWebRequest removedRequest;
                             bool removedChannel = ChannelRequest[PubnubInstance.InstanceId].TryRemove(multiChannelName, out removedRequest);
@@ -454,8 +454,8 @@ namespace PubnubApi.EndPoint
                                 HttpWebRequest webRequest = ChannelRequest[PubnubInstance.InstanceId][multiChannelName];
                                 ChannelRequest[PubnubInstance.InstanceId][multiChannelName] = null;
 
-                                if (webRequest != null)
-                                    TerminateLocalClientHeartbeatTimer(webRequest.RequestUri);
+                                //if (webRequest != null)
+                                //    TerminateLocalClientHeartbeatTimer(webRequest.RequestUri);
 
                                 HttpWebRequest removedRequest;
                                 bool removedChannel = ChannelRequest[PubnubInstance.InstanceId].TryRemove(multiChannelName, out removedRequest);

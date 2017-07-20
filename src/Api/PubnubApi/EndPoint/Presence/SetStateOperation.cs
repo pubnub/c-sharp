@@ -749,10 +749,6 @@ namespace PubnubApi.EndPoint
             {
                 ChannelGroupLocalUserState.Add(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
             }
-            if (!ChannelLocalClientHeartbeatTimer.ContainsKey(instance.InstanceId))
-            {
-                ChannelLocalClientHeartbeatTimer.Add(instance.InstanceId, new ConcurrentDictionary<Uri, Timer>());
-            }
         }
     }
 }
