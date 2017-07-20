@@ -1,6 +1,6 @@
 ﻿{
   "name": "Pubnub",
-  "version": "4.0.2.0",
+  "version": "4.0.2.2",
   "title": "PubNub C# .NET - Web Data Push API",
   "authors": [ "Pandu Masabathula" ],
   "packOptions": {
@@ -9,7 +9,7 @@
     "iconUrl": "http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png",
     "requireLicenseAcceptance": true,
     "repository": { "url": "https://github.com/pubnub/c-sharp/" },
-    "releaseNotes": "refactored code for application level grant, to reuse HttpClient instance and to handle Pubnub multi-instancing",
+    "releaseNotes": "code refactor to fix subscribe timeout and reconnect",
     "tags": [ "Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing" ],
     "summary": "PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously"
   },

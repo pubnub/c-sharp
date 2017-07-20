@@ -1,6 +1,6 @@
 ﻿{
   "name": "PubnubUWP",
-  "version": "4.0.2.0",
+  "version": "4.0.2.2",
   "title": "PubNub C# .NET - Web Data Push API",
   "authors": [
     "Pandu Masabathula"
@@ -15,7 +15,7 @@
     "repository": {
       "url": "https://github.com/pubnub/c-sharp/"
     },
-    "releaseNotes": "refactored code for application level grant, to reuse HttpClient instance and to handle Pubnub multi-instancing",
+    "releaseNotes": "code refactor to fix subscribe timeout and reconnect",
     "tags": [
       "Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing"
     ],

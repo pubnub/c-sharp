@@ -132,7 +132,6 @@ namespace PubnubApi.EndPoint
             {
                 ChannelGroupInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
             }
-
         }
     }
 }

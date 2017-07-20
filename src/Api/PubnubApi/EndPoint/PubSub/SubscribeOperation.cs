@@ -211,6 +211,10 @@ namespace PubnubApi.EndPoint
             {
                 LastSubscribeTimetoken.Add(instance.InstanceId, 0);
             }
+            if (!SubscribeRequestTracker.ContainsKey(instance.InstanceId))
+            {
+                SubscribeRequestTracker.Add(instance.InstanceId, DateTime.Now);
+            }
         }
     }
 }
