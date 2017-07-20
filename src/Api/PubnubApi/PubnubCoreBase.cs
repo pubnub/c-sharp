@@ -142,6 +142,12 @@ namespace PubnubApi
 
         protected static Dictionary<string, ConcurrentDictionary<Uri, Timer>> ChannelLocalClientHeartbeatTimer { get; set; } = new Dictionary<string, ConcurrentDictionary<Uri, Timer>>();
 
+        protected static ConcurrentDictionary<string, DateTime> SubscribeRequestTracker
+        {
+            get;
+            set;
+        } = new ConcurrentDictionary<string, DateTime>();
+
         public PubnubCoreBase(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log)
         {
             if (pubnubConfiguation == null)
@@ -804,6 +810,7 @@ namespace PubnubApi
 
                 if (ChannelRequest.ContainsKey(PubnubInstance.InstanceId) && !ChannelRequest[PubnubInstance.InstanceId].ContainsKey(channel) && (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation || pubnubRequestState.ResponseType == PNOperationType.Presence))
                 {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, UrlProcessRequest ChannelRequest PubnubInstance.InstanceId Channel NOT matching", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
                     return "";
                 }
 
@@ -844,6 +851,11 @@ namespace PubnubApi
                 }
 
                 LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Request={1}", DateTime.Now.ToString(), requestUri.ToString()), pubnubConfig.LogVerbosity);
+
+                if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
+                {
+                    SubscribeRequestTracker.AddOrUpdate(PubnubInstance.InstanceId, DateTime.Now, (key, oldState) => DateTime.Now);
+                }
 
                 string jsonString = "";
                 if (pubnubRequestState.UsePostMethod)

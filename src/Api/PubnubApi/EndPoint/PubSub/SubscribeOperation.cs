@@ -215,6 +215,10 @@ namespace PubnubApi.EndPoint
             {
                 ChannelLocalClientHeartbeatTimer.Add(instance.InstanceId, new ConcurrentDictionary<Uri, Timer>());
             }
+            if (!SubscribeRequestTracker.ContainsKey(instance.InstanceId))
+            {
+                SubscribeRequestTracker.Add(instance.InstanceId, DateTime.Now);
+            }
         }
     }
 }
