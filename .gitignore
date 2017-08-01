@@ -45,6 +45,12 @@
 /src/Examples/PubnubApi.ConsoleExample/obj/Release/*
 /src/Examples/PubnubApi.ConsoleExample/*.user
 
+/src/Examples/PubnubApi.WinFormExample/bin/Debug/*
+/src/Examples/PubnubApi.WinFormExample/obj/Debug/*
+/src/Examples/PubnubApi.WinFormExample/bin/Release/*
+/src/Examples/PubnubApi.WinFormExample/obj/Release/*
+/src/Examples/PubnubApi.WinFormExample/*.user
+
 /src/Examples/PubnubApiPCL.ConsoleExample/bin/Debug/*
 /src/Examples/PubnubApiPCL.ConsoleExample/obj/Debug/*
 /src/Examples/PubnubApiPCL.ConsoleExample/bin/Release/*
