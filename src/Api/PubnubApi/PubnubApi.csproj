@@ -1,0 +1,95 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!--<TargetFrameworks>net35;net40;net45;net461</TargetFrameworks>-->
+    <TargetFrameworks>net35;net40;net45;net461</TargetFrameworks>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>pubnub.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>False</DelaySign>
+    <IncludeSymbols>False</IncludeSymbols>
+    <AssemblyTitle>PubNub C# .NET - Web Data Push API</AssemblyTitle>
+    <AssemblyName>Pubnub</AssemblyName>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>Pubnub</PackageId>
+    <PackageVersion>4.0.2.3</PackageVersion>
+    <Title>PubNub C# .NET - Web Data Push API</Title>
+    <Authors>Pandu Masabathula</Authors>
+    <Owners>PubNub</Owners>
+    <PackageLicenseUrl>http://www.pubnub.com/terms</PackageLicenseUrl>
+    <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
+    <PackageReleaseNotes>subscribe connect status callback. message null value check for publish</PackageReleaseNotes>
+    <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
+    <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
+    <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
+    <Copyright>PubNub 2012-2017</Copyright>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net35' ">
+    <DefineConstants>$(DefineConstants);NET35</DefineConstants>
+    <FrameworkPathOverride>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v3.5\Profile\Client</FrameworkPathOverride>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net40' ">
+    <DefineConstants>$(DefineConstants);NET40</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <DefineConstants>$(DefineConstants);NET45</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <DefineConstants>$(DefineConstants);NET461</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net35'">
+    <PackageReference Include="AsyncBridge.Net35">
+      <Version>0.2.0</Version>
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Threading.dll">
+      <Version>1.0.2856</Version>
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="TaskParallelLibrary">
+      <Version>1.0.2856</Version>
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <Reference Include="System" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
+    <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="AsyncBridge.JetBrains" Version="0.1.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
+    <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
+    <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+</Project>

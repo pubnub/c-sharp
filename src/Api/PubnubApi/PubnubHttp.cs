@@ -230,7 +230,7 @@ namespace PubnubApi
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
                 {
                     //Need to return this response 
-#if NET35
+#if NET35 || NET40
                     string jsonString = streamReader.ReadToEnd();
 #else
                     string jsonString = await streamReader.ReadToEndAsync();
@@ -260,7 +260,7 @@ namespace PubnubApi
                     using (StreamReader streamReader = new StreamReader(ex.Response.GetResponseStream()))
                     {
                         //Need to return this response 
-#if NET35
+#if NET35 || NET40
                         string jsonString = streamReader.ReadToEnd();
 #else
                         string jsonString = await streamReader.ReadToEndAsync();
@@ -332,7 +332,7 @@ namespace PubnubApi
                 //request.ContentLength = data.Length;
                 using (var requestStream = await Task<Stream>.Factory.FromAsync(request.BeginGetRequestStream, request.EndGetRequestStream, pubnubRequestState))
                 {
-#if NET35
+#if NET35 || NET40
                     requestStream.Write(data, 0, data.Length);
                     requestStream.Flush();
 #else
@@ -348,7 +348,7 @@ namespace PubnubApi
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
                 {
                     //Need to return this response 
-#if NET35
+#if NET35 || NET40
                     string jsonString = streamReader.ReadToEnd();
 #else
                     string jsonString = await streamReader.ReadToEndAsync();
@@ -378,7 +378,7 @@ namespace PubnubApi
                     using (StreamReader streamReader = new StreamReader(ex.Response.GetResponseStream()))
                     {
                         //Need to return this response 
-#if NET35
+#if NET35 || NET40
                         string jsonString = streamReader.ReadToEnd();
 #else
                         string jsonString = await streamReader.ReadToEndAsync();
@@ -457,7 +457,7 @@ namespace PubnubApi
                     using (StreamReader streamReader = new StreamReader(ex.Response.GetResponseStream()))
                     {
                         //Need to return this response 
-#if NET35
+#if NET35 || NET40
                         await Task.Factory.StartNew(() => { });
                         string jsonString = streamReader.ReadToEnd();
 #else
@@ -555,7 +555,7 @@ namespace PubnubApi
                     using (StreamReader streamReader = new StreamReader(ex.Response.GetResponseStream()))
                     {
                         //Need to return this response 
-#if NET35
+#if NET35 || NET40
                         await Task.Factory.StartNew(() => { });
                         string jsonString = streamReader.ReadToEnd();
 #else
