@@ -262,6 +262,35 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, currentType, queryParams);
         }
 
+        Uri IUrlRequestBuilder.BuildDeleteMessageRequest(string channel, long start, long end)
+        {
+            PNOperationType currentType = PNOperationType.PNDeleteMessageOperation;
+
+            List<string> url = new List<string>();
+            url.Add("v3");
+            url.Add("history");
+            url.Add("sub-key");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("channel");
+            url.Add(channel);
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            if (start != -1)
+            {
+                requestQueryStringParams.Add("start", start.ToString().ToLower());
+            }
+            if (end != -1)
+            {
+                requestQueryStringParams.Add("end", end.ToString().ToLower());
+            }
+
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+        }
+
         Uri IUrlRequestBuilder.BuildWhereNowRequest(string uuid)
         {
             PNOperationType currentType = PNOperationType.PNWhereNowOperation;
@@ -775,38 +804,45 @@ namespace PubnubApi
         {
             string queryString = "";
 
-            if (queryStringParamDic == null)
+            try
             {
-                queryStringParamDic = new Dictionary<string, string>();
-            }
-
-            Dictionary<string, string> commonQueryStringParams = GenerateCommonQueryParams(type);
-            Dictionary<string, string> queryStringParams = new Dictionary<string, string>(commonQueryStringParams.Concat(queryStringParamDic).GroupBy(item => item.Key).ToDictionary(item => item.Key, item => item.First().Value));
-
-            string queryToSign = string.Join("&", queryStringParams.OrderBy(kvp => kvp.Key).Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value)).ToArray());
-
-            if (this.pubnubConfig.SecretKey.Length > 0)
-            {
-                StringBuilder partialUrl = new StringBuilder();
-                for (int componentIndex = 0; componentIndex < urlComponentList.Count; componentIndex++)
+                if (queryStringParamDic == null)
                 {
-                    partialUrl.Append("/");
-                    if (type == PNOperationType.PNPublishOperation && componentIndex == urlComponentList.Count - 1)
-                    {
-                        partialUrl.Append(new UriUtil().EncodeUriComponent(urlComponentList[componentIndex].ToString(), type, false, false));
-                    }
-                    else
-                    {
-                        partialUrl.Append(new UriUtil().EncodeUriComponent(urlComponentList[componentIndex].ToString(), type, true, false));
-                    }
+                    queryStringParamDic = new Dictionary<string, string>();
                 }
 
-                string signature = GenerateSignature(type, queryToSign, partialUrl.ToString());
-                queryString = string.Format("{0}&signature={1}", queryToSign, signature);
+                Dictionary<string, string> commonQueryStringParams = GenerateCommonQueryParams(type);
+                Dictionary<string, string> queryStringParams = new Dictionary<string, string>(commonQueryStringParams.Concat(queryStringParamDic).GroupBy(item => item.Key).ToDictionary(item => item.Key, item => item.First().Value));
+
+                string queryToSign = string.Join("&", queryStringParams.OrderBy(kvp => kvp.Key).Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value)).ToArray());
+
+                if (this.pubnubConfig.SecretKey.Length > 0)
+                {
+                    StringBuilder partialUrl = new StringBuilder();
+                    for (int componentIndex = 0; componentIndex < urlComponentList.Count; componentIndex++)
+                    {
+                        partialUrl.Append("/");
+                        if (type == PNOperationType.PNPublishOperation && componentIndex == urlComponentList.Count - 1)
+                        {
+                            partialUrl.Append(new UriUtil().EncodeUriComponent(urlComponentList[componentIndex].ToString(), type, false, false));
+                        }
+                        else
+                        {
+                            partialUrl.Append(new UriUtil().EncodeUriComponent(urlComponentList[componentIndex].ToString(), type, true, false));
+                        }
+                    }
+
+                    string signature = GenerateSignature(type, queryToSign, partialUrl.ToString());
+                    queryString = string.Format("{0}&signature={1}", queryToSign, signature);
+                }
+                else
+                {
+                    queryString = queryToSign;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                queryString = queryToSign;
+                LoggingMethod.WriteToLog(pubnubLog, "UrlRequestBuilder => BuildQueryString error " + ex.ToString(), pubnubConfig.LogVerbosity);
             }
 
             return queryString;

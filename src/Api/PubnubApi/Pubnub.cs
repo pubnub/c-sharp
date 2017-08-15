@@ -65,7 +65,14 @@ namespace PubnubApi
             return historyOperaton;
         }
 
-		public EndPoint.HereNowOperation HereNow()
+        public EndPoint.DeleteMessageOperation DeleteMessages()
+        {
+            EndPoint.DeleteMessageOperation deleteMessageOperaton = new EndPoint.DeleteMessageOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog);
+            deleteMessageOperaton.CurrentPubnubInstance(this);
+            return deleteMessageOperaton;
+        }
+
+        public EndPoint.HereNowOperation HereNow()
 		{
             EndPoint.HereNowOperation hereNowOperation = new EndPoint.HereNowOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog);
             hereNowOperation.CurrentPubnubInstance(this);

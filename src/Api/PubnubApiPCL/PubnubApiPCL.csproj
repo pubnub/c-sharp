@@ -13,7 +13,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubPCL</PackageId>
-    <PackageVersion>4.0.2.3</PackageVersion>
+    <PackageVersion>4.0.3.1</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -21,7 +21,7 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Migrated VS 2015 projects to VS 2017. Added exception handler to Unsubscribe.</PackageReleaseNotes>
+    <PackageReleaseNotes>Migrated VS 2015 projects to VS 2017. Added exception handlers to Unsubscribe and query builder functionality. Added DeleteMessages feature.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -118,6 +118,7 @@
     <Compile Include="..\PubnubApi\EndPoint\ChannelGroup\RemoveChannelsFromChannelGroupOperation.cs">
       <Link>EndPoint\ChannelGroup\RemoveChannelsFromChannelGroupOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DeleteMessageOperation.cs" Link="EndPoint\DeleteMessageOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\HistoryOperation.cs">
       <Link>EndPoint\HistoryOperation.cs</Link>
     </Compile>
@@ -256,6 +257,7 @@
     <Compile Include="..\PubnubApi\Model\Consumer\ChannelGroup\PNChannelGroupsRemoveChannelResult.cs">
       <Link>Model\Consumer\ChannelGroup\PNChannelGroupsRemoveChannelResult.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\DeleteMessage\PNDeleteMessageResult.cs" Link="Model\Consumer\DeleteMessage\PNDeleteMessageResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\History\PNHistoryItemResult.cs">
       <Link>Model\Consumer\History\PNHistoryItemResult.cs</Link>
     </Compile>
@@ -331,6 +333,7 @@
     <Compile Include="..\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsRemoveChannelResultExt.cs">
       <Link>Model\Derived\ChannelGroup\PNChannelGroupsRemoveChannelResultExt.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\DeleteMessage\PNDeleteMessageResultExt.cs" Link="Model\Derived\DeleteMessage\PNDeleteMessageResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\History\PNHistoryResultExt.cs">
       <Link>Model\Derived\History\PNHistoryResultExt.cs</Link>
     </Compile>
@@ -652,12 +655,14 @@
     <Folder Include="Model\Consumer\AccessManager\" />
     <Folder Include="Model\Consumer\ChannelGroup\" />
     <Folder Include="Model\Consumer\History\" />
+    <Folder Include="Model\Consumer\DeleteMessage\" />
     <Folder Include="Model\Consumer\Push\" />
     <Folder Include="Model\Consumer\Pubsub\" />
     <Folder Include="Model\Consumer\Presence\" />
     <Folder Include="Model\Derived\AccessManager\" />
     <Folder Include="Model\Derived\ChannelGroup\" />
     <Folder Include="Model\Derived\History\" />
+    <Folder Include="Model\Derived\DeleteMessage\" />
     <Folder Include="Model\Derived\Push\" />
     <Folder Include="Model\Derived\Pubsub\" />
     <Folder Include="Model\Derived\Presence\" />

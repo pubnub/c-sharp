@@ -135,6 +135,9 @@
     <Compile Include="..\..\Api\PubnubApi\EndPoint\ChannelGroup\RemoveChannelsFromChannelGroupOperation.cs">
       <Link>LinkedSourceCode\EndPoint\ChannelGroup\RemoveChannelsFromChannelGroupOperation.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\DeleteMessageOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\DeleteMessageOperation.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\EndPoint\HistoryOperation.cs">
       <Link>LinkedSourceCode\EndPoint\HistoryOperation.cs</Link>
     </Compile>
@@ -273,6 +276,9 @@
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\ChannelGroup\PNChannelGroupsRemoveChannelResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\ChannelGroup\PNChannelGroupsRemoveChannelResult.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\DeleteMessage\PNDeleteMessageResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\DeleteMessage\PNDeleteMessageResult.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\History\PNHistoryItemResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\History\PNHistoryItemResult.cs</Link>
     </Compile>
@@ -347,6 +353,9 @@
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsRemoveChannelResultExt.cs">
       <Link>LinkedSourceCode\Model\Derived\ChannelGroup\PNChannelGroupsRemoveChannelResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\DeleteMessage\PNDeleteMessageResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\DeleteMessage\PNDeleteMessageResultExt.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Derived\History\PNHistoryResultExt.cs">
       <Link>LinkedSourceCode\Model\Derived\History\PNHistoryResultExt.cs</Link>
