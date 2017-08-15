@@ -481,6 +481,7 @@
     <Compile Include="WhenGetRequestServerTimeMultiInstance.cs" />
     <Compile Include="WhenGetRequestServerTime.cs" />
     <Compile Include="WhenGrantIsRequested.cs" />
+    <Compile Include="WhenMessageDeletedFromChannel.cs" />
     <Compile Include="WhenPushIsRequested.cs" />
     <Compile Include="WhenSubscribedToAChannel.cs" />
     <Compile Include="WhenSubscribedToAChannel2.cs" />
