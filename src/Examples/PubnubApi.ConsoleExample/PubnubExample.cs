@@ -323,6 +323,7 @@ namespace PubnubApiDemo
                     Console.WriteLine("Enter 20 FOR UnsubscribeAll");
                     Console.WriteLine("Enter 21 FOR GetSubscribeChannels");
                     Console.WriteLine("Enter 22 FOR GetSubscribeChannelGroups");
+                    Console.WriteLine("Enter 23 FOR DeleteMessages");
                     Console.WriteLine("Enter 31 FOR Push - Register Device");
                     Console.WriteLine("Enter 32 FOR Push - Remove Channel");
                     Console.WriteLine("Enter 33 FOR Push - Get Current Channels");
@@ -1074,6 +1075,20 @@ namespace PubnubApiDemo
                         {
                             Console.WriteLine("No channelgroups");
                         }
+                        break;
+                    case "23":
+                        Console.WriteLine("Enter channel name: ");
+                        //Console.WriteLine("NOTE: If you want to consider only Channel Group, just hit ENTER");
+                        string deleteMessageChannel = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}", deleteMessageChannel));
+                        Console.ResetColor();
+                        pubnub.DeleteMessages().Channel(deleteMessageChannel) //.Start(15021998840118350).End(15026815715586992)
+                            .Async(new PNDeleteMessageResultExt(
+                                (r, s) => {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                }));
+
                         break;
                     case "31":
                         Console.WriteLine("Enter channel name");

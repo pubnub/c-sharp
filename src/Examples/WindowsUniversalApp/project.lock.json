@@ -319,10 +319,10 @@
           "lib/netstandard1.3/crypto.dll": {}
         }
       },
-      "PubnubUWP/4.0.2": {
+      "PubnubUWP/4.0.3.1": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.3",
           "Newtonsoft.Json": "9.0.1",
           "Portable.BouncyCastle": "1.8.1.1"
         },
@@ -2455,10 +2455,10 @@
           "lib/netstandard1.3/crypto.dll": {}
         }
       },
-      "PubnubUWP/4.0.2": {
+      "PubnubUWP/4.0.3.1": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.3",
           "Newtonsoft.Json": "9.0.1",
           "Portable.BouncyCastle": "1.8.1.1"
         },
@@ -4752,10 +4752,10 @@
           "lib/netstandard1.3/crypto.dll": {}
         }
       },
-      "PubnubUWP/4.0.2": {
+      "PubnubUWP/4.0.3.1": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.3",
           "Newtonsoft.Json": "9.0.1",
           "Portable.BouncyCastle": "1.8.1.1"
         },
@@ -7089,10 +7089,10 @@
           "lib/netstandard1.3/crypto.dll": {}
         }
       },
-      "PubnubUWP/4.0.2": {
+      "PubnubUWP/4.0.3.1": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.3",
           "Newtonsoft.Json": "9.0.1",
           "Portable.BouncyCastle": "1.8.1.1"
         },
@@ -9395,10 +9395,10 @@
           "lib/netstandard1.3/crypto.dll": {}
         }
       },
-      "PubnubUWP/4.0.2": {
+      "PubnubUWP/4.0.3.1": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.3",
           "Newtonsoft.Json": "9.0.1",
           "Portable.BouncyCastle": "1.8.1.1"
         },
@@ -11738,10 +11738,10 @@
           "lib/netstandard1.3/crypto.dll": {}
         }
       },
-      "PubnubUWP/4.0.2": {
+      "PubnubUWP/4.0.3.1": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.3",
           "Newtonsoft.Json": "9.0.1",
           "Portable.BouncyCastle": "1.8.1.1"
         },
@@ -14044,10 +14044,10 @@
           "lib/netstandard1.3/crypto.dll": {}
         }
       },
-      "PubnubUWP/4.0.2": {
+      "PubnubUWP/4.0.3.1": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.3",
           "Newtonsoft.Json": "9.0.1",
           "Portable.BouncyCastle": "1.8.1.1"
         },
@@ -16466,12 +16466,12 @@
         "portable.bouncycastle.nuspec"
       ]
     },
-    "PubnubUWP/4.0.2": {
-      "sha512": "peBrua+jr7CABNYnXBedZ4MKm7+r2yS/RvSpnMTwIbU8vuqoyyWBobsik97UDVZrLpBPeIxmCjQox27Edb0WtA==",
+    "PubnubUWP/4.0.3.1": {
+      "sha512": "Av2t1Hmnxpc/rhc4Gf0cwkVQCMYDRq00ouOq0NzeiiA7WH2hJ3mIfPwAjpf9FOjLNPqXh/3GmjEACQkZs5cyhw==",
       "type": "package",
-      "path": "PubnubUWP/4.0.2",
+      "path": "PubnubUWP/4.0.3.1",
       "files": [
-        "PubnubUWP.4.0.2.nupkg.sha512",
+        "PubnubUWP.4.0.3.1.nupkg.sha512",
         "PubnubUWP.nuspec",
         "lib/uap10.0/PubnubUWP.dll"
       ]
@@ -22344,7 +22344,7 @@
   "projectFileDependencyGroups": {
     "": [
       "Microsoft.NETCore.UniversalWindowsPlatform >= 5.2.2",
-      "PubnubUWP >= 4.0.2"
+      "PubnubUWP >= 4.0.3.1"
     ],
     "UAP,Version=v10.0": []
   },
