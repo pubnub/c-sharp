@@ -664,6 +664,7 @@ namespace PubnubApi
                 case PNOperationType.PNPublishOperation:
                 case PNOperationType.PNFireOperation:
                 case PNOperationType.PNHistoryOperation:
+                case PNOperationType.PNDeleteMessageOperation:
                 case PNOperationType.PNHereNowOperation:
                 case PNOperationType.PNWhereNowOperation:
                 case PNOperationType.PNAccessManagerGrant:

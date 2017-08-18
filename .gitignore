@@ -3,6 +3,7 @@
 /src/Api/PubnubApiPCL/bin/*
 /src/Api/PubnubApiPCL/obj/Debug/*
 /src/Api/PubnubApiPCL/obj/Release/*
+/src/Api/PubnubApiPCL/obj/*
 /src/Api/PubnubApiPCL/bin/Debug/*
 /src/Api/PubnubApiPCL/bin/Release/*
 /src/Api/PubnubApiPCL/*.user
@@ -12,6 +13,7 @@
 /src/Api/PubnubApi/obj/Debug/*
 /src/Api/PubnubApi/bin/Release/*
 /src/Api/PubnubApi/obj/Release/*
+/src/Api/PubnubApi/obj/*
 /src/Api/PubnubApi/*.user
 
 /src/Api/PubnubApiUWP/bin/*
@@ -19,6 +21,7 @@
 /src/Api/PubnubApiUWP/obj/Debug/*
 /src/Api/PubnubApiUWP/bin/Release/*
 /src/Api/PubnubApiUWP/obj/Release/*
+/src/Api/PubnubApiUWP/obj/*
 /src/Api/PubnubApiUWP/*.user
 
 /src/packages/*

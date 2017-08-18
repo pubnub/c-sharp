@@ -1,8 +1,16 @@
 name: c-sharp
-version: "4.0.2.2"
+version: "4.0.3.1"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
+  - version: 4.0.3.1
+    changes:
+      - type: Improvement
+        text: Refactored code to handle exception in Unsubscribe and query builder functionality
+      - type: Improvement
+        text: Migrated source code from VS 2015 to VS 2017
+      - type: Improvement
+        text: Added DeleteMessages feature
   - version: 4.0.2.2
     changes:
       - type: Improvement
@@ -141,7 +149,7 @@ features:
     - SUBSCRIBE-PUBLISHER-UUID
 supported-platforms:
   - 
-    version: Pubnub 'C#' 4.0.2.2
+    version: Pubnub 'C#' 4.0.3.1
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
@@ -151,7 +159,7 @@ supported-platforms:
       - .Net Framework 4.5
       - .Net Framework 4.6.1
   - 
-    version: PubnubPCL 'C#' 4.0.2.2
+    version: PubnubPCL 'C#' 4.0.3.1
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -163,7 +171,7 @@ supported-platforms:
       - Mono 4.8.0
       - PCL Profile 111
   - 
-    version: PubnubUWP 'C#' 4.0.2.2
+    version: PubnubUWP 'C#' 4.0.3.1
     platforms:
       - Windows Phone 10
       - Universal Windows Apps

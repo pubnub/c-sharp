@@ -145,6 +145,10 @@ namespace PubnubApi
                 {
                     response = await httpClientSubscribe.GetAsync(requestUri);
                 }
+                else if (pubnubRequestState.ResponseType == PNOperationType.PNDeleteMessageOperation)
+                {
+                    response = await httpClientNonsubscribe.DeleteAsync(requestUri);
+                }
                 else
                 {
                     response = await httpClientNonsubscribe.GetAsync(requestUri);
@@ -222,7 +226,7 @@ namespace PubnubApi
             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Inside SendRequestAndGetJsonResponseTaskFactory", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
             try
             {
-                request.Method = "GET";
+                request.Method = (pubnubRequestState != null && pubnubRequestState.ResponseType == PNOperationType.PNDeleteMessageOperation) ? "DELETE" : "GET";
                 Timer webRequestTimer = new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000, Timeout.Infinite);
                 response = await Task.Factory.FromAsync<HttpWebResponse>(request.BeginGetResponse, asyncPubnubResult => (HttpWebResponse)request.EndGetResponse(asyncPubnubResult), pubnubRequestState);
                 pubnubRequestState.Response = response;
@@ -230,7 +234,7 @@ namespace PubnubApi
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
                 {
                     //Need to return this response 
-#if NET35
+#if NET35 || NET40
                     string jsonString = streamReader.ReadToEnd();
 #else
                     string jsonString = await streamReader.ReadToEndAsync();
@@ -260,7 +264,7 @@ namespace PubnubApi
                     using (StreamReader streamReader = new StreamReader(ex.Response.GetResponseStream()))
                     {
                         //Need to return this response 
-#if NET35
+#if NET35 || NET40
                         string jsonString = streamReader.ReadToEnd();
 #else
                         string jsonString = await streamReader.ReadToEndAsync();
@@ -332,7 +336,7 @@ namespace PubnubApi
                 //request.ContentLength = data.Length;
                 using (var requestStream = await Task<Stream>.Factory.FromAsync(request.BeginGetRequestStream, request.EndGetRequestStream, pubnubRequestState))
                 {
-#if NET35
+#if NET35 || NET40
                     requestStream.Write(data, 0, data.Length);
                     requestStream.Flush();
 #else
@@ -348,7 +352,7 @@ namespace PubnubApi
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
                 {
                     //Need to return this response 
-#if NET35
+#if NET35 || NET40
                     string jsonString = streamReader.ReadToEnd();
 #else
                     string jsonString = await streamReader.ReadToEndAsync();
@@ -378,7 +382,7 @@ namespace PubnubApi
                     using (StreamReader streamReader = new StreamReader(ex.Response.GetResponseStream()))
                     {
                         //Need to return this response 
-#if NET35
+#if NET35 || NET40
                         string jsonString = streamReader.ReadToEnd();
 #else
                         string jsonString = await streamReader.ReadToEndAsync();
@@ -410,7 +414,7 @@ namespace PubnubApi
             var taskComplete = new TaskCompletionSource<string>();
             try
             {
-                request.Method = "GET";
+                request.Method = (pubnubRequestState != null && pubnubRequestState.ResponseType == PNOperationType.PNDeleteMessageOperation) ? "DELETE" : "GET";
                 System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Before BeginGetResponse", DateTime.Now.ToString()));
                 IAsyncResult asyncResult = request.BeginGetResponse(new AsyncCallback(
                     (asynchronousResult) => {
@@ -457,7 +461,7 @@ namespace PubnubApi
                     using (StreamReader streamReader = new StreamReader(ex.Response.GetResponseStream()))
                     {
                         //Need to return this response 
-#if NET35
+#if NET35 || NET40
                         await Task.Factory.StartNew(() => { });
                         string jsonString = streamReader.ReadToEnd();
 #else
@@ -555,7 +559,7 @@ namespace PubnubApi
                     using (StreamReader streamReader = new StreamReader(ex.Response.GetResponseStream()))
                     {
                         //Need to return this response 
-#if NET35
+#if NET35 || NET40
                         await Task.Factory.StartNew(() => { });
                         string jsonString = streamReader.ReadToEnd();
 #else

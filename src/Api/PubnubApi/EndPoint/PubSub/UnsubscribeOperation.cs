@@ -53,7 +53,7 @@ namespace PubnubApi.EndPoint
             string channel = (channels != null) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
             string channelGroup = (channelGroups != null) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
 
-            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, requested unsubscribe for channel(s)={1}", DateTime.Now.ToString(), channel), config.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, requested unsubscribe for channel(s)={1}, cg(s)={2}", DateTime.Now.ToString(), channel, channelGroup), config.LogVerbosity);
             Task.Factory.StartNew(() =>
             {
                 SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog);
@@ -66,6 +66,14 @@ namespace PubnubApi.EndPoint
         {
             PubnubInstance = instance;
 
+            if (!MultiChannelSubscribe.ContainsKey(instance.InstanceId))
+            {
+                MultiChannelSubscribe.Add(instance.InstanceId, new ConcurrentDictionary<string, long>());
+            }
+            if (!MultiChannelGroupSubscribe.ContainsKey(instance.InstanceId))
+            {
+                MultiChannelGroupSubscribe.Add(instance.InstanceId, new ConcurrentDictionary<string, long>());
+            }
             if (!ChannelRequest.ContainsKey(instance.InstanceId))
             {
                 ChannelRequest.Add(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());

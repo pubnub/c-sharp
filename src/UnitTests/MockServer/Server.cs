@@ -283,6 +283,11 @@ namespace MockServer
                                         item.Response = "[1,\"Sent\",\"14715322883933786\"]";
                                         item.StatusCode = HttpStatusCode.OK;
                                     }
+                                    else if(path.Contains("DELETE /v3/history/sub-key"))
+                                    {
+                                        item.Response = "{\"status\": 200, \"error\": false, \"error_message\": \"\"}";
+                                        item.StatusCode = HttpStatusCode.OK;
+                                    }
                                     else
                                     {
                                         item.Response = "";

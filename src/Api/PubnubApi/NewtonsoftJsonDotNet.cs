@@ -803,6 +803,13 @@ namespace PubnubApi
                 ret = (T)Convert.ChangeType(ack, typeof(PNHistoryResult), CultureInfo.InvariantCulture);
 #endregion
             }
+            else if (typeof(T) == typeof(PNDeleteMessageResult))
+            {
+#region "PNDeleteMessageResult"
+                PNDeleteMessageResult ack = new PNDeleteMessageResult();
+                ret = (T)Convert.ChangeType(ack, typeof(PNDeleteMessageResult), CultureInfo.InvariantCulture);
+#endregion
+            }
             else if (typeof(T) == typeof(PNHereNowResult))
             {
 #region "PNHereNowResult"
