@@ -4,6 +4,7 @@ schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
   - version: 4.0.3.1
+    date: Aug 18, 17
     changes:
       - type: Improvement
         text: Refactored code to handle exception in Unsubscribe and query builder functionality
@@ -12,10 +13,12 @@ changelog:
       - type: Improvement
         text: Added DeleteMessages feature
   - version: 4.0.2.2
+    date: Jul 20, 17
     changes:
       - type: Improvement
         text: Code refactor to fix subscribe timeout and reconnect
   - version: 4.0.2.0
+    date: Jul 05, 17
     changes:
       - type: Improvement
         text: Refactored code for application level grant
@@ -24,26 +27,31 @@ changelog:
       - type: Improvement
         text: Refactored code to handle Pubnub multi-instancing
   - version: 4.0.1.7
+    date: Jun 07, 17
     changes:
       - type: Improvement
         text: Fix for publish with UsePOST and cipher key
       - type: Improvement
         text: Handling object array for History response
   - version: 4.0.1.6
+    date: Apr 15, 17
     changes:
       - type: Improvement
         text: Fix for subscribe connect status callback
       - type: Improvement
         text: Message null value check for publish
   - version: 4.0.1.5
+    date: Apr 06, 17
     changes:
       - type: Improvement
         text: Refactored to handle thread blocking
   - version: 4.0.1.4
+    date: Mar 31, 17
     changes:
       - type: Improvement
         text: Fix to support Xamarin.Android Pubnub SDK install using Visual Studio
   - version: 4.0.1.3
+    date: Mar 29, 17
     changes:
       - type: Improvement
         text: Added code to handle presence interval event
