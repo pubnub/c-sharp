@@ -1,5 +1,7 @@
 .settings
 *~
+src/.vs/Pubnub/v15/sqlite3/storage.ide
+
 /src/Api/PubnubApiPCL/bin/*
 /src/Api/PubnubApiPCL/obj/Debug/*
 /src/Api/PubnubApiPCL/obj/Release/*

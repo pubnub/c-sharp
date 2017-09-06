@@ -736,7 +736,7 @@ namespace PubnubApi
                             List<object> timeoutDeltaList = presenceDicObj["timeout"] as List<object>;
                             if (timeoutDeltaList != null && timeoutDeltaList.Count > 0)
                             {
-                                ack.Timeout = timeoutDeltaList.Select(x => x.ToString()).ToArray(); ;
+                                ack.Timeout = timeoutDeltaList.Select(x => x.ToString()).ToArray();
                             }
                         }
                         if (presenceDicObj.ContainsKey("leave"))
@@ -744,10 +744,24 @@ namespace PubnubApi
                             List<object> leaveDeltaList = presenceDicObj["leave"] as List<object>;
                             if (leaveDeltaList != null && leaveDeltaList.Count > 0)
                             {
-                                ack.Leave = leaveDeltaList.Select(x => x.ToString()).ToArray(); ;
+                                ack.Leave = leaveDeltaList.Select(x => x.ToString()).ToArray();
                             }
                         }
+                        if (presenceDicObj.ContainsKey("here_now_refresh"))
+                        {
+                            string hereNowRefreshStr = presenceDicObj["here_now_refresh"].ToString();
+                            if (!string.IsNullOrEmpty(hereNowRefreshStr))
+                            {
+                                bool boolHereNowRefresh = false;
+                                if (Boolean.TryParse(hereNowRefreshStr, out boolHereNowRefresh))
+                                {
+                                    ack.HereNowRefresh = boolHereNowRefresh;
+                                }
+                            }
+                        }
+
                     }
+
                 }
 
                 ret = (T)Convert.ChangeType(ack, typeof(PNPresenceEventResult), CultureInfo.InvariantCulture);

@@ -172,6 +172,8 @@ namespace PubnubApi
                 if (response != null && response.Content != null)
                 {
                     response.Content.Dispose();
+                    pubnubRequestState.Response = null;
+                    pubnubRequestState.Request = null;
                 }
             }
             return jsonString;
@@ -214,6 +216,8 @@ namespace PubnubApi
                 if (response != null && response.Content != null)
                 {
                     response.Content.Dispose();
+                    pubnubRequestState.Response = null;
+                    pubnubRequestState.Request = null;
                 }
             }
             return jsonString;

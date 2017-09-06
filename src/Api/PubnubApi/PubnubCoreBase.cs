@@ -905,7 +905,8 @@ namespace PubnubApi
                 }
 
                 if (exceptionMessage.IndexOf("The request was aborted: The request was canceled") == -1
-                && exceptionMessage.IndexOf("Machine suspend mode enabled. No request will be processed.") == -1)
+                && exceptionMessage.IndexOf("Machine suspend mode enabled. No request will be processed.") == -1
+                && exceptionMessage.IndexOf("A task was canceled") == -1)
                 {
                     PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(webEx == null ? innerEx : webEx);
                     PNStatus status = new StatusBuilder(pubnubConfig, jsonLib).CreateStatusResponse<T>(pubnubRequestState.ResponseType, category, pubnubRequestState, (int)HttpStatusCode.NotFound, ex);
@@ -1787,6 +1788,18 @@ namespace PubnubApi
                     }
                 }
             }
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+            if (httpClientSubscribe != null)
+            {
+                try
+                {
+                    httpClientSubscribe.CancelPendingRequests();
+                    //httpClientSubscribe.Dispose();
+                    //httpClientSubscribe = null;
+                }
+                catch { }
+            }
+#endif
         }
 
 #endregion
