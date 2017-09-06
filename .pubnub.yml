@@ -1,8 +1,15 @@
 name: c-sharp
-version: "4.0.3.1"
+version: "4.0.3.2"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
+  - version: 4.0.3.2
+    date: Sept 06, 17
+    changes:
+      - type: Improvement
+        text: Added HereNowRefresh to PNPresenceEventResult
+      - type: Improvement
+        text: PCL version duplicate message fix for multiple disconnet/reconnect
   - version: 4.0.3.1
     date: Aug 18, 17
     changes:
@@ -157,7 +164,7 @@ features:
     - SUBSCRIBE-PUBLISHER-UUID
 supported-platforms:
   - 
-    version: Pubnub 'C#' 4.0.3.1
+    version: Pubnub 'C#' 4.0.3.2
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
@@ -167,7 +174,7 @@ supported-platforms:
       - .Net Framework 4.5
       - .Net Framework 4.6.1
   - 
-    version: PubnubPCL 'C#' 4.0.3.1
+    version: PubnubPCL 'C#' 4.0.3.2
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -179,7 +186,7 @@ supported-platforms:
       - Mono 4.8.0
       - PCL Profile 111
   - 
-    version: PubnubUWP 'C#' 4.0.3.1
+    version: PubnubUWP 'C#' 4.0.3.2
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
