@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.0;netstandard1.3;netstandard1.4;netstandard1.1</TargetFrameworks>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>pubnub.snk</AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>
@@ -13,7 +14,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubPCL</PackageId>
-    <PackageVersion>4.0.3.1</PackageVersion>
+    <PackageVersion>4.0.3.2</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -21,7 +22,7 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Migrated VS 2015 projects to VS 2017. Added exception handlers to Unsubscribe and query builder functionality. Added DeleteMessages feature.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added HereNowRefresh for PNPresenceEventResult. PCL related fix for duplicate message after multiple disconnect/reconnet</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -466,12 +467,12 @@
     <DefineConstants>$(DefineConstants);PORTABLE111</DefineConstants>
   </PropertyGroup>
 
-  <!--<ItemGroup>
+  <ItemGroup>
     <PackageReference Include="NETStandard.Library" Version="1.6.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <Reference Include="System.Runtime" />
-  </ItemGroup>-->
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
