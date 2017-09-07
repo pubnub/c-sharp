@@ -186,6 +186,9 @@
     <Compile Include="..\..\Api\PubnubApi\EndPoint\Push\RemovePushChannelOperation.cs">
       <Link>LinkedSourceCode\EndPoint\Push\RemovePushChannelOperation.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\TelemetryManager.cs">
+      <Link>LinkedSourceCode\EndPoint\TelemetryManager.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\EndPoint\TimeOperation.cs">
       <Link>LinkedSourceCode\EndPoint\TimeOperation.cs</Link>
     </Compile>

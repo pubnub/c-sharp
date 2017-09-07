@@ -17,7 +17,7 @@ namespace PubnubApi.EndPoint
         private string channelGroupName = "";
         private PNCallback<PNChannelGroupsDeleteGroupResult> savedCallback = null;
 
-        public DeleteChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log)
+        public DeleteChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;

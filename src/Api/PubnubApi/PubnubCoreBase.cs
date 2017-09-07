@@ -48,6 +48,7 @@ namespace PubnubApi
         private IJsonPluggableLibrary jsonLib = null;
         private IPubnubUnitTest unitTest = null;
         private IPubnubLog pubnubLog = null;
+        private EndPoint.TelemetryManager pubnubTelemetryMgr = null;
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
         private static HttpClient httpClientSubscribe = null;
         private static HttpClient httpClientNonsubscribe = null;
@@ -148,7 +149,7 @@ namespace PubnubApi
             set;
         } = new ConcurrentDictionary<string, DateTime>();
 
-        public PubnubCoreBase(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log)
+        public PubnubCoreBase(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager)
         {
             if (pubnubConfiguation == null)
             {
@@ -156,20 +157,21 @@ namespace PubnubApi
             }
             if (jsonPluggableLibrary == null)
             {
-                InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(pubnubConfiguation,log), pubnubUnitTest, log);
+                InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(pubnubConfiguation,log), pubnubUnitTest, log, telemetryManager);
             }
             else
             {
-                InternalConstructor(pubnubConfiguation, jsonPluggableLibrary, pubnubUnitTest, log);
+                InternalConstructor(pubnubConfiguation, jsonPluggableLibrary, pubnubUnitTest, log, telemetryManager);
             }
         }
 
-        private void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log)
+        private void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager)
         {
             pubnubConfig = pubnubConfiguation;
             jsonLib = jsonPluggableLibrary;
             unitTest = pubnubUnitTest;
             pubnubLog = log;
+            pubnubTelemetryMgr = telemetryManager;
 
             CurrentUuid = pubnubConfig.Uuid;
 
@@ -188,9 +190,9 @@ namespace PubnubApi
                 httpClientNonsubscribe.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 httpClientNonsubscribe.Timeout = TimeSpan.FromSeconds(pubnubConfig.NonSubscribeRequestTimeout);
             }
-            pubnubHttp = new PubnubHttp(pubnubConfiguation, jsonLib, pubnubLog, httpClientSubscribe, httpClientNonsubscribe);
+            pubnubHttp = new PubnubHttp(pubnubConfiguation, jsonLib, pubnubLog, pubnubTelemetryMgr, httpClientSubscribe, httpClientNonsubscribe);
 #else
-            pubnubHttp = new PubnubHttp(pubnubConfiguation, jsonLib, pubnubLog);
+            pubnubHttp = new PubnubHttp(pubnubConfiguation, jsonLib, pubnubLog, pubnubTelemetryMgr);
 #endif
 
 
@@ -1521,6 +1523,14 @@ namespace PubnubApi
             }
         }
 
+        protected void TerminateTelemetry()
+        {
+            if (pubnubTelemetryMgr != null)
+            {
+                pubnubTelemetryMgr.Destroy();
+            }
+        }
+
         //protected virtual void TerminateLocalClientHeartbeatTimer()
         //{
         //    //TerminateLocalClientHeartbeatTimer(null);
@@ -1705,6 +1715,7 @@ namespace PubnubApi
             TerminateReconnectTimer();
             RemoveUserState();
             TerminatePresenceHeartbeatTimer();
+            TerminateTelemetry();
 
             if (MultiChannelSubscribe.Count > 0 && MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId))
             {

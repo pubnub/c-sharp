@@ -16,7 +16,7 @@ namespace PubnubApi.EndPoint
         private IPubnubUnitTest unit = null;
         private IPubnubLog pubnubLog = null;
 
-        public OtherOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log)
+        public OtherOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;

@@ -18,7 +18,7 @@ namespace PubnubApi.EndPoint
         private string[] presenceChannelNames = new string[] { };
         private string[] presenceChannelGroupNames = new string[] { };
 
-        public UnsubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log)
+        public UnsubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
@@ -56,7 +56,7 @@ namespace PubnubApi.EndPoint
             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, requested unsubscribe for channel(s)={1}, cg(s)={2}", DateTime.Now.ToString(), channel, channelGroup), config.LogVerbosity);
             Task.Factory.StartNew(() =>
             {
-                SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog);
+                SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, null);
                 manager.CurrentPubnubInstance(PubnubInstance);
                 manager.MultiChannelUnSubscribeInit<T>(PNOperationType.PNUnsubscribeOperation, channel, channelGroup);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
