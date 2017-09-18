@@ -15,6 +15,7 @@ namespace PubnubApi.EndPoint
         private IJsonPluggableLibrary jsonLibrary = null;
         private IPubnubUnitTest unit;
         private IPubnubLog pubnubLog = null;
+        private EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         private string[] channelNames = null;
         private string[] channelGroupNames = null;
@@ -30,6 +31,7 @@ namespace PubnubApi.EndPoint
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
+            pubnubTelemetryMgr = telemetryManager;
         }
 
         public GrantOperation Channels(string[] channels)
@@ -124,7 +126,7 @@ namespace PubnubApi.EndPoint
             string channelGroupsCommaDelimited = string.Join(",", channelGroupList.ToArray().OrderBy(x => x).ToArray());
             string authKeysCommaDelimited = string.Join(",", authList.ToArray().OrderBy(x => x).ToArray());
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
             Uri request = urlBuilder.BuildGrantAccessRequest(channelsCommaDelimited, channelGroupsCommaDelimited, authKeysCommaDelimited, read, write, manage, ttl);
 

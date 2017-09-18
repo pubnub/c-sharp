@@ -15,7 +15,7 @@ namespace PubnubApi.EndPoint
         private IJsonPluggableLibrary jsonLibrary = null;
         private IPubnubUnitTest unit = null;
         private IPubnubLog pubnubLog = null;
-        private EndPoint.TelemetryManager pnTelemetryMgr = null;
+        private EndPoint.TelemetryManager pubnubTelemetryMgr = null;
 
         private object msg = null;
         private string channelName = "";
@@ -32,7 +32,7 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
-            pnTelemetryMgr = telemetryManager;
+            pubnubTelemetryMgr = telemetryManager;
         }
 
 
@@ -146,7 +146,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing userCallback");
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
             Uri request = urlBuilder.BuildPublishRequest(channel, message, storeInHistory, ttl, metaData, httpPost, null);
 

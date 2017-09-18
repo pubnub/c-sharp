@@ -10,9 +10,10 @@ namespace PubnubApi.EndPoint
     public class ListChannelsForChannelGroupOperation : PubnubCoreBase
     {
         private PNConfiguration config = null;
-        private IJsonPluggableLibrary jsonLibrary = null;
+        private readonly IJsonPluggableLibrary jsonLibrary;
         private IPubnubUnitTest unit = null;
-        private IPubnubLog pubnubLog = null;
+        private readonly IPubnubLog pubnubLog = null;
+        private EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         private string channelGroupName = "";
         private PNCallback<PNChannelGroupsAllChannelsResult> savedCallback = null;
@@ -23,6 +24,7 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
+            pubnubTelemetryMgr = telemetryManager;
         }
 
 
@@ -56,7 +58,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing groupName");
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
 
             Uri request = urlBuilder.BuildGetChannelsForChannelGroupRequest(null, groupName, false);

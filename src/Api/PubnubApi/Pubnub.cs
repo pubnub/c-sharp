@@ -17,7 +17,7 @@ namespace PubnubApi
 
         private string instanceId = "";
 
-        private static string sdkVersion = "PubNubCSharp4.0.3.2";
+        private static string sdkVersion = "PubNubCSharp4.0.4.1";
 
         private object savedSubscribeOperation = null;
 
@@ -395,7 +395,10 @@ namespace PubnubApi
                 pubnubLog = config.PubnubLog;
             }
             jsonPluggableLibrary = new NewtonsoftJsonDotNet(config, pubnubLog);
-            telemetryManager = new EndPoint.TelemetryManager(pubnubConfig, pubnubLog);
+            if (config != null && config.EnableTelemetry)
+            {
+                telemetryManager = new EndPoint.TelemetryManager(pubnubConfig, pubnubLog);
+            }
             CheckRequiredConfigValues();
         }
 

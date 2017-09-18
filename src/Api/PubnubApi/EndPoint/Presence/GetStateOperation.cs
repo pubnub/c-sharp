@@ -15,6 +15,7 @@ namespace PubnubApi.EndPoint
         private IJsonPluggableLibrary jsonLibrary = null;
         private IPubnubUnitTest unit = null;
         private IPubnubLog pubnubLog = null;
+        private EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         private string[] channelNames = null;
         private string[] channelGroupNames = null;
@@ -27,6 +28,7 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
+            pubnubTelemetryMgr = telemetryManager;
         }
 
         public GetStateOperation Channels(string[] channels)
@@ -84,7 +86,7 @@ namespace PubnubApi.EndPoint
             string channelsCommaDelimited = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
             string channelGroupsCommaDelimited = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
             Uri request = urlBuilder.BuildGetUserStateRequest(channelsCommaDelimited, channelGroupsCommaDelimited, uuid);
 

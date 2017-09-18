@@ -16,7 +16,7 @@ namespace PubnubApi.EndPoint
         private PNConfiguration pubnubConfig = null;
         private IPubnubLog pubnubLog = null;
 
-        private Dictionary<string, ConcurrentDictionary<double, long>> dicEndpointLatency
+        private static Dictionary<string, ConcurrentDictionary<double, long>> dicEndpointLatency
         {
             get;
             set;
@@ -28,6 +28,10 @@ namespace PubnubApi.EndPoint
         {
             this.pubnubConfig = config;
             this.pubnubLog = log;
+            if (config != null && config.EnableTelemetry)
+            {
+                StartTelemetryTimer();
+            }
         }
 
         private void StartTelemetryTimer()
@@ -38,8 +42,8 @@ namespace PubnubApi.EndPoint
 
         private void OnTelemetryIntervalTimeout(System.Object telemetryState)
         {
-            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - OnTelemetryIntervalTimeout", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
-
+            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - OnTelemetryIntervalTimeout => CleanupTelemetryData", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
+            CleanupTelemetryData();
         }
 
         private void StopTelemetryTimer()
@@ -62,12 +66,12 @@ namespace PubnubApi.EndPoint
             switch (type)
             {
                 case PNOperationType.PNPublishOperation:
-                    endpoint = "pub";
+                    endpoint = "l_pub";
                     break;
                 case PNOperationType.PNHistoryOperation:
                 case PNOperationType.PNFireOperation:
                 case PNOperationType.PNDeleteMessageOperation:
-                    endpoint = "hist";
+                    endpoint = "l_hist";
                     break;
                 case PNOperationType.PNUnsubscribeOperation:
                 case PNOperationType.PNWhereNowOperation:
@@ -75,14 +79,14 @@ namespace PubnubApi.EndPoint
                 case PNOperationType.PNHeartbeatOperation:
                 case PNOperationType.PNSetStateOperation:
                 case PNOperationType.PNGetStateOperation:
-                    endpoint = "pres";
+                    endpoint = "l_pres";
                     break;
                 case PNOperationType.PNAddChannelsToGroupOperation:
                 case PNOperationType.PNRemoveChannelsFromGroupOperation:
                 case PNOperationType.PNChannelGroupsOperation:
                 case PNOperationType.PNRemoveGroupOperation:
                 case PNOperationType.PNChannelsForGroupOperation:
-                    endpoint = "cg";
+                    endpoint = "l_cg";
                     break;
                 //case PNOperationType.PNPushNotificationEnabledChannelsOperation:
                 //case PNOperationType.PNAddPushNotificationsOnChannelsOperation:
@@ -92,10 +96,10 @@ namespace PubnubApi.EndPoint
                 //    break;
                 case PNOperationType.PNAccessManagerAudit:
                 case PNOperationType.PNAccessManagerGrant:
-                    endpoint = "pam";
+                    endpoint = "l_pam";
                     break;
                 case PNOperationType.PNTimeOperation:
-                    endpoint = "time";
+                    endpoint = "l_time";
                     break;
                 default:
                     break;
@@ -109,18 +113,71 @@ namespace PubnubApi.EndPoint
             try
             {
                 string latencyEndPoint = EndpointNameForOperation(type);
-                if (latencyMillisec > 0 && !string.IsNullOrEmpty(latencyEndPoint) && dicEndpointLatency.ContainsKey(latencyEndPoint))
+                if (latencyMillisec > 0 && !string.IsNullOrEmpty(latencyEndPoint))
                 {
                     double epochMillisec = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
-                    dicEndpointLatency[latencyEndPoint].AddOrUpdate(epochMillisec, latencyMillisec, (key, oldValue) => latencyMillisec);
+                    if (dicEndpointLatency.ContainsKey(latencyEndPoint))
+                    {
+                        dicEndpointLatency[latencyEndPoint].AddOrUpdate(epochMillisec, latencyMillisec, (key, oldValue) => latencyMillisec);
+                    }
+                    else
+                    {
+                        ConcurrentDictionary<double, long> elapsedInfo = new ConcurrentDictionary<double, long>();
+                        elapsedInfo.Add(epochMillisec, latencyMillisec);
+                        dicEndpointLatency.Add(latencyEndPoint, elapsedInfo);
+                    }
                     //private string epoch2string(int epoch) { return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(epoch).ToShortDateString();
+                    System.Diagnostics.Debug.WriteLine(string.Format("{0} latency = {1}", type, latencyMillisec));
                 }
-                System.Diagnostics.Debug.WriteLine(string.Format("{0} latency = {1}", type, latencyMillisec));
-
             }
             catch (Exception ex)
             {
                 LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - StoreLatency error: {1}", DateTime.Now.ToString(), ex.ToString()), pubnubConfig.LogVerbosity);
+            }
+        }
+
+        public Dictionary<string, string> GetOperationsLatency()
+        {
+            Dictionary<string, string> dictionaryOpsLatency = new Dictionary<string, string>();
+            foreach (string key in dicEndpointLatency.Keys)
+            {
+                if (dicEndpointLatency[key] != null && dicEndpointLatency[key].Count > 0)
+                {
+                    
+                    dictionaryOpsLatency.Add(key, Math.Round(((double)dicEndpointLatency[key].Average(kvp => kvp.Value) / (double)1000.0), 10).ToString()); //Convert millisec to sec
+                }
+            }
+            return dictionaryOpsLatency;
+        }
+
+        private void CleanupTelemetryData()
+        {
+            double currentEpochMillisec = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
+            foreach (string key in dicEndpointLatency.Keys)
+            {
+                List<KeyValuePair<double, long>> outdatedLatencies = dicEndpointLatency[key].Where(dt => currentEpochMillisec - dt.Key >= 60000).ToList();
+                if (outdatedLatencies != null && outdatedLatencies.Count > 0)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => {1} outdatedLatencies count = {2}", DateTime.Now.ToString(), key, outdatedLatencies.Count), pubnubConfig.LogVerbosity);
+                    try
+                    {
+                        foreach (KeyValuePair<double, long> kvp in outdatedLatencies)
+                        {
+                            if (dicEndpointLatency[key].ContainsKey(kvp.Key))
+                            {
+                                long removeOutdatedLatency;
+                                if (!dicEndpointLatency[key].TryRemove(kvp.Key, out removeOutdatedLatency))
+                                {
+                                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => removed failed for key = {1}", DateTime.Now.ToString(), kvp.Key), pubnubConfig.LogVerbosity);
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => Exception = {1}", DateTime.Now.ToString(), ex.ToString()), pubnubConfig.LogVerbosity);
+                    }
+                }
             }
         }
 

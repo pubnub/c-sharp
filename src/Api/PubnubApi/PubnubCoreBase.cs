@@ -1711,7 +1711,6 @@ namespace PubnubApi
 
             RemoveChannelDictionary();
             TerminatePendingWebRequest();
-            //TerminateLocalClientHeartbeatTimer();
             TerminateReconnectTimer();
             RemoveUserState();
             TerminatePresenceHeartbeatTimer();
@@ -1838,10 +1837,6 @@ namespace PubnubApi
                     callbackList[listenerIndex].Message(PubnubInstance, message);
                 }
             }
-            //for (int listenerIndex = 0; listenerIndex < SubscribeCallbackListenerList.Count; listenerIndex++)
-            //{
-            //    SubscribeCallbackListenerList[listenerIndex].Message(PubnubInstance, message);
-            //}
         }
 
         internal void Announce(PNPresenceEventResult presence)
@@ -1854,10 +1849,6 @@ namespace PubnubApi
                     callbackList[listenerIndex].Presence(PubnubInstance, presence);
                 }
             }
-            //for (int listenerIndex = 0; listenerIndex < SubscribeCallbackListenerList.Count; listenerIndex++)
-            //{
-            //    SubscribeCallbackListenerList[listenerIndex].Presence(PubnubInstance, presence);
-            //}
         }
     }
 }

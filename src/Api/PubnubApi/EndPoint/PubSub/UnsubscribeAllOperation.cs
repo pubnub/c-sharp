@@ -11,6 +11,7 @@ namespace PubnubApi.EndPoint
         private IJsonPluggableLibrary jsonLibrary = null;
         private IPubnubUnitTest unit = null;
         private IPubnubLog pubnubLog = null;
+        private EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         public UnsubscribeAllOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub pubnubInstance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
@@ -18,6 +19,7 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
+            pubnubTelemetryMgr = telemetryManager;
             CurrentPubnubInstance(pubnubInstance);
 
             UnsubscribeAll();
@@ -27,7 +29,7 @@ namespace PubnubApi.EndPoint
         {
             Task.Factory.StartNew(() =>
             {
-                SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, null);
+                SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
                 manager.CurrentPubnubInstance(PubnubInstance);
                 manager.MultiChannelUnSubscribeAll<T>(PNOperationType.PNUnsubscribeOperation);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);

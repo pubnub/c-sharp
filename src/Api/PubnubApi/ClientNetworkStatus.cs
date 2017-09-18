@@ -164,7 +164,7 @@ namespace PubnubApi
                 channelGroups = state.ChannelGroups;
             }
 
-            PubnubApi.Interface.IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(pubnubConfig, jsonLib, unit, pubnubLog);
+            PubnubApi.Interface.IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(pubnubConfig, jsonLib, unit, pubnubLog, null);
             Uri requestUri = urlBuilder.BuildTimeRequest();
             try
             {

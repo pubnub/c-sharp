@@ -14,13 +14,15 @@ namespace PubnubApi
         private IPubnubUnitTest pubnubUnitTest = null;
         private IPubnubLog pubnubLog = null;
         private string pubnubInstanceId = "";
+        private EndPoint.TelemetryManager telemetryMgr;
 
-        public UrlRequestBuilder(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log)
+        public UrlRequestBuilder(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager pubnubTelemetryMgr)
         {
             this.pubnubConfig = config;
             this.jsonLib = jsonPluggableLibrary;
             this.pubnubUnitTest = pubnubUnitTest;
             this.pubnubLog = log;
+            this.telemetryMgr = pubnubTelemetryMgr;
         }
 
         string IUrlRequestBuilder.PubnubInstanceId
@@ -765,6 +767,19 @@ namespace PubnubApi
                 {
                     ret.Add("instanceid", pubnubInstanceId);
                 }
+
+                if (pubnubConfig.EnableTelemetry && telemetryMgr != null)
+                {
+                    Dictionary<string, string> opsLatency = telemetryMgr.GetOperationsLatency();
+                    if (opsLatency != null && opsLatency.Count > 0)
+                    {
+                        foreach (string key in opsLatency.Keys)
+                        {
+                            ret.Add(key, opsLatency[key]);
+                        }
+                    }
+                }
+
             }
 
             if (!string.IsNullOrEmpty(pubnubConfig.SecretKey))
@@ -856,8 +871,6 @@ namespace PubnubApi
         private Uri BuildRestApiRequest<T>(List<string> urlComponents, PNOperationType type, string uuid, string queryString)
         {
             StringBuilder url = new StringBuilder();
-
-            uuid = new UriUtil().EncodeUriComponent(uuid, type, false, false);
 
             if (pubnubConfig.Secure)
             {

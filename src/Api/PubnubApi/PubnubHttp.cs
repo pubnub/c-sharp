@@ -252,7 +252,7 @@ namespace PubnubApi
                 stopWatch.Start();
                 response = await Task.Factory.FromAsync<HttpWebResponse>(request.BeginGetResponse, asyncPubnubResult => (HttpWebResponse)request.EndGetResponse(asyncPubnubResult), pubnubRequestState);
                 stopWatch.Stop();
-                if (pubnubTelemetryMgr != null)
+                if (pubnubConfig.EnableTelemetry && pubnubTelemetryMgr != null)
                 {
                     pubnubTelemetryMgr.StoreLatency(stopWatch.ElapsedMilliseconds, pubnubRequestState.ResponseType);
                 }
