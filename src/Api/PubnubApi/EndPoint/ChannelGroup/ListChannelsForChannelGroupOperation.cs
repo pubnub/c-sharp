@@ -10,19 +10,21 @@ namespace PubnubApi.EndPoint
     public class ListChannelsForChannelGroupOperation : PubnubCoreBase
     {
         private PNConfiguration config = null;
-        private IJsonPluggableLibrary jsonLibrary = null;
+        private readonly IJsonPluggableLibrary jsonLibrary;
         private IPubnubUnitTest unit = null;
-        private IPubnubLog pubnubLog = null;
+        private readonly IPubnubLog pubnubLog = null;
+        private EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         private string channelGroupName = "";
         private PNCallback<PNChannelGroupsAllChannelsResult> savedCallback = null;
 
-        public ListChannelsForChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log)
+        public ListChannelsForChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
+            pubnubTelemetryMgr = telemetryManager;
         }
 
 
@@ -56,7 +58,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing groupName");
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
 
             Uri request = urlBuilder.BuildGetChannelsForChannelGroupRequest(null, groupName, false);

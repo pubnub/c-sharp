@@ -282,6 +282,7 @@ namespace PubnubApiDemo
             config.ReconnectionPolicy = PNReconnectionPolicy.LINEAR;
             //config.UseClassicHttpWebRequest = true;
             //config.FilterExpression = "uuid == '" + config.Uuid +  "'";
+            config.EnableTelemetry = false;
 
             pubnub = new Pubnub(config);
             pubnub.AddListener(new SubscribeCallbackExt(
@@ -1144,7 +1145,7 @@ namespace PubnubApiDemo
 
                         Console.WriteLine("Running AuditPushChannelProvisions()");
                         pubnub.AuditPushChannelProvisions()
-                            .PushType(PNPushType.MPNS)
+                            .PushType(PNPushType.APNS)
                             .DeviceId(pushTokenGetChannel)
                             .Async(new PNPushListProvisionsResultExt(
                                 (r, s) => {

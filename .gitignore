@@ -17,6 +17,7 @@ src/.vs/Pubnub/v15/sqlite3/storage.ide
 /src/Api/PubnubApi/obj/Release/*
 /src/Api/PubnubApi/obj/*
 /src/Api/PubnubApi/*.user
+/src/Api/PubnubApi/Settings.StyleCop
 
 /src/Api/PubnubApiUWP/bin/*
 /src/Api/PubnubApiUWP/bin/Debug/*

@@ -71,8 +71,6 @@ namespace PubnubApi
 
         public Proxy Proxy { get; set; }
 
-        //public int ConnectTimeout { get; set; } //How long to wait before giving up connection to client.
-
         public int SubscribeTimeout { get; set; } //How long to keep the subscribe loop running before disconnect.
 
         public int NonSubscribeRequestTimeout { get; set; } //On non subscribe operations, how long to wait for server response.
@@ -91,6 +89,8 @@ namespace PubnubApi
 
         public bool UseClassicHttpWebRequest { get; set; } = false;
 
+        public bool EnableTelemetry { get; set; } = true;
+
         public PNConfiguration()
         {
             this.Origin = "ps.pndsn.com";
@@ -98,7 +98,6 @@ namespace PubnubApi
             this.uuid = string.Format("pn-{0}", Guid.NewGuid().ToString());
             this.NonSubscribeRequestTimeout = 10;
             this.SubscribeTimeout = 310;
-            //this.ConnectTimeout = 5;
             this.LogVerbosity = PNLogVerbosity.NONE;
             this.CipherKey = "";
             this.PublishKey = "";
@@ -109,7 +108,6 @@ namespace PubnubApi
             this.HeartbeatNotificationOption = PNHeartbeatNotificationOption.Failures;
             this.IncludeRequestIdentifier = true;
             this.IncludeInstanceIdentifier = false;
-            //this.EnableJsonEncodingForPublish = true;
         }
 
         public PNConfiguration SetPresenceTimeoutWithCustomInterval(int timeout, int interval)

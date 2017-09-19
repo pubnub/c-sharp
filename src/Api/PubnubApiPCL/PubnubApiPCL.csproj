@@ -14,7 +14,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubPCL</PackageId>
-    <PackageVersion>4.0.3.2</PackageVersion>
+    <PackageVersion>4.0.4.1</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -22,7 +22,7 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Added HereNowRefresh for PNPresenceEventResult. PCL related fix for duplicate message after multiple disconnect/reconnet</PackageReleaseNotes>
+    <PackageReleaseNotes>Added Telemetry and fix for PNPushListProvisionsResult</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -168,6 +168,7 @@
     <Compile Include="..\PubnubApi\EndPoint\Push\RemovePushChannelOperation.cs">
       <Link>EndPoint\Push\RemovePushChannelOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\TelemetryManager.cs" Link="EndPoint\TelemetryManager.cs" />
     <Compile Include="..\PubnubApi\EndPoint\TimeOperation.cs">
       <Link>EndPoint\TimeOperation.cs</Link>
     </Compile>

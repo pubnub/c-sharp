@@ -22,10 +22,14 @@ namespace PubnubApi
 	{
 		static public MD5 Create(string hashName)
 		{
-			if (hashName == "MD5")
-				return new MD5();
-			else
-				throw new NotSupportedException();
+            if (hashName == "MD5")
+            {
+                return new MD5();
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
 		}
 
 		static public String GetMd5String(String source)
@@ -176,10 +180,11 @@ namespace PubnubApi
 		/// </remarks>
 		public virtual void Initialize()
 		{
-			count[0] = count[1] = 0;
+			count[0] = 0;
+            count[1] = 0;
 
-			// Load magic initialization constants.
-			state[0] = 0x67452301;
+            // Load magic initialization constants.
+            state[0] = 0x67452301;
 			state[1] = 0xefcdab89;
 			state[2] = 0x98badcfe;
 			state[3] = 0x10325476;
@@ -203,9 +208,11 @@ namespace PubnubApi
 			// Compute number of bytes mod 64
 			index = (int)((this.count[0] >> 3) & 0x3F);
 
-			// Update number of bits
-			if ((this.count[0] += (uint)((uint)count << 3)) < ((uint)count << 3))
-				this.count[1]++;
+            // Update number of bits
+            if ((this.count[0] += (uint)((uint)count << 3)) < ((uint)count << 3))
+            {
+                this.count[1]++;
+            }
 			this.count[1] += (uint)count >> 29;
 
 			partLen = 64 - index;

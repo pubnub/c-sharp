@@ -9,19 +9,10 @@ namespace PubnubApi.EndPoint
 {
     public class ListenerManager : PubnubCoreBase
     {
-        private PNConfiguration config = null;
-        private IJsonPluggableLibrary jsonLibrary = null;
-        private IPubnubUnitTest unit = null;
-        private IPubnubLog pubnubLog = null;
-
         private object syncLockSubscribeCallback = new object();
 
-        public ListenerManager(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log)
+        public ListenerManager(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-            unit = pubnubUnit;
-            pubnubLog = log;
         }
 
         internal void CurrentPubnubInstance(Pubnub instance)

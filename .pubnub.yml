@@ -1,8 +1,15 @@
 name: c-sharp
-version: "4.0.3.2"
+version: "4.0.4.1"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
+  - version: 4.0.4.1
+    date: Sept 19, 17
+    changes:
+      - type: Improvement
+        text: Added Telemetry feature
+      - type: Improvement
+        text: Fix for PNPushListProvisionsResult
   - version: 4.0.3.2
     date: Sept 06, 17
     changes:
@@ -164,7 +171,7 @@ features:
     - SUBSCRIBE-PUBLISHER-UUID
 supported-platforms:
   - 
-    version: Pubnub 'C#' 4.0.3.2
+    version: Pubnub 'C#' 4.0.4.1
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
@@ -174,7 +181,7 @@ supported-platforms:
       - .Net Framework 4.5
       - .Net Framework 4.6.1
   - 
-    version: PubnubPCL 'C#' 4.0.3.2
+    version: PubnubPCL 'C#' 4.0.4.1
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -186,7 +193,7 @@ supported-platforms:
       - Mono 4.8.0
       - PCL Profile 111
   - 
-    version: PubnubUWP 'C#' 4.0.3.2
+    version: PubnubUWP 'C#' 4.0.4.1
     platforms:
       - Windows Phone 10
       - Universal Windows Apps

@@ -1258,6 +1258,7 @@ namespace PubnubApi
 #region "PNPushListProvisionsResult"
 
                 PNPushListProvisionsResult result = new PNPushListProvisionsResult();
+                result.Channels = listObject.OfType<string>().Where(s => s.Trim() != "").ToList();
 
                 ret = (T)Convert.ChangeType(result, typeof(PNPushListProvisionsResult), CultureInfo.InvariantCulture);
 #endregion
