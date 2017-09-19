@@ -15,10 +15,10 @@ namespace PubNubMessaging.Tests
     [TestFixture]
     public class WhenPushIsRequested : TestHarness
     {
-        private static bool receivedPublishMessage = false;
+        private static bool receivedMessage = false;
         private static bool receivedGrantMessage = false;
 
-        ManualResetEvent mrePush = new ManualResetEvent(false);
+        private static ManualResetEvent mrePush = new ManualResetEvent(false);
         private static ManualResetEvent grantManualEvent = new ManualResetEvent(false);
         private static ManualResetEvent publishManualEvent = new ManualResetEvent(false);
 
@@ -103,7 +103,7 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedPublishMessage = false;
+            receivedMessage = false;
             publishTimetoken = 0;
             currentTestCase = "ThenPublishMpnsToastShouldReturnSuccess";
 
@@ -144,7 +144,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = null;
             pubnub = null;
 
-            Assert.IsTrue(receivedPublishMessage, "Toast Publish Failed");
+            Assert.IsTrue(receivedMessage, "Toast Publish Failed");
         }
 
         [Test]
@@ -152,7 +152,7 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedPublishMessage = false;
+            receivedMessage = false;
             publishTimetoken = 0;
             currentTestCase = "ThenPublishMpnsFlipTileShouldReturnSuccess";
 
@@ -198,7 +198,7 @@ namespace PubNubMessaging.Tests
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(receivedPublishMessage, "Flip Tile Publish Failed");
+            Assert.IsTrue(receivedMessage, "Flip Tile Publish Failed");
         }
 
         [Test]
@@ -206,7 +206,7 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedPublishMessage = false;
+            receivedMessage = false;
             publishTimetoken = 0;
             currentTestCase = "ThenPublishMpnsCycleTileShouldReturnSuccess";
 
@@ -252,7 +252,7 @@ namespace PubNubMessaging.Tests
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(receivedPublishMessage, "Cycle Tile Publish Failed");
+            Assert.IsTrue(receivedMessage, "Cycle Tile Publish Failed");
         }
 
         [Test]
@@ -260,7 +260,7 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedPublishMessage = false;
+            receivedMessage = false;
             publishTimetoken = 0;
             currentTestCase = "ThenPublishMpnsIconicTileShouldReturnSuccess";
 
@@ -306,7 +306,44 @@ namespace PubNubMessaging.Tests
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(receivedPublishMessage, "Iconic Tile Publish Failed");
+            Assert.IsTrue(receivedMessage, "Iconic Tile Publish Failed");
+        }
+
+        [Test]
+        public void ThenAuditPushChannelProvisionsShouldReturnSuccess()
+        {
+            server.ClearRequests();
+
+            receivedMessage = false;
+            currentTestCase = "ThenAuditPushChannelProvisionsShouldReturnSuccess";
+
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Cannot run static unit test on AuditPushChannelProvisions");
+                return;
+            }
+
+            PNConfiguration config = new PNConfiguration()
+            {
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+            server.RunOnHttps(false);
+
+            pubnub = this.createPubNubInstance(config);
+
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+
+            mrePush = new ManualResetEvent(false);
+
+            pubnub.AuditPushChannelProvisions().DeviceId("4e71acc275a8eeb400654d923724c073956661455697c92ca6c5438f2c19aa7b").PushType(PNPushType.APNS).Async(new UTAuditPushChannel());
+            mrePush.WaitOne(manualResetEventWaitTimeout);
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedMessage, "AuditPushChannelProvisions Failed");
         }
 
         private class UTGrantResult : PNCallback<PNAccessManagerGrantResult>
@@ -356,7 +393,7 @@ namespace PubNubMessaging.Tests
                         case "ThenPublishMpnsFlipTileShouldReturnSuccess":
                         case "ThenPublishMpnsCycleTileShouldReturnSuccess":
                         case "ThenPublishMpnsIconicTileShouldReturnSuccess":
-                            receivedPublishMessage = true;
+                            receivedMessage = true;
                             break;
                         default:
                             break;
@@ -366,5 +403,14 @@ namespace PubNubMessaging.Tests
                 publishManualEvent.Set();
             }
         };
+
+        public class UTAuditPushChannel : PNCallback<PNPushListProvisionsResult>
+        {
+            public override void OnResponse(PNPushListProvisionsResult result, PNStatus status)
+            {
+                receivedMessage = true;
+                mrePush.Set();
+            }
+        }
     }
 }
