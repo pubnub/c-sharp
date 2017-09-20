@@ -3,7 +3,7 @@
     public static class PubnubCommon
     {
 		public static readonly bool PAMEnabled = true;
-		public static readonly bool EnableStubTest = false;
+		public static readonly bool EnableStubTest = true;
 
         //USE demo-36 keys for unit tests
         public static readonly string PublishKey = "demo-36";

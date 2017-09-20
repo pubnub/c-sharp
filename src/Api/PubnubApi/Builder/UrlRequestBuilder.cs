@@ -784,15 +784,15 @@ namespace PubnubApi
                 {
                     ret.Add("timestamp", timeStamp.ToString());
                 }
-            }
 
-            if (type != PNOperationType.PNTimeOperation
-                    && type != PNOperationType.PNAccessManagerGrant && type != PNOperationType.ChannelGroupGrantAccess
-                    && type != PNOperationType.PNAccessManagerAudit && type != PNOperationType.ChannelGroupAuditAccess)
-            {
-                if (!string.IsNullOrEmpty(this.pubnubConfig.AuthKey))
+                if (type != PNOperationType.PNTimeOperation
+                        && type != PNOperationType.PNAccessManagerGrant && type != PNOperationType.ChannelGroupGrantAccess
+                        && type != PNOperationType.PNAccessManagerAudit && type != PNOperationType.ChannelGroupAuditAccess)
                 {
-                    ret.Add("auth", new UriUtil().EncodeUriComponent(this.pubnubConfig.AuthKey, type, false, false));
+                    if (!string.IsNullOrEmpty(this.pubnubConfig.AuthKey))
+                    {
+                        ret.Add("auth", new UriUtil().EncodeUriComponent(this.pubnubConfig.AuthKey, type, false, false));
+                    }
                 }
             }
 
