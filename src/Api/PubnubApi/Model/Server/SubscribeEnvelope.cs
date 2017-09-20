@@ -7,8 +7,15 @@ namespace PubnubApi
 {
     internal class SubscribeEnvelope
     {
-        private List<SubscribeMessage> m { get; set; } //messages;
-        private TimetokenMetadata t { get; set; } //subscribeMetadata;
+        /// <summary>
+        /// messages
+        /// </summary>
+        private List<SubscribeMessage> m { get; set; }
+
+        /// <summary>
+        /// subscribeMetadata
+        /// </summary>
+        private TimetokenMetadata t { get; set; }
 
         public List<SubscribeMessage> Messages
         {

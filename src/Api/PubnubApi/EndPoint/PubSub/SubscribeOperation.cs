@@ -11,10 +11,10 @@ namespace PubnubApi.EndPoint
 {
     public class SubscribeOperation<T> : PubnubCoreBase
     {
-        private PNConfiguration config = null;
-        private IJsonPluggableLibrary jsonLibrary = null;
-        private IPubnubUnitTest unit = null;
-        private IPubnubLog pubnubLog = null;
+        private readonly PNConfiguration config;
+        private readonly IJsonPluggableLibrary jsonLibrary;
+        private readonly IPubnubUnitTest unit;
+        private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         private List<string> subscribeChannelNames = new List<string>();
@@ -22,8 +22,8 @@ namespace PubnubApi.EndPoint
         private List<string> presenceChannelNames = new List<string>();
         private List<string> presenceChannelGroupNames = new List<string>();
         private long subscribeTimetoken = -1;
-        private bool presenceSubscribeEnabled = false;
-        private SubscribeManager manager = null;
+        private bool presenceSubscribeEnabled;
+        private SubscribeManager manager;
 
         public SubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {

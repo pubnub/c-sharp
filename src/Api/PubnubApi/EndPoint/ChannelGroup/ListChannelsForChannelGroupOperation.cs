@@ -9,14 +9,14 @@ namespace PubnubApi.EndPoint
 {
     public class ListChannelsForChannelGroupOperation : PubnubCoreBase
     {
-        private PNConfiguration config = null;
+        private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
-        private IPubnubUnitTest unit = null;
-        private readonly IPubnubLog pubnubLog = null;
+        private readonly IPubnubUnitTest unit;
+        private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         private string channelGroupName = "";
-        private PNCallback<PNChannelGroupsAllChannelsResult> savedCallback = null;
+        private PNCallback<PNChannelGroupsAllChannelsResult> savedCallback;
 
         public ListChannelsForChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {

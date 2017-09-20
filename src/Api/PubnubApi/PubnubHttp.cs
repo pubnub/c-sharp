@@ -195,8 +195,7 @@ namespace PubnubApi
             try
             {
                 System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, SendRequestAndGetJsonResponseHttpClientPOST Before httpClient.GetAsync", DateTime.Now.ToString()));
-                //HttpClient httpClient = new HttpClient();
-                //httpClient.Timeout = TimeSpan.FromSeconds(GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType));
+                
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
                 StringContent jsonPostString = new StringContent(postData, Encoding.UTF8);

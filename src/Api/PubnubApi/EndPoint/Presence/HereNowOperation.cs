@@ -11,17 +11,17 @@ namespace PubnubApi.EndPoint
 {
     public class HereNowOperation : PubnubCoreBase
     {
-        private PNConfiguration config = null;
-        private IJsonPluggableLibrary jsonLibrary = null;
-        private IPubnubUnitTest unit = null;
-        private IPubnubLog pubnubLog = null;
+        private readonly PNConfiguration config;
+        private readonly IJsonPluggableLibrary jsonLibrary;
+        private readonly IPubnubUnitTest unit;
+        private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
-        private string[] channelNames = null;
-        private string[] channelGroupNames = null;
-        private bool includeUserState = false;
+        private string[] channelNames;
+        private string[] channelGroupNames;
+        private bool includeUserState;
         private bool includeChannelUUIDs = true;
-        private PNCallback<PNHereNowResult> savedCallback = null;
+        private PNCallback<PNHereNowResult> savedCallback;
 
         public HereNowOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {

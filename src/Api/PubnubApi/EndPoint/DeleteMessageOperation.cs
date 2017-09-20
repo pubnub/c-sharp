@@ -11,17 +11,17 @@ namespace PubnubApi.EndPoint
 {
     public class DeleteMessageOperation : PubnubCoreBase
     {
-        private PNConfiguration config = null;
-        private IJsonPluggableLibrary jsonLibrary = null;
-        private IPubnubUnitTest unit = null;
-        private IPubnubLog pubnubLog = null;
+        private readonly PNConfiguration config;
+        private readonly IJsonPluggableLibrary jsonLibrary;
+        private readonly IPubnubUnitTest unit;
+        private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         private long startTimetoken = -1;
         private long endTimetoken = -1;
 
         private string channelName = "";
-        private PNCallback<PNDeleteMessageResult> savedCallback = null;
+        private PNCallback<PNDeleteMessageResult> savedCallback;
 
         public DeleteMessageOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
@@ -83,7 +83,7 @@ namespace PubnubApi.EndPoint
             Uri request = urlBuilder.BuildDeleteMessageRequest(channel, start, end);
 
             RequestState<PNDeleteMessageResult> requestState = new RequestState<PNDeleteMessageResult>();
-            requestState.Channels = new string[] { channel };
+            requestState.Channels = new [] { channel };
             requestState.ResponseType = PNOperationType.PNDeleteMessageOperation;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;

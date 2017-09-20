@@ -17,9 +17,9 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
-        private string[] channelNames;
-        private string[] channelGroupNames;
-        private string[] authenticationKeys;
+        private string[] pubnubChannelNames;
+        private string[] pubnubChannelGroupNames;
+        private string[] pamAuthenticationKeys;
         private bool grantWrite;
         private bool grantRead;
         private bool grantManage;
@@ -37,19 +37,19 @@ namespace PubnubApi.EndPoint
 
         public GrantOperation Channels(string[] channels)
         {
-            this.channelNames = channels;
+            this.pubnubChannelNames = channels;
             return this;
         }
 
         public GrantOperation ChannelGroups(string[] channelGroups)
         {
-            this.channelGroupNames = channelGroups;
+            this.pubnubChannelGroupNames = channelGroups;
             return this;
         }
 
         public GrantOperation AuthKeys(string[] authKeys)
         {
-            this.authenticationKeys = authKeys;
+            this.pamAuthenticationKeys = authKeys;
             return this;
         }
 
@@ -82,7 +82,7 @@ namespace PubnubApi.EndPoint
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                GrantAccess(this.channelNames, this.channelGroupNames, this.authenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, callback);
+                GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, callback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
@@ -90,7 +90,7 @@ namespace PubnubApi.EndPoint
         {
             Task.Factory.StartNew(() =>
             {
-                GrantAccess(this.channelNames, this.channelGroupNames, this.authenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, savedCallback);
+                GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 

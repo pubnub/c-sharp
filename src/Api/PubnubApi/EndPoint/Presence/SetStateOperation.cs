@@ -11,17 +11,17 @@ namespace PubnubApi.EndPoint
 {
     public class SetStateOperation : PubnubCoreBase
     {
-        private PNConfiguration config = null;
-        private IJsonPluggableLibrary jsonLibrary = null;
-        private IPubnubUnitTest unit = null;
-        private IPubnubLog pubnubLog = null;
+        private readonly PNConfiguration config;
+        private readonly IJsonPluggableLibrary jsonLibrary;
+        private readonly IPubnubUnitTest unit;
+        private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
-        private string[] channelNames = null;
-        private string[] channelGroupNames = null;
-        private Dictionary<string, object> userState = null;
+        private string[] channelNames;
+        private string[] channelGroupNames;
+        private Dictionary<string, object> userState;
         private string channelUUID = "";
-        private PNCallback<PNSetStateResult> savedCallback = null;
+        private PNCallback<PNSetStateResult> savedCallback;
 
         public SetStateOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
@@ -105,9 +105,6 @@ namespace PubnubApi.EndPoint
                 channelGroups = channelGroupList.ToArray();
             }
 
-            string commaDelimitedChannel = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
-            string commaDelimitedChannelGroup = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
-
             if (!jsonLibrary.IsDictionaryCompatible(jsonUserState))
             {
                 throw new MissingMemberException("Missing json format for user state");
@@ -190,9 +187,6 @@ namespace PubnubApi.EndPoint
                 channelGroupList = channelGroupList.Where(cg => !string.IsNullOrEmpty(cg) && cg.Trim().Length > 0).Distinct<string>().ToList();
                 channelGroups = channelGroupList.ToArray();
             }
-
-            string commaDelimitedChannel = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
-            string commaDelimitedChannelGroup = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
 
             string key = keyValuePair.Key;
 

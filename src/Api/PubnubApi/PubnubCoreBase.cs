@@ -49,15 +49,15 @@ namespace PubnubApi
         private IPubnubLog pubnubLog;
         private EndPoint.TelemetryManager pubnubTelemetryMgr;
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
-        private static HttpClient httpClientSubscribe = null;
-        private static HttpClient httpClientNonsubscribe = null;
-        private static HttpClient httpClientNetworkStatus = null;
+        private static HttpClient httpClientSubscribe;
+        private static HttpClient httpClientNonsubscribe;
+        private static HttpClient httpClientNetworkStatus;
 #endif
 
         private bool clientNetworkStatusInternetStatus = true;
         protected static Dictionary<string, bool> SubscribeDisconnected = new Dictionary<string, bool>();
 
-        protected Pubnub PubnubInstance { get; set; } = null;
+        protected Pubnub PubnubInstance { get; set; }
 
         protected bool UuidChanged { get; set; }
 
