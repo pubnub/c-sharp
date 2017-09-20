@@ -11,16 +11,16 @@ namespace PubnubApi.EndPoint
 {
     public class AuditOperation : PubnubCoreBase
     {
-        private PNConfiguration config = null;
-        private IJsonPluggableLibrary jsonLibrary = null;
-        private IPubnubUnitTest unit;
-        private IPubnubLog pubnubLog = null;
-        private EndPoint.TelemetryManager pubnubTelemetryMgr;
+        private readonly PNConfiguration config;
+        private readonly IJsonPluggableLibrary jsonLibrary;
+        private readonly IPubnubUnitTest unit;
+        private readonly IPubnubLog pubnubLog;
+        private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
-        private string channelName = null;
-        private string channelGroupName = null;
-        private string[] authenticationKeys = null;
-        private PNCallback<PNAccessManagerAuditResult> savedCallback = null;
+        private string channelName;
+        private string channelGroupName;
+        private string[] authenticationKeys;
+        private PNCallback<PNAccessManagerAuditResult> savedCallback;
 
         public AuditOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
@@ -82,11 +82,11 @@ namespace PubnubApi.EndPoint
             RequestState<PNAccessManagerAuditResult> requestState = new RequestState<PNAccessManagerAuditResult>();
             if (!string.IsNullOrEmpty(channel))
             {
-                requestState.Channels = new string[] { channel };
+                requestState.Channels = new [] { channel };
             }
             if (!string.IsNullOrEmpty(channelGroup))
             {
-                requestState.ChannelGroups = new string[] { channelGroup };
+                requestState.ChannelGroups = new [] { channelGroup };
             }
             requestState.ResponseType = PNOperationType.PNAccessManagerAudit;
             requestState.PubnubCallback = callback;

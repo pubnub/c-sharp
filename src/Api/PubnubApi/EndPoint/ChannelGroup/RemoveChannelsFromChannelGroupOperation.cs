@@ -14,7 +14,7 @@ namespace PubnubApi.EndPoint
         private IJsonPluggableLibrary jsonLibrary = null;
         private IPubnubUnitTest unit = null;
         private IPubnubLog pubnubLog = null;
-        private EndPoint.TelemetryManager pubnubTelemetryMgr;
+        private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         private string channelGroupName = "";
         private string[] channelNames = null;

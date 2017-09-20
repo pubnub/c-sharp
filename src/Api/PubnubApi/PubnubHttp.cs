@@ -16,10 +16,10 @@ namespace PubnubApi
 {
     public class PubnubHttp : IPubnubHttp
     {
-        private PNConfiguration pubnubConfig = null;
-        private IJsonPluggableLibrary jsonLib = null;
-        private IPubnubLog pubnubLog = null;
-        private EndPoint.TelemetryManager pubnubTelemetryMgr = null;
+        private readonly PNConfiguration pubnubConfig;
+        private readonly IJsonPluggableLibrary jsonLib;
+        private readonly IPubnubLog pubnubLog;
+        private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
         private static HttpClient httpClientSubscribe = null;
         private static HttpClient httpClientNonsubscribe = null;

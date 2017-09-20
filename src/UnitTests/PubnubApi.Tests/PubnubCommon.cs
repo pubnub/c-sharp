@@ -2,8 +2,8 @@
 {
     public static class PubnubCommon
     {
-		public const bool PAMEnabled = true;
-		public const bool EnableStubTest = false;
+		public static readonly bool PAMEnabled = true;
+		public static readonly bool EnableStubTest = false;
 
         //USE demo-36 keys for unit tests
         public static readonly string PublishKey = "demo-36";

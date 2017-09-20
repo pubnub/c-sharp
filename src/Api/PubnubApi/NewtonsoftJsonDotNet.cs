@@ -11,8 +11,8 @@ namespace PubnubApi
 {
     public class NewtonsoftJsonDotNet : IJsonPluggableLibrary
     {
-        private PNConfiguration config = null;
-        private IPubnubLog pubnubLog = null;
+        private readonly PNConfiguration config = null;
+        private readonly IPubnubLog pubnubLog = null;
 
         public NewtonsoftJsonDotNet(PNConfiguration pubnubConfig, IPubnubLog log)
         {

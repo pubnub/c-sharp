@@ -6,6 +6,7 @@ using PubnubApi.Interface;
 using System.Net;
 using System.Threading.Tasks;
 using System.Collections;
+using System.Globalization;
 
 namespace PubnubApi.EndPoint
 {
@@ -13,8 +14,8 @@ namespace PubnubApi.EndPoint
     {
         private const int TELEMETRY_TIMER_IN_SEC = 60;
 
-        private PNConfiguration pubnubConfig = null;
-        private IPubnubLog pubnubLog = null;
+        private readonly PNConfiguration pubnubConfig;
+        private readonly IPubnubLog pubnubLog;
 
         private static Dictionary<string, ConcurrentDictionary<double, long>> dicEndpointLatency
         {
@@ -22,7 +23,7 @@ namespace PubnubApi.EndPoint
             set;
         } = new Dictionary<string, ConcurrentDictionary<double, long>>();
 
-        private System.Threading.Timer telemetryTimer { get; set; } = null;
+        private System.Threading.Timer telemetryTimer { get; set; }
 
         public TelemetryManager(PNConfiguration config, IPubnubLog log)
         {
@@ -42,7 +43,7 @@ namespace PubnubApi.EndPoint
 
         private void OnTelemetryIntervalTimeout(System.Object telemetryState)
         {
-            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - OnTelemetryIntervalTimeout => CleanupTelemetryData", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - OnTelemetryIntervalTimeout => CleanupTelemetryData", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
             CleanupTelemetryData();
         }
 
@@ -56,7 +57,9 @@ namespace PubnubApi.EndPoint
                     telemetryTimer.Dispose();
                 }
             }
-            catch { }
+            catch {
+                //Ignore exception caused by dispose
+            }
             finally { telemetryTimer = null; }
         }
 
@@ -88,12 +91,12 @@ namespace PubnubApi.EndPoint
                 case PNOperationType.PNChannelsForGroupOperation:
                     endpoint = "l_cg";
                     break;
-                //case PNOperationType.PNPushNotificationEnabledChannelsOperation:
-                //case PNOperationType.PNAddPushNotificationsOnChannelsOperation:
-                //case PNOperationType.PNRemovePushNotificationsFromChannelsOperation:
-                //case PNOperationType.PNRemoveAllPushNotificationsOperation:
-                //    endpoint = "push";
-                //    break;
+                case PNOperationType.PushGet:
+                case PNOperationType.PushRegister:
+                case PNOperationType.PushRemove:
+                case PNOperationType.PushUnregister:
+                    endpoint = "l_push";
+                    break;
                 case PNOperationType.PNAccessManagerAudit:
                 case PNOperationType.PNAccessManagerGrant:
                     endpoint = "l_pam";
@@ -102,6 +105,7 @@ namespace PubnubApi.EndPoint
                     endpoint = "l_time";
                     break;
                 default:
+                    endpoint = "";
                     break;
             }
 
@@ -126,13 +130,12 @@ namespace PubnubApi.EndPoint
                         elapsedInfo.Add(epochMillisec, latencyMillisec);
                         dicEndpointLatency.Add(latencyEndPoint, elapsedInfo);
                     }
-                    //private string epoch2string(int epoch) { return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(epoch).ToShortDateString();
                     System.Diagnostics.Debug.WriteLine(string.Format("{0} latency = {1}", type, latencyMillisec));
                 }
             }
             catch (Exception ex)
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - StoreLatency error: {1}", DateTime.Now.ToString(), ex.ToString()), pubnubConfig.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - StoreLatency error: {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex.ToString()), pubnubConfig.LogVerbosity);
             }
         }
 
@@ -144,7 +147,7 @@ namespace PubnubApi.EndPoint
                 if (dicEndpointLatency[key] != null && dicEndpointLatency[key].Count > 0)
                 {
                     
-                    dictionaryOpsLatency.Add(key, Math.Round(((double)dicEndpointLatency[key].Average(kvp => kvp.Value) / (double)1000.0), 10).ToString()); //Convert millisec to sec
+                    dictionaryOpsLatency.Add(key, Math.Round(((double)dicEndpointLatency[key].Average(kvp => kvp.Value) / 1000.0), 10).ToString()); //Convert millisec to sec
                 }
             }
             return dictionaryOpsLatency;

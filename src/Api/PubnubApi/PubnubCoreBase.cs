@@ -32,8 +32,7 @@ namespace PubnubApi
         #region "Class variables"
         private bool enableResumeOnReconnect = true;
         protected bool OverrideTcpKeepAlive { get; set; } = true;
-        //protected static System.Threading.Timer LocalClientHeartBeatTimer { get; set; } = null;
-        protected System.Threading.Timer PresenceHeartbeatTimer { get; set; } = null;
+        protected System.Threading.Timer PresenceHeartbeatTimer { get; set; }
         protected static bool PubnetSystemActive { get; set; } = true;
         protected Collection<Uri> PushRemoteImageDomainUri { get; set; } = new Collection<Uri>();
         protected int ConnectionErrors { get; set; } = 0;
@@ -43,12 +42,12 @@ namespace PubnubApi
         private const int MAXEXPONENTIALBACKOFF = 32;
         private const int INTERVAL = 3;
 
-        private IPubnubHttp pubnubHttp = null;
-        private PNConfiguration pubnubConfig = null;
-        private IJsonPluggableLibrary jsonLib = null;
-        private IPubnubUnitTest unitTest = null;
-        private IPubnubLog pubnubLog = null;
-        private EndPoint.TelemetryManager pubnubTelemetryMgr = null;
+        private IPubnubHttp pubnubHttp;
+        private PNConfiguration pubnubConfig;
+        private IJsonPluggableLibrary jsonLib;
+        private IPubnubUnitTest unitTest;
+        private IPubnubLog pubnubLog;
+        private EndPoint.TelemetryManager pubnubTelemetryMgr;
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
         private static HttpClient httpClientSubscribe = null;
         private static HttpClient httpClientNonsubscribe = null;
@@ -141,15 +140,13 @@ namespace PubnubApi
             set;
         } = new Dictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>>();
 
-        //protected static Dictionary<string, ConcurrentDictionary<Uri, Timer>> ChannelLocalClientHeartbeatTimer { get; set; } = new Dictionary<string, ConcurrentDictionary<Uri, Timer>>();
-
         protected static ConcurrentDictionary<string, DateTime> SubscribeRequestTracker
         {
             get;
             set;
         } = new ConcurrentDictionary<string, DateTime>();
 
-        public PubnubCoreBase(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager)
+        protected PubnubCoreBase(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager)
         {
             if (pubnubConfiguation == null)
             {

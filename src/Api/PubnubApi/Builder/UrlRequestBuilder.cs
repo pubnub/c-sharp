@@ -9,12 +9,12 @@ namespace PubnubApi
 {
     public sealed class UrlRequestBuilder : IUrlRequestBuilder
     {
-        private PNConfiguration pubnubConfig = null;
-        private IJsonPluggableLibrary jsonLib = null;
-        private IPubnubUnitTest pubnubUnitTest = null;
-        private IPubnubLog pubnubLog = null;
+        private readonly PNConfiguration pubnubConfig;
+        private readonly IJsonPluggableLibrary jsonLib ;
+        private readonly IPubnubUnitTest pubnubUnitTest;
+        private readonly IPubnubLog pubnubLog;
         private string pubnubInstanceId = "";
-        private EndPoint.TelemetryManager telemetryMgr;
+        private readonly EndPoint.TelemetryManager telemetryMgr;
 
         public UrlRequestBuilder(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager pubnubTelemetryMgr)
         {
@@ -621,7 +621,7 @@ namespace PubnubApi
             url.Add("sub-key");
             url.Add(pubnubConfig.SubscribeKey);
             url.Add("devices");
-            url.Add(pushToken.ToString());
+            url.Add(pushToken);
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
@@ -780,11 +780,10 @@ namespace PubnubApi
                     }
                 }
 
-            }
-
-            if (!string.IsNullOrEmpty(pubnubConfig.SecretKey))
-            {
-                ret.Add("timestamp", timeStamp.ToString());
+                if (!string.IsNullOrEmpty(pubnubConfig.SecretKey))
+                {
+                    ret.Add("timestamp", timeStamp.ToString());
+                }
             }
 
             if (type != PNOperationType.PNTimeOperation
@@ -805,7 +804,7 @@ namespace PubnubApi
             string signature = "";
             StringBuilder string_to_sign = new StringBuilder();
             string_to_sign.Append(this.pubnubConfig.SubscribeKey).Append("\n").Append(this.pubnubConfig.PublishKey).Append("\n");
-            string_to_sign.Append(partialUrl.ToString()).Append("\n");
+            string_to_sign.Append(partialUrl).Append("\n");
             string_to_sign.Append(queryStringToSign);
 
             PubnubCrypto pubnubCrypto = new PubnubCrypto(this.pubnubConfig.CipherKey, this.pubnubConfig, this.pubnubLog);
@@ -839,11 +838,11 @@ namespace PubnubApi
                         partialUrl.Append("/");
                         if (type == PNOperationType.PNPublishOperation && componentIndex == urlComponentList.Count - 1)
                         {
-                            partialUrl.Append(new UriUtil().EncodeUriComponent(urlComponentList[componentIndex].ToString(), type, false, false));
+                            partialUrl.Append(new UriUtil().EncodeUriComponent(urlComponentList[componentIndex], type, false, false));
                         }
                         else
                         {
-                            partialUrl.Append(new UriUtil().EncodeUriComponent(urlComponentList[componentIndex].ToString(), type, true, false));
+                            partialUrl.Append(new UriUtil().EncodeUriComponent(urlComponentList[componentIndex], type, true, false));
                         }
                     }
 
@@ -889,11 +888,11 @@ namespace PubnubApi
 
                 if (type == PNOperationType.PNPublishOperation && componentIndex == urlComponents.Count - 1)
                 {
-                    url.Append(new UriUtil().EncodeUriComponent(urlComponents[componentIndex].ToString(), type, false, false));
+                    url.Append(new UriUtil().EncodeUriComponent(urlComponents[componentIndex], type, false, false));
                 }
                 else
                 {
-                    url.Append(new UriUtil().EncodeUriComponent(urlComponents[componentIndex].ToString(), type, true, false));
+                    url.Append(new UriUtil().EncodeUriComponent(urlComponents[componentIndex], type, true, false));
                 }
             }
 

@@ -13,15 +13,15 @@ namespace PubnubApi
 	#region "Network Status -- code split required"
 	internal class ClientNetworkStatus
 	{
-        private static IJsonPluggableLibrary jsonLib;
-        private static PNConfiguration pubnubConfig;
-        private static IPubnubUnitTest unit = null;
-        private IPubnubLog pubnubLog = null;
+        private readonly IJsonPluggableLibrary jsonLib;
+        private readonly PNConfiguration pubnubConfig;
+        private readonly IPubnubUnitTest unit;
+        private readonly IPubnubLog pubnubLog;
 
         private static bool networkStatus = true;
-		private static bool machineSuspendMode = false;
+		private static bool machineSuspendMode;
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
-        private static HttpClient httpClient = null;
+        private static HttpClient httpClient;
 #endif
 
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
@@ -78,7 +78,7 @@ namespace PubnubApi
                 Task[] tasks = new Task[1];
 
                 tasks[0] = Task.Factory.StartNew(async() => await CheckClientNetworkAvailability(CallbackClientNetworkStatus, type, callback, channels, channelGroups));
-
+                tasks[0].ConfigureAwait(false);
                 try
                 {
                     Task.WaitAll(tasks);
@@ -95,13 +95,13 @@ namespace PubnubApi
 		}
 		//#endif
 
-		private void CallbackClientNetworkStatus(bool status)
+		private static void CallbackClientNetworkStatus(bool status)
 		{
 			networkStatus = status;
 		}
 
         private static object internetCheckLock = new object();
-        private static bool isInternetCheckRunning = false;
+        private static bool isInternetCheckRunning;
 
         internal bool IsInternetCheckRunning()
         {
@@ -118,24 +118,16 @@ namespace PubnubApi
                     return networkStatus;
                 }
             }
-            //mres = new ManualResetEvent(false);
-
 
 			InternetState<T> state = new InternetState<T>();
 			state.InternalCallback = internalCallback;
             state.PubnubCallbacck = callback;
             state.ResponseType = type;
-            //state.ErrorCallback = errorCallback;
             state.Channels = channels;
             state.ChannelGroups = channelGroups;
 
-            networkStatus = await CheckSocketConnect<T>(state);
+            networkStatus = await CheckSocketConnect<T>(state).ConfigureAwait(false);
             return networkStatus;
-
-            //ThreadPool.QueueUserWorkItem(CheckSocketConnect<T>, state);
-
-            //mres.WaitOne(500);
-
 		}
 
         private async Task<bool> CheckSocketConnect<T>(object internetState)
@@ -213,7 +205,7 @@ namespace PubnubApi
             {
                 isInternetCheckRunning = false;
             }
-            return await t.Task;
+            return await t.Task.ConfigureAwait(false);
 		}
 
 
@@ -230,19 +222,6 @@ namespace PubnubApi
 
 			LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} ParseCheckSocketConnectException Error. {1}", DateTime.Now.ToString(), ex.Message), pubnubConfig.LogVerbosity);
 			internalcallback(false);
-		}
-
-		private static void JsonResponseToCallback<T>(object result, Action<T> callback)
-		{
-			string callbackJson = "";
-
-			if (typeof(T) == typeof(string))
-			{
-				callbackJson = jsonLib.SerializeToJsonString(result);
-
-				Action<string> castCallback = callback as Action<string>;
-				castCallback(callbackJson);
-			}
 		}
 
 	}

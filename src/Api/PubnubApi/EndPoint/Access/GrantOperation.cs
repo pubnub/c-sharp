@@ -11,26 +11,27 @@ namespace PubnubApi.EndPoint
 {
     public class GrantOperation : PubnubCoreBase
     {
-        private PNConfiguration config = null;
-        private IJsonPluggableLibrary jsonLibrary = null;
-        private IPubnubUnitTest unit;
-        private IPubnubLog pubnubLog = null;
-        private EndPoint.TelemetryManager pubnubTelemetryMgr;
+        private readonly PNConfiguration config;
+        private readonly IJsonPluggableLibrary jsonLibrary;
+        private readonly IPubnubUnitTest unit;
+        private readonly IPubnubLog pubnubLog;
+        private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
-        private string[] channelNames = null;
-        private string[] channelGroupNames = null;
-        private string[] authenticationKeys = null;
-        private bool grantWrite = false;
-        private bool grantRead = false;
-        private bool grantManage = false;
+        private string[] channelNames;
+        private string[] channelGroupNames;
+        private string[] authenticationKeys;
+        private bool grantWrite;
+        private bool grantRead;
+        private bool grantManage;
         private long grantTTL = -1;
-        private PNCallback<PNAccessManagerGrantResult> savedCallback = null;
+        private PNCallback<PNAccessManagerGrantResult> savedCallback;
 
         public GrantOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
+            pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
         }
 
