@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using PubnubApi.Interface;
-using System.Net;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Net;
 
 namespace PubnubApi.EndPoint
 {
-    public class AddPushChannelOperation : PubnubCoreBase
+    public class RemoveAllPushChannelsOperation : PubnubCoreBase
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
@@ -17,11 +16,10 @@ namespace PubnubApi.EndPoint
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         private PNPushType pubnubPushType;
-        private string[] channelNames;
         private string deviceTokenId = "";
-        private PNCallback<PNPushAddChannelResult> savedCallback;
+        private PNCallback<PNPushRemoveAllChannelsResult> savedCallback;
 
-        public AddPushChannelOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
+        public RemoveAllPushChannelsOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
@@ -30,30 +28,24 @@ namespace PubnubApi.EndPoint
             pubnubTelemetryMgr = telemetryManager;
         }
 
-        public AddPushChannelOperation PushType(PNPushType pushType)
+        public RemoveAllPushChannelsOperation PushType(PNPushType pushType)
         {
             this.pubnubPushType = pushType;
             return this;
         }
 
-        public AddPushChannelOperation DeviceId(string deviceId)
+        public RemoveAllPushChannelsOperation DeviceId(string deviceId)
         {
             this.deviceTokenId = deviceId;
             return this;
         }
 
-        public AddPushChannelOperation Channels(string[] channels)
-        {
-            this.channelNames = channels;
-            return this;
-        }
-
-        public void Async(PNCallback<PNPushAddChannelResult> callback)
+        public void Async(PNCallback<PNPushRemoveAllChannelsResult> callback)
         {
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                RegisterDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, callback);
+                RemoveAllChannelsForDevice(this.pubnubPushType, this.deviceTokenId, callback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
@@ -61,39 +53,31 @@ namespace PubnubApi.EndPoint
         {
             Task.Factory.StartNew(() =>
             {
-                RegisterDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, savedCallback);
+                RemoveAllChannelsForDevice(this.pubnubPushType, this.deviceTokenId, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
-        internal void RegisterDevice(string[] channels, PNPushType pushType, string pushToken, PNCallback<PNPushAddChannelResult> callback)
+        internal void RemoveAllChannelsForDevice(PNPushType pushType, string pushToken, PNCallback<PNPushRemoveAllChannelsResult> callback)
         {
-            if (channels == null || channels.Length == 0 || channels[0] == null || channels[0].Trim().Length == 0)
-            {
-                throw new ArgumentException("Missing Channel");
-            }
-
             if (pushToken == null)
             {
                 throw new ArgumentException("Missing deviceId");
             }
 
-            string channel = string.Join(",", channels.OrderBy(x => x).ToArray());
-
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildRegisterDevicePushRequest(channel, pushType, pushToken);
+            Uri request = urlBuilder.BuildUnregisterDevicePushRequest(pushType, pushToken);
 
-            RequestState<PNPushAddChannelResult> requestState = new RequestState<PNPushAddChannelResult>();
-            requestState.Channels = new string[] { channel };
-            requestState.ResponseType = PNOperationType.PushRegister;
+            RequestState<PNPushRemoveAllChannelsResult> requestState = new RequestState<PNPushRemoveAllChannelsResult>();
+            requestState.ResponseType = PNOperationType.PushUnregister;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 
-            string json = UrlProcessRequest<PNPushAddChannelResult>(request, requestState, false);
+            string json = UrlProcessRequest<PNPushRemoveAllChannelsResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<PNPushAddChannelResult>(requestState, json);
+                List<object> result = ProcessJsonResponse<PNPushRemoveAllChannelsResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
             }
         }

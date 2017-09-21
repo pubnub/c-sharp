@@ -183,6 +183,9 @@
     <Compile Include="..\..\Api\PubnubApi\EndPoint\Push\AuditPushChannelOperation.cs">
       <Link>LinkedSourceCode\EndPoint\Push\AuditPushChannelOperation.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\Push\RemoveAllPushChannelsOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\Push\RemoveAllPushChannelsOperation.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\EndPoint\Push\RemovePushChannelOperation.cs">
       <Link>LinkedSourceCode\EndPoint\Push\RemovePushChannelOperation.cs</Link>
     </Compile>
@@ -389,6 +392,9 @@
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Derived\Push\PNPushListProvisionsResultExt.cs">
       <Link>LinkedSourceCode\Model\Derived\Push\PNPushListProvisionsResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Push\PNPushRemoveAllChannelsResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Push\PNPushRemoveAllChannelsResultExt.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Derived\Push\PNPushRemoveChannelResultExt.cs">
       <Link>LinkedSourceCode\Model\Derived\Push\PNPushRemoveChannelResultExt.cs</Link>

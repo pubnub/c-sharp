@@ -17,7 +17,7 @@ namespace PubnubApi
 
         private string instanceId = "";
 
-        private static string sdkVersion = "PubNubCSharp4.0.4.1";
+        private static string sdkVersion = "PubNubCSharp4.0.5.1";
 
         private object savedSubscribeOperation;
 
@@ -135,7 +135,14 @@ namespace PubnubApi
             return removePushChannelOperation;
         }
 
-		public EndPoint.AuditPushChannelOperation AuditPushChannelProvisions()
+        public EndPoint.RemoveAllPushChannelsOperation RemoveAllPushNotificationsFromDeviceWithPushToken()
+        {
+            EndPoint.RemoveAllPushChannelsOperation removeAllPushChannelsOperation = new EndPoint.RemoveAllPushChannelsOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager);
+            removeAllPushChannelsOperation.CurrentPubnubInstance(this);
+            return removeAllPushChannelsOperation;
+        }
+
+        public EndPoint.AuditPushChannelOperation AuditPushChannelProvisions()
 		{
             EndPoint.AuditPushChannelOperation auditPushChannelOperation = new EndPoint.AuditPushChannelOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager);
             auditPushChannelOperation.CurrentPubnubInstance(this);

@@ -14,7 +14,6 @@ namespace PubnubApi
 		{
 			if (pubnubLog != null && logVerbosity == PNLogVerbosity.BODY)
             {
-				//System.Diagnostics.Debug.WriteLine(logText);
 				try
 				{
                     pubnubLog.WriteToLog(logText);

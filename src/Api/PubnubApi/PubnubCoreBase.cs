@@ -280,44 +280,6 @@ namespace PubnubApi
             return clientNetworkStatusInternetStatus;
         }
 
-        //protected void OnPubnubLocalClientHeartBeatTimeoutCallback<T>(System.Object heartbeatState)
-        //{
-        //    RequestState<T> currentState = heartbeatState as RequestState<T>;
-        //    if (currentState != null)
-        //    {
-        //        string channel = (currentState.Channels != null) ? string.Join(",", currentState.Channels.OrderBy(x => x).ToArray()) : "";
-        //        string channelGroup = (currentState.ChannelGroups != null) ? string.Join(",", currentState.ChannelGroups.OrderBy(x => x).ToArray()) : "";
-
-        //        if ((ChannelInternetStatus[PubnubInstance.InstanceId].ContainsKey(channel) || ChannelInternetStatus[PubnubInstance.InstanceId].ContainsKey(channelGroup))
-        //                && (currentState.ResponseType == PNOperationType.PNSubscribeOperation || currentState.ResponseType == PNOperationType.Presence || currentState.ResponseType == PNOperationType.PNHeartbeatOperation)
-        //                && OverrideTcpKeepAlive)
-        //        {
-        //            bool networkConnection = CheckInternetConnectionStatus<T>(PubnetSystemActive, currentState.ResponseType, currentState.PubnubCallback, currentState.Channels, currentState.ChannelGroups);
-
-        //            ChannelInternetStatus[PubnubInstance.InstanceId][channel] = networkConnection;
-        //            ChannelGroupInternetStatus[PubnubInstance.InstanceId][channelGroup] = networkConnection;
-
-        //            if (!networkConnection)
-        //            {
-        //                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, OnPubnubLocalClientHeartBeatTimeoutCallback - Internet connection = {1}", DateTime.Now.ToString(), networkConnection), pubnubConfig.LogVerbosity);
-        //                if (pubnubConfig.ReconnectionPolicy == PNReconnectionPolicy.NONE)
-        //                {
-        //                    if (LocalClientHeartBeatTimer != null)
-        //                    {
-        //                        try
-        //                        {
-        //                            LocalClientHeartBeatTimer.Change(Timeout.Infinite, Timeout.Infinite);
-        //                            LocalClientHeartBeatTimer.Dispose();
-        //                        }
-        //                        catch { }
-        //                    }
-        //                }
-        //                TerminatePendingWebRequest(currentState);
-        //            }
-        //        }
-        //    }
-        //}
-
         protected long GetTimetokenFromMultiplexResult(List<object> result)
         {
             long jsonTimetoken = 0;
@@ -448,11 +410,8 @@ namespace PubnubApi
                                         }
                                         msg.PublishTimetokenMetadata = ttMeta;
                                     }
-                                    //TimetokenMetadata ttMeta = new TimetokenMetadata();
-                                    //msg.PublishTimetokenMetadata = dicItem[key] as TimetokenMetadata;
                                     break;
                                 case "u":
-                                    //TimetokenMetadata ttMeta = new TimetokenMetadata();
                                     msg.UserMetadata = dicItem[key];
                                     break;
                             }
@@ -551,7 +510,6 @@ namespace PubnubApi
                         for (int messageIndex=0; messageIndex < messageList.Count; messageIndex++)
                         {
                             SubscribeMessage currentMessage = messageList[messageIndex];
-                            //Dictionary<string, object> messageDic = jsonLib.ConvertToDictionaryObject(messageList[messageIndex]);
                             if (currentMessage != null)
                             {
                                 string currentMessageChannel = currentMessage.Channel;
@@ -830,20 +788,7 @@ namespace PubnubApi
 
                 if (OverrideTcpKeepAlive) //overrideTcpKeepAlive must be true
                 {
-                    //Eventhough heart-beat is disabled, run one time to check internet connection by setting dueTime=0
-                    //if (LocalClientHeartBeatTimer != null)
-                    //{
-                    //    try
-                    //    {
-                    //        LocalClientHeartBeatTimer.Dispose();
-                    //    }
-                    //    catch { }
-                    //}
-
-                    //LocalClientHeartBeatTimer = new System.Threading.Timer(
-                    //    new TimerCallback(OnPubnubLocalClientHeartBeatTimeoutCallback<T>), pubnubRequestState, 0,
-                    //    (-1 == PubnubLocalHeartbeatCheckIntervalInSeconds) ? Timeout.Infinite : PubnubLocalHeartbeatCheckIntervalInSeconds * 1000);
-                    //ChannelLocalClientHeartbeatTimer[PubnubInstance.InstanceId].AddOrUpdate(requestUri, LocalClientHeartBeatTimer, (key, oldState) => LocalClientHeartBeatTimer);
+                    //Placeholder. To be removed.
                 }
                 else
                 {
@@ -1528,72 +1473,6 @@ namespace PubnubApi
             }
         }
 
-        //protected virtual void TerminateLocalClientHeartbeatTimer()
-        //{
-        //    //TerminateLocalClientHeartbeatTimer(null);
-        //}
-
-        //protected virtual void TerminateLocalClientHeartbeatTimer(Uri requestUri)
-        //{
-        //    if (ChannelLocalClientHeartbeatTimer.Count == 0) return;
-
-        //    if (requestUri != null)
-        //    {
-        //        if (ChannelLocalClientHeartbeatTimer[PubnubInstance.InstanceId].ContainsKey(requestUri))
-        //        {
-        //            Timer requestHeatbeatTimer = null;
-        //            if (ChannelLocalClientHeartbeatTimer[PubnubInstance.InstanceId].TryGetValue(requestUri, out requestHeatbeatTimer) && requestHeatbeatTimer != null)
-        //            {
-        //                try
-        //                {
-        //                    requestHeatbeatTimer.Change(
-        //                        (-1 == PubnubLocalHeartbeatCheckIntervalInSeconds) ? -1 : PubnubLocalHeartbeatCheckIntervalInSeconds * 1000,
-        //                        (-1 == PubnubLocalHeartbeatCheckIntervalInSeconds) ? -1 : PubnubLocalHeartbeatCheckIntervalInSeconds * 1000);
-        //                    requestHeatbeatTimer.Dispose();
-        //                }
-        //                catch (ObjectDisposedException){ /*Known exception to be ignored*/ }
-
-        //                Timer removedTimer = null;
-        //                bool removed = ChannelLocalClientHeartbeatTimer[PubnubInstance.InstanceId].TryRemove(requestUri, out removedTimer);
-        //                if (removed)
-        //                {
-        //                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} Remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString(), requestUri.ToString()), pubnubConfig.LogVerbosity);
-        //                }
-        //                else
-        //                {
-        //                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} Unable to remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString(), requestUri.ToString()), pubnubConfig.LogVerbosity);
-        //                }
-        //            }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        ConcurrentDictionary<Uri, Timer> timerCollection = ChannelLocalClientHeartbeatTimer[PubnubInstance.InstanceId];
-        //        ICollection<Uri> keyCollection = timerCollection.Keys;
-        //        if (keyCollection != null && keyCollection.Count > 0)
-        //        {
-        //            List<Uri> keyList = keyCollection.ToList();
-        //            foreach (Uri key in keyList)
-        //            {
-        //                if (ChannelLocalClientHeartbeatTimer[PubnubInstance.InstanceId].ContainsKey(key))
-        //                {
-        //                    Timer currentTimer = null;
-        //                    if (ChannelLocalClientHeartbeatTimer[PubnubInstance.InstanceId].TryGetValue(key, out currentTimer) && currentTimer != null)
-        //                    {
-        //                        currentTimer.Dispose();
-        //                        Timer removedTimer = null;
-        //                        bool removed = ChannelLocalClientHeartbeatTimer[PubnubInstance.InstanceId].TryRemove(key, out removedTimer);
-        //                        if (!removed)
-        //                        {
-        //                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} TerminateLocalClientHeartbeatTimer(null) - Unable to remove local client heartbeat reference from collection for {1}", DateTime.Now.ToString(), key.ToString()), pubnubConfig.LogVerbosity);
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-
         protected void UpdatePubnubNetworkTcpCheckIntervalInSeconds()
         {
             int timerInterval;
@@ -1801,8 +1680,6 @@ namespace PubnubApi
                 try
                 {
                     httpClientSubscribe.CancelPendingRequests();
-                    //httpClientSubscribe.Dispose();
-                    //httpClientSubscribe = null;
                 }
                 catch { }
             }

@@ -132,8 +132,6 @@ namespace PubnubApi
                         LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} Decrypt Error. {1}", DateTime.Now.ToString(), ex.ToString()), config.LogVerbosity);
                     }
                     throw ex;
-                    //LoggingMethod.WriteToLog(string.Format("DateTime {0} Decrypt Error. {1}", DateTime.Now.ToString(), ex.ToString()), pubnubConfig.LogVerbosity);
-                    //return "**DECRYPT ERROR**";
                 }
             }
         }
