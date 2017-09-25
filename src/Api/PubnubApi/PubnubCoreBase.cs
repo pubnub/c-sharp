@@ -1517,8 +1517,13 @@ namespace PubnubApi
                 {
                     if (ChannelReconnectTimer[PubnubInstance.InstanceId].ContainsKey(key))
                     {
-                        Timer currentTimer = ChannelReconnectTimer[PubnubInstance.InstanceId][key];
-                        currentTimer.Dispose();
+                        try
+                        {
+                            Timer currentTimer = ChannelReconnectTimer[PubnubInstance.InstanceId][key];
+                            currentTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                            currentTimer.Dispose();
+                        }
+                        catch { }
                         Timer removedTimer = null;
                         bool removed = ChannelReconnectTimer[PubnubInstance.InstanceId].TryRemove(key, out removedTimer);
                         if (!removed)
@@ -1542,8 +1547,13 @@ namespace PubnubApi
                 {
                     if (ChannelGroupReconnectTimer.ContainsKey(groupKey))
                     {
-                        Timer currentTimer = ChannelGroupReconnectTimer[PubnubInstance.InstanceId][groupKey];
-                        currentTimer.Dispose();
+                        try
+                        {
+                            Timer currentTimer = ChannelGroupReconnectTimer[PubnubInstance.InstanceId][groupKey];
+                            currentTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                            currentTimer.Dispose();
+                        }
+                        catch { }
                         Timer removedTimer = null;
                         bool removed = ChannelGroupReconnectTimer[PubnubInstance.InstanceId].TryRemove(groupKey, out removedTimer);
                         if (!removed)
