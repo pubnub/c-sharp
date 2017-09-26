@@ -282,7 +282,7 @@ namespace PubnubApiDemo
             config.ReconnectionPolicy = PNReconnectionPolicy.LINEAR;
             //config.UseClassicHttpWebRequest = true;
             //config.FilterExpression = "uuid == '" + config.Uuid +  "'";
-            config.EnableTelemetry = false;
+            //config.EnableTelemetry = false;
 
             pubnub = new Pubnub(config);
             pubnub.AddListener(new SubscribeCallbackExt(
