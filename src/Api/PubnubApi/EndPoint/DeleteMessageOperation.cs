@@ -92,7 +92,6 @@ namespace PubnubApi.EndPoint
             string json = UrlProcessRequest<PNDeleteMessageResult>(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
             {
-                //json = json.Replace("\"error\": False", "\"error\": false"); //THIS IS A HACK UNTIL IT IS FIXED AT SERVER
                 List<object> result = ProcessJsonResponse<PNDeleteMessageResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
             }

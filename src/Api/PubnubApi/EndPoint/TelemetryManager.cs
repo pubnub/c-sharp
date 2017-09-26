@@ -152,29 +152,36 @@ namespace PubnubApi.EndPoint
         private void CleanupTelemetryData()
         {
             double currentEpochMillisec = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
-            foreach (string key in dicEndpointLatency.Keys)
+            string[] latencyOpKeys = dicEndpointLatency.Keys.ToArray<string>();
+            for (int keyIndex = 0; keyIndex < latencyOpKeys.Length; keyIndex++)
             {
-                List<KeyValuePair<double, long>> outdatedLatencies = dicEndpointLatency[key].Where(dt => currentEpochMillisec - dt.Key >= 60000).ToList();
-                if (outdatedLatencies != null && outdatedLatencies.Count > 0)
+                string opKey = latencyOpKeys[keyIndex];
+                ConcurrentDictionary<double, long> outdatedLatencyValue = dicEndpointLatency[opKey];
+                if (dicEndpointLatency != null)
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => {1} outdatedLatencies count = {2}", DateTime.Now.ToString(), key, outdatedLatencies.Count), pubnubConfig.LogVerbosity);
-                    try
+                    List<KeyValuePair<double, long>> outdatedLatencies = outdatedLatencyValue.Where(dt => currentEpochMillisec - dt.Key >= 60000).ToList();
+                    if (outdatedLatencies != null && outdatedLatencies.Count > 0)
                     {
-                        foreach (KeyValuePair<double, long> kvp in outdatedLatencies)
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => {1} outdatedLatencies count = {2}", DateTime.Now.ToString(), opKey, outdatedLatencies.Count), pubnubConfig.LogVerbosity);
+                        try
                         {
-                            if (dicEndpointLatency[key].ContainsKey(kvp.Key))
+                            for(int outdateIndex=0; outdateIndex < outdatedLatencies.Count; outdateIndex++)
                             {
-                                long removeOutdatedLatency;
-                                if (!dicEndpointLatency[key].TryRemove(kvp.Key, out removeOutdatedLatency))
+                                KeyValuePair<double, long> kvp = outdatedLatencies[outdateIndex];
+                                if (dicEndpointLatency[opKey].ContainsKey(kvp.Key))
                                 {
-                                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => removed failed for key = {1}", DateTime.Now.ToString(), kvp.Key), pubnubConfig.LogVerbosity);
+                                    long removeOutdatedLatency;
+                                    if (!dicEndpointLatency[opKey].TryRemove(kvp.Key, out removeOutdatedLatency))
+                                    {
+                                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => removed failed for key = {1}", DateTime.Now.ToString(), kvp.Key), pubnubConfig.LogVerbosity);
+                                    }
                                 }
                             }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => Exception = {1}", DateTime.Now.ToString(), ex.ToString()), pubnubConfig.LogVerbosity);
+                        catch (Exception ex)
+                        {
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => Exception = {1}", DateTime.Now.ToString(), ex.ToString()), pubnubConfig.LogVerbosity);
+                        }
                     }
                 }
             }
