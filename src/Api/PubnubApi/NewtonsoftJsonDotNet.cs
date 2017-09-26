@@ -11,8 +11,8 @@ namespace PubnubApi
 {
     public class NewtonsoftJsonDotNet : IJsonPluggableLibrary
     {
-        private PNConfiguration config = null;
-        private IPubnubLog pubnubLog = null;
+        private readonly PNConfiguration config = null;
+        private readonly IPubnubLog pubnubLog = null;
 
         public NewtonsoftJsonDotNet(PNConfiguration pubnubConfig, IPubnubLog log)
         {
@@ -401,10 +401,7 @@ namespace PubnubApi
 
                             if (!string.IsNullOrEmpty(ack.Level) && ack.Level == "subkey")
                             {
-                                //ack.Payload.Access = new PNAccessManagerGrantResult.Data.SubkeyAccess();
-                                //ack.Payload.Access.Read = grantAckPayloadDic["r"].ToString() == "1";
-                                //ack.Payload.Access.Write = grantAckPayloadDic["w"].ToString() == "1";
-                                //ack.Payload.Access.Manage = grantAckPayloadDic["m"].ToString() == "1";
+                                //Placeholder for subkey level
                             }
                             else
                             {
@@ -706,7 +703,6 @@ namespace PubnubApi
                     }
 
                     ack.Timetoken = Convert.ToInt64(listObject[2].ToString());
-                    //ack.ChannelGroupName = (listObject.Count == 4) ? listObject[2].ToString() : "";
                     ack.Channel = (listObject.Count == 5) ? listObject[4].ToString() : listObject[3].ToString();
                     ack.Channel = ack.Channel.Replace("-pnpres", "");
 
@@ -773,7 +769,6 @@ namespace PubnubApi
                 PNHistoryResult ack = new PNHistoryResult();
                 ack.StartTimeToken = Convert.ToInt64(listObject[1].ToString());
                 ack.EndTimeToken = Convert.ToInt64(listObject[2].ToString());
-                //ack.ChannelName = listObject[3].ToString();
                 List<object> messagesContainer = listObject[0] as List<object>;
                 if (messagesContainer == null)
                 {
@@ -1010,16 +1005,6 @@ namespace PubnubApi
                 {
                     ack = new PNSetStateResult();
 
-                    //if (listObject != null && listObject.Count >= 2 && listObject[1] != null && !string.IsNullOrEmpty(listObject[1].ToString()))
-                    //{
-                    //    ack.ChannelGroupName = listObject[1].ToString().Split(',');
-                    //}
-
-                    //if (listObject != null && listObject.Count >= 3 && listObject[2] != null && !string.IsNullOrEmpty(listObject[2].ToString()))
-                    //{
-                    //    ack.ChannelName = listObject[2].ToString().Split(',');
-                    //}
-
                     ack.State = new Dictionary<string, object>();
 
                     if (setUserStatewDicObj.ContainsKey("payload"))
@@ -1046,15 +1031,6 @@ namespace PubnubApi
                 if (getUserStatewDicObj != null)
                 {
                     ack = new PNGetStateResult();
-
-                    //if (listObject != null && listObject.Count >= 2 && listObject[1] != null && !string.IsNullOrEmpty(listObject[1].ToString()))
-                    //{
-                    //    ack.ChannelGroupName = listObject[1].ToString().Split(',');
-                    //}
-                    //if (listObject != null && listObject.Count >= 3 && listObject[2] != null && !string.IsNullOrEmpty(listObject[2].ToString()))
-                    //{
-                    //    ack.ChannelName = listObject[2].ToString().Split(',');
-                    //}
 
                     ack.StateByUUID = new Dictionary<string, object>();
 
@@ -1138,21 +1114,9 @@ namespace PubnubApi
 
                 PNChannelGroupsAddChannelResult ack = null;
 
-                //int statusCode = 0;
-
                 if (addChToCgDicObj != null)
                 {
                     ack = new PNChannelGroupsAddChannelResult();
-
-                    //if (int.TryParse(addChToCgDicObj["status"].ToString(), out statusCode))
-                    //    ack.Status = statusCode;
-
-                    //ack.Message = addChToCgDicObj["message"].ToString();
-                    //ack.Service = addChToCgDicObj["service"].ToString();
-
-                    //ack.Error = Convert.ToBoolean(addChToCgDicObj["error"].ToString());
-
-                    //ack.ChannelGroup = listObject[1].ToString();
                 }
 
                 ret = (T)Convert.ChangeType(ack, typeof(PNChannelGroupsAddChannelResult), CultureInfo.InvariantCulture);
@@ -1203,24 +1167,6 @@ namespace PubnubApi
 
                     ack.Service = removeCgDicObj["service"].ToString();
                     ack.Message = removeCgDicObj["message"].ToString();
-
-                    //Dictionary<string, object> removeCgPayloadDic = ConvertToDictionaryObject(removeCgDicObj["payload"]);
-                    //if (removeCgPayloadDic != null && removeCgPayloadDic.Count > 0)
-                    //{
-                    //    ack.Payload = new RemoveChannelGroupAck.Data();
-                    //    ack.Payload.ChannelGroupName = removeCgPayloadDic["group"].ToString();
-
-                    //    object[] cgChPayloadChannels = ConvertToObjectArray(removeCgPayloadDic["channels"]);
-                    //    if (cgChPayloadChannels != null && cgChPayloadChannels.Length > 0)
-                    //    {
-                    //        List<string> chList = new List<string>();
-                    //        for (int index = 0; index < cgChPayloadChannels.Length; index++)
-                    //        {
-                    //            chList.Add(cgChPayloadChannels[index].ToString());
-                    //        }
-                    //        ack.Payload.ChannelName = chList.ToArray();
-                    //    }
-                    //}
 
                     ack.Error = Convert.ToBoolean(removeCgDicObj["error"].ToString());
                 }
@@ -1462,10 +1408,6 @@ namespace PubnubApi
                     jsonDict.Add(property.Name, ConvertJTokenToObject(property.Value));
                 }
 
-                //(from childToken in token 
-                //    where childToken is JProperty select childToken as JProperty)
-                //    .ToList()
-                //    .ForEach(property => jsonDict.Add(property.Name, ConvertJTokenToDictionary(property.Value)));
                 return jsonDict;
             }
 

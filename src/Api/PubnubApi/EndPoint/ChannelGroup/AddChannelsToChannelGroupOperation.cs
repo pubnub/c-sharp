@@ -10,15 +10,15 @@ namespace PubnubApi.EndPoint
 {
     public class AddChannelsToChannelGroupOperation : PubnubCoreBase
     {
-        private PNConfiguration config = null;
-        private IJsonPluggableLibrary jsonLibrary = null;
-        private IPubnubUnitTest unit = null;
-        private IPubnubLog pubnubLog = null;
-        private EndPoint.TelemetryManager pnTelemetryMgr;
+        private readonly PNConfiguration config;
+        private readonly IJsonPluggableLibrary jsonLibrary;
+        private readonly IPubnubUnitTest unit;
+        private readonly IPubnubLog pubnubLog;
+        private readonly EndPoint.TelemetryManager pnTelemetryMgr;
 
         private string channelGroupName = "";
-        private string[] channelNames = null;
-        private PNCallback<PNChannelGroupsAddChannelResult> savedCallback = null;
+        private string[] channelNames;
+        private PNCallback<PNChannelGroupsAddChannelResult> savedCallback;
 
         public AddChannelsToChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {

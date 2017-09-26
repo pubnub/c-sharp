@@ -9,14 +9,14 @@ namespace PubnubApi.EndPoint
 {
     public class DeleteChannelGroupOperation : PubnubCoreBase
     {
-        private PNConfiguration config = null;
-        private IJsonPluggableLibrary jsonLibrary = null;
-        private IPubnubUnitTest unit = null;
-        private IPubnubLog pubnubLog = null;
-        private EndPoint.TelemetryManager pubnubTelemetryMgr;
+        private readonly PNConfiguration config;
+        private readonly IJsonPluggableLibrary jsonLibrary;
+        private readonly IPubnubUnitTest unit;
+        private readonly IPubnubLog pubnubLog;
+        private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         private string channelGroupName = "";
-        private PNCallback<PNChannelGroupsDeleteGroupResult> savedCallback = null;
+        private PNCallback<PNChannelGroupsDeleteGroupResult> savedCallback;
 
         public DeleteChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {

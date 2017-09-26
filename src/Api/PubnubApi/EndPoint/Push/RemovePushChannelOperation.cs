@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using PubnubApi.Interface;
 using System.Threading.Tasks;
 using System.Threading;
@@ -11,16 +10,16 @@ namespace PubnubApi.EndPoint
 {
     public class RemovePushChannelOperation : PubnubCoreBase
     {
-        private PNConfiguration config = null;
-        private IJsonPluggableLibrary jsonLibrary = null;
-        private IPubnubUnitTest unit = null;
-        private IPubnubLog pubnubLog = null;
-        private EndPoint.TelemetryManager pubnubTelemetryMgr;
+        private readonly PNConfiguration config;
+        private readonly IJsonPluggableLibrary jsonLibrary;
+        private readonly IPubnubUnitTest unit;
+        private readonly IPubnubLog pubnubLog;
+        private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         private PNPushType pubnubPushType;
-        private string[] channelNames = null;
+        private string[] channelNames;
         private string deviceTokenId = "";
-        private PNCallback<PNPushRemoveChannelResult> savedCallback = null;
+        private PNCallback<PNPushRemoveChannelResult> savedCallback;
 
         public RemovePushChannelOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {

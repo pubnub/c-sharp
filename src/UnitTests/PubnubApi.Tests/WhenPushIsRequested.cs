@@ -15,8 +15,8 @@ namespace PubNubMessaging.Tests
     [TestFixture]
     public class WhenPushIsRequested : TestHarness
     {
-        private static bool receivedMessage = false;
-        private static bool receivedGrantMessage = false;
+        private static bool receivedMessage;
+        private static bool receivedGrantMessage;
 
         private static ManualResetEvent mrePush = new ManualResetEvent(false);
         private static ManualResetEvent grantManualEvent = new ManualResetEvent(false);

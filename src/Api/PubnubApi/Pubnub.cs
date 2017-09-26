@@ -8,18 +8,18 @@ namespace PubnubApi
 {
 	public class Pubnub
 	{
-        private PNConfiguration pubnubConfig = null;
-        private IJsonPluggableLibrary jsonPluggableLibrary = null;
-        private static IPubnubUnitTest pubnubUnitTest = null;
-        private IPubnubLog pubnubLog = null;
-        private EndPoint.ListenerManager listenerManager = null;
-        private EndPoint.TelemetryManager telemetryManager = null;
+        private PNConfiguration pubnubConfig;
+        private IJsonPluggableLibrary jsonPluggableLibrary;
+        private static IPubnubUnitTest pubnubUnitTest;
+        private IPubnubLog pubnubLog;
+        private EndPoint.ListenerManager listenerManager;
+        private readonly EndPoint.TelemetryManager telemetryManager;
 
         private string instanceId = "";
 
-        private static string sdkVersion = "PubNubCSharp4.0.4.1";
+        private static string sdkVersion = "PubNubCSharp4.0.5.1";
 
-        private object savedSubscribeOperation = null;
+        private object savedSubscribeOperation;
 
         #region "PubNub API Channel Methods"
 
@@ -41,7 +41,6 @@ namespace PubnubApi
         public EndPoint.UnsubscribeAllOperation<T> UnsubscribeAll<T>()
         {
             EndPoint.UnsubscribeAllOperation<T> unSubscribeAllOperation = new EndPoint.UnsubscribeAllOperation<T>(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
-            //unSubscribeAllOperation.CurrentPubnubInstance(this);
             return unSubscribeAllOperation;
         }
 
@@ -136,7 +135,14 @@ namespace PubnubApi
             return removePushChannelOperation;
         }
 
-		public EndPoint.AuditPushChannelOperation AuditPushChannelProvisions()
+        public EndPoint.RemoveAllPushChannelsOperation RemoveAllPushNotificationsFromDeviceWithPushToken()
+        {
+            EndPoint.RemoveAllPushChannelsOperation removeAllPushChannelsOperation = new EndPoint.RemoveAllPushChannelsOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager);
+            removeAllPushChannelsOperation.CurrentPubnubInstance(this);
+            return removeAllPushChannelsOperation;
+        }
+
+        public EndPoint.AuditPushChannelOperation AuditPushChannelProvisions()
 		{
             EndPoint.AuditPushChannelOperation auditPushChannelOperation = new EndPoint.AuditPushChannelOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager);
             auditPushChannelOperation.CurrentPubnubInstance(this);
@@ -198,8 +204,6 @@ namespace PubnubApi
             {
                 listenerManager.RemoveListener(listener);
             }
-            //EndPoint.ListenerManager listenerManager = new EndPoint.ListenerManager(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog);
-            //listenerManager.CurrentPubnubInstance(this);
         }
         #endregion
 
@@ -296,8 +300,15 @@ namespace PubnubApi
 
         public string Decrypt(string inputString)
         {
-            if (string.IsNullOrEmpty(inputString)) throw new ArgumentException("inputString is not valid");
-            if (pubnubConfig == null || string.IsNullOrEmpty(pubnubConfig.CipherKey)) throw new Exception("CipherKey missing");
+            if (string.IsNullOrEmpty(inputString))
+            {
+                throw new ArgumentException("inputString is not valid");
+            }
+
+            if (pubnubConfig == null || string.IsNullOrEmpty(pubnubConfig.CipherKey))
+            {
+                throw new Exception("CipherKey missing");
+            }
 
             PubnubCrypto pc = new PubnubCrypto(pubnubConfig.CipherKey);
             return pc.Decrypt(inputString);
@@ -305,7 +316,10 @@ namespace PubnubApi
 
         public string Decrypt(string inputString, string cipherKey)
         {
-            if (string.IsNullOrEmpty(inputString)) throw new ArgumentException("inputString is not valid");
+            if (string.IsNullOrEmpty(inputString))
+            {
+                throw new ArgumentException("inputString is not valid");
+            }
 
             PubnubCrypto pc = new PubnubCrypto(cipherKey);
             return pc.Decrypt(inputString);
@@ -313,8 +327,15 @@ namespace PubnubApi
 
         public string Encrypt(string inputString)
         {
-            if (string.IsNullOrEmpty(inputString)) throw new ArgumentException("inputString is not valid");
-            if (pubnubConfig == null || string.IsNullOrEmpty(pubnubConfig.CipherKey)) throw new Exception("CipherKey missing");
+            if (string.IsNullOrEmpty(inputString))
+            {
+                throw new ArgumentException("inputString is not valid");
+            }
+
+            if (pubnubConfig == null || string.IsNullOrEmpty(pubnubConfig.CipherKey))
+            {
+                throw new Exception("CipherKey missing");
+            }
 
             PubnubCrypto pc = new PubnubCrypto(pubnubConfig.CipherKey);
             return pc.Encrypt(inputString);
@@ -322,7 +343,10 @@ namespace PubnubApi
 
         public string Encrypt(string inputString, string cipherKey)
         {
-            if (string.IsNullOrEmpty(inputString)) throw new ArgumentException("inputString is not valid");
+            if (string.IsNullOrEmpty(inputString))
+            {
+                throw new ArgumentException("inputString is not valid");
+            }
 
             PubnubCrypto pc = new PubnubCrypto(cipherKey);
             return pc.Encrypt(inputString);

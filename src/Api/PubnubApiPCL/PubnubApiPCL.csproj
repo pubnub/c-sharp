@@ -14,7 +14,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubPCL</PackageId>
-    <PackageVersion>4.0.4.1</PackageVersion>
+    <PackageVersion>4.0.5.1</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -22,7 +22,7 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Added Telemetry and fix for PNPushListProvisionsResult</PackageReleaseNotes>
+    <PackageReleaseNotes>Added new method RemoveAllPushNotificationsFromDeviceWithPushToken. Code refactor based on codacy recommendations. Code improvement on Reconnect.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -165,6 +165,7 @@
     <Compile Include="..\PubnubApi\EndPoint\Push\AuditPushChannelOperation.cs">
       <Link>EndPoint\Push\AuditPushChannelOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\Push\RemoveAllPushChannelsOperation.cs" Link="EndPoint\Push\RemoveAllPushChannelsOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\Push\RemovePushChannelOperation.cs">
       <Link>EndPoint\Push\RemovePushChannelOperation.cs</Link>
     </Compile>
@@ -366,6 +367,7 @@
     <Compile Include="..\PubnubApi\Model\Derived\Push\PNPushListProvisionsResultExt.cs">
       <Link>Model\Derived\Push\PNPushListProvisionsResultExt.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\Push\PNPushRemoveAllChannelsResultExt.cs" Link="Model\Derived\Push\PNPushRemoveAllChannelsResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\Push\PNPushRemoveChannelResultExt.cs">
       <Link>Model\Derived\Push\PNPushRemoveChannelResultExt.cs</Link>
     </Compile>

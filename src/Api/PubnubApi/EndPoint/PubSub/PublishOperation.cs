@@ -11,20 +11,20 @@ namespace PubnubApi.EndPoint
 {
     public class PublishOperation : PubnubCoreBase
     {
-        private PNConfiguration config = null;
-        private IJsonPluggableLibrary jsonLibrary = null;
-        private IPubnubUnitTest unit = null;
-        private IPubnubLog pubnubLog = null;
-        private EndPoint.TelemetryManager pubnubTelemetryMgr = null;
+        private readonly PNConfiguration config;
+        private readonly IJsonPluggableLibrary jsonLibrary;
+        private readonly IPubnubUnitTest unit;
+        private readonly IPubnubLog pubnubLog;
+        private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
-        private object msg = null;
+        private object msg;
         private string channelName = "";
         private bool storeInHistory = true;
-        private bool httpPost = false;
-        private Dictionary<string, object> userMetadata = null;
+        private bool httpPost;
+        private Dictionary<string, object> userMetadata;
         private int ttl = -1;
-        private PNCallback<PNPublishResult> savedCallback = null;
-        private bool syncRequest = false;
+        private PNCallback<PNPublishResult> savedCallback;
+        private bool syncRequest;
 
         public PublishOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {

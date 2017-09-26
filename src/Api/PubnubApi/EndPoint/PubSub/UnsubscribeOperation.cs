@@ -8,14 +8,14 @@ namespace PubnubApi.EndPoint
 {
     public class UnsubscribeOperation<T> : PubnubCoreBase
     {
-        private PNConfiguration config = null;
-        private IJsonPluggableLibrary jsonLibrary = null;
-        private IPubnubUnitTest unit = null;
-        private IPubnubLog pubnubLog = null;
-        private EndPoint.TelemetryManager pubnubTelemetryMgr;
+        private readonly PNConfiguration config;
+        private readonly IJsonPluggableLibrary jsonLibrary;
+        private readonly IPubnubUnitTest unit;
+        private readonly IPubnubLog pubnubLog;
+        private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
-        private string[] subscribeChannelNames = null;
-        private string[] subscribeChannelGroupNames = null;
+        private string[] subscribeChannelNames;
+        private string[] subscribeChannelGroupNames;
         private string[] presenceChannelNames = new string[] { };
         private string[] presenceChannelGroupNames = new string[] { };
 

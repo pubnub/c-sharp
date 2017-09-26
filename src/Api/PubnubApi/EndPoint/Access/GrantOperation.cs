@@ -11,44 +11,45 @@ namespace PubnubApi.EndPoint
 {
     public class GrantOperation : PubnubCoreBase
     {
-        private PNConfiguration config = null;
-        private IJsonPluggableLibrary jsonLibrary = null;
-        private IPubnubUnitTest unit;
-        private IPubnubLog pubnubLog = null;
-        private EndPoint.TelemetryManager pubnubTelemetryMgr;
+        private readonly PNConfiguration config;
+        private readonly IJsonPluggableLibrary jsonLibrary;
+        private readonly IPubnubUnitTest unit;
+        private readonly IPubnubLog pubnubLog;
+        private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
-        private string[] channelNames = null;
-        private string[] channelGroupNames = null;
-        private string[] authenticationKeys = null;
-        private bool grantWrite = false;
-        private bool grantRead = false;
-        private bool grantManage = false;
+        private string[] pubnubChannelNames;
+        private string[] pubnubChannelGroupNames;
+        private string[] pamAuthenticationKeys;
+        private bool grantWrite;
+        private bool grantRead;
+        private bool grantManage;
         private long grantTTL = -1;
-        private PNCallback<PNAccessManagerGrantResult> savedCallback = null;
+        private PNCallback<PNAccessManagerGrantResult> savedCallback;
 
         public GrantOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
+            pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
         }
 
         public GrantOperation Channels(string[] channels)
         {
-            this.channelNames = channels;
+            this.pubnubChannelNames = channels;
             return this;
         }
 
         public GrantOperation ChannelGroups(string[] channelGroups)
         {
-            this.channelGroupNames = channelGroups;
+            this.pubnubChannelGroupNames = channelGroups;
             return this;
         }
 
         public GrantOperation AuthKeys(string[] authKeys)
         {
-            this.authenticationKeys = authKeys;
+            this.pamAuthenticationKeys = authKeys;
             return this;
         }
 
@@ -81,7 +82,7 @@ namespace PubnubApi.EndPoint
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                GrantAccess(this.channelNames, this.channelGroupNames, this.authenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, callback);
+                GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, callback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
@@ -89,7 +90,7 @@ namespace PubnubApi.EndPoint
         {
             Task.Factory.StartNew(() =>
             {
-                GrantAccess(this.channelNames, this.channelGroupNames, this.authenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, savedCallback);
+                GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
