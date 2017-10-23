@@ -1023,6 +1023,9 @@ namespace PubnubApi.EndPoint
 
                 if (netState != null && ((netState.Channels != null && netState.Channels.Length > 0) || (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)))
                 {
+                    if (netState.Channels == null) netState.Channels = new string[] { };
+                    if (netState.ChannelGroups != null) netState.ChannelGroups = new string[] { };
+
                     if (netState.Channels != null && netState.Channels.Length > 0)
                     {
                         channel = (netState.Channels.Length > 0) ? string.Join(",", netState.Channels.OrderBy(x=>x).ToArray()) : ",";
@@ -1054,7 +1057,7 @@ namespace PubnubApi.EndPoint
                                 {
                                     PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.NotFound, new Exception("Internet connection problem. Retrying connection"));
                                     status.AffectedChannels.AddRange(netState.Channels.ToList());
-                                    status.AffectedChannelGroups.AddRange(netState.Channels.ToList());
+                                    status.AffectedChannelGroups.AddRange(netState.ChannelGroups.ToList());
                                     Announce(status);
                                 }
 
@@ -1071,7 +1074,7 @@ namespace PubnubApi.EndPoint
 
                             PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.OK, null);
                             status.AffectedChannels.AddRange(netState.Channels.ToList());
-                            status.AffectedChannelGroups.AddRange(netState.Channels.ToList());
+                            status.AffectedChannelGroups.AddRange(netState.ChannelGroups.ToList());
                             Announce(status);
 
                             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, channel={1} {2} reconnectNetworkCallback. Internet Available : {3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), channel, netState.ResponseType, ChannelInternetStatus[PubnubInstance.InstanceId][channel]), config.LogVerbosity);
@@ -1115,7 +1118,7 @@ namespace PubnubApi.EndPoint
                                 {
                                     PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.NotFound, new Exception("Internet connection problem. Retrying connection"));
                                     status.AffectedChannels.AddRange(netState.Channels.ToList());
-                                    status.AffectedChannelGroups.AddRange(netState.Channels.ToList());
+                                    status.AffectedChannelGroups.AddRange(netState.ChannelGroups.ToList());
                                     Announce(status);
                                 }
                             }
@@ -1131,7 +1134,7 @@ namespace PubnubApi.EndPoint
 
                             PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.OK, null);
                             status.AffectedChannels.AddRange(netState.Channels.ToList());
-                            status.AffectedChannelGroups.AddRange(netState.Channels.ToList());
+                            status.AffectedChannelGroups.AddRange(netState.ChannelGroups.ToList());
                             Announce(status);
 
                             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, channelgroup={1} {2} reconnectNetworkCallback. Internet Available", DateTime.Now.ToString(CultureInfo.InvariantCulture), channelGroup, netState.ResponseType), config.LogVerbosity);
@@ -1156,13 +1159,16 @@ namespace PubnubApi.EndPoint
             {
                 if (netState != null)
                 {
-                    string multiChannel = (netState.Channels != null) ? string.Join(",", netState.Channels.OrderBy(x => x).ToArray()) : "";
-                    string multiChannelGroup = (netState.ChannelGroups != null) ? string.Join(",", netState.ChannelGroups.OrderBy(x => x).ToArray()) : "";
-
                     PNStatusCategory errorCategory = PNStatusCategoryHelper.GetPNStatusCategory(ex);
                     PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, errorCategory, null, (int)HttpStatusCode.NotFound, ex);
-                    status.AffectedChannels.AddRange(netState.Channels);
-                    status.AffectedChannels.AddRange(netState.ChannelGroups);
+                    if (netState.Channels != null)
+                    {
+                        status.AffectedChannels.AddRange(netState.Channels.ToList());
+                    }
+                    if (netState.ChannelGroups != null)
+                    {
+                        status.AffectedChannels.AddRange(netState.ChannelGroups.ToList());
+                    }
                     Announce(status);
                 }
 
