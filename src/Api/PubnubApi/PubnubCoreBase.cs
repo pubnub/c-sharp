@@ -896,7 +896,7 @@ namespace PubnubApi
                 PNStatus status = null;
                 Dictionary<string, object> deserializeStatus = jsonLib.DeserializeToDictionaryOfObject(jsonString);
                 int statusCode = 0; //default. assuming all is ok 
-                if (deserializeStatus.Count == 1 && deserializeStatus.ContainsKey("error"))
+                if (deserializeStatus.Count >= 1 && deserializeStatus.ContainsKey("error"))
                 {
                     status = new StatusBuilder(pubnubConfig, jsonLib).CreateStatusResponse<T>(type, PNStatusCategory.PNUnknownCategory, asyncRequestState, (int)HttpStatusCode.NotFound, new Exception(jsonString));
                 }
