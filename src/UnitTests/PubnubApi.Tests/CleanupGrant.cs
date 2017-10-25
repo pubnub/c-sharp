@@ -119,7 +119,7 @@ namespace PubNubMessaging.Tests
                         Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
                     }
                 }
-                catch { }
+                catch {  /* ignore */ }
                 finally
                 {
                     revokeManualEvent.Set();
@@ -166,9 +166,7 @@ namespace PubNubMessaging.Tests
                         }
                     }
                 }
-                catch
-                {
-                }
+                catch {  /* ignore */  }
                 finally
                 {
                     auditManualEvent.Set();

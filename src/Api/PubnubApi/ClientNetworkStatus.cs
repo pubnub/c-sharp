@@ -3,6 +3,7 @@ using System.Threading;
 using System.Net;
 using System.Threading.Tasks;
 using System.IO;
+using System.Globalization;
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -86,7 +87,7 @@ namespace PubnubApi
                 catch (AggregateException ae) {
                     foreach (var ie in ae.InnerExceptions)
                     {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} AggregateException CheckInternetStatus Error: {1} {2} ", DateTime.Now.ToString(), ie.GetType().Name, ie.Message), pubnubConfig.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} AggregateException CheckInternetStatus Error: {1} {2} ", DateTime.Now.ToString(CultureInfo.InvariantCulture), ie.GetType().Name, ie.Message), pubnubConfig.LogVerbosity);
                     }
                 }
 
@@ -114,7 +115,7 @@ namespace PubnubApi
             {
                 if (isInternetCheckRunning)
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} InternetCheckRunning Already running", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} InternetCheckRunning Already running", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
                     return networkStatus;
                 }
             }
@@ -136,7 +137,7 @@ namespace PubnubApi
             {
                 isInternetCheckRunning = true;
             }
-            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} CheckSocketConnect Entered", DateTime.Now.ToString()), pubnubConfig.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} CheckSocketConnect Entered", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
 
             Action<bool> internalCallback = null;
             PNCallback<T> pubnubCallback = null;
@@ -165,13 +166,13 @@ namespace PubnubApi
 
                 if (response.IsSuccessStatusCode)
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} HttpClient CheckSocketConnect Resp {1}", DateTime.Now.ToString(), response.StatusCode.ToString()), pubnubConfig.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} HttpClient CheckSocketConnect Resp {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), response.StatusCode.ToString()), pubnubConfig.LogVerbosity);
                     networkStatus = true;
                     t.TrySetResult(true);
                 }
                 else
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} HttpClient CheckSocketConnect Resp {1}", DateTime.Now.ToString(), response.StatusCode.ToString()), pubnubConfig.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} HttpClient CheckSocketConnect Resp {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), response.StatusCode.ToString()), pubnubConfig.LogVerbosity);
                     networkStatus = false;
                     t.TrySetResult(false);
                 }
@@ -183,7 +184,7 @@ namespace PubnubApi
                 {
                     if (response != null && response.StatusCode == HttpStatusCode.OK)
                     {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} WebRequest CheckSocketConnect Resp {1}", DateTime.Now.ToString(), response.StatusCode.ToString()), pubnubConfig.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} WebRequest CheckSocketConnect Resp {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), response.StatusCode.ToString()), pubnubConfig.LogVerbosity);
                         networkStatus = true;
                         t.TrySetResult(true);
                     }
@@ -193,7 +194,7 @@ namespace PubnubApi
             catch (Exception ex)
             {
                 networkStatus = false;
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} CheckSocketConnect (HttpClient Or Task.Factory) Failed {1}", DateTime.Now.ToString(), ex.Message), pubnubConfig.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} CheckSocketConnect (HttpClient Or Task.Factory) Failed {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex.Message), pubnubConfig.LogVerbosity);
                 if (!networkStatus)
                 {
                     t.TrySetResult(false);
@@ -220,7 +221,7 @@ namespace PubnubApi
                 callback.OnResponse(default(T), status);
             }
 
-			LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} ParseCheckSocketConnectException Error. {1}", DateTime.Now.ToString(), ex.Message), pubnubConfig.LogVerbosity);
+			LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} ParseCheckSocketConnectException Error. {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex.Message), pubnubConfig.LogVerbosity);
 			internalcallback(false);
 		}
 

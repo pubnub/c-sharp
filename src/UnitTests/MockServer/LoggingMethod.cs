@@ -8,7 +8,7 @@ namespace MockServer
 {
 	#region "Logging and error codes -- code split required"
 
-	public class LoggingMethod
+	public static class LoggingMethod
 	{
 		private static int logLevel = 0;
 		private static IMockServerLog mockServerLog = null;

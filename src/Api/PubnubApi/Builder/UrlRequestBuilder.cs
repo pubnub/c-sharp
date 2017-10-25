@@ -856,7 +856,7 @@ namespace PubnubApi
             }
             catch (Exception ex)
             {
-                LoggingMethod.WriteToLog(pubnubLog, "UrlRequestBuilder => BuildQueryString error " + ex.ToString(), pubnubConfig.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, "UrlRequestBuilder => BuildQueryString error " + ex, pubnubConfig.LogVerbosity);
             }
 
             return queryString;
@@ -939,7 +939,7 @@ namespace PubnubApi
             }
             catch (Exception ex)
             {
-                LoggingMethod.WriteToLog(pubnubLog, "Exception Inside ForceCanonicalPathAndQuery = " + ex.ToString(), pubnubConfig.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, "Exception Inside ForceCanonicalPathAndQuery = " + ex, pubnubConfig.LogVerbosity);
             }
 #endif
         }

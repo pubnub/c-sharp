@@ -69,7 +69,7 @@ namespace PubnubApi.EndPoint
 
                     TerminateCurrentSubscriberRequest();
                 }
-                catch { }
+                catch {  /* ignore */ }
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
 
         }

@@ -6,6 +6,7 @@ using System.Threading;
 using PubnubApi.Interface;
 using System.Threading.Tasks;
 using System.Net;
+using System.Globalization;
 
 namespace PubnubApi.EndPoint
 {
@@ -112,7 +113,7 @@ namespace PubnubApi.EndPoint
 
             PNPlatform.Print(config, pubnubLog);
 
-            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, requested subscribe for channel(s)={1} and channel group(s)={2}", DateTime.Now.ToString(), channel, channelGroup), config.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, requested subscribe for channel(s)={1} and channel group(s)={2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), channel, channelGroup), config.LogVerbosity);
 
             string[] arrayChannel = new string[] { };
             string[] arrayChannelGroup = new string[] { };

@@ -29,7 +29,7 @@ namespace PubnubApi
                 JObject.Parse(jsonString);
                 ret = true;
             }
-            catch { }
+            catch {  /* ignore */ }
             return ret;
         }
 
@@ -42,7 +42,7 @@ namespace PubnubApi
                 var token = JToken.Parse(jsonString);
                 ret = token;
             }
-            catch { }
+            catch {  /* ignore */ }
 
             return ret;
         }
@@ -74,7 +74,7 @@ namespace PubnubApi
                         }
                     }
                 }
-                catch { }
+                catch {  /* ignore */ }
             }
             return ret;
         }
@@ -109,7 +109,7 @@ namespace PubnubApi
 #endif
                     }
                 }
-                catch { }
+                catch {  /* ignore */ }
             }
             return ret;
         }
@@ -162,7 +162,7 @@ namespace PubnubApi
             {
                 ret = JsonConvert.DeserializeObject<T>(jsonString);
             }
-            catch { }
+            catch { /* ignore */ }
 
             return ret;
         }
@@ -177,20 +177,20 @@ namespace PubnubApi
             {
                 ret = true;
             }
-            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, NET35/40 IsGenericTypeForMessage = {1}", DateTime.Now.ToString(), ret.ToString()), config.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, NET35/40 IsGenericTypeForMessage = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ret.ToString()), config.LogVerbosity);
 #elif (PORTABLE111 || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12 || NETSTANDARD13 || NETSTANDARD14 || UAP || NETFX_CORE || WINDOWS_UWP)
             if (typeof(T).GetTypeInfo().IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(PNMessageResult<>))
             {
                 ret = true;
             }
-            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, typeof(T).GetTypeInfo().IsGenericType = {1}", DateTime.Now.ToString(), typeof(T).GetTypeInfo().IsGenericType.ToString()), config.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, typeof(T).GetTypeInfo().IsGenericType = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), typeof(T).GetTypeInfo().IsGenericType.ToString()), config.LogVerbosity);
             if (typeof(T).GetTypeInfo().IsGenericType)
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, typeof(T).GetGenericTypeDefinition() = {1}", DateTime.Now.ToString(), typeof(T).GetGenericTypeDefinition().ToString()), config.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, typeof(T).GetGenericTypeDefinition() = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), typeof(T).GetGenericTypeDefinition().ToString()), config.LogVerbosity);
             }
-            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, PCL/CORE IsGenericTypeForMessage = {1}", DateTime.Now.ToString(), ret.ToString()), config.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, PCL/CORE IsGenericTypeForMessage = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ret.ToString()), config.LogVerbosity);
 #endif
-            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, IsGenericTypeForMessage = {1}", DateTime.Now.ToString(), ret.ToString()), config.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, IsGenericTypeForMessage = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ret.ToString()), config.LogVerbosity);
             return ret;
         }
 
@@ -1259,7 +1259,7 @@ namespace PubnubApi
                 {
                     ret = (T)(object)listObject;
                 }
-                catch { }
+                catch {  /* ignore */ }
             }
 
             return ret;
