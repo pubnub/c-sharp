@@ -375,13 +375,13 @@ namespace PubnubApi
 
                                         foreach (string metaKey in ttOriginMetaData.Keys)
                                         {
-                                            if (string.Compare(metaKey.ToLowerInvariant(),"t", true) == 0)
+                                            if (metaKey.ToLowerInvariant().Equals("t", StringComparison.CurrentCultureIgnoreCase))
                                             {
                                                 long timetoken;
                                                 Int64.TryParse(ttOriginMetaData[metaKey].ToString(), out timetoken);
                                                 ttMeta.Timetoken = timetoken;
                                             }
-                                            else if (string.Compare(metaKey.ToLowerInvariant(),"r", true) == 0)
+                                            else if (metaKey.ToLowerInvariant().Equals("r", StringComparison.CurrentCultureIgnoreCase))
                                             {
                                                 ttMeta.Region = ttOriginMetaData[metaKey].ToString();
                                             }
@@ -881,7 +881,7 @@ namespace PubnubApi
                 PNStatus status = null;
                 Dictionary<string, object> deserializeStatus = jsonLib.DeserializeToDictionaryOfObject(jsonString);
                 int statusCode = 0; //default. assuming all is ok 
-                if (deserializeStatus.Count >= 1 && deserializeStatus.ContainsKey("error"))
+                if (deserializeStatus.Count >= 1 && deserializeStatus.ContainsKey("error") && string.Equals(deserializeStatus["error"].ToString(),"true", StringComparison.CurrentCultureIgnoreCase))
                 {
                     status = new StatusBuilder(pubnubConfig, jsonLib).CreateStatusResponse<T>(type, PNStatusCategory.PNUnknownCategory, asyncRequestState, (int)HttpStatusCode.NotFound, new Exception(jsonString));
                 }
