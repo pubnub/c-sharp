@@ -98,23 +98,23 @@ namespace PubnubApi
             set;
         } = new Dictionary<string, ConcurrentDictionary<string, Timer>>();
 
-        protected static Dictionary<string, ConcurrentDictionary<string, HttpWebRequest>> ChannelRequest
+        protected static ConcurrentDictionary<string, ConcurrentDictionary<string, HttpWebRequest>> ChannelRequest
         {
             get;
             set;
-        } = new Dictionary<string, ConcurrentDictionary<string, HttpWebRequest>>();
+        } = new ConcurrentDictionary<string, ConcurrentDictionary<string, HttpWebRequest>>();
 
-        protected static Dictionary<string, ConcurrentDictionary<string, bool>> ChannelInternetStatus
+        protected static ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> ChannelInternetStatus
         {
             get;
             set;
-        } = new Dictionary<string, ConcurrentDictionary<string, bool>>();
+        } = new ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>();
 
-        protected static Dictionary<string, ConcurrentDictionary<string, bool>> ChannelGroupInternetStatus
+        protected static ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> ChannelGroupInternetStatus
         {
             get;
             set;
-        } = new Dictionary<string, ConcurrentDictionary<string, bool>>();
+        } = new ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>();
 
         protected static Dictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>> ChannelLocalUserState
         {
