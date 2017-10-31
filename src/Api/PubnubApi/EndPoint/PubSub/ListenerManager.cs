@@ -4,15 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using PubnubApi.Interface;
+using System.Globalization;
 
 namespace PubnubApi.EndPoint
 {
     public class ListenerManager : PubnubCoreBase
     {
         private object syncLockSubscribeCallback = new object();
+        private readonly PNConfiguration pubnubConfig;
+        private readonly IPubnubLog pubnubLog;
 
-        public ListenerManager(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
+        public ListenerManager(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(config, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
+            this.pubnubConfig = config;
+            this.pubnubLog = log;
         }
 
         internal void CurrentPubnubInstance(Pubnub instance)
@@ -26,19 +31,25 @@ namespace PubnubApi.EndPoint
             {
                 lock (syncLockSubscribeCallback)
                 {
-                    if (SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+                    try
                     {
-                        List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
-                        callbackList.Add(listener);
-                        SubscribeCallbackListenerList[PubnubInstance.InstanceId] = callbackList;
+                        if (SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+                        {
+                            List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+                            callbackList.Add(listener);
+                            SubscribeCallbackListenerList[PubnubInstance.InstanceId] = callbackList;
+                        }
+                        else
+                        {
+                            List<SubscribeCallback> callbackList = new List<SubscribeCallback>();
+                            callbackList.Add(listener);
+                            SubscribeCallbackListenerList.Add(PubnubInstance.InstanceId, callbackList);
+                        }
                     }
-                    else
+                    catch(Exception ex)
                     {
-                        List<SubscribeCallback> callbackList = new List<SubscribeCallback>();
-                        callbackList.Add(listener);
-                        SubscribeCallbackListenerList.Add(PubnubInstance.InstanceId, callbackList);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, ListenerManager AddListener => Exception = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), pubnubConfig.LogVerbosity);
                     }
-                    
                 }
             }
         }
@@ -49,11 +60,18 @@ namespace PubnubApi.EndPoint
             {
                 lock (syncLockSubscribeCallback)
                 {
-                    if (SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+                    try
                     {
-                        List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
-                        callbackList.Remove(listener);
-                        SubscribeCallbackListenerList[PubnubInstance.InstanceId] = callbackList;
+                        if (SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+                        {
+                            List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+                            callbackList.Remove(listener);
+                            SubscribeCallbackListenerList[PubnubInstance.InstanceId] = callbackList;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, ListenerManager RemoveListener => Exception = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), pubnubConfig.LogVerbosity);
                     }
                 }
             }
