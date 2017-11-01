@@ -592,13 +592,6 @@ namespace PubNubMessaging.Tests
                         case "ThenSubscribeShouldReturnEmojiMessageSecretSSL":
                             subscribeManualEvent.Set();
                             break;
-                        //case "ThenSubscribeShouldReturnConnectStatus":
-                        //case "ThenMultiSubscribeShouldReturnConnectStatus":
-                        //case "ThenMultiSubscribeShouldReturnConnectStatusSSL":
-                        //case "ThenSubscriberShouldBeAbleToReceiveManyMessages":
-                        //    receivedMessage = true;
-                        //    subscribeManualEvent.Set();
-                        //    break;
                         default:
                             break;
                     }

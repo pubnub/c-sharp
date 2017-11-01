@@ -11,13 +11,9 @@ namespace PubNubMessaging.Tests
     public class WhenUnsubscribedToAChannel : TestHarness
     {
         private static ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
-        //ManualResetEvent meChannelSubscribed = new ManualResetEvent(false);
-        //ManualResetEvent meChannelUnsubscribed = new ManualResetEvent(false);
         private static ManualResetEvent grantManualEvent = new ManualResetEvent(false);
 
         private static bool receivedMessage = false;
-        //bool receivedUnsubscribedMessage = false;
-        //bool receivedChannelConnectedMessage = false;
         private static bool receivedGrantMessage = false;
 
         private static int manualResetEventWaitTimeout = 310 * 1000;
@@ -172,82 +168,6 @@ namespace PubNubMessaging.Tests
 
             Assert.IsTrue(receivedMessage, "WhenUnsubscribedToAChannel --> ThenShouldReturnUnsubscribedMessage Failed");
         }
-
-        //void ThenUnsubscribeInitializeShouldReturnGrantMessage(PNAccessManagerGrantResult receivedMessage)
-        //{
-        //    try
-        //    {
-        //        if (receivedMessage != null)
-        //        {
-        //            var status = receivedMessage.StatusCode;
-        //            if (status == 200)
-        //            {
-        //                receivedGrantMessage = true;
-        //            }
-
-        //        }
-        //    }
-        //    catch { }
-        //    finally
-        //    {
-        //        grantManualEvent.Set();
-        //    }
-        //}
-
-        //private void DummyMethodChannelSubscribeUserCallback(PNMessageResult<string> result)
-        //{
-        //}
-
-        //private void DummyMethodChannelSubscribeConnectCallback(ConnectOrDisconnectAck result)
-        //{
-        //    if (result.StatusMessage.Contains("Connected"))
-        //    {
-        //        receivedChannelConnectedMessage = true;
-        //    }
-        //    meChannelSubscribed.Set();
-        //}
-
-        //private void DummyMethodUnsubscribeChannelUserCallback(string result)
-        //{
-        //}
-
-        //private void DummyMethodUnsubscribeChannelConnectCallback(ConnectOrDisconnectAck result)
-        //{
-        //}
-
-        //private void DummyMethodUnsubscribeChannelDisconnectCallback(ConnectOrDisconnectAck result)
-        //{
-        //    if (result.StatusMessage.Contains("Unsubscribed from"))
-        //    {
-        //        receivedUnsubscribedMessage = true;
-        //    }
-        //    meChannelUnsubscribed.Set();
-        //}
-
-        //private void DummyMethodNoExistChannelUnsubscribeChannelUserCallback(string result)
-        //{
-        //}
-
-        //private void DummyMethodNoExistChannelUnsubscribeChannelConnectCallback(ConnectOrDisconnectAck result)
-        //{
-        //}
-
-        //private void DummyMethodNoExistChannelUnsubscribeChannelDisconnectCallback1(ConnectOrDisconnectAck result)
-        //{
-        //}
-
-        //private void DummyErrorCallback(PubnubClientError result)
-        //{
-        //}
-
-        //private void NoExistChannelErrorCallback(PubnubClientError result)
-        //{
-        //    if (result != null && result.Message.ToLower().Contains("not subscribed"))
-        //    {
-        //        receivedNotSubscribedMessage = true;
-        //    }
-        //    meNotSubscribed.Set();
-        //}
 
         private class UTGrantResult : PNCallback<PNAccessManagerGrantResult>
         {

@@ -835,14 +835,6 @@ namespace PubNubMessaging.Tests
                             }
                             subscribeManualEvent.Set();
                             break;
-                        //case "ThenSubscriberShouldBeAbleToReceiveManyMessages":
-                        //    numberOfReceivedMessages++;
-                        //    if (numberOfReceivedMessages >= 10)
-                        //    {
-                        //        receivedMessage = true;
-                        //        subscribeManualEvent.Set();
-                        //    }
-                        //    break;
                         default:
                             break;
                     }
@@ -920,10 +912,6 @@ namespace PubNubMessaging.Tests
                         case "ChannelAndChannelGroupAndWildcardChannelSubscribeShouldReturnReceivedMessage":
                             subscribeManualEvent.Set();
                             break;
-                        //case "ThenSubscribeShouldReturnWildCardPresenceEventInWildcardPresenceCallback":
-                        //    receivedMessage = true;
-                        //    subscribeManualEvent.Set();
-                        //    break;
                         default:
                             break;
                     }
@@ -981,7 +969,6 @@ namespace PubNubMessaging.Tests
                     if (result != null)
                     {
                         Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                        //if (status.StatusCode == 200 && result.Message.ToLower() == "ok" && result.Service == "channel-registry"&& status.Error == false && result.ChannelGroup.Substring(1) == channelGroupName)
                         if (status.StatusCode == 200 && status.Error == false)
                         {
                             receivedMessage = true;

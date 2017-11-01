@@ -645,12 +645,6 @@ namespace PubNubMessaging.Tests
                         case "ThenSubscribeShouldReturnSpecialCharMessageSecretSSL":
                         case "ThenSubscribeShouldReturnSpecialCharMessageCipherSecret":
                         case "ThenSubscribeShouldReturnSpecialCharMessageCipherSecretSSL":
-                        //    if (publishedMessage.ToString() == message.Message.ToString())
-                        //    {
-                        //        receivedMessage = true;
-                        //    }
-                        //    subscribeManualEvent.Set();
-                        //    break;
                         default:
                             break;
                     }
@@ -727,13 +721,6 @@ namespace PubNubMessaging.Tests
                         case "ThenSubscribeShouldReturnSpecialCharMessageCipherSecretSSL":
                             subscribeManualEvent.Set();
                             break;
-                        //case "ThenSubscribeShouldReturnConnectStatus":
-                        //case "ThenMultiSubscribeShouldReturnConnectStatus":
-                        //case "ThenMultiSubscribeShouldReturnConnectStatusSSL":
-                        //case "ThenSubscriberShouldBeAbleToReceiveManyMessages":
-                        //    receivedMessage = true;
-                        //    subscribeManualEvent.Set();
-                        //    break;
                         default:
                             break;
                     }
