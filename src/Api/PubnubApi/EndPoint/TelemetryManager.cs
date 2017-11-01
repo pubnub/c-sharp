@@ -53,9 +53,7 @@ namespace PubnubApi.EndPoint
                     telemetryTimer.Dispose();
                 }
             }
-            catch {
-                //Ignore exception caused by dispose
-            }
+            catch {  /* Ignore exception caused by dispose */  }
             finally { telemetryTimer = null; }
         }
 
@@ -162,7 +160,7 @@ namespace PubnubApi.EndPoint
                     List<KeyValuePair<double, long>> outdatedLatencies = outdatedLatencyValue.Where(dt => currentEpochMillisec - dt.Key >= 60000).ToList();
                     if (outdatedLatencies != null && outdatedLatencies.Count > 0)
                     {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => {1} outdatedLatencies count = {2}", DateTime.Now.ToString(), opKey, outdatedLatencies.Count), pubnubConfig.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => {1} outdatedLatencies count = {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), opKey, outdatedLatencies.Count), pubnubConfig.LogVerbosity);
                         try
                         {
                             for(int outdateIndex=0; outdateIndex < outdatedLatencies.Count; outdateIndex++)
@@ -173,14 +171,14 @@ namespace PubnubApi.EndPoint
                                     long removeOutdatedLatency;
                                     if (!dicEndpointLatency[opKey].TryRemove(kvp.Key, out removeOutdatedLatency))
                                     {
-                                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => removed failed for key = {1}", DateTime.Now.ToString(), kvp.Key), pubnubConfig.LogVerbosity);
+                                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => removed failed for key = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), kvp.Key), pubnubConfig.LogVerbosity);
                                     }
                                 }
                             }
                         }
                         catch (Exception ex)
                         {
-                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => Exception = {1}", DateTime.Now.ToString(), ex.ToString()), pubnubConfig.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => Exception = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), pubnubConfig.LogVerbosity);
                         }
                     }
                 }

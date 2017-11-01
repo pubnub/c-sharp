@@ -1082,9 +1082,18 @@ namespace PubnubApiDemo
                         Console.WriteLine(string.Format("Channel = {0}", deleteMessageChannel));
                         Console.ResetColor();
                         pubnub.DeleteMessages().Channel(deleteMessageChannel) //.Start(15021998840118350).End(15026815715586992)
+                            .Start(15088506076921021)
+                              .End(15088532035597390)
                             .Async(new PNDeleteMessageResultExt(
                                 (r, s) => {
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    if (s != null && s.Error)
+                                    {
+                                        Console.WriteLine(s.ErrorData.Information);
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    }
                                 }));
 
                         break;

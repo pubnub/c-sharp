@@ -177,7 +177,11 @@ namespace PubNubMessaging.Tests
             {
                 Console.WriteLine("DeleteMessage Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
                 Console.WriteLine("DeleteMessage PNStatus => Status = : " + status.StatusCode.ToString());
-                if (result != null && status.StatusCode == 200 && !status.Error)
+                if (status != null && status.Error)
+                {
+                    deleteMessageManualEvent.Set();
+                }
+                else if (result != null && status.StatusCode == 200 && !status.Error)
                 {
                     switch (currentTestCase)
                     {
