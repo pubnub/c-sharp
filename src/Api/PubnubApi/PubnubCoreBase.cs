@@ -68,11 +68,11 @@ namespace PubnubApi
         protected int PubnubNetworkTcpCheckIntervalInSeconds { get; set; } = 3;
         private int PubnubLocalHeartbeatCheckIntervalInSeconds { get; set; } = 30;
 
-        protected static Dictionary<string, List<SubscribeCallback>> SubscribeCallbackListenerList
+        protected static ConcurrentDictionary<string, List<SubscribeCallback>> SubscribeCallbackListenerList
         {
             get;
             set;
-        } = new Dictionary<string, List<SubscribeCallback>>();
+        } = new ConcurrentDictionary<string, List<SubscribeCallback>>();
 
         protected static Dictionary<string, ConcurrentDictionary<string, long>> MultiChannelSubscribe
         {

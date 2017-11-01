@@ -138,7 +138,7 @@ namespace PubnubApi
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
 
-            return BuildRestApiRequest<Uri>(url, currentType, uuid, queryParams);
+            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
         }
 
         Uri IUrlRequestBuilder.BuildPublishRequest(string channel, object originalMessage, bool storeInHistory, int ttl, Dictionary<string, object> userMetaData, bool usePOST, Dictionary<string, string> additionalUrlParams)
@@ -392,18 +392,22 @@ namespace PubnubApi
         {
             PNOperationType currentType = PNOperationType.PNGetStateOperation;
 
-            if (string.IsNullOrEmpty(channelsCommaDelimited) && channelsCommaDelimited.Trim().Length <= 0)
-            {
-                channelsCommaDelimited = ",";
-            }
-
             List<string> url = new List<string>();
             url.Add("v2");
             url.Add("presence");
             url.Add("sub_key");
             url.Add(pubnubConfig.SubscribeKey);
             url.Add("channel");
-            url.Add(channelsCommaDelimited);
+
+            if (string.IsNullOrEmpty(channelsCommaDelimited) && channelsCommaDelimited.Trim().Length <= 0)
+            {
+                url.Add(",");
+            }
+            else
+            {
+                url.Add(channelsCommaDelimited);
+            }
+
             url.Add("uuid");
             url.Add(uuid);
 
@@ -799,7 +803,7 @@ namespace PubnubApi
             return ret;
         }
 
-        private string GenerateSignature(PNOperationType type, string queryStringToSign, string partialUrl)
+        private string GenerateSignature(string queryStringToSign, string partialUrl)
         {
             string signature = "";
             StringBuilder string_to_sign = new StringBuilder();
@@ -846,7 +850,7 @@ namespace PubnubApi
                         }
                     }
 
-                    string signature = GenerateSignature(type, queryToSign, partialUrl.ToString());
+                    string signature = GenerateSignature(queryToSign, partialUrl.ToString());
                     queryString = string.Format("{0}&signature={1}", queryToSign, signature);
                 }
                 else
@@ -863,12 +867,7 @@ namespace PubnubApi
         }
 
         private Uri BuildRestApiRequest<T>(List<string> urlComponents, PNOperationType type, string queryString)
-        {
-            return BuildRestApiRequest<T>(urlComponents, type, this.pubnubConfig.Uuid, queryString);
-        }
-
-        private Uri BuildRestApiRequest<T>(List<string> urlComponents, PNOperationType type, string uuid, string queryString)
-        {
+        {   
             StringBuilder url = new StringBuilder();
 
             if (pubnubConfig.Secure)
@@ -942,22 +941,6 @@ namespace PubnubApi
                 LoggingMethod.WriteToLog(pubnubLog, "Exception Inside ForceCanonicalPathAndQuery = " + ex, pubnubConfig.LogVerbosity);
             }
 #endif
-        }
-
-        private static string Md5(string text)
-        {
-            using (MD5 md5 = new MD5CryptoServiceProvider())
-            {
-                byte[] data = Encoding.Unicode.GetBytes(text);
-                byte[] hash = md5.ComputeHash(data);
-                string hexaHash = "";
-                foreach (byte b in hash)
-                {
-                    hexaHash += String.Format("{0:x2}", b);
-                }
-
-                return hexaHash;
-            }
         }
 
         public static long TranslateUtcDateTimeToSeconds(DateTime dotNetUTCDateTime)

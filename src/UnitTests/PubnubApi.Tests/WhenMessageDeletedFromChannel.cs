@@ -116,8 +116,6 @@ namespace PubNubMessaging.Tests
             server.AddRequest(new Request()
                     .WithMethod("DELETE")
                     .WithPath(string.Format("/v3/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
-                    //.WithParameter("start", -1)
-                    //.WithParameter("end", -1)
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")

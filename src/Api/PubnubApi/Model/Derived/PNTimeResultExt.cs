@@ -8,7 +8,7 @@ namespace PubnubApi
 {
     public class PNTimeResultExt : PNCallback<PNTimeResult>
     {
-        Action<PNTimeResult, PNStatus> callbackAction = null;
+        readonly Action<PNTimeResult, PNStatus> callbackAction = null;
 
         public PNTimeResultExt(Action<PNTimeResult, PNStatus> callback)
         {

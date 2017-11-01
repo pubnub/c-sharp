@@ -8,20 +8,60 @@ namespace PubnubApi
 {
     internal class SubscribeMessage
     {
-        private string a { get; set; } = "";//shard;
-        private string b { get; set; } = "";//subscriptionMatch
-        private string c { get; set; } = ""; //channel
-        private object d { get; set; } = "";//payload
-        //private bool ear { get; set;} //eat after reading
-        private string f { get; set; } = "";//flags
-        private string i { get; set; } = "";//issuingClientId
-        private string k { get; set; } = "";//subscribeKey
-        private long s { get; set; } //sequenceNumber
-        private TimetokenMetadata o { get; set; } //originatingTimetoken
-        private TimetokenMetadata p { get; set; } //publishMetadata
-        //private string r { get; set;} //replicationMap
-        private object u { get; set; } //userMetadata
-                                       //private string w { get; set;} //waypointList
+        /// <summary>
+        /// shard
+        /// </summary>
+        private string a { get; set; } = "";
+
+        /// <summary>
+        /// subscriptionMatch
+        /// </summary>
+        private string b { get; set; } = "";
+
+        /// <summary>
+        /// channel
+        /// </summary>
+        private string c { get; set; } = "";
+
+        /// <summary>
+        /// payload
+        /// </summary>
+        private object d { get; set; } = "";
+
+        /// <summary>
+        /// flags
+        /// </summary>
+        private string f { get; set; } = "";
+
+        /// <summary>
+        /// issuingClientId
+        /// </summary>
+        private string i { get; set; } = "";
+
+        /// <summary>
+        /// subscribeKey
+        /// </summary>
+        private string k { get; set; } = "";
+
+        /// <summary>
+        /// sequenceNumber
+        /// </summary>
+        private long s { get; set; }
+
+        /// <summary>
+        /// originatingTimetoken
+        /// </summary>
+        private TimetokenMetadata o { get; set; }
+
+        /// <summary>
+        /// publishMetadata
+        /// </summary>
+        private TimetokenMetadata p { get; set; }
+
+        /// <summary>
+        /// userMetadata
+        /// </summary>
+        private object u { get; set; }
 
         public SubscribeMessage() { }
 
@@ -72,12 +112,6 @@ namespace PubnubApi
                 d = value;
             }
         }
-
-        /*public bool EatAfterReading{
-            get{
-                return ear;
-            }
-        }*/
 
         public string Flags
         {
@@ -151,12 +185,6 @@ namespace PubnubApi
             }
         }
 
-        /*public object ReplicationMap{
-            get{
-                return r;
-            }
-        }*/
-
         public object UserMetadata
         {
             get
@@ -168,13 +196,6 @@ namespace PubnubApi
                 u = value;
             }
         }
-
-        /*public string WaypointList{
-            get{
-                return w;
-            }
-        }*/
-
 
     }
 }

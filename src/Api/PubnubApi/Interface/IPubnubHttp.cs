@@ -14,8 +14,6 @@ namespace PubnubApi
 
         HttpWebRequest SetServicePointSetTcpKeepAlive(HttpWebRequest request);
 
-        //void SendRequestAndGetResult<T>(Uri requestUri, RequestState<T> pubnubRequestState, PubnubWebRequest request);
-
         Task<string> SendRequestAndGetJsonResponse<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request);
 
         Task<string> SendRequestAndGetJsonResponseWithPOST<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request, string postData);

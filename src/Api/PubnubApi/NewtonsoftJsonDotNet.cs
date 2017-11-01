@@ -841,8 +841,6 @@ namespace PubnubApi
                             hereNowResult.TotalChannels = Int32.Parse(hereNowPayloadDic["total_channels"].ToString());
                             if (hereNowPayloadDic.ContainsKey("channels"))
                             {
-                                Dictionary<string, PNHereNowChannelData> hereNowChannelData = new Dictionary<string, PNHereNowChannelData>();
-
                                 Dictionary<string, object> hereNowChannelListDic = ConvertToDictionaryObject(hereNowPayloadDic["channels"]);
                                 if (hereNowChannelListDic != null && hereNowChannelListDic.Count > 0)
                                 {
@@ -1462,8 +1460,6 @@ namespace PubnubApi
                     break;
                 case "System.Object":
                     userMessage = Convert.ChangeType(inputValue, typeof(System.Object), CultureInfo.InvariantCulture);
-                    break;
-                default:
                     break;
             }
 

@@ -81,7 +81,6 @@ namespace PubnubApi
         /// <param name="value">Hex Value.</param>
         public static string ConvertHexToUnicodeChars(string value)
         {
-            //if(;
             return Regex.Replace(
                 value,
                 @"\\u(?<Value>[a-zA-Z0-9]{4})",

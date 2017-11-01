@@ -20,7 +20,7 @@ namespace PubnubApi
 
         public T JsonToObject<T>(List<object> result, bool internalObject)
         {
-            T ret = default(T);
+            T ret;
 
             if (!internalObject)
             {

@@ -126,7 +126,6 @@ namespace PubnubApi
                 throw new ArgumentOutOfRangeException("index");
             }
 
-            //Contract.EndContractBlock();
             // Check if the character at index is a high surrogate.
             int temp1 = (int)s[index] - HighSurrogateStart;
             if (temp1 >= 0 && temp1 <= 0x7ff)

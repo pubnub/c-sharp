@@ -32,12 +32,12 @@ namespace PubnubApi
             {
                 if (throwable.InnerException != null)
                 {
-                    PNErrorData errorData = new PNErrorData(throwable.InnerException.Message, throwable);
+                    PNErrorData errorData = new PNErrorData(jsonLibrary.SerializeToJsonString(throwable.InnerException.Message), throwable);
                     status.ErrorData = errorData;
                 }
                 else
                 {
-                    PNErrorData errorData = new PNErrorData(throwable.Message, throwable);
+                    PNErrorData errorData = new PNErrorData(jsonLibrary.SerializeToJsonString(throwable.Message), throwable);
                     status.ErrorData = errorData;
                 }
             }

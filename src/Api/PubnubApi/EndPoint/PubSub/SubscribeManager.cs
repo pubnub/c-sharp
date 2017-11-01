@@ -85,7 +85,7 @@ namespace PubnubApi.EndPoint
                     requestState.ResponseType = PNOperationType.Leave;
                     requestState.Reconnect = false;
 
-                    string json = UrlProcessRequest<T>(request, requestState, false);
+                    UrlProcessRequest<T>(request, requestState, false);
 
                     MultiChannelSubscribe[PubnubInstance.InstanceId].Clear();
                     MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Clear();
@@ -390,9 +390,6 @@ namespace PubnubApi.EndPoint
             {
                 bool channelGroupSubscribeOnly = false;
                 SubscribeDisconnected[PubnubInstance.InstanceId] = false;
-
-                string channel = (rawChannels != null) ? string.Join(",", rawChannels.OrderBy(x => x).ToArray()) : "";
-                string channelGroup = (rawChannelGroups != null) ? string.Join(",", rawChannelGroups.OrderBy(x => x).ToArray()) : "";
 
                 if (rawChannels.Length > 0)
                 {
@@ -755,7 +752,7 @@ namespace PubnubApi.EndPoint
                 }
                 else
                 {
-                    channels = message[message.Count - 1].ToString().Split(',') as string[];
+                    channels = message[message.Count - 1].ToString().Split(',');
                 }
 
                 if (channels.Length == 1 && channels[0] == "")
@@ -770,7 +767,7 @@ namespace PubnubApi.EndPoint
                     }
                     else if (message[message.Count - 2].ToString() != "")
                     {
-                        channelGroups = message[message.Count - 2].ToString().Split(',') as string[];
+                        channelGroups = message[message.Count - 2].ToString().Split(',');
                     }
                 }
             }
@@ -1041,8 +1038,7 @@ namespace PubnubApi.EndPoint
 
                             if (ChannelInternetStatus[PubnubInstance.InstanceId][channel])
                             {
-                                //Reset Retry if previous state is true
-                                //ChannelInternetRetry.AddOrUpdate(channel, 0, (key, oldValue) => 0);
+                                //do nothing
                             }
                             else
                             {
@@ -1105,8 +1101,7 @@ namespace PubnubApi.EndPoint
 
                             if (ChannelGroupInternetStatus[PubnubInstance.InstanceId][channelGroup])
                             {
-                                //Reset Retry if previous state is true
-                                //ChannelGroupInternetRetry.AddOrUpdate(channelGroup, 0, (key, oldValue) => 0);
+                                //do nothing
                             }
                             else
                             {

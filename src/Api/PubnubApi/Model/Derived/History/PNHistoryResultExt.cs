@@ -8,7 +8,7 @@ namespace PubnubApi
 {
     public class PNHistoryResultExt : PNCallback<PNHistoryResult>
     {
-        Action<PNHistoryResult, PNStatus> callbackAction = null;
+        readonly Action<PNHistoryResult, PNStatus> callbackAction = null;
 
         public PNHistoryResultExt(Action<PNHistoryResult, PNStatus> callback)
         {

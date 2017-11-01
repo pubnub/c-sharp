@@ -8,7 +8,7 @@ namespace PubnubApi
 {
     public class PNChannelGroupsAllChannelsResultExt : PNCallback<PNChannelGroupsAllChannelsResult>
     {
-        Action<PNChannelGroupsAllChannelsResult, PNStatus> callbackAction = null;
+        readonly Action<PNChannelGroupsAllChannelsResult, PNStatus> callbackAction = null;
 
         public PNChannelGroupsAllChannelsResultExt(Action<PNChannelGroupsAllChannelsResult, PNStatus> callback)
         {
