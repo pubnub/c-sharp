@@ -161,7 +161,7 @@ namespace PubnubApi.EndPoint
                     if (dicEndpointLatency != null)
                     {
                         IEnumerable<KeyValuePair<double, long>> enumerableOutdatedLatencies = outdatedLatencyValue.Where(dt => currentEpochMillisec - dt.Key >= 60000);
-                        if (enumerableOutdatedLatencies != null && enumerableOutdatedLatencies.Count() > 0)
+                        if (enumerableOutdatedLatencies != null)
                         {
                             Dictionary<double, long> dicOutdatedLatencies = enumerableOutdatedLatencies.ToDictionary(item => item.Key, item => item.Value);
                             if (dicOutdatedLatencies != null && dicOutdatedLatencies.Count > 0)
