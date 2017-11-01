@@ -8,16 +8,17 @@ namespace PubnubApi
 {
     internal class TimetokenMetadata
     {
-        private long t { get; set; } //timetoken;
-        private string r { get; set; } //region;
+        /// <summary>
+        /// timetoken
+        /// </summary>
+        private long t { get; set; }
+
+        /// <summary>
+        /// region
+        /// </summary>
+        private string r { get; set; }
 
         internal TimetokenMetadata() { }
-
-        //internal TimetokenMetadata(long timetoken, string region)
-        //{
-        //    t = timetoken;
-        //    r = region;
-        //}
 
         public long Timetoken
         {

@@ -1,11 +1,6 @@
 using System;
 using System.IO;
 using System.Text;
-//using System.Text.RegularExpressions;
-//using System.Globalization;
-//using Org.BouncyCastle.Crypto;
-//using Org.BouncyCastle.Crypto.Parameters;
-//using Org.BouncyCastle.Security;
 
 namespace PubnubApi
 {

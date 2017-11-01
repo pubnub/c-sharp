@@ -94,8 +94,7 @@ namespace PubnubApi
 
                     if (urlencoded)
                     {
-                        // If .NET 4.5 and above (Thanks @Paya)
-                        //key = WebUtility.UrlDecode(key);
+                        // If .NET 4.5 and above (Thanks @Paya) key = WebUtility.UrlDecode(key);
                         // If .NET 4.0 use this instead.
                         key = Uri.EscapeDataString(key);
                     }

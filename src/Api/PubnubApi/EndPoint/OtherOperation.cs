@@ -64,7 +64,7 @@ namespace PubnubApi.EndPoint
                         requestState.ResponseType = PNOperationType.Leave;
                         requestState.Reconnect = false;
 
-                        string json = UrlProcessRequest(request, requestState, false); // connectCallback = null
+                        UrlProcessRequest(request, requestState, false); // connectCallback = null
                     }
 
                     TerminateCurrentSubscriberRequest();

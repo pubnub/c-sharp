@@ -48,9 +48,6 @@ namespace PubnubApi
 #endif
         }
 
-        private static ManualResetEvent mres = new ManualResetEvent(false);
-        private static ManualResetEvent mreSocketAsync = new ManualResetEvent(false);
-
 		internal static bool MachineSuspendMode
 		{
 			get
@@ -199,7 +196,7 @@ namespace PubnubApi
                 {
                     t.TrySetResult(false);
                     isInternetCheckRunning = false;
-                    ParseCheckSocketConnectException<T>(ex, type, channels, channelGroups, pubnubCallback, internalCallback);
+                    ParseCheckSocketConnectException<T>(ex, type, pubnubCallback, internalCallback);
                 }
             }
             finally
@@ -210,7 +207,7 @@ namespace PubnubApi
 		}
 
 
-        private void ParseCheckSocketConnectException<T>(Exception ex, PNOperationType type, string[] channels, string[] channelGroups, PNCallback<T> callback, Action<bool> internalcallback)
+        private void ParseCheckSocketConnectException<T>(Exception ex, PNOperationType type, PNCallback<T> callback, Action<bool> internalcallback)
 		{
             PNStatusCategory errorCategory = PNStatusCategoryHelper.GetPNStatusCategory(ex);
             StatusBuilder statusBuilder = new StatusBuilder(pubnubConfig, jsonLib);

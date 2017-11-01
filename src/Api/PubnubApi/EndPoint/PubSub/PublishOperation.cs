@@ -117,6 +117,7 @@ namespace PubnubApi.EndPoint
         }
 
         private static PNPublishResult SyncResult { get; set; }
+        private static PNStatus SyncStatus { get; set; }
 
         internal void Retry()
         {
@@ -182,6 +183,7 @@ namespace PubnubApi.EndPoint
             public override void OnResponse(PNPublishResult result, PNStatus status)
             {
                 SyncResult = result;
+                SyncStatus = status;
                 syncEvent.Set();
             }
         }

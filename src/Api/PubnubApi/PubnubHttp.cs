@@ -72,10 +72,7 @@ namespace PubnubApi
 
         HttpWebRequest IPubnubHttp.SetServicePointSetTcpKeepAlive(HttpWebRequest request)
         {
-#if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !NETFX_CORE)
-            //request.ServicePoint.SetTcpKeepAlive(true, base.LocalClientHeartbeatInterval * 1000, 1000);
-#endif
-            //do nothing for mono
+            //do nothing
             return request;
         }
 
@@ -90,7 +87,7 @@ namespace PubnubApi
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
                 return await SendRequestAndGetJsonResponseHttpClient(requestUri, pubnubRequestState, request);
 #else
-                return await SendRequestAndGetJsonResponseTaskFactory(requestUri, pubnubRequestState, request);
+                return await SendRequestAndGetJsonResponseTaskFactory(pubnubRequestState, request);
 #endif
             }
 
@@ -107,7 +104,7 @@ namespace PubnubApi
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
                 return await SendRequestAndGetJsonResponseHttpClientWithPOST(requestUri, pubnubRequestState, request, postData);
 #else
-                return await SendRequestAndGetJsonResponseTaskFactoryWithPOST(requestUri, pubnubRequestState, request, postData);
+                return await SendRequestAndGetJsonResponseTaskFactoryWithPOST(pubnubRequestState, request, postData);
 #endif
             }
         }
@@ -216,7 +213,7 @@ namespace PubnubApi
         }
 #endif
 
-        async Task<string> SendRequestAndGetJsonResponseTaskFactory<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request)
+        async Task<string> SendRequestAndGetJsonResponseTaskFactory<T>(RequestState<T> pubnubRequestState, HttpWebRequest request)
         {
             HttpWebResponse response = null;
             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Inside SendRequestAndGetJsonResponseTaskFactory", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
@@ -292,7 +289,7 @@ namespace PubnubApi
             }
         }
 
-        async Task<string> SendRequestAndGetJsonResponseTaskFactoryWithPOST<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request, string postData)
+        async Task<string> SendRequestAndGetJsonResponseTaskFactoryWithPOST<T>(RequestState<T> pubnubRequestState, HttpWebRequest request, string postData)
         {
             System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Before Task.Factory.FromAsync With POST", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
             try

@@ -122,8 +122,6 @@ namespace PubnubApi
             }
             else
             {
-                //Console.WriteLine("ATTENTION: Error Type = " + errorType);
-                //Console.WriteLine("ATTENTION: Error Message = " + errorMessage);
                 ret = PNStatusCategory.PNUnknownCategory;
             }
             return ret;

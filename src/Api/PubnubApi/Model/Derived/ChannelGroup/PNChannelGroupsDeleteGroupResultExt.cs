@@ -8,7 +8,7 @@ namespace PubnubApi
 {
     public class PNChannelGroupsDeleteGroupResultExt : PNCallback<PNChannelGroupsDeleteGroupResult>
     {
-        Action<PNChannelGroupsDeleteGroupResult, PNStatus> callbackAction = null;
+        readonly Action<PNChannelGroupsDeleteGroupResult, PNStatus> callbackAction = null;
 
         public PNChannelGroupsDeleteGroupResultExt(Action<PNChannelGroupsDeleteGroupResult, PNStatus> callback)
         {
