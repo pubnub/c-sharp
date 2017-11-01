@@ -136,13 +136,20 @@ namespace PubnubApi.EndPoint
         public Dictionary<string, string> GetOperationsLatency()
         {
             Dictionary<string, string> dictionaryOpsLatency = new Dictionary<string, string>();
-            foreach (string key in dicEndpointLatency.Keys)
+            try
             {
-                if (dicEndpointLatency[key] != null && dicEndpointLatency[key].Count > 0)
+                foreach (string key in dicEndpointLatency.Keys)
                 {
-                    
-                    dictionaryOpsLatency.Add(key, Math.Round(((double)dicEndpointLatency[key].Average(kvp => kvp.Value) / 1000.0), 10).ToString()); //Convert millisec to sec
+                    if (dicEndpointLatency[key] != null && dicEndpointLatency[key].Count > 0)
+                    {
+
+                        dictionaryOpsLatency.Add(key, Math.Round(((double)dicEndpointLatency[key].Average(kvp => kvp.Value) / 1000.0), 10).ToString()); //Convert millisec to sec
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - GetOperationsLatency error: {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), pubnubConfig.LogVerbosity);
             }
             return dictionaryOpsLatency;
         }
