@@ -17,7 +17,7 @@ namespace PubnubApi
 
         private string instanceId = "";
 
-        private static string sdkVersion = "PubNubCSharp4.0.7.0";
+        private static string sdkVersion = "PubNubCSharp4.0.8.0";
 
         private object savedSubscribeOperation;
 
@@ -188,22 +188,24 @@ namespace PubnubApi
             return listAllChannelGroupOperation;
         }
 
-        public void AddListener(SubscribeCallback listener)
+        public bool AddListener(SubscribeCallback listener)
         {
             if (listenerManager == null)
             {
                 listenerManager = new EndPoint.ListenerManager(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, null);
                 listenerManager.CurrentPubnubInstance(this);
             }
-            listenerManager.AddListener(listener);
+            return listenerManager.AddListener(listener);
         }
 
-        public void RemoveListener(SubscribeCallback listener)
+        public bool RemoveListener(SubscribeCallback listener)
         {
+            bool ret = false;
             if (listenerManager != null)
             {
-                listenerManager.RemoveListener(listener);
+                ret = listenerManager.RemoveListener(listener);
             }
+            return ret;
         }
         #endregion
 
