@@ -848,11 +848,11 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        internal void Reconnect<T>()
+        internal bool Reconnect<T>(bool resetSubscribeTimetoken)
         {
             if (!SubscribeDisconnected[PubnubInstance.InstanceId]) //Check if disconnect is done before
             {
-                return;
+                return false;
             }
 
             string[] channels = GetCurrentSubscriberChannels();
@@ -897,13 +897,13 @@ namespace PubnubApi.EndPoint
                     status.AffectedChannels.AddRange(chananelGroups);
                     Announce(status);
 
-                    return;
+                    return false;
                 }
             }
             else
             {
                 LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, No channels/channelgroups for SubscribeManager Manual Reconnect", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-                return;
+                return false;
             }
 
 
@@ -912,21 +912,29 @@ namespace PubnubApi.EndPoint
 
             Task.Factory.StartNew(() =>
             {
+                if (resetSubscribeTimetoken)
+                {
+                    LastSubscribeTimetoken[PubnubInstance.InstanceId] = 0;
+                }
                 MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, GetCurrentSubscriberChannels(), GetCurrentSubscriberChannelGroups(), LastSubscribeTimetoken[PubnubInstance.InstanceId], false, null);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+
+            return true;
         }
 
-        internal void Disconnect<T>()
+        internal bool Disconnect<T>()
         {
             if (SubscribeDisconnected[PubnubInstance.InstanceId])
             {
-                return;
+                return false;
             }
             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager Manual Disconnect", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
             SubscribeDisconnected[PubnubInstance.InstanceId] = true;
             TerminateCurrentSubscriberRequest();
             TerminatePresenceHeartbeatTimer();
             TerminateReconnectTimer();
+
+            return true;
         }
 
         internal void StartSubscribeHeartbeatCheckCallback<T>(object state)
