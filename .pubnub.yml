@@ -192,6 +192,7 @@ features:
     - STORAGE-INCLUDE-TIMETOKEN
     - STORAGE-START-END
     - STORAGE-COUNT
+    - STORAGE-DELETE-MESSAGES
   time:
     - TIME-TIME
   subscribe:
