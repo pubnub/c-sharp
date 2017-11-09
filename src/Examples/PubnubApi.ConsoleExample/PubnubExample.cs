@@ -1040,11 +1040,25 @@ namespace PubnubApiDemo
                         break;
                     case "18":
                         Console.WriteLine("Disconnect");
-                        pubnub.Disconnect<object>();
+                        if (pubnub.Disconnect<object>())
+                        {
+                            Console.WriteLine("Disconnect success");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Disconnect failed");
+                        }
                         break;
                     case "19":
                         Console.WriteLine("Re-connect");
-                        pubnub.Reconnect<object>();
+                        if (pubnub.Reconnect<object>())
+                        {
+                            Console.WriteLine("Reconnect success");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Reconnect failed");
+                        }
                         break;
                     case "20":
                         Console.WriteLine("UnsubscribeAll");
