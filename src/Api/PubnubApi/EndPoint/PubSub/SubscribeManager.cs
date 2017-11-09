@@ -557,11 +557,6 @@ namespace PubnubApi.EndPoint
 
             string multiChannel = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : ",";
             string multiChannelGroup = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
-            if (!ChannelRequest.ContainsKey(PubnubInstance.InstanceId) || !ChannelRequest[PubnubInstance.InstanceId].ContainsKey(multiChannel))
-            {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, PubnubInstance.InstanceId NOT matching", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-                return;
-            }
 
             bool networkConnection = CheckInternetConnectionStatus<T>(PubnetSystemActive, type, null, channels, channelGroups);
 
@@ -582,6 +577,13 @@ namespace PubnubApi.EndPoint
                     return;
                 }
             }
+
+            if (!ChannelRequest.ContainsKey(PubnubInstance.InstanceId) || (!multiChannel.Equals(",", StringComparison.CurrentCultureIgnoreCase) && !ChannelRequest[PubnubInstance.InstanceId].ContainsKey(multiChannel)))
+            {
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, PubnubInstance.InstanceId NOT matching", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                return;
+            }
+
 
             // Begin recursive subscribe
             RequestState<T> pubnubRequestState = null;
@@ -640,14 +642,17 @@ namespace PubnubApi.EndPoint
                     string subscribedChannelGroups = (MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys.OrderBy(x => x).Aggregate((x, y) => x + "," + y) : "";
                     string currentChannelGroups = (channelGroups != null && channelGroups.Length > 0) ? channelGroups.OrderBy(x => x).Aggregate((x, y) => x + "," + y) : "";
 
-                    if (subscribedChannels == currentChannels && subscribedChannelGroups == currentChannelGroups)
+                    if (subscribedChannels.Equals(currentChannels, StringComparison.CurrentCultureIgnoreCase) && subscribedChannelGroups.Equals(currentChannelGroups, StringComparison.CurrentCultureIgnoreCase))
                     {
                         List<object> result = ProcessJsonResponse<T>(pubnubRequestState, json);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, result count of ProcessJsonResponse = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), (result != null) ? result.Count : -1), config.LogVerbosity);
+
                         ProcessResponseCallbacks<T>(result, pubnubRequestState);
 
                         if ((pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation || pubnubRequestState.ResponseType == PNOperationType.Presence) && (result != null) && (result.Count > 0))
                         {
                             long jsonTimetoken = GetTimetokenFromMultiplexResult(result);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, jsonTimetoken = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), jsonTimetoken), config.LogVerbosity);
 
                             if (jsonTimetoken > 0)
                             {
@@ -677,6 +682,14 @@ namespace PubnubApi.EndPoint
                                 break;
                         }
 
+                    }
+                    else
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, condition failed for subscribedChannels == currentChannels && subscribedChannelGroups == currentChannelGroups", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, subscribedChannels = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), subscribedChannels), config.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, currentChannels = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), currentChannels), config.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, subscribedChannelGroups = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), subscribedChannelGroups), config.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, currentChannelGroups = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), currentChannelGroups), config.LogVerbosity);
                     }
 
                 }
@@ -782,6 +795,7 @@ namespace PubnubApi.EndPoint
                 long timetoken = GetTimetokenFromMultiplexResult(message);
                 System.Threading.Tasks.Task.Factory.StartNew(() => 
                 {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} MultiplexInternalCallback timetoken = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), timetoken), config.LogVerbosity);
                     MultiChannelSubscribeRequest<T>(type, channels, channelGroups, timetoken, false, null);
                 }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
             }
@@ -834,16 +848,29 @@ namespace PubnubApi.EndPoint
             {
                 LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager ReconnectNetwork interval = {1} sec", DateTime.Now.ToString(CultureInfo.InvariantCulture), PubnubNetworkTcpCheckIntervalInSeconds), config.LogVerbosity);
 
-                System.Threading.Timer timer = new Timer(new TimerCallback(ReconnectNetworkCallback<T>), netState, 0,
-                                                      (-1 == PubnubNetworkTcpCheckIntervalInSeconds) ? Timeout.Infinite : PubnubNetworkTcpCheckIntervalInSeconds * 1000);
+                System.Threading.Timer timer;
 
                 if (netState.Channels != null && netState.Channels.Length > 0)
                 {
-                    ChannelReconnectTimer[PubnubInstance.InstanceId].AddOrUpdate(string.Join(",", netState.Channels.OrderBy(x => x).ToArray()), timer, (key, oldState) => timer);
+                    string reconnectChannelTimerKey = string.Join(",", netState.Channels.OrderBy(x => x).ToArray());
+
+                    if (!ChannelReconnectTimer[PubnubInstance.InstanceId].ContainsKey(reconnectChannelTimerKey))
+                    {
+                        timer = new Timer(new TimerCallback(ReconnectNetworkCallback<T>), netState, 0,
+                                                              (-1 == PubnubNetworkTcpCheckIntervalInSeconds) ? Timeout.Infinite : PubnubNetworkTcpCheckIntervalInSeconds * 1000);
+                        ChannelReconnectTimer[PubnubInstance.InstanceId].AddOrUpdate(reconnectChannelTimerKey, timer, (key, oldState) => timer);
+                    }
                 }
-                if (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)
+                else if (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)
                 {
-                    ChannelGroupReconnectTimer[PubnubInstance.InstanceId].AddOrUpdate(string.Join(",", netState.ChannelGroups.OrderBy(x => x).ToArray()), timer, (key, oldState) => timer);
+                    string reconnectChannelGroupTimerKey = string.Join(",", netState.ChannelGroups.OrderBy(x => x).ToArray());
+
+                    if (!ChannelGroupReconnectTimer[PubnubInstance.InstanceId].ContainsKey(reconnectChannelGroupTimerKey))
+                    {
+                        timer = new Timer(new TimerCallback(ReconnectNetworkCallback<T>), netState, 0,
+                                                              (-1 == PubnubNetworkTcpCheckIntervalInSeconds) ? Timeout.Infinite : PubnubNetworkTcpCheckIntervalInSeconds * 1000);
+                        ChannelGroupReconnectTimer[PubnubInstance.InstanceId].AddOrUpdate(reconnectChannelGroupTimerKey, timer, (key, oldState) => timer);
+                    }
                 }
             }
         }
@@ -1029,11 +1056,12 @@ namespace PubnubApi.EndPoint
                 if (netState != null && ((netState.Channels != null && netState.Channels.Length > 0) || (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)))
                 {
                     if (netState.Channels == null) netState.Channels = new string[] { };
-                    if (netState.ChannelGroups != null) netState.ChannelGroups = new string[] { };
+                    if (netState.ChannelGroups == null) netState.ChannelGroups = new string[] { };
 
                     if (netState.Channels != null && netState.Channels.Length > 0)
                     {
                         channel = (netState.Channels.Length > 0) ? string.Join(",", netState.Channels.OrderBy(x=>x).ToArray()) : ",";
+                        channelGroup = (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0) ? string.Join(",", netState.ChannelGroups.OrderBy(x => x).ToArray()) : "";
 
                         if (channel == subscribedChannels && ChannelInternetStatus[PubnubInstance.InstanceId].ContainsKey(channel)
                             && (netState.ResponseType == PNOperationType.PNSubscribeOperation || netState.ResponseType == PNOperationType.Presence))
@@ -1051,6 +1079,10 @@ namespace PubnubApi.EndPoint
                             else
                             {
                                 ChannelInternetStatus[PubnubInstance.InstanceId].AddOrUpdate(channel, networkConnection, (key, oldValue) => networkConnection);
+                                if (!string.IsNullOrEmpty(channelGroup) && channelGroup.Length > 0)
+                                {
+                                    ChannelGroupInternetStatus[PubnubInstance.InstanceId].AddOrUpdate(channelGroup, networkConnection, (key, oldValue) => networkConnection);
+                                }
 
                                 ConnectionErrors++;
                                 UpdatePubnubNetworkTcpCheckIntervalInSeconds();
@@ -1060,8 +1092,14 @@ namespace PubnubApi.EndPoint
                                 if (netState.Channels != null && netState.Channels.Length > 0)
                                 {
                                     PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.NotFound, new Exception("Internet connection problem. Retrying connection"));
-                                    status.AffectedChannels.AddRange(netState.Channels.ToList());
-                                    status.AffectedChannelGroups.AddRange(netState.ChannelGroups.ToList());
+                                    if (netState.Channels != null && netState.Channels.Length > 0)
+                                    {
+                                        status.AffectedChannels.AddRange(netState.Channels.ToList());
+                                    }
+                                    if (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)
+                                    {
+                                        status.AffectedChannelGroups.AddRange(netState.ChannelGroups.ToList());
+                                    }
                                     Announce(status);
                                 }
 
@@ -1077,8 +1115,14 @@ namespace PubnubApi.EndPoint
                             }
 
                             PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.OK, null);
-                            status.AffectedChannels.AddRange(netState.Channels.ToList());
-                            status.AffectedChannelGroups.AddRange(netState.ChannelGroups.ToList());
+                            if (netState.Channels != null && netState.Channels.Length > 0)
+                            {
+                                status.AffectedChannels.AddRange(netState.Channels.ToList());
+                            }
+                            if (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)
+                            {
+                                status.AffectedChannelGroups.AddRange(netState.ChannelGroups.ToList());
+                            }
                             Announce(status);
 
                             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, channel={1} {2} reconnectNetworkCallback. Internet Available : {3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), channel, netState.ResponseType, ChannelInternetStatus[PubnubInstance.InstanceId][channel]), config.LogVerbosity);
@@ -1096,6 +1140,7 @@ namespace PubnubApi.EndPoint
                     else if (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)
                     {
                         channelGroup = string.Join(",", netState.ChannelGroups.OrderBy(x => x).ToArray());
+                        channel = (netState.Channels != null && netState.Channels.Length > 0) ? string.Join(",", netState.Channels.OrderBy(x => x).ToArray()) : ",";
 
                         if (subscribedChannelGroups == channelGroup && channelGroup != "" && ChannelGroupInternetStatus[PubnubInstance.InstanceId].ContainsKey(channelGroup)
                             && (netState.ResponseType == PNOperationType.PNSubscribeOperation || netState.ResponseType == PNOperationType.Presence))
@@ -1114,14 +1159,24 @@ namespace PubnubApi.EndPoint
                             else
                             {
                                 ChannelGroupInternetStatus[PubnubInstance.InstanceId].AddOrUpdate(channelGroup, networkConnection, (key, oldValue) => networkConnection);
+                                if (!string.IsNullOrEmpty(channel) && channel.Length > 0)
+                                {
+                                    ChannelInternetStatus[PubnubInstance.InstanceId].AddOrUpdate(channel, networkConnection, (key, oldValue) => networkConnection);
+                                }
 
                                 LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, channelgroup={1} {2} reconnectNetworkCallback. Retrying", DateTime.Now.ToString(CultureInfo.InvariantCulture), channelGroup, netState.ResponseType), config.LogVerbosity);
 
                                 if (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)
                                 {
                                     PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.NotFound, new Exception("Internet connection problem. Retrying connection"));
-                                    status.AffectedChannels.AddRange(netState.Channels.ToList());
-                                    status.AffectedChannelGroups.AddRange(netState.ChannelGroups.ToList());
+                                    if (netState.Channels != null && netState.Channels.Length > 0)
+                                    {
+                                        status.AffectedChannels.AddRange(netState.Channels.ToList());
+                                    }
+                                    if (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)
+                                    {
+                                        status.AffectedChannelGroups.AddRange(netState.ChannelGroups.ToList());
+                                    }
                                     Announce(status);
                                 }
                             }
@@ -1129,16 +1184,26 @@ namespace PubnubApi.EndPoint
 
                         if (ChannelGroupInternetStatus[PubnubInstance.InstanceId][channelGroup])
                         {
-                            if (ChannelGroupReconnectTimer.ContainsKey(channelGroup))
+                            if (ChannelGroupReconnectTimer[PubnubInstance.InstanceId].ContainsKey(channelGroup))
                             {
                                 LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, {1} {2} terminating cg reconnectimer", DateTime.Now.ToString(CultureInfo.InvariantCulture), channelGroup, netState.ResponseType), config.LogVerbosity);
                                 TerminateReconnectTimer();
                             }
 
-                            PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.OK, null);
-                            status.AffectedChannels.AddRange(netState.Channels.ToList());
-                            status.AffectedChannelGroups.AddRange(netState.ChannelGroups.ToList());
-                            Announce(status);
+                            //Send one ReConnectedCategory message. If Channels NOT available then use this
+                            if (netState.Channels.Length == 0 && netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)
+                            {
+                                PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.OK, null);
+                                if (netState.Channels != null && netState.Channels.Length > 0)
+                                {
+                                    status.AffectedChannels.AddRange(netState.Channels.ToList());
+                                }
+                                if (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)
+                                {
+                                    status.AffectedChannelGroups.AddRange(netState.ChannelGroups.ToList());
+                                }
+                                Announce(status);
+                            }
 
                             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, channelgroup={1} {2} reconnectNetworkCallback. Internet Available", DateTime.Now.ToString(CultureInfo.InvariantCulture), channelGroup, netState.ResponseType), config.LogVerbosity);
                             switch (netState.ResponseType)
