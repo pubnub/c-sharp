@@ -133,3 +133,4 @@ src/Examples/PubnubApiPCL.XamariniMacExample/obj/*
 *.suo
 src/UnitTests/MockServer/bin/*
 src/UnitTests/MockServer/obj/*
+/src/.vs/Pubnub/v15/Server/sqlite3

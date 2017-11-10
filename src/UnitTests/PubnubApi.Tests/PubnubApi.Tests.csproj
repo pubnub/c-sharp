@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET35</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -491,6 +491,7 @@
     <Compile Include="WhenGetRequestServerTime.cs" />
     <Compile Include="WhenGrantIsRequested.cs" />
     <Compile Include="WhenMessageDeletedFromChannel.cs" />
+    <Compile Include="WhenMessageIsDeserialized.cs" />
     <Compile Include="WhenPushIsRequested.cs" />
     <Compile Include="WhenSubscribedToAChannel.cs" />
     <Compile Include="WhenSubscribedToAChannel2.cs" />
