@@ -11,12 +11,11 @@ namespace PubNubMessaging.Tests
     {
         private static string authKey = "myAuth";
         private PNConfiguration config;
-        private IPubnubLog pubnubLog = null;
 
         [TestFixtureSetUp]
         public void Init()
         {
-            config = new PNConfiguration()
+            config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -34,7 +33,7 @@ namespace PubNubMessaging.Tests
             Object[] content = new Object[] { messageContent };
             JArray jArray = new JArray(content);
 
-            NewtonsoftJsonDotNet newtonsoftJsonDotNet = new NewtonsoftJsonDotNet(config, pubnubLog);
+            NewtonsoftJsonDotNet newtonsoftJsonDotNet = new NewtonsoftJsonDotNet(config, null);
             var listObject = new List<object>
             {
                 jArray,
