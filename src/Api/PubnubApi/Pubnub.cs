@@ -17,7 +17,7 @@ namespace PubnubApi
 
         private string instanceId = "";
 
-        private static string sdkVersion = "PubNubCSharp4.0.7.0";
+        private static string sdkVersion = "PubNubCSharp4.0.8.0";
 
         private object savedSubscribeOperation;
 
@@ -188,22 +188,24 @@ namespace PubnubApi
             return listAllChannelGroupOperation;
         }
 
-        public void AddListener(SubscribeCallback listener)
+        public bool AddListener(SubscribeCallback listener)
         {
             if (listenerManager == null)
             {
                 listenerManager = new EndPoint.ListenerManager(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, null);
                 listenerManager.CurrentPubnubInstance(this);
             }
-            listenerManager.AddListener(listener);
+            return listenerManager.AddListener(listener);
         }
 
-        public void RemoveListener(SubscribeCallback listener)
+        public bool RemoveListener(SubscribeCallback listener)
         {
+            bool ret = false;
             if (listenerManager != null)
             {
-                listenerManager.RemoveListener(listener);
+                ret = listenerManager.RemoveListener(listener);
             }
+            return ret;
         }
         #endregion
 
@@ -274,28 +276,46 @@ namespace PubnubApi
             endpoint.EndPendingRequests();
         }
 
-        public void Reconnect<T>()
+        public bool Reconnect<T>()
         {
+            bool ret = false;
             if (savedSubscribeOperation != null && savedSubscribeOperation is EndPoint.SubscribeOperation<T>)
             {
                 EndPoint.SubscribeOperation<T> subscibeOperationInstance = savedSubscribeOperation as EndPoint.SubscribeOperation<T>;
                 if (subscibeOperationInstance != null)
                 {
-                    subscibeOperationInstance.Retry(true);
+                    ret = subscibeOperationInstance.Retry(true, false);
                 }
             }
+            return ret;
         }
 
-        public void Disconnect<T>()
+        public bool Reconnect<T>(bool resetSubscribeTimetoken)
         {
+            bool ret = false;
             if (savedSubscribeOperation != null && savedSubscribeOperation is EndPoint.SubscribeOperation<T>)
             {
                 EndPoint.SubscribeOperation<T> subscibeOperationInstance = savedSubscribeOperation as EndPoint.SubscribeOperation<T>;
                 if (subscibeOperationInstance != null)
                 {
-                    subscibeOperationInstance.Retry(false);
+                    ret = subscibeOperationInstance.Retry(true, resetSubscribeTimetoken);
                 }
             }
+            return ret;
+        }
+
+        public bool Disconnect<T>()
+        {
+            bool ret = false;
+            if (savedSubscribeOperation != null && savedSubscribeOperation is EndPoint.SubscribeOperation<T>)
+            {
+                EndPoint.SubscribeOperation<T> subscibeOperationInstance = savedSubscribeOperation as EndPoint.SubscribeOperation<T>;
+                if (subscibeOperationInstance != null)
+                {
+                    ret = subscibeOperationInstance.Retry(false);
+                }
+            }
+            return ret;
         }
 
         public string Decrypt(string inputString)

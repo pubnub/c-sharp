@@ -31,7 +31,7 @@ namespace PubnubApi
     {
         #region "Class variables"
         private bool enableResumeOnReconnect = true;
-        protected bool OverrideTcpKeepAlive { get; set; } = true;
+        protected static bool OverrideTcpKeepAlive { get; set; } = true;
         protected System.Threading.Timer PresenceHeartbeatTimer { get; set; }
         protected static bool PubnetSystemActive { get; set; } = true;
         protected Collection<Uri> PushRemoteImageDomainUri { get; set; } = new Collection<Uri>();
@@ -55,7 +55,7 @@ namespace PubnubApi
 #endif
 
         private bool clientNetworkStatusInternetStatus = true;
-        protected static Dictionary<string, bool> SubscribeDisconnected { get; set; } = new Dictionary<string, bool>();
+        protected static ConcurrentDictionary<string, bool> SubscribeDisconnected { get; set; } = new ConcurrentDictionary<string, bool>();
 
         protected Pubnub PubnubInstance { get; set; }
 
@@ -63,7 +63,7 @@ namespace PubnubApi
 
         protected string CurrentUuid { get; set; }
 
-        protected static Dictionary<string, long> LastSubscribeTimetoken { get; set; } = new Dictionary<string, long>();
+        protected static ConcurrentDictionary<string, long> LastSubscribeTimetoken { get; set; } = new ConcurrentDictionary<string, long>();
 
         protected int PubnubNetworkTcpCheckIntervalInSeconds { get; set; } = 3;
         private int PubnubLocalHeartbeatCheckIntervalInSeconds { get; set; } = 30;
@@ -74,29 +74,29 @@ namespace PubnubApi
             set;
         } = new ConcurrentDictionary<string, List<SubscribeCallback>>();
 
-        protected static Dictionary<string, ConcurrentDictionary<string, long>> MultiChannelSubscribe
+        protected static ConcurrentDictionary<string, ConcurrentDictionary<string, long>> MultiChannelSubscribe
         {
             get;
             set;
-        } = new Dictionary<string, ConcurrentDictionary<string, long>>();
+        } = new ConcurrentDictionary<string, ConcurrentDictionary<string, long>>();
 
-        protected static Dictionary<string, ConcurrentDictionary<string, long>> MultiChannelGroupSubscribe
+        protected static ConcurrentDictionary<string, ConcurrentDictionary<string, long>> MultiChannelGroupSubscribe
         {
             get;
             set;
-        } = new Dictionary<string, ConcurrentDictionary<string, long>>();
+        } = new ConcurrentDictionary<string, ConcurrentDictionary<string, long>>();
 
-        protected static Dictionary<string, ConcurrentDictionary<string, Timer>> ChannelReconnectTimer
+        protected static ConcurrentDictionary<string, ConcurrentDictionary<string, Timer>> ChannelReconnectTimer
         {
             get;
             set;
-        } = new Dictionary<string, ConcurrentDictionary<string, Timer>>();
+        } = new ConcurrentDictionary<string, ConcurrentDictionary<string, Timer>>();
 
-        protected static Dictionary<string, ConcurrentDictionary<string, Timer>> ChannelGroupReconnectTimer
+        protected static ConcurrentDictionary<string, ConcurrentDictionary<string, Timer>> ChannelGroupReconnectTimer
         {
             get;
             set;
-        } = new Dictionary<string, ConcurrentDictionary<string, Timer>>();
+        } = new ConcurrentDictionary<string, ConcurrentDictionary<string, Timer>>();
 
         protected static ConcurrentDictionary<string, ConcurrentDictionary<string, HttpWebRequest>> ChannelRequest
         {
@@ -122,23 +122,23 @@ namespace PubnubApi
             set;
         } = new Dictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>>();
 
-        protected static Dictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>> ChannelUserState
+        protected static ConcurrentDictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>> ChannelUserState
         {
             get;
             set;
-        } = new Dictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>>();
+        } = new ConcurrentDictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>>();
 
-        protected static Dictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>> ChannelGroupLocalUserState
+        protected static ConcurrentDictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>> ChannelGroupLocalUserState
         {
             get;
             set;
-        } = new Dictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>>();
+        } = new ConcurrentDictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>>();
 
-        protected static Dictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>> ChannelGroupUserState
+        protected static ConcurrentDictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>> ChannelGroupUserState
         {
             get;
             set;
-        } = new Dictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>>();
+        } = new ConcurrentDictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>>();
 
         protected static ConcurrentDictionary<string, DateTime> SubscribeRequestTracker
         {
@@ -751,17 +751,14 @@ namespace PubnubApi
 
                 if (pubnubRequestState != null)
                 {
-                    if (pubnubRequestState.Channels != null)
-                    {
-                        channel = (pubnubRequestState.Channels.Length > 0) ? string.Join(",", pubnubRequestState.Channels.OrderBy(x => x).ToArray()) : ",";
-                    }
+                    channel = (pubnubRequestState.Channels != null && pubnubRequestState.Channels.Length > 0) ? string.Join(",", pubnubRequestState.Channels.OrderBy(x => x).ToArray()) : ",";
                     if (pubnubRequestState.ChannelGroups != null)
                     {
                         channelGroup = string.Join(",", pubnubRequestState.ChannelGroups.OrderBy(x => x).ToArray());
                     }
                 }
 
-                if (ChannelRequest.ContainsKey(PubnubInstance.InstanceId) && !ChannelRequest[PubnubInstance.InstanceId].ContainsKey(channel) && (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation || pubnubRequestState.ResponseType == PNOperationType.Presence))
+                if (ChannelRequest.ContainsKey(PubnubInstance.InstanceId) && !channel.Equals(",", StringComparison.CurrentCultureIgnoreCase) && !ChannelRequest[PubnubInstance.InstanceId].ContainsKey(channel) && (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation || pubnubRequestState.ResponseType == PNOperationType.Presence))
                 {
                     LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, UrlProcessRequest ChannelRequest PubnubInstance.InstanceId Channel NOT matching", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
                     return "";
@@ -1525,7 +1522,7 @@ namespace PubnubApi
                 List<string> groupKeyList = groupKeyCollection.ToList();
                 foreach (string groupKey in groupKeyList)
                 {
-                    if (ChannelGroupReconnectTimer.ContainsKey(groupKey))
+                    if (ChannelGroupReconnectTimer[PubnubInstance.InstanceId].ContainsKey(groupKey))
                     {
                         try
                         {

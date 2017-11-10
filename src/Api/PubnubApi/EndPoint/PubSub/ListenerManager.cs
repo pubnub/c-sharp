@@ -25,8 +25,9 @@ namespace PubnubApi.EndPoint
             PubnubInstance = instance;
         }
 
-        public void AddListener(SubscribeCallback listener)
+        public bool AddListener(SubscribeCallback listener)
         {
+            bool ret = false;
             if (listener != null)
             {
                 lock (syncLockSubscribeCallback)
@@ -45,17 +46,21 @@ namespace PubnubApi.EndPoint
                             callbackList.Add(listener);
                             SubscribeCallbackListenerList.Add(PubnubInstance.InstanceId, callbackList);
                         }
+                        ret = true;
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, ListenerManager AddListener => Exception = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), pubnubConfig.LogVerbosity);
                     }
                 }
             }
+            return ret;
         }
 
-        public void RemoveListener(SubscribeCallback listener)
+        public bool RemoveListener(SubscribeCallback listener)
         {
+            bool ret = false;
+
             if (listener != null)
             {
                 lock (syncLockSubscribeCallback)
@@ -65,7 +70,10 @@ namespace PubnubApi.EndPoint
                         if (SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
                         {
                             List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
-                            callbackList.Remove(listener);
+                            if (callbackList.Remove(listener))
+                            {
+                                ret = true;
+                            }
                             SubscribeCallbackListenerList[PubnubInstance.InstanceId] = callbackList;
                         }
                     }
@@ -75,6 +83,8 @@ namespace PubnubApi.EndPoint
                     }
                 }
             }
+
+            return ret;
         }
 
         
