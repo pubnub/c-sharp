@@ -143,7 +143,10 @@ namespace PubNubMessaging.Tests
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
-            pubnub.AddListener(listenerSubCallack);
+            if (!pubnub.AddListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
+            }
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = 310 * 1000;
@@ -183,7 +186,10 @@ namespace PubNubMessaging.Tests
             if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
             else Thread.Sleep(100);
 
-            pubnub.RemoveListener(listenerSubCallack);
+            if (!pubnub.RemoveListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: RemoveListener failed");
+            }
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
@@ -210,7 +216,10 @@ namespace PubNubMessaging.Tests
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
-            pubnub.AddListener(listenerSubCallack);
+            if (!pubnub.AddListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
+            }
 
 
             string channel = "hello_my_channel";
@@ -251,7 +260,10 @@ namespace PubNubMessaging.Tests
             //if (!PubnubCommon.EnableStubTest) Thread.Sleep(100);
             Thread.Sleep(100);
 
-            pubnub.RemoveListener(listenerSubCallack);
+            if (!pubnub.RemoveListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: RemoveListener failed");
+            }
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
@@ -278,7 +290,10 @@ namespace PubNubMessaging.Tests
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
-            pubnub.AddListener(listenerSubCallack);
+            if (!pubnub.AddListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
+            }
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = 310 * 1000;
@@ -320,7 +335,10 @@ namespace PubNubMessaging.Tests
             if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
             else Thread.Sleep(100);
 
-            pubnub.RemoveListener(listenerSubCallack);
+            if (!pubnub.RemoveListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: RemoveListener failed");
+            }
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
@@ -347,7 +365,10 @@ namespace PubNubMessaging.Tests
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
-            pubnub.AddListener(listenerSubCallack);
+            if (!pubnub.AddListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
+            }
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = 310 * 1000;
@@ -405,7 +426,10 @@ namespace PubNubMessaging.Tests
             if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
             else Thread.Sleep(100);
 
-            pubnub.RemoveListener(listenerSubCallack);
+            if (!pubnub.RemoveListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: RemoveListener failed");
+            }
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
@@ -433,7 +457,10 @@ namespace PubNubMessaging.Tests
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
-            pubnub.AddListener(listenerSubCallack);
+            if (!pubnub.AddListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
+            }
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = 310 * 1000;
@@ -491,7 +518,10 @@ namespace PubNubMessaging.Tests
             if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
             else Thread.Sleep(100);
 
-            pubnub.RemoveListener(listenerSubCallack);
+            if (!pubnub.RemoveListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: RemoveListener failed");
+            }
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
@@ -518,7 +548,10 @@ namespace PubNubMessaging.Tests
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
-            pubnub.AddListener(listenerSubCallack);
+            if (!pubnub.AddListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
+            }
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = 310 * 1000;
@@ -578,7 +611,10 @@ namespace PubNubMessaging.Tests
             if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
             else Thread.Sleep(100);
 
-            pubnub.RemoveListener(listenerSubCallack);
+            if (!pubnub.RemoveListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: RemoveListener failed");
+            }
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
@@ -606,7 +642,10 @@ namespace PubNubMessaging.Tests
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
-            pubnub.AddListener(listenerSubCallack);
+            if (!pubnub.AddListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
+            }
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = 310 * 1000;
@@ -666,7 +705,10 @@ namespace PubNubMessaging.Tests
             if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
             else Thread.Sleep(100);
 
-            pubnub.RemoveListener(listenerSubCallack);
+            if (!pubnub.RemoveListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: RemoveListener failed");
+            }
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
@@ -694,7 +736,10 @@ namespace PubNubMessaging.Tests
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
-            pubnub.AddListener(listenerSubCallack);
+            if (!pubnub.AddListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
+            }
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = 310 * 1000;
@@ -752,7 +797,10 @@ namespace PubNubMessaging.Tests
             if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
             else Thread.Sleep(100);
 
-            pubnub.RemoveListener(listenerSubCallack);
+            if (!pubnub.RemoveListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: RemoveListener failed");
+            }
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
@@ -779,7 +827,10 @@ namespace PubNubMessaging.Tests
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
-            pubnub.AddListener(listenerSubCallack);
+            if (!pubnub.AddListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
+            }
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = 310 * 1000;
@@ -839,7 +890,10 @@ namespace PubNubMessaging.Tests
             if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
             else Thread.Sleep(100);
 
-            pubnub.RemoveListener(listenerSubCallack);
+            if (!pubnub.RemoveListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: RemoveListener failed");
+            }
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
@@ -866,7 +920,10 @@ namespace PubNubMessaging.Tests
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
-            pubnub.AddListener(listenerSubCallack);
+            if (!pubnub.AddListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
+            }
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = 310 * 1000;
@@ -926,7 +983,10 @@ namespace PubNubMessaging.Tests
             if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
             else Thread.Sleep(100);
 
-            pubnub.RemoveListener(listenerSubCallack);
+            if (!pubnub.RemoveListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: RemoveListener failed");
+            }
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
@@ -953,7 +1013,10 @@ namespace PubNubMessaging.Tests
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
-            pubnub.AddListener(listenerSubCallack);
+            if (!pubnub.AddListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
+            }
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = 310 * 1000;
@@ -1011,7 +1074,10 @@ namespace PubNubMessaging.Tests
             if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
             else Thread.Sleep(100);
 
-            pubnub.RemoveListener(listenerSubCallack);
+            if (!pubnub.RemoveListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: RemoveListener failed");
+            }
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
@@ -1037,7 +1103,10 @@ namespace PubNubMessaging.Tests
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
-            pubnub.AddListener(listenerSubCallack);
+            if (!pubnub.AddListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
+            }
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = 310 * 1000;
@@ -1128,7 +1197,10 @@ namespace PubNubMessaging.Tests
             if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
             else Thread.Sleep(100);
 
-            pubnub.RemoveListener(listenerSubCallack);
+            if (!pubnub.RemoveListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: RemoveListener failed");
+            }
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
@@ -1160,7 +1232,10 @@ namespace PubNubMessaging.Tests
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
-            pubnub.AddListener(listenerSubCallack);
+            if (!pubnub.AddListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
+            }
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = 310 * 1000;
@@ -1237,7 +1312,10 @@ namespace PubNubMessaging.Tests
             if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
             else Thread.Sleep(100);
 
-            pubnub.RemoveListener(listenerSubCallack);
+            if (!pubnub.RemoveListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: RemoveListener failed");
+            }
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
@@ -1263,7 +1341,10 @@ namespace PubNubMessaging.Tests
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
-            pubnub.AddListener(listenerSubCallack);
+            if (!pubnub.AddListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
+            }
 
             string channel = "hello_my_channel";
 
@@ -1351,7 +1432,10 @@ namespace PubNubMessaging.Tests
             if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
             else Thread.Sleep(100);
 
-            pubnub.RemoveListener(listenerSubCallack);
+            if (!pubnub.RemoveListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: RemoveListener failed");
+            }
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
@@ -1377,7 +1461,10 @@ namespace PubNubMessaging.Tests
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
-            pubnub.AddListener(listenerSubCallack);
+            if (!pubnub.AddListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
+            }
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = 310 * 1000;
@@ -1438,7 +1525,10 @@ namespace PubNubMessaging.Tests
             if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
             else Thread.Sleep(100);
 
-            pubnub.RemoveListener(listenerSubCallack);
+            if (!pubnub.RemoveListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: RemoveListener failed");
+            }
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
@@ -1532,7 +1622,10 @@ namespace PubNubMessaging.Tests
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
-            pubnub.AddListener(listenerSubCallack);
+            if (!pubnub.AddListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
+            }
 
             manualResetEventWaitTimeout = 310 * 1000;
             string channel = "hello_my_channel";
@@ -1663,7 +1756,10 @@ namespace PubNubMessaging.Tests
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = this.createPubNubInstance(config);
-            pubnub.AddListener(listenerSubCallack);
+            if (!pubnub.AddListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
+            }
 
             presenceManualEvent = new ManualResetEvent(false);
 
@@ -1703,7 +1799,10 @@ namespace PubNubMessaging.Tests
             if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
             else Thread.Sleep(100);
 
-            pubnub.RemoveListener(listenerSubCallack);
+            if (!pubnub.RemoveListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: RemoveListener failed");
+            }
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;

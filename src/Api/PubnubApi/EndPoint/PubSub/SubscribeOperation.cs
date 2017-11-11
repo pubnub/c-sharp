@@ -147,15 +147,27 @@ namespace PubnubApi.EndPoint
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
-        internal void Retry(bool reconnect)
+        internal bool Retry(bool reconnect)
         {
             if (reconnect)
             {
-                manager.Reconnect<T>();
+                return manager.Reconnect<T>(false);
             }
             else
             {
-                manager.Disconnect<T>();
+                return manager.Disconnect<T>();
+            }
+        }
+
+        internal bool Retry(bool reconnect, bool resetSubscribeTimetoken)
+        {
+            if (reconnect)
+            {
+                return manager.Reconnect<T>(resetSubscribeTimetoken);
+            }
+            else
+            {
+                return manager.Disconnect<T>();
             }
         }
 
