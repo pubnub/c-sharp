@@ -484,12 +484,12 @@ namespace PubnubApiDemo
                         if (int.TryParse(publishMsg, out intData)) //capture numeric data
                         {
                             pubnub.Publish().Channel(channel).Message(intData).Meta(meta).ShouldStore(store).UsePOST(usePost)
-                                .Async(new PNPublishResultExt((r, s) => { Console.WriteLine(r.Timetoken); }));
+                                .Async(new PNPublishResultExt((r, s) => { if (s.Error) { Console.WriteLine(s.ErrorData.Information); } else { Console.WriteLine(r.Timetoken); } }));
                         }
                         else if (double.TryParse(publishMsg, out doubleData)) //capture numeric data
                         {
                             pubnub.Publish().Channel(channel).Message(doubleData).Meta(meta).ShouldStore(store).UsePOST(usePost)
-                                .Async(new PNPublishResultExt((r, s) => { Console.WriteLine(r.Timetoken); }));
+                                .Async(new PNPublishResultExt((r, s) => { if (s.Error) { Console.WriteLine(s.ErrorData.Information); } else { Console.WriteLine(r.Timetoken); } }));
                         }
                         else
                         {
@@ -500,17 +500,17 @@ namespace PubnubApiDemo
                                 if (int.TryParse(strMsg, out intData))
                                 {
                                     pubnub.Publish().Channel(channel).Message(strMsg).Meta(meta).ShouldStore(store).UsePOST(usePost)
-                                        .Async(new PNPublishResultExt((r, s) => { Console.WriteLine(r.Timetoken); }));
+                                        .Async(new PNPublishResultExt((r, s) => { if (s.Error) { Console.WriteLine(s.ErrorData.Information); } else { Console.WriteLine(r.Timetoken); } }));
                                 }
                                 else if (double.TryParse(strMsg, out doubleData))
                                 {
                                     pubnub.Publish().Channel(channel).Message(strMsg).Meta(meta).ShouldStore(store).UsePOST(usePost)
-                                        .Async(new PNPublishResultExt((r, s) => { Console.WriteLine(r.Timetoken); }));
+                                        .Async(new PNPublishResultExt((r, s) => { if (s.Error) { Console.WriteLine(s.ErrorData.Information); } else { Console.WriteLine(r.Timetoken); } }));
                                 }
                                 else
                                 {
                                     pubnub.Publish().Channel(channel).Message(publishMsg).Meta(meta).ShouldStore(store).UsePOST(usePost)
-                                        .Async(new PNPublishResultExt((r, s) => { Console.WriteLine(r.Timetoken); }));
+                                        .Async(new PNPublishResultExt((r, s) => { if (s.Error) { Console.WriteLine(s.ErrorData.Information); } else { Console.WriteLine(r.Timetoken); } }));
                                 }
                             }
                             else
@@ -533,7 +533,7 @@ namespace PubnubApiDemo
                                         .Meta(meta)
                                         .ShouldStore(store)
                                         .UsePOST(usePost)
-                                        .Async(new PNPublishResultExt((r, s) => { Console.WriteLine(r.Timetoken); }));
+                                        .Async(new PNPublishResultExt((r, s) => { if (s.Error) { Console.WriteLine(s.ErrorData.Information); } else { Console.WriteLine(r.Timetoken); } }));
                                 }
                             }
                         }
