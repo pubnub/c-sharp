@@ -611,7 +611,32 @@ namespace PubnubApi
                     currentState.Request.Abort();
                 }
                 catch {  /* ignore */ }
+
                 LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, **WP7 OnPubnubWebRequestTimeout**", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+
+                if (currentState.ResponseType != PNOperationType.PNSubscribeOperation 
+                    && currentState.ResponseType != PNOperationType.Presence
+                    && currentState.ResponseType != PNOperationType.PNHeartbeatOperation
+                    && currentState.ResponseType != PNOperationType.Leave)
+                {
+                    PNStatusCategory errorCategory = PNStatusCategory.PNTimeoutCategory;
+                    PNStatus status = new StatusBuilder(pubnubConfig, jsonLib).CreateStatusResponse<T>(currentState.ResponseType, errorCategory, null, (int)HttpStatusCode.NotFound, new TimeoutException("Request timeout"));
+
+                    if (currentState.Channels != null)
+                    {
+                        status.AffectedChannels.AddRange(currentState.Channels);
+                    }
+
+                    if (currentState.ChannelGroups != null)
+                    {
+                        status.AffectedChannels.AddRange(currentState.ChannelGroups);
+                    }
+
+                    if (currentState.PubnubCallback != null)
+                    {
+                        currentState.PubnubCallback.OnResponse(default(T), status);
+                    }
+                }
             }
         }
 
