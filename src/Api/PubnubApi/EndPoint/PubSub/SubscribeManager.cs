@@ -949,7 +949,7 @@ namespace PubnubApi.EndPoint
             return true;
         }
 
-        internal bool Disconnect<T>()
+        internal bool Disconnect()
         {
             if (SubscribeDisconnected[PubnubInstance.InstanceId])
             {
