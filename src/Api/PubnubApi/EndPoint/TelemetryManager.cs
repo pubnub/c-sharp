@@ -143,7 +143,7 @@ namespace PubnubApi.EndPoint
                     if (dicEndpointLatency[key] != null && dicEndpointLatency[key].Count > 0)
                     {
 
-                        dictionaryOpsLatency.Add(key, Math.Round(((double)dicEndpointLatency[key].Average(kvp => kvp.Value) / 1000.0), 10).ToString()); //Convert millisec to sec
+                        dictionaryOpsLatency.Add(key, Math.Round(((double)dicEndpointLatency[key].Average(kvp => kvp.Value) / 1000.0), 10).ToString(CultureInfo.InvariantCulture)); //Convert millisec to sec
                     }
                 }
             }
