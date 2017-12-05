@@ -13,14 +13,13 @@ namespace PubNubMessaging.Tests
         private static ManualResetEvent auditManualEvent = new ManualResetEvent(false);
         private static bool receivedAuditMessage = false;
         private static string currentUnitTestCase = "";
-        private static Pubnub pubnub = null;
-        private Server server;
-        private UnitTestLog unitLog;
+        private static Pubnub pubnub;
+        private static Server server;
 
         [TestFixtureSetUp]
-        public void Init()
+        public static void Init()
         {
-            unitLog = new Tests.UnitTestLog();
+            UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
@@ -28,20 +27,20 @@ namespace PubNubMessaging.Tests
         }
 
         [TestFixtureTearDown]
-        public void Exit()
+        public static void Exit()
         {
             server.Stop();
         }
 
         [Test]
-        public void ThenSubKeyLevelShouldReturnSuccess()
+        public static void ThenSubKeyLevelShouldReturnSuccess()
         {
             server.ClearRequests();
 
             currentUnitTestCase = "ThenSubKeyLevelShouldReturnSuccess";
             receivedAuditMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -49,7 +48,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"subkey\",\"subscribe_key\":\"demo-36\",\"channels\":{},\"objects\":{},\"channel-groups\":{}},\"service\":\"Access Manager\",\"status\":200}";
 
@@ -86,7 +85,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenChannelLevelShouldReturnSuccess()
+        public static void ThenChannelLevelShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -95,7 +94,7 @@ namespace PubNubMessaging.Tests
 
             receivedAuditMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -103,7 +102,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel\",\"subscribe_key\":\"demo-36\",\"channels\":{}},\"service\":\"Access Manager\",\"status\":200}";
 
@@ -141,7 +140,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenChannelGroupLevelShouldReturnSuccess()
+        public static void ThenChannelGroupLevelShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -149,7 +148,7 @@ namespace PubNubMessaging.Tests
             string channelgroup = "hello_my_group";
             receivedAuditMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -157,7 +156,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"demo-36\",\"channel-groups\":{}},\"service\":\"Access Manager\",\"status\":200}";
 

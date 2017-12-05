@@ -21,15 +21,14 @@ namespace PubNubMessaging.Tests
         private static string authKey = "myAuth";
         private static string currentTestCase = "";
 
-        private static Pubnub pubnub = null;
+        private static Pubnub pubnub;
 
-        private Server server;
-        private UnitTestLog unitLog;
+        private static Server server;
 
         [TestFixtureSetUp]
-        public void Init()
+        public static void Init()
         {
-            unitLog = new Tests.UnitTestLog();
+            UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
@@ -39,7 +38,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -50,7 +49,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string channel = "hello_my_channel";
 
@@ -73,7 +72,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
 
             Thread.Sleep(1000);
 
@@ -87,20 +86,20 @@ namespace PubNubMessaging.Tests
         }
 
         [TestFixtureTearDown]
-        public void Exit()
+        public static void Exit()
         {
             server.Stop();
         }
 
         [Test]
-        public void DeleteMessageShouldReturnSuccessMessage()
+        public static void DeleteMessageShouldReturnSuccessMessage()
         {
             server.ClearRequests();
 
             currentTestCase = "DeleteMessageShouldReturnSuccessMessage";
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -109,7 +108,7 @@ namespace PubNubMessaging.Tests
                 Secure = false
             };
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "{\"status\": 200, \"error\": false, \"error_message\": \"\"}";
 

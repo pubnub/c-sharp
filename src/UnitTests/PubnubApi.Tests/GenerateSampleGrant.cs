@@ -14,14 +14,13 @@ namespace PubNubMessaging.Tests
         private static int sampleCount = 100;
         private static string currentUnitTestCase;
 
-        private static Pubnub pubnub = null;
-        private Server server;
-        private UnitTestLog unitLog;
+        private static Pubnub pubnub;
+        private static Server server;
 
         [TestFixtureSetUp]
-        public void Init()
+        public static void Init()
         {
-            unitLog = new Tests.UnitTestLog();
+            UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
@@ -29,13 +28,13 @@ namespace PubNubMessaging.Tests
         }
 
         [TestFixtureTearDown]
-        public void Exit()
+        public static void Exit()
         {
             server.Stop();
         }
 
         [Test]
-        public void AtUserLevel()
+        public static void AtUserLevel()
         {
             server.ClearRequests();
 
@@ -49,7 +48,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -57,7 +56,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             if (PubnubCommon.EnableStubTest) sampleCount = 1;
 
@@ -85,7 +84,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.Grant().Channels(new string[] { channelName }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(false).Async(new GrantResult());
+                pubnub.Grant().Channels(new [] { channelName }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(false).Async(new GrantResult());
                 grantManualEvent.WaitOne();
             }
 
@@ -96,7 +95,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void AtChannelLevel()
+        public static void AtChannelLevel()
         {
             server.ClearRequests();
 
@@ -110,7 +109,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -118,7 +117,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             if (PubnubCommon.EnableStubTest) sampleCount = 1;
 
@@ -144,7 +143,7 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.Grant().Channels(new string[] { channelName }).Read(true).Write(true).Manage(false).Async(new GrantResult());
+                pubnub.Grant().Channels(new [] { channelName }).Read(true).Write(true).Manage(false).Async(new GrantResult());
                 grantManualEvent.WaitOne();
             }
 

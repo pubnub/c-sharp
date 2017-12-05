@@ -80,14 +80,14 @@ namespace PubnubApi
         {
             if (pubnubConfig.UseClassicHttpWebRequest)
             {
-                return await SendRequestAndGetJsonResponseClassicHttp(requestUri, pubnubRequestState, request);
+                return await SendRequestAndGetJsonResponseClassicHttp(requestUri, pubnubRequestState, request).ConfigureAwait(false);
             }
             else
             {
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
-                return await SendRequestAndGetJsonResponseHttpClient(requestUri, pubnubRequestState, request);
+                return await SendRequestAndGetJsonResponseHttpClient(requestUri, pubnubRequestState, request).ConfigureAwait(false);
 #else
-                return await SendRequestAndGetJsonResponseTaskFactory(pubnubRequestState, request);
+                return await SendRequestAndGetJsonResponseTaskFactory(pubnubRequestState, request).ConfigureAwait(false);
 #endif
             }
 
@@ -97,14 +97,14 @@ namespace PubnubApi
         {
             if (pubnubConfig.UseClassicHttpWebRequest)
             {
-                return await SendRequestAndGetJsonResponseClassicHttpWithPOST(requestUri, pubnubRequestState, request, postData);
+                return await SendRequestAndGetJsonResponseClassicHttpWithPOST(requestUri, pubnubRequestState, request, postData).ConfigureAwait(false);
             }
             else
             {
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
-                return await SendRequestAndGetJsonResponseHttpClientWithPOST(requestUri, pubnubRequestState, request, postData);
+                return await SendRequestAndGetJsonResponseHttpClientWithPOST(requestUri, pubnubRequestState, request, postData).ConfigureAwait(false);
 #else
-                return await SendRequestAndGetJsonResponseTaskFactoryWithPOST(pubnubRequestState, request, postData);
+                return await SendRequestAndGetJsonResponseTaskFactoryWithPOST(pubnubRequestState, request, postData).ConfigureAwait(false);
 #endif
             }
         }
@@ -121,18 +121,18 @@ namespace PubnubApi
                 stopWatch.Start();
                 if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
                 {
-                    response = await httpClientSubscribe.GetAsync(requestUri);
+                    response = await httpClientSubscribe.GetAsync(requestUri).ConfigureAwait(false);
                 }
                 else if (pubnubRequestState.ResponseType == PNOperationType.PNDeleteMessageOperation)
                 {
-                    response = await httpClientNonsubscribe.DeleteAsync(requestUri);
+                    response = await httpClientNonsubscribe.DeleteAsync(requestUri).ConfigureAwait(false);
                 }
                 else
                 {
-                    response = await httpClientNonsubscribe.GetAsync(requestUri);
+                    response = await httpClientNonsubscribe.GetAsync(requestUri).ConfigureAwait(false);
                 }
                 response.EnsureSuccessStatusCode();
-                var stream = await response.Content.ReadAsStreamAsync();
+                var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 stopWatch.Stop();
                 if (pubnubTelemetryMgr != null)
                 {
@@ -140,7 +140,7 @@ namespace PubnubApi
                 }
                 using (StreamReader streamReader = new StreamReader(stream))
                 {
-                    jsonString = await streamReader.ReadToEndAsync();
+                    jsonString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
                     pubnubRequestState.GotJsonResponse = true;
                 }
 
@@ -175,14 +175,14 @@ namespace PubnubApi
                 StringContent jsonPostString = new StringContent(postData, Encoding.UTF8);
                 if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
                 {
-                    response = await httpClientSubscribe.PostAsync(requestUri, jsonPostString);
+                    response = await httpClientSubscribe.PostAsync(requestUri, jsonPostString).ConfigureAwait(false);
                 }
                 else
                 {
-                    response = await httpClientNonsubscribe.PostAsync(requestUri, jsonPostString);
+                    response = await httpClientNonsubscribe.PostAsync(requestUri, jsonPostString).ConfigureAwait(false);
                 }
                 response.EnsureSuccessStatusCode();
-                var stream = await response.Content.ReadAsStreamAsync();
+                var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 stopWatch.Stop();
                 if (pubnubTelemetryMgr != null)
                 {
@@ -190,7 +190,7 @@ namespace PubnubApi
                 }
                 using (StreamReader streamReader = new StreamReader(stream))
                 {
-                    jsonString = await streamReader.ReadToEndAsync();
+                    jsonString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
                     pubnubRequestState.GotJsonResponse = true;
                 }
 
@@ -223,7 +223,7 @@ namespace PubnubApi
                 Timer webRequestTimer = new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000, Timeout.Infinite);
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
-                response = await Task.Factory.FromAsync<HttpWebResponse>(request.BeginGetResponse, asyncPubnubResult => (HttpWebResponse)request.EndGetResponse(asyncPubnubResult), pubnubRequestState);
+                response = await Task.Factory.FromAsync<HttpWebResponse>(request.BeginGetResponse, asyncPubnubResult => (HttpWebResponse)request.EndGetResponse(asyncPubnubResult), pubnubRequestState).ConfigureAwait(false);
                 stopWatch.Stop();
                 if (pubnubConfig.EnableTelemetry && pubnubTelemetryMgr != null)
                 {
@@ -237,7 +237,7 @@ namespace PubnubApi
 #if NET35 || NET40
                     string jsonString = streamReader.ReadToEnd();
 #else
-                    string jsonString = await streamReader.ReadToEndAsync();
+                    string jsonString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
 #endif
                     System.Diagnostics.Debug.WriteLine(jsonString);
                     pubnubRequestState.GotJsonResponse = true; 
@@ -267,7 +267,7 @@ namespace PubnubApi
 #if NET35 || NET40
                         string jsonString = streamReader.ReadToEnd();
 #else
-                        string jsonString = await streamReader.ReadToEndAsync();
+                        string jsonString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
 #endif
                         System.Diagnostics.Debug.WriteLine(jsonString);
                         System.Diagnostics.Debug.WriteLine("");
@@ -303,19 +303,19 @@ namespace PubnubApi
                 request.ContentType = "application/json";
 
                 byte[] data = Encoding.UTF8.GetBytes(postData);
-                using (var requestStream = await Task<Stream>.Factory.FromAsync(request.BeginGetRequestStream, request.EndGetRequestStream, pubnubRequestState))
+                using (var requestStream = await Task<Stream>.Factory.FromAsync(request.BeginGetRequestStream, request.EndGetRequestStream, pubnubRequestState).ConfigureAwait(false))
                 {
 #if NET35 || NET40
                     requestStream.Write(data, 0, data.Length);
                     requestStream.Flush();
 #else
-                    await requestStream.WriteAsync(data, 0, data.Length);
-                    await requestStream.FlushAsync();
+                    await requestStream.WriteAsync(data, 0, data.Length).ConfigureAwait(false);
+                    await requestStream.FlushAsync().ConfigureAwait(false);
 #endif
 
                 }
 
-                WebResponse response = await Task.Factory.FromAsync(request.BeginGetResponse, request.EndGetResponse, pubnubRequestState);
+                WebResponse response = await Task.Factory.FromAsync(request.BeginGetResponse, request.EndGetResponse, pubnubRequestState).ConfigureAwait(false);
                 stopWatch.Stop();
                 if (pubnubTelemetryMgr != null)
                 {
@@ -329,7 +329,7 @@ namespace PubnubApi
 #if NET35 || NET40
                     string jsonString = streamReader.ReadToEnd();
 #else
-                    string jsonString = await streamReader.ReadToEndAsync();
+                    string jsonString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
 #endif
                     System.Diagnostics.Debug.WriteLine(jsonString);
                     System.Diagnostics.Debug.WriteLine("");
@@ -359,7 +359,7 @@ namespace PubnubApi
 #if NET35 || NET40
                         string jsonString = streamReader.ReadToEnd();
 #else
-                        string jsonString = await streamReader.ReadToEndAsync();
+                        string jsonString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
 #endif
                         System.Diagnostics.Debug.WriteLine(jsonString);
                         System.Diagnostics.Debug.WriteLine("");
@@ -445,7 +445,7 @@ namespace PubnubApi
                         await Task.Factory.StartNew(() => { });
                         string jsonString = streamReader.ReadToEnd();
 #else
-                        string jsonString = await streamReader.ReadToEndAsync();
+                        string jsonString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
 #endif
                         System.Diagnostics.Debug.WriteLine(jsonString);
                         System.Diagnostics.Debug.WriteLine("");
@@ -481,7 +481,7 @@ namespace PubnubApi
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
 #if !NET35 && !NET40 && !NET45 && !NET461
-                using (var requestStream = await Task<Stream>.Factory.FromAsync(request.BeginGetRequestStream, request.EndGetRequestStream, pubnubRequestState))
+                using (var requestStream = await Task<Stream>.Factory.FromAsync(request.BeginGetRequestStream, request.EndGetRequestStream, pubnubRequestState).ConfigureAwait(false))
                 {
                     requestStream.Write(data, 0, data.Length);
                     requestStream.Flush();
@@ -549,7 +549,7 @@ namespace PubnubApi
                         await Task.Factory.StartNew(() => { });
                         string jsonString = streamReader.ReadToEnd();
 #else
-                        string jsonString = await streamReader.ReadToEndAsync();
+                        string jsonString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
 #endif
                         System.Diagnostics.Debug.WriteLine(jsonString);
                         System.Diagnostics.Debug.WriteLine("");
@@ -611,7 +611,32 @@ namespace PubnubApi
                     currentState.Request.Abort();
                 }
                 catch {  /* ignore */ }
+
                 LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, **WP7 OnPubnubWebRequestTimeout**", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+
+                if (currentState.ResponseType != PNOperationType.PNSubscribeOperation 
+                    && currentState.ResponseType != PNOperationType.Presence
+                    && currentState.ResponseType != PNOperationType.PNHeartbeatOperation
+                    && currentState.ResponseType != PNOperationType.Leave)
+                {
+                    PNStatusCategory errorCategory = PNStatusCategory.PNTimeoutCategory;
+                    PNStatus status = new StatusBuilder(pubnubConfig, jsonLib).CreateStatusResponse<T>(currentState.ResponseType, errorCategory, currentState, (int)HttpStatusCode.NotFound, new TimeoutException("Request timeout"));
+
+                    if (currentState.Channels != null)
+                    {
+                        status.AffectedChannels.AddRange(currentState.Channels);
+                    }
+
+                    if (currentState.ChannelGroups != null)
+                    {
+                        status.AffectedChannels.AddRange(currentState.ChannelGroups);
+                    }
+
+                    if (currentState.PubnubCallback != null)
+                    {
+                        currentState.PubnubCallback.OnResponse(default(T), status);
+                    }
+                }
             }
         }
 

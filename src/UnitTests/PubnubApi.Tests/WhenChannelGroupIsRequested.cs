@@ -21,14 +21,13 @@ namespace PubNubMessaging.Tests
         private static string channelName = "hello_my_channel";
         private static string authKey = "myAuth";
 
-        private static Pubnub pubnub = null;
-        private Server server;
-        private UnitTestLog unitLog;
+        private static Pubnub pubnub;
+        private static Server server;
 
         [TestFixtureSetUp]
-        public void Init()
+        public static void Init()
         {
-            unitLog = new Tests.UnitTestLog();
+            UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
@@ -38,7 +37,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -47,7 +46,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"demo-36\",\"ttl\":20,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
 
@@ -68,7 +67,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().ChannelGroups(new string[] { channelGroupName }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new GrantResult());
+            pubnub.Grant().ChannelGroups(new [] { channelGroupName }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new GrantResult());
 
             Thread.Sleep(1000);
 
@@ -81,20 +80,20 @@ namespace PubNubMessaging.Tests
         }
 
         [TestFixtureTearDown]
-        public void Exit()
+        public static void Exit()
         {
             server.Stop();
         }
 
         [Test]
-        public void ThenAddChannelShouldReturnSuccess()
+        public static void ThenAddChannelShouldReturnSuccess()
         {
             server.ClearRequests();
 
             currentUnitTestCase = "ThenAddChannelShouldReturnSuccess";
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -102,7 +101,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}";
 
@@ -120,7 +119,7 @@ namespace PubNubMessaging.Tests
 
             channelGroupManualEvent = new ManualResetEvent(false);
 
-            pubnub.AddChannelsToChannelGroup().Channels(new string[] { channelName }).ChannelGroup(channelGroupName).Async(new ChannelGroupAddChannelResult());
+            pubnub.AddChannelsToChannelGroup().Channels(new [] { channelName }).ChannelGroup(channelGroupName).Async(new ChannelGroupAddChannelResult());
             Thread.Sleep(1000);
 
             channelGroupManualEvent.WaitOne();
@@ -133,7 +132,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenRemoveChannelShouldReturnSuccess()
+        public static void ThenRemoveChannelShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -141,7 +140,7 @@ namespace PubNubMessaging.Tests
             string channelName = "hello_my_channel";
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -149,7 +148,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}";
 
@@ -167,7 +166,7 @@ namespace PubNubMessaging.Tests
 
             channelGroupManualEvent = new ManualResetEvent(false);
 
-            pubnub.RemoveChannelsFromChannelGroup().Channels(new string[] { channelName }).ChannelGroup(channelGroupName).Async(new ChannelGroupRemoveChannel());
+            pubnub.RemoveChannelsFromChannelGroup().Channels(new [] { channelName }).ChannelGroup(channelGroupName).Async(new ChannelGroupRemoveChannel());
             Thread.Sleep(1000);
 
             channelGroupManualEvent.WaitOne();
@@ -181,7 +180,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenGetChannelListShouldReturnSuccess()
+        public static void ThenGetChannelListShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -189,7 +188,7 @@ namespace PubNubMessaging.Tests
 
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -197,7 +196,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "{\"status\": 200, \"payload\": {\"channels\": [\"" + channelName + "\"], \"group\": \"" + channelGroupName + "\"}, \"service\": \"channel-registry\", \"error\": false}";
 
@@ -227,7 +226,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenGetAllChannelGroupShouldReturnSuccess()
+        public static void ThenGetAllChannelGroupShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -235,7 +234,7 @@ namespace PubNubMessaging.Tests
 
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -243,7 +242,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "{\"status\": 200, \"payload\": {\"namespace\": \"\", \"groups\": [\"" + channelGroupName + "\", \"hello_my_group1\"]}, \"service\": \"channel-registry\", \"error\": false}";
 

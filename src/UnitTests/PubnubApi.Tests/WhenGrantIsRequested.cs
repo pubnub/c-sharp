@@ -24,15 +24,14 @@ namespace PubNubMessaging.Tests
         private static string[] channelBuilder;
         private static string[] authKeyBuilder;
 
-        private static Pubnub pubnub = null;
+        private static Pubnub pubnub;
 
-        private Server server;
-        private UnitTestLog unitLog;
+        private static Server server;
 
         [TestFixtureSetUp]
-        public void Init()
+        public static void Init()
         {
-            unitLog = new Tests.UnitTestLog();
+            UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
@@ -40,13 +39,13 @@ namespace PubNubMessaging.Tests
         }
 
         [TestFixtureTearDown]
-        public void Exit()
+        public static void Exit()
         {
             server.Stop();
         }
 
         [Test]
-        public void ThenUserLevelWithReadWriteShouldReturnSuccess()
+        public static void ThenUserLevelWithReadWriteShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -54,7 +53,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -62,7 +61,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":5,\"channel\":\"hello_my_channel\",\"auths\":{\"hello_my_authkey\":{\"r\":1,\"w\":1,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}";
 
@@ -87,7 +86,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(false).TTL(5).Async(new GrantResult());
+                pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(false).TTL(5).Async(new GrantResult());
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -104,7 +103,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenUserLevelWithReadShouldReturnSuccess()
+        public static void ThenUserLevelWithReadShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -112,7 +111,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -120,7 +119,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":5,\"channel\":\"hello_my_channel\",\"auths\":{\"hello_my_authkey\":{\"r\":1,\"w\":0,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}";
 
@@ -145,7 +144,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(true).Write(false).Manage(false).TTL(5).Async(new GrantResult());
+                pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(false).Manage(false).TTL(5).Async(new GrantResult());
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -162,7 +161,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenUserLevelWithWriteShouldReturnSuccess()
+        public static void ThenUserLevelWithWriteShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -170,7 +169,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -178,7 +177,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":5,\"channel\":\"hello_my_channel\",\"auths\":{\"hello_my_authkey\":{\"r\":0,\"w\":1,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}";
 
@@ -204,7 +203,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(false).Write(true).Manage(false).TTL(5).Async(new GrantResult());
+                pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(false).Write(true).Manage(false).TTL(5).Async(new GrantResult());
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -221,7 +220,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenMultipleChannelGrantShouldReturnSuccess()
+        public static void ThenMultipleChannelGrantShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -229,7 +228,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -237,7 +236,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             channelBuilder = new string[multipleChannelGrantCount];
 
@@ -269,7 +268,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.Grant().AuthKeys(new string[] { authKey }).Channels(channelBuilder).Read(true).Write(true).Manage(false).TTL(5).Async(new GrantResult());
+                pubnub.Grant().AuthKeys(new [] { authKey }).Channels(channelBuilder).Read(true).Write(true).Manage(false).TTL(5).Async(new GrantResult());
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -286,7 +285,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenMultipleAuthGrantShouldReturnSuccess()
+        public static void ThenMultipleAuthGrantShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -294,7 +293,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -302,7 +301,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             channelBuilder = new string[multipleChannelGrantCount];
             authKeyBuilder = new string[multipleChannelGrantCount];
@@ -353,7 +352,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenRevokeAtUserLevelReturnSuccess()
+        public static void ThenRevokeAtUserLevelReturnSuccess()
         {
             server.ClearRequests();
 
@@ -362,7 +361,7 @@ namespace PubNubMessaging.Tests
             receivedGrantMessage = false;
             receivedRevokeMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -370,7 +369,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expectedGrant = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":5,\"channel\":\"hello_my_channel\",\"auths\":{\"hello_my_authkey\":{\"r\":1,\"w\":1,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}";
             string expectedRevoke = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":1,\"channel\":\"hello_my_channel\",\"auths\":{\"hello_my_authkey\":{\"r\":0,\"w\":0,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}";
@@ -412,15 +411,14 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(false).TTL(5).Async(new GrantResult());
+                pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(false).TTL(5).Async(new GrantResult());
                 Thread.Sleep(1000);
                 grantManualEvent.WaitOne();
 
                 if (receivedGrantMessage)
                 {
                     revokeManualEvent = new ManualResetEvent(false);
-                    Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant ok..Now trying Revoke");
-                    pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(false).Write(false).Manage(false).TTL(0).Async(new RevokeGrantResult());
+                    pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(false).Write(false).Manage(false).TTL(0).Async(new RevokeGrantResult());
                     Thread.Sleep(1000);
                     revokeManualEvent.WaitOne();
 
@@ -441,7 +439,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenChannelGroupLevelWithReadManageShouldReturnSuccess()
+        public static void ThenChannelGroupLevelWithReadManageShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -449,7 +447,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -457,7 +455,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group+auth\",\"subscribe_key\":\"demo-36\",\"ttl\":5,\"channel-groups\":\"myChannelGroup\",\"auths\":{\"hello_my_authkey\":{\"r\":1,\"w\":1,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
 
@@ -482,7 +480,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.Grant().ChannelGroups(new string[] { channelGroup }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(5).Async(new GrantResult());
+                pubnub.Grant().ChannelGroups(new [] { channelGroup }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(5).Async(new GrantResult());
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -499,7 +497,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenChannelGroupLevelWithReadShouldReturnSuccess()
+        public static void ThenChannelGroupLevelWithReadShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -507,7 +505,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -515,7 +513,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group+auth\",\"subscribe_key\":\"demo-36\",\"ttl\":5,\"channel-groups\":\"myChannelGroup\",\"auths\":{\"hello_my_authkey\":{\"r\":1,\"w\":0,\"m\":0}}},\"service\":\"Access Manager\",\"status\":200}";
 
@@ -540,7 +538,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.Grant().ChannelGroups(new string[] { channelGroup }).AuthKeys(new string[] { authKey }).Read(true).Write(false).Manage(false).TTL(5).Async(new GrantResult());
+                pubnub.Grant().ChannelGroups(new [] { channelGroup }).AuthKeys(new [] { authKey }).Read(true).Write(false).Manage(false).TTL(5).Async(new GrantResult());
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();

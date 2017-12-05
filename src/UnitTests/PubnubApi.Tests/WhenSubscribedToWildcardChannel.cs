@@ -16,26 +16,25 @@ namespace PubNubMessaging.Tests
         private static ManualResetEvent channelGroupManualEvent = new ManualResetEvent(false);
 
         private static bool receivedMessage = false;
-        private static object publishedMessage = null;
+        private static object publishedMessage;
         private static long publishTimetoken = 0;
         private static bool receivedGrantMessage = false;
 
         private static string channelGroupName = "";
 
-        int manualResetEventWaitTimeout = 310 * 1000;
+        static int manualResetEventWaitTimeout = 310 * 1000;
         private static string channel = "hello_my_channel";
         private static string authKey = "myAuth";
         private static string currentTestCase = "";
 
-        private static Pubnub pubnub = null;
+        private static Pubnub pubnub;
 
-        private Server server;
-        private UnitTestLog unitLog;
+        private static Server server;
 
         [TestFixtureSetUp]
-        public void Init()
+        public static void Init()
         {
-            unitLog = new Tests.UnitTestLog();
+            UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
@@ -46,7 +45,7 @@ namespace PubNubMessaging.Tests
             receivedGrantMessage = false;
             currentTestCase = "Init";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -57,7 +56,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
             manualResetEventWaitTimeout = 310 * 1000;
 
             channel = "foo.*";
@@ -82,7 +81,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
             Thread.Sleep(1000);
             grantManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -112,7 +111,7 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+                pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
                 Thread.Sleep(1000);
                 grantManualEvent.WaitOne(manualResetEventWaitTimeout);
             }
@@ -143,7 +142,7 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+                pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
                 Thread.Sleep(1000);
                 grantManualEvent.WaitOne(manualResetEventWaitTimeout);
             }
@@ -174,7 +173,7 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+                pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
                 Thread.Sleep(1000);
                 grantManualEvent.WaitOne(manualResetEventWaitTimeout);
             }
@@ -205,7 +204,7 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.Grant().ChannelGroups(new string[] { channelGroupName }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+                pubnub.Grant().ChannelGroups(new [] { channelGroupName }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
                 Thread.Sleep(1000);
                 grantManualEvent.WaitOne(manualResetEventWaitTimeout);
             }
@@ -218,27 +217,27 @@ namespace PubNubMessaging.Tests
         }
 
         [TestFixtureTearDown]
-        public void Exit()
+        public static void Exit()
         {
             server.Stop();
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnReceivedMessage()
+        public static void ThenSubscribeShouldReturnReceivedMessage()
         {
             currentTestCase = "ThenSubscribeShouldReturnReceivedMessage";
             CommonSubscribeShouldReturnReceivedMessageBasedOnParams("", "", false);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToWildcardChannel --> ThenItShouldReturnReceivedMessage Failed");
         }
 
-        private void CommonSubscribeShouldReturnReceivedMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
+        private static void CommonSubscribeShouldReturnReceivedMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
         {
             server.ClearRequests();
 
             receivedMessage = false;
             Console.WriteLine("Running currentTestCase = " + currentTestCase);
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -250,7 +249,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(ssl);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             string wildCardSubscribeChannel = "foo.*";
@@ -295,7 +294,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Subscribe<string>().Channels(new string[] { wildCardSubscribeChannel }).Execute();
+            pubnub.Subscribe<string>().Channels(new [] { wildCardSubscribeChannel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             publishManualEvent = new ManualResetEvent(false);
@@ -321,7 +320,7 @@ namespace PubNubMessaging.Tests
 
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            pubnub.Unsubscribe<string>().Channels(new string[] { wildCardSubscribeChannel }).Execute();
+            pubnub.Unsubscribe<string>().Channels(new [] { wildCardSubscribeChannel }).Execute();
 
             Thread.Sleep(1000);
 
@@ -332,7 +331,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnReceivedMessageSSL()
+        public static void ThenSubscribeShouldReturnReceivedMessageSSL()
         {
             currentTestCase = "ThenSubscribeShouldReturnReceivedMessageSSL";
             CommonSubscribeShouldReturnReceivedMessageBasedOnParams("", "", true);
@@ -340,7 +339,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnReceivedMessageCipherSSL()
+        public static void ThenSubscribeShouldReturnReceivedMessageCipherSSL()
         {
             currentTestCase = "ThenSubscribeShouldReturnReceivedMessageCipherSSL";
             CommonSubscribeShouldReturnReceivedMessageBasedOnParams("", "enigma", true);
@@ -348,7 +347,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnReceivedMessageSecret()
+        public static void ThenSubscribeShouldReturnReceivedMessageSecret()
         {
             currentTestCase = "ThenSubscribeShouldReturnReceivedMessageSecret";
             CommonSubscribeShouldReturnReceivedMessageBasedOnParams(PubnubCommon.SecretKey, "", false);
@@ -356,7 +355,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnReceivedMessageSecretSSL()
+        public static void ThenSubscribeShouldReturnReceivedMessageSecretSSL()
         {
             currentTestCase = "ThenSubscribeShouldReturnReceivedMessageSecretSSL";
             CommonSubscribeShouldReturnReceivedMessageBasedOnParams(PubnubCommon.SecretKey, "", true);
@@ -364,7 +363,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnReceivedMessageSecretCipher()
+        public static void ThenSubscribeShouldReturnReceivedMessageSecretCipher()
         {
             currentTestCase = "ThenSubscribeShouldReturnReceivedMessageSecretCipher";
             CommonSubscribeShouldReturnReceivedMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", false);
@@ -372,7 +371,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnReceivedMessageSecretCipherSSL()
+        public static void ThenSubscribeShouldReturnReceivedMessageSecretCipherSSL()
         {
             currentTestCase = "ThenSubscribeShouldReturnReceivedMessageSecretCipherSSL";
             CommonSubscribeShouldReturnReceivedMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", true);
@@ -380,7 +379,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnReceivedMessageCipher()
+        public static void ThenSubscribeShouldReturnReceivedMessageCipher()
         {
             currentTestCase = "ThenSubscribeShouldReturnReceivedMessageCipher";
             CommonSubscribeShouldReturnReceivedMessageBasedOnParams("", "enigma", false);
@@ -388,21 +387,21 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnEmojiMessage()
+        public static void ThenSubscribeShouldReturnEmojiMessage()
         {
             currentTestCase = "ThenSubscribeShouldReturnEmojiMessage";
             CommonSubscribeShouldReturnEmojiMessageBasedOnParams("", "", false);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToWildcardChannel --> ThenSubscribeShouldReturnEmojiMessage Failed");
         }
 
-        private void CommonSubscribeShouldReturnEmojiMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
+        private static void CommonSubscribeShouldReturnEmojiMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
         {
             server.ClearRequests();
 
             receivedMessage = false;
             Console.WriteLine("Running currentTestCase = " + currentTestCase);
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -414,7 +413,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(ssl);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             string wildCardSubscribeChannel = "foo.*";
@@ -460,7 +459,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Subscribe<string>().Channels(new string[] { wildCardSubscribeChannel }).Execute();
+            pubnub.Subscribe<string>().Channels(new [] { wildCardSubscribeChannel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             publishManualEvent = new ManualResetEvent(false);
@@ -487,7 +486,7 @@ namespace PubNubMessaging.Tests
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
             Console.WriteLine("publishManualEvent.WaitOne DONE");
 
-            pubnub.Unsubscribe<string>().Channels(new string[] { wildCardSubscribeChannel }).Execute();
+            pubnub.Unsubscribe<string>().Channels(new [] { wildCardSubscribeChannel }).Execute();
 
             Thread.Sleep(1000);
 
@@ -498,7 +497,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnEmojiMessageSSL()
+        public static void ThenSubscribeShouldReturnEmojiMessageSSL()
         {
             currentTestCase = "ThenSubscribeShouldReturnEmojiMessageSSL";
             CommonSubscribeShouldReturnEmojiMessageBasedOnParams("", "", true);
@@ -506,7 +505,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnEmojiMessageSecret()
+        public static void ThenSubscribeShouldReturnEmojiMessageSecret()
         {
             currentTestCase = "ThenSubscribeShouldReturnEmojiMessageSecret";
             CommonSubscribeShouldReturnEmojiMessageBasedOnParams(PubnubCommon.SecretKey, "", false);
@@ -514,7 +513,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnEmojiMessageCipherSecret()
+        public static void ThenSubscribeShouldReturnEmojiMessageCipherSecret()
         {
             currentTestCase = "ThenSubscribeShouldReturnEmojiMessageCipherSecret";
             CommonSubscribeShouldReturnEmojiMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", false);
@@ -522,7 +521,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnEmojiMessageCipherSecretSSL()
+        public static void ThenSubscribeShouldReturnEmojiMessageCipherSecretSSL()
         {
             currentTestCase = "ThenSubscribeShouldReturnEmojiMessageCipherSecretSSL";
             CommonSubscribeShouldReturnEmojiMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", true);
@@ -530,7 +529,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnEmojiMessageSecretSSL()
+        public static void ThenSubscribeShouldReturnEmojiMessageSecretSSL()
         {
             currentTestCase = "ThenSubscribeShouldReturnEmojiMessageSecretSSL";
             CommonSubscribeShouldReturnEmojiMessageBasedOnParams(PubnubCommon.SecretKey, "", true);
@@ -538,14 +537,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ChannelAndChannelGroupAndWildcardChannelSubscribeShouldReturnReceivedMessage()
+        public static void ChannelAndChannelGroupAndWildcardChannelSubscribeShouldReturnReceivedMessage()
         {
             server.ClearRequests();
 
             receivedMessage = false;
             currentTestCase = "ChannelAndChannelGroupAndWildcardChannelSubscribeShouldReturnReceivedMessage";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -556,12 +555,12 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(false);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             string wildCardSubscribeChannel = "foo.*";
             string subChannelName = "hello_my_channel";
-            string[] commaDelimitedChannel = new string[] { subChannelName, wildCardSubscribeChannel };
+            string[] commaDelimitedChannel = new [] { subChannelName, wildCardSubscribeChannel };
             channelGroupName = "hello_my_group";
             string channelAddForGroup = "hello_my_channel1";
             string pubWildChannelName = "foo.a";
@@ -582,7 +581,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.AddChannelsToChannelGroup().Channels(new string[] { channelAddForGroup }).ChannelGroup(channelGroupName).Async(new ChannelGroupAddChannelResult());
+            pubnub.AddChannelsToChannelGroup().Channels(new [] { channelAddForGroup }).ChannelGroup(channelGroupName).Async(new ChannelGroupAddChannelResult());
             channelGroupManualEvent.WaitOne();
 
             subscribeManualEvent = new ManualResetEvent(false);
@@ -610,7 +609,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Subscribe<string>().Channels(commaDelimitedChannel).ChannelGroups(new string[] { channelGroupName }).Execute();
+            pubnub.Subscribe<string>().Channels(commaDelimitedChannel).ChannelGroups(new [] { channelGroupName }).Execute();
 
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -683,7 +682,7 @@ namespace PubNubMessaging.Tests
                 Console.WriteLine("publishManualEvent.WaitOne DONE");
             }
 
-            pubnub.Unsubscribe<string>().Channels(commaDelimitedChannel).ChannelGroups(new string[] { channelGroupName }).Execute();
+            pubnub.Unsubscribe<string>().Channels(commaDelimitedChannel).ChannelGroups(new [] { channelGroupName }).Execute();
 
             Thread.Sleep(1000);
 
@@ -696,14 +695,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnWildCardPresenceEventInWildcardPresenceCallback()
+        public static void ThenSubscribeShouldReturnWildCardPresenceEventInWildcardPresenceCallback()
         {
             server.ClearRequests();
 
             receivedMessage = false;
             currentTestCase = "ThenSubscribeShouldReturnWildCardPresenceEventInWildcardPresenceCallback";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -714,7 +713,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(false);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             string wildCardSubscribeChannel = "foo.*";
@@ -744,12 +743,12 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Subscribe<string>().Channels(new string[] { wildCardSubscribeChannel }).ChannelGroups(new string[] { channelGroupName }).Execute();
+            pubnub.Subscribe<string>().Channels(new [] { wildCardSubscribeChannel }).ChannelGroups(new [] { channelGroupName }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             Thread.Sleep(1000);
 
-            pubnub.Unsubscribe<string>().Channels(new string[] { wildCardSubscribeChannel }).ChannelGroups(new string[] { channelGroupName }).Execute();
+            pubnub.Unsubscribe<string>().Channels(new [] { wildCardSubscribeChannel }).ChannelGroups(new [] { channelGroupName }).Execute();
 
             Thread.Sleep(1000);
 

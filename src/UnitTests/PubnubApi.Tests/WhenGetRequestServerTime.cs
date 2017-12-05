@@ -13,15 +13,14 @@ namespace PubNubMessaging.Tests
         private static bool timeReceived = false;
         private static string currentUnitTestCase = "";
         private static long expectedTime = 14725889985315301;
-        private static Pubnub pubnub = null;
+        private static Pubnub pubnub;
 
-        private Server server;
-        private UnitTestLog unitLog;
+        private static Server server;
 
         [TestFixtureSetUp]
-        public void Init()
+        public static void Init()
         {
-            unitLog = new Tests.UnitTestLog();
+            UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
@@ -29,13 +28,13 @@ namespace PubNubMessaging.Tests
         }
 
         [TestFixtureTearDown]
-        public void Exit()
+        public static void Exit()
         {
             server.Stop();
         }
 
         [Test]
-        public void ThenItShouldReturnTimeStamp()
+        public static void ThenItShouldReturnTimeStamp()
         {
             server.ClearRequests();
 
@@ -43,7 +42,7 @@ namespace PubNubMessaging.Tests
             timeReceived = false;
             mreTime = new ManualResetEvent(false);
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -52,7 +51,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "[14725889985315301]";
 
@@ -76,7 +75,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenItShouldReturnTimeStampWithSSL()
+        public static void ThenItShouldReturnTimeStampWithSSL()
         {
             server.ClearRequests();
 
@@ -85,7 +84,7 @@ namespace PubNubMessaging.Tests
             timeReceived = false;
             mreTime = new ManualResetEvent(false);
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -93,7 +92,7 @@ namespace PubNubMessaging.Tests
             };
 
             server.RunOnHttps(true);
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "[14725889985315301]";
 
@@ -117,7 +116,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenWithProxyItShouldReturnTimeStamp()
+        public static void ThenWithProxyItShouldReturnTimeStamp()
         {
             server.ClearRequests();
 
@@ -129,7 +128,7 @@ namespace PubNubMessaging.Tests
             timeReceived = false;
             mreTime = new ManualResetEvent(false);
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -139,7 +138,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             expectedTime = 14725889985315301;
             string expected = "[14725889985315301]";
@@ -173,7 +172,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenWithProxyItShouldReturnTimeStampWithSSL()
+        public static void ThenWithProxyItShouldReturnTimeStampWithSSL()
         {
             server.ClearRequests();
 
@@ -183,7 +182,7 @@ namespace PubNubMessaging.Tests
             timeReceived = false;
             mreTime = new ManualResetEvent(false);
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -192,7 +191,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(true);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "[14725889985315301]";
 
@@ -226,7 +225,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void TranslateDateTimeToUnixTime()
+        public static void TranslateDateTimeToUnixTime()
         {
             //Test for 26th June 2012 GMT
             DateTime dt = new DateTime(2012, 6, 26, 0, 0, 0, DateTimeKind.Utc);
@@ -235,7 +234,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void TranslateUnixTimeToDateTime()
+        public static void TranslateUnixTimeToDateTime()
         {
             //Test for 26th June 2012 GMT
             DateTime expectedDate = new DateTime(2012, 6, 26, 0, 0, 0, DateTimeKind.Utc);
@@ -271,9 +270,7 @@ namespace PubNubMessaging.Tests
                         }
                     }
                 }
-                catch
-                {
-                }
+                catch { /* ignone */ }
                 finally
                 {
                     mreTime.Set();

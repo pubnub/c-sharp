@@ -15,22 +15,20 @@ namespace PubNubMessaging.Tests
         private static bool receivedAuditMessage = false;
         private static string currentUnitTestCase;
 
-        private static Pubnub pubnub = null;
-        private Server server;
-        private UnitTestLog unitLog;
+        private static Pubnub pubnub;
 
         [TestFixtureSetUp]
-        public void Init()
+        public static void Init()
         {
         }
 
         [TestFixtureTearDown]
-        public void Exit()
+        public static void Exit()
         {
         }
 
         [Test]
-        public void AtUserLevel()
+        public static void AtUserLevel()
         {
             currentUnitTestCase = "AtUserLevel";
 
@@ -45,7 +43,7 @@ namespace PubNubMessaging.Tests
                 receivedAuditMessage = false;
                 auditManualEvent = new ManualResetEvent(false);
 
-                PNConfiguration config = new PNConfiguration()
+                PNConfiguration config = new PNConfiguration
                 {
                     PublishKey = PubnubCommon.PublishKey,
                     SubscribeKey = PubnubCommon.SubscribeKey,
@@ -53,7 +51,7 @@ namespace PubNubMessaging.Tests
                     Uuid = "mytestuuid",
                 };
 
-                pubnub = this.createPubNubInstance(config);
+                pubnub = createPubNubInstance(config);
 
                 pubnub.Audit().Async(new AuditResult());
                 auditManualEvent.WaitOne();
@@ -68,7 +66,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void AtChannelLevel()
+        public static void AtChannelLevel()
         {
             currentUnitTestCase = "AtChannelLevel";
 
@@ -83,7 +81,7 @@ namespace PubNubMessaging.Tests
                 receivedAuditMessage = false;
                 auditManualEvent = new ManualResetEvent(false);
 
-                PNConfiguration config = new PNConfiguration()
+                PNConfiguration config = new PNConfiguration
                 {
                     PublishKey = PubnubCommon.PublishKey,
                     SubscribeKey = PubnubCommon.SubscribeKey,
@@ -91,7 +89,7 @@ namespace PubNubMessaging.Tests
                     Uuid = "mytestuuid",
                 };
 
-                pubnub = this.createPubNubInstance(config);
+                pubnub = createPubNubInstance(config);
 
                 pubnub.Audit().Async(new AuditResult());
                 auditManualEvent.WaitOne();
@@ -152,7 +150,7 @@ namespace PubNubMessaging.Tests
                                         {
                                             Console.WriteLine("Auth Key = " + authKey);
                                             revokeManualEvent = new ManualResetEvent(false);
-                                            pubnub.Grant().Channels(new string[] { channelName }).AuthKeys(new string[] { authKey }).Read(false).Write(false).Manage(false).Async(new GrantResult());
+                                            pubnub.Grant().Channels(new [] { channelName }).AuthKeys(new [] { authKey }).Read(false).Write(false).Manage(false).Async(new GrantResult());
                                             revokeManualEvent.WaitOne();
                                         }
                                     }

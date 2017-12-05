@@ -26,28 +26,30 @@ namespace PubNubMessaging.Tests
         private static string authKey = "myAuth";
         private static long publishTimetoken = 0;
         private static string currentTestCase = "";
-        int manualResetEventWaitTimeout = 310 * 1000;
+        private static int manualResetEventWaitTimeout = 310 * 1000;
 
-        private static Pubnub pubnub = null;
+        private static Pubnub pubnub;
 
-        private Server server;
-        private UnitTestLog unitLog;
+        private static Server server;
 
 
         [TestFixtureSetUp]
-        public void Init()
+        public static void Init()
         {
-            unitLog = new Tests.UnitTestLog();
+            UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
 
-            if (!PubnubCommon.PAMEnabled) return;
+            if (!PubnubCommon.PAMEnabled)
+            {
+                return;
+            }
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -58,7 +60,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":20,\"channel\":\"hello_my_channel\",\"auths\":{\"myAuth\":{\"r\":1,\"w\":1,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
 
@@ -79,7 +81,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
 
             Thread.Sleep(1000);
 
@@ -93,13 +95,13 @@ namespace PubNubMessaging.Tests
         }
 
         [TestFixtureTearDown]
-        public void Exit()
+        public static void Exit()
         {
             server.Stop();
         }
 
         [Test]
-        public void ThenPublishMpnsToastShouldReturnSuccess()
+        public static void ThenPublishMpnsToastShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -107,7 +109,7 @@ namespace PubNubMessaging.Tests
             publishTimetoken = 0;
             currentTestCase = "ThenPublishMpnsToastShouldReturnSuccess";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -116,7 +118,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             MpnsToastNotification toast = new MpnsToastNotification();
             toast.text1 = "hardcode message";
@@ -148,7 +150,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenPublishMpnsFlipTileShouldReturnSuccess()
+        public static void ThenPublishMpnsFlipTileShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -156,7 +158,7 @@ namespace PubNubMessaging.Tests
             publishTimetoken = 0;
             currentTestCase = "ThenPublishMpnsFlipTileShouldReturnSuccess";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -165,7 +167,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             MpnsFlipTileNotification tile = new MpnsFlipTileNotification();
             tile.title = "front title";
@@ -202,7 +204,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenPublishMpnsCycleTileShouldReturnSuccess()
+        public static void ThenPublishMpnsCycleTileShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -210,7 +212,7 @@ namespace PubNubMessaging.Tests
             publishTimetoken = 0;
             currentTestCase = "ThenPublishMpnsCycleTileShouldReturnSuccess";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -219,14 +221,14 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string channel = "hello_my_channel";
 
             MpnsCycleTileNotification tile = new MpnsCycleTileNotification();
             tile.title = "front title";
             tile.count = 2;
-            tile.images = new string[] { "Assets/Tiles/pubnub1.png", "Assets/Tiles/pubnub2.png", "Assets/Tiles/pubnub3.png", "Assets/Tiles/pubnub4.png" };
+            tile.images = new [] { "Assets/Tiles/pubnub1.png", "Assets/Tiles/pubnub2.png", "Assets/Tiles/pubnub3.png", "Assets/Tiles/pubnub4.png" };
 
             Dictionary<string, object> dicTile = new Dictionary<string, object>();
             dicTile.Add("pn_mpns", tile);
@@ -256,7 +258,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenPublishMpnsIconicTileShouldReturnSuccess()
+        public static void ThenPublishMpnsIconicTileShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -264,7 +266,7 @@ namespace PubNubMessaging.Tests
             publishTimetoken = 0;
             currentTestCase = "ThenPublishMpnsIconicTileShouldReturnSuccess";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -273,7 +275,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string channel = "hello_my_channel";
 
@@ -310,7 +312,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenAuditPushChannelProvisionsShouldReturnSuccess()
+        public static void ThenAuditPushChannelProvisionsShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -323,7 +325,7 @@ namespace PubNubMessaging.Tests
                 return;
             }
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
@@ -331,7 +333,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 

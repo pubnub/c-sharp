@@ -24,22 +24,21 @@ namespace PubNubMessaging.Tests
         private static string channelGroupName2 = "hello_my_group2";
         private static string channelName = "hello_my_channel";
 
-        private static object publishedMessage = null;
+        private static object publishedMessage;
         private static long publishTimetoken = 0;
 
-        int manualResetEventWaitTimeout = 310 * 1000;
+        static int manualResetEventWaitTimeout = 310 * 1000;
         private static string authKey = "myAuth";
         private static string currentTestCase = "";
 
-        private static Pubnub pubnub = null;
+        private static Pubnub pubnub;
 
-        private Server server;
-        private UnitTestLog unitLog;
+        private static Server server;
 
         [TestFixtureSetUp]
-        public void Init()
+        public static void Init()
         {
-            unitLog = new Tests.UnitTestLog();
+            UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
@@ -50,7 +49,7 @@ namespace PubNubMessaging.Tests
             currentTestCase = "Init";
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -60,7 +59,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
             grantManualEvent = new ManualResetEvent(false);
@@ -85,7 +84,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().AuthKeys(new string[] { authKey }).ChannelGroups(new string[] { channelGroupName, channelGroupName1, channelGroupName2 }).Channels(new string[] { channelName }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+            pubnub.Grant().AuthKeys(new [] { authKey }).ChannelGroups(new [] { channelGroupName, channelGroupName1, channelGroupName2 }).Channels(new [] { channelName }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
             Thread.Sleep(1000);
             grantManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -97,20 +96,20 @@ namespace PubNubMessaging.Tests
         }
 
         [TestFixtureTearDown]
-        public void Exit()
+        public static void Exit()
         {
             server.Stop();
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnReceivedMessage()
+        public static void ThenSubscribeShouldReturnReceivedMessage()
         {
             server.ClearRequests();
 
             currentTestCase = "ThenSubscribeShouldReturnReceivedMessage";
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -121,7 +120,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(false);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             channelGroupManualEvent = new ManualResetEvent(false);
@@ -139,7 +138,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.AddChannelsToChannelGroup().Channels(new string[] { channelName }).ChannelGroup(channelGroupName).Async(new ChannelGroupAddChannelResult());
+            pubnub.AddChannelsToChannelGroup().Channels(new [] { channelName }).ChannelGroup(channelGroupName).Async(new ChannelGroupAddChannelResult());
             channelGroupManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             if (receivedMessage)
@@ -170,7 +169,7 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.Subscribe<string>().ChannelGroups(new string[] { channelGroupName }).Execute();
+                pubnub.Subscribe<string>().ChannelGroups(new [] { channelGroupName }).Execute();
                 subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
                 publishManualEvent = new ManualResetEvent(false);
@@ -193,7 +192,7 @@ namespace PubNubMessaging.Tests
                 publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
                 Thread.Sleep(1000);
-                pubnub.Unsubscribe<string>().ChannelGroups(new string[] { channelGroupName }).Execute();
+                pubnub.Unsubscribe<string>().ChannelGroups(new [] { channelGroupName }).Execute();
 
                 pubnub.Destroy();
                 pubnub.PubnubUnitTest = null;
@@ -209,14 +208,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnConnectStatus()
+        public static void ThenSubscribeShouldReturnConnectStatus()
         {
             server.ClearRequests();
 
             currentTestCase = "ThenSubscribeShouldReturnConnectStatus";
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -227,7 +226,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(false);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             channelGroupManualEvent = new ManualResetEvent(false);
@@ -245,7 +244,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.AddChannelsToChannelGroup().Channels(new string[] { channelName }).ChannelGroup(channelGroupName).Async(new ChannelGroupAddChannelResult());
+            pubnub.AddChannelsToChannelGroup().Channels(new [] { channelName }).ChannelGroup(channelGroupName).Async(new ChannelGroupAddChannelResult());
             channelGroupManualEvent.WaitOne();
 
             if (receivedMessage)
@@ -276,7 +275,7 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.Subscribe<string>().ChannelGroups(new string[] { channelGroupName }).Execute();
+                pubnub.Subscribe<string>().ChannelGroups(new [] { channelGroupName }).Execute();
 
                 subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
@@ -295,14 +294,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenMultiSubscribeShouldReturnConnectStatus()
+        public static void ThenMultiSubscribeShouldReturnConnectStatus()
         {
             server.ClearRequests();
 
             currentTestCase = "ThenMultiSubscribeShouldReturnConnectStatus";
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -313,7 +312,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(false);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             manualResetEventWaitTimeout = 310 * 1000;
@@ -339,7 +338,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.AddChannelsToChannelGroup().Channels(new string[] { channelName1 }).ChannelGroup(channelGroupName1).Async(new ChannelGroupAddChannelResult());
+            pubnub.AddChannelsToChannelGroup().Channels(new [] { channelName1 }).ChannelGroup(channelGroupName1).Async(new ChannelGroupAddChannelResult());
             channelGroupManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             if (receivedMessage)
@@ -361,7 +360,7 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.AddChannelsToChannelGroup().Channels(new string[] { channelName2 }).ChannelGroup(channelGroupName2).Async(new ChannelGroupAddChannelResult());
+                pubnub.AddChannelsToChannelGroup().Channels(new [] { channelName2 }).ChannelGroup(channelGroupName2).Async(new ChannelGroupAddChannelResult());
                 channelGroupManualEvent.WaitOne(manualResetEventWaitTimeout);
             }
 
@@ -394,7 +393,7 @@ namespace PubNubMessaging.Tests
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
 
-                pubnub.Subscribe<string>().ChannelGroups(new string[] { channelGroupName1, channelGroupName2 }).Execute();
+                pubnub.Subscribe<string>().ChannelGroups(new [] { channelGroupName1, channelGroupName2 }).Execute();
                 subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
             }
 

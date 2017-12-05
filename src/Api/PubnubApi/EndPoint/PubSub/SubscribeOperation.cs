@@ -155,7 +155,7 @@ namespace PubnubApi.EndPoint
             }
             else
             {
-                return manager.Disconnect<T>();
+                return manager.Disconnect();
             }
         }
 
@@ -167,7 +167,7 @@ namespace PubnubApi.EndPoint
             }
             else
             {
-                return manager.Disconnect<T>();
+                return manager.Disconnect();
             }
         }
 
