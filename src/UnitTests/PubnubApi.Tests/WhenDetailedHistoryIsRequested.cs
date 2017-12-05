@@ -22,29 +22,28 @@ namespace PubNubMessaging.Tests
         private static bool receivedMessage = false;
 
         private static long currentTimetoken = 0;
-        List<int> firstPublishSet;
-        List<double> secondPublishSet;
+        static List<int> firstPublishSet;
+        static List<double> secondPublishSet;
         private static List<object> historyMessageList = new List<object>();
 
-        long starttime = Int64.MaxValue;
-        long midtime = Int64.MaxValue;
-        long endtime = Int64.MaxValue;
+        static long starttime = Int64.MaxValue;
+        static long midtime = Int64.MaxValue;
+        static long endtime = Int64.MaxValue;
 
         private static long publishTimetoken = 0;
-        int manualResetEventWaitTimeout = 310 * 1000;
+        static int manualResetEventWaitTimeout = 310 * 1000;
         private static string channel = "hello_my_channel";
         private static string authKey = "myAuth";
         private static string currentTestCase = "";
 
-        private static Pubnub pubnub = null;
+        private static Pubnub pubnub;
 
-        private Server server;
-        private UnitTestLog unitLog;
+        private static Server server;
 
         [TestFixtureSetUp]
-        public void Init()
+        public static void Init()
         {
-            unitLog = new Tests.UnitTestLog();
+            UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
@@ -54,7 +53,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -107,7 +106,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void DetailHistoryNoStoreShouldNotGetMessage()
+        public static void DetailHistoryNoStoreShouldNotGetMessage()
         {
             server.ClearRequests();
 
@@ -115,7 +114,7 @@ namespace PubNubMessaging.Tests
             publishTimetoken = 0;
             currentTestCase = "DetailHistoryNoStoreShouldNotGetMessage";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -188,7 +187,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void DetailHistoryShouldReturnDecryptMessage()
+        public static void DetailHistoryShouldReturnDecryptMessage()
         {
             server.ClearRequests();
 
@@ -196,7 +195,7 @@ namespace PubNubMessaging.Tests
             publishTimetoken = 0;
             currentTestCase = "DetailHistoryShouldReturnDecryptMessage";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -274,14 +273,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void DetailHistoryCount10ReturnsRecords()
+        public static void DetailHistoryCount10ReturnsRecords()
         {
             server.ClearRequests();
 
             receivedMessage = false;
             currentTestCase = "DetailHistoryCount10ReturnsRecords";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -323,14 +322,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void DetailHistoryCount10ReverseTrueReturnsRecords()
+        public static void DetailHistoryCount10ReverseTrueReturnsRecords()
         {
             server.ClearRequests();
 
             receivedMessage = false;
             currentTestCase = "DetailHistoryCount10ReverseTrueReturnsRecords";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -373,7 +372,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void DetailedHistoryStartWithReverseTrue()
+        public static void DetailedHistoryStartWithReverseTrue()
         {
             server.ClearRequests();
 
@@ -381,7 +380,7 @@ namespace PubNubMessaging.Tests
             publishTimetoken = 0;
             currentTestCase = "DetailedHistoryStartWithReverseTrue";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -477,14 +476,14 @@ namespace PubNubMessaging.Tests
 
         [Test]
         [ExpectedException(typeof(MissingMemberException))]
-        public void DetailHistoryWithNullKeysReturnsError()
+        public static void DetailHistoryWithNullKeysReturnsError()
         {
             server.ClearRequests();
 
             receivedMessage = false;
             currentTestCase = "DetailHistoryWithNullKeysReturnsError";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = null,
                 SubscribeKey = null,
@@ -518,7 +517,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void DetailHistoryShouldReturnUnencrypedSecretMessage()
+        public static void DetailHistoryShouldReturnUnencrypedSecretMessage()
         {
             server.ClearRequests();
 
@@ -528,7 +527,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void DetailHistoryShouldReturnUnencrypedMessage()
+        public static void DetailHistoryShouldReturnUnencrypedMessage()
         {
             server.ClearRequests();
 
@@ -538,7 +537,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void DetailHistoryShouldReturnUnencrypedSecretSSLMessage()
+        public static void DetailHistoryShouldReturnUnencrypedSecretSSLMessage()
         {
             server.ClearRequests();
 
@@ -548,7 +547,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void DetailHistoryShouldReturnUnencrypedSSLMessage()
+        public static void DetailHistoryShouldReturnUnencrypedSSLMessage()
         {
             server.ClearRequests();
 
@@ -558,7 +557,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void DetailHistoryShouldReturnEncrypedMessage()
+        public static void DetailHistoryShouldReturnEncrypedMessage()
         {
             server.ClearRequests();
 
@@ -568,7 +567,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void DetailHistoryShouldReturnEncrypedSecretMessage()
+        public static void DetailHistoryShouldReturnEncrypedSecretMessage()
         {
             server.ClearRequests();
 
@@ -578,7 +577,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void DetailHistoryShouldReturnEncrypedSecretSSLMessage()
+        public static void DetailHistoryShouldReturnEncrypedSecretSSLMessage()
         {
             server.ClearRequests();
 
@@ -588,7 +587,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void DetailHistoryShouldReturnEncrypedSSLMessage()
+        public static void DetailHistoryShouldReturnEncrypedSSLMessage()
         {
             server.ClearRequests();
 
@@ -597,7 +596,7 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedMessage, "DetailHistoryShouldReturnEncrypedSSLMessage - Detailed History Result not expected");
         }
 
-        private void CommonDetailedHistoryShouldReturnEncryptedMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
+        private static void CommonDetailedHistoryShouldReturnEncryptedMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
         {
             server.ClearRequests();
 
@@ -607,7 +606,7 @@ namespace PubNubMessaging.Tests
             midtime = 0;
             endtime = 0;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -857,7 +856,7 @@ namespace PubNubMessaging.Tests
             pubnub = null;
         }
 
-        private void CommonDetailedHistoryShouldReturnUnencryptedMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
+        private static void CommonDetailedHistoryShouldReturnUnencryptedMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
         {
             receivedMessage = false;
             int totalMessages = 10;
@@ -865,7 +864,7 @@ namespace PubNubMessaging.Tests
             midtime = 0;
             endtime = 0;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,

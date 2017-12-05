@@ -26,28 +26,30 @@ namespace PubNubMessaging.Tests
         private static string authKey = "myAuth";
         private static long publishTimetoken = 0;
         private static string currentTestCase = "";
-        int manualResetEventWaitTimeout = 310 * 1000;
+        static int manualResetEventWaitTimeout = 310 * 1000;
 
-        private static Pubnub pubnub = null;
+        private static Pubnub pubnub;
 
-        private Server server;
-        private UnitTestLog unitLog;
+        private static Server server;
 
 
         [TestFixtureSetUp]
-        public void Init()
+        public static void Init()
         {
-            unitLog = new Tests.UnitTestLog();
+            UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
 
-            if (!PubnubCommon.PAMEnabled) return;
+            if (!PubnubCommon.PAMEnabled)
+            {
+                return;
+            }
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -99,7 +101,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenPublishMpnsToastShouldReturnSuccess()
+        public static void ThenPublishMpnsToastShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -107,7 +109,7 @@ namespace PubNubMessaging.Tests
             publishTimetoken = 0;
             currentTestCase = "ThenPublishMpnsToastShouldReturnSuccess";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -148,7 +150,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenPublishMpnsFlipTileShouldReturnSuccess()
+        public static void ThenPublishMpnsFlipTileShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -156,7 +158,7 @@ namespace PubNubMessaging.Tests
             publishTimetoken = 0;
             currentTestCase = "ThenPublishMpnsFlipTileShouldReturnSuccess";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -202,7 +204,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenPublishMpnsCycleTileShouldReturnSuccess()
+        public static void ThenPublishMpnsCycleTileShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -210,7 +212,7 @@ namespace PubNubMessaging.Tests
             publishTimetoken = 0;
             currentTestCase = "ThenPublishMpnsCycleTileShouldReturnSuccess";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -256,7 +258,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenPublishMpnsIconicTileShouldReturnSuccess()
+        public static void ThenPublishMpnsIconicTileShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -264,7 +266,7 @@ namespace PubNubMessaging.Tests
             publishTimetoken = 0;
             currentTestCase = "ThenPublishMpnsIconicTileShouldReturnSuccess";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -310,7 +312,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenAuditPushChannelProvisionsShouldReturnSuccess()
+        public static void ThenAuditPushChannelProvisionsShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -323,7 +325,7 @@ namespace PubNubMessaging.Tests
                 return;
             }
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",

@@ -24,22 +24,21 @@ namespace PubNubMessaging.Tests
         private static string channelGroupName2 = "hello_my_group2";
         private static string channelName = "hello_my_channel";
 
-        private static object publishedMessage = null;
+        private static object publishedMessage;
         private static long publishTimetoken = 0;
 
-        int manualResetEventWaitTimeout = 310 * 1000;
+        static int manualResetEventWaitTimeout = 310 * 1000;
         private static string authKey = "myAuth";
         private static string currentTestCase = "";
 
-        private static Pubnub pubnub = null;
+        private static Pubnub pubnub;
 
-        private Server server;
-        private UnitTestLog unitLog;
+        private static Server server;
 
         [TestFixtureSetUp]
-        public void Init()
+        public static void Init()
         {
-            unitLog = new Tests.UnitTestLog();
+            UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
@@ -50,7 +49,7 @@ namespace PubNubMessaging.Tests
             currentTestCase = "Init";
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -103,14 +102,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnReceivedMessage()
+        public static void ThenSubscribeShouldReturnReceivedMessage()
         {
             server.ClearRequests();
 
             currentTestCase = "ThenSubscribeShouldReturnReceivedMessage";
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -209,14 +208,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnConnectStatus()
+        public static void ThenSubscribeShouldReturnConnectStatus()
         {
             server.ClearRequests();
 
             currentTestCase = "ThenSubscribeShouldReturnConnectStatus";
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -295,14 +294,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenMultiSubscribeShouldReturnConnectStatus()
+        public static void ThenMultiSubscribeShouldReturnConnectStatus()
         {
             server.ClearRequests();
 
             currentTestCase = "ThenMultiSubscribeShouldReturnConnectStatus";
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,

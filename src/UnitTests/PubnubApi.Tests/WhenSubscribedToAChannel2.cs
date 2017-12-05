@@ -16,25 +16,24 @@ namespace PubNubMessaging.Tests
         private static ManualResetEvent grantManualEvent = new ManualResetEvent(false);
 
         private static bool receivedMessage = false;
-        private static object publishedMessage = null;
+        private static object publishedMessage;
         private static long publishTimetoken = 0;
         private static bool receivedGrantMessage = false;
 
-        int manualResetEventWaitTimeout = 310 * 1000;
+        static int manualResetEventWaitTimeout = 310 * 1000;
         private static string channel = "hello_my_channel";
         private static string[] channelsGrant = { "hello_my_channel", "hello_my_channel1", "hello_my_channel2" };
         private static string authKey = "myAuth";
         private static string currentTestCase = "";
 
-        private static Pubnub pubnub = null;
+        private static Pubnub pubnub;
 
-        private Server server;
-        private UnitTestLog unitLog;
+        private static Server server;
 
         [TestFixtureSetUp]
-        public void Init()
+        public static void Init()
         {
-            unitLog = new Tests.UnitTestLog();
+            UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
@@ -44,7 +43,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -102,7 +101,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnReceivedMessage()
+        public static void ThenSubscribeShouldReturnReceivedMessage()
         {
             server.ClearRequests();
 
@@ -111,11 +110,11 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenItShouldReturnReceivedMessage Failed");
         }
 
-        private void CommonSubscribeShouldReturnReceivedMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
+        private static void CommonSubscribeShouldReturnReceivedMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
         {
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -212,7 +211,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnReceivedMessageSSL()
+        public static void ThenSubscribeShouldReturnReceivedMessageSSL()
         {
             server.ClearRequests();
 
@@ -222,7 +221,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnReceivedMessageCipherSSL()
+        public static void ThenSubscribeShouldReturnReceivedMessageCipherSSL()
         {
             server.ClearRequests();
 
@@ -232,7 +231,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnReceivedMessageSecret()
+        public static void ThenSubscribeShouldReturnReceivedMessageSecret()
         {
             server.ClearRequests();
 
@@ -242,7 +241,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnReceivedMessageSecretSSL()
+        public static void ThenSubscribeShouldReturnReceivedMessageSecretSSL()
         {
             server.ClearRequests();
 
@@ -252,7 +251,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnReceivedMessageSecretCipher()
+        public static void ThenSubscribeShouldReturnReceivedMessageSecretCipher()
         {
             server.ClearRequests();
 
@@ -262,7 +261,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnReceivedMessageSecretCipherSSL()
+        public static void ThenSubscribeShouldReturnReceivedMessageSecretCipherSSL()
         {
             server.ClearRequests();
 
@@ -272,7 +271,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnReceivedMessageCipher()
+        public static void ThenSubscribeShouldReturnReceivedMessageCipher()
         {
             server.ClearRequests();
 
@@ -282,7 +281,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnEmojiMessage()
+        public static void ThenSubscribeShouldReturnEmojiMessage()
         {
             server.ClearRequests();
 
@@ -291,11 +290,11 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnEmojiMessage Failed");
         }
 
-        private void CommonSubscribeShouldReturnEmojiMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
+        private static void CommonSubscribeShouldReturnEmojiMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
         {
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -392,7 +391,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnEmojiMessageSSL()
+        public static void ThenSubscribeShouldReturnEmojiMessageSSL()
         {
             server.ClearRequests();
 
@@ -402,7 +401,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnEmojiMessageSecret()
+        public static void ThenSubscribeShouldReturnEmojiMessageSecret()
         {
             server.ClearRequests();
 
@@ -412,7 +411,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnEmojiMessageCipherSecret()
+        public static void ThenSubscribeShouldReturnEmojiMessageCipherSecret()
         {
             server.ClearRequests();
 
@@ -422,7 +421,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnEmojiMessageCipherSecretSSL()
+        public static void ThenSubscribeShouldReturnEmojiMessageCipherSecretSSL()
         {
             server.ClearRequests();
 
@@ -432,7 +431,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnEmojiMessageSecretSSL()
+        public static void ThenSubscribeShouldReturnEmojiMessageSecretSSL()
         {
             server.ClearRequests();
 

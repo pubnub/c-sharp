@@ -29,24 +29,21 @@ namespace PubNubMessaging.Tests
         static bool receivedGrantMessage = false;
         static bool receivedUserStateMessage = false;
 
-        string customUUID = "mylocalmachine.mydomain.com";
-        string jsonUserState = "";
-        Dictionary<string, object> dicState = null;
+        static string customUUID = "mylocalmachine.mydomain.com";
+        static Dictionary<string, object> dicState;
         private static string currentTestCase = "";
-        string whereNowChannel = "";
-        int manualResetEventWaitTimeout = 310 * 1000;
+        static int manualResetEventWaitTimeout = 310 * 1000;
         private static string channel = "hello_my_channel";
         private static string authKey = "myAuth";
 
-        private static Pubnub pubnub = null;
+        private static Pubnub pubnub;
 
-        private Server server;
-        private UnitTestLog unitLog;
+        private static Server server;
 
         [TestFixtureSetUp]
-        public void Init()
+        public static void Init()
         {
-            unitLog = new Tests.UnitTestLog();
+            UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
@@ -56,7 +53,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -124,14 +121,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenPresenceShouldReturnReceivedMessage()
+        public static void ThenPresenceShouldReturnReceivedMessage()
         {
             server.ClearRequests();
 
             receivedPresenceMessage = false;
             currentTestCase = "ThenPresenceShouldReturnReceivedMessage";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -197,14 +194,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenPresenceShouldReturnReceivedMessageSSL()
+        public static void ThenPresenceShouldReturnReceivedMessageSSL()
         {
             server.ClearRequests();
 
             receivedPresenceMessage = false;
             currentTestCase = "ThenPresenceShouldReturnReceivedMessageSSL";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -271,14 +268,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenPresenceShouldReturnCustomUUID()
+        public static void ThenPresenceShouldReturnCustomUUID()
         {
             server.ClearRequests();
 
             receivedCustomUUID = false;
             currentTestCase = "ThenPresenceShouldReturnCustomUUID";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -346,14 +343,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void IfHereNowIsCalledThenItShouldReturnInfo()
+        public static void IfHereNowIsCalledThenItShouldReturnInfo()
         {
             server.ClearRequests();
 
             receivedHereNowMessage = false;
             currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfo";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -437,14 +434,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void IfHereNowIsCalledThenItShouldReturnInfoCipher()
+        public static void IfHereNowIsCalledThenItShouldReturnInfoCipher()
         {
             server.ClearRequests();
 
             receivedHereNowMessage = false;
             currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoCipher";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -529,14 +526,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void IfHereNowIsCalledThenItShouldReturnInfoCipherSecret()
+        public static void IfHereNowIsCalledThenItShouldReturnInfoCipherSecret()
         {
             server.ClearRequests();
 
             receivedHereNowMessage = false;
             currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoCipherSecret";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -622,14 +619,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void IfHereNowIsCalledThenItShouldReturnInfoCipherSecretSSL()
+        public static void IfHereNowIsCalledThenItShouldReturnInfoCipherSecretSSL()
         {
             server.ClearRequests();
 
             receivedHereNowMessage = false;
             currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoCipherSecretSSL";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -716,14 +713,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void IfHereNowIsCalledThenItShouldReturnInfoCipherSSL()
+        public static void IfHereNowIsCalledThenItShouldReturnInfoCipherSSL()
         {
             server.ClearRequests();
 
             receivedHereNowMessage = false;
             currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoCipherSSL";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -808,14 +805,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void IfHereNowIsCalledThenItShouldReturnInfoSecret()
+        public static void IfHereNowIsCalledThenItShouldReturnInfoSecret()
         {
             server.ClearRequests();
 
             receivedHereNowMessage = false;
             currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoSecret";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -901,14 +898,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void IfHereNowIsCalledThenItShouldReturnInfoSecretSSL()
+        public static void IfHereNowIsCalledThenItShouldReturnInfoSecretSSL()
         {
             server.ClearRequests();
 
             receivedHereNowMessage = false;
             currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoSecretSSL";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -994,14 +991,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void IfHereNowIsCalledThenItShouldReturnInfoSSL()
+        public static void IfHereNowIsCalledThenItShouldReturnInfoSSL()
         {
             server.ClearRequests();
 
             receivedHereNowMessage = false;
             currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoSSL";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -1085,14 +1082,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void IfHereNowIsCalledThenItShouldReturnInfoWithUserState()
+        public static void IfHereNowIsCalledThenItShouldReturnInfoWithUserState()
         {
             server.ClearRequests();
 
             receivedHereNowMessage = false;
             currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoWithUserState";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -1208,14 +1205,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void IfGlobalHereNowIsCalledThenItShouldReturnInfo()
+        public static void IfGlobalHereNowIsCalledThenItShouldReturnInfo()
         {
             server.ClearRequests();
 
             receivedHereNowMessage = false;
             currentTestCase = "IfGlobalHereNowIsCalledThenItShouldReturnInfo";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -1323,14 +1320,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void IfGlobalHereNowIsCalledThenItShouldReturnInfoWithUserState()
+        public static void IfGlobalHereNowIsCalledThenItShouldReturnInfoWithUserState()
         {
             server.ClearRequests();
 
             receivedHereNowMessage = false;
             currentTestCase = "IfGlobalHereNowIsCalledThenItShouldReturnInfoWithUserState";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -1443,14 +1440,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void IfWhereNowIsCalledThenItShouldReturnInfo()
+        public static void IfWhereNowIsCalledThenItShouldReturnInfo()
         {
             server.ClearRequests();
 
             receivedWhereNowMessage = false;
             currentTestCase = "IfWhereNowIsCalledThenItShouldReturnInfo";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -1536,14 +1533,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void IfSetAndGetUserStateThenItShouldReturnInfo()
+        public static void IfSetAndGetUserStateThenItShouldReturnInfo()
         {
             server.ClearRequests();
 
             receivedUserStateMessage = false;
             currentTestCase = "IfSetAndGetUserStateThenItShouldReturnInfo";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -1603,7 +1600,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void IfSetAndDeleteUserStateThenItShouldReturnInfo()
+        public static void IfSetAndDeleteUserStateThenItShouldReturnInfo()
         {
             server.ClearRequests();
 
@@ -1611,7 +1608,7 @@ namespace PubNubMessaging.Tests
             receivedUserStateMessage = false;
             currentTestCase = "IfSetAndDeleteUserStateThenItShouldReturnInfo";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -1736,14 +1733,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenPresenceHeartbeatShouldReturnMessage()
+        public static void ThenPresenceHeartbeatShouldReturnMessage()
         {
             server.ClearRequests();
 
             receivedPresenceMessage = false;
             currentTestCase = "ThenPresenceHeartbeatShouldReturnMessage";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,

@@ -13,14 +13,13 @@ namespace PubNubMessaging.Tests
         private static ManualResetEvent auditManualEvent = new ManualResetEvent(false);
         private static bool receivedAuditMessage = false;
         private static string currentUnitTestCase = "";
-        private static Pubnub pubnub = null;
-        private Server server;
-        private UnitTestLog unitLog;
+        private static Pubnub pubnub;
+        private static Server server;
 
         [TestFixtureSetUp]
-        public void Init()
+        public static void Init()
         {
-            unitLog = new Tests.UnitTestLog();
+            UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
@@ -34,14 +33,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubKeyLevelShouldReturnSuccess()
+        public static void ThenSubKeyLevelShouldReturnSuccess()
         {
             server.ClearRequests();
 
             currentUnitTestCase = "ThenSubKeyLevelShouldReturnSuccess";
             receivedAuditMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -86,7 +85,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenChannelLevelShouldReturnSuccess()
+        public static void ThenChannelLevelShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -95,7 +94,7 @@ namespace PubNubMessaging.Tests
 
             receivedAuditMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -141,7 +140,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenChannelGroupLevelShouldReturnSuccess()
+        public static void ThenChannelGroupLevelShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -149,7 +148,7 @@ namespace PubNubMessaging.Tests
             string channelgroup = "hello_my_group";
             receivedAuditMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,

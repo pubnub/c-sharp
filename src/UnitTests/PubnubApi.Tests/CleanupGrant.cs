@@ -15,9 +15,7 @@ namespace PubNubMessaging.Tests
         private static bool receivedAuditMessage = false;
         private static string currentUnitTestCase;
 
-        private static Pubnub pubnub = null;
-        private Server server;
-        private UnitTestLog unitLog;
+        private static Pubnub pubnub;
 
         [TestFixtureSetUp]
         public void Init()
@@ -45,7 +43,7 @@ namespace PubNubMessaging.Tests
                 receivedAuditMessage = false;
                 auditManualEvent = new ManualResetEvent(false);
 
-                PNConfiguration config = new PNConfiguration()
+                PNConfiguration config = new PNConfiguration
                 {
                     PublishKey = PubnubCommon.PublishKey,
                     SubscribeKey = PubnubCommon.SubscribeKey,
@@ -83,7 +81,7 @@ namespace PubNubMessaging.Tests
                 receivedAuditMessage = false;
                 auditManualEvent = new ManualResetEvent(false);
 
-                PNConfiguration config = new PNConfiguration()
+                PNConfiguration config = new PNConfiguration
                 {
                     PublishKey = PubnubCommon.PublishKey,
                     SubscribeKey = PubnubCommon.SubscribeKey,

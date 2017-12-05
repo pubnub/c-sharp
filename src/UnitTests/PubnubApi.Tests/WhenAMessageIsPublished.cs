@@ -37,7 +37,7 @@ namespace PubNubMessaging.Tests
         private static string authKey = "myAuth";
         private static string currentTestCase = "";
 
-        private static Pubnub pubnub = null;
+        private static Pubnub pubnub;
 
         private static Server server;
         private static UnitTestLog unitLog;
@@ -55,7 +55,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -114,7 +114,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             object message = null;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -156,7 +156,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             string message = messageForUnencryptPublish;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -236,7 +236,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             object message = new CustomClass();
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -318,7 +318,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             object message = new SecretCustomClass();
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -402,7 +402,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             object message = new SecretCustomClass();
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -486,7 +486,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             string message = messageForEncryptPublish;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -569,7 +569,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             string message = messageForSecretEncryptPublish;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -656,7 +656,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             object message = new PubnubDemoObject();
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -732,7 +732,7 @@ namespace PubNubMessaging.Tests
         [Test]
         public static void ThenPubnubShouldGenerateUniqueIdentifier()
         {
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -748,7 +748,7 @@ namespace PubNubMessaging.Tests
         [ExpectedException(typeof(MissingMemberException))]
         public static void ThenPublishKeyShouldNotBeEmpty()
         {
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = "",
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -773,7 +773,7 @@ namespace PubNubMessaging.Tests
             publishTimetoken = 0;
             currentTestCase = "ThenOptionalSecretKeyShouldBeProvidedInConfig";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -825,7 +825,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,

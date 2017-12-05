@@ -15,27 +15,26 @@ namespace PubNubMessaging.Tests
         private static ManualResetEvent grantManualEvent = new ManualResetEvent(false);
 
         private static bool receivedMessage = false;
-        private static object publishedMessage = null;
+        private static object publishedMessage;
         private static long publishTimetoken = 0;
         private static bool receivedGrantMessage = false;
 
         private static int numberOfReceivedMessages = 0;
 
-        int manualResetEventWaitTimeout = 310 * 1000;
+        static int manualResetEventWaitTimeout = 310 * 1000;
         private static string channel = "hello_my_channel";
         private static string[] channelsGrant = { "hello_my_channel", "hello_my_channel1", "hello_my_channel2" };
         private static string authKey = "myAuth";
         private static string currentTestCase = "";
 
-        private static Pubnub pubnub = null;
+        private static Pubnub pubnub;
 
-        private Server server;
-        private UnitTestLog unitLog;
+        private static Server server;
 
         [TestFixtureSetUp]
-        public void Init()
+        public static void Init()
         {
-            unitLog = new Tests.UnitTestLog();
+            UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
@@ -45,7 +44,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -103,7 +102,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenComplexMessageSubscribeShouldReturnReceivedMessage()
+        public static void ThenComplexMessageSubscribeShouldReturnReceivedMessage()
         {
             server.ClearRequests();
 
@@ -112,11 +111,11 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageSubscribeShouldReturnReceivedMessage Failed");
         }
 
-        private void CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
+        private static void CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
         {
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -212,7 +211,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenComplexMessageSSLSubscribeShouldReturnReceivedMessage()
+        public static void ThenComplexMessageSSLSubscribeShouldReturnReceivedMessage()
         {
             server.ClearRequests();
 
@@ -222,7 +221,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenComplexMessageSecretSubscribeShouldReturnReceivedMessage()
+        public static void ThenComplexMessageSecretSubscribeShouldReturnReceivedMessage()
         {
             server.ClearRequests();
 
@@ -232,7 +231,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenComplexMessageSecretSSLSubscribeShouldReturnReceivedMessage()
+        public static void ThenComplexMessageSecretSSLSubscribeShouldReturnReceivedMessage()
         {
             server.ClearRequests();
 
@@ -242,7 +241,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenComplexMessageCipherSubscribeShouldReturnReceivedMessage()
+        public static void ThenComplexMessageCipherSubscribeShouldReturnReceivedMessage()
         {
             server.ClearRequests();
 
@@ -252,7 +251,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenComplexMessageCipherSSLSubscribeShouldReturnReceivedMessage()
+        public static void ThenComplexMessageCipherSSLSubscribeShouldReturnReceivedMessage()
         {
             server.ClearRequests();
 
@@ -262,7 +261,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenComplexMessageCipherSecretSubscribeShouldReturnReceivedMessage()
+        public static void ThenComplexMessageCipherSecretSubscribeShouldReturnReceivedMessage()
         {
             server.ClearRequests();
 
@@ -272,7 +271,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenComplexMessageCipherSecretSSLSubscribeShouldReturnReceivedMessage()
+        public static void ThenComplexMessageCipherSecretSSLSubscribeShouldReturnReceivedMessage()
         {
             server.ClearRequests();
 
@@ -282,14 +281,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscribeShouldReturnConnectStatus()
+        public static void ThenSubscribeShouldReturnConnectStatus()
         {
             server.ClearRequests();
 
             receivedMessage = false;
             currentTestCase = "ThenSubscribeShouldReturnConnectStatus";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -347,14 +346,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenMultiSubscribeShouldReturnConnectStatus()
+        public static void ThenMultiSubscribeShouldReturnConnectStatus()
         {
             server.ClearRequests();
 
             receivedMessage = false;
             currentTestCase = "ThenMultiSubscribeShouldReturnConnectStatus";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -441,14 +440,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenMultiSubscribeShouldReturnConnectStatusSSL()
+        public static void ThenMultiSubscribeShouldReturnConnectStatusSSL()
         {
             server.ClearRequests();
 
             receivedMessage = false;
             currentTestCase = "ThenMultiSubscribeShouldReturnConnectStatusSSL";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -535,14 +534,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSubscriberShouldBeAbleToReceiveManyMessages()
+        public static void ThenSubscriberShouldBeAbleToReceiveManyMessages()
         {
             server.ClearRequests();
 
             receivedMessage = false;
             currentTestCase = "ThenSubscriberShouldBeAbleToReceiveManyMessages";
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,

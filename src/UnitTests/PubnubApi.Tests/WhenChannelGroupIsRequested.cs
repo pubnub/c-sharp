@@ -21,14 +21,13 @@ namespace PubNubMessaging.Tests
         private static string channelName = "hello_my_channel";
         private static string authKey = "myAuth";
 
-        private static Pubnub pubnub = null;
-        private Server server;
-        private UnitTestLog unitLog;
+        private static Pubnub pubnub;
+        private static Server server;
 
         [TestFixtureSetUp]
-        public void Init()
+        public static void Init()
         {
-            unitLog = new Tests.UnitTestLog();
+            UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
@@ -38,7 +37,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -87,14 +86,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenAddChannelShouldReturnSuccess()
+        public static void ThenAddChannelShouldReturnSuccess()
         {
             server.ClearRequests();
 
             currentUnitTestCase = "ThenAddChannelShouldReturnSuccess";
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -133,7 +132,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenRemoveChannelShouldReturnSuccess()
+        public static void ThenRemoveChannelShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -141,7 +140,7 @@ namespace PubNubMessaging.Tests
             string channelName = "hello_my_channel";
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -181,7 +180,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenGetChannelListShouldReturnSuccess()
+        public static void ThenGetChannelListShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -189,7 +188,7 @@ namespace PubNubMessaging.Tests
 
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -227,7 +226,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenGetAllChannelGroupShouldReturnSuccess()
+        public static void ThenGetAllChannelGroupShouldReturnSuccess()
         {
             server.ClearRequests();
 
@@ -235,7 +234,7 @@ namespace PubNubMessaging.Tests
 
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration()
+            PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
