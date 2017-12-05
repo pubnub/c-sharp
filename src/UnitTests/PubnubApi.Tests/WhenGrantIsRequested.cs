@@ -39,7 +39,7 @@ namespace PubNubMessaging.Tests
         }
 
         [TestFixtureTearDown]
-        public void Exit()
+        public static void Exit()
         {
             server.Stop();
         }
@@ -418,7 +418,6 @@ namespace PubNubMessaging.Tests
                 if (receivedGrantMessage)
                 {
                     revokeManualEvent = new ManualResetEvent(false);
-                    Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant ok..Now trying Revoke");
                     pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(false).Write(false).Manage(false).TTL(0).Async(new RevokeGrantResult());
                     Thread.Sleep(1000);
                     revokeManualEvent.WaitOne();

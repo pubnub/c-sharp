@@ -89,7 +89,7 @@ namespace PubNubMessaging.Tests
         }
 
         [TestFixtureTearDown]
-        public void Exit()
+        public static void Exit()
         {
             server.Stop();
         }
@@ -559,8 +559,6 @@ namespace PubNubMessaging.Tests
                         case "ThenSubscribeShouldReturnEmojiMessageCipherSecretSSL":
                         case "ThenSubscribeShouldReturnEmojiMessageSecretSSL":
                             subscribeManualEvent.Set();
-                            break;
-                        default:
                             break;
                     }
 

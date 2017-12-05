@@ -236,7 +236,7 @@ namespace MockServer
                         }
 
                         string[] lines = strData.Split(new string[] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-                        string path = lines[0].Substring(0, lines[0].LastIndexOf(" "));
+                        string path = lines[0].Substring(0, lines[0].LastIndexOf(" ", StringComparison.InvariantCultureIgnoreCase));
                         responses.Add(path);
                         System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("        ###  MM/dd/yyyy HH:mm:ss:fff") + " - " + path);
 
@@ -417,7 +417,7 @@ namespace MockServer
                 if (messageData.ToString().Contains("\r\n\r\n"))
                 {
                     string msg = messageData.ToString();
-                    int index = msg.ToLower().IndexOf("content-length: ");
+                    int index = msg.ToLowerInvariant().IndexOf("content-length: ");
                     if (index != -1)
                     {
                         int indexlast = msg.IndexOf("\r\n\r\n");

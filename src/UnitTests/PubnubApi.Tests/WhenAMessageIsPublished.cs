@@ -19,18 +19,15 @@ namespace PubNubMessaging.Tests
         private static bool receivedPublishMessage = false;
 
         private static long publishTimetoken;
-        private static long unEncryptObjectPublishTimetoken = 0;
-        private static long encryptObjectPublishTimetoken = 0;
-        private static long encryptPublishTimetoken = 0;
-        private static long secretEncryptPublishTimetoken = 0;
-        private static long complexObjectPublishTimetoken = 0;
+        private static long unEncryptObjectPublishTimetoken;
+        private static long encryptObjectPublishTimetoken;
+        private static long encryptPublishTimetoken;
+        private static long secretEncryptPublishTimetoken;
+        private static long complexObjectPublishTimetoken;
 
         private const string messageForUnencryptPublish = "Pubnub Messaging API 1";
         private const string messageForEncryptPublish = "漢語";
         private const string messageForSecretEncryptPublish = "Pubnub Messaging API 2";
-        private static string messageObjectForUnencryptPublish = "";
-        private static string messageObjectForEncryptPublish = "";
-        private static string messageComplexObjectForPublish = "";
 
         private static int manualResetEventWaitTimeout = 310 * 1000;
         private static string channel = "hello_my_channel";
@@ -40,12 +37,11 @@ namespace PubNubMessaging.Tests
         private static Pubnub pubnub;
 
         private static Server server;
-        private static UnitTestLog unitLog;
 
         [TestFixtureSetUp]
         public static void Init()
         {
-            unitLog = new Tests.UnitTestLog();
+            UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
@@ -100,7 +96,7 @@ namespace PubNubMessaging.Tests
         }
 
         [TestFixtureTearDown]
-        public void Exit()
+        public static void Exit()
         {
             server.Stop();
         }
@@ -257,8 +253,6 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            messageObjectForUnencryptPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
-
             manualResetEventWaitTimeout = 310 * 1000;
 
             publishManualEvent = new ManualResetEvent(false);
@@ -341,8 +335,6 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            messageObjectForEncryptPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
-
             manualResetEventWaitTimeout = 310 * 1000;
 
             publishManualEvent = new ManualResetEvent(false);
@@ -424,8 +416,6 @@ namespace PubNubMessaging.Tests
                     .WithParameter("uuid", config.Uuid)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
-
-            messageObjectForEncryptPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
 
             manualResetEventWaitTimeout = 310 * 1000;
 
@@ -678,8 +668,6 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            messageComplexObjectForPublish = pubnub.JsonPluggableLibrary.SerializeToJsonString(message);
-
             manualResetEventWaitTimeout = 310 * 1000;
 
             publishManualEvent = new ManualResetEvent(false);
@@ -914,8 +902,6 @@ namespace PubNubMessaging.Tests
                             receivedPublishMessage = true;
                             publishManualEvent.Set();
                             break;
-                        default:
-                            break;
                     }
                 }
             }
@@ -950,7 +936,7 @@ namespace PubNubMessaging.Tests
         };
 
         #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
+        private bool disposedValue; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)
         {
@@ -962,10 +948,6 @@ namespace PubNubMessaging.Tests
                     publishManualEvent.Dispose();
                     historyManualEvent.Dispose();
                 }
-
-                grantManualEvent = null;
-                publishManualEvent = null;
-                historyManualEvent = null;
 
                 disposedValue = true;
             }

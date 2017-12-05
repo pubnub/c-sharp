@@ -90,7 +90,7 @@ namespace PubNubMessaging.Tests
         }
 
         [TestFixtureTearDown]
-        public void Exit()
+        public static void Exit()
         {
             server.Stop();
         }
@@ -766,7 +766,7 @@ namespace PubNubMessaging.Tests
         }
 
         #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
+        private bool disposedValue; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)
         {
@@ -778,10 +778,6 @@ namespace PubNubMessaging.Tests
                     publishManualEvent.Dispose();
                     grantManualEvent.Dispose();
                 }
-
-                subscribeManualEvent = null;
-                publishManualEvent = null;
-                grantManualEvent = null;
 
                 disposedValue = true;
             }

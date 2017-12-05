@@ -100,7 +100,7 @@ namespace PubNubMessaging.Tests
         }
 
         [TestFixtureTearDown]
-        public void Exit()
+        public static void Exit()
         {
             server.Stop();
         }
@@ -1141,6 +1141,7 @@ namespace PubNubMessaging.Tests
                 }
                 catch
                 {
+                    /* ignore */
                 }
                 finally
                 {
@@ -1251,13 +1252,8 @@ namespace PubNubMessaging.Tests
                 }
                 else if (result == null || status.StatusCode != 200 || status.Error)
                 {
-                    switch (currentTestCase)
-                    {
-                        case "DetailHistoryWithNullKeysReturnsError":
-                            receivedMessage = true;
-                            break;
-                        default:
-                            break;
+                    if (string.Compare(currentTestCase, "DetailHistoryWithNullKeysReturnsError", true, System.Globalization.CultureInfo.InvariantCulture) == 0){
+                        receivedMessage = true;
                     }
                 }
 

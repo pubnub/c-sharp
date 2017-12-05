@@ -26,7 +26,7 @@ namespace PubNubMessaging.Tests
         private static string authKey = "myAuth";
         private static long publishTimetoken = 0;
         private static string currentTestCase = "";
-        static int manualResetEventWaitTimeout = 310 * 1000;
+        private static int manualResetEventWaitTimeout = 310 * 1000;
 
         private static Pubnub pubnub;
 
@@ -95,7 +95,7 @@ namespace PubNubMessaging.Tests
         }
 
         [TestFixtureTearDown]
-        public void Exit()
+        public static void Exit()
         {
             server.Stop();
         }

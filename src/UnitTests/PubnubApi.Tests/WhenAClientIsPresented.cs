@@ -30,9 +30,8 @@ namespace PubNubMessaging.Tests
         static bool receivedUserStateMessage = false;
 
         static string customUUID = "mylocalmachine.mydomain.com";
-        static Dictionary<string, object> dicState;
         private static string currentTestCase = "";
-        static int manualResetEventWaitTimeout = 310 * 1000;
+        private static int manualResetEventWaitTimeout = 310 * 1000;
         private static string channel = "hello_my_channel";
         private static string authKey = "myAuth";
 
@@ -87,7 +86,7 @@ namespace PubNubMessaging.Tests
         }
 
         [TestFixtureTearDown]
-        public void Exit()
+        public static void Exit()
         {
             server.Stop();
         }
@@ -1137,7 +1136,7 @@ namespace PubNubMessaging.Tests
             else Thread.Sleep(200);
 
             userStateManualEvent = new ManualResetEvent(false);
-            dicState = new Dictionary<string, object>();
+            Dictionary<string, object> dicState = new Dictionary<string, object>();
             dicState.Add("testkey", "testval");
 
             expected = "{\"status\": 200, \"message\": \"OK\", \"payload\": {\"testkey\": \"testval\"}, \"service\": \"Presence\"}";
@@ -1372,7 +1371,7 @@ namespace PubNubMessaging.Tests
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             userStateManualEvent = new ManualResetEvent(false);
-            dicState = new Dictionary<string, object>();
+            Dictionary<string, object> dicState = new Dictionary<string, object>();
             dicState.Add("testkey", "testval");
 
             expected = "[[],\"14740704540745015\"]";
@@ -1556,7 +1555,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
 
             userStateManualEvent = new ManualResetEvent(false);
-            dicState = new Dictionary<string, object>();
+            Dictionary<string, object> dicState = new Dictionary<string, object>();
             dicState.Add("testkey", "testval");
 
             string expected = "{\"status\": 200, \"message\": \"OK\", \"payload\": {\"testkey\": \"testval\"}, \"service\": \"Presence\"}";
@@ -1628,7 +1627,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
 
             userStateManualEvent = new ManualResetEvent(false);
-            dicState = new Dictionary<string, object>();
+            Dictionary<string, object> dicState = new Dictionary<string, object>();
             dicState.Add("k", "v");
 
             string expected = "{\"status\": 200, \"message\": \"OK\", \"payload\": {\"k\": \"v\"}, \"service\": \"Presence\"}";

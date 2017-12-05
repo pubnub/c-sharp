@@ -18,17 +18,17 @@ namespace PubNubMessaging.Tests
         private static Pubnub pubnub;
 
         [TestFixtureSetUp]
-        public void Init()
+        public static void Init()
         {
         }
 
         [TestFixtureTearDown]
-        public void Exit()
+        public static void Exit()
         {
         }
 
         [Test]
-        public void AtUserLevel()
+        public static void AtUserLevel()
         {
             currentUnitTestCase = "AtUserLevel";
 
@@ -66,7 +66,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void AtChannelLevel()
+        public static void AtChannelLevel()
         {
             currentUnitTestCase = "AtChannelLevel";
 

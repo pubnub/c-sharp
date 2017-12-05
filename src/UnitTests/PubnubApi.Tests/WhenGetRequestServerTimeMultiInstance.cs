@@ -19,7 +19,7 @@ namespace PubNubMessaging.Tests
         private static Server server;
 
         [TestFixtureSetUp]
-        public void Init()
+        public static void Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
@@ -252,7 +252,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void TranslateDateTimeToUnixTime()
+        public static void TranslateDateTimeToUnixTime()
         {
             //Test for 26th June 2012 GMT
             DateTime dt = new DateTime(2012, 6, 26, 0, 0, 0, DateTimeKind.Utc);
@@ -261,7 +261,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void TranslateUnixTimeToDateTime()
+        public static void TranslateUnixTimeToDateTime()
         {
             //Test for 26th June 2012 GMT
             DateTime expectedDate = new DateTime(2012, 6, 26, 0, 0, 0, DateTimeKind.Utc);
