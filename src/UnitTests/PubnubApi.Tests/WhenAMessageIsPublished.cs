@@ -9,27 +9,8 @@ using PubnubApi.Tests;
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
-    public class WhenAMessageIsPublished : TestHarness
+    public class WhenAMessageIsPublished : TestHarness, IDisposable
     {
-        private ManualResetEvent mreUnencryptedPublish = new ManualResetEvent(false);
-        private ManualResetEvent mreOptionalSecretKeyPublish = new ManualResetEvent(false);
-        private ManualResetEvent mreNoSslPublish = new ManualResetEvent(false);
-
-        private ManualResetEvent mreUnencryptObjectPublish = new ManualResetEvent(false);
-        private ManualResetEvent mreEncryptObjectPublish = new ManualResetEvent(false);
-        private ManualResetEvent mreEncryptPublish = new ManualResetEvent(false);
-        private ManualResetEvent mreSecretEncryptPublish = new ManualResetEvent(false);
-        private ManualResetEvent mreComplexObjectPublish = new ManualResetEvent(false);
-        private ManualResetEvent mreLaregMessagePublish = new ManualResetEvent(false);
-
-        private ManualResetEvent mreEncryptDetailedHistory = new ManualResetEvent(false);
-        private ManualResetEvent mreSecretEncryptDetailedHistory = new ManualResetEvent(false);
-        private ManualResetEvent mreUnencryptDetailedHistory = new ManualResetEvent(false);
-        private ManualResetEvent mreUnencryptObjectDetailedHistory = new ManualResetEvent(false);
-        private ManualResetEvent mreEncryptObjectDetailedHistory = new ManualResetEvent(false);
-        private ManualResetEvent mreComplexObjectDetailedHistory = new ManualResetEvent(false);
-        private ManualResetEvent mreSerializedObjectMessageForPublish = new ManualResetEvent(false);
-        private ManualResetEvent mreSerializedMessagePublishDetailedHistory = new ManualResetEvent(false);
         private static ManualResetEvent grantManualEvent = new ManualResetEvent(false);
         private static ManualResetEvent publishManualEvent = new ManualResetEvent(false);
         private static ManualResetEvent historyManualEvent = new ManualResetEvent(false);
@@ -37,32 +18,32 @@ namespace PubNubMessaging.Tests
         private static bool receivedGrantMessage = false;
         private static bool receivedPublishMessage = false;
 
-        private static long publishTimetoken = 0;
-        private long unEncryptObjectPublishTimetoken = 0;
-        private long encryptObjectPublishTimetoken = 0;
-        private long encryptPublishTimetoken = 0;
-        private long secretEncryptPublishTimetoken = 0;
-        private long complexObjectPublishTimetoken = 0;
+        private static long publishTimetoken;
+        private static long unEncryptObjectPublishTimetoken = 0;
+        private static long encryptObjectPublishTimetoken = 0;
+        private static long encryptPublishTimetoken = 0;
+        private static long secretEncryptPublishTimetoken = 0;
+        private static long complexObjectPublishTimetoken = 0;
 
         private const string messageForUnencryptPublish = "Pubnub Messaging API 1";
         private const string messageForEncryptPublish = "漢語";
         private const string messageForSecretEncryptPublish = "Pubnub Messaging API 2";
-        private string messageObjectForUnencryptPublish = "";
-        private string messageObjectForEncryptPublish = "";
-        private string messageComplexObjectForPublish = "";
+        private static string messageObjectForUnencryptPublish = "";
+        private static string messageObjectForEncryptPublish = "";
+        private static string messageComplexObjectForPublish = "";
 
-        int manualResetEventWaitTimeout = 310 * 1000;
+        private static int manualResetEventWaitTimeout = 310 * 1000;
         private static string channel = "hello_my_channel";
         private static string authKey = "myAuth";
         private static string currentTestCase = "";
 
         private static Pubnub pubnub = null;
 
-        private Server server;
-        private UnitTestLog unitLog;
+        private static Server server;
+        private static UnitTestLog unitLog;
 
         [TestFixtureSetUp]
-        public void Init()
+        public static void Init()
         {
             unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
@@ -85,7 +66,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":20,\"channel\":\"hello_my_channel\",\"auths\":{\"myAuth\":{\"r\":1,\"w\":1,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
 
@@ -106,7 +87,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
 
             if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
 
@@ -126,7 +107,7 @@ namespace PubNubMessaging.Tests
 
         [Test]
         [ExpectedException(typeof(ArgumentException))]
-        public void ThenNullMessageShouldReturnException()
+        public static void ThenNullMessageShouldReturnException()
         {
             server.ClearRequests();
 
@@ -141,7 +122,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(true);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "";
 
@@ -164,7 +145,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenUnencryptPublishShouldReturnSuccessCodeAndInfo()
+        public static void ThenUnencryptPublishShouldReturnSuccessCodeAndInfo()
         {
             server.ClearRequests();
 
@@ -183,7 +164,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(true);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "[1,\"Sent\",\"14715278266153304\"]";
 
@@ -244,7 +225,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo()
+        public static void ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo()
         {
             server.ClearRequests();
 
@@ -263,7 +244,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(true);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "[1,\"Sent\",\"14715286132003364\"]";
 
@@ -326,7 +307,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo()
+        public static void ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo()
         {
             server.ClearRequests();
 
@@ -347,7 +328,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "[1,\"Sent\",\"14715322883933786\"]";
 
@@ -410,7 +391,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfoWithSSL()
+        public static void ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfoWithSSL()
         {
             server.ClearRequests();
 
@@ -431,7 +412,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(true);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "[1,\"Sent\",\"14715322883933786\"]";
 
@@ -494,7 +475,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenEncryptPublishShouldReturnSuccessCodeAndInfo()
+        public static void ThenEncryptPublishShouldReturnSuccessCodeAndInfo()
         {
             server.ClearRequests();
 
@@ -515,7 +496,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "[1,\"Sent\",\"14715426119520817\"]";
 
@@ -577,7 +558,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo()
+        public static void ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo()
         {
             server.ClearRequests();
 
@@ -599,7 +580,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "[1, \"Sent\", \"14715438956854374\"]";
 
@@ -664,7 +645,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo()
+        public static void ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo()
         {
             server.ClearRequests();
 
@@ -684,7 +665,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "[1, \"Sent\", \"14715459088445832\"]";
 
@@ -749,7 +730,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenPubnubShouldGenerateUniqueIdentifier()
+        public static void ThenPubnubShouldGenerateUniqueIdentifier()
         {
             PNConfiguration config = new PNConfiguration()
             {
@@ -757,7 +738,7 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
             };
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             Assert.IsNotNull(pubnub.GenerateGuid());
             pubnub = null;
@@ -765,7 +746,7 @@ namespace PubNubMessaging.Tests
 
         [Test]
         [ExpectedException(typeof(MissingMemberException))]
-        public void ThenPublishKeyShouldNotBeEmpty()
+        public static void ThenPublishKeyShouldNotBeEmpty()
         {
             PNConfiguration config = new PNConfiguration()
             {
@@ -773,7 +754,7 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
             };
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
@@ -784,7 +765,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void ThenOptionalSecretKeyShouldBeProvidedInConfig()
+        public static void ThenOptionalSecretKeyShouldBeProvidedInConfig()
         {
             server.ClearRequests();
 
@@ -802,7 +783,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
@@ -833,7 +814,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void IfSSLNotProvidedThenDefaultShouldBeTrue()
+        public static void IfSSLNotProvidedThenDefaultShouldBeTrue()
         {
             server.ClearRequests();
 
@@ -851,7 +832,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(true);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "[1,\"Sent\",\"14722484585147754\"]";
 
@@ -967,5 +948,33 @@ namespace PubNubMessaging.Tests
                 }
             }
         };
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    grantManualEvent.Dispose();
+                    publishManualEvent.Dispose();
+                    historyManualEvent.Dispose();
+                }
+
+                grantManualEvent = null;
+                publishManualEvent = null;
+                historyManualEvent = null;
+
+                disposedValue = true;
+            }
+        }
+
+        void IDisposable.Dispose()
+        {
+            Dispose(true);
+        }
+        #endregion
     }
 }

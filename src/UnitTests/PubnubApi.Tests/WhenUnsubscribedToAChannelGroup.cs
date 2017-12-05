@@ -51,7 +51,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":20,\"channel-group\":\"hello_my_group\",\"auths\":{\"myAuth\":{\"r\":1,\"w\":1,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
 
@@ -72,7 +72,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().ChannelGroups(new string[] { channelGroupName }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+            pubnub.Grant().ChannelGroups(new [] { channelGroupName }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
             Thread.Sleep(1000);
 
             grantManualEvent.WaitOne();
@@ -109,7 +109,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(false);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             channelGroupName = "hello_my_group";
@@ -132,7 +132,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.AddChannelsToChannelGroup().Channels(new string[] { channelName }).ChannelGroup(channelGroupName).Async(new ChannelGroupAddChannelResult());
+            pubnub.AddChannelsToChannelGroup().Channels(new [] { channelName }).ChannelGroup(channelGroupName).Async(new ChannelGroupAddChannelResult());
             cgManualEvent.WaitOne(manualResetEventWaitTimeout); 
 
             if (receivedMessage)
@@ -163,7 +163,7 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.Subscribe<string>().ChannelGroups(new string[] { channelGroupName }).Execute();
+                pubnub.Subscribe<string>().ChannelGroups(new [] { channelGroupName }).Execute();
                 subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
                 if (receivedMessage)
@@ -179,7 +179,7 @@ namespace PubNubMessaging.Tests
                             .WithResponse(expected)
                             .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                    pubnub.Unsubscribe<string>().ChannelGroups(new string[] { channelGroupName }).Execute();
+                    pubnub.Unsubscribe<string>().ChannelGroups(new [] { channelGroupName }).Execute();
                     subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
                 }
 

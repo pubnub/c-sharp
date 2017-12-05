@@ -57,7 +57,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
             manualResetEventWaitTimeout = 310 * 1000;
 
             channel = "foo.*";
@@ -82,7 +82,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
             Thread.Sleep(1000);
             grantManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -112,7 +112,7 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+                pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
                 Thread.Sleep(1000);
                 grantManualEvent.WaitOne(manualResetEventWaitTimeout);
             }
@@ -143,7 +143,7 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+                pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
                 Thread.Sleep(1000);
                 grantManualEvent.WaitOne(manualResetEventWaitTimeout);
             }
@@ -174,7 +174,7 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.Grant().Channels(new string[] { channel }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+                pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
                 Thread.Sleep(1000);
                 grantManualEvent.WaitOne(manualResetEventWaitTimeout);
             }
@@ -205,7 +205,7 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.Grant().ChannelGroups(new string[] { channelGroupName }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+                pubnub.Grant().ChannelGroups(new [] { channelGroupName }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
                 Thread.Sleep(1000);
                 grantManualEvent.WaitOne(manualResetEventWaitTimeout);
             }
@@ -250,7 +250,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(ssl);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             string wildCardSubscribeChannel = "foo.*";
@@ -295,7 +295,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Subscribe<string>().Channels(new string[] { wildCardSubscribeChannel }).Execute();
+            pubnub.Subscribe<string>().Channels(new [] { wildCardSubscribeChannel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             publishManualEvent = new ManualResetEvent(false);
@@ -321,7 +321,7 @@ namespace PubNubMessaging.Tests
 
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            pubnub.Unsubscribe<string>().Channels(new string[] { wildCardSubscribeChannel }).Execute();
+            pubnub.Unsubscribe<string>().Channels(new [] { wildCardSubscribeChannel }).Execute();
 
             Thread.Sleep(1000);
 
@@ -414,7 +414,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(ssl);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             string wildCardSubscribeChannel = "foo.*";
@@ -460,7 +460,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Subscribe<string>().Channels(new string[] { wildCardSubscribeChannel }).Execute();
+            pubnub.Subscribe<string>().Channels(new [] { wildCardSubscribeChannel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             publishManualEvent = new ManualResetEvent(false);
@@ -487,7 +487,7 @@ namespace PubNubMessaging.Tests
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
             Console.WriteLine("publishManualEvent.WaitOne DONE");
 
-            pubnub.Unsubscribe<string>().Channels(new string[] { wildCardSubscribeChannel }).Execute();
+            pubnub.Unsubscribe<string>().Channels(new [] { wildCardSubscribeChannel }).Execute();
 
             Thread.Sleep(1000);
 
@@ -556,12 +556,12 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(false);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             string wildCardSubscribeChannel = "foo.*";
             string subChannelName = "hello_my_channel";
-            string[] commaDelimitedChannel = new string[] { subChannelName, wildCardSubscribeChannel };
+            string[] commaDelimitedChannel = new [] { subChannelName, wildCardSubscribeChannel };
             channelGroupName = "hello_my_group";
             string channelAddForGroup = "hello_my_channel1";
             string pubWildChannelName = "foo.a";
@@ -582,7 +582,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.AddChannelsToChannelGroup().Channels(new string[] { channelAddForGroup }).ChannelGroup(channelGroupName).Async(new ChannelGroupAddChannelResult());
+            pubnub.AddChannelsToChannelGroup().Channels(new [] { channelAddForGroup }).ChannelGroup(channelGroupName).Async(new ChannelGroupAddChannelResult());
             channelGroupManualEvent.WaitOne();
 
             subscribeManualEvent = new ManualResetEvent(false);
@@ -610,7 +610,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Subscribe<string>().Channels(commaDelimitedChannel).ChannelGroups(new string[] { channelGroupName }).Execute();
+            pubnub.Subscribe<string>().Channels(commaDelimitedChannel).ChannelGroups(new [] { channelGroupName }).Execute();
 
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -683,7 +683,7 @@ namespace PubNubMessaging.Tests
                 Console.WriteLine("publishManualEvent.WaitOne DONE");
             }
 
-            pubnub.Unsubscribe<string>().Channels(commaDelimitedChannel).ChannelGroups(new string[] { channelGroupName }).Execute();
+            pubnub.Unsubscribe<string>().Channels(commaDelimitedChannel).ChannelGroups(new [] { channelGroupName }).Execute();
 
             Thread.Sleep(1000);
 
@@ -714,7 +714,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(false);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             string wildCardSubscribeChannel = "foo.*";
@@ -744,12 +744,12 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Subscribe<string>().Channels(new string[] { wildCardSubscribeChannel }).ChannelGroups(new string[] { channelGroupName }).Execute();
+            pubnub.Subscribe<string>().Channels(new [] { wildCardSubscribeChannel }).ChannelGroups(new [] { channelGroupName }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             Thread.Sleep(1000);
 
-            pubnub.Unsubscribe<string>().Channels(new string[] { wildCardSubscribeChannel }).ChannelGroups(new string[] { channelGroupName }).Execute();
+            pubnub.Unsubscribe<string>().Channels(new [] { wildCardSubscribeChannel }).ChannelGroups(new [] { channelGroupName }).Execute();
 
             Thread.Sleep(1000);
 

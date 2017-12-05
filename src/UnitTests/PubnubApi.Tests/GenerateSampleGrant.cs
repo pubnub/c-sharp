@@ -57,7 +57,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             if (PubnubCommon.EnableStubTest) sampleCount = 1;
 
@@ -85,7 +85,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.Grant().Channels(new string[] { channelName }).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(false).Async(new GrantResult());
+                pubnub.Grant().Channels(new [] { channelName }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(false).Async(new GrantResult());
                 grantManualEvent.WaitOne();
             }
 
@@ -118,7 +118,7 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
             };
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             if (PubnubCommon.EnableStubTest) sampleCount = 1;
 
@@ -144,7 +144,7 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.Grant().Channels(new string[] { channelName }).Read(true).Write(true).Manage(false).Async(new GrantResult());
+                pubnub.Grant().Channels(new [] { channelName }).Read(true).Write(true).Manage(false).Async(new GrantResult());
                 grantManualEvent.WaitOne();
             }
 

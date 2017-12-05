@@ -56,7 +56,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(true);
 
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
 
             string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":20,\"channel\":\"hello_my_channel\",\"auths\":{\"myAuth\":{\"r\":1,\"w\":1,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
 
@@ -77,7 +77,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().Channels(channelsGrant).AuthKeys(new string[] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+            pubnub.Grant().Channels(channelsGrant).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
 
             Thread.Sleep(1000);
 
@@ -129,7 +129,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(ssl);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             string channel = "hello_my_channel";
@@ -174,7 +174,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute();
+            pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
             publishManualEvent = new ManualResetEvent(false);
@@ -200,7 +200,7 @@ namespace PubNubMessaging.Tests
 
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
+            pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
 
             Thread.Sleep(1000);
 
@@ -299,7 +299,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(false);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             string channel = "hello_my_channel";
@@ -328,13 +328,13 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute();
+            pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
 
             Thread.Sleep(1000);
 
-            pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
+            pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
 
             Thread.Sleep(1000);
 
@@ -364,7 +364,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(false);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             manualResetEventWaitTimeout = 310 * 1000;
@@ -393,7 +393,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Subscribe<string>().Channels(new string[] { channel1 }).Execute();
+            pubnub.Subscribe<string>().Channels(new [] { channel1 }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
             string channel2 = "hello_my_channel2";
@@ -425,13 +425,13 @@ namespace PubNubMessaging.Tests
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
                 Thread.Sleep(1000);
-                pubnub.Subscribe<string>().Channels(new string[] { channel2 }).Execute();
+                pubnub.Subscribe<string>().Channels(new [] { channel2 }).Execute();
                 subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
             }
 
             Thread.Sleep(1000);
 
-            pubnub.Unsubscribe<string>().Channels(new string[] { channel1, channel2 }).Execute();
+            pubnub.Unsubscribe<string>().Channels(new [] { channel1, channel2 }).Execute();
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
@@ -458,7 +458,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(true);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             manualResetEventWaitTimeout = 310 * 1000;
@@ -487,7 +487,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Subscribe<string>().Channels(new string[] { channel1 }).Execute();
+            pubnub.Subscribe<string>().Channels(new [] { channel1 }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
             string channel2 = "hello_my_channel2";
@@ -519,13 +519,13 @@ namespace PubNubMessaging.Tests
 
                 Thread.Sleep(1000);
 
-                pubnub.Subscribe<string>().Channels(new string[] { channel2 }).Execute();
+                pubnub.Subscribe<string>().Channels(new [] { channel2 }).Execute();
                 subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
             }
 
             Thread.Sleep(1000);
 
-            pubnub.Unsubscribe<string>().Channels(new string[] { channel1, channel2 }).Execute();
+            pubnub.Unsubscribe<string>().Channels(new [] { channel1, channel2 }).Execute();
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
@@ -552,7 +552,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(false);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
-            pubnub = this.createPubNubInstance(config);
+            pubnub = createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             manualResetEventWaitTimeout = 310 * 1000;
@@ -583,7 +583,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute();
+            pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
 
@@ -601,7 +601,7 @@ namespace PubNubMessaging.Tests
 
             }
 
-            pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
+            pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
 
             Thread.Sleep(1000);
 

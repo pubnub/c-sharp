@@ -5,7 +5,7 @@ namespace PubNubMessaging.Tests
 {
     public class TestHarness
     {
-        protected Pubnub createPubNubInstance(PNConfiguration pnConfiguration)
+        protected static Pubnub createPubNubInstance(PNConfiguration pnConfiguration)
         {
             Pubnub pubnub = null;
             if (PubnubCommon.EnableStubTest)

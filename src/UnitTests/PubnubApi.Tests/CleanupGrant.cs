@@ -53,7 +53,7 @@ namespace PubNubMessaging.Tests
                     Uuid = "mytestuuid",
                 };
 
-                pubnub = this.createPubNubInstance(config);
+                pubnub = createPubNubInstance(config);
 
                 pubnub.Audit().Async(new AuditResult());
                 auditManualEvent.WaitOne();
@@ -91,7 +91,7 @@ namespace PubNubMessaging.Tests
                     Uuid = "mytestuuid",
                 };
 
-                pubnub = this.createPubNubInstance(config);
+                pubnub = createPubNubInstance(config);
 
                 pubnub.Audit().Async(new AuditResult());
                 auditManualEvent.WaitOne();
@@ -152,7 +152,7 @@ namespace PubNubMessaging.Tests
                                         {
                                             Console.WriteLine("Auth Key = " + authKey);
                                             revokeManualEvent = new ManualResetEvent(false);
-                                            pubnub.Grant().Channels(new string[] { channelName }).AuthKeys(new string[] { authKey }).Read(false).Write(false).Manage(false).Async(new GrantResult());
+                                            pubnub.Grant().Channels(new [] { channelName }).AuthKeys(new [] { authKey }).Read(false).Write(false).Manage(false).Async(new GrantResult());
                                             revokeManualEvent.WaitOne();
                                         }
                                     }

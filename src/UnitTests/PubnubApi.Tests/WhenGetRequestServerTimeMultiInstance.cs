@@ -60,8 +60,8 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub1 = this.createPubNubInstance(config1);
-            pubnub2 = this.createPubNubInstance(config2);
+            pubnub1 = createPubNubInstance(config1);
+            pubnub2 = createPubNubInstance(config2);
 
             string expected1 = "[14725889985315301]";
             string expected2 = "[14725889985315302]";
@@ -120,7 +120,7 @@ namespace PubNubMessaging.Tests
             };
 
             server.RunOnHttps(true);
-            pubnub1 = this.createPubNubInstance(config);
+            pubnub1 = createPubNubInstance(config);
 
             string expected = "[14725889985315301]";
 
@@ -166,7 +166,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub1 = this.createPubNubInstance(config);
+            pubnub1 = createPubNubInstance(config);
 
             expectedTime = 14725889985315301;
             string expected = "[14725889985315301]";
@@ -219,7 +219,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(true);
 
-            pubnub1 = this.createPubNubInstance(config);
+            pubnub1 = createPubNubInstance(config);
 
             string expected = "[14725889985315301]";
 
