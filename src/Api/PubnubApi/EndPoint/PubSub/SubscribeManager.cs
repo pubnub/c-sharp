@@ -103,11 +103,11 @@ namespace PubnubApi.EndPoint
             {
                 if (!MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId))
                 {
-                    MultiChannelSubscribe.Add(PubnubInstance.InstanceId, new ConcurrentDictionary<string, long>());
+                    MultiChannelSubscribe.GetOrAdd(PubnubInstance.InstanceId, new ConcurrentDictionary<string, long>());
                 }
                 if (!MultiChannelGroupSubscribe.ContainsKey(PubnubInstance.InstanceId))
                 {
-                    MultiChannelGroupSubscribe.Add(PubnubInstance.InstanceId, new ConcurrentDictionary<string, long>());
+                    MultiChannelGroupSubscribe.GetOrAdd(PubnubInstance.InstanceId, new ConcurrentDictionary<string, long>());
                 }
 
                 string[] rawChannels = (channel != null && channel.Trim().Length > 0) ? channel.Split(',') : new string[] { };

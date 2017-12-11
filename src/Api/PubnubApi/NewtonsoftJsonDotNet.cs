@@ -11,8 +11,8 @@ namespace PubnubApi
 {
     public class NewtonsoftJsonDotNet : IJsonPluggableLibrary
     {
-        private readonly PNConfiguration config = null;
-        private readonly IPubnubLog pubnubLog = null;
+        private readonly PNConfiguration config;
+        private readonly IPubnubLog pubnubLog;
 
         public NewtonsoftJsonDotNet(PNConfiguration pubnubConfig, IPubnubLog log)
         {
@@ -21,12 +21,19 @@ namespace PubnubApi
         }
 
         #region IJsonPlugableLibrary methods implementation
-        private bool IsValidJson(string jsonString)
+        private bool IsValidJson(string jsonString, PNOperationType operationType)
         {
             bool ret = false;
             try
             {
-                JObject.Parse(jsonString);
+                if (operationType == PNOperationType.PNPublishOperation)
+                {
+                    JArray.Parse(jsonString);
+                }
+                else
+                {
+                    JObject.Parse(jsonString);
+                }
                 ret = true;
             }
             catch {  /* ignore */ }
@@ -47,42 +54,10 @@ namespace PubnubApi
             return ret;
         }
 
-        public bool IsArrayCompatible(string jsonString)
+        public bool IsDictionaryCompatible(string jsonString, PNOperationType operationType)
         {
             bool ret = false;
-            if (IsValidJson(jsonString))
-            {
-                try
-                {
-                    using (StringReader strReader = new StringReader(jsonString))
-                    {
-                        using (JsonTextReader jsonTxtreader = new JsonTextReader(strReader))
-                        {
-                            while (jsonTxtreader.Read())
-                            {
-                                if (jsonTxtreader.LineNumber == 1 && jsonTxtreader.LinePosition == 1 && jsonTxtreader.TokenType == JsonToken.StartArray)
-                                {
-                                    ret = true;
-                                    break;
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
-                            jsonTxtreader.Close();
-                        }
-                    }
-                }
-                catch {  /* ignore */ }
-            }
-            return ret;
-        }
-
-        public bool IsDictionaryCompatible(string jsonString)
-        {
-            bool ret = false;
-            if (IsValidJson(jsonString))
+            if (IsValidJson(jsonString, operationType))
             {
                 try
                 {

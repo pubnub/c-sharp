@@ -89,6 +89,11 @@ namespace PubnubApi.EndPoint
                 throw new MissingMemberException("publish key is required");
             }
 
+            if (callback == null)
+            {
+                throw new ArgumentException("Missing userCallback");
+            }
+
             Task.Factory.StartNew(() =>
             {
                 syncRequest = false;
@@ -104,6 +109,12 @@ namespace PubnubApi.EndPoint
             {
                 throw new ArgumentException("message cannot be null");
             }
+
+            if (this.config == null || string.IsNullOrEmpty(this.config.PublishKey) || this.config.PublishKey.Trim().Length <= 0)
+            {
+                throw new MissingMemberException("publish key is required");
+            }
+
             Task<PNPublishResult> task = Task<PNPublishResult>.Factory.StartNew(() =>
             {
                 syncRequest = true;
@@ -134,17 +145,25 @@ namespace PubnubApi.EndPoint
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
             {
-                throw new ArgumentException("Missing Channel or Message");
+                PNStatus status = new PNStatus();
+                status.Error = true;
+                status.ErrorData = new PNErrorData("Missing Channel or Message", new ArgumentException("Missing Channel or Message"));
+                callback.OnResponse(null, status);
+                return;
             }
 
             if (string.IsNullOrEmpty(config.PublishKey) || string.IsNullOrEmpty(config.PublishKey.Trim()) || config.PublishKey.Length <= 0)
             {
-                throw new MissingMemberException("Invalid publish key");
+                PNStatus status = new PNStatus();
+                status.Error = true;
+                status.ErrorData = new PNErrorData("Invalid publish key", new MissingMemberException("Invalid publish key"));
+                callback.OnResponse(null, status);
+                return;
             }
 
             if (callback == null)
             {
-                throw new ArgumentException("Missing userCallback");
+                return;
             }
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
@@ -194,15 +213,15 @@ namespace PubnubApi.EndPoint
 
             if (!ChannelRequest.ContainsKey(instance.InstanceId))
             {
-                ChannelRequest.Add(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
             }
             if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
             {
-                ChannelInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+                ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
             }
             if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
             {
-                ChannelGroupInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+                ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
             }
         }
 

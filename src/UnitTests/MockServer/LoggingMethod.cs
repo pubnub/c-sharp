@@ -11,7 +11,7 @@ namespace MockServer
 	public static class LoggingMethod
 	{
 		private static int logLevel = 0;
-		private static IMockServerLog mockServerLog = null;
+		private static IMockServerLog mockServerLog;
 
         /// <summary>
         /// Set the IMockServerLog class

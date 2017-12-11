@@ -70,23 +70,23 @@ namespace PubnubApi.EndPoint
 
             if (!MultiChannelSubscribe.ContainsKey(instance.InstanceId))
             {
-                MultiChannelSubscribe.Add(instance.InstanceId, new ConcurrentDictionary<string, long>());
+                MultiChannelSubscribe.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, long>());
             }
             if (!MultiChannelGroupSubscribe.ContainsKey(instance.InstanceId))
             {
-                MultiChannelGroupSubscribe.Add(instance.InstanceId, new ConcurrentDictionary<string, long>());
+                MultiChannelGroupSubscribe.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, long>());
             }
             if (!ChannelRequest.ContainsKey(instance.InstanceId))
             {
-                ChannelRequest.Add(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
             }
             if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
             {
-                ChannelInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+                ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
             }
             if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
             {
-                ChannelGroupInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+                ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
             }
         }
     }

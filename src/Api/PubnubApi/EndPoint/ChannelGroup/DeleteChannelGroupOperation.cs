@@ -84,15 +84,15 @@ namespace PubnubApi.EndPoint
 
             if (!ChannelRequest.ContainsKey(instance.InstanceId))
             {
-                ChannelRequest.Add(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
             }
             if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
             {
-                ChannelInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+                ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
             }
             if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
             {
-                ChannelGroupInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+                ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
             }
         }
 

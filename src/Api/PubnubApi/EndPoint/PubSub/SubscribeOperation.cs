@@ -176,59 +176,59 @@ namespace PubnubApi.EndPoint
             PubnubInstance = instance;
             if (!MultiChannelSubscribe.ContainsKey(instance.InstanceId))
             {
-                MultiChannelSubscribe.Add(instance.InstanceId, new ConcurrentDictionary<string, long>());
+                MultiChannelSubscribe.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, long>());
             }
             if (!MultiChannelGroupSubscribe.ContainsKey(instance.InstanceId))
             {
-                MultiChannelGroupSubscribe.Add(instance.InstanceId, new ConcurrentDictionary<string, long>());
+                MultiChannelGroupSubscribe.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, long>());
             }
             if (!ChannelRequest.ContainsKey(instance.InstanceId))
             {
-                ChannelRequest.Add(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
             }
             if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
             {
-                ChannelInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+                ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
             }
             if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
             {
-                ChannelGroupInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+                ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
             }
             if (!ChannelLocalUserState.ContainsKey(instance.InstanceId))
             {
-                ChannelLocalUserState.Add(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
+                ChannelLocalUserState.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
             }
             if (!ChannelGroupLocalUserState.ContainsKey(instance.InstanceId))
             {
-                ChannelGroupLocalUserState.Add(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
+                ChannelGroupLocalUserState.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
             }
             if (!ChannelUserState.ContainsKey(instance.InstanceId))
             {
-                ChannelUserState.Add(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
+                ChannelUserState.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
             }
             if (!ChannelGroupUserState.ContainsKey(instance.InstanceId))
             {
-                ChannelGroupUserState.Add(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
+                ChannelGroupUserState.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
             }
             if (!ChannelReconnectTimer.ContainsKey(instance.InstanceId))
             {
-                ChannelReconnectTimer.Add(instance.InstanceId, new ConcurrentDictionary<string, Timer>());
+                ChannelReconnectTimer.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, Timer>());
             }
             if (!ChannelGroupReconnectTimer.ContainsKey(instance.InstanceId))
             {
-                ChannelGroupReconnectTimer.Add(instance.InstanceId, new ConcurrentDictionary<string, Timer>());
+                ChannelGroupReconnectTimer.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, Timer>());
             }
             if (!SubscribeDisconnected.ContainsKey(instance.InstanceId))
             {
-                SubscribeDisconnected.Add(instance.InstanceId, false);
+                SubscribeDisconnected.GetOrAdd(instance.InstanceId, false);
             }
             if (!LastSubscribeTimetoken.ContainsKey(instance.InstanceId))
             {
-                LastSubscribeTimetoken.Add(instance.InstanceId, 0);
+                LastSubscribeTimetoken.GetOrAdd(instance.InstanceId, 0);
             }
             if (!SubscribeRequestTracker.ContainsKey(instance.InstanceId))
             {
-                SubscribeRequestTracker.Add(instance.InstanceId, DateTime.Now);
+                SubscribeRequestTracker.GetOrAdd(instance.InstanceId, DateTime.Now);
             }
         }
     }

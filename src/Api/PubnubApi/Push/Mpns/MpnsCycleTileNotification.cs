@@ -8,6 +8,6 @@ namespace PubnubApi
         public string title { get; set; } = "";
         public int? count { get; set; } = 0;
         public string small_background_image { get; set; } = "";
-        public string[] images { get; set; } = null;
+        public string[] images { get; set; }
     }
 }

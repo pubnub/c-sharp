@@ -116,11 +116,11 @@ namespace PubnubApi
             set;
         } = new ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>();
 
-        protected static Dictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>> ChannelLocalUserState
+        protected static ConcurrentDictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>> ChannelLocalUserState
         {
             get;
             set;
-        } = new Dictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>>();
+        } = new ConcurrentDictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>>();
 
         protected static ConcurrentDictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>> ChannelUserState
         {
@@ -809,7 +809,7 @@ namespace PubnubApi
                 if (SubscribeDisconnected.ContainsKey(PubnubInstance.InstanceId) && SubscribeDisconnected[PubnubInstance.InstanceId])
                 {
                     LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0},Received JSON but SubscribeDisconnected = {1} for request={2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), jsonString, requestUri), pubnubConfig.LogVerbosity);
-                    throw new Exception("Disconnected");
+                    throw new OperationCanceledException("Disconnected");
                 }
 
                 LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, JSON= {1} for request={2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), jsonString, requestUri), pubnubConfig.LogVerbosity);
@@ -873,7 +873,7 @@ namespace PubnubApi
             }
 
             bool errorCallbackRaised = false;
-            if (jsonLib.IsDictionaryCompatible(jsonString))
+            if (jsonLib.IsDictionaryCompatible(jsonString, type))
             {
                 PNStatus status = null;
                 Dictionary<string, object> deserializeStatus = jsonLib.DeserializeToDictionaryOfObject(jsonString);

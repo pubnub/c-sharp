@@ -105,7 +105,7 @@ namespace PubnubApi.EndPoint
                 channelGroups = channelGroupList.ToArray();
             }
 
-            if (!jsonLibrary.IsDictionaryCompatible(jsonUserState))
+            if (!jsonLibrary.IsDictionaryCompatible(jsonUserState, PNOperationType.PNSetStateOperation))
             {
                 throw new MissingMemberException("Missing json format for user state");
             }
@@ -561,31 +561,31 @@ namespace PubnubApi.EndPoint
 
             if (!ChannelRequest.ContainsKey(instance.InstanceId))
             {
-                ChannelRequest.Add(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
             }
             if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
             {
-                ChannelInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+                ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
             }
             if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
             {
-                ChannelGroupInternetStatus.Add(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+                ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
             }
             if (!ChannelUserState.ContainsKey(instance.InstanceId))
             {
-                ChannelUserState.Add(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
+                ChannelUserState.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
             }
             if (!ChannelGroupUserState.ContainsKey(instance.InstanceId))
             {
-                ChannelGroupUserState.Add(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
+                ChannelGroupUserState.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
             }
             if (!ChannelLocalUserState.ContainsKey(instance.InstanceId))
             {
-                ChannelLocalUserState.Add(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
+                ChannelLocalUserState.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
             }
             if (!ChannelGroupLocalUserState.ContainsKey(instance.InstanceId))
             {
-                ChannelGroupLocalUserState.Add(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
+                ChannelGroupLocalUserState.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
             }
         }
     }

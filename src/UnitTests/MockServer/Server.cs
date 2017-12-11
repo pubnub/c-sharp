@@ -13,13 +13,13 @@ namespace MockServer
 {
     public class Server
     {
-        static private Server server = null;
+        static private Server server;
         private X509Certificate2 certificate;
         private TcpListener listener;
         private const int MAXBUFFER = 1024 * 64;
         private string notFoundContent = "<html><head><title>Not Found</title></head><body>Sorry, the object you requested was not found.</body><html>";
         private readonly Uri uri;
-        private Thread trf = null;
+        private Thread trf;
         private Dictionary<string, Request> requests = new Dictionary<string, Request>();
         private List<string> responses = new List<string>();
         private int read;
@@ -231,8 +231,8 @@ namespace MockServer
                         }
                         catch (Exception error)
                         {
-                            LoggingMethod.WriteToLog(String.Format("Error: {0}", error.Message), LoggingMethod.LevelError);
-                            throw error;
+                            LoggingMethod.WriteToLog(String.Format("Error: {0}", error), LoggingMethod.LevelError);
+                            throw;
                         }
 
                         string[] lines = strData.Split(new string[] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);

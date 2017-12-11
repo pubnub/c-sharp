@@ -16,8 +16,8 @@ namespace PubnubApi
 {
     public class PubnubCrypto : PubnubCryptoBase
     {
-        private PNConfiguration config = null;
-        private IPubnubLog pubnubLog = null;
+        private PNConfiguration config;
+        private IPubnubLog pubnubLog;
 
         public PubnubCrypto(string cipher_key, PNConfiguration pubnubConfig, IPubnubLog log)
             : base(cipher_key)
@@ -132,7 +132,7 @@ namespace PubnubApi
                     {
                         LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} Decrypt Error. {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), config.LogVerbosity);
                     }
-                    throw ex;
+                    throw;
                 }
             }
         }

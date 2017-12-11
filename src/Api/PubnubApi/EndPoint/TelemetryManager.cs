@@ -121,8 +121,8 @@ namespace PubnubApi.EndPoint
                     else
                     {
                         ConcurrentDictionary<double, long> elapsedInfo = new ConcurrentDictionary<double, long>();
-                        elapsedInfo.Add(epochMillisec, latencyMillisec);
-                        dicEndpointLatency.Add(latencyEndPoint, elapsedInfo);
+                        elapsedInfo.AddOrUpdate(epochMillisec, latencyMillisec, (o,n) => latencyMillisec);
+                        dicEndpointLatency.AddOrUpdate(latencyEndPoint, elapsedInfo,(o, n) => elapsedInfo);
                     }
                     LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - StoreLatency {1} latency = {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), type, latencyMillisec), pubnubConfig.LogVerbosity);
                 }

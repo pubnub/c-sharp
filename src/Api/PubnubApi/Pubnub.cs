@@ -354,7 +354,7 @@ namespace PubnubApi
 
             if (pubnubConfig == null || string.IsNullOrEmpty(pubnubConfig.CipherKey))
             {
-                throw new Exception("CipherKey missing");
+                throw new MissingMemberException("CipherKey missing");
             }
 
             PubnubCrypto pc = new PubnubCrypto(pubnubConfig.CipherKey);
