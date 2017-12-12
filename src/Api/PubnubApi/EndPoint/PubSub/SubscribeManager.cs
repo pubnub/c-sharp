@@ -63,7 +63,9 @@ namespace PubnubApi.EndPoint
                             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unable to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelUnSubscribeInit).", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.LogVerbosity);
                         }
                         if (webRequest != null)
+                        {
                             TerminatePendingWebRequest(webRequest);
+                        }
                     }
                     else
                     {
@@ -120,7 +122,10 @@ namespace PubnubApi.EndPoint
                         if (rawChannels[index].Trim().Length > 0)
                         {
                             string channelName = rawChannels[index].Trim();
-                            if (string.IsNullOrEmpty(channelName)) continue;
+                            if (string.IsNullOrEmpty(channelName))
+                            {
+                                continue;
+                            }
 
                             if (MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId) && !MultiChannelSubscribe[PubnubInstance.InstanceId].ContainsKey(channelName))
                             {
@@ -151,7 +156,10 @@ namespace PubnubApi.EndPoint
                         if (rawChannelGroups[index].Trim().Length > 0)
                         {
                             string channelGroupName = rawChannelGroups[index].Trim();
-                            if (string.IsNullOrEmpty(channelGroupName)) continue;
+                            if (string.IsNullOrEmpty(channelGroupName))
+                            {
+                                continue;
+                            }
 
                             if (MultiChannelGroupSubscribe.ContainsKey(PubnubInstance.InstanceId) && !MultiChannelGroupSubscribe[PubnubInstance.InstanceId].ContainsKey(channelGroupName))
                             {
@@ -1055,8 +1063,15 @@ namespace PubnubApi.EndPoint
 
                 if (netState != null && ((netState.Channels != null && netState.Channels.Length > 0) || (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)))
                 {
-                    if (netState.Channels == null) netState.Channels = new string[] { };
-                    if (netState.ChannelGroups == null) netState.ChannelGroups = new string[] { };
+                    if (netState.Channels == null)
+                    {
+                        netState.Channels = new string[] { };
+                    }
+
+                    if (netState.ChannelGroups == null)
+                    {
+                        netState.ChannelGroups = new string[] { };
+                    }
 
                     if (netState.Channels != null && netState.Channels.Length > 0)
                     {

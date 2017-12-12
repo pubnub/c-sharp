@@ -11,11 +11,11 @@ namespace PubnubApi.EndPoint
 {
     public class PublishOperation : PubnubCoreBase
     {
-        private readonly PNConfiguration config;
-        private readonly IJsonPluggableLibrary jsonLibrary;
-        private readonly IPubnubUnitTest unit;
-        private readonly IPubnubLog pubnubLog;
-        private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
+        private PNConfiguration config;
+        private IJsonPluggableLibrary jsonLibrary;
+        private IPubnubUnitTest unit;
+        private IPubnubLog pubnubLog;
+        private EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         private object msg;
         private string channelName = "";
@@ -84,7 +84,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("message cannot be null");
             }
 
-            if (this.config == null || string.IsNullOrEmpty(this.config.PublishKey) || this.config.PublishKey.Trim().Length <= 0)
+            if (config == null || string.IsNullOrEmpty(config.PublishKey) || config.PublishKey.Trim().Length <= 0)
             {
                 throw new MissingMemberException("publish key is required");
             }
@@ -110,7 +110,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("message cannot be null");
             }
 
-            if (this.config == null || string.IsNullOrEmpty(this.config.PublishKey) || this.config.PublishKey.Trim().Length <= 0)
+            if (config == null || string.IsNullOrEmpty(config.PublishKey) || config.PublishKey.Trim().Length <= 0)
             {
                 throw new MissingMemberException("publish key is required");
             }
@@ -195,6 +195,10 @@ namespace PubnubApi.EndPoint
                 List<object> result = ProcessJsonResponse<PNPublishResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
             }
+
+            urlBuilder = null;
+            requestState = null;
+            CleanUp();
         }
 
         private class SyncPublishResult : PNCallback<PNPublishResult>
@@ -237,6 +241,17 @@ namespace PubnubApi.EndPoint
             }
 
             return message;
+        }
+
+        private void CleanUp()
+        {
+            config = null;
+            jsonLibrary = null;
+            unit = null;
+            pubnubLog = null;
+            pubnubTelemetryMgr = null;
+
+            this.savedCallback = null;
         }
     }
 }

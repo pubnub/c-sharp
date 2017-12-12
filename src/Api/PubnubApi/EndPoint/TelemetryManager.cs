@@ -6,12 +6,12 @@ using System.Globalization;
 
 namespace PubnubApi.EndPoint
 {
-    public class TelemetryManager
+    public class TelemetryManager: IDisposable
     {
         private const int TELEMETRY_TIMER_IN_SEC = 60;
 
-        private readonly PNConfiguration pubnubConfig;
-        private readonly IPubnubLog pubnubLog;
+        private PNConfiguration pubnubConfig;
+        private IPubnubLog pubnubLog;
 
         private static ConcurrentDictionary<string, ConcurrentDictionary<double, long>> dicEndpointLatency
         {
@@ -203,7 +203,39 @@ namespace PubnubApi.EndPoint
             StopTelemetryTimer();
             dicEndpointLatency.Clear();
             dicEndpointLatency = null;
+            pubnubConfig = null;
+            pubnubLog = null;
         }
+
+        #region IDisposable Support
+        private bool disposedValue;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+                }
+
+                if (telemetryTimer != null)
+                {
+                    telemetryTimer = null;
+                }
+                dicEndpointLatency.Clear();
+                pubnubConfig = null;
+                pubnubLog = null;
+
+                disposedValue = true;
+            }
+        }
+
+        void IDisposable.Dispose()
+        {
+            Dispose(true);
+        }
+        #endregion
     }
 }
 

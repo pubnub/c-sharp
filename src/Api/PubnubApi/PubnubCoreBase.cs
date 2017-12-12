@@ -397,7 +397,7 @@ namespace PubnubApi
 
                                         foreach (string metaKey in ttPublishMetaData.Keys)
                                         {
-                                            switch (metaKey.ToLower())
+                                            switch (metaKey.ToLowerInvariant())
                                             {
                                                 case "t":
                                                     long timetoken;
@@ -909,13 +909,13 @@ namespace PubnubApi
             }
             if (!errorCallbackRaised && asyncRequestState != null)
             {
-                result = WrapResultBasedOnResponseType<T>(asyncRequestState.ResponseType, jsonString, asyncRequestState.Channels, asyncRequestState.ChannelGroups, asyncRequestState.Reconnect, asyncRequestState.Timetoken, asyncRequestState.Request, asyncRequestState.PubnubCallback);
+                result = WrapResultBasedOnResponseType<T>(asyncRequestState.ResponseType, jsonString, asyncRequestState.Channels, asyncRequestState.ChannelGroups, asyncRequestState.Reconnect, asyncRequestState.Timetoken, asyncRequestState.PubnubCallback);
             }
 
             return result;
         }
 
-        protected List<object> WrapResultBasedOnResponseType<T>(PNOperationType type, string jsonString, string[] channels, string[] channelGroups, bool reconnect, long lastTimetoken, HttpWebRequest request, PNCallback<T> callback)
+        protected List<object> WrapResultBasedOnResponseType<T>(PNOperationType type, string jsonString, string[] channels, string[] channelGroups, bool reconnect, long lastTimetoken, PNCallback<T> callback)
         {
             List<object> result = new List<object>();
 
@@ -1482,64 +1482,74 @@ namespace PubnubApi
 
         protected void TerminateReconnectTimer()
         {
-            if (ChannelReconnectTimer.Count == 0 || !ChannelReconnectTimer.ContainsKey(PubnubInstance.InstanceId)) return;
-
-            ConcurrentDictionary<string, Timer> channelReconnectCollection = ChannelReconnectTimer[PubnubInstance.InstanceId];
-            ICollection<string> keyCollection = channelReconnectCollection.Keys;
-            if (keyCollection != null && keyCollection.Count > 0)
+            try
             {
-                List<string> keyList = keyCollection.ToList();
-                foreach (string key in keyList)
+                if (ChannelReconnectTimer.Count == 0 || !ChannelReconnectTimer.ContainsKey(PubnubInstance.InstanceId))
                 {
-                    if (ChannelReconnectTimer[PubnubInstance.InstanceId].ContainsKey(key))
-                    {
-                        try
-                        {
-                            Timer currentTimer = ChannelReconnectTimer[PubnubInstance.InstanceId][key];
-                            currentTimer.Change(Timeout.Infinite, Timeout.Infinite);
-                            currentTimer.Dispose();
-                        }
-                        catch { /* ignore */ }
+                    return;
+                }
 
-                        Timer removedTimer = null;
-                        bool removed = ChannelReconnectTimer[PubnubInstance.InstanceId].TryRemove(key, out removedTimer);
-                        if (!removed)
+                ConcurrentDictionary<string, Timer> channelReconnectCollection = ChannelReconnectTimer[PubnubInstance.InstanceId];
+                ICollection<string> keyCollection = channelReconnectCollection.Keys;
+                if (keyCollection != null && keyCollection.Count > 0)
+                {
+                    List<string> keyList = keyCollection.ToList();
+                    foreach (string key in keyList)
+                    {
+                        if (ChannelReconnectTimer[PubnubInstance.InstanceId].ContainsKey(key))
                         {
-                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channel reconnect timer reference from collection for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key.ToString()), pubnubConfig.LogVerbosity);
+                            try
+                            {
+                                Timer currentTimer = ChannelReconnectTimer[PubnubInstance.InstanceId][key];
+                                currentTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                                currentTimer.Dispose();
+                            }
+                            catch { /* ignore */ }
+
+                            Timer removedTimer = null;
+                            bool removed = ChannelReconnectTimer[PubnubInstance.InstanceId].TryRemove(key, out removedTimer);
+                            if (!removed)
+                            {
+                                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channel reconnect timer reference from collection for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key.ToString()), pubnubConfig.LogVerbosity);
+                            }
+                        }
+                    }
+                }
+
+                ICollection<string> groupKeyCollection = null;
+                if (ChannelGroupReconnectTimer.Count > 0 && ChannelGroupReconnectTimer.ContainsKey(PubnubInstance.InstanceId))
+                {
+                    ConcurrentDictionary<string, Timer> channelGroupReconnectCollection = ChannelGroupReconnectTimer[PubnubInstance.InstanceId];
+                    groupKeyCollection = channelGroupReconnectCollection.Keys;
+                }
+                if (groupKeyCollection != null && groupKeyCollection.Count > 0)
+                {
+                    List<string> groupKeyList = groupKeyCollection.ToList();
+                    foreach (string groupKey in groupKeyList)
+                    {
+                        if (ChannelGroupReconnectTimer[PubnubInstance.InstanceId].ContainsKey(groupKey))
+                        {
+                            try
+                            {
+                                Timer currentTimer = ChannelGroupReconnectTimer[PubnubInstance.InstanceId][groupKey];
+                                currentTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                                currentTimer.Dispose();
+                            }
+                            catch { /* ignore */ }
+
+                            Timer removedTimer = null;
+                            bool removed = ChannelGroupReconnectTimer[PubnubInstance.InstanceId].TryRemove(groupKey, out removedTimer);
+                            if (!removed)
+                            {
+                                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channelgroup reconnect timer reference from collection for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), groupKey.ToString()), pubnubConfig.LogVerbosity);
+                            }
                         }
                     }
                 }
             }
-
-            ICollection<string> groupKeyCollection = null;
-            if (ChannelGroupReconnectTimer.Count > 0 && ChannelGroupReconnectTimer.ContainsKey(PubnubInstance.InstanceId))
+            catch (Exception ex)
             {
-                ConcurrentDictionary<string, Timer> channelGroupReconnectCollection = ChannelGroupReconnectTimer[PubnubInstance.InstanceId];
-                groupKeyCollection = channelGroupReconnectCollection.Keys;
-            }
-            if (groupKeyCollection != null && groupKeyCollection.Count > 0)
-            {
-                List<string> groupKeyList = groupKeyCollection.ToList();
-                foreach (string groupKey in groupKeyList)
-                {
-                    if (ChannelGroupReconnectTimer[PubnubInstance.InstanceId].ContainsKey(groupKey))
-                    {
-                        try
-                        {
-                            Timer currentTimer = ChannelGroupReconnectTimer[PubnubInstance.InstanceId][groupKey];
-                            currentTimer.Change(Timeout.Infinite, Timeout.Infinite);
-                            currentTimer.Dispose();
-                        }
-                        catch { /* ignore */ }
-
-                        Timer removedTimer = null;
-                        bool removed = ChannelGroupReconnectTimer[PubnubInstance.InstanceId].TryRemove(groupKey, out removedTimer);
-                        if (!removed)
-                        {
-                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channelgroup reconnect timer reference from collection for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), groupKey.ToString()), pubnubConfig.LogVerbosity);
-                        }
-                    }
-                }
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} TerminateReconnectTimer exception: {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), pubnubConfig.LogVerbosity);
             }
         }
 
