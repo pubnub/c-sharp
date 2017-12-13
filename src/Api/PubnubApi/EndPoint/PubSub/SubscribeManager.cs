@@ -802,7 +802,6 @@ namespace PubnubApi.EndPoint
             else
             {
                 LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Lost Channel Name for resubscribe", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-                return;
             }
         }
 
