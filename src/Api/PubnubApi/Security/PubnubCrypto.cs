@@ -16,8 +16,8 @@ namespace PubnubApi
 {
     public class PubnubCrypto : PubnubCryptoBase
     {
-        private PNConfiguration config;
-        private IPubnubLog pubnubLog;
+        private readonly PNConfiguration config;
+        private readonly IPubnubLog pubnubLog;
 
         public PubnubCrypto(string cipher_key, PNConfiguration pubnubConfig, IPubnubLog log)
             : base(cipher_key)
