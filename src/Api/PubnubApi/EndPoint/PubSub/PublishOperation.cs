@@ -196,8 +196,6 @@ namespace PubnubApi.EndPoint
                 ProcessResponseCallbacks(result, requestState);
             }
 
-            urlBuilder = null;
-            requestState = null;
             CleanUp();
         }
 

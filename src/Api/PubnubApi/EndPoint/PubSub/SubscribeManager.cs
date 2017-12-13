@@ -791,21 +791,18 @@ namespace PubnubApi.EndPoint
                         channelGroups = message[message.Count - 2].ToString().Split(',');
                     }
                 }
+
+                long timetoken = GetTimetokenFromMultiplexResult(message);
+                System.Threading.Tasks.Task.Factory.StartNew(() =>
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} MultiplexInternalCallback timetoken = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), timetoken), config.LogVerbosity);
+                    MultiChannelSubscribeRequest<T>(type, channels, channelGroups, timetoken, false, null);
+                }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
             }
             else
             {
                 LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Lost Channel Name for resubscribe", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                 return;
-            }
-
-            if (message != null && message.Count >= 3)
-            {
-                long timetoken = GetTimetokenFromMultiplexResult(message);
-                System.Threading.Tasks.Task.Factory.StartNew(() => 
-                {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} MultiplexInternalCallback timetoken = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), timetoken), config.LogVerbosity);
-                    MultiChannelSubscribeRequest<T>(type, channels, channelGroups, timetoken, false, null);
-                }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
             }
         }
 

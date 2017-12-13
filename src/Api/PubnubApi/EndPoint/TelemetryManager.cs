@@ -210,19 +210,11 @@ namespace PubnubApi.EndPoint
         #region IDisposable Support
         private bool disposedValue;
 
-        protected virtual void Dispose(bool disposing)
+        protected virtual void DisposeInternal(bool disposing)
         {
             if (!disposedValue)
             {
-                if (disposing)
-                {
-                    // TODO: dispose managed state (managed objects).
-                }
-
-                if (telemetryTimer != null)
-                {
-                    telemetryTimer = null;
-                }
+                telemetryTimer = null;
                 dicEndpointLatency.Clear();
                 pubnubConfig = null;
                 pubnubLog = null;
@@ -233,7 +225,7 @@ namespace PubnubApi.EndPoint
 
         void IDisposable.Dispose()
         {
-            Dispose(true);
+            DisposeInternal(true);
         }
         #endregion
     }
