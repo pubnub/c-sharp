@@ -146,9 +146,9 @@ namespace PubnubApi
 
                 System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Got HttpResponseMessage for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), requestUri));
             }
-            catch (Exception ex)
+            catch
             {
-                throw ex;
+                throw;
             }
             finally
             {
@@ -196,9 +196,9 @@ namespace PubnubApi
 
                 System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Got POST HttpResponseMessage for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), requestUri));
             }
-            catch (Exception ex)
+            catch
             {
-                throw ex;
+                throw;
             }
             finally
             {
@@ -279,13 +279,13 @@ namespace PubnubApi
                 if (ex.Message.IndexOf("The request was aborted: The request was canceled") == -1
                                 && ex.Message.IndexOf("Machine suspend mode enabled. No request will be processed.") == -1)
                 {
-                    throw ex;
+                    throw;
                 }
                 return "";
             }
-            catch (Exception ex)
+            catch
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -371,13 +371,13 @@ namespace PubnubApi
                 if (ex.Message.IndexOf("The request was aborted: The request was canceled") == -1
                                 && ex.Message.IndexOf("Machine suspend mode enabled. No request will be processed.") == -1)
                 {
-                    throw ex;
+                    throw;
                 }
                 return "";
             }
-            catch (Exception ex)
+            catch
             {
-                throw ex;
+                throw;
             }
         }
 

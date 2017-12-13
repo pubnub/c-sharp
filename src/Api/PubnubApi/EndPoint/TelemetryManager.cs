@@ -6,12 +6,12 @@ using System.Globalization;
 
 namespace PubnubApi.EndPoint
 {
-    public class TelemetryManager
+    public class TelemetryManager: IDisposable
     {
         private const int TELEMETRY_TIMER_IN_SEC = 60;
 
-        private readonly PNConfiguration pubnubConfig;
-        private readonly IPubnubLog pubnubLog;
+        private PNConfiguration pubnubConfig;
+        private IPubnubLog pubnubLog;
 
         private static ConcurrentDictionary<string, ConcurrentDictionary<double, long>> dicEndpointLatency
         {
@@ -121,8 +121,8 @@ namespace PubnubApi.EndPoint
                     else
                     {
                         ConcurrentDictionary<double, long> elapsedInfo = new ConcurrentDictionary<double, long>();
-                        elapsedInfo.Add(epochMillisec, latencyMillisec);
-                        dicEndpointLatency.Add(latencyEndPoint, elapsedInfo);
+                        elapsedInfo.AddOrUpdate(epochMillisec, latencyMillisec, (o,n) => latencyMillisec);
+                        dicEndpointLatency.AddOrUpdate(latencyEndPoint, elapsedInfo,(o, n) => elapsedInfo);
                     }
                     LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - StoreLatency {1} latency = {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), type, latencyMillisec), pubnubConfig.LogVerbosity);
                 }
@@ -203,7 +203,31 @@ namespace PubnubApi.EndPoint
             StopTelemetryTimer();
             dicEndpointLatency.Clear();
             dicEndpointLatency = null;
+            pubnubConfig = null;
+            pubnubLog = null;
         }
+
+        #region IDisposable Support
+        private bool disposedValue;
+
+        protected virtual void DisposeInternal(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                telemetryTimer = null;
+                dicEndpointLatency.Clear();
+                pubnubConfig = null;
+                pubnubLog = null;
+
+                disposedValue = true;
+            }
+        }
+
+        void IDisposable.Dispose()
+        {
+            DisposeInternal(true);
+        }
+        #endregion
     }
 }
 

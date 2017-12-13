@@ -7,9 +7,9 @@ namespace PubnubApi
 {
     internal class ResponseBuilder
     {
-        private PNConfiguration config = null;
-        private IJsonPluggableLibrary jsonLib = null;
-        private IPubnubLog pubnubLog = null;
+        private readonly PNConfiguration config;
+        private readonly IJsonPluggableLibrary jsonLib;
+        private readonly IPubnubLog pubnubLog;
 
         public ResponseBuilder(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log)
         {

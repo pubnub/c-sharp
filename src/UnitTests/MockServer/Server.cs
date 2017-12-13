@@ -13,19 +13,17 @@ namespace MockServer
 {
     public class Server
     {
-        static private Server server = null;
-        private X509Certificate2 certificate;
+        static private Server server;
+        private readonly X509Certificate2 certificate;
         private TcpListener listener;
         private const int MAXBUFFER = 1024 * 64;
         private string notFoundContent = "<html><head><title>Not Found</title></head><body>Sorry, the object you requested was not found.</body><html>";
         private readonly Uri uri;
-        private Thread trf = null;
+        private Thread trf;
         private Dictionary<string, Request> requests = new Dictionary<string, Request>();
         private List<string> responses = new List<string>();
-        private int read;
-        private bool finalizeServer = false;
-        private bool secure = false;
-        private bool IsRunning = false;
+        private bool finalizeServer;
+        private bool secure;
 
         static public Server Instance()
         {
@@ -44,7 +42,6 @@ namespace MockServer
         /// <param name="uri">Uri for server</param>
         public Server(Uri uri)
         {
-            this.read = 0;
             this.uri = uri;
             if (this.uri.OriginalString.Contains("https:"))
             {
@@ -147,6 +144,7 @@ namespace MockServer
             }
             catch
             {
+                /* ignore */
             }
 
             try
@@ -155,13 +153,12 @@ namespace MockServer
             }
             catch
             {
+                /* ignore */
             }
 
             trf = null;
 
             LoggingMethod.WriteToLog("Server was stoped.", LoggingMethod.LevelInfo);
-
-            IsRunning = false;
         }
 
         /// <summary>
@@ -191,9 +188,7 @@ namespace MockServer
                     Thread trfS = new Thread(new ParameterizedThreadStart((object obj) =>
                     {
                         string strData;
-                        byte[] data = new byte[MAXBUFFER];
 
-                        //var sock = (Socket)obj;
                         var sock = new Socket((SocketInformation)obj);
                         SslStream sslStream = null;
                         Stream stream = new NetworkStream(sock);
@@ -202,7 +197,6 @@ namespace MockServer
                         {
                             if (secure)
                             {
-                                /////sslStream = new SslStream(stream, true, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
                                 sslStream = new SslStream(stream, false, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
                                 sslStream.AuthenticateAsServer(certificate, true, System.Security.Authentication.SslProtocols.Default, false);
                                 strData = ReadMessage(sslStream);
@@ -213,29 +207,15 @@ namespace MockServer
                                 strData = ReadMessage(stream);
                             }
 
-                            ////try
-                            ////{
-                            ////    ////sslStream = new SslStream(stream, true, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
-                            ////    sslStream = new SslStream(stream, false, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
-                            ////    sslStream.AuthenticateAsServer(certificate, true, System.Security.Authentication.SslProtocols.Default, false);
-                            ////    strData = ReadMessage(sslStream);
-                            ////    stream = sslStream;
-                            ////}
-                            ////catch
-                            ////{
-                            ////    strData = ReadMessage(stream);
-                            ////    strData = "GET /" + strData;
-                            ////}
-
                             LoggingMethod.WriteToLog(String.Format("Request: {0}", strData), LoggingMethod.LevelVerbose);
                         }
                         catch (Exception error)
                         {
-                            LoggingMethod.WriteToLog(String.Format("Error: {0}", error.Message), LoggingMethod.LevelError);
-                            throw error;
+                            LoggingMethod.WriteToLog(String.Format("Error: {0}", error), LoggingMethod.LevelError);
+                            throw;
                         }
 
-                        string[] lines = strData.Split(new string[] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                        string[] lines = strData.Split(new [] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
                         string path = lines[0].Substring(0, lines[0].LastIndexOf(" ", StringComparison.InvariantCultureIgnoreCase));
                         responses.Add(path);
                         System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("        ###  MM/dd/yyyy HH:mm:ss:fff") + " - " + path);

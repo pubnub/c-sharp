@@ -6,9 +6,7 @@ namespace PubnubApi
     {
         object BuildJsonObject(string jsonString);
 
-        bool IsArrayCompatible(string jsonString);
-
-        bool IsDictionaryCompatible(string jsonString);
+        bool IsDictionaryCompatible(string jsonString, PNOperationType operationType);
 
         string SerializeToJsonString(object objectToSerialize);
 

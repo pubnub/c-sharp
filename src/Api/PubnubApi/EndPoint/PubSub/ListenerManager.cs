@@ -44,7 +44,7 @@ namespace PubnubApi.EndPoint
                         {
                             List<SubscribeCallback> callbackList = new List<SubscribeCallback>();
                             callbackList.Add(listener);
-                            SubscribeCallbackListenerList.Add(PubnubInstance.InstanceId, callbackList);
+                            SubscribeCallbackListenerList.GetOrAdd(PubnubInstance.InstanceId, callbackList);
                         }
                         ret = true;
                     }
