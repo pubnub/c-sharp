@@ -1,8 +1,17 @@
 name: c-sharp
-version: "4.0.9.0"
+version: "4.0.10.0"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
+  - version: 4.0.10.0
+    date: Dec 13, 17
+    changes:
+      - type: Improvement
+        text: Refactored code by replacing Add with AddOrGet for ConcurrentDictionary
+      - type: Improvement
+        text: Added exception handling in TerminateReconnectTimer
+      - type: Improvement
+        text: Code refactor based on Codacy recommendation
   - version: 4.0.9.0
     date: Dec 05, 17
     changes:
@@ -224,7 +233,7 @@ features:
     - SUBSCRIBE-PUBLISHER-UUID
 supported-platforms:
   - 
-    version: Pubnub 'C#' 4.0.9.0
+    version: Pubnub 'C#' 4.0.10.0
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
@@ -234,7 +243,7 @@ supported-platforms:
       - .Net Framework 4.5
       - .Net Framework 4.6.1
   - 
-    version: PubnubPCL 'C#' 4.0.9.0
+    version: PubnubPCL 'C#' 4.0.10.0
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -246,7 +255,7 @@ supported-platforms:
       - Mono 4.8.0
       - PCL Profile 111
   - 
-    version: PubnubUWP 'C#' 4.0.9.0
+    version: PubnubUWP 'C#' 4.0.10.0
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
