@@ -26,7 +26,9 @@ namespace PubnubApi
             bool ret = false;
             try
             {
-                if (operationType == PNOperationType.PNPublishOperation)
+                if (operationType == PNOperationType.PNPublishOperation 
+                    || operationType == PNOperationType.PNHistoryOperation 
+                    || operationType == PNOperationType.PNTimeOperation)
                 {
                     JArray.Parse(jsonString);
                 }
