@@ -22,8 +22,6 @@ namespace PubnubApi
 
         Dictionary<string, object> ConvertToDictionaryObject(object localContainer);
 
-        Dictionary<string, object>[] ConvertToDictionaryObjectArray(object localContainer);
-
         object[] ConvertToObjectArray(object localContainer);
 
         void PopulateObject(string value, object target);

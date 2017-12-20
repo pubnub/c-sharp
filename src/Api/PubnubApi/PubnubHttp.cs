@@ -131,20 +131,27 @@ namespace PubnubApi
                 {
                     response = await httpClientNonsubscribe.GetAsync(requestUri).ConfigureAwait(false);
                 }
-                response.EnsureSuccessStatusCode();
-                var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                stopWatch.Stop();
-                if (pubnubTelemetryMgr != null)
+                if (response.IsSuccessStatusCode || response.Content != null)
                 {
-                    pubnubTelemetryMgr.StoreLatency(stopWatch.ElapsedMilliseconds, pubnubRequestState.ResponseType);
+                    var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                    stopWatch.Stop();
+                    if (pubnubTelemetryMgr != null)
+                    {
+                        pubnubTelemetryMgr.StoreLatency(stopWatch.ElapsedMilliseconds, pubnubRequestState.ResponseType);
+                    }
+                    using (StreamReader streamReader = new StreamReader(stream))
+                    {
+                        jsonString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
+                        pubnubRequestState.GotJsonResponse = true;
+                    }
+                    System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Got HttpResponseMessage for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), requestUri));
                 }
-                using (StreamReader streamReader = new StreamReader(stream))
+                else
                 {
-                    jsonString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
-                    pubnubRequestState.GotJsonResponse = true;
+                    stopWatch.Stop();
+                    System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, No HttpResponseMessage for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), requestUri));
                 }
 
-                System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Got HttpResponseMessage for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), requestUri));
             }
             catch
             {
@@ -181,20 +188,28 @@ namespace PubnubApi
                 {
                     response = await httpClientNonsubscribe.PostAsync(requestUri, jsonPostString).ConfigureAwait(false);
                 }
-                response.EnsureSuccessStatusCode();
-                var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                stopWatch.Stop();
-                if (pubnubTelemetryMgr != null)
+
+                if (response.IsSuccessStatusCode || response.Content != null)
                 {
-                    pubnubTelemetryMgr.StoreLatency(stopWatch.ElapsedMilliseconds, pubnubRequestState.ResponseType);
+                    var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                    stopWatch.Stop();
+                    if (pubnubTelemetryMgr != null)
+                    {
+                        pubnubTelemetryMgr.StoreLatency(stopWatch.ElapsedMilliseconds, pubnubRequestState.ResponseType);
+                    }
+                    using (StreamReader streamReader = new StreamReader(stream))
+                    {
+                        jsonString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
+                        pubnubRequestState.GotJsonResponse = true;
+                    }
+                    System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Got POST HttpResponseMessage for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), requestUri));
                 }
-                using (StreamReader streamReader = new StreamReader(stream))
+                else
                 {
-                    jsonString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
-                    pubnubRequestState.GotJsonResponse = true;
+                    stopWatch.Stop();
+                    System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, No POST HttpResponseMessage for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), requestUri));
                 }
 
-                System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Got POST HttpResponseMessage for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), requestUri));
             }
             catch
             {

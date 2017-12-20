@@ -69,7 +69,7 @@ namespace PubnubApi.EndPoint
             Uri request = urlBuilder.BuildWhereNowRequest(uuid);
 
             RequestState<PNWhereNowResult> requestState = new RequestState<PNWhereNowResult>();
-            requestState.Channels = new string[] { uuid };
+            requestState.Channels = new [] { uuid };
             requestState.ResponseType = PNOperationType.PNWhereNowOperation;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;

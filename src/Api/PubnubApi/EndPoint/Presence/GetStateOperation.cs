@@ -73,10 +73,6 @@ namespace PubnubApi.EndPoint
             {
                 throw new ArgumentException("Either Channel Or Channel Group or Both should be provided");
             }
-            if ((channels == null && channelGroups != null) || (channels.Length == 0  && channelGroups.Length == 0))
-            {
-                throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
-            }
 
             if (string.IsNullOrEmpty(uuid) || uuid.Trim().Length == 0)
             {

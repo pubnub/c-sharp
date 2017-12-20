@@ -17,8 +17,8 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
-        private bool reverseOption = false;
-        private bool includeTimetokenOption = false;
+        private bool reverseOption;
+        private bool includeTimetokenOption;
         private long startTimetoken = -1;
         private long endTimetoken = -1;
         private int historyCount = -1;
@@ -104,7 +104,7 @@ namespace PubnubApi.EndPoint
             Uri request = urlBuilder.BuildHistoryRequest(channel, start, end, count, reverse, includeToken);
 
             RequestState<PNHistoryResult> requestState = new RequestState<PNHistoryResult>();
-            requestState.Channels = new string[] { channel };
+            requestState.Channels = new [] { channel };
             requestState.ResponseType = PNOperationType.PNHistoryOperation;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;

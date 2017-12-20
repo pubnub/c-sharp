@@ -84,7 +84,7 @@ namespace PubnubApi.EndPoint
             Uri request = urlBuilder.BuildRegisterDevicePushRequest(channel, pushType, pushToken);
 
             RequestState<PNPushAddChannelResult> requestState = new RequestState<PNPushAddChannelResult>();
-            requestState.Channels = new string[] { channel };
+            requestState.Channels = new [] { channel };
             requestState.ResponseType = PNOperationType.PushRegister;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;

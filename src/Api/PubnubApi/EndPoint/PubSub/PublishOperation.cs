@@ -171,7 +171,7 @@ namespace PubnubApi.EndPoint
             Uri request = urlBuilder.BuildPublishRequest(channel, message, storeInHistory, ttl, metaData, httpPost, null);
 
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
-            requestState.Channels = new string[] { channel };
+            requestState.Channels = new [] { channel };
             requestState.ResponseType = PNOperationType.PNPublishOperation;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;

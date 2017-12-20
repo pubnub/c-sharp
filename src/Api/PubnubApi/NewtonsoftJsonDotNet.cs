@@ -197,7 +197,7 @@ namespace PubnubApi
 
                     dataProp.SetValue(message, userMessage, null);
                 }
-                else if (listObject[0].GetType() == typeof(Newtonsoft.Json.Linq.JObject))
+                else if (listObject[0].GetType() == typeof(Newtonsoft.Json.Linq.JObject) || listObject[0].GetType() == typeof(Newtonsoft.Json.Linq.JArray))
                 {
                     JToken token = listObject[0] as JToken;
                     if (dataProp.PropertyType == typeof(string))
@@ -208,13 +208,6 @@ namespace PubnubApi
                     {
                         userMessage = token.ToObject(dataProp.PropertyType, JsonSerializer.Create());
                     }
-
-                    dataProp.SetValue(message, userMessage, null);
-                }
-                else if (listObject[0].GetType() == typeof(Newtonsoft.Json.Linq.JArray))
-                {
-                    JToken token = listObject[0] as JToken;
-                    userMessage = token.ToObject(dataProp.PropertyType, JsonSerializer.Create());
 
                     dataProp.SetValue(message, userMessage, null);
                 }
@@ -272,7 +265,7 @@ namespace PubnubApi
 
                     dataProp.SetValue(message, userMessage, null);
                 }
-                else if (listObject[0].GetType() == typeof(Newtonsoft.Json.Linq.JObject))
+                else if (listObject[0].GetType() == typeof(Newtonsoft.Json.Linq.JObject) || listObject[0].GetType() == typeof(Newtonsoft.Json.Linq.JArray))
                 {
                     JToken token = listObject[0] as JToken;
                     if (dataProp.PropertyType == typeof(string))
@@ -283,13 +276,6 @@ namespace PubnubApi
                     {
                         userMessage = token.ToObject(dataProp.PropertyType, JsonSerializer.Create());
                     }
-
-                    dataProp.SetValue(message, userMessage, null);
-                }
-                else if (listObject[0].GetType() == typeof(Newtonsoft.Json.Linq.JArray))
-                {
-                    JToken token = listObject[0] as JToken;
-                    userMessage = token.ToObject(dataProp.PropertyType, JsonSerializer.Create());
 
                     dataProp.SetValue(message, userMessage, null);
                 }
@@ -1242,107 +1228,96 @@ namespace PubnubApi
 
         public Dictionary<string, object> DeserializeToDictionaryOfObject(string jsonString)
         {
-            return JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            try
+            {
+                return JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public Dictionary<string, object> ConvertToDictionaryObject(object localContainer)
         {
             Dictionary<string, object> ret = null;
 
-            if (localContainer != null)
+            try
             {
-                if (localContainer.GetType().ToString() == "Newtonsoft.Json.Linq.JObject")
+                if (localContainer != null)
                 {
-                    ret = new Dictionary<string, object>();
-
-                    IDictionary<string, JToken> jsonDictionary = localContainer as JObject;
-                    if (jsonDictionary != null)
+                    if (localContainer.GetType().ToString() == "Newtonsoft.Json.Linq.JObject")
                     {
-                        foreach (KeyValuePair<string, JToken> pair in jsonDictionary)
+                        ret = new Dictionary<string, object>();
+
+                        IDictionary<string, JToken> jsonDictionary = localContainer as JObject;
+                        if (jsonDictionary != null)
                         {
-                            JToken token = pair.Value;
-                            ret.Add(pair.Key, ConvertJTokenToObject(token));
+                            foreach (KeyValuePair<string, JToken> pair in jsonDictionary)
+                            {
+                                JToken token = pair.Value;
+                                ret.Add(pair.Key, ConvertJTokenToObject(token));
+                            }
                         }
                     }
-                }
-                else if (localContainer.GetType().ToString() == "System.Collections.Generic.Dictionary`2[System.String,System.Object]")
-                {
-                    ret = new Dictionary<string, object>();
-                    Dictionary<string, object> dictionary = localContainer as Dictionary<string, object>;
-                    foreach (string key in dictionary.Keys)
+                    else if (localContainer.GetType().ToString() == "System.Collections.Generic.Dictionary`2[System.String,System.Object]")
                     {
-                        ret.Add(key, dictionary[key]);
-                    }
-                }
-                else if (localContainer.GetType().ToString() == "Newtonsoft.Json.Linq.JProperty")
-                {
-                    ret = new Dictionary<string, object>();
-
-                    JProperty jsonProp = localContainer as JProperty;
-                    if (jsonProp != null)
-                    {
-                        string propName = jsonProp.Name;
-                        ret.Add(propName, ConvertJTokenToObject(jsonProp.Value));
-                    }
-                }
-            }
-
-            return ret;
-
-        }
-
-        public Dictionary<string, object>[] ConvertToDictionaryObjectArray(object localContainer)
-        {
-            Dictionary<string, object>[] ret = null;
-
-            if (localContainer != null && localContainer.GetType().ToString() == "Newtonsoft.Json.Linq.JObject[]")
-            {
-                IDictionary<string, JToken>[] jsonDictionary = localContainer as IDictionary<string, JToken>[];
-                if (jsonDictionary != null && jsonDictionary.Length > 0)
-                {
-                    ret = new Dictionary<string, object>[jsonDictionary.Length];
-
-                    for (int index = 0; index < jsonDictionary.Length; index++)
-                    {
-                        IDictionary<string, JToken> jsonItem = jsonDictionary[index];
-                        foreach (KeyValuePair<string, JToken> pair in jsonItem)
+                        ret = new Dictionary<string, object>();
+                        Dictionary<string, object> dictionary = localContainer as Dictionary<string, object>;
+                        foreach (string key in dictionary.Keys)
                         {
-                            JToken token = pair.Value;
-                            ret[index].Add(pair.Key, ConvertJTokenToObject(token));
+                            ret.Add(key, dictionary[key]);
+                        }
+                    }
+                    else if (localContainer.GetType().ToString() == "Newtonsoft.Json.Linq.JProperty")
+                    {
+                        ret = new Dictionary<string, object>();
+
+                        JProperty jsonProp = localContainer as JProperty;
+                        if (jsonProp != null)
+                        {
+                            string propName = jsonProp.Name;
+                            ret.Add(propName, ConvertJTokenToObject(jsonProp.Value));
                         }
                     }
                 }
             }
+            catch { /* ignore */ }
 
             return ret;
+
         }
 
         public object[] ConvertToObjectArray(object localContainer)
         {
             object[] ret = null;
 
-            if (localContainer.GetType().ToString() == "Newtonsoft.Json.Linq.JArray")
+            try
             {
-                JArray jarrayResult = localContainer as JArray;
-                List<object> objectContainer = jarrayResult.ToObject<List<object>>();
-                if (objectContainer != null && objectContainer.Count > 0)
+                if (localContainer.GetType().ToString() == "Newtonsoft.Json.Linq.JArray")
                 {
-                    for (int index = 0; index < objectContainer.Count; index++)
+                    JArray jarrayResult = localContainer as JArray;
+                    List<object> objectContainer = jarrayResult.ToObject<List<object>>();
+                    if (objectContainer != null && objectContainer.Count > 0)
                     {
-                        if (objectContainer[index].GetType().ToString() == "Newtonsoft.Json.Linq.JArray")
+                        for (int index = 0; index < objectContainer.Count; index++)
                         {
-                            JArray internalItem = objectContainer[index] as JArray;
-                            objectContainer[index] = internalItem.Select(item => (object)item).ToArray();
+                            if (objectContainer[index].GetType().ToString() == "Newtonsoft.Json.Linq.JArray")
+                            {
+                                JArray internalItem = objectContainer[index] as JArray;
+                                objectContainer[index] = internalItem.Select(item => (object)item).ToArray();
+                            }
                         }
+                        ret = objectContainer.ToArray<object>();
                     }
-                    ret = objectContainer.ToArray<object>();
+                }
+                else if (localContainer.GetType().ToString() == "System.Collections.Generic.List`1[System.Object]")
+                {
+                    List<object> listResult = localContainer as List<object>;
+                    ret = listResult.ToArray<object>();
                 }
             }
-            else if (localContainer.GetType().ToString() == "System.Collections.Generic.List`1[System.Object]")
-            {
-                List<object> listResult = localContainer as List<object>;
-                ret = listResult.ToArray<object>();
-            }
+            catch { /* ignore */ }
 
             return ret;
         }

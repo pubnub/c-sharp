@@ -231,8 +231,8 @@ namespace PubnubApi.EndPoint
                             Uri request = urlBuilder.BuildMultiChannelLeaveRequest(validChannels.ToArray(), validChannelGroups.ToArray(), config.Uuid, channelsJsonState);
 
                             RequestState<T> requestState = new RequestState<T>();
-                            requestState.Channels = new string[] { channel };
-                            requestState.ChannelGroups = new string[] { channelGroup };
+                            requestState.Channels = new [] { channel };
+                            requestState.ChannelGroups = new [] { channelGroup };
                             requestState.ResponseType = PNOperationType.Leave;
                             requestState.Reconnect = false;
 
