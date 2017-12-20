@@ -50,7 +50,6 @@ namespace PubnubApi
                         serverErrorMessage = true;
                         if (deserializeStatus.ContainsKey("payload"))
                         {
-                            string payload = deserializeStatus["payload"].ToString();
                             Dictionary<string, object> payloadDic = jsonLibrary.ConvertToDictionaryObject(deserializeStatus["payload"]);
                             if (payloadDic != null && payloadDic.Count > 0)
                             {

@@ -1097,7 +1097,9 @@ namespace PubnubApi
                     ack = new PNChannelGroupsRemoveChannelResult();
 
                     if (int.TryParse(removeChFromCgDicObj["status"].ToString(), out statusCode))
+                    {
                         ack.Status = statusCode;
+                    }
 
                     ack.Message = removeChFromCgDicObj["message"].ToString();
                     ack.Service = removeChFromCgDicObj["service"].ToString();
@@ -1124,7 +1126,9 @@ namespace PubnubApi
                     ack = new PNChannelGroupsDeleteGroupResult();
 
                     if (int.TryParse(removeCgDicObj["status"].ToString(), out statusCode))
+                    {
                         ack.Status = statusCode;
+                    }
 
                     ack.Service = removeCgDicObj["service"].ToString();
                     ack.Message = removeCgDicObj["message"].ToString();
