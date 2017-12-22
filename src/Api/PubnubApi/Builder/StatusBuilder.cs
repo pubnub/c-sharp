@@ -19,6 +19,11 @@ namespace PubnubApi
 
         public PNStatus CreateStatusResponse<T>(PNOperationType type, PNStatusCategory category, RequestState<T> asyncRequestState, int statusCode, Exception throwable)
         {
+            int serverErrorStatusCode = 0;
+            bool serverErrorMessage = false;
+            List<string> serverAffectedChannels = null;
+            List<string> serverAffectedChannelGroups = null;
+
             PNStatus status = new PNStatus(asyncRequestState != null ? asyncRequestState.EndPointOperation : null);
             status.Category = category;
             status.Operation = type;
@@ -37,6 +42,38 @@ namespace PubnubApi
                 }
                 else
                 {
+                    Dictionary<string, object> deserializeStatus = jsonLibrary.DeserializeToDictionaryOfObject(throwable.Message);
+                    if (deserializeStatus != null && deserializeStatus.Count >= 1 
+                        && deserializeStatus.ContainsKey("error") && string.Equals(deserializeStatus["error"].ToString(), "true", StringComparison.CurrentCultureIgnoreCase)
+                        && deserializeStatus.ContainsKey("status") && Int32.TryParse(deserializeStatus["status"].ToString(), out serverErrorStatusCode))
+                    {
+                        serverErrorMessage = true;
+                        if (deserializeStatus.ContainsKey("payload"))
+                        {
+                            Dictionary<string, object> payloadDic = jsonLibrary.ConvertToDictionaryObject(deserializeStatus["payload"]);
+                            if (payloadDic != null && payloadDic.Count > 0)
+                            {
+                                if (payloadDic.ContainsKey("channels"))
+                                {
+                                    object[] chDic = jsonLibrary.ConvertToObjectArray(payloadDic["channels"]);
+                                    if (chDic != null && chDic.Length > 0)
+                                    {
+                                        serverAffectedChannels = chDic.Select(x => x.ToString()).ToList();
+                                    }
+                                }
+
+                                if (payloadDic.ContainsKey("channel-groups"))
+                                {
+                                    object[] cgDic = jsonLibrary.ConvertToObjectArray(payloadDic["channel-groups"]);
+                                    if (cgDic != null && cgDic.Length > 0)
+                                    {
+                                        serverAffectedChannelGroups = cgDic.Select(x => x.ToString()).ToList();
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     PNErrorData errorData = new PNErrorData(jsonLibrary.SerializeToJsonString(throwable.Message), throwable);
                     status.ErrorData = errorData;
                 }
@@ -61,7 +98,11 @@ namespace PubnubApi
                     }
                 }
 
-                if (asyncRequestState.Response != null)
+                if (serverErrorMessage && serverErrorStatusCode > 0)
+                {
+                    status.StatusCode = serverErrorStatusCode;
+                }
+                else if (asyncRequestState.Response != null)
                 {
                     status.StatusCode = (int)asyncRequestState.Response.StatusCode;
                 }
@@ -70,20 +111,35 @@ namespace PubnubApi
                     status.StatusCode = statusCode;
                 }
 
-                if (asyncRequestState.ChannelGroups != null)
+                if (serverErrorMessage)
                 {
-                    status.AffectedChannelGroups = asyncRequestState.ChannelGroups.ToList<string>();
+                    status.AffectedChannels = serverAffectedChannels;
+                    status.AffectedChannelGroups = serverAffectedChannelGroups;
                 }
-
-                if (asyncRequestState.Channels != null)
+                else
                 {
-                    status.AffectedChannels = asyncRequestState.Channels.ToList<string>();
+                    if (asyncRequestState.ChannelGroups != null)
+                    {
+                        status.AffectedChannelGroups = asyncRequestState.ChannelGroups.ToList<string>();
+                    }
+
+                    if (asyncRequestState.Channels != null)
+                    {
+                        status.AffectedChannels = asyncRequestState.Channels.ToList<string>();
+                    }
                 }
             }
             else
             {
                 status.StatusCode = statusCode;
             }
+
+            if (status.StatusCode == 403)
+            {
+                status.Category = PNStatusCategory.PNAccessDeniedCategory;
+            }
+
+
             status.Origin = config.Origin;
             status.TlsEnabled = config.Secure;
 

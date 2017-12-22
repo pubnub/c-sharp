@@ -84,7 +84,7 @@ namespace PubnubApi.EndPoint
             Uri request = urlBuilder.BuildRemoveChannelPushRequest(channel, pushType, pushToken);
 
             RequestState<PNPushRemoveChannelResult> requestState = new RequestState<PNPushRemoveChannelResult>();
-            requestState.Channels = new string[] { channel };
+            requestState.Channels = new [] { channel };
             requestState.ResponseType = PNOperationType.PushRemove;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;

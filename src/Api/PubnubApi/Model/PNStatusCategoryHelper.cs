@@ -17,23 +17,14 @@ namespace PubnubApi
                     ret = PNStatusCategory.PNCancelledCategory;
                     break;
                 case WebExceptionStatus.ConnectFailure:
-                    ret = PNStatusCategory.PNNetworkIssuesCategory;
-                    break;
                 case WebExceptionStatus.SendFailure:
-                    ret = PNStatusCategory.PNNetworkIssuesCategory;
-                    break;
                 case WebExceptionStatus.Pending:
-                    ret = PNStatusCategory.PNNetworkIssuesCategory;
-                    break;
                 case WebExceptionStatus.Success:
                     ret = PNStatusCategory.PNNetworkIssuesCategory;
                     break;
                 default:
-                    if (webExceptionStatus.ToString() == "SecureChannelFailure")
-                    {
-                        ret = PNStatusCategory.PNNetworkIssuesCategory;
-                    }
-                    else if (webExceptionStatus.ToString() == "NameResolutionFailure")
+                    if (string.Compare(webExceptionStatus.ToString(), "SecureChannelFailure", StringComparison.CurrentCultureIgnoreCase) == 0 
+                        || string.Compare(webExceptionStatus.ToString(),"NameResolutionFailure", StringComparison.CurrentCultureIgnoreCase) == 0)
                     {
                         ret = PNStatusCategory.PNNetworkIssuesCategory;
                     }
@@ -51,7 +42,7 @@ namespace PubnubApi
         {
             PNStatusCategory ret = PNStatusCategory.PNUnknownCategory;
 
-            if (ex == null) return ret;
+            if (ex == null) { return ret; }
 
             string errorType = ex.GetType().ToString();
             string errorMessage = ex.Message;
@@ -134,35 +125,35 @@ namespace PubnubApi
             switch (statusCode)
             {
                 case 400:
-                    if (httpErrorCodeMessage.ToUpper().Contains("MESSAGE TOO LARGE"))
+                    if (httpErrorCodeMessage.ToUpperInvariant().Contains("MESSAGE TOO LARGE"))
                     {
                         ret = PNStatusCategory.PNBadRequestCategory;
                     }
-                    else if (httpErrorCodeMessage.ToUpper() == "INVALID KEY" || httpErrorCodeMessage.ToUpper() == "INVALID SUBSCRIBE KEY")
+                    else if (httpErrorCodeMessage.ToUpperInvariant() == "INVALID KEY" || httpErrorCodeMessage.ToUpperInvariant() == "INVALID SUBSCRIBE KEY")
                     {
                         ret = PNStatusCategory.PNAccessDeniedCategory;
                     }
-                    else if (httpErrorCodeMessage.ToUpper() == "BADREQUEST")
+                    else if (httpErrorCodeMessage.ToUpperInvariant() == "BADREQUEST")
                     {
                         ret = PNStatusCategory.PNBadRequestCategory;
                     }
-                    else if (httpErrorCodeMessage.ToUpper() == "NO UUID SPECIFIED")
+                    else if (httpErrorCodeMessage.ToUpperInvariant() == "NO UUID SPECIFIED")
                     {
                         ret = PNStatusCategory.PNBadRequestCategory;
                     }
-                    else if (httpErrorCodeMessage.ToUpper() == "INVALID TIMESTAMP")
+                    else if (httpErrorCodeMessage.ToUpperInvariant() == "INVALID TIMESTAMP")
                     {
                         ret = PNStatusCategory.PNBadRequestCategory;
                     }
-                    else if (httpErrorCodeMessage.ToUpper() == "INVALID TYPE ARGUMENT")
+                    else if (httpErrorCodeMessage.ToUpperInvariant() == "INVALID TYPE ARGUMENT")
                     {
                         ret = PNStatusCategory.PNBadRequestCategory;
                     }
-                    else if (httpErrorCodeMessage.ToUpper() == "CHANNEL GROUP OR GROUPS RESULT IN EMPTY SUBSCRIPTION SET")
+                    else if (httpErrorCodeMessage.ToUpperInvariant() == "CHANNEL GROUP OR GROUPS RESULT IN EMPTY SUBSCRIPTION SET")
                     {
                         ret = PNStatusCategory.PNBadRequestCategory;
                     }
-                    else if (httpErrorCodeMessage.ToUpper() == "COULD NOT PARSE REQUEST")
+                    else if (httpErrorCodeMessage.ToUpperInvariant() == "COULD NOT PARSE REQUEST")
                     {
                         ret = PNStatusCategory.PNBadRequestCategory;
                     }
@@ -171,36 +162,28 @@ namespace PubnubApi
                     ret = PNStatusCategory.PNAccessDeniedCategory;
                     break;
                 case 402:
-                    if (httpErrorCodeMessage.ToUpper() == "NOT ENABLED")
+                    if (httpErrorCodeMessage.ToUpperInvariant() == "NOT ENABLED")
                     {
                         ret = PNStatusCategory.PNAccessDeniedCategory;
                     }
                     break;
                 case 403:
-                    if (httpErrorCodeMessage.ToUpper() == "FORBIDDEN")
+                    if (httpErrorCodeMessage.ToUpperInvariant() == "FORBIDDEN")
                     {
                         ret = PNStatusCategory.PNAccessDeniedCategory;
                     }
-                    else if (httpErrorCodeMessage.ToUpper() == "SIGNATURE DOES NOT MATCH")
+                    else if (httpErrorCodeMessage.ToUpperInvariant() == "SIGNATURE DOES NOT MATCH")
                     {
                         ret = PNStatusCategory.PNAccessDeniedCategory;
                     }
                     break;
                 case 404:
-                    ret = PNStatusCategory.PNBadRequestCategory;
-                    break;
                 case 414:
-                    ret = PNStatusCategory.PNBadRequestCategory;
-                    break;
                 case 500:
                     ret = PNStatusCategory.PNBadRequestCategory;
                     break;
                 case 502:
-                    ret = PNStatusCategory.PNNetworkIssuesCategory;
-                    break;
                 case 503:
-                    ret = PNStatusCategory.PNNetworkIssuesCategory;
-                    break;
                 case 504:
                     ret = PNStatusCategory.PNNetworkIssuesCategory;
                     break;

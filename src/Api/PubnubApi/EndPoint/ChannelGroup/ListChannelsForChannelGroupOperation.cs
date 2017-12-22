@@ -65,7 +65,7 @@ namespace PubnubApi.EndPoint
 
             RequestState<PNChannelGroupsAllChannelsResult> requestState = new RequestState<PNChannelGroupsAllChannelsResult>();
             requestState.ResponseType = PNOperationType.ChannelGroupGet;
-            requestState.ChannelGroups = new string[] { groupName };
+            requestState.ChannelGroups = new [] { groupName };
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
