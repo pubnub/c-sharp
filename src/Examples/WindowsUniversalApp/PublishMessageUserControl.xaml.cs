@@ -19,7 +19,7 @@ namespace WindowsUniversalApp
 {
     public sealed partial class PublishMessageUserControl : UserControl
     {
-        public bool IsOKButtonEntered = false;
+        internal bool IsOKButtonEntered;
 
         public PublishMessageUserControl()
         {

@@ -19,9 +19,9 @@ namespace WindowsUniversalApp
 {
     public sealed partial class UserStateUserControl : UserControl
     {
-        public bool IsOKButtonEntered = false;
-        public bool IsGetUserState = false;
-        public bool IsSetUserState = false;
+        internal bool IsOKButtonEntered;
+        internal bool IsGetUserState;
+        internal bool IsSetUserState;
 
         public UserStateUserControl()
         {

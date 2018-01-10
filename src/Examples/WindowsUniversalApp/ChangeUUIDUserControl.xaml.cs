@@ -19,7 +19,7 @@ namespace WindowsUniversalApp
 {
     public sealed partial class ChangeUUIDUserControl : UserControl
     {
-        public bool IsCancelledButton = false;
+        internal bool IsCancelledButton;
 
         public ChangeUUIDUserControl()
         {

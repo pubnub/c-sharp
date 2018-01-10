@@ -34,7 +34,7 @@ namespace PubNubMessaging.Example
         Button btnGrant;
         TextView lblInput1, lblInput2, lblInput3, lblAuth;
         ToggleButton tbRead, tbWrite;
-        EditText txtVal, txtauth; //, txtChannel, txtChannelGroup;
+        EditText txtVal, edittxtauth;
         View view;
 
         public bool IsPresenceGrant {
@@ -42,8 +42,8 @@ namespace PubNubMessaging.Example
             set;
         }
 
-        CommonDialogStates cds;
-        Context ctx;
+        readonly CommonDialogStates cds;
+        readonly Context ctx;
 
         public GrantDialogFragment (CommonDialogStates cds, Context context)
         {
@@ -58,7 +58,7 @@ namespace PubNubMessaging.Example
                 ToggleButton tbCanWrite = view.FindViewById<ToggleButton> (Resource.Id.tbWrite);
                 ToggleButton tbCanRead = view.FindViewById<ToggleButton> (Resource.Id.tbRead);
                 EditText txtttl = view.FindViewById<EditText> (Resource.Id.txtttl);
-                EditText txtauth = view.FindViewById<EditText> (Resource.Id.txtauth);
+                EditText edittxtauth = view.FindViewById<EditText> (Resource.Id.txtauth);
                 int iTtl;
 
                 Int32.TryParse (txtttl.Text, out iTtl);
@@ -70,7 +70,7 @@ namespace PubNubMessaging.Example
                 if (txtChannel.Text.Trim ().Length == 0) {
                     ShowAlert ("Please enter channel name");
                 } else {
-                    FireEvent (iTtl, tbCanRead.Checked, tbCanWrite.Checked, IsPresenceGrant, txtChannel.Text, txtauth.Text, "");
+                    FireEvent (iTtl, tbCanRead.Checked, tbCanWrite.Checked, IsPresenceGrant, txtChannel.Text, edittxtauth.Text, "");
 
                     Dismiss ();
                 }
@@ -179,14 +179,12 @@ namespace PubNubMessaging.Example
 
                 lblInput3 = view.FindViewById<TextView> (Resource.Id.lblGrant3);
                 lblInput3.Visibility = ViewStates.Gone;
-                //lblInput3.SetText (Resource.String.channel);
 
                 txtVal = view.FindViewById<EditText> (Resource.Id.txtttl);
                 txtVal.Visibility = ViewStates.Gone;
-                //txtVal.InputType = Android.Text.InputTypes.TextFlagAutoComplete;
 
-                txtauth = view.FindViewById<EditText> (Resource.Id.txtauth);
-                txtauth.Visibility = ViewStates.Invisible;
+                edittxtauth = view.FindViewById<EditText> (Resource.Id.txtauth);
+                edittxtauth.Visibility = ViewStates.Invisible;
 
                 lblAuth = view.FindViewById<TextView> (Resource.Id.lblinput1);
                 lblAuth.Visibility = ViewStates.Invisible;
@@ -227,10 +225,8 @@ namespace PubNubMessaging.Example
 
                 lblAuth = view.FindViewById<TextView> (Resource.Id.lblinput1);
                 lblAuth.Visibility = ViewStates.Gone;
-                txtauth = view.FindViewById<EditText> (Resource.Id.txtauth);
-                txtauth.Visibility = ViewStates.Gone;
-
-                //lblAuth.SetText (Resource.String.channel);
+                edittxtauth = view.FindViewById<EditText> (Resource.Id.txtauth);
+                edittxtauth.Visibility = ViewStates.Gone;
 
                 txtVal = view.FindViewById<EditText> (Resource.Id.txtttl);
                 txtVal.InputType = Android.Text.InputTypes.TextFlagAutoComplete;
@@ -263,8 +259,8 @@ namespace PubNubMessaging.Example
                 txtVal = view.FindViewById<EditText> (Resource.Id.txtttl);
                 txtVal.Visibility = ViewStates.Invisible;
 
-                txtauth = view.FindViewById<EditText> (Resource.Id.txtauth);
-                txtauth.Visibility = ViewStates.Invisible;
+                edittxtauth = view.FindViewById<EditText> (Resource.Id.txtauth);
+                edittxtauth.Visibility = ViewStates.Invisible;
 
                 lblAuth = view.FindViewById<TextView> (Resource.Id.lblinput1);
                 lblAuth.Visibility = ViewStates.Invisible;
@@ -314,7 +310,9 @@ namespace PubNubMessaging.Example
 
             // Unwire event
             if (disposing)
+            {
                 btnDismiss.Click -= ButtonDismissClick;
+            }
         }
      
         void ShowAlert (string message)

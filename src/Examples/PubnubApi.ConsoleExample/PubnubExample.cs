@@ -18,31 +18,28 @@ namespace PubnubApiDemo
 {
     public class PubnubExample
     {
-        static public Pubnub pubnub;
+        static private Pubnub pubnub { get; set; }
 
-        static public bool deliveryStatus = false;
-        static public string channel = "";
-        static public bool showErrorMessageSegments = false;
-        static public bool showDebugMessages = false;
-        static public string authKey = "";
-        static public int presenceHeartbeat = 0;
-        static public int presenceHeartbeatInterval = 0;
+        static private string channel { get; set; } = "";
+        static private bool showErrorMessageSegments { get; set; } = false;
+        static private bool showDebugMessages { get; set; } = false;
+        static private string authKey { get; set; } = "";
+        static private int presenceHeartbeat { get; set; } = 0;
+        static private int presenceHeartbeatInterval { get; set; } = 0;
 
         public class PlatformPubnubLog : IPubnubLog
         {
-            private string logFilePath = "";
-
             public PlatformPubnubLog()
             {
                 // Get folder path may vary based on environment
                 string folder = System.IO.Directory.GetCurrentDirectory(); //For console
                 //string folder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments); // For iOS
                 System.Diagnostics.Debug.WriteLine(folder);
-                logFilePath = System.IO.Path.Combine(folder, "pubnubmessaging.log");
+                string logFilePath = System.IO.Path.Combine(folder, "pubnubmessaging.log");
                 Trace.Listeners.Add(new TextWriterTraceListener(logFilePath));
             }
 
-            public void WriteToLog(string log)
+            void IPubnubLog.WriteToLog(string log)
             {
                 Trace.WriteLine(log);
                 Trace.Flush();
@@ -52,7 +49,6 @@ namespace PubnubApiDemo
 
         static void UnhandledExceptionTrapper(object sender, UnhandledExceptionEventArgs e)
         {
-            //Console.WriteLine(e.ExceptionObject.ToString());
             Console.WriteLine("Unhandled exception occured inside Pubnub C# API. Exiting the application. Please try again.");
             Environment.Exit(1);
         }
@@ -89,11 +85,11 @@ namespace PubnubApiDemo
             Console.WriteLine("Enable SSL? ENTER Y for Yes, else N. (Default N)");
             string enableSSL = Console.ReadLine();
             Console.ForegroundColor = ConsoleColor.Blue;
-            if (enableSSL.Trim().ToLower() == "y")
+            if (enableSSL.Trim().ToLowerInvariant() == "y")
             {
                 Console.WriteLine("SSL Enabled");
             }
-            else if (enableSSL.Trim().ToLower() == "n")
+            else if (enableSSL.Trim().ToLowerInvariant() == "n")
             {
                 Console.WriteLine("SSL NOT Enabled");
             }
@@ -170,7 +166,7 @@ namespace PubnubApiDemo
 
             Console.WriteLine("Use Custom Session UUID? ENTER Y for Yes, else N");
             string enableCustomUUID = Console.ReadLine();
-            if (enableCustomUUID.Trim().ToLower() == "y")
+            if (enableCustomUUID.Trim().ToLowerInvariant() == "y")
             {
                 Console.WriteLine("ENTER Session UUID.");
                 string sessionUUID = Console.ReadLine();
@@ -207,7 +203,7 @@ namespace PubnubApiDemo
             Console.WriteLine("Default = Y  ");
             string enableLoggingString = Console.ReadLine();
             Console.ForegroundColor = ConsoleColor.Blue;
-            if (enableLoggingString.Trim().ToLower() == "n")
+            if (enableLoggingString.Trim().ToLowerInvariant() == "n")
             {
                 config.LogVerbosity = PNLogVerbosity.NONE;
                 config.PubnubLog = null;
@@ -1090,12 +1086,11 @@ namespace PubnubApiDemo
                         break;
                     case "23":
                         Console.WriteLine("Enter channel name: ");
-                        //Console.WriteLine("NOTE: If you want to consider only Channel Group, just hit ENTER");
                         string deleteMessageChannel = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", deleteMessageChannel));
                         Console.ResetColor();
-                        pubnub.DeleteMessages().Channel(deleteMessageChannel) //.Start(15021998840118350).End(15026815715586992)
+                        pubnub.DeleteMessages().Channel(deleteMessageChannel)
                             .Start(15088506076921021)
                               .End(15088532035597390)
                             .Async(new PNDeleteMessageResultExt(
@@ -1438,430 +1433,6 @@ namespace PubnubApiDemo
         Home,
         Mobile,
         Work
-    }
-
-    public class DemoTimeResult : PNCallback<PNTimeResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoTimeResult(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-
-        public override void OnResponse(PNTimeResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    };
-
-    public class DemoPublishResult : PNCallback<PNPublishResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoPublishResult(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-
-        public override void OnResponse(PNPublishResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    };
-
-    public class DemoHistoryResult : PNCallback<PNHistoryResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoHistoryResult(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNHistoryResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    };
-
-    public class DemoHereNowResult : PNCallback<PNHereNowResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoHereNowResult(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNHereNowResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    };
-
-    public class DemoWhereNowResult : PNCallback<PNWhereNowResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoWhereNowResult(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNWhereNowResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    };
-
-    public class DemoPNGetStateResult : PNCallback<PNGetStateResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoPNGetStateResult(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNGetStateResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    };
-
-    public class DemoPNSetStateResult : PNCallback<PNSetStateResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoPNSetStateResult(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNSetStateResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    };
-
-    public class DemoSubscribeCallback : SubscribeCallback
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoSubscribeCallback(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void Message<T>(Pubnub pubnub, PNMessageResult<T> message)
-        {
-            if (message != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(message));
-            }
-        }
-
-        public override void Presence(Pubnub pubnub, PNPresenceEventResult presence)
-        {
-            if (presence != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(presence));
-            }
-        }
-
-        public override void Status(Pubnub pubnub, PNStatus status)
-        {
-            string msg = string.Format("Operation: {0}; Category: {1};  StatusCode: {2}", status.Operation, status.Category, status.StatusCode);
-            this.callback(msg);
-
-            //if (status.StatusCode != 200 || status.Error)
-            //{
-            //    Console.ForegroundColor = ConsoleColor.Red;
-            //    if (status.ErrorData != null)
-            //    {
-            //        Console.WriteLine(status.ErrorData.Information);
-            //    }
-            //    Console.ForegroundColor = ConsoleColor.White;
-            //}
-
-            if (status.Category == PNStatusCategory.PNUnexpectedDisconnectCategory)
-            {
-                // This event happens when radio / connectivity is lost
-            }
-            else if (status.Category == PNStatusCategory.PNConnectedCategory)
-            {
-                //Console.WriteLine("CONNECTED {0} Channels = {1}, ChannelGroups = {2}", status.StatusCode, string.Join(",", status.AffectedChannels), string.Join(",", status.AffectedChannelGroups));
-                // Connect event. You can do stuff like publish, and know you'll get it.
-                // Or just use the connected event to confirm you are subscribed for
-                // UI / internal notifications, etc
-
-            }
-            else if (status.Category == PNStatusCategory.PNReconnectedCategory)
-            {
-                //Console.WriteLine("RE-CONNECTED {0} Channels = {1}, ChannelGroups = {2}", status.StatusCode, string.Join(",", status.AffectedChannels), string.Join(",", status.AffectedChannelGroups));
-                // Happens as part of our regular operation. This event happens when
-                // radio / connectivity is lost, then regained.
-            }
-            else if (status.Category == PNStatusCategory.PNDecryptionErrorCategory)
-            {
-                // Handle messsage decryption error. Probably client configured to
-                // encrypt messages and on live data feed it received plain text.
-            }
-        }
-    }
-
-    public class DemoGrantResult : PNCallback<PNAccessManagerGrantResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoGrantResult(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNAccessManagerGrantResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    };
-
-    public class DemoAuditResult : PNCallback<PNAccessManagerAuditResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoAuditResult(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNAccessManagerAuditResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    };
-
-    public class DemoPushAddChannel : PNCallback<PNPushAddChannelResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoPushAddChannel(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNPushAddChannelResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    }
-
-    public class DemoPushRemoveChannel : PNCallback<PNPushRemoveChannelResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoPushRemoveChannel(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNPushRemoveChannelResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    }
-
-    public class DemoPushListProvisionChannel : PNCallback<PNPushListProvisionsResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoPushListProvisionChannel(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNPushListProvisionsResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    }
-
-    public class DemoChannelGroupAddChannel : PNCallback<PNChannelGroupsAddChannelResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoChannelGroupAddChannel(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNChannelGroupsAddChannelResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    }
-
-    public class DemoChannelGroupRemoveChannel : PNCallback<PNChannelGroupsRemoveChannelResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoChannelGroupRemoveChannel(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNChannelGroupsRemoveChannelResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    }
-
-    public class DemoChannelGroupDeleteGroup : PNCallback<PNChannelGroupsDeleteGroupResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoChannelGroupDeleteGroup(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNChannelGroupsDeleteGroupResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    }
-
-    public class DemoChannelGroupAll : PNCallback<PNChannelGroupsListAllResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoChannelGroupAll(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNChannelGroupsListAllResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
-    }
-
-    public class DemoChannelGroupAllChannels : PNCallback<PNChannelGroupsAllChannelsResult>
-    {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
-        public DemoChannelGroupAllChannels(Action<string> displayCallback)
-        {
-            this.callback = displayCallback;
-        }
-        public override void OnResponse(PNChannelGroupsAllChannelsResult result, PNStatus status)
-        {
-            if (result != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-            }
-            else if (status != null)
-            {
-                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-            }
-        }
     }
 
 }

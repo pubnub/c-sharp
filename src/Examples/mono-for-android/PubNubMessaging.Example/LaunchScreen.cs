@@ -20,9 +20,8 @@ namespace PubNubMessaging.Example
     public class LaunchScreen : Activity
     {
         Dialog dialog;
-        TextView btnProxy;
         ToggleButton tgProxy;
-        bool proxyEnabled = false;
+        bool proxyEnabled;
         TextView tvProxy;
 
         EditText proxyUsername;
@@ -35,8 +34,8 @@ namespace PubNubMessaging.Example
         EditText txtSecKey;
 
         Proxy proxy = null;
-        public static Pubnub pubnub = null;
-        public PNConfiguration config = null;
+        internal static Pubnub pubnub;
+        private PNConfiguration config;
 
         protected override void OnCreate (Bundle bundle)
         {
@@ -47,7 +46,7 @@ namespace PubNubMessaging.Example
             Button btnLaunch = FindViewById<Button> (Resource.Id.btnLaunch);
             btnLaunch.Click += LaunchClick;
 
-            btnProxy = FindViewById<Button> (Resource.Id.btnProxy);
+            Button btnProxy = FindViewById<Button> (Resource.Id.btnProxy);
             btnProxy.Click += ProxySettingsHandler;
 
             tvProxy = FindViewById<TextView> (Resource.Id.tvProxy);
@@ -108,28 +107,11 @@ namespace PubNubMessaging.Example
                 tvProxy.Text = SetProxyText (false);
             }
 
-            //if (config != null && config.Proxy != null && !string.IsNullOrEmpty (config.Proxy.pProxyServer))) {
-            //    proxyServer.Text = proxy.ProxyServer;
-            //}
-            //if ((proxy != null) && (!string.IsNullOrEmpty (proxy.ProxyPort.ToString ()))) {
-            //    proxyPort.Text = proxy.ProxyPort.ToString ();
-            //}
-            //if ((proxy != null) && (!string.IsNullOrEmpty (proxy.ProxyUserName))) {
-            //    proxyUsername.Text = proxy.ProxyUserName;
-            //}
-            //if ((proxy != null) && (!string.IsNullOrEmpty (proxy.ProxyPassword))) {
-            //    proxyPassword.Text = proxy.ProxyPassword;
-            //}
-
             dialog.Show ();
         }
 
         void DialogDismissHandler (object sender, EventArgs e)
         {
-            /*if (proxy == null) {
-                tvProxy.Text = SetProxyText(false);
-                tgProxy.Checked = false;
-            }*/
         }
 
         void ProxyCheckedChanged (object sender, CompoundButton.CheckedChangeEventArgs e)
@@ -154,10 +136,6 @@ namespace PubNubMessaging.Example
 
         void DisableProxy (object sender, EventArgs e)
         {
-            /*if (proxy == null) {
-                tvProxy.Text = SetProxyText (false);
-                tgProxy.Checked = false;
-            }*/
             if (!tgProxy.Checked) {
                 proxyEnabled = false;
                 tvProxy.Text = SetProxyText (false);
@@ -247,7 +225,7 @@ namespace PubNubMessaging.Example
                         config.Proxy = proxy;
                     } catch (MissingMemberException mse) {
                         errorFree = false;
-                        Console.WriteLine (mse.Message);
+                        System.Diagnostics.Debug.WriteLine (mse.Message);
 
                         ShowAlert ("Proxy settings invalid, please re-enter the details."); 
                     }

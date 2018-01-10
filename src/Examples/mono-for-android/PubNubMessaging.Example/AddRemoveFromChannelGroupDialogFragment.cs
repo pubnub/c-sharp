@@ -26,11 +26,10 @@ namespace PubNubMessaging.Example
         public event EventHandler<EventArgs> AddRemoveFromCgPerms;
 
         Button btnDismiss;
-        Button btnSet;
         View view;
 
-        CommonDialogStates cds;
-        Context ctx;
+        readonly CommonDialogStates cds;
+        readonly Context ctx;
 
         public AddRemoveFromChannelGroupDialogFragment (CommonDialogStates cds, Context context)
         {
@@ -40,7 +39,7 @@ namespace PubNubMessaging.Example
 
         void ButtonSetClick (object sender, EventArgs e)
         {
-            if (cds == CommonDialogStates.AddToChannelGroup) {
+            if (cds == CommonDialogStates.AddToChannelGroup || cds == CommonDialogStates.RemoveFromChannelGroup) {
                 EditText txtChannel = view.FindViewById<EditText> (Resource.Id.txtChannel);
                 EditText txtChannelGroup = view.FindViewById<EditText> (Resource.Id.txtChannelGroup);
 
@@ -51,18 +50,6 @@ namespace PubNubMessaging.Example
 
                     Dismiss ();
                 }
-            } else if (cds == CommonDialogStates.RemoveFromChannelGroup) {
-                EditText txtChannel = view.FindViewById<EditText> (Resource.Id.txtChannel);
-                EditText txtChannelGroup = view.FindViewById<EditText> (Resource.Id.txtChannelGroup);
-
-                if (txtChannel.Text.Trim ().Length == 0 || txtChannelGroup.Text.Trim ().Length == 0) {
-                    ShowAlert ("Please enter channel/channelgroup name");
-                } else {
-                    FireEvent (txtChannel.Text.Trim (), txtChannelGroup.Text.Trim ());
-
-                    Dismiss ();
-                }
-
             } else if (cds == CommonDialogStates.GetChannelGroup) {
                 EditText txtChannelGroup = view.FindViewById<EditText> (Resource.Id.txtChannelGroup);
 
@@ -96,17 +83,10 @@ namespace PubNubMessaging.Example
             // Create our view
             view = inflater.Inflate (Resource.Layout.AddRemoveFromChannelGroup, container, true);
 
-            if (cds == CommonDialogStates.AddToChannelGroup) {
+            if (cds == CommonDialogStates.AddToChannelGroup || cds == CommonDialogStates.RemoveFromChannelGroup) {
 
                 // Handle dismiss button click
-                btnSet = view.FindViewById<Button> (Resource.Id.btnSet);
-                btnSet.Click += ButtonSetClick;
-
-                btnDismiss = view.FindViewById<Button> (Resource.Id.btnCancel);
-                btnDismiss.Click += ButtonDismissClick;
-            } else if (cds == CommonDialogStates.RemoveFromChannelGroup) {
-
-                btnSet = view.FindViewById<Button> (Resource.Id.btnSet);
+                Button btnSet = view.FindViewById<Button> (Resource.Id.btnSet);
                 btnSet.Click += ButtonSetClick;
 
                 btnDismiss = view.FindViewById<Button> (Resource.Id.btnCancel);
@@ -118,7 +98,7 @@ namespace PubNubMessaging.Example
                 EditText txtChannel = view.FindViewById<EditText> (Resource.Id.txtChannel);
                 txtChannel.Visibility = ViewStates.Gone;
 
-                btnSet = view.FindViewById<Button> (Resource.Id.btnSet);
+                Button btnSet = view.FindViewById<Button> (Resource.Id.btnSet);
                 btnSet.Click += ButtonSetClick;
 
                 btnDismiss = view.FindViewById<Button> (Resource.Id.btnCancel);
@@ -152,7 +132,9 @@ namespace PubNubMessaging.Example
 
             // Unwire event
             if (disposing)
+            {
                 btnDismiss.Click -= ButtonDismissClick;
+            }
         }
 
         void ShowAlert (string message)

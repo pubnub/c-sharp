@@ -23,21 +23,21 @@ namespace WindowsUniversalApp
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class PubnubOperation : Page
+    public partial class PubnubOperation : Page
     {
         string channel = "";
         string channelGroup = "";
-        PubnubConfigData data = null;
-        static Pubnub pubnub = null;
-        static PNConfiguration config = null;
-        SubscribeCallbackExt listener = null;
+        PubnubConfigData data;
+        static Pubnub pubnub;
+        static PNConfiguration config;
+        SubscribeCallbackExt listener;
 
-        Popup publishPopup = null;
-        Popup hereNowPopup = null;
-        Popup whereNowPopup = null;
-        Popup globalHereNowPopup = null;
-        Popup userStatePopup = null;
-        Popup changeUUIDPopup = null;
+        Popup publishPopup;
+        Popup hereNowPopup;
+        Popup whereNowPopup;
+        Popup globalHereNowPopup;
+        Popup userStatePopup;
+        Popup changeUUIDPopup;
 
 
         public PubnubOperation()
@@ -94,12 +94,6 @@ namespace WindowsUniversalApp
                     {
                         DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
                     });
-                //pubnub.NetworkCheckMaxRetries = data.maxRetries;
-                //pubnub.NetworkCheckRetryInterval = data.retryInterval;
-                //pubnub.LocalClientHeartbeatInterval = data.localClientHeartbeatInterval;
-                //pubnub.EnableResumeOnReconnect = data.resumeOnReconnect;
-                //pubnub.PresenceHeartbeat = data.presenceHeartbeat;
-                //pubnub.PresenceHeartbeatInterval = data.presenceHeartbeatInterval;
             }
 
         }
@@ -123,20 +117,16 @@ namespace WindowsUniversalApp
         void PubnubCallbackResult(string result)
         {
             DisplayMessageInTextBox(result);
-            //Console.WriteLine("REGULAR CALLBACK:");
-            //Console.WriteLine(result);
-            //Console.WriteLine();
         }
 
         private void btnSubscribe_Click(object sender, RoutedEventArgs e)
         {
             channel = txtChannel.Text;
             channelGroup = txtChannelGroup.Text;
-            //DisplayMessageInTextBox("Running Subscribe:");
             pubnub.AddListener(listener);
             pubnub.Subscribe<string>()
-                .Channels(new string[] { channel })
-                .ChannelGroups(new string[] { channelGroup })
+                .Channels(new [] { channel })
+                .ChannelGroups(new [] { channelGroup })
                 .WithPresence()
                 .Execute();
         }
@@ -145,10 +135,9 @@ namespace WindowsUniversalApp
         {
             channel = txtChannel.Text;
             channelGroup = txtChannelGroup.Text;
-            //DisplayMessageInTextBox("Running Unsubscribe:");
             pubnub.Unsubscribe<string>()
-                .Channels(new string[] { channel })
-                .ChannelGroups(new string[] { channelGroup })
+                .Channels(new [] { channel })
+                .ChannelGroups(new [] { channelGroup })
                 .Execute();
             pubnub.RemoveListener(listener);
         }
@@ -195,7 +184,6 @@ namespace WindowsUniversalApp
 
                         if (publishMsg != "")
                         {
-                            //DisplayMessageInTextBox("Running Publish:");
                             double doubleData;
                             int intData;
                             if (int.TryParse(publishMsg, out intData)) //capture numeric data
@@ -365,7 +353,7 @@ namespace WindowsUniversalApp
 
                     DisplayMessageInTextBox("Running HereNow:");
                     pubnub.HereNow()
-                    .Channels(new string[] { channel })
+                    .Channels(new [] { channel })
                     .IncludeUUIDs(showUUID)
                     .IncludeState(includeState)
                     .Async(new PNHereNowResultEx(
@@ -442,8 +430,8 @@ namespace WindowsUniversalApp
                         DisplayMessageInTextBox("Running GrantAccess:");
                         int ttlInMinutes = 1440;
                         pubnub.Grant()
-                        .Channels(new string[] { pamUserChannelName })
-                        .AuthKeys(new string[] { pamAuthKey })
+                        .Channels(new [] { pamUserChannelName })
+                        .AuthKeys(new [] { pamAuthKey })
                         .Read(true)
                         .Write(true)
                         .TTL(ttlInMinutes)
@@ -462,7 +450,7 @@ namespace WindowsUniversalApp
                         DisplayMessageInTextBox("Running AuditAccess:");
                         pubnub.Audit()
                         .Channel(pamUserChannelName)
-                        .AuthKeys(new string[] { pamAuthKey })
+                        .AuthKeys(new [] { pamAuthKey })
                         .Async(new PNAccessManagerAuditResultExt(
                             (r,s)=> 
                             {
@@ -480,8 +468,8 @@ namespace WindowsUniversalApp
                         System.Threading.Tasks.Task.Run(() =>
                         {
                             pubnub.Grant()
-                            .Channels(new string[] { pamUserChannelName })
-                            .AuthKeys(new string[] { pamAuthKey })
+                            .Channels(new [] { pamUserChannelName })
+                            .AuthKeys(new [] { pamAuthKey })
                             .Read(false)
                             .Write(false)
                             .Async(new PNAccessManagerGrantResultExt((r, s) =>
@@ -559,8 +547,8 @@ namespace WindowsUniversalApp
                         {
                             DisplayMessageInTextBox("Running ChannelGroupGrantAccess:");
                             pubnub.Grant()
-                            .ChannelGroups(new string[] { pamUserChannelGroup })
-                            .AuthKeys(new string[] { pamAuthKey })
+                            .ChannelGroups(new [] { pamUserChannelGroup })
+                            .AuthKeys(new [] { pamAuthKey })
                             .Read(true)
                             .Write(true)
                             .TTL(ttlInMinutes)
@@ -579,7 +567,7 @@ namespace WindowsUniversalApp
                             DisplayMessageInTextBox("Running ChannelGroupAuditAccess:");
                             pubnub.Audit()
                             .ChannelGroup(pamUserChannelGroup)
-                            .AuthKeys(new string[] { pamAuthKey })
+                            .AuthKeys(new [] { pamAuthKey })
                             .Async(new PNAccessManagerAuditResultExt(
                                 (r, s) =>
                                 {
@@ -595,8 +583,8 @@ namespace WindowsUniversalApp
                         {
                             DisplayMessageInTextBox("Running ChannelGroup Revoke Access:");
                             pubnub.Grant()
-                            .ChannelGroups(new string[] { pamUserChannelGroup })
-                            .AuthKeys(new string[] { pamAuthKey })
+                            .ChannelGroups(new [] { pamUserChannelGroup })
+                            .AuthKeys(new [] { pamAuthKey })
                             .Read(false)
                             .Write(false)
                             .TTL(ttlInMinutes)
@@ -677,8 +665,8 @@ namespace WindowsUniversalApp
                             dicInt.Add(userStateKey1, valueInt);
 
                             pubnub.SetPresenceState()
-                            .Channels(new string[] { channel })
-                            .ChannelGroups(new string[] { channelGroup })
+                            .Channels(new [] { channel })
+                            .ChannelGroups(new [] { channelGroup })
                             .State(dicInt)
                             .Async(new PNSetStateResultExt(
                                 (r,s)=> 
@@ -692,8 +680,8 @@ namespace WindowsUniversalApp
                             dicDouble.Add(userStateKey1, valueDouble);
 
                             pubnub.SetPresenceState()
-                            .Channels(new string[] { channel })
-                            .ChannelGroups(new string[] { channelGroup })
+                            .Channels(new [] { channel })
+                            .ChannelGroups(new [] { channelGroup })
                             .State(dicDouble)
                             .Async(new PNSetStateResultExt(
                                 (r, s) =>
@@ -707,8 +695,8 @@ namespace WindowsUniversalApp
                             dicObj.Add(userStateKey1, userStateValue1);
 
                             pubnub.SetPresenceState()
-                            .Channels(new string[] { channel })
-                            .ChannelGroups(new string[] { channelGroup })
+                            .Channels(new [] { channel })
+                            .ChannelGroups(new [] { channelGroup })
                             .State(dicObj)
                             .Async(new PNSetStateResultExt(
                                 (r, s) =>
@@ -726,8 +714,8 @@ namespace WindowsUniversalApp
                             string userStateUUID = txtGetUserStateUUID.Text.Trim();
 
                             pubnub.GetPresenceState()
-                            .Channels(new string[] { channel })
-                            .ChannelGroups(new string[] { channelGroup })
+                            .Channels(new [] { channel })
+                            .ChannelGroups(new [] { channelGroup })
                             .Uuid(userStateUUID)
                             .Async(new PNGetStateResultExt(
                                 (r, s) =>
@@ -925,7 +913,7 @@ namespace WindowsUniversalApp
                         {
                             DisplayMessageInTextBox("Running AddChannelsToChannelGroup:");
                             pubnub.AddChannelsToChannelGroup()
-                            .Channels(new string[] { userChannelName })
+                            .Channels(new [] { userChannelName })
                             .ChannelGroup(userChannelGroup)
                             .Async(new PNChannelGroupsAddChannelResultExt((r, s) =>
                             {
@@ -938,7 +926,7 @@ namespace WindowsUniversalApp
                         {
                             DisplayMessageInTextBox("Running RemoveChannelsFromChannelGroup:");
                             pubnub.RemoveChannelsFromChannelGroup()
-                            .Channels(new string[] { userChannelName })
+                            .Channels(new [] { userChannelName })
                             .ChannelGroup(userChannelGroup)
                             .Async(new PNChannelGroupsRemoveChannelResultExt((r, s) =>
                             {

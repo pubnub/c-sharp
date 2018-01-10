@@ -22,7 +22,7 @@ namespace WindowsUniversalApp
     /// </summary>
     public sealed partial class PubnubTimeoutSettings : Page
     {
-        PubnubConfigData data = null;
+        PubnubConfigData data;
 
         public PubnubTimeoutSettings()
         {
@@ -39,13 +39,26 @@ namespace WindowsUniversalApp
         {
             if (data != null)
             {
-                Int32.TryParse(txtSubscribeTimeout.Text.Trim(), out data.subscribeTimeout);
-                Int32.TryParse(txtNonSubscribeTimeout.Text.Trim(), out data.nonSubscribeTimeout);
-                Int32.TryParse(txtNetworkMaxRetries.Text.Trim(), out data.maxRetries);
-                Int32.TryParse(txtRetryInterval.Text.Trim(), out data.retryInterval);
-                Int32.TryParse(txtLocalClientHeartbeatInterval.Text.Trim(), out data.localClientHeartbeatInterval);
-                Int32.TryParse(txtPresenceHeartbeat.Text.Trim(), out data.presenceHeartbeat);
-                Int32.TryParse(txtPresenceHeartbeatInterval.Text.Trim(), out data.presenceHeartbeatInterval);
+                int subscribeTimeout = 0;
+                if (Int32.TryParse(txtSubscribeTimeout.Text.Trim(), out subscribeTimeout)) { data.subscribeTimeout = subscribeTimeout; }
+
+                int nonSubscribeTimeout = 0;
+                if (Int32.TryParse(txtNonSubscribeTimeout.Text.Trim(), out nonSubscribeTimeout)) { data.nonSubscribeTimeout = nonSubscribeTimeout; }
+
+                int maxRetries = 0;
+                if (Int32.TryParse(txtNetworkMaxRetries.Text.Trim(), out maxRetries)) { data.maxRetries = maxRetries; }
+
+                int retryInterval = 0;
+                if (Int32.TryParse(txtRetryInterval.Text.Trim(), out retryInterval)) { data.retryInterval = retryInterval; }
+
+                int localClientHeartbeatInterval = 0;
+                if (Int32.TryParse(txtLocalClientHeartbeatInterval.Text.Trim(), out localClientHeartbeatInterval)) { data.localClientHeartbeatInterval = localClientHeartbeatInterval;  }
+
+                int presenceHeartbeat = 0;
+                if (Int32.TryParse(txtPresenceHeartbeat.Text.Trim(), out presenceHeartbeat)) { data.presenceHeartbeat = presenceHeartbeat; }
+
+                int presenceHeartbeatInterval = 0;
+                if (Int32.TryParse(txtPresenceHeartbeatInterval.Text.Trim(), out presenceHeartbeatInterval)) { data.presenceHeartbeatInterval = presenceHeartbeatInterval; }
 
                 var frame = new Frame();
                 frame.Navigate(typeof(PubnubOperation), data);

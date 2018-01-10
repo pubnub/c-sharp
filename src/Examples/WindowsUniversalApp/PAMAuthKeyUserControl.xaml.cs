@@ -19,7 +19,7 @@ namespace WindowsUniversalApp
 {
     public sealed partial class PAMAuthKeyUserControl : UserControl
     {
-        public bool IsOKButtonEntered = false;
+        private bool IsOKButtonEntered;
 
         public PAMAuthKeyUserControl()
         {

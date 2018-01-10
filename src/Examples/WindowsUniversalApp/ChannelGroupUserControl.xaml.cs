@@ -18,7 +18,7 @@ namespace WindowsUniversalApp
 {
     public sealed partial class ChannelGroupUserControl : UserControl
     {
-        public bool IsOKButtonEntered = false;
+        internal bool IsOKButtonEntered;
 
         public ChannelGroupUserControl()
         {

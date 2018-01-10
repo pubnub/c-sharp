@@ -8,23 +8,21 @@ namespace WindowsUniversalApp
 {
     public class PubnubConfigData
     {
-        public bool ssl;
-        //public bool resumeOnReconnect;
-        public string publishKey = "";
-        public string subscribeKey = "";
-        public string cipherKey = "";
-        public string secretKey = "";
-        public string sessionUUID = "";
-        public string origin = "";
-        public string authKey = "";
-        //public bool hideErrorCallbackMessages;
+        public bool ssl { get; set; }
+        public string publishKey { get; set; } = "";
+        public string subscribeKey { get; set; } = "";
+        public string cipherKey { get; set; } = "";
+        public string secretKey { get; set; } = "";
+        public string sessionUUID { get; set; } = "";
+        public string origin { get; set; } = "";
+        public string authKey { get; set; } = "";
 
-        public int subscribeTimeout;
-        public int nonSubscribeTimeout;
-        public int maxRetries;
-        public int retryInterval;
-        public int localClientHeartbeatInterval;
-        public int presenceHeartbeat;
-        public int presenceHeartbeatInterval;
+        public int subscribeTimeout { get; set; }
+        public int nonSubscribeTimeout { get; set; }
+        public int maxRetries { get; set; }
+        public int retryInterval { get; set; }
+        public int localClientHeartbeatInterval { get; set; }
+        public int presenceHeartbeat { get; set; }
+        public int presenceHeartbeatInterval { get; set; }
     }
 }
