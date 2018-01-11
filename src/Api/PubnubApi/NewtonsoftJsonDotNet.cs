@@ -38,7 +38,20 @@ namespace PubnubApi
                 }
                 ret = true;
             }
-            catch {  /* ignore */ }
+            catch
+            {
+                try
+                {
+                    if (operationType == PNOperationType.PNPublishOperation
+                        || operationType == PNOperationType.PNHistoryOperation
+                        || operationType == PNOperationType.PNTimeOperation)
+                    {
+                        JObject.Parse(jsonString);
+                        ret = true;
+                    }
+                }
+                catch { /* igonore */ }
+            }
             return ret;
         }
 

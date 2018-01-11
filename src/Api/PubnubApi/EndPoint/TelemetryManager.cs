@@ -214,10 +214,14 @@ namespace PubnubApi.EndPoint
         {
             if (!disposedValue)
             {
-                telemetryTimer = null;
                 dicEndpointLatency.Clear();
                 pubnubConfig = null;
                 pubnubLog = null;
+                if (telemetryTimer != null)
+                {
+                    telemetryTimer.Dispose();
+                    telemetryTimer = null;
+                }
 
                 disposedValue = true;
             }

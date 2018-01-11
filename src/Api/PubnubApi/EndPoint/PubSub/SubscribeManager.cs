@@ -9,7 +9,7 @@ using System.Globalization;
 
 namespace PubnubApi.EndPoint
 {
-    internal class SubscribeManager : PubnubCoreBase
+    internal class SubscribeManager : PubnubCoreBase, IDisposable
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
@@ -236,7 +236,7 @@ namespace PubnubApi.EndPoint
                             requestState.ResponseType = PNOperationType.Leave;
                             requestState.Reconnect = false;
 
-                            string json = UrlProcessRequest<T>(request, requestState, false);
+                            UrlProcessRequest<T>(request, requestState, false);
                         }
                     }
 
@@ -260,7 +260,7 @@ namespace PubnubApi.EndPoint
                     for (int index = 0; index < validChannels.Count; index++)
                     {
                         long timetokenValue;
-                        string channelToBeRemoved = validChannels[index].ToString();
+                        string channelToBeRemoved = validChannels[index];
                         bool unsubscribeStatus = false;
                         if (PubnubInstance != null && MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId))
                         {
@@ -292,7 +292,7 @@ namespace PubnubApi.EndPoint
                     for (int index = 0; index < validChannelGroups.Count; index++)
                     {
                         long timetokenValue;
-                        string channelGroupToBeRemoved = validChannelGroups[index].ToString();
+                        string channelGroupToBeRemoved = validChannelGroups[index];
                         bool unsubscribeStatus = false;
                         if (PubnubInstance != null && MultiChannelGroupSubscribe.ContainsKey(PubnubInstance.InstanceId))
                         {
@@ -399,18 +399,19 @@ namespace PubnubApi.EndPoint
                 bool channelGroupSubscribeOnly = false;
                 SubscribeDisconnected[PubnubInstance.InstanceId] = false;
 
-                if (rawChannels.Length > 0)
+                if (rawChannels != null && rawChannels.Length > 0)
                 {
+                    string[] rawChannelsFiltered = rawChannels;
                     if (rawChannels.Length != rawChannels.Distinct().Count())
                     {
-                        rawChannels = rawChannels.Distinct().ToArray();
+                        rawChannelsFiltered = rawChannels.Distinct().ToArray();
                     }
 
-                    for (int index = 0; index < rawChannels.Length; index++)
+                    for (int index = 0; index < rawChannelsFiltered.Length; index++)
                     {
-                        if (rawChannels[index].Trim().Length > 0)
+                        if (rawChannelsFiltered[index].Trim().Length > 0)
                         {
-                            string channelName = rawChannels[index].Trim();
+                            string channelName = rawChannelsFiltered[index].Trim();
                             if (!string.IsNullOrEmpty(channelName))
                             {
                                 if (MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId) && !MultiChannelSubscribe[PubnubInstance.InstanceId].ContainsKey(channelName))
@@ -424,16 +425,17 @@ namespace PubnubApi.EndPoint
 
                 if (rawChannelGroups != null && rawChannelGroups.Length > 0)
                 {
+                    string[] rawChannelGroupsFiltered = rawChannelGroups;
                     if (rawChannelGroups.Length != rawChannelGroups.Distinct().Count())
                     {
-                        rawChannelGroups = rawChannelGroups.Distinct().ToArray();
+                        rawChannelGroupsFiltered = rawChannelGroups.Distinct().ToArray();
                     }
 
-                    for (int index = 0; index < rawChannelGroups.Length; index++)
+                    for (int index = 0; index < rawChannelGroupsFiltered.Length; index++)
                     {
-                        if (rawChannelGroups[index].Trim().Length > 0)
+                        if (rawChannelGroupsFiltered[index].Trim().Length > 0)
                         {
-                            string channelGroupName = rawChannelGroups[index].Trim();
+                            string channelGroupName = rawChannelGroupsFiltered[index].Trim();
                             if (MultiChannelGroupSubscribe.ContainsKey(PubnubInstance.InstanceId) && !MultiChannelGroupSubscribe[PubnubInstance.InstanceId].ContainsKey(channelGroupName))
                             {
                                 validChannelGroups.Add(channelGroupName);
@@ -474,7 +476,9 @@ namespace PubnubApi.EndPoint
                                         LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unable to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelSubscribeInit).", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.LogVerbosity);
                                     }
                                     if (webRequest != null)
+                                    {
                                         TerminatePendingWebRequest(webRequest);
+                                    }
                                 }
                                 else
                                 {
@@ -493,14 +497,14 @@ namespace PubnubApi.EndPoint
                     //Add the valid channels to the channels subscribe list for tracking
                     for (int index = 0; index < validChannels.Count; index++)
                     {
-                        string currentLoopChannel = validChannels[index].ToString();
+                        string currentLoopChannel = validChannels[index];
                         MultiChannelSubscribe[PubnubInstance.InstanceId].GetOrAdd(currentLoopChannel, 0);
                     }
 
 
                     for (int index = 0; index < validChannelGroups.Count; index++)
                     {
-                        string currentLoopChannelGroup = validChannelGroups[index].ToString();
+                        string currentLoopChannelGroup = validChannelGroups[index];
                         MultiChannelGroupSubscribe[PubnubInstance.InstanceId].GetOrAdd(currentLoopChannelGroup, 0);
                     }
 
@@ -708,7 +712,7 @@ namespace PubnubApi.EndPoint
             }
             catch (Exception ex)
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} method:_subscribe \n channel={1} \n timetoken={2} \n Exception Details={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), string.Join(",", channels.OrderBy(x => x).ToArray()), timetoken.ToString(), ex), config.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} method:_subscribe \n channel={1} \n timetoken={2} \n Exception Details={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), string.Join(",", channels.OrderBy(x => x).ToArray()), timetoken, ex), config.LogVerbosity);
 
                 PNStatusCategory errorCategory = PNStatusCategoryHelper.GetPNStatusCategory(ex);
                 PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, errorCategory, pubnubRequestState, (int)HttpStatusCode.NotFound, ex);
@@ -730,17 +734,6 @@ namespace PubnubApi.EndPoint
 
         private void MultiplexExceptionHandler<T>(PNOperationType type, string[] channels, string[] channelGroups, bool reconnectMaxTried, bool resumeOnReconnect)
         {
-            string channel = "";
-            string channelGroup = "";
-            if (channels != null)
-            {
-                channel = string.Join(",", channels.OrderBy(x => x).ToArray());
-            }
-            if (channelGroups != null)
-            {
-                channelGroup = string.Join(",", channelGroups.OrderBy(x => x).ToArray());
-            }
-
             List<object> result = new List<object>();
             result.Add("0");
             if (resumeOnReconnect)
@@ -1327,6 +1320,29 @@ namespace PubnubApi.EndPoint
         {
             PubnubInstance = instance;
         }
+
+        #region IDisposable Support
+        private bool disposedValue;
+
+        protected virtual void DisposeInternal(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (SubscribeHeartbeatCheckTimer != null)
+                {
+                    SubscribeHeartbeatCheckTimer.Dispose();
+                    SubscribeHeartbeatCheckTimer = null;
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        void IDisposable.Dispose()
+        {
+            DisposeInternal(true);
+        }
+        #endregion
 
     }
 }
