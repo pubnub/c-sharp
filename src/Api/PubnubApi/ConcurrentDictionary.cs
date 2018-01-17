@@ -74,7 +74,10 @@ namespace PubnubApi
 
         public bool ContainsKey(TKey key)
         {
-            return d.ContainsKey(key);
+            lock (syncRoot)
+            {
+                return d.ContainsKey(key);
+            }
         }
 
         public ICollection<TKey> Keys

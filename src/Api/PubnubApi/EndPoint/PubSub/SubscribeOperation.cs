@@ -135,7 +135,7 @@ namespace PubnubApi.EndPoint
             }
             if (!string.IsNullOrEmpty(config.FilterExpression) && config.FilterExpression.Trim().Length > 0)
             {
-                initialSubscribeUrlParams.Add("filter-expr", new UriUtil().EncodeUriComponent(config.FilterExpression, PNOperationType.PNSubscribeOperation, false, false));
+                initialSubscribeUrlParams.Add("filter-expr", new UriUtil().EncodeUriComponent(config.FilterExpression, PNOperationType.PNSubscribeOperation, false, false, false));
             }
 
 
