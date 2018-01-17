@@ -514,6 +514,7 @@ namespace PubNubMessaging.Tests
                     switch (currentTestCase)
                     {
                         case "ThenSubscribeShouldReturnReceivedMessage":
+                        case "ThenSubscribeShouldReturnConnectStatus":
                             subscribeManualEvent.Set();
                             break;
                         default:

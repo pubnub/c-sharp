@@ -28,6 +28,7 @@ namespace PubNubMessaging.Tests
         static bool receivedCustomUUID = false;
         static bool receivedGrantMessage = false;
         static bool receivedUserStateMessage = false;
+        static bool receivedErrorMessage = false;
 
         static string customUUID = "mylocalmachine.mydomain.com";
         private static string currentTestCase = "";
@@ -347,6 +348,7 @@ namespace PubNubMessaging.Tests
             server.ClearRequests();
 
             receivedHereNowMessage = false;
+            receivedErrorMessage = false;
             currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfo";
 
             PNConfiguration config = new PNConfiguration
@@ -394,33 +396,37 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
-            else Thread.Sleep(200);
+            if (!receivedErrorMessage)
+            {
+                if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
+                else Thread.Sleep(200);
 
-            expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"Presence\", \"uuids\": [\"mytestuuid\"], \"occupancy\": 1}";
+                expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"Presence\", \"uuids\": [\"mytestuuid\"], \"occupancy\": 1}";
 
-            server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow().Channels(new [] { channel }).Async(new UTHereNowResult());
-            hereNowManualEvent.WaitOne(manualResetEventWaitTimeout);
+                hereNowManualEvent = new ManualResetEvent(false);
+                pubnub.HereNow().Channels(new[] { channel }).Async(new UTHereNowResult());
+                hereNowManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            expected = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
+                expected = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
 
-            server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/leave", PubnubCommon.SubscribeKey, channel))
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/leave", PubnubCommon.SubscribeKey, channel))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
+                pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
 
-            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
-            else Thread.Sleep(100);
+                if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+                else Thread.Sleep(100);
+            }
+
 
             if (!pubnub.RemoveListener(listenerSubCallack))
             {
@@ -438,6 +444,7 @@ namespace PubNubMessaging.Tests
             server.ClearRequests();
 
             receivedHereNowMessage = false;
+            receivedErrorMessage = false;
             currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoCipher";
 
             PNConfiguration config = new PNConfiguration
@@ -486,33 +493,36 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
-            else Thread.Sleep(200);
+            if (!receivedErrorMessage)
+            {
+                if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
+                else Thread.Sleep(200);
 
-            expected = "{\"TotalChannels\":1,\"TotalOccupancy\":1,\"Channels\":{\"hello_my_channel\":{\"ChannelName\":\"hello_my_channel\",\"Occupancy\":1,\"Occupants\":[{\"Uuid\":\"mytestuuid\",\"State\":null}]}}}";
+                expected = "{\"TotalChannels\":1,\"TotalOccupancy\":1,\"Channels\":{\"hello_my_channel\":{\"ChannelName\":\"hello_my_channel\",\"Occupancy\":1,\"Occupants\":[{\"Uuid\":\"mytestuuid\",\"State\":null}]}}}";
 
-            server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow().Channels(new [] { channel }).Async(new UTHereNowResult());
-            hereNowManualEvent.WaitOne(manualResetEventWaitTimeout);
+                hereNowManualEvent = new ManualResetEvent(false);
+                pubnub.HereNow().Channels(new[] { channel }).Async(new UTHereNowResult());
+                hereNowManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            expected = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
+                expected = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
 
-            server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/leave", PubnubCommon.SubscribeKey, channel))
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/leave", PubnubCommon.SubscribeKey, channel))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
+                pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
 
-            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
-            else Thread.Sleep(100);
+                if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+                else Thread.Sleep(100);
+            }
 
             if (!pubnub.RemoveListener(listenerSubCallack))
             {
@@ -717,6 +727,7 @@ namespace PubNubMessaging.Tests
             server.ClearRequests();
 
             receivedHereNowMessage = false;
+            receivedErrorMessage = false;
             currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoCipherSSL";
 
             PNConfiguration config = new PNConfiguration
@@ -765,33 +776,36 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
-            else Thread.Sleep(200);
+            if (!receivedErrorMessage)
+            {
+                if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
+                else Thread.Sleep(200);
 
-            expected = "{\"TotalChannels\":1,\"TotalOccupancy\":1,\"Channels\":{\"hello_my_channel\":{\"ChannelName\":\"hello_my_channel\",\"Occupancy\":1,\"Occupants\":[{\"Uuid\":\"mytestuuid\",\"State\":null}]}}}";
+                expected = "{\"TotalChannels\":1,\"TotalOccupancy\":1,\"Channels\":{\"hello_my_channel\":{\"ChannelName\":\"hello_my_channel\",\"Occupancy\":1,\"Occupants\":[{\"Uuid\":\"mytestuuid\",\"State\":null}]}}}";
 
-            server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow().Channels(new [] { channel }).Async(new UTHereNowResult());
-            hereNowManualEvent.WaitOne(manualResetEventWaitTimeout);
+                hereNowManualEvent = new ManualResetEvent(false);
+                pubnub.HereNow().Channels(new[] { channel }).Async(new UTHereNowResult());
+                hereNowManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            expected = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
+                expected = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
 
-            server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/leave", PubnubCommon.SubscribeKey, channel))
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/leave", PubnubCommon.SubscribeKey, channel))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
+                pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
 
-            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
-            else Thread.Sleep(100);
+                if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+                else Thread.Sleep(100);
+            }
 
             if (!pubnub.RemoveListener(listenerSubCallack))
             {
@@ -995,6 +1009,7 @@ namespace PubNubMessaging.Tests
             server.ClearRequests();
 
             receivedHereNowMessage = false;
+            receivedErrorMessage = false;
             currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoSSL";
 
             PNConfiguration config = new PNConfiguration
@@ -1042,33 +1057,36 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
-            else Thread.Sleep(200);
+            if (!receivedErrorMessage)
+            {
+                if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
+                else Thread.Sleep(200);
 
-            expected = "{\"TotalChannels\":1,\"TotalOccupancy\":1,\"Channels\":{\"hello_my_channel\":{\"ChannelName\":\"hello_my_channel\",\"Occupancy\":1,\"Occupants\":[{\"Uuid\":\"mytestuuid\",\"State\":null}]}}}";
+                expected = "{\"TotalChannels\":1,\"TotalOccupancy\":1,\"Channels\":{\"hello_my_channel\":{\"ChannelName\":\"hello_my_channel\",\"Occupancy\":1,\"Occupants\":[{\"Uuid\":\"mytestuuid\",\"State\":null}]}}}";
 
-            server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow().Channels(new [] { channel }).Async(new UTHereNowResult());
-            hereNowManualEvent.WaitOne(manualResetEventWaitTimeout);
+                hereNowManualEvent = new ManualResetEvent(false);
+                pubnub.HereNow().Channels(new[] { channel }).Async(new UTHereNowResult());
+                hereNowManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            expected = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
+                expected = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
 
-            server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/leave", PubnubCommon.SubscribeKey, channel))
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/leave", PubnubCommon.SubscribeKey, channel))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
+                pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
 
-            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
-            else Thread.Sleep(100);
+                if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+                else Thread.Sleep(100);
+            }
 
             if (!pubnub.RemoveListener(listenerSubCallack))
             {
@@ -1086,6 +1104,7 @@ namespace PubNubMessaging.Tests
             server.ClearRequests();
 
             receivedHereNowMessage = false;
+            receivedErrorMessage = false;
             currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoWithUserState";
 
             PNConfiguration config = new PNConfiguration
@@ -1132,66 +1151,69 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
-            else Thread.Sleep(200);
+            if (!receivedErrorMessage)
+            {
+                if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
+                else Thread.Sleep(200);
 
-            userStateManualEvent = new ManualResetEvent(false);
-            Dictionary<string, object> dicState = new Dictionary<string, object>();
-            dicState.Add("testkey", "testval");
+                userStateManualEvent = new ManualResetEvent(false);
+                Dictionary<string, object> dicState = new Dictionary<string, object>();
+                dicState.Add("testkey", "testval");
 
-            expected = "{\"status\": 200, \"message\": \"OK\", \"payload\": {\"testkey\": \"testval\"}, \"service\": \"Presence\"}";
+                expected = "{\"status\": 200, \"message\": \"OK\", \"payload\": {\"testkey\": \"testval\"}, \"service\": \"Presence\"}";
 
-            server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/uuid/{2}/data", PubnubCommon.SubscribeKey, channel, config.Uuid))
-                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
-                    .WithParameter("requestid", "myRequestId")
-                    .WithParameter("state", "%7B%22testkey%22%3A%22testval%22%7D")
-                    .WithParameter("timestamp", "1356998400")
-                    .WithParameter("uuid", config.Uuid)
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/uuid/{2}/data", PubnubCommon.SubscribeKey, channel, config.Uuid))
+                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                        .WithParameter("requestid", "myRequestId")
+                        .WithParameter("state", "%7B%22testkey%22%3A%22testval%22%7D")
+                        .WithParameter("timestamp", "1356998400")
+                        .WithParameter("uuid", config.Uuid)
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
 
 
-            pubnub.SetPresenceState()
-                            .Channels(new [] { channel })
-                            .State(dicState)
-                            .Async(new UTPNSetStateResult());
-            userStateManualEvent.WaitOne(manualResetEventWaitTimeout);
+                pubnub.SetPresenceState()
+                                .Channels(new[] { channel })
+                                .State(dicState)
+                                .Async(new UTPNSetStateResult());
+                userStateManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"Presence\", \"uuids\": [{\"state\": {\"testkey\": \"testval\"}, \"uuid\": \"mytestuuid\"}], \"occupancy\": 1}";
+                expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"Presence\", \"uuids\": [{\"state\": {\"testkey\": \"testval\"}, \"uuid\": \"mytestuuid\"}], \"occupancy\": 1}";
 
-            server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
-                    .WithParameter("disable_uuids", "0")
-                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
-                    .WithParameter("requestid", "myRequestId")
-                    .WithParameter("state", "1")
-                    .WithParameter("timestamp", "1356998400")
-                    .WithParameter("uuid", config.Uuid)
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithParameter("disable_uuids", "0")
+                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                        .WithParameter("requestid", "myRequestId")
+                        .WithParameter("state", "1")
+                        .WithParameter("timestamp", "1356998400")
+                        .WithParameter("uuid", config.Uuid)
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow().Channels(new [] { channel })
-                    .IncludeState(true)
-                    .IncludeUUIDs(true)
-                    .Async(new UTHereNowResult());
-            hereNowManualEvent.WaitOne(manualResetEventWaitTimeout);
+                hereNowManualEvent = new ManualResetEvent(false);
+                pubnub.HereNow().Channels(new[] { channel })
+                        .IncludeState(true)
+                        .IncludeUUIDs(true)
+                        .Async(new UTHereNowResult());
+                hereNowManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            expected = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
+                expected = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
 
-            server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/leave", PubnubCommon.SubscribeKey, channel))
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/leave", PubnubCommon.SubscribeKey, channel))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
+                pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
 
-            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
-            else Thread.Sleep(100);
+                if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+                else Thread.Sleep(100);
+            }
 
             if (!pubnub.RemoveListener(listenerSubCallack))
             {
@@ -1880,6 +1902,7 @@ namespace PubNubMessaging.Tests
                 Console.WriteLine("SubscribeCallback: PNStatus: " + status.StatusCode.ToString());
                 if (status.StatusCode != 200 || status.Error)
                 {
+                    receivedErrorMessage = true;
                     switch (currentTestCase)
                     {
                         case "ThenPresenceShouldReturnReceivedMessage":
@@ -1963,11 +1986,11 @@ namespace PubNubMessaging.Tests
                     case "IfGlobalHereNowIsCalledThenItShouldReturnInfo":
                     case "IfGlobalHereNowIsCalledThenItShouldReturnInfoWithUserState":
                         receivedHereNowMessage = true;
-                        hereNowManualEvent.Set();
                         break;
                     default:
                         break;
                 }
+                hereNowManualEvent.Set();
             }
         };
 

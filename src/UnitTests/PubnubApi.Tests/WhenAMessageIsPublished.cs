@@ -17,6 +17,7 @@ namespace PubNubMessaging.Tests
 
         private static bool receivedGrantMessage = false;
         private static bool receivedPublishMessage = false;
+        private static bool receivedErrorMessage = false;
 
         private static long publishTimetoken;
         private static long unEncryptObjectPublishTimetoken;
@@ -903,6 +904,11 @@ namespace PubNubMessaging.Tests
                             publishManualEvent.Set();
                             break;
                     }
+                }
+                else
+                {
+                    receivedErrorMessage = true;
+                    publishManualEvent.Set();
                 }
             }
         };

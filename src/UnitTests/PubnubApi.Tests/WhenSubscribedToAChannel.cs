@@ -18,6 +18,7 @@ namespace PubNubMessaging.Tests
         private static object publishedMessage;
         private static long publishTimetoken = 0;
         private static bool receivedGrantMessage = false;
+        private static bool receivedErrorMessage = false;
 
         private static int numberOfReceivedMessages = 0;
 
@@ -539,6 +540,7 @@ namespace PubNubMessaging.Tests
             server.ClearRequests();
 
             receivedMessage = false;
+            receivedErrorMessage = false;
             currentTestCase = "ThenSubscriberShouldBeAbleToReceiveManyMessages";
 
             PNConfiguration config = new PNConfiguration
@@ -585,24 +587,25 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
-
-            if (receivedMessage && !PubnubCommon.EnableStubTest)
-            {
-                subscribeManualEvent = new ManualResetEvent(false); //for messages
-
-                for (int index = 0; index < 10; index++)
+            if (!receivedErrorMessage){
+                if (receivedMessage && !PubnubCommon.EnableStubTest)
                 {
-                    Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Publishing " + index.ToString());
-                    publishManualEvent = new ManualResetEvent(false);
-                    pubnub.Publish().Channel(channel).Message(index.ToString()).Async(new UTPublishResult());
-                    publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+                    subscribeManualEvent = new ManualResetEvent(false); //for messages
+
+                    for (int index = 0; index < 10; index++)
+                    {
+                        Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Publishing " + index.ToString());
+                        publishManualEvent = new ManualResetEvent(false);
+                        pubnub.Publish().Channel(channel).Message(index.ToString()).Async(new UTPublishResult());
+                        publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+                    }
+
                 }
 
+                pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
+
+                Thread.Sleep(1000);
             }
-
-            pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
-
-            Thread.Sleep(1000);
 
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
@@ -723,6 +726,7 @@ namespace PubNubMessaging.Tests
                         case "ThenSubscribeShouldReturnConnectStatus":
                         case "ThenMultiSubscribeShouldReturnConnectStatus":
                         case "ThenMultiSubscribeShouldReturnConnectStatusSSL":
+                        case "ThenSubscriberShouldBeAbleToReceiveManyMessages":
                             subscribeManualEvent.Set();
                             break;
                         default:

@@ -1167,12 +1167,12 @@ namespace PubNubMessaging.Tests
                         case "DetailHistoryShouldReturnEncrypedSecretSSLMessage":
                         case "DetailHistoryShouldReturnEncrypedSSLMessage":
                             receivedMessage = true;
-                            publishManualEvent.Set();
                             break;
                         default:
                             break;
                     }
                 }
+                publishManualEvent.Set();
             }
         };
 

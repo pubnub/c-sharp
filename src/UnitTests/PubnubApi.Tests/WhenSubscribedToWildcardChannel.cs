@@ -19,6 +19,7 @@ namespace PubNubMessaging.Tests
         private static object publishedMessage;
         private static long publishTimetoken = 0;
         private static bool receivedGrantMessage = false;
+        static bool receivedErrorMessage = false;
 
         private static string channelGroupName = "";
 
@@ -700,6 +701,7 @@ namespace PubNubMessaging.Tests
             server.ClearRequests();
 
             receivedMessage = false;
+            receivedErrorMessage = true;
             currentTestCase = "ThenSubscribeShouldReturnWildCardPresenceEventInWildcardPresenceCallback";
 
             PNConfiguration config = new PNConfiguration
@@ -746,12 +748,14 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new [] { wildCardSubscribeChannel }).ChannelGroups(new [] { channelGroupName }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            Thread.Sleep(1000);
+            if (!receivedErrorMessage)
+            {
+                Thread.Sleep(1000);
 
-            pubnub.Unsubscribe<string>().Channels(new [] { wildCardSubscribeChannel }).ChannelGroups(new [] { channelGroupName }).Execute();
+                pubnub.Unsubscribe<string>().Channels(new[] { wildCardSubscribeChannel }).ChannelGroups(new[] { channelGroupName }).Execute();
 
-            Thread.Sleep(1000);
-
+                Thread.Sleep(1000);
+            }
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
@@ -859,6 +863,7 @@ namespace PubNubMessaging.Tests
                 Console.WriteLine("SubscribeCallback: PNStatus: " + status.StatusCode.ToString());
                 if (status.StatusCode != 200 || status.Error)
                 {
+                    receivedErrorMessage = true;
                     switch (currentTestCase)
                     {
                         case "ThenSubscribeShouldReturnReceivedMessage":
