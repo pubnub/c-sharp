@@ -34,8 +34,7 @@ namespace PubNubMessaging.Example
         EditText txtSecKey;
 
         Proxy proxy = null;
-        internal static Pubnub pubnub;
-        private PNConfiguration config;
+        internal static Pubnub pubnub { get; set; }
 
         protected override void OnCreate (Bundle bundle)
         {
@@ -112,6 +111,7 @@ namespace PubNubMessaging.Example
 
         void DialogDismissHandler (object sender, EventArgs e)
         {
+            /* leave it empty */
         }
 
         void ProxyCheckedChanged (object sender, CompoundButton.CheckedChangeEventArgs e)
@@ -207,7 +207,7 @@ namespace PubNubMessaging.Example
                 }
 
                 mainActivity.PutExtra ("Cipher", txtCipher.Text.Trim ());
-                config = new PNConfiguration ();
+                PNConfiguration config = new PNConfiguration ();
                 config.PublishKey = txtPubKey.Text.Trim ();
                 config.SubscribeKey = txtSubKey.Text.Trim ();
                 config.SecretKey = txtSecKey.Text.Trim ();

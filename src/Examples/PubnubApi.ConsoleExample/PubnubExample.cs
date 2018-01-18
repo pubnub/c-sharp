@@ -20,12 +20,7 @@ namespace PubnubApiDemo
     {
         static private Pubnub pubnub { get; set; }
 
-        static private string channel { get; set; } = "";
-        static private bool showErrorMessageSegments { get; set; } = false;
-        static private bool showDebugMessages { get; set; } = false;
         static private string authKey { get; set; } = "";
-        static private int presenceHeartbeat { get; set; } = 0;
-        static private int presenceHeartbeatInterval { get; set; } = 0;
 
         public class PlatformPubnubLog : IPubnubLog
         {

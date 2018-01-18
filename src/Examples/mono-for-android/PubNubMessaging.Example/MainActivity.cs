@@ -829,7 +829,6 @@ namespace PubNubMessaging.Example
     public class DemoSubscribeCallback : SubscribeCallback
     {
         readonly Action<string> callback;
-        readonly Pubnub pubnub = new Pubnub (null);
         public DemoSubscribeCallback (Action<string> displayCallback)
         {
             this.callback = displayCallback;
@@ -866,7 +865,7 @@ namespace PubNubMessaging.Example
                 //Console.WriteLine("RE-CONNECTED {0} Channels = {1}, ChannelGroups = {2}", status.StatusCode, string.Join(",", status.AffectedChannels), string.Join(",", status.AffectedChannelGroups));
                 // Happens as part of our regular operation. This event happens when
                 // radio / connectivity is lost, then regained.
-                System.Diagnostics.Debug.WriteLine("PNConnectedCategory");
+                System.Diagnostics.Debug.WriteLine("PNReconnectedCategory");
             } else if (statusObj.Category == PNStatusCategory.PNDecryptionErrorCategory) {
                 // Handle messsage decryption error. Probably client configured to
                 // encrypt messages and on live data feed it received plain text.
@@ -877,7 +876,7 @@ namespace PubNubMessaging.Example
 
     public class DemoGrantResult : PNCallback<PNAccessManagerGrantResult>
     {
-        readonly Action<string> callback = null;
+        readonly Action<string> callback;
         readonly Pubnub pubnub = new Pubnub (null);
         public DemoGrantResult (Action<string> displayCallback)
         {
