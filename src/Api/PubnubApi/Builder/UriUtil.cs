@@ -30,11 +30,7 @@ namespace PubnubApi
                 else
                 {
                     int positionOfChar = s.IndexOf(ch);
-                    if (ch == ',' && ignoreComma)
-                    {
-                        o.Append(ch.ToString());
-                    }
-                    else if (ch == ':' && ignoreColon)
+                    if ((ch == ',' && ignoreComma) || (ch == ':' && ignoreColon))
                     {
                         o.Append(ch.ToString());
                     }
@@ -96,7 +92,7 @@ namespace PubnubApi
             return encodedUri;
         }
 
-        private bool IsUnsafe(char ch, bool ignoreComma, bool ignoreColon)
+        private static bool IsUnsafe(char ch, bool ignoreComma, bool ignoreColon)
         {
             if (ignoreComma && ignoreColon)
             {
