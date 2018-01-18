@@ -189,7 +189,7 @@ namespace WindowsUniversalApp
                                     {
                                         if (r != null)
                                         {
-                                            await DisplayMessageInTextBox(r.Timetoken.ToString());
+                                            await DisplayMessageInTextBox(r.Timetoken.ToString()).ConfigureAwait(false);
                                         }
                                     }));
                             }
@@ -204,7 +204,7 @@ namespace WindowsUniversalApp
                                     {
                                         if (r != null)
                                         {
-                                            await DisplayMessageInTextBox(r.Timetoken.ToString());
+                                            await DisplayMessageInTextBox(r.Timetoken.ToString()).ConfigureAwait(false);
                                         }
                                     }));
                             }
@@ -219,7 +219,7 @@ namespace WindowsUniversalApp
                                     {
                                         if (r != null)
                                         {
-                                            await DisplayMessageInTextBox(r.Timetoken.ToString());
+                                            await DisplayMessageInTextBox(r.Timetoken.ToString()).ConfigureAwait(false);
                                         }
                                     }));
                             }
@@ -286,7 +286,7 @@ namespace WindowsUniversalApp
                     CheckBox chkIncludeUserState = control.FindName("chkHereIncludeUserState") as CheckBox;
                     bool includeState = (chkIncludeUserState != null) ? chkIncludeUserState.IsChecked.Value : false;
 
-                    await DisplayMessageInTextBox("Running GlobalHereNow:");
+                    await DisplayMessageInTextBox("Running GlobalHereNow:").ConfigureAwait(false);
                     pubnub.HereNow()
                     .IncludeUUIDs(showUUID)
                     .IncludeState(includeState)
@@ -295,8 +295,8 @@ namespace WindowsUniversalApp
                         {
                             if (r != null)
                             {
-                                await DisplayMessageInTextBox("TotalChannels = " + r.TotalChannels.ToString());
-                                await DisplayMessageInTextBox("TotalOccupancy = " + r.TotalOccupancy.ToString());
+                                await DisplayMessageInTextBox("TotalChannels = " + r.TotalChannels.ToString()).ConfigureAwait(false);
+                                await DisplayMessageInTextBox("TotalOccupancy = " + r.TotalOccupancy.ToString()).ConfigureAwait(false);
                             }
                         }));
                 }
@@ -343,7 +343,7 @@ namespace WindowsUniversalApp
                     CheckBox chkIncludeUserState = control.FindName("chkHereIncludeUserState") as CheckBox;
                     bool includeState = (chkIncludeUserState != null) ? chkIncludeUserState.IsChecked.Value : false;
 
-                    await DisplayMessageInTextBox("Running HereNow:");
+                    await DisplayMessageInTextBox("Running HereNow:").ConfigureAwait(false);
                     pubnub.HereNow()
                     .Channels(new[] { channel })
                     .IncludeUUIDs(showUUID)
@@ -353,8 +353,8 @@ namespace WindowsUniversalApp
                         {
                             if (r != null)
                             {
-                                await DisplayMessageInTextBox("TotalChannels = " + r.TotalChannels.ToString());
-                                await DisplayMessageInTextBox("TotalOccupancy = " + r.TotalOccupancy.ToString());
+                                await DisplayMessageInTextBox("TotalChannels = " + r.TotalChannels.ToString()).ConfigureAwait(false);
+                                await DisplayMessageInTextBox("TotalOccupancy = " + r.TotalOccupancy.ToString()).ConfigureAwait(false);
                             }
                         }));
                 }
@@ -419,7 +419,7 @@ namespace WindowsUniversalApp
                     RadioButton radGrantPAMChannel = control.FindName("radGrantChannel") as RadioButton;
                     if (radGrantPAMChannel != null && radGrantPAMChannel.IsChecked.Value)
                     {
-                        await DisplayMessageInTextBox("Running GrantAccess:");
+                        await DisplayMessageInTextBox("Running GrantAccess:").ConfigureAwait(false);
                         int ttlInMinutes = 1440;
                         pubnub.Grant()
                         .Channels(new[] { pamUserChannelName })
@@ -431,7 +431,7 @@ namespace WindowsUniversalApp
                         {
                             if (r != null)
                             {
-                                await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                             }
                         }));
                     }
@@ -439,7 +439,7 @@ namespace WindowsUniversalApp
                     RadioButton radAuditChannel = control.FindName("radAuditChannel") as RadioButton;
                     if (radAuditChannel != null && radAuditChannel.IsChecked.Value)
                     {
-                        await DisplayMessageInTextBox("Running AuditAccess:");
+                        await DisplayMessageInTextBox("Running AuditAccess:").ConfigureAwait(false);
                         pubnub.Audit()
                         .Channel(pamUserChannelName)
                         .AuthKeys(new[] { pamAuthKey })
@@ -448,7 +448,7 @@ namespace WindowsUniversalApp
                             {
                                 if (r != null)
                                 {
-                                    await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                                 }
                             }));
                     }
@@ -456,7 +456,7 @@ namespace WindowsUniversalApp
                     RadioButton radRevokeChannel = control.FindName("radRevokeChannel") as RadioButton;
                     if (radRevokeChannel != null && radRevokeChannel.IsChecked.Value)
                     {
-                        await DisplayMessageInTextBox("Running Revoke Access:");
+                        await DisplayMessageInTextBox("Running Revoke Access:").ConfigureAwait(false);
                         await Task.Run(() =>
                          {
                              pubnub.Grant()
@@ -471,7 +471,7 @@ namespace WindowsUniversalApp
                                      await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                  }
                              }));
-                         });
+                         }).ConfigureAwait(false);
                     }
 
                 }
@@ -537,7 +537,7 @@ namespace WindowsUniversalApp
                         RadioButton radGrantPAMChannelGroup = control.FindName("radGrantChannelGroup") as RadioButton;
                         if (radGrantPAMChannelGroup != null && radGrantPAMChannelGroup.IsChecked.Value)
                         {
-                            await DisplayMessageInTextBox("Running ChannelGroupGrantAccess:");
+                            await DisplayMessageInTextBox("Running ChannelGroupGrantAccess:").ConfigureAwait(false);
                             pubnub.Grant()
                             .ChannelGroups(new[] { pamUserChannelGroup })
                             .AuthKeys(new[] { pamAuthKey })
@@ -548,7 +548,7 @@ namespace WindowsUniversalApp
                             {
                                 if (r != null)
                                 {
-                                    await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                                 }
                             }));
                         }
@@ -556,7 +556,7 @@ namespace WindowsUniversalApp
                         RadioButton radAuditPAMChannelGroup = control.FindName("radAuditChannelGroup") as RadioButton;
                         if (radAuditPAMChannelGroup != null && radAuditPAMChannelGroup.IsChecked.Value)
                         {
-                            await DisplayMessageInTextBox("Running ChannelGroupAuditAccess:");
+                            await DisplayMessageInTextBox("Running ChannelGroupAuditAccess:").ConfigureAwait(false);
                             pubnub.Audit()
                             .ChannelGroup(pamUserChannelGroup)
                             .AuthKeys(new[] { pamAuthKey })
@@ -565,7 +565,7 @@ namespace WindowsUniversalApp
                                 {
                                     if (r != null)
                                     {
-                                        await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                        await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                                     }
                                 }));
                         }
@@ -573,7 +573,7 @@ namespace WindowsUniversalApp
                         RadioButton radRevokePAMChannelGroup = control.FindName("radRevokeChannelGroup") as RadioButton;
                         if (radRevokePAMChannelGroup != null && radRevokePAMChannelGroup.IsChecked.Value)
                         {
-                            await DisplayMessageInTextBox("Running ChannelGroup Revoke Access:");
+                            await DisplayMessageInTextBox("Running ChannelGroup Revoke Access:").ConfigureAwait(false);
                             pubnub.Grant()
                             .ChannelGroups(new[] { pamUserChannelGroup })
                             .AuthKeys(new[] { pamAuthKey })
@@ -584,7 +584,7 @@ namespace WindowsUniversalApp
                             {
                                 if (r != null)
                                 {
-                                    await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                                 }
                             }));
                         }
@@ -647,7 +647,7 @@ namespace WindowsUniversalApp
                             userStateValue1 = txtSetUserStateVal1.Text;
                         }
 
-                        await DisplayMessageInTextBox("Running Set User State:");
+                        await DisplayMessageInTextBox("Running Set User State:").ConfigureAwait(false);
 
                         int valueInt;
                         double valueDouble;
@@ -663,7 +663,7 @@ namespace WindowsUniversalApp
                             .Async(new PNSetStateResultExt(
                                 async (r, s) =>
                                 {
-                                    await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                                 }));
                         }
                         else if (Double.TryParse(userStateValue1, out valueDouble))
@@ -678,7 +678,7 @@ namespace WindowsUniversalApp
                             .Async(new PNSetStateResultExt(
                                 async (r, s) =>
                                 {
-                                    await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                                 }));
                         }
                         else
@@ -693,7 +693,7 @@ namespace WindowsUniversalApp
                             .Async(new PNSetStateResultExt(
                                 async (r, s) =>
                                 {
-                                    await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                                 }));
                         }
                     }
@@ -702,7 +702,7 @@ namespace WindowsUniversalApp
                         txtGetUserStateUUID = control.FindName("txtGetUserStateUUID") as TextBox;
                         if (txtGetUserStateUUID != null)
                         {
-                            await DisplayMessageInTextBox("Running Get User State:");
+                            await DisplayMessageInTextBox("Running Get User State:").ConfigureAwait(false);
                             string userStateUUID = txtGetUserStateUUID.Text.Trim();
 
                             pubnub.GetPresenceState()
@@ -712,7 +712,7 @@ namespace WindowsUniversalApp
                             .Async(new PNGetStateResultExt(
                                 async (r, s) =>
                                 {
-                                    await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                                 }));
                         }
                     }
@@ -763,13 +763,13 @@ namespace WindowsUniversalApp
                     {
                         string whereNowUUID = txtWhereNowUUIDConfirm.Text.Trim();
 
-                        await DisplayMessageInTextBox("Running WhereNow:");
+                        await DisplayMessageInTextBox("Running WhereNow:").ConfigureAwait(false);
 
                         pubnub.WhereNow()
                         .Uuid(whereNowUUID)
                         .Async(new PNWhereNowResultExt(async (r, s) =>
                         {
-                            await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                            await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                         }));
                     }
 
@@ -891,38 +891,38 @@ namespace WindowsUniversalApp
                         RadioButton radGetChannelsOfChannelGroup = control.FindName("radGetChannelsOfChannelGroup") as RadioButton;
                         if (radGetChannelsOfChannelGroup != null && radGetChannelsOfChannelGroup.IsChecked.Value)
                         {
-                            await DisplayMessageInTextBox("Running GetChannelsForChannelGroup:");
+                            await DisplayMessageInTextBox("Running GetChannelsForChannelGroup:").ConfigureAwait(false);
                             pubnub.ListChannelsForChannelGroup()
                             .ChannelGroup(userChannelGroup)
                             .Async(new PNChannelGroupsAllChannelsResultExt(async (r, s) =>
                             {
-                                await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                             }));
                         }
 
                         RadioButton radAddChannelToChannelGroup = control.FindName("radAddChannelToChannelGroup") as RadioButton;
                         if (radAddChannelToChannelGroup != null && radAddChannelToChannelGroup.IsChecked.Value)
                         {
-                            await DisplayMessageInTextBox("Running AddChannelsToChannelGroup:");
+                            await DisplayMessageInTextBox("Running AddChannelsToChannelGroup:").ConfigureAwait(false);
                             pubnub.AddChannelsToChannelGroup()
                             .Channels(new[] { userChannelName })
                             .ChannelGroup(userChannelGroup)
                             .Async(new PNChannelGroupsAddChannelResultExt(async (r, s) =>
                             {
-                                await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                             }));
                         }
 
                         RadioButton radRemoveChannelFromChannelGroup = control.FindName("radRemoveChannelFromChannelGroup") as RadioButton;
                         if (radRemoveChannelFromChannelGroup != null && radRemoveChannelFromChannelGroup.IsChecked.Value)
                         {
-                            await DisplayMessageInTextBox("Running RemoveChannelsFromChannelGroup:");
+                            await DisplayMessageInTextBox("Running RemoveChannelsFromChannelGroup:").ConfigureAwait(false);
                             pubnub.RemoveChannelsFromChannelGroup()
                             .Channels(new[] { userChannelName })
                             .ChannelGroup(userChannelGroup)
                             .Async(new PNChannelGroupsRemoveChannelResultExt(async (r, s) =>
                             {
-                                await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                             }));
                         }
                     }

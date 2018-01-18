@@ -584,7 +584,7 @@ namespace PubNubMessaging.Tests
                 ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
                 pubnub.HereNow().Channels(new[] { channel }).Async(new PNHereNowResultEx(
                                 (r, s) => {
-                                    if (r == null) return;
+                                    if (r == null) { return; }
                                     Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedHereNowMessage = true;
                                     hereNowManualEvent.Set();
@@ -696,7 +696,7 @@ namespace PubNubMessaging.Tests
             ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
             pubnub.HereNow().Channels(new [] { channel }).Async(new PNHereNowResultEx(
                                 (r, s) => {
-                                    if (r == null) return;
+                                    if (r == null) { return; }
                                     Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedHereNowMessage = true;
                                     hereNowManualEvent.Set();
@@ -808,7 +808,7 @@ namespace PubNubMessaging.Tests
             ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
             pubnub.HereNow().Channels(new [] { channel }).Async(new PNHereNowResultEx(
                                 (r, s) => {
-                                    if (r == null) return;
+                                    if (r == null) { return; }
                                     Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedHereNowMessage = true;
                                     hereNowManualEvent.Set();
@@ -921,7 +921,7 @@ namespace PubNubMessaging.Tests
                 ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
                 pubnub.HereNow().Channels(new[] { channel }).Async(new PNHereNowResultEx(
                                 (r, s) => {
-                                    if (r == null) return;
+                                    if (r == null) { return; }
                                     Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedHereNowMessage = true;
                                     hereNowManualEvent.Set();
@@ -1033,7 +1033,7 @@ namespace PubNubMessaging.Tests
             ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
             pubnub.HereNow().Channels(new [] { channel }).Async(new PNHereNowResultEx(
                                 (r, s) => {
-                                    if (r == null) return;
+                                    if (r == null) { return; }
                                     Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedHereNowMessage = true;
                                     hereNowManualEvent.Set();
@@ -1144,7 +1144,7 @@ namespace PubNubMessaging.Tests
             ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
             pubnub.HereNow().Channels(new [] { channel }).Async(new PNHereNowResultEx(
                                 (r, s) => {
-                                    if (r == null) return;
+                                    if (r == null) { return; }
                                     Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedHereNowMessage = true;
                                     hereNowManualEvent.Set();
@@ -1257,7 +1257,7 @@ namespace PubNubMessaging.Tests
                 ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
                 pubnub.HereNow().Channels(new[] { channel }).Async(new PNHereNowResultEx(
                                 (r, s) => {
-                                    if (r == null) return;
+                                    if (r == null) { return; }
                                     Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedHereNowMessage = true;
                                     hereNowManualEvent.Set();
@@ -1407,7 +1407,7 @@ namespace PubNubMessaging.Tests
                         .IncludeUUIDs(true)
                         .Async(new PNHereNowResultEx(
                                 (r, s) => {
-                                    if (r == null) return;
+                                    if (r == null) { return; }
                                     Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedHereNowMessage = true;
                                     hereNowManualEvent.Set();
@@ -1540,7 +1540,7 @@ namespace PubNubMessaging.Tests
             ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
             pubnub.HereNow().Async(new PNHereNowResultEx(
                                 (r, s) => {
-                                    if (r == null) return;
+                                    if (r == null) { return; }
                                     Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedHereNowMessage = true;
                                     hereNowManualEvent.Set();
@@ -1684,7 +1684,7 @@ namespace PubNubMessaging.Tests
                     .IncludeUUIDs(true)
                     .Async(new PNHereNowResultEx(
                                 (r, s) => {
-                                    if (r == null) return;
+                                    if (r == null) { return; }
                                     Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedHereNowMessage = true;
                                     hereNowManualEvent.Set();

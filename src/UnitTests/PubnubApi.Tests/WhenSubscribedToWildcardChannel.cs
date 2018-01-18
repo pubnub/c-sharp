@@ -896,7 +896,7 @@ namespace PubNubMessaging.Tests
                                             }
                                         }
                                     }
-                                    catch { }
+                                    catch { /* ignore */ }
                                     finally
                                     {
                                         channelGroupManualEvent.Set();

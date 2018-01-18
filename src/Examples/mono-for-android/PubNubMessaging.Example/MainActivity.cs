@@ -12,8 +12,6 @@ using Android.Support.V4.Widget;
 using Android.Support.V4.App;
 using System.Threading;
 
-//TODO
-//layout-large
 using PubnubApi;
 
 namespace PubNubMessaging.Example
@@ -894,7 +892,7 @@ namespace PubNubMessaging.Example
 
     public class DemoAuditResult : PNCallback<PNAccessManagerAuditResult>
     {
-        readonly Action<string> callback = null;
+        readonly Action<string> callback;
         readonly Pubnub pubnub = new Pubnub (null);
         public DemoAuditResult (Action<string> displayCallback)
         {
@@ -912,7 +910,7 @@ namespace PubNubMessaging.Example
 
     public class DemoPushAddChannel : PNCallback<PNPushAddChannelResult>
     {
-        readonly Action<string> callback = null;
+        readonly Action<string> callback;
         readonly Pubnub pubnub = new Pubnub (null);
         public DemoPushAddChannel (Action<string> displayCallback)
         {
@@ -930,7 +928,7 @@ namespace PubNubMessaging.Example
 
     public class DemoPushRemoveChannel : PNCallback<PNPushRemoveChannelResult>
     {
-        readonly Action<string> callback = null;
+        readonly Action<string> callback;
         readonly Pubnub pubnub = new Pubnub (null);
         public DemoPushRemoveChannel (Action<string> displayCallback)
         {
@@ -948,7 +946,7 @@ namespace PubNubMessaging.Example
 
     public class DemoPushListProvisionChannel : PNCallback<PNPushListProvisionsResult>
     {
-        readonly Action<string> callback = null;
+        readonly Action<string> callback;
         readonly Pubnub pubnub = new Pubnub (null);
         public DemoPushListProvisionChannel (Action<string> displayCallback)
         {
@@ -966,7 +964,7 @@ namespace PubNubMessaging.Example
 
     public class DemoChannelGroupAddChannel : PNCallback<PNChannelGroupsAddChannelResult>
     {
-        readonly Action<string> callback = null;
+        readonly Action<string> callback;
         readonly Pubnub pubnub = new Pubnub (null);
         public DemoChannelGroupAddChannel (Action<string> displayCallback)
         {
@@ -984,7 +982,7 @@ namespace PubNubMessaging.Example
 
     public class DemoChannelGroupRemoveChannel : PNCallback<PNChannelGroupsRemoveChannelResult>
     {
-        readonly Action<string> callback = null;
+        readonly Action<string> callback;
         readonly Pubnub pubnub = new Pubnub (null);
         public DemoChannelGroupRemoveChannel (Action<string> displayCallback)
         {
@@ -1002,7 +1000,7 @@ namespace PubNubMessaging.Example
 
     public class DemoChannelGroupDeleteGroup : PNCallback<PNChannelGroupsDeleteGroupResult>
     {
-        readonly Action<string> callback = null;
+        readonly Action<string> callback;
         readonly Pubnub pubnub = new Pubnub (null);
         public DemoChannelGroupDeleteGroup (Action<string> displayCallback)
         {
@@ -1020,7 +1018,7 @@ namespace PubNubMessaging.Example
 
     public class DemoChannelGroupAll : PNCallback<PNChannelGroupsListAllResult>
     {
-        readonly Action<string> callback = null;
+        readonly Action<string> callback;
         readonly Pubnub pubnub = new Pubnub (null);
         public DemoChannelGroupAll (Action<string> displayCallback)
         {
@@ -1038,7 +1036,7 @@ namespace PubNubMessaging.Example
 
     public class DemoChannelGroupAllChannels : PNCallback<PNChannelGroupsAllChannelsResult>
     {
-        readonly Action<string> callback = null;
+        readonly Action<string> callback;
         readonly Pubnub pubnub = new Pubnub (null);
         public DemoChannelGroupAllChannels (Action<string> displayCallback)
         {
