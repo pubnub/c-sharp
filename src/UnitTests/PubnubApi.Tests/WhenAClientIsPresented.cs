@@ -14,30 +14,8 @@ namespace PubNubMessaging.Tests
     [TestFixture]
     public class WhenAClientIsPresented : TestHarness
     {
-        private static ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
-        private static ManualResetEvent presenceManualEvent = new ManualResetEvent(false);
-        private static ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
-        private static ManualResetEvent whereNowManualEvent = new ManualResetEvent(false);
-
-        private static ManualResetEvent grantManualEvent = new ManualResetEvent(false);
-        private static ManualResetEvent userStateManualEvent = new ManualResetEvent(false);
-
-        static bool receivedPresenceMessage = false;
-        static bool receivedHereNowMessage = false;
-        static bool receivedWhereNowMessage = false;
-        static bool receivedCustomUUID = false;
-        static bool receivedGrantMessage = false;
-        static bool receivedUserStateMessage = false;
-        static bool receivedErrorMessage = false;
-
-        static string customUUID = "mylocalmachine.mydomain.com";
-        private static string currentTestCase = "";
         private static int manualResetEventWaitTimeout = 310 * 1000;
-        private static string channel = "hello_my_channel";
-        private static string authKey = "myAuth";
-
         private static Pubnub pubnub;
-
         private static Server server;
 
         [TestFixtureSetUp]
@@ -51,7 +29,9 @@ namespace PubNubMessaging.Tests
 
             if (!PubnubCommon.PAMEnabled) return;
 
-            receivedGrantMessage = false;
+            bool receivedGrantMessage = false;
+            string channel = "hello_my_channel";
+            string authKey = "myAuth";
 
             PNConfiguration config = new PNConfiguration
             {
@@ -74,7 +54,31 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+            ManualResetEvent grantManualEvent = new ManualResetEvent(false);
+            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
+                .Async(new PNAccessManagerGrantResultExt(
+                                (r, s) =>
+                                {
+                                    try
+                                    {
+                                        Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
+                                        if (r != null)
+                                        {
+                                            Console.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                            if (r.Channels != null && r.Channels.Count > 0)
+                                            {
+                                                var read = r.Channels[channel][authKey].ReadEnabled;
+                                                var write = r.Channels[channel][authKey].WriteEnabled;
+                                                if (read && write) { receivedGrantMessage = true; }
+                                            }
+                                        }
+                                    }
+                                    catch { }
+                                    finally
+                                    {
+                                        grantManualEvent.Set();
+                                    }
+                                }));
 
             Thread.Sleep(100);
 
@@ -125,8 +129,7 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedPresenceMessage = false;
-            currentTestCase = "ThenPresenceShouldReturnReceivedMessage";
+            bool receivedPresenceMessage = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -138,7 +141,24 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
+            ManualResetEvent presenceManualEvent = new ManualResetEvent(false);
+
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, p) => {
+                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(p));
+                    if (p.Event == "join") { receivedPresenceMessage = true; }
+                    presenceManualEvent.Set();
+                },
+                (o, s) => {
+                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    if (s.StatusCode != 200 || s.Error)
+                    {
+                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                        presenceManualEvent.Set();
+                    }
+                });
+
             pubnub = createPubNubInstance(config);
             if (!pubnub.AddListener(listenerSubCallack))
             {
@@ -171,7 +191,6 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            presenceManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>().Channels(new [] { channel }).WithPresence().Execute();
             presenceManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -198,8 +217,7 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedPresenceMessage = false;
-            currentTestCase = "ThenPresenceShouldReturnReceivedMessageSSL";
+            bool receivedPresenceMessage = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -211,7 +229,22 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(true);
 
-            SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
+            ManualResetEvent presenceManualEvent = new ManualResetEvent(false);
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, p) => {
+                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(p));
+                    if (p.Event == "join") { receivedPresenceMessage = true; }
+                    presenceManualEvent.Set();
+                },
+                (o, s) => {
+                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    if (s.StatusCode != 200 || s.Error)
+                    {
+                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                        presenceManualEvent.Set();
+                    }
+                });
             pubnub = createPubNubInstance(config);
             if (!pubnub.AddListener(listenerSubCallack))
             {
@@ -245,7 +278,6 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            presenceManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>().Channels(new [] { channel }).WithPresence().Execute();
             presenceManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -254,7 +286,6 @@ namespace PubNubMessaging.Tests
 
             pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
 
-            //if (!PubnubCommon.EnableStubTest) Thread.Sleep(100);
             Thread.Sleep(100);
 
             if (!pubnub.RemoveListener(listenerSubCallack))
@@ -272,8 +303,8 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedCustomUUID = false;
-            currentTestCase = "ThenPresenceShouldReturnCustomUUID";
+            string customUUID = "mylocalmachine.mydomain.com";
+            bool receivedCustomUUID = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -285,7 +316,22 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
+            ManualResetEvent presenceManualEvent = new ManualResetEvent(false);
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, p) => {
+                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(p));
+                    receivedCustomUUID = true;
+                    presenceManualEvent.Set();
+                },
+                (o, s) => {
+                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    if (s.StatusCode != 200 || s.Error)
+                    {
+                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                        presenceManualEvent.Set();
+                    }
+                });
             pubnub = createPubNubInstance(config);
             if (!pubnub.AddListener(listenerSubCallack))
             {
@@ -295,7 +341,6 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = 310 * 1000;
 
-            presenceManualEvent = new ManualResetEvent(false);
             pubnub.ChangeUUID(customUUID);
 
             string expected = "{\"t\":{\"t\":\"14833694874957031\",\"r\":7},\"m\":[{\"a\":\"4\",\"f\":512,\"p\":{\"t\":\"14833694873794045\",\"r\":2},\"k\":\"demo-36\",\"c\":\"hello_my_channel-pnpres\",\"d\":{\"action\": \"join\", \"timestamp\": 1483369487, \"uuid\": \"mylocalmachine.mydomain.com\", \"occupancy\": 1},\"b\":\"hello_my_channel-pnpres\"}]}";
@@ -347,9 +392,8 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedHereNowMessage = false;
-            receivedErrorMessage = false;
-            currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfo";
+            bool receivedHereNowMessage = false;
+            bool receivedErrorMessage = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -361,7 +405,21 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, p) => {
+                    subscribeManualEvent.Set();
+                },
+                (o, s) => {
+                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    if (s.StatusCode != 200 || s.Error)
+                    {
+                        receivedErrorMessage = true;
+                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                    }
+                    subscribeManualEvent.Set();
+                });
             pubnub = createPubNubInstance(config);
             if (!pubnub.AddListener(listenerSubCallack))
             {
@@ -392,7 +450,6 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            subscribeManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -409,8 +466,14 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                hereNowManualEvent = new ManualResetEvent(false);
-                pubnub.HereNow().Channels(new[] { channel }).Async(new UTHereNowResult());
+                ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
+                pubnub.HereNow().Channels(new[] { channel }).Async(new PNHereNowResultEx(
+                                (r, s) => {
+                                    if (r == null) return;
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedHereNowMessage = true;
+                                    hereNowManualEvent.Set();
+                                }));
                 hereNowManualEvent.WaitOne(manualResetEventWaitTimeout);
 
                 expected = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
@@ -443,9 +506,8 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedHereNowMessage = false;
-            receivedErrorMessage = false;
-            currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoCipher";
+            bool receivedHereNowMessage = false;
+            bool receivedErrorMessage = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -458,7 +520,21 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, p) => {
+                    subscribeManualEvent.Set();
+                },
+                (o, s) => {
+                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    if (s.StatusCode != 200 || s.Error)
+                    {
+                        receivedErrorMessage = true;
+                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                    }
+                    subscribeManualEvent.Set();
+                });
             pubnub = createPubNubInstance(config);
             if (!pubnub.AddListener(listenerSubCallack))
             {
@@ -489,7 +565,6 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            subscribeManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -506,8 +581,14 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                hereNowManualEvent = new ManualResetEvent(false);
-                pubnub.HereNow().Channels(new[] { channel }).Async(new UTHereNowResult());
+                ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
+                pubnub.HereNow().Channels(new[] { channel }).Async(new PNHereNowResultEx(
+                                (r, s) => {
+                                    if (r == null) return;
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedHereNowMessage = true;
+                                    hereNowManualEvent.Set();
+                                }));
                 hereNowManualEvent.WaitOne(manualResetEventWaitTimeout);
 
                 expected = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
@@ -539,8 +620,7 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedHereNowMessage = false;
-            currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoCipherSecret";
+            bool receivedHereNowMessage = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -552,7 +632,20 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(true);
 
-            SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, p) => {
+                    subscribeManualEvent.Set();
+                },
+                (o, s) => {
+                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    if (s.StatusCode != 200 || s.Error)
+                    {
+                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                    }
+                    subscribeManualEvent.Set();
+                });
             pubnub = createPubNubInstance(config);
             if (!pubnub.AddListener(listenerSubCallack))
             {
@@ -585,7 +678,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            subscribeManualEvent = new ManualResetEvent(false);
+            
             pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -600,8 +693,14 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow().Channels(new [] { channel }).Async(new UTHereNowResult());
+            ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
+            pubnub.HereNow().Channels(new [] { channel }).Async(new PNHereNowResultEx(
+                                (r, s) => {
+                                    if (r == null) return;
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedHereNowMessage = true;
+                                    hereNowManualEvent.Set();
+                                }));
             hereNowManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             expected = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
@@ -632,8 +731,7 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedHereNowMessage = false;
-            currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoCipherSecretSSL";
+            bool receivedHereNowMessage = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -646,7 +744,20 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(true);
 
-            SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, p) => {
+                    subscribeManualEvent.Set();
+                },
+                (o, s) => {
+                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    if (s.StatusCode != 200 || s.Error)
+                    {
+                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                    }
+                    subscribeManualEvent.Set();
+                });
             pubnub = createPubNubInstance(config);
             if (!pubnub.AddListener(listenerSubCallack))
             {
@@ -679,7 +790,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            subscribeManualEvent = new ManualResetEvent(false);
+            
             pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -694,8 +805,14 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow().Channels(new [] { channel }).Async(new UTHereNowResult());
+            ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
+            pubnub.HereNow().Channels(new [] { channel }).Async(new PNHereNowResultEx(
+                                (r, s) => {
+                                    if (r == null) return;
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedHereNowMessage = true;
+                                    hereNowManualEvent.Set();
+                                }));
             hereNowManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             expected = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
@@ -726,9 +843,8 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedHereNowMessage = false;
-            receivedErrorMessage = false;
-            currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoCipherSSL";
+            bool receivedHereNowMessage = false;
+            bool receivedErrorMessage = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -741,7 +857,21 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(true);
 
-            SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                            (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                            (o, p) => {
+                                subscribeManualEvent.Set();
+                            },
+                            (o, s) => {
+                                Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                                if (s.StatusCode != 200 || s.Error)
+                                {
+                                    receivedErrorMessage = true;
+                                    if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                                }
+                                subscribeManualEvent.Set();
+                            });
             pubnub = createPubNubInstance(config);
             if (!pubnub.AddListener(listenerSubCallack))
             {
@@ -772,7 +902,6 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            subscribeManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -789,8 +918,14 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                hereNowManualEvent = new ManualResetEvent(false);
-                pubnub.HereNow().Channels(new[] { channel }).Async(new UTHereNowResult());
+                ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
+                pubnub.HereNow().Channels(new[] { channel }).Async(new PNHereNowResultEx(
+                                (r, s) => {
+                                    if (r == null) return;
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedHereNowMessage = true;
+                                    hereNowManualEvent.Set();
+                                }));
                 hereNowManualEvent.WaitOne(manualResetEventWaitTimeout);
 
                 expected = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
@@ -822,8 +957,7 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedHereNowMessage = false;
-            currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoSecret";
+            bool receivedHereNowMessage = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -835,7 +969,20 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, p) => {
+                    subscribeManualEvent.Set();
+                },
+                (o, s) => {
+                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    if (s.StatusCode != 200 || s.Error)
+                    {
+                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                    }
+                    subscribeManualEvent.Set();
+                });
             pubnub = createPubNubInstance(config);
             if (!pubnub.AddListener(listenerSubCallack))
             {
@@ -868,7 +1015,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            subscribeManualEvent = new ManualResetEvent(false);
+            
             pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -883,8 +1030,14 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow().Channels(new [] { channel }).Async(new UTHereNowResult());
+            ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
+            pubnub.HereNow().Channels(new [] { channel }).Async(new PNHereNowResultEx(
+                                (r, s) => {
+                                    if (r == null) return;
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedHereNowMessage = true;
+                                    hereNowManualEvent.Set();
+                                }));
             hereNowManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             expected = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
@@ -915,8 +1068,7 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedHereNowMessage = false;
-            currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoSecretSSL";
+            bool receivedHereNowMessage = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -928,7 +1080,20 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(true);
 
-            SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, p) => {
+                    subscribeManualEvent.Set();
+                },
+                (o, s) => {
+                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    if (s.StatusCode != 200 || s.Error)
+                    {
+                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                    }
+                    subscribeManualEvent.Set();
+                });
             pubnub = createPubNubInstance(config);
             if (!pubnub.AddListener(listenerSubCallack))
             {
@@ -961,7 +1126,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            subscribeManualEvent = new ManualResetEvent(false);
+            
             pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -976,8 +1141,14 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow().Channels(new [] { channel }).Async(new UTHereNowResult());
+            ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
+            pubnub.HereNow().Channels(new [] { channel }).Async(new PNHereNowResultEx(
+                                (r, s) => {
+                                    if (r == null) return;
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedHereNowMessage = true;
+                                    hereNowManualEvent.Set();
+                                }));
             hereNowManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             expected = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
@@ -1008,9 +1179,8 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedHereNowMessage = false;
-            receivedErrorMessage = false;
-            currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoSSL";
+            bool receivedHereNowMessage = false;
+            bool receivedErrorMessage = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -1022,7 +1192,21 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(true);
 
-            SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, p) => {
+                    subscribeManualEvent.Set();
+                },
+                (o, s) => {
+                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    if (s.StatusCode != 200 || s.Error)
+                    {
+                        receivedErrorMessage = true;
+                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                    }
+                    subscribeManualEvent.Set();
+                });
             pubnub = createPubNubInstance(config);
             if (!pubnub.AddListener(listenerSubCallack))
             {
@@ -1053,7 +1237,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            subscribeManualEvent = new ManualResetEvent(false);
+            
             pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -1070,8 +1254,14 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                hereNowManualEvent = new ManualResetEvent(false);
-                pubnub.HereNow().Channels(new[] { channel }).Async(new UTHereNowResult());
+                ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
+                pubnub.HereNow().Channels(new[] { channel }).Async(new PNHereNowResultEx(
+                                (r, s) => {
+                                    if (r == null) return;
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedHereNowMessage = true;
+                                    hereNowManualEvent.Set();
+                                }));
                 hereNowManualEvent.WaitOne(manualResetEventWaitTimeout);
 
                 expected = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
@@ -1103,9 +1293,8 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedHereNowMessage = false;
-            receivedErrorMessage = false;
-            currentTestCase = "IfHereNowIsCalledThenItShouldReturnInfoWithUserState";
+            bool receivedHereNowMessage = false;
+            bool receivedErrorMessage = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -1116,7 +1305,21 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, p) => {
+                    subscribeManualEvent.Set();
+                },
+                (o, s) => {
+                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    if (s.StatusCode != 200 || s.Error)
+                    {
+                        receivedErrorMessage = true;
+                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                    }
+                    subscribeManualEvent.Set();
+                });
             pubnub = createPubNubInstance(config);
             if (!pubnub.AddListener(listenerSubCallack))
             {
@@ -1147,7 +1350,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            subscribeManualEvent = new ManualResetEvent(false);
+            
             pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -1156,7 +1359,7 @@ namespace PubNubMessaging.Tests
                 if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
                 else Thread.Sleep(200);
 
-                userStateManualEvent = new ManualResetEvent(false);
+                
                 Dictionary<string, object> dicState = new Dictionary<string, object>();
                 dicState.Add("testkey", "testval");
 
@@ -1173,11 +1376,15 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-
+                ManualResetEvent userStateManualEvent = new ManualResetEvent(false);
                 pubnub.SetPresenceState()
                                 .Channels(new[] { channel })
                                 .State(dicState)
-                                .Async(new UTPNSetStateResult());
+                                .Async(new PNSetStateResultExt(
+                                (r, s) => {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    userStateManualEvent.Set();
+                                }));
                 userStateManualEvent.WaitOne(manualResetEventWaitTimeout);
 
                 expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"Presence\", \"uuids\": [{\"state\": {\"testkey\": \"testval\"}, \"uuid\": \"mytestuuid\"}], \"occupancy\": 1}";
@@ -1194,11 +1401,17 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                hereNowManualEvent = new ManualResetEvent(false);
+                ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
                 pubnub.HereNow().Channels(new[] { channel })
                         .IncludeState(true)
                         .IncludeUUIDs(true)
-                        .Async(new UTHereNowResult());
+                        .Async(new PNHereNowResultEx(
+                                (r, s) => {
+                                    if (r == null) return;
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedHereNowMessage = true;
+                                    hereNowManualEvent.Set();
+                                }));
                 hereNowManualEvent.WaitOne(manualResetEventWaitTimeout);
 
                 expected = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
@@ -1230,8 +1443,7 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedHereNowMessage = false;
-            currentTestCase = "IfGlobalHereNowIsCalledThenItShouldReturnInfo";
+            bool receivedHereNowMessage = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -1248,7 +1460,20 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(false);
 
-            SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, p) => {
+                    subscribeManualEvent.Set();
+                },
+                (o, s) => {
+                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    if (s.StatusCode != 200 || s.Error)
+                    {
+                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                    }
+                    subscribeManualEvent.Set();
+                });
             pubnub = createPubNubInstance(config);
             if (!pubnub.AddListener(listenerSubCallack))
             {
@@ -1291,7 +1516,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            subscribeManualEvent = new ManualResetEvent(false);
+            
             pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -1312,8 +1537,14 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow().Async(new UTHereNowResult());
+            ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
+            pubnub.HereNow().Async(new PNHereNowResultEx(
+                                (r, s) => {
+                                    if (r == null) return;
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedHereNowMessage = true;
+                                    hereNowManualEvent.Set();
+                                }));
 
             hereNowManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -1345,8 +1576,7 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedHereNowMessage = false;
-            currentTestCase = "IfGlobalHereNowIsCalledThenItShouldReturnInfoWithUserState";
+            bool receivedHereNowMessage = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -1357,7 +1587,20 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, p) => {
+                    subscribeManualEvent.Set();
+                },
+                (o, s) => {
+                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    if (s.StatusCode != 200 || s.Error)
+                    {
+                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                    }
+                    subscribeManualEvent.Set();
+                });
             pubnub = createPubNubInstance(config);
             if (!pubnub.AddListener(listenerSubCallack))
             {
@@ -1388,11 +1631,11 @@ namespace PubNubMessaging.Tests
 
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest ? 2000 : 310 * 1000);
 
-            subscribeManualEvent = new ManualResetEvent(false);
+            
             pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            userStateManualEvent = new ManualResetEvent(false);
+            
             Dictionary<string, object> dicState = new Dictionary<string, object>();
             dicState.Add("testkey", "testval");
 
@@ -1409,10 +1652,15 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
+            ManualResetEvent userStateManualEvent = new ManualResetEvent(false);
             pubnub.SetPresenceState()
                             .Channels(new [] { channel })
                             .State(dicState)
-                            .Async(new UTPNSetStateResult());
+                            .Async(new PNSetStateResultExt(
+                                (r, s) => {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    userStateManualEvent.Set();
+                                }));
             userStateManualEvent.WaitOne(manualResetEventWaitTimeout);
 
 
@@ -1430,11 +1678,17 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            hereNowManualEvent = new ManualResetEvent(false);
+            ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
             pubnub.HereNow()
                     .IncludeState(true)
                     .IncludeUUIDs(true)
-                    .Async(new UTHereNowResult());
+                    .Async(new PNHereNowResultEx(
+                                (r, s) => {
+                                    if (r == null) return;
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedHereNowMessage = true;
+                                    hereNowManualEvent.Set();
+                                }));
             hereNowManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             expected = "[[],\"14740704540745015\"]";
@@ -1465,8 +1719,7 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedWhereNowMessage = false;
-            currentTestCase = "IfWhereNowIsCalledThenItShouldReturnInfo";
+            bool receivedWhereNowMessage = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -1477,7 +1730,20 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, p) => {
+                    subscribeManualEvent.Set();
+                },
+                (o, s) => {
+                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    if (s.StatusCode != 200 || s.Error)
+                    {
+                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                    }
+                    subscribeManualEvent.Set();
+                });
             pubnub = createPubNubInstance(config);
             if (!pubnub.AddListener(listenerSubCallack))
             {
@@ -1507,7 +1773,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            subscribeManualEvent = new ManualResetEvent(false);
+            
             pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -1526,8 +1792,13 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            whereNowManualEvent = new ManualResetEvent(false);
-            pubnub.WhereNow().Uuid(config.Uuid).Async(new UTWhereNowResult());
+            ManualResetEvent whereNowManualEvent = new ManualResetEvent(false);
+            pubnub.WhereNow().Uuid(config.Uuid).Async(new PNWhereNowResultExt(
+                                (r, s) => {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedWhereNowMessage = true;
+                                    whereNowManualEvent.Set();
+                                }));
             whereNowManualEvent.WaitOne();
 
             expected = "[[],\"14740704540745015\"]";
@@ -1558,8 +1829,8 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedUserStateMessage = false;
-            currentTestCase = "IfSetAndGetUserStateThenItShouldReturnInfo";
+            string customUUID = "mylocalmachine.mydomain.com";
+            bool receivedUserStateMessage = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -1576,7 +1847,6 @@ namespace PubNubMessaging.Tests
             manualResetEventWaitTimeout = 310 * 1000;
             string channel = "hello_my_channel";
 
-            userStateManualEvent = new ManualResetEvent(false);
             Dictionary<string, object> dicState = new Dictionary<string, object>();
             dicState.Add("testkey", "testval");
 
@@ -1587,10 +1857,16 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
+            ManualResetEvent userStateManualEvent = new ManualResetEvent(false);
             pubnub.SetPresenceState()
                             .Channels(new [] { channel })
                             .State(dicState)
-                            .Async(new UTPNSetStateResult());
+                            .Async(new PNSetStateResultExt(
+                                (r, s) => {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedUserStateMessage = true;
+                                    userStateManualEvent.Set();
+                                }));
 
             userStateManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -1611,7 +1887,12 @@ namespace PubNubMessaging.Tests
 
                 pubnub.GetPresenceState()
                                 .Channels(new [] { channel })
-                                .Async(new UTPNGetStateResult());
+                                .Async(new PNGetStateResultExt(
+                                (r, s) => {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedUserStateMessage = true;
+                                    userStateManualEvent.Set();
+                                }));
                 userStateManualEvent.WaitOne(manualResetEventWaitTimeout);
             }
             pubnub.Destroy();
@@ -1626,8 +1907,7 @@ namespace PubNubMessaging.Tests
             server.ClearRequests();
 
             Request getRequest = new Request();
-            receivedUserStateMessage = false;
-            currentTestCase = "IfSetAndDeleteUserStateThenItShouldReturnInfo";
+            bool receivedUserStateMessage = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -1638,17 +1918,12 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
             pubnub = createPubNubInstance(config);
-            if (!pubnub.AddListener(listenerSubCallack))
-            {
-                System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
-            }
 
             manualResetEventWaitTimeout = 310 * 1000;
             string channel = "hello_my_channel";
 
-            userStateManualEvent = new ManualResetEvent(false);
+            
             Dictionary<string, object> dicState = new Dictionary<string, object>();
             dicState.Add("k", "v");
 
@@ -1664,10 +1939,16 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
+            ManualResetEvent userStateManualEvent = new ManualResetEvent(false);
             pubnub.SetPresenceState()
                             .Channels(new [] { channel })
                             .State(dicState)
-                            .Async(new UTPNSetStateResult());
+                            .Async(new PNSetStateResultExt(
+                                (r, s) => {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedUserStateMessage = true;
+                                    userStateManualEvent.Set();
+                                }));
 
             userStateManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -1692,7 +1973,12 @@ namespace PubNubMessaging.Tests
                 userStateManualEvent = new ManualResetEvent(false);
                 pubnub.GetPresenceState()
                                 .Channels(new [] { channel })
-                                .Async(new UTPNGetStateResult());
+                                .Async(new PNGetStateResultExt(
+                                (r, s) => {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedUserStateMessage = true;
+                                    userStateManualEvent.Set();
+                                }));
 
                 userStateManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -1723,7 +2009,12 @@ namespace PubNubMessaging.Tests
                 pubnub.SetPresenceState()
                                 .Channels(new [] { channel })
                                 .State(dicState)
-                                .Async(new UTPNSetStateResult());
+                                .Async(new PNSetStateResultExt(
+                                (r, s) => {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedUserStateMessage = true;
+                                    userStateManualEvent.Set();
+                                }));
 
                 userStateManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -1742,7 +2033,12 @@ namespace PubNubMessaging.Tests
                 userStateManualEvent = new ManualResetEvent(false);
                 pubnub.GetPresenceState()
                                 .Channels(new [] { channel })
-                                .Async(new UTPNGetStateResult());
+                                .Async(new PNGetStateResultExt(
+                                (r, s) => {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedUserStateMessage = true;
+                                    userStateManualEvent.Set();
+                                }));
 
                 userStateManualEvent.WaitOne(manualResetEventWaitTimeout);
             }
@@ -1758,8 +2054,7 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedPresenceMessage = false;
-            currentTestCase = "ThenPresenceHeartbeatShouldReturnMessage";
+            bool receivedPresenceMessage = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -1772,14 +2067,28 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(false);
 
 
-            SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
+            ManualResetEvent presenceManualEvent = new ManualResetEvent(false);
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, p) => {
+                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(p));
+                    if (p.Event == "join") { receivedPresenceMessage = true; }
+                    presenceManualEvent.Set();
+                },
+                (o, s) => {
+                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    if (s.StatusCode != 200 || s.Error)
+                    {
+                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                        presenceManualEvent.Set();
+                    }
+                });
             pubnub = createPubNubInstance(config);
             if (!pubnub.AddListener(listenerSubCallack))
             {
                 System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
             }
 
-            presenceManualEvent = new ManualResetEvent(false);
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = 310 * 1000;
@@ -1806,7 +2115,6 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            presenceManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>().Channels(new [] { channel }).WithPresence().Execute();
             presenceManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -1826,233 +2134,6 @@ namespace PubNubMessaging.Tests
             pubnub = null;
             Assert.IsTrue(receivedPresenceMessage, "ThenPresenceHeartbeatShouldReturnMessage not received");
         }
-
-        private class UTGrantResult : PNCallback<PNAccessManagerGrantResult>
-        {
-            public override void OnResponse(PNAccessManagerGrantResult result, PNStatus status)
-            {
-                try
-                {
-                    Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-
-                    if (result != null)
-                    {
-                        Console.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                        if (result.Channels != null && result.Channels.Count > 0)
-                        {
-                            var read = result.Channels[channel][authKey].ReadEnabled;
-                            var write = result.Channels[channel][authKey].WriteEnabled;
-                            if (read && write)
-                            {
-                                receivedGrantMessage = true;
-                            }
-                        }
-                    }
-                }
-                catch
-                {
-                }
-                finally
-                {
-                    grantManualEvent.Set();
-                }
-            }
-        }
-
-        public class UTSubscribeCallback : SubscribeCallback
-        {
-            public override void Message<T>(Pubnub pubnub, PNMessageResult<T> message)
-            {
-                if (message != null)
-                {
-                    Console.WriteLine("SubscribeCallback: PNMessageResult: {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(message.Message));
-                }
-            }
-
-            public override void Presence(Pubnub pubnub, PNPresenceEventResult presence)
-            {
-                Console.WriteLine("SubscribeCallback: Presence: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(presence));
-                switch (currentTestCase)
-                {
-                    case "ThenPresenceShouldReturnReceivedMessage":
-                    case "ThenPresenceShouldReturnReceivedMessageSSL":
-                    case "ThenPresenceHeartbeatShouldReturnMessage":
-                        if (presence.Event == "join")
-                        {
-                            receivedPresenceMessage = true;
-                            presenceManualEvent.Set();
-                        }
-                        else if (presence.Event == "leave")
-                        {
-                            presenceManualEvent.Set();
-                        }
-                        break;
-                    case "ThenPresenceShouldReturnCustomUUID":
-                        receivedCustomUUID = true;
-                        presenceManualEvent.Set();
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            public override void Status(Pubnub pubnub, PNStatus status)
-            {
-                //Console.WriteLine("SubscribeCallback: PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-                Console.WriteLine("SubscribeCallback: PNStatus: " + status.StatusCode.ToString());
-                if (status.StatusCode != 200 || status.Error)
-                {
-                    receivedErrorMessage = true;
-                    switch (currentTestCase)
-                    {
-                        case "ThenPresenceShouldReturnReceivedMessage":
-                        case "ThenPresenceShouldReturnReceivedMessageSSL":
-                        case "ThenPresenceShouldReturnCustomUUID":
-                        case "ThenPresenceHeartbeatShouldReturnMessage":
-                            presenceManualEvent.Set();
-                            break;
-                        case "IfHereNowIsCalledThenItShouldReturnInfo":
-                        case "IfHereNowIsCalledThenItShouldReturnInfoSSL":
-                        case "IfHereNowIsCalledThenItShouldReturnInfoSecret":
-                        case "IfHereNowIsCalledThenItShouldReturnInfoSecretSSL":
-                        case "IfHereNowIsCalledThenItShouldReturnInfoCipher":
-                        case "IfHereNowIsCalledThenItShouldReturnInfoCipherSSL":
-                        case "IfHereNowIsCalledThenItShouldReturnInfoCipherSecret":
-                        case "IfHereNowIsCalledThenItShouldReturnInfoCipherSecretSSL":
-                        case "IfHereNowIsCalledThenItShouldReturnInfoWithUserState":
-                        case "IfGlobalHereNowIsCalledThenItShouldReturnInfo":
-                        case "IfGlobalHereNowIsCalledThenItShouldReturnInfoWithUserState":
-                        case "IfWhereNowIsCalledThenItShouldReturnInfo":
-                            subscribeManualEvent.Set();
-                            break;
-                        default:
-                            break;
-                    }
-
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    if (status.ErrorData != null)
-                    {
-                        Console.WriteLine(status.ErrorData.Information);
-                    }
-                    Console.ForegroundColor = ConsoleColor.White;
-                }
-                else if (status.StatusCode == 200 && status.Category == PNStatusCategory.PNConnectedCategory)
-                {
-                    switch (currentTestCase)
-                    {
-                        case "IfHereNowIsCalledThenItShouldReturnInfo":
-                        case "IfHereNowIsCalledThenItShouldReturnInfoSSL":
-                        case "IfHereNowIsCalledThenItShouldReturnInfoSecret":
-                        case "IfHereNowIsCalledThenItShouldReturnInfoSecretSSL":
-                        case "IfHereNowIsCalledThenItShouldReturnInfoCipher":
-                        case "IfHereNowIsCalledThenItShouldReturnInfoCipherSSL":
-                        case "IfHereNowIsCalledThenItShouldReturnInfoCipherSecret":
-                        case "IfHereNowIsCalledThenItShouldReturnInfoCipherSecretSSL":
-                        case "IfHereNowIsCalledThenItShouldReturnInfoWithUserState":
-                        case "IfGlobalHereNowIsCalledThenItShouldReturnInfo":
-                        case "IfGlobalHereNowIsCalledThenItShouldReturnInfoWithUserState":
-                        case "IfWhereNowIsCalledThenItShouldReturnInfo":
-                            subscribeManualEvent.Set();
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-
-            }
-        }
-
-        public class UTHereNowResult : PNCallback<PNHereNowResult>
-        {
-            public override void OnResponse(PNHereNowResult result, PNStatus status)
-            {
-                if (result == null) return;
-
-                Console.WriteLine("HereNow Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                Console.WriteLine("HereNow PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-
-                switch (currentTestCase)
-                {
-                    case "IfHereNowIsCalledThenItShouldReturnInfo":
-                    case "IfHereNowIsCalledThenItShouldReturnInfoSSL":
-                    case "IfHereNowIsCalledThenItShouldReturnInfoSecret":
-                    case "IfHereNowIsCalledThenItShouldReturnInfoSecretSSL":
-                    case "IfHereNowIsCalledThenItShouldReturnInfoCipher":
-                    case "IfHereNowIsCalledThenItShouldReturnInfoCipherSSL":
-                    case "IfHereNowIsCalledThenItShouldReturnInfoCipherSecret":
-                    case "IfHereNowIsCalledThenItShouldReturnInfoCipherSecretSSL":
-                    case "IfHereNowIsCalledThenItShouldReturnInfoWithUserState":
-                    case "IfGlobalHereNowIsCalledThenItShouldReturnInfo":
-                    case "IfGlobalHereNowIsCalledThenItShouldReturnInfoWithUserState":
-                        receivedHereNowMessage = true;
-                        break;
-                    default:
-                        break;
-                }
-                hereNowManualEvent.Set();
-            }
-        };
-
-        public class UTPNSetStateResult : PNCallback<PNSetStateResult>
-        {
-            public override void OnResponse(PNSetStateResult result, PNStatus status)
-            {
-                Console.WriteLine("SetState Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                Console.WriteLine("SetState PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-                switch (currentTestCase)
-                {
-                    case "IfHereNowIsCalledThenItShouldReturnInfoWithUserState":
-                    case "IfGlobalHereNowIsCalledThenItShouldReturnInfoWithUserState":
-                        userStateManualEvent.Set();
-                        break;
-                    case "IfSetAndGetUserStateThenItShouldReturnInfo":
-                    case "IfSetAndDeleteUserStateThenItShouldReturnInfo":
-                        receivedUserStateMessage = true;
-                        userStateManualEvent.Set();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        };
-
-        public class UTPNGetStateResult : PNCallback<PNGetStateResult>
-        {
-            public override void OnResponse(PNGetStateResult result, PNStatus status)
-            {
-                Console.WriteLine("GetState Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                Console.WriteLine("GetState PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-                switch (currentTestCase)
-                {
-                    case "IfSetAndGetUserStateThenItShouldReturnInfo":
-                    case "IfSetAndDeleteUserStateThenItShouldReturnInfo":
-                        receivedUserStateMessage = true;
-                        userStateManualEvent.Set();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        };
-
-
-        public class UTWhereNowResult : PNCallback<PNWhereNowResult>
-        {
-            public override void OnResponse(PNWhereNowResult result, PNStatus status)
-            {
-                Console.WriteLine("WhereNow Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                Console.WriteLine("WhereNow PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-                switch (currentTestCase)
-                {
-                    case "IfWhereNowIsCalledThenItShouldReturnInfo":
-                        receivedWhereNowMessage = true;
-                        whereNowManualEvent.Set();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        };
+        
     }
 }
