@@ -85,15 +85,15 @@ namespace WindowsUniversalApp
                 listener = new SubscribeCallbackExt(
                     async (o, m) =>
                     {
-                        await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(m));
+                        await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)).ConfigureAwait(false);
                     },
                     async (o, p) =>
                     {
-                        await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(p));
+                        await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(p)).ConfigureAwait(false);
                     },
                     async (o, s) =>
                     {
-                        await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
+                        await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(s)).ConfigureAwait(false);
                     });
             }
 
@@ -106,20 +106,9 @@ namespace WindowsUniversalApp
                 {
                     if (r != null)
                     {
-                        await DisplayMessageInTextBox(r.Timetoken.ToString());
+                        await DisplayMessageInTextBox(r.Timetoken.ToString()).ConfigureAwait(false);
                     }
                 }));
-        }
-
-
-
-        /// <summary>
-        /// Callback method captures the response in JSON string format for all operations
-        /// </summary>
-        /// <param name="result"></param>
-        async void PubnubCallbackResult(string result)
-        {
-            await DisplayMessageInTextBox(result);
         }
 
         private void btnSubscribe_Click(object sender, RoutedEventArgs e)
@@ -247,7 +236,7 @@ namespace WindowsUniversalApp
         private async void btnHistory_Click(object sender, RoutedEventArgs e)
         {
             channel = txtChannel.Text;
-            await DisplayMessageInTextBox("Running Detailed History:");
+            await DisplayMessageInTextBox("Running Detailed History:").ConfigureAwait(false);
             pubnub.History()
                 .Channel(channel)
                 .Count(100)
@@ -256,7 +245,7 @@ namespace WindowsUniversalApp
                     {
                         if (r != null)
                         {
-                            await DisplayMessageInTextBox("Message Count = " + r.Messages.Count.ToString());
+                            await DisplayMessageInTextBox("Message Count = " + r.Messages.Count.ToString()).ConfigureAwait(false);
                         }
                     }));
         }
