@@ -103,9 +103,7 @@ namespace PubNubMessaging.Tests
                                             Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
                                         }
                                     }
-                                    catch
-                                    {
-                                    }
+                                    catch {  /* ignore */  }
                                     finally
                                     {
                                         grantManualEvent.Set();

@@ -79,11 +79,11 @@ namespace PubNubMessaging.Tests
                                             {
                                                 foreach (KeyValuePair<string, Dictionary<string, PNAccessManagerKeyData>> channelKP in r.Channels)
                                                 {
-                                                    string channel = channelKP.Key;
-                                                    if (Array.IndexOf(channelsGrant, channel) > -1)
+                                                    string receivedChannel = channelKP.Key;
+                                                    if (Array.IndexOf(channelsGrant, receivedChannel) > -1)
                                                     {
-                                                        var read = r.Channels[channel][authKey].ReadEnabled;
-                                                        var write = r.Channels[channel][authKey].WriteEnabled;
+                                                        var read = r.Channels[receivedChannel][authKey].ReadEnabled;
+                                                        var write = r.Channels[receivedChannel][authKey].WriteEnabled;
                                                         if (read && write)
                                                         {
                                                             receivedGrantMessage = true;
@@ -102,7 +102,7 @@ namespace PubNubMessaging.Tests
                                             }
                                         }
                                     }
-                                    catch { }
+                                    catch { /* ignore */ }
                                     finally
                                     {
                                         grantManualEvent.Set();

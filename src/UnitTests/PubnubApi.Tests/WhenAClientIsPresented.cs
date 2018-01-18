@@ -73,7 +73,7 @@ namespace PubNubMessaging.Tests
                                             }
                                         }
                                     }
-                                    catch { }
+                                    catch { /* ignore */ }
                                     finally
                                     {
                                         grantManualEvent.Set();
@@ -469,7 +469,7 @@ namespace PubNubMessaging.Tests
                 ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
                 pubnub.HereNow().Channels(new[] { channel }).Async(new PNHereNowResultEx(
                                 (r, s) => {
-                                    if (r == null) return;
+                                    if (r == null) { return; }
                                     Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedHereNowMessage = true;
                                     hereNowManualEvent.Set();

@@ -85,7 +85,7 @@ namespace PubNubMessaging.Tests
                                             }
                                         }
                                     }
-                                    catch { }
+                                    catch { /* ignore */  }
                                     finally
                                     {
                                         grantManualEvent.Set();
