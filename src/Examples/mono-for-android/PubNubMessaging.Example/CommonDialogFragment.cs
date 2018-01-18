@@ -66,18 +66,6 @@ namespace PubNubMessaging.Example
             this.ctx = ctx;
         }
 
-        void ShowAlert (string message)
-        {
-            AlertDialog.Builder builder = new AlertDialog.Builder (this.ctx);
-            builder.SetTitle (Android.Resource.String.DialogAlertTitle);
-            builder.SetIcon (Android.Resource.Drawable.IcDialogAlert);
-            builder.SetMessage (message);
-            builder.SetPositiveButton ("OK", (sender, e) => {
-            });
-
-            builder.Show ();
-        }
-
         void ButtonSetClick (object sender, EventArgs e)
         {
             if ((cds == CommonDialogStates.ChangeUuid)
@@ -160,14 +148,12 @@ namespace PubNubMessaging.Example
                        (cds == CommonDialogStates.RevokeSubscribe)) {
                 //auth
                 lblInput0 = view.FindViewById<TextView> (Resource.Id.lblinput0);
-                //lblInput0.Visibility = ViewStates.Invisible;
                 lblInput2 = view.FindViewById<TextView> (Resource.Id.lblinput2);
                 lblInput2.Visibility = ViewStates.Invisible;
                 tvinput2 = view.FindViewById<TextView> (Resource.Id.txtinput2);
                 tvinput2.Visibility = ViewStates.Invisible;
 
                 txtChannel = view.FindViewById<TextView> (Resource.Id.txtChannel);
-                //txtChannel.Visibility = ViewStates.Invisible;
 
                 lblCGinput = view.FindViewById<TextView> (Resource.Id.lblCGinput);
                 lblCGinput.Visibility = ViewStates.Invisible;
@@ -378,7 +364,9 @@ namespace PubNubMessaging.Example
 
             // Unwire event
             if (disposing)
+            {
                 btnDismiss.Click -= ButtonDismissClick;
+            }
         }
 
     }

@@ -16,6 +16,7 @@ using PubnubApi;
 using Windows.UI.Core;
 using Windows.UI;
 using Windows.UI.Popups;
+using System.Threading.Tasks;
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace WindowsUniversalApp
@@ -23,21 +24,21 @@ namespace WindowsUniversalApp
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class PubnubOperation : Page
+    public partial class PubnubOperation : Page //ignore codacy check
     {
         string channel = "";
         string channelGroup = "";
-        PubnubConfigData data = null;
-        static Pubnub pubnub = null;
-        static PNConfiguration config = null;
-        SubscribeCallbackExt listener = null;
+        PubnubConfigData data;
+        static Pubnub pubnub;
+        static PNConfiguration config;
+        SubscribeCallbackExt listener;
 
-        Popup publishPopup = null;
-        Popup hereNowPopup = null;
-        Popup whereNowPopup = null;
-        Popup globalHereNowPopup = null;
-        Popup userStatePopup = null;
-        Popup changeUUIDPopup = null;
+        Popup publishPopup;
+        Popup hereNowPopup;
+        Popup whereNowPopup;
+        Popup globalHereNowPopup;
+        Popup userStatePopup;
+        Popup changeUUIDPopup;
 
 
         public PubnubOperation()
@@ -82,24 +83,18 @@ namespace WindowsUniversalApp
                 config.LogVerbosity = PNLogVerbosity.BODY;
                 pubnub = new Pubnub(config);
                 listener = new SubscribeCallbackExt(
-                    (o, m) => 
+                    async (o, m) =>
                     {
-                        DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(m));
-                    }, 
-                    (o, p) =>
+                        await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)).ConfigureAwait(false);
+                    },
+                    async (o, p) =>
                     {
-                        DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(p));
-                    }, 
-                    (o, s) => 
+                        await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(p)).ConfigureAwait(false);
+                    },
+                    async (o, s) =>
                     {
-                        DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
+                        await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(s)).ConfigureAwait(false);
                     });
-                //pubnub.NetworkCheckMaxRetries = data.maxRetries;
-                //pubnub.NetworkCheckRetryInterval = data.retryInterval;
-                //pubnub.LocalClientHeartbeatInterval = data.localClientHeartbeatInterval;
-                //pubnub.EnableResumeOnReconnect = data.resumeOnReconnect;
-                //pubnub.PresenceHeartbeat = data.presenceHeartbeat;
-                //pubnub.PresenceHeartbeatInterval = data.presenceHeartbeatInterval;
             }
 
         }
@@ -107,36 +102,23 @@ namespace WindowsUniversalApp
         private void btnTime_Click(object sender, RoutedEventArgs e)
         {
             pubnub.Time().Async(new PNTimeResultExt(
-                (r,s) => 
+                async (r, s) =>
                 {
                     if (r != null)
                     {
-                        DisplayMessageInTextBox(r.Timetoken.ToString());
+                        await DisplayMessageInTextBox(r.Timetoken.ToString()).ConfigureAwait(false);
                     }
                 }));
-        }
-
-        /// <summary>
-        /// Callback method captures the response in JSON string format for all operations
-        /// </summary>
-        /// <param name="result"></param>
-        void PubnubCallbackResult(string result)
-        {
-            DisplayMessageInTextBox(result);
-            //Console.WriteLine("REGULAR CALLBACK:");
-            //Console.WriteLine(result);
-            //Console.WriteLine();
         }
 
         private void btnSubscribe_Click(object sender, RoutedEventArgs e)
         {
             channel = txtChannel.Text;
             channelGroup = txtChannelGroup.Text;
-            //DisplayMessageInTextBox("Running Subscribe:");
             pubnub.AddListener(listener);
             pubnub.Subscribe<string>()
-                .Channels(new string[] { channel })
-                .ChannelGroups(new string[] { channelGroup })
+                .Channels(new [] { channel })
+                .ChannelGroups(new [] { channelGroup })
                 .WithPresence()
                 .Execute();
         }
@@ -145,10 +127,9 @@ namespace WindowsUniversalApp
         {
             channel = txtChannel.Text;
             channelGroup = txtChannelGroup.Text;
-            //DisplayMessageInTextBox("Running Unsubscribe:");
             pubnub.Unsubscribe<string>()
-                .Channels(new string[] { channel })
-                .ChannelGroups(new string[] { channelGroup })
+                .Channels(new [] { channel })
+                .ChannelGroups(new [] { channelGroup })
                 .Execute();
             pubnub.RemoveListener(listener);
         }
@@ -195,7 +176,6 @@ namespace WindowsUniversalApp
 
                         if (publishMsg != "")
                         {
-                            //DisplayMessageInTextBox("Running Publish:");
                             double doubleData;
                             int intData;
                             if (int.TryParse(publishMsg, out intData)) //capture numeric data
@@ -205,11 +185,11 @@ namespace WindowsUniversalApp
                                 .Message(intData)
                                 .ShouldStore(storeInHistory)
                                 .Async(new PNPublishResultExt(
-                                    (r,s)=> 
+                                    async (r, s) =>
                                     {
                                         if (r != null)
                                         {
-                                            DisplayMessageInTextBox(r.Timetoken.ToString());
+                                            await DisplayMessageInTextBox(r.Timetoken.ToString()).ConfigureAwait(false);
                                         }
                                     }));
                             }
@@ -220,11 +200,11 @@ namespace WindowsUniversalApp
                                 .Message(doubleData)
                                 .ShouldStore(storeInHistory)
                                 .Async(new PNPublishResultExt(
-                                    (r, s) =>
+                                    async (r, s) =>
                                     {
                                         if (r != null)
                                         {
-                                            DisplayMessageInTextBox(r.Timetoken.ToString());
+                                            await DisplayMessageInTextBox(r.Timetoken.ToString()).ConfigureAwait(false);
                                         }
                                     }));
                             }
@@ -235,11 +215,11 @@ namespace WindowsUniversalApp
                                 .Message(publishMsg)
                                 .ShouldStore(storeInHistory)
                                 .Async(new PNPublishResultExt(
-                                    (r, s) =>
+                                    async (r, s) =>
                                     {
                                         if (r != null)
                                         {
-                                            DisplayMessageInTextBox(r.Timetoken.ToString());
+                                            await DisplayMessageInTextBox(r.Timetoken.ToString()).ConfigureAwait(false);
                                         }
                                     }));
                             }
@@ -253,19 +233,19 @@ namespace WindowsUniversalApp
 
         }
 
-        private void btnHistory_Click(object sender, RoutedEventArgs e)
+        private async void btnHistory_Click(object sender, RoutedEventArgs e)
         {
             channel = txtChannel.Text;
-            DisplayMessageInTextBox("Running Detailed History:");
+            await DisplayMessageInTextBox("Running Detailed History:").ConfigureAwait(false);
             pubnub.History()
                 .Channel(channel)
                 .Count(100)
                 .Async(new PNHistoryResultExt(
-                    (r,s)=> 
+                    async (r, s) =>
                     {
                         if (r != null)
                         {
-                            DisplayMessageInTextBox("Message Count = " + r.Messages.Count.ToString());
+                            await DisplayMessageInTextBox("Message Count = " + r.Messages.Count.ToString()).ConfigureAwait(false);
                         }
                     }));
         }
@@ -296,7 +276,7 @@ namespace WindowsUniversalApp
             globalHereNowPopup.Child = border;
             globalHereNowPopup.IsOpen = true;
 
-            globalHereNowPopup.Closed += (senderPopup, argsPopup) =>
+            globalHereNowPopup.Closed += async (senderPopup, argsPopup) =>
             {
                 if (control.IsOKButtonEntered)
                 {
@@ -306,17 +286,17 @@ namespace WindowsUniversalApp
                     CheckBox chkIncludeUserState = control.FindName("chkHereIncludeUserState") as CheckBox;
                     bool includeState = (chkIncludeUserState != null) ? chkIncludeUserState.IsChecked.Value : false;
 
-                    DisplayMessageInTextBox("Running GlobalHereNow:");
+                    await DisplayMessageInTextBox("Running GlobalHereNow:").ConfigureAwait(false);
                     pubnub.HereNow()
                     .IncludeUUIDs(showUUID)
                     .IncludeState(includeState)
                     .Async(new PNHereNowResultEx(
-                        (r,s) => 
+                        async (r, s) =>
                         {
                             if (r != null)
                             {
-                                DisplayMessageInTextBox("TotalChannels = " + r.TotalChannels.ToString());
-                                DisplayMessageInTextBox("TotalOccupancy = " + r.TotalOccupancy.ToString());
+                                await DisplayMessageInTextBox("TotalChannels = " + r.TotalChannels.ToString()).ConfigureAwait(false);
+                                await DisplayMessageInTextBox("TotalOccupancy = " + r.TotalOccupancy.ToString()).ConfigureAwait(false);
                             }
                         }));
                 }
@@ -353,7 +333,7 @@ namespace WindowsUniversalApp
             hereNowPopup.Child = border;
             hereNowPopup.IsOpen = true;
 
-            hereNowPopup.Closed += (senderPopup, argsPopup) =>
+            hereNowPopup.Closed += async (senderPopup, argsPopup) =>
             {
                 if (control.IsOKButtonEntered)
                 {
@@ -363,18 +343,18 @@ namespace WindowsUniversalApp
                     CheckBox chkIncludeUserState = control.FindName("chkHereIncludeUserState") as CheckBox;
                     bool includeState = (chkIncludeUserState != null) ? chkIncludeUserState.IsChecked.Value : false;
 
-                    DisplayMessageInTextBox("Running HereNow:");
+                    await DisplayMessageInTextBox("Running HereNow:").ConfigureAwait(false);
                     pubnub.HereNow()
-                    .Channels(new string[] { channel })
+                    .Channels(new[] { channel })
                     .IncludeUUIDs(showUUID)
                     .IncludeState(includeState)
                     .Async(new PNHereNowResultEx(
-                        (r, s) =>
+                        async (r, s) =>
                         {
                             if (r != null)
                             {
-                                DisplayMessageInTextBox("TotalChannels = " + r.TotalChannels.ToString());
-                                DisplayMessageInTextBox("TotalOccupancy = " + r.TotalOccupancy.ToString());
+                                await DisplayMessageInTextBox("TotalChannels = " + r.TotalChannels.ToString()).ConfigureAwait(false);
+                                await DisplayMessageInTextBox("TotalOccupancy = " + r.TotalOccupancy.ToString()).ConfigureAwait(false);
                             }
                         }));
                 }
@@ -418,7 +398,7 @@ namespace WindowsUniversalApp
             pamChannelPopup.Child = border;
             pamChannelPopup.IsOpen = true;
 
-            pamChannelPopup.Closed += (senderPopup, argsPopup) =>
+            pamChannelPopup.Closed += async (senderPopup, argsPopup) =>
             {
                 if (control.IsOKButtonEntered)
                 {
@@ -439,19 +419,19 @@ namespace WindowsUniversalApp
                     RadioButton radGrantPAMChannel = control.FindName("radGrantChannel") as RadioButton;
                     if (radGrantPAMChannel != null && radGrantPAMChannel.IsChecked.Value)
                     {
-                        DisplayMessageInTextBox("Running GrantAccess:");
+                        await DisplayMessageInTextBox("Running GrantAccess:").ConfigureAwait(false);
                         int ttlInMinutes = 1440;
                         pubnub.Grant()
-                        .Channels(new string[] { pamUserChannelName })
-                        .AuthKeys(new string[] { pamAuthKey })
+                        .Channels(new[] { pamUserChannelName })
+                        .AuthKeys(new[] { pamAuthKey })
                         .Read(true)
                         .Write(true)
                         .TTL(ttlInMinutes)
-                        .Async(new PNAccessManagerGrantResultExt((r,s)=> 
+                        .Async(new PNAccessManagerGrantResultExt(async (r, s) =>
                         {
                             if (r != null)
                             {
-                                DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                             }
                         }));
                     }
@@ -459,16 +439,16 @@ namespace WindowsUniversalApp
                     RadioButton radAuditChannel = control.FindName("radAuditChannel") as RadioButton;
                     if (radAuditChannel != null && radAuditChannel.IsChecked.Value)
                     {
-                        DisplayMessageInTextBox("Running AuditAccess:");
+                        await DisplayMessageInTextBox("Running AuditAccess:").ConfigureAwait(false);
                         pubnub.Audit()
                         .Channel(pamUserChannelName)
-                        .AuthKeys(new string[] { pamAuthKey })
+                        .AuthKeys(new[] { pamAuthKey })
                         .Async(new PNAccessManagerAuditResultExt(
-                            (r,s)=> 
+                            async (r, s) =>
                             {
                                 if (r != null)
                                 {
-                                    DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                                 }
                             }));
                     }
@@ -476,22 +456,22 @@ namespace WindowsUniversalApp
                     RadioButton radRevokeChannel = control.FindName("radRevokeChannel") as RadioButton;
                     if (radRevokeChannel != null && radRevokeChannel.IsChecked.Value)
                     {
-                        DisplayMessageInTextBox("Running Revoke Access:");
-                        System.Threading.Tasks.Task.Run(() =>
-                        {
-                            pubnub.Grant()
-                            .Channels(new string[] { pamUserChannelName })
-                            .AuthKeys(new string[] { pamAuthKey })
-                            .Read(false)
-                            .Write(false)
-                            .Async(new PNAccessManagerGrantResultExt((r, s) =>
-                            {
-                                if (r != null)
-                                {
-                                    DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                                }
-                            }));
-                        });
+                        await DisplayMessageInTextBox("Running Revoke Access:").ConfigureAwait(false);
+                        await Task.Run(() =>
+                         {
+                             pubnub.Grant()
+                             .Channels(new[] { pamUserChannelName })
+                             .AuthKeys(new[] { pamAuthKey })
+                             .Read(false)
+                             .Write(false)
+                             .Async(new PNAccessManagerGrantResultExt(async (r, s) =>
+                             {
+                                 if (r != null)
+                                 {
+                                     await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
+                                 }
+                             }));
+                         }).ConfigureAwait(false);
                     }
 
                 }
@@ -536,7 +516,7 @@ namespace WindowsUniversalApp
             pamChannelGroupPopup.Child = border;
             pamChannelGroupPopup.IsOpen = true;
 
-            pamChannelGroupPopup.Closed += (senderPopup, argsPopup) =>
+            pamChannelGroupPopup.Closed += async (senderPopup, argsPopup) =>
             {
                 if (control.IsOKButtonEntered)
                 {
@@ -557,18 +537,18 @@ namespace WindowsUniversalApp
                         RadioButton radGrantPAMChannelGroup = control.FindName("radGrantChannelGroup") as RadioButton;
                         if (radGrantPAMChannelGroup != null && radGrantPAMChannelGroup.IsChecked.Value)
                         {
-                            DisplayMessageInTextBox("Running ChannelGroupGrantAccess:");
+                            await DisplayMessageInTextBox("Running ChannelGroupGrantAccess:").ConfigureAwait(false);
                             pubnub.Grant()
-                            .ChannelGroups(new string[] { pamUserChannelGroup })
-                            .AuthKeys(new string[] { pamAuthKey })
+                            .ChannelGroups(new[] { pamUserChannelGroup })
+                            .AuthKeys(new[] { pamAuthKey })
                             .Read(true)
                             .Write(true)
                             .TTL(ttlInMinutes)
-                            .Async(new PNAccessManagerGrantResultExt((r, s) =>
+                            .Async(new PNAccessManagerGrantResultExt(async (r, s) =>
                             {
                                 if (r != null)
                                 {
-                                    DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                                 }
                             }));
                         }
@@ -576,16 +556,16 @@ namespace WindowsUniversalApp
                         RadioButton radAuditPAMChannelGroup = control.FindName("radAuditChannelGroup") as RadioButton;
                         if (radAuditPAMChannelGroup != null && radAuditPAMChannelGroup.IsChecked.Value)
                         {
-                            DisplayMessageInTextBox("Running ChannelGroupAuditAccess:");
+                            await DisplayMessageInTextBox("Running ChannelGroupAuditAccess:").ConfigureAwait(false);
                             pubnub.Audit()
                             .ChannelGroup(pamUserChannelGroup)
-                            .AuthKeys(new string[] { pamAuthKey })
+                            .AuthKeys(new[] { pamAuthKey })
                             .Async(new PNAccessManagerAuditResultExt(
-                                (r, s) =>
+                                async (r, s) =>
                                 {
                                     if (r != null)
                                     {
-                                        DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                        await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                                     }
                                 }));
                         }
@@ -593,18 +573,18 @@ namespace WindowsUniversalApp
                         RadioButton radRevokePAMChannelGroup = control.FindName("radRevokeChannelGroup") as RadioButton;
                         if (radRevokePAMChannelGroup != null && radRevokePAMChannelGroup.IsChecked.Value)
                         {
-                            DisplayMessageInTextBox("Running ChannelGroup Revoke Access:");
+                            await DisplayMessageInTextBox("Running ChannelGroup Revoke Access:").ConfigureAwait(false);
                             pubnub.Grant()
-                            .ChannelGroups(new string[] { pamUserChannelGroup })
-                            .AuthKeys(new string[] { pamAuthKey })
+                            .ChannelGroups(new[] { pamUserChannelGroup })
+                            .AuthKeys(new[] { pamAuthKey })
                             .Read(false)
                             .Write(false)
                             .TTL(ttlInMinutes)
-                            .Async(new PNAccessManagerGrantResultExt((r, s) =>
+                            .Async(new PNAccessManagerGrantResultExt(async (r, s) =>
                             {
                                 if (r != null)
                                 {
-                                    DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                                 }
                             }));
                         }
@@ -648,7 +628,7 @@ namespace WindowsUniversalApp
             userStatePopup.Child = border;
             userStatePopup.IsOpen = true;
 
-            userStatePopup.Closed += (senderPopup, argsPopup) =>
+            userStatePopup.Closed += async (senderPopup, argsPopup) =>
             {
                 if (control.IsOKButtonEntered)
                 {
@@ -667,7 +647,7 @@ namespace WindowsUniversalApp
                             userStateValue1 = txtSetUserStateVal1.Text;
                         }
 
-                        DisplayMessageInTextBox("Running Set User State:");
+                        await DisplayMessageInTextBox("Running Set User State:").ConfigureAwait(false);
 
                         int valueInt;
                         double valueDouble;
@@ -677,13 +657,13 @@ namespace WindowsUniversalApp
                             dicInt.Add(userStateKey1, valueInt);
 
                             pubnub.SetPresenceState()
-                            .Channels(new string[] { channel })
-                            .ChannelGroups(new string[] { channelGroup })
+                            .Channels(new[] { channel })
+                            .ChannelGroups(new[] { channelGroup })
                             .State(dicInt)
                             .Async(new PNSetStateResultExt(
-                                (r,s)=> 
+                                async (r, s) =>
                                 {
-                                    DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                                 }));
                         }
                         else if (Double.TryParse(userStateValue1, out valueDouble))
@@ -692,13 +672,13 @@ namespace WindowsUniversalApp
                             dicDouble.Add(userStateKey1, valueDouble);
 
                             pubnub.SetPresenceState()
-                            .Channels(new string[] { channel })
-                            .ChannelGroups(new string[] { channelGroup })
+                            .Channels(new[] { channel })
+                            .ChannelGroups(new[] { channelGroup })
                             .State(dicDouble)
                             .Async(new PNSetStateResultExt(
-                                (r, s) =>
+                                async (r, s) =>
                                 {
-                                    DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                                 }));
                         }
                         else
@@ -707,13 +687,13 @@ namespace WindowsUniversalApp
                             dicObj.Add(userStateKey1, userStateValue1);
 
                             pubnub.SetPresenceState()
-                            .Channels(new string[] { channel })
-                            .ChannelGroups(new string[] { channelGroup })
+                            .Channels(new[] { channel })
+                            .ChannelGroups(new[] { channelGroup })
                             .State(dicObj)
                             .Async(new PNSetStateResultExt(
-                                (r, s) =>
+                                async (r, s) =>
                                 {
-                                    DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                                 }));
                         }
                     }
@@ -722,17 +702,17 @@ namespace WindowsUniversalApp
                         txtGetUserStateUUID = control.FindName("txtGetUserStateUUID") as TextBox;
                         if (txtGetUserStateUUID != null)
                         {
-                            DisplayMessageInTextBox("Running Get User State:");
+                            await DisplayMessageInTextBox("Running Get User State:").ConfigureAwait(false);
                             string userStateUUID = txtGetUserStateUUID.Text.Trim();
 
                             pubnub.GetPresenceState()
-                            .Channels(new string[] { channel })
-                            .ChannelGroups(new string[] { channelGroup })
+                            .Channels(new[] { channel })
+                            .ChannelGroups(new[] { channelGroup })
                             .Uuid(userStateUUID)
                             .Async(new PNGetStateResultExt(
-                                (r, s) =>
+                                async (r, s) =>
                                 {
-                                    DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                                 }));
                         }
                     }
@@ -774,7 +754,7 @@ namespace WindowsUniversalApp
             whereNowPopup.Child = border;
             whereNowPopup.IsOpen = true;
 
-            whereNowPopup.Closed += (senderPopup, argsPopup) =>
+            whereNowPopup.Closed += async (senderPopup, argsPopup) =>
             {
                 if (control.IsOKButtonEntered)
                 {
@@ -783,13 +763,13 @@ namespace WindowsUniversalApp
                     {
                         string whereNowUUID = txtWhereNowUUIDConfirm.Text.Trim();
 
-                        DisplayMessageInTextBox("Running WhereNow:");
+                        await DisplayMessageInTextBox("Running WhereNow:").ConfigureAwait(false);
 
                         pubnub.WhereNow()
                         .Uuid(whereNowUUID)
-                        .Async(new PNWhereNowResultExt((r,s) => 
+                        .Async(new PNWhereNowResultExt(async (r, s) =>
                         {
-                            DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                            await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                         }));
                     }
 
@@ -891,7 +871,7 @@ namespace WindowsUniversalApp
             channelGroupPopup.Child = border;
             channelGroupPopup.IsOpen = true;
 
-            channelGroupPopup.Closed += (senderPopup, argsPopup) =>
+            channelGroupPopup.Closed += async (senderPopup, argsPopup) =>
             {
                 if (control.IsOKButtonEntered)
                 {
@@ -911,38 +891,38 @@ namespace WindowsUniversalApp
                         RadioButton radGetChannelsOfChannelGroup = control.FindName("radGetChannelsOfChannelGroup") as RadioButton;
                         if (radGetChannelsOfChannelGroup != null && radGetChannelsOfChannelGroup.IsChecked.Value)
                         {
-                            DisplayMessageInTextBox("Running GetChannelsForChannelGroup:");
+                            await DisplayMessageInTextBox("Running GetChannelsForChannelGroup:").ConfigureAwait(false);
                             pubnub.ListChannelsForChannelGroup()
                             .ChannelGroup(userChannelGroup)
-                            .Async(new PNChannelGroupsAllChannelsResultExt((r,s)=> 
+                            .Async(new PNChannelGroupsAllChannelsResultExt(async (r, s) =>
                             {
-                                DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                             }));
                         }
 
                         RadioButton radAddChannelToChannelGroup = control.FindName("radAddChannelToChannelGroup") as RadioButton;
                         if (radAddChannelToChannelGroup != null && radAddChannelToChannelGroup.IsChecked.Value)
                         {
-                            DisplayMessageInTextBox("Running AddChannelsToChannelGroup:");
+                            await DisplayMessageInTextBox("Running AddChannelsToChannelGroup:").ConfigureAwait(false);
                             pubnub.AddChannelsToChannelGroup()
-                            .Channels(new string[] { userChannelName })
+                            .Channels(new[] { userChannelName })
                             .ChannelGroup(userChannelGroup)
-                            .Async(new PNChannelGroupsAddChannelResultExt((r, s) =>
+                            .Async(new PNChannelGroupsAddChannelResultExt(async (r, s) =>
                             {
-                                DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                             }));
                         }
 
                         RadioButton radRemoveChannelFromChannelGroup = control.FindName("radRemoveChannelFromChannelGroup") as RadioButton;
                         if (radRemoveChannelFromChannelGroup != null && radRemoveChannelFromChannelGroup.IsChecked.Value)
                         {
-                            DisplayMessageInTextBox("Running RemoveChannelsFromChannelGroup:");
+                            await DisplayMessageInTextBox("Running RemoveChannelsFromChannelGroup:").ConfigureAwait(false);
                             pubnub.RemoveChannelsFromChannelGroup()
-                            .Channels(new string[] { userChannelName })
+                            .Channels(new[] { userChannelName })
                             .ChannelGroup(userChannelGroup)
-                            .Async(new PNChannelGroupsRemoveChannelResultExt((r, s) =>
+                            .Async(new PNChannelGroupsRemoveChannelResultExt(async (r, s) =>
                             {
-                                DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                             }));
                         }
                     }
@@ -958,13 +938,18 @@ namespace WindowsUniversalApp
             pubnub.TerminateCurrentSubscriberRequest();
         }
 
-        private async void DisplayMessageInTextBox(string msg)
+        private async Task DisplayMessageInTextBox(string msg)
         {
             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
+                string modifiedMsg = "";
                 if (msg.Length > 200)
                 {
-                    msg = string.Concat(msg.Substring(0, 200), "..(truncated)");
+                    modifiedMsg = string.Concat(msg.Substring(0, 200), "..(truncated)");
+                }
+                else
+                {
+                    modifiedMsg = msg;
                 }
 
                 if (txtResult.Text.Length > 200)
@@ -972,7 +957,7 @@ namespace WindowsUniversalApp
                     txtResult.Text = string.Concat("(Truncated)..\n", txtResult.Text.Remove(0, 200));
                 }
 
-                txtResult.Text += msg + "\n";
+                txtResult.Text += modifiedMsg + "\n";
                 txtResult.Select(txtResult.Text.Length - 1, 1);
             });
         }
@@ -982,7 +967,7 @@ namespace WindowsUniversalApp
             PubnubCleanup();
         }
 
-        void PubnubCleanup()
+        static void PubnubCleanup()
         {
             if (pubnub != null)
             {
@@ -1020,10 +1005,6 @@ namespace WindowsUniversalApp
 
     public class PlatformPubnubLog : IPubnubLog
     {
-        public PlatformPubnubLog()
-        {
-        }
-
         public void WriteToLog(string log)
         {
             System.Diagnostics.Debug.WriteLine(log);
@@ -1033,8 +1014,8 @@ namespace WindowsUniversalApp
 
     public class DemoSubscribeCallback : SubscribeCallback
     {
-        Action<string> callback = null;
-        Pubnub pubnub = new Pubnub(null);
+        readonly Action<string> callback;
+        readonly Pubnub pubnub = new Pubnub(null);
         public DemoSubscribeCallback(Action<string> displayCallback)
         {
             this.callback = displayCallback;
@@ -1059,16 +1040,6 @@ namespace WindowsUniversalApp
         {
             string msg = string.Format("Operation: {0}; Category: {1};  StatusCode: {2}", status.Operation, status.Category, status.StatusCode);
             this.callback(msg);
-
-            //if (status.StatusCode != 200 || status.Error)
-            //{
-            //    Console.ForegroundColor = ConsoleColor.Red;
-            //    if (status.ErrorData != null)
-            //    {
-            //        Console.WriteLine(status.ErrorData.Information);
-            //    }
-            //    Console.ForegroundColor = ConsoleColor.White;
-            //}
 
             if (status.Category == PNStatusCategory.PNUnexpectedDisconnectCategory)
             {

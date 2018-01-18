@@ -18,19 +18,13 @@ namespace PubNubMessaging.Tests
         const string messageForNoStorePublish = "Pubnub Messaging With No Storage";
         const string messageForPublish = "Pubnub Messaging API 1";
 
-        private static bool receivedGrantMessage = false;
-        private static bool receivedMessage = false;
+        private static bool receivedGrantMessage;
+        private static bool receivedMessage;
+        private static long currentTimetoken;
 
-        private static long currentTimetoken = 0;
-        static List<int> firstPublishSet;
-        static List<double> secondPublishSet;
         private static List<object> historyMessageList = new List<object>();
 
-        static long starttime = Int64.MaxValue;
-        static long midtime = Int64.MaxValue;
-        static long endtime = Int64.MaxValue;
-
-        private static long publishTimetoken = 0;
+        private static long publishTimetoken;
         static int manualResetEventWaitTimeout = 310 * 1000;
         private static string channel = "hello_my_channel";
         private static string authKey = "myAuth";
@@ -49,7 +43,7 @@ namespace PubNubMessaging.Tests
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
 
-            if (!PubnubCommon.PAMEnabled) return;
+            if (!PubnubCommon.PAMEnabled) { return; }
 
             receivedGrantMessage = false;
 
@@ -66,7 +60,7 @@ namespace PubNubMessaging.Tests
 
             pubnub = createPubNubInstance(config);
 
-            string channel = "hello_my_channel";
+            string grantChannel = "hello_my_channel";
 
             string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":20,\"channel\":\"hello_my_channel\",\"auths\":{\"myAuth\":{\"r\":1,\"w\":1,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
 
@@ -74,7 +68,7 @@ namespace PubNubMessaging.Tests
                     .WithMethod("GET")
                     .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
                     .WithParameter("auth", authKey)
-                    .WithParameter("channel", channel)
+                    .WithParameter("channel", grantChannel)
                     .WithParameter("m", "1")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("r", "1")
@@ -87,7 +81,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+            pubnub.Grant().Channels(new [] { grantChannel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
 
             Thread.Sleep(1000);
 
@@ -296,7 +290,7 @@ namespace PubNubMessaging.Tests
 
             historyManualEvent = new ManualResetEvent(false);
 
-            string expected = expected = "[[\"Pubnub Messaging API 1\",\"Pubnub Messaging API 2\",\"Pubnub Messaging API 3\",\"Pubnub Messaging API 4\",\"Pubnub Messaging API 5\",\"Pubnub Messaging API 6\",\"Pubnub Messaging API 7\",\"Pubnub Messaging API 8\",\"Pubnub Messaging API 9\",\"Pubnub Messaging API 10\"],14715432709547189,14715432709547189]";
+            string expected = "[[\"Pubnub Messaging API 1\",\"Pubnub Messaging API 2\",\"Pubnub Messaging API 3\",\"Pubnub Messaging API 4\",\"Pubnub Messaging API 5\",\"Pubnub Messaging API 6\",\"Pubnub Messaging API 7\",\"Pubnub Messaging API 8\",\"Pubnub Messaging API 9\",\"Pubnub Messaging API 10\"],14715432709547189,14715432709547189]";
 
             server.AddRequest(new Request()
                     .WithMethod("GET")
@@ -447,7 +441,7 @@ namespace PubNubMessaging.Tests
 
                 historyManualEvent = new ManualResetEvent(false);
 
-                expected = expected = "[[\"Pubnub Messaging API 1\",\"Pubnub Messaging API 2\",\"Pubnub Messaging API 3\",\"Pubnub Messaging API 4\",\"Pubnub Messaging API 5\",\"Pubnub Messaging API 6\",\"Pubnub Messaging API 7\",\"Pubnub Messaging API 8\",\"Pubnub Messaging API 9\",\"Pubnub Messaging API 10\"],14715432709547189,14715432709547189]";
+                expected = "[[\"Pubnub Messaging API 1\",\"Pubnub Messaging API 2\",\"Pubnub Messaging API 3\",\"Pubnub Messaging API 4\",\"Pubnub Messaging API 5\",\"Pubnub Messaging API 6\",\"Pubnub Messaging API 7\",\"Pubnub Messaging API 8\",\"Pubnub Messaging API 9\",\"Pubnub Messaging API 10\"],14715432709547189,14715432709547189]";
 
                 server.AddRequest(new Request()
                         .WithMethod("GET")
@@ -602,9 +596,9 @@ namespace PubNubMessaging.Tests
 
             receivedMessage = false;
             int totalMessages = 10;
-            starttime = 0;
-            midtime = 0;
-            endtime = 0;
+            long starttime = 0;
+            long midtime = 0;
+            long endtime = 0;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -638,8 +632,8 @@ namespace PubNubMessaging.Tests
 
             starttime = currentTimetoken;
 
-            Console.WriteLine(string.Format("Start Time = {0}", starttime));
-            firstPublishSet = new List<int>();
+            System.Diagnostics.Debug.WriteLine(string.Format("Start Time = {0}", starttime));
+            List<int> firstPublishSet = new List<int>();
 
             for (int index = 0; index < totalMessages / 2; index++)
             {
@@ -661,7 +655,7 @@ namespace PubNubMessaging.Tests
                 pubnub.Publish().Channel(channel).Message(message).ShouldStore(true).Async(new UTPublishResult());
                 publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-                Console.WriteLine(string.Format("Message #{0} publish {1}", index, (receivedMessage) ? "SUCCESS" : "FAILED"));
+                System.Diagnostics.Debug.WriteLine(string.Format("Message #{0} publish {1}", index, (receivedMessage) ? "SUCCESS" : "FAILED"));
             }
 
             currentTimetoken = 0;
@@ -681,8 +675,8 @@ namespace PubNubMessaging.Tests
 
             midtime = currentTimetoken;
 
-            Console.WriteLine(string.Format("Mid Time = {0}", midtime));
-            secondPublishSet = new List<double>();
+            System.Diagnostics.Debug.WriteLine(string.Format("Mid Time = {0}", midtime));
+            List<double> secondPublishSet = new List<double>();
             int arrayIndex = 0;
 
             for (int index = totalMessages / 2; index < totalMessages; index++)
@@ -708,7 +702,7 @@ namespace PubNubMessaging.Tests
                 pubnub.Publish().Channel(channel).Message(message).ShouldStore(true).Async(new UTPublishResult());
                 publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-                Console.WriteLine(string.Format("Message #{0} publish {1}", index, (receivedMessage) ? "SUCCESS" : "FAILED"));
+                System.Diagnostics.Debug.WriteLine(string.Format("Message #{0} publish {1}", index, (receivedMessage) ? "SUCCESS" : "FAILED"));
             }
 
             currentTimetoken = 0;
@@ -728,11 +722,11 @@ namespace PubNubMessaging.Tests
 
             endtime = currentTimetoken;
 
-            Console.WriteLine(string.Format("End Time = {0}", endtime));
+            System.Diagnostics.Debug.WriteLine(string.Format("End Time = {0}", endtime));
 
             Thread.Sleep(1000);
 
-            Console.WriteLine("Detailed History with Start & End");
+            System.Diagnostics.Debug.WriteLine("Detailed History with Start & End");
 
             historyManualEvent = new ManualResetEvent(false);
 
@@ -770,11 +764,11 @@ namespace PubNubMessaging.Tests
 
             if (!receivedMessage)
             {
-                Console.WriteLine("firstPublishSet did not match");
+                System.Diagnostics.Debug.WriteLine("firstPublishSet did not match");
             }
             else
             {
-                Console.WriteLine("DetailedHistory with start & reverse = true");
+                System.Diagnostics.Debug.WriteLine("DetailedHistory with start & reverse = true");
 
                 historyManualEvent = new ManualResetEvent(false);
 
@@ -811,14 +805,14 @@ namespace PubNubMessaging.Tests
 
                 if (!receivedMessage)
                 {
-                    Console.WriteLine("secondPublishSet did not match");
+                    System.Diagnostics.Debug.WriteLine("secondPublishSet did not match");
                 }
                 else
                 {
                     Console.WriteLine("DetailedHistory with start & reverse = false");
                     historyManualEvent = new ManualResetEvent(false);
 
-                    expected = expected = "[[\"kvIeHmojsLyV1KMBo82DYQ==\",\"Ld0rZfbe4yN0Qj4V7o2BuQ==\",\"zNlnhYco9o6a646+Ox6ksg==\",\"mR8EEMx154BBHU3OOa+YjQ==\",\"v+viLoq0Gj2docUMAYyoYg==\"],14835550731714499,14835550737165103]";
+                    expected = "[[\"kvIeHmojsLyV1KMBo82DYQ==\",\"Ld0rZfbe4yN0Qj4V7o2BuQ==\",\"zNlnhYco9o6a646+Ox6ksg==\",\"mR8EEMx154BBHU3OOa+YjQ==\",\"v+viLoq0Gj2docUMAYyoYg==\"],14835550731714499,14835550737165103]";
 
                     server.AddRequest(new Request()
                             .WithMethod("GET")
@@ -860,9 +854,9 @@ namespace PubNubMessaging.Tests
         {
             receivedMessage = false;
             int totalMessages = 10;
-            starttime = 0;
-            midtime = 0;
-            endtime = 0;
+            long starttime = 0;
+            long midtime = 0;
+            long endtime = 0;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -897,7 +891,7 @@ namespace PubNubMessaging.Tests
             starttime = currentTimetoken;
 
             Console.WriteLine(string.Format("Start Time = {0}", starttime));
-            firstPublishSet = new List<int>();
+            List<int> firstPublishSet = new List<int>();
 
             for (int index = 0; index < totalMessages / 2; index++)
             {
@@ -942,7 +936,7 @@ namespace PubNubMessaging.Tests
             midtime = currentTimetoken;
 
             Console.WriteLine(string.Format("Mid Time = {0}", midtime));
-            secondPublishSet = new List<double>();
+            List<double> secondPublishSet = new List<double>();
             int arrayIndex = 0;
 
             for (int index = totalMessages / 2; index < totalMessages; index++)
@@ -996,7 +990,7 @@ namespace PubNubMessaging.Tests
 
             historyManualEvent = new ManualResetEvent(false);
 
-            expected = expected = "[[0,1,2,3,4],14715432709547189,14715432709547189]";
+            expected = "[[0,1,2,3,4],14715432709547189,14715432709547189]";
 
             server.AddRequest(new Request()
                     .WithMethod("GET")
@@ -1038,7 +1032,7 @@ namespace PubNubMessaging.Tests
 
                 historyManualEvent = new ManualResetEvent(false);
 
-                expected = expected = "[[5.1,6.1,7.1,8.1,9.1],14715432709547189,14715432709547189]";
+                expected = "[[5.1,6.1,7.1,8.1,9.1],14715432709547189,14715432709547189]";
 
                 server.AddRequest(new Request()
                         .WithMethod("GET")
@@ -1173,12 +1167,12 @@ namespace PubNubMessaging.Tests
                         case "DetailHistoryShouldReturnEncrypedSecretSSLMessage":
                         case "DetailHistoryShouldReturnEncrypedSSLMessage":
                             receivedMessage = true;
-                            publishManualEvent.Set();
                             break;
                         default:
                             break;
                     }
                 }
+                publishManualEvent.Set();
             }
         };
 
@@ -1278,9 +1272,7 @@ namespace PubNubMessaging.Tests
                         }
                     }
                 }
-                catch
-                {
-                }
+                catch { /* ignore */ }
                 finally
                 {
                     timeManualEvent.Set();

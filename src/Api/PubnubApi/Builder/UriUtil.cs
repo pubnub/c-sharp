@@ -8,7 +8,7 @@ namespace PubnubApi
 {
     public class UriUtil
     {
-        public string EncodeUriComponent(string s, PNOperationType type, bool ignoreComma, bool ignorePercent2fEncode)
+        public string EncodeUriComponent(string s, PNOperationType type, bool ignoreComma, bool ignoreColon, bool ignorePercent2fEncode)
         {
             string encodedUri = "";
             bool prevSurroagePair = false;
@@ -21,7 +21,7 @@ namespace PubnubApi
                     continue;
                 }
 
-                if (IsUnsafe(ch, ignoreComma))
+                if (IsUnsafe(ch, ignoreComma, ignoreColon))
                 {
                     o.Append('%');
                     o.Append(ToHex(ch / 16));
@@ -30,7 +30,7 @@ namespace PubnubApi
                 else
                 {
                     int positionOfChar = s.IndexOf(ch);
-                    if (ch == ',' && ignoreComma)
+                    if ((ch == ',' && ignoreComma) || (ch == ':' && ignoreColon))
                     {
                         o.Append(ch.ToString());
                     }
@@ -92,9 +92,17 @@ namespace PubnubApi
             return encodedUri;
         }
 
-        private bool IsUnsafe(char ch, bool ignoreComma)
+        private static bool IsUnsafe(char ch, bool ignoreComma, bool ignoreColon)
         {
-            if (ignoreComma)
+            if (ignoreComma && ignoreColon)
+            {
+                return " ~`!@#$%^&*()+=[]\\{}|;'\"/<>?".IndexOf(ch) >= 0;
+            }
+            else if (ignoreColon)
+            {
+                return " ~`!@#$%^&*()+=[]\\{}|;'\",/<>?".IndexOf(ch) >= 0;
+            }
+            else if (ignoreComma)
             {
                 return " ~`!@#$%^&*()+=[]\\{}|;':\"/<>?".IndexOf(ch) >= 0;
             }

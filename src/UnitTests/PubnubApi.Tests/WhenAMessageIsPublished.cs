@@ -9,33 +9,14 @@ using PubnubApi.Tests;
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
-    public class WhenAMessageIsPublished : TestHarness, IDisposable
+    public class WhenAMessageIsPublished : TestHarness
     {
-        private static ManualResetEvent grantManualEvent = new ManualResetEvent(false);
-        private static ManualResetEvent publishManualEvent = new ManualResetEvent(false);
-        private static ManualResetEvent historyManualEvent = new ManualResetEvent(false);
-
-        private static bool receivedGrantMessage = false;
-        private static bool receivedPublishMessage = false;
-
-        private static long publishTimetoken;
-        private static long unEncryptObjectPublishTimetoken;
-        private static long encryptObjectPublishTimetoken;
-        private static long encryptPublishTimetoken;
-        private static long secretEncryptPublishTimetoken;
-        private static long complexObjectPublishTimetoken;
-
         private const string messageForUnencryptPublish = "Pubnub Messaging API 1";
         private const string messageForEncryptPublish = "漢語";
         private const string messageForSecretEncryptPublish = "Pubnub Messaging API 2";
 
         private static int manualResetEventWaitTimeout = 310 * 1000;
-        private static string channel = "hello_my_channel";
-        private static string authKey = "myAuth";
-        private static string currentTestCase = "";
-
         private static Pubnub pubnub;
-
         private static Server server;
 
         [TestFixtureSetUp]
@@ -49,7 +30,9 @@ namespace PubNubMessaging.Tests
 
             if (!PubnubCommon.PAMEnabled) return;
 
-            receivedGrantMessage = false;
+            bool receivedGrantMessage = false;
+            string channel = "hello_my_channel";
+            string authKey = "myAuth";
 
             PNConfiguration config = new PNConfiguration
             {
@@ -83,7 +66,31 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+            ManualResetEvent grantManualEvent = new ManualResetEvent(false);
+            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
+                .Async(new PNAccessManagerGrantResultExt(
+                                (r, s) =>
+                                {
+                                    try
+                                    {
+                                        Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
+                                        if (r != null)
+                                        {
+                                            Console.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                            if (r.Channels != null && r.Channels.Count > 0)
+                                            {
+                                                var read = r.Channels[channel][authKey].ReadEnabled;
+                                                var write = r.Channels[channel][authKey].WriteEnabled;
+                                                if (read && write) { receivedGrantMessage = true; }
+                                            }
+                                        }
+                                    }
+                                    catch { /* ignore */  }
+                                    finally
+                                    {
+                                        grantManualEvent.Set();
+                                    }
+                                }));
 
             if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
 
@@ -133,7 +140,7 @@ namespace PubNubMessaging.Tests
             pubnub.Publish()
                     .Channel(channel)
                     .Message(message)
-                    .Async(new UTPublishResult());
+                    .Async(new PNPublishResultExt((r, s) => { }));
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
@@ -145,9 +152,9 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedPublishMessage = false;
-            publishTimetoken = 0;
-            currentTestCase = "ThenUnencryptPublishShouldReturnSuccessCodeAndInfo";
+            bool receivedPublishMessage = false;
+
+            long publishTimetoken = 0;
 
             string channel = "hello_my_channel";
             string message = messageForUnencryptPublish;
@@ -175,8 +182,17 @@ namespace PubNubMessaging.Tests
 
             manualResetEventWaitTimeout = 310 * 1000;
 
-            publishManualEvent = new ManualResetEvent(false);
-            pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message)
+                    .Async(new PNPublishResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            publishTimetoken = r.Timetoken;
+                            receivedPublishMessage = true;
+                        }
+                        publishManualEvent.Set();
+                    }));
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             if (!receivedPublishMessage)
@@ -203,13 +219,19 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                historyManualEvent = new ManualResetEvent(false);
+                ManualResetEvent historyManualEvent = new ManualResetEvent(false);
 
                 pubnub.History().Channel(channel)
                     .End(PubnubCommon.EnableStubTest ? 14715278266153304 : publishTimetoken)
                     .Reverse(false)
                     .IncludeTimetoken(true)
-                    .Async(new UTHistoryResult());
+                    .Async(new PNHistoryResultExt(
+                                (r, s) =>
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedPublishMessage = true;
+                                    historyManualEvent.Set();
+                                }));
 
                 historyManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -225,9 +247,9 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedPublishMessage = false;
-            publishTimetoken = 0;
-            currentTestCase = "ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo";
+            bool receivedPublishMessage = false;
+
+            long publishTimetoken = 0;
 
             string channel = "hello_my_channel";
             object message = new CustomClass();
@@ -255,8 +277,17 @@ namespace PubNubMessaging.Tests
 
             manualResetEventWaitTimeout = 310 * 1000;
 
-            publishManualEvent = new ManualResetEvent(false);
-            pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message)
+                    .Async(new PNPublishResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            publishTimetoken = r.Timetoken;
+                            receivedPublishMessage = true;
+                        }
+                        publishManualEvent.Set();
+                    }));
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             if (!receivedPublishMessage)
@@ -283,13 +314,19 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                historyManualEvent = new ManualResetEvent(false);
+                ManualResetEvent historyManualEvent = new ManualResetEvent(false);
 
                 pubnub.History().Channel(channel)
-                    .End(PubnubCommon.EnableStubTest ? 14715286132003364 : unEncryptObjectPublishTimetoken)
+                    .End(PubnubCommon.EnableStubTest ? 14715286132003364 : publishTimetoken)
                     .Reverse(false)
                     .IncludeTimetoken(true)
-                    .Async(new UTHistoryResult());
+                    .Async(new PNHistoryResultExt(
+                                (r, s) =>
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedPublishMessage = true;
+                                    historyManualEvent.Set();
+                                }));
 
                 historyManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -305,9 +342,9 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedPublishMessage = false;
-            publishTimetoken = 0;
-            currentTestCase = "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo";
+            bool receivedPublishMessage = false;
+
+            long publishTimetoken = 0;
 
             string channel = "hello_my_channel";
             object message = new SecretCustomClass();
@@ -337,8 +374,17 @@ namespace PubNubMessaging.Tests
 
             manualResetEventWaitTimeout = 310 * 1000;
 
-            publishManualEvent = new ManualResetEvent(false);
-            pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message)
+                    .Async(new PNPublishResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            publishTimetoken = r.Timetoken;
+                            receivedPublishMessage = true;
+                        }
+                        publishManualEvent.Set();
+                    }));
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             if (!receivedPublishMessage)
@@ -364,14 +410,20 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                historyManualEvent = new ManualResetEvent(false);
+                ManualResetEvent historyManualEvent = new ManualResetEvent(false);
 
                 pubnub.History().Channel(channel)
-                    .End(PubnubCommon.EnableStubTest ? 14715325228931129 : encryptObjectPublishTimetoken)
+                    .End(PubnubCommon.EnableStubTest ? 14715325228931129 : publishTimetoken)
                     .Count(100)
                     .Reverse(false)
                     .IncludeTimetoken(false)
-                    .Async(new UTHistoryResult());
+                    .Async(new PNHistoryResultExt(
+                                (r, s) =>
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedPublishMessage = true;
+                                    historyManualEvent.Set();
+                                }));
 
                 historyManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -387,9 +439,8 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedPublishMessage = false;
-            publishTimetoken = 0;
-            currentTestCase = "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfoWithSSL";
+            bool receivedPublishMessage = false;
+            long publishTimetoken = 0;
 
             string channel = "hello_my_channel";
             object message = new SecretCustomClass();
@@ -419,8 +470,17 @@ namespace PubNubMessaging.Tests
 
             manualResetEventWaitTimeout = 310 * 1000;
 
-            publishManualEvent = new ManualResetEvent(false);
-            pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message)
+                    .Async(new PNPublishResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            publishTimetoken = r.Timetoken;
+                            receivedPublishMessage = true;
+                        }
+                        publishManualEvent.Set();
+                    }));
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             if (!receivedPublishMessage)
@@ -446,14 +506,20 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                historyManualEvent = new ManualResetEvent(false);
+                ManualResetEvent historyManualEvent = new ManualResetEvent(false);
 
                 pubnub.History().Channel(channel)
-                    .End(PubnubCommon.EnableStubTest ? 14715325228931129 : encryptObjectPublishTimetoken)
+                    .End(PubnubCommon.EnableStubTest ? 14715325228931129 : publishTimetoken)
                     .Count(100)
                     .Reverse(false)
                     .IncludeTimetoken(false)
-                    .Async(new UTHistoryResult());
+                    .Async(new PNHistoryResultExt(
+                                (r, s) =>
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedPublishMessage = true;
+                                    historyManualEvent.Set();
+                                }));
 
                 historyManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -469,9 +535,8 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedPublishMessage = false;
-            publishTimetoken = 0;
-            currentTestCase = "ThenEncryptPublishShouldReturnSuccessCodeAndInfo";
+            bool receivedPublishMessage = false;
+            long publishTimetoken = 0;
 
             string channel = "hello_my_channel";
             string message = messageForEncryptPublish;
@@ -501,8 +566,21 @@ namespace PubNubMessaging.Tests
 
             manualResetEventWaitTimeout = 310 * 1000;
 
-            publishManualEvent = new ManualResetEvent(false);
-            pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message)
+                    .Async(new PNPublishResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            publishTimetoken = r.Timetoken;
+                            receivedPublishMessage = true;
+                            publishManualEvent.Set();
+                        }
+                        else
+                        {
+                            publishManualEvent.Set();
+                        }
+                    }));
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             if (!receivedPublishMessage)
@@ -529,13 +607,19 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                historyManualEvent = new ManualResetEvent(false);
+                ManualResetEvent historyManualEvent = new ManualResetEvent(false);
 
                 pubnub.History().Channel(channel)
-                    .End(PubnubCommon.EnableStubTest ? 14715426119520817 : encryptPublishTimetoken)
+                    .End(PubnubCommon.EnableStubTest ? 14715426119520817 : publishTimetoken)
                     .Reverse(false)
                     .IncludeTimetoken(true)
-                    .Async(new UTHistoryResult());
+                    .Async(new PNHistoryResultExt(
+                                (r, s) =>
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedPublishMessage = true;
+                                    historyManualEvent.Set();
+                                }));
 
                 historyManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -552,9 +636,8 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedPublishMessage = false;
-            publishTimetoken = 0;
-            currentTestCase = "ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo";
+            bool receivedPublishMessage = false;
+            long publishTimetoken = 0;
 
             string channel = "hello_my_channel";
             string message = messageForSecretEncryptPublish;
@@ -587,8 +670,17 @@ namespace PubNubMessaging.Tests
 
             manualResetEventWaitTimeout = 310 * 1000;
 
-            publishManualEvent = new ManualResetEvent(false);
-            pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message)
+                    .Async(new PNPublishResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            publishTimetoken = r.Timetoken;
+                            receivedPublishMessage = true;
+                        }
+                        publishManualEvent.Set();
+                    }));
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             if (!receivedPublishMessage)
@@ -616,13 +708,19 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                historyManualEvent = new ManualResetEvent(false);
+                ManualResetEvent historyManualEvent = new ManualResetEvent(false);
 
                 pubnub.History().Channel(channel)
-                    .End(PubnubCommon.EnableStubTest ? 14715438956854374 : secretEncryptPublishTimetoken)
+                    .End(PubnubCommon.EnableStubTest ? 14715438956854374 : publishTimetoken)
                     .Reverse(false)
                     .IncludeTimetoken(false)
-                    .Async(new UTHistoryResult());
+                    .Async(new PNHistoryResultExt(
+                                (r, s) =>
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedPublishMessage = true;
+                                    historyManualEvent.Set();
+                                }));
 
                 historyManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -639,9 +737,8 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedPublishMessage = false;
-            publishTimetoken = 0;
-            currentTestCase = "ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo";
+            bool receivedPublishMessage = false;
+            long publishTimetoken = 0;
 
             string channel = "hello_my_channel";
             object message = new PubnubDemoObject();
@@ -670,8 +767,17 @@ namespace PubNubMessaging.Tests
 
             manualResetEventWaitTimeout = 310 * 1000;
 
-            publishManualEvent = new ManualResetEvent(false);
-            pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message)
+                    .Async(new PNPublishResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            publishTimetoken = r.Timetoken;
+                            receivedPublishMessage = true;
+                        }
+                        publishManualEvent.Set();
+                    }));
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             if (!receivedPublishMessage)
@@ -700,13 +806,19 @@ namespace PubNubMessaging.Tests
 
                 Console.WriteLine("WhenAMessageIsPublished-ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo - Publish OK. Now checking detailed history");
 
-                historyManualEvent = new ManualResetEvent(false);
+                ManualResetEvent historyManualEvent = new ManualResetEvent(false);
 
                 pubnub.History().Channel(channel)
-                    .End(PubnubCommon.EnableStubTest ? 14715459088445832 : complexObjectPublishTimetoken)
+                    .End(PubnubCommon.EnableStubTest ? 14715459088445832 : publishTimetoken)
                     .Reverse(false)
                     .IncludeTimetoken(true)
-                    .Async(new UTHistoryResult());
+                    .Async(new PNHistoryResultExt(
+                                (r, s) =>
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    receivedPublishMessage = true;
+                                    historyManualEvent.Set();
+                                }));
 
                 historyManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -747,7 +859,8 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
 
-            pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
+            pubnub.Publish().Channel(channel).Message(message)
+                    .Async(new PNPublishResultExt((r, s) => { }));
             pubnub = null;
 
         }
@@ -757,9 +870,8 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedPublishMessage = false;
-            publishTimetoken = 0;
-            currentTestCase = "ThenOptionalSecretKeyShouldBeProvidedInConfig";
+            bool receivedPublishMessage = false;
+            long publishTimetoken = 0;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -791,8 +903,17 @@ namespace PubNubMessaging.Tests
 
             manualResetEventWaitTimeout = 310 * 1000;
 
-            publishManualEvent = new ManualResetEvent(false);
-            pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message)
+                    .Async(new PNPublishResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            publishTimetoken = r.Timetoken;
+                            receivedPublishMessage = true;
+                        }
+                        publishManualEvent.Set();
+                    }));
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             pubnub.Destroy();
@@ -806,9 +927,8 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedPublishMessage = false;
-            publishTimetoken = 0;
-            currentTestCase = "IfSSLNotProvidedThenDefaultShouldBeTrue";
+            bool receivedPublishMessage = false;
+            long publishTimetoken = 0;
 
             string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
@@ -835,8 +955,17 @@ namespace PubNubMessaging.Tests
 
             manualResetEventWaitTimeout = 310 * 1000;
 
-            publishManualEvent = new ManualResetEvent(false);
-            pubnub.Publish().Channel(channel).Message(message).Async(new UTPublishResult());
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message)
+                    .Async(new PNPublishResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            publishTimetoken = r.Timetoken;
+                            receivedPublishMessage = true;
+                        }
+                        publishManualEvent.Set();
+                    }));
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             pubnub.Destroy();
@@ -844,119 +973,5 @@ namespace PubNubMessaging.Tests
             pubnub = null;
             Assert.IsTrue(receivedPublishMessage, "Publish Failed with no SSL");
         }
-
-        private class UTGrantResult : PNCallback<PNAccessManagerGrantResult>
-        {
-            public override void OnResponse(PNAccessManagerGrantResult result, PNStatus status)
-            {
-                try
-                {
-                    Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-
-                    if (result != null)
-                    {
-                        Console.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                        if (result.Channels != null && result.Channels.Count > 0)
-                        {
-                            var read = result.Channels[channel][authKey].ReadEnabled;
-                            var write = result.Channels[channel][authKey].WriteEnabled;
-                            if (read && write)
-                            {
-                                receivedGrantMessage = true;
-                            }
-                        }
-                    }
-                }
-                catch
-                {
-                }
-                finally
-                {
-                    grantManualEvent.Set();
-                }
-            }
-        }
-
-        public class UTPublishResult : PNCallback<PNPublishResult>
-        {
-            public override void OnResponse(PNPublishResult result, PNStatus status)
-            {
-                Console.WriteLine("Publish Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                Console.WriteLine("Publish PNStatus => Status = : " + status.StatusCode.ToString());
-                if (result != null && status.StatusCode == 200 && !status.Error)
-                {
-                    publishTimetoken = result.Timetoken;
-                    switch (currentTestCase)
-                    {
-                        case "ThenUnencryptPublishShouldReturnSuccessCodeAndInfo":
-                        case "ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo":
-                        case "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo":
-                        case "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfoWithSSL":
-                        case "ThenEncryptPublishShouldReturnSuccessCodeAndInfo":
-                        case "ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo":
-                        case "ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo":
-                        case "ThenDisableJsonEncodeShouldSendSerializedObjectMessage":
-                        case "ThenLargeMessageShoudFailWithMessageTooLargeInfo":
-                        case "ThenOptionalSecretKeyShouldBeProvidedInConfig":
-                        case "IfSSLNotProvidedThenDefaultShouldBeTrue":
-                            receivedPublishMessage = true;
-                            publishManualEvent.Set();
-                            break;
-                    }
-                }
-            }
-        };
-
-        public class UTHistoryResult : PNCallback<PNHistoryResult>
-        {
-            public override void OnResponse(PNHistoryResult result, PNStatus status)
-            {
-                Console.WriteLine("History Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                Console.WriteLine("History PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-                if (status.StatusCode == 200 && !status.Error)
-                {
-                    switch (currentTestCase)
-                    {
-                        case "ThenUnencryptPublishShouldReturnSuccessCodeAndInfo":
-                        case "ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo":
-                        case "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfo":
-                        case "ThenEncryptObjectPublishShouldReturnSuccessCodeAndInfoWithSSL":
-                        case "ThenEncryptPublishShouldReturnSuccessCodeAndInfo":
-                        case "ThenSecretKeyWithEncryptPublishShouldReturnSuccessCodeAndInfo":
-                        case "ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo":
-                        case "ThenDisableJsonEncodeShouldSendSerializedObjectMessage":
-                            receivedPublishMessage = true;
-                            historyManualEvent.Set();
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        };
-
-        #region IDisposable Support
-        private bool disposedValue; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    grantManualEvent.Dispose();
-                    publishManualEvent.Dispose();
-                    historyManualEvent.Dispose();
-                }
-
-                disposedValue = true;
-            }
-        }
-
-        void IDisposable.Dispose()
-        {
-            Dispose(true);
-        }
-        #endregion
     }
 }

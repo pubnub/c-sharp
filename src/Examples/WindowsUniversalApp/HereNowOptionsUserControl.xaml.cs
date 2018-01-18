@@ -19,7 +19,7 @@ namespace WindowsUniversalApp
 {
     public sealed partial class HereNowOptionsUserControl : UserControl
     {
-        public bool IsOKButtonEntered = false;
+        internal bool IsOKButtonEntered;
 
         public HereNowOptionsUserControl()
         {

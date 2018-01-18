@@ -10,25 +10,11 @@ namespace PubNubMessaging.Tests
     [TestFixture]
     public class WhenSubscribedToAChannel : TestHarness
     {
-        private static ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
-        private static ManualResetEvent publishManualEvent = new ManualResetEvent(false);
-        private static ManualResetEvent grantManualEvent = new ManualResetEvent(false);
-
-        private static bool receivedMessage = false;
-        private static object publishedMessage;
-        private static long publishTimetoken = 0;
-        private static bool receivedGrantMessage = false;
-
-        private static int numberOfReceivedMessages = 0;
-
         static int manualResetEventWaitTimeout = 310 * 1000;
-        private static string channel = "hello_my_channel";
-        private static string[] channelsGrant = { "hello_my_channel", "hello_my_channel1", "hello_my_channel2" };
         private static string authKey = "myAuth";
-        private static string currentTestCase = "";
+        private static string channel = "hello_my_channel";
 
         private static Pubnub pubnub;
-
         private static Server server;
 
         [TestFixtureSetUp]
@@ -42,7 +28,10 @@ namespace PubNubMessaging.Tests
 
             if (!PubnubCommon.PAMEnabled) return;
 
-            receivedGrantMessage = false;
+            bool receivedGrantMessage = false;
+            
+            
+            string[] channelsGrant = { "hello_my_channel", "hello_my_channel1", "hello_my_channel2" };
 
             PNConfiguration config = new PNConfiguration
             {
@@ -76,7 +65,49 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().Channels(channelsGrant).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+            ManualResetEvent grantManualEvent = new ManualResetEvent(false);
+            pubnub.Grant().Channels(channelsGrant).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
+                .Async(new PNAccessManagerGrantResultExt(
+                                (r, s) =>
+                                {
+                                    try
+                                    {
+                                        if (r != null)
+                                        {
+                                            Console.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                            if (r.Channels != null && r.Channels.Count > 0)
+                                            {
+                                                foreach (KeyValuePair<string, Dictionary<string, PNAccessManagerKeyData>> channelKP in r.Channels)
+                                                {
+                                                    string receivedChannel = channelKP.Key;
+                                                    if (Array.IndexOf(channelsGrant, receivedChannel) > -1)
+                                                    {
+                                                        var read = r.Channels[receivedChannel][authKey].ReadEnabled;
+                                                        var write = r.Channels[receivedChannel][authKey].WriteEnabled;
+                                                        if (read && write)
+                                                        {
+                                                            receivedGrantMessage = true;
+                                                        }
+                                                        else
+                                                        {
+                                                            receivedGrantMessage = false;
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        receivedGrantMessage = false;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    catch { /* ignore */ }
+                                    finally
+                                    {
+                                        grantManualEvent.Set();
+                                    }
+                                }));
 
             Thread.Sleep(1000);
 
@@ -105,15 +136,17 @@ namespace PubNubMessaging.Tests
         public static void ThenComplexMessageSubscribeShouldReturnReceivedMessage()
         {
             server.ClearRequests();
+            bool receivedMessage = false;
 
-            currentTestCase = "ThenComplexMessageSubscribeShouldReturnReceivedMessage";
-            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams("", "", false);
+            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams("", "", false, out receivedMessage);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageSubscribeShouldReturnReceivedMessage Failed");
         }
 
-        private static void CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
+        private static void CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(string secretKey, string cipherKey, bool ssl, out bool receivedMessage)
         {
-            receivedMessage = false;
+            bool internalReceivedMessage = false;
+            bool receivedErrorMessage = false;
+            CustomClass publishedMessage = new CustomClass();
 
             PNConfiguration config = new PNConfiguration
             {
@@ -127,14 +160,45 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(ssl);
 
-            SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) => 
+                {
+                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m));
+                    if (m != null)
+                    {
+                        Console.WriteLine("SubscribeCallback: PNMessageResult: {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(m.Message));
+                        if (pubnub.JsonPluggableLibrary.SerializeToJsonString(publishedMessage) == m.Message.ToString())
+                        {
+                            internalReceivedMessage = true;
+                        }
+                        subscribeManualEvent.Set();
+                    }
+                },
+                (o, p) => {
+                    subscribeManualEvent.Set();
+                },
+                (o, s) => {
+                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    if (s.StatusCode != 200 || s.Error)
+                    {
+                        receivedErrorMessage = true;
+                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                        subscribeManualEvent.Set();
+                    }
+                    else if (s.StatusCode == 200 && s.Category == PNStatusCategory.PNConnectedCategory)
+                    {
+                        internalReceivedMessage = true;
+                        subscribeManualEvent.Set();
+                    }
+                });
             pubnub = createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = 310 * 1000;
 
-            subscribeManualEvent = new ManualResetEvent(false);
 
             string expected = "{\"t\":{\"t\":\"14836303477713304\",\"r\":7},\"m\":[]}";
 
@@ -176,8 +240,6 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
-            publishManualEvent = new ManualResetEvent(false);
-            publishedMessage = new CustomClass();
 
             expected = "[1,\"Sent\",\"14836234233392078\"]";
 
@@ -195,14 +257,27 @@ namespace PubNubMessaging.Tests
 
             Thread.Sleep(1000);
 
-            pubnub.Publish().Channel(channel).Message(publishedMessage).Async(new UTPublishResult());
+            if (!receivedErrorMessage)
+            {
+                ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+                pubnub.Publish().Channel(channel).Message(publishedMessage)
+                        .Async(new PNPublishResultExt((r, s) =>
+                        {
+                            if (r != null && s.StatusCode == 200 && !s.Error)
+                            {
+                                internalReceivedMessage = true;
+                            }
+                            publishManualEvent.Set();
+                        }));
 
-            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+                publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
+                pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
 
-            Thread.Sleep(1000);
+                Thread.Sleep(1000);
+            }
 
+            receivedMessage = internalReceivedMessage;
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
@@ -214,9 +289,9 @@ namespace PubNubMessaging.Tests
         public static void ThenComplexMessageSSLSubscribeShouldReturnReceivedMessage()
         {
             server.ClearRequests();
+            bool receivedMessage = false;
 
-            currentTestCase = "ThenComplexMessageSSLSubscribeShouldReturnReceivedMessage";
-            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams("", "", true);
+            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams("", "", true, out receivedMessage);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageSSLSubscribeShouldReturnReceivedMessage Failed");
         }
 
@@ -224,9 +299,9 @@ namespace PubNubMessaging.Tests
         public static void ThenComplexMessageSecretSubscribeShouldReturnReceivedMessage()
         {
             server.ClearRequests();
+            bool receivedMessage = false;
 
-            currentTestCase = "ThenComplexMessageSecretSubscribeShouldReturnReceivedMessage";
-            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(PubnubCommon.SecretKey, "", false);
+            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(PubnubCommon.SecretKey, "", false, out receivedMessage);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageSecretSubscribeShouldReturnReceivedMessage Failed");
         }
 
@@ -234,9 +309,9 @@ namespace PubNubMessaging.Tests
         public static void ThenComplexMessageSecretSSLSubscribeShouldReturnReceivedMessage()
         {
             server.ClearRequests();
+            bool receivedMessage = false;
 
-            currentTestCase = "ThenComplexMessageSecretSSLSubscribeShouldReturnReceivedMessage";
-            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(PubnubCommon.SecretKey, "", true);
+            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(PubnubCommon.SecretKey, "", true, out receivedMessage);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageSecretSSLSubscribeShouldReturnReceivedMessage Failed");
         }
 
@@ -244,9 +319,9 @@ namespace PubNubMessaging.Tests
         public static void ThenComplexMessageCipherSubscribeShouldReturnReceivedMessage()
         {
             server.ClearRequests();
+            bool receivedMessage = false;
 
-            currentTestCase = "ThenComplexMessageCipherSubscribeShouldReturnReceivedMessage";
-            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams("", "enigma", false);
+            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams("", "enigma", false, out receivedMessage);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageCipherSubscribeShouldReturnReceivedMessage Failed");
         }
 
@@ -254,9 +329,9 @@ namespace PubNubMessaging.Tests
         public static void ThenComplexMessageCipherSSLSubscribeShouldReturnReceivedMessage()
         {
             server.ClearRequests();
+            bool receivedMessage = false;
 
-            currentTestCase = "ThenComplexMessageCipherSSLSubscribeShouldReturnReceivedMessage";
-            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams("", "enigma", true);
+            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams("", "enigma", true, out receivedMessage);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageCipherSSLSubscribeShouldReturnReceivedMessage Failed");
         }
 
@@ -264,9 +339,9 @@ namespace PubNubMessaging.Tests
         public static void ThenComplexMessageCipherSecretSubscribeShouldReturnReceivedMessage()
         {
             server.ClearRequests();
+            bool receivedMessage = false;
 
-            currentTestCase = "ThenComplexMessageCipherSecretSubscribeShouldReturnReceivedMessage";
-            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", false);
+            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", false, out receivedMessage);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageCipherSecretSubscribeShouldReturnReceivedMessage Failed");
         }
 
@@ -274,9 +349,9 @@ namespace PubNubMessaging.Tests
         public static void ThenComplexMessageCipherSecretSSLSubscribeShouldReturnReceivedMessage()
         {
             server.ClearRequests();
+            bool receivedMessage = false;
 
-            currentTestCase = "ThenComplexMessageCipherSecretSSLSubscribeShouldReturnReceivedMessage";
-            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", true);
+            CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", true, out receivedMessage);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageCipherSecretSSLSubscribeShouldReturnReceivedMessage Failed");
         }
 
@@ -285,8 +360,7 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedMessage = false;
-            currentTestCase = "ThenSubscribeShouldReturnConnectStatus";
+            bool receivedMessage = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -297,14 +371,23 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) => { },
+                (o, p) => { },
+                (o, s) => {
+                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    if (s.StatusCode == 200 && s.Category == PNStatusCategory.PNConnectedCategory)
+                    {
+                        receivedMessage = true;
+                    }
+                    subscribeManualEvent.Set();
+                });
             pubnub = createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = 310 * 1000;
-
-            subscribeManualEvent = new ManualResetEvent(false);
 
             string expected = "{\"t\":{\"t\":\"14836303477713304\",\"r\":7},\"m\":[]}";
 
@@ -330,9 +413,7 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
-
             Thread.Sleep(1000);
-
             pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
 
             Thread.Sleep(1000);
@@ -350,8 +431,7 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedMessage = false;
-            currentTestCase = "ThenMultiSubscribeShouldReturnConnectStatus";
+            bool receivedMessage = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -362,14 +442,24 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) => { },
+                (o, p) => { },
+                (o, s) => {
+                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    if (s.StatusCode == 200 && s.Category == PNStatusCategory.PNConnectedCategory)
+                    {
+                        receivedMessage = true;
+                    }
+                    subscribeManualEvent.Set();
+                });
             pubnub = createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             manualResetEventWaitTimeout = 310 * 1000;
 
             string channel1 = "hello_my_channel1";
-            subscribeManualEvent = new ManualResetEvent(false);
 
             string expected = "{\"t\":{\"t\":\"14839022442039237\",\"r\":7},\"m\":[]}";
 
@@ -444,8 +534,7 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedMessage = false;
-            currentTestCase = "ThenMultiSubscribeShouldReturnConnectStatusSSL";
+            bool receivedMessage = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -456,14 +545,24 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(true);
 
-            SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) => { },
+                (o, p) => { },
+                (o, s) => {
+                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    if (s.StatusCode == 200 && s.Category == PNStatusCategory.PNConnectedCategory)
+                    {
+                        receivedMessage = true;
+                    }
+                    subscribeManualEvent.Set();
+                });
             pubnub = createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
             manualResetEventWaitTimeout = 310 * 1000;
 
             string channel1 = "hello_my_channel1";
-            subscribeManualEvent = new ManualResetEvent(false);
 
             string expected = "{\"t\":{\"t\":\"14839022442039237\",\"r\":7},\"m\":[]}";
 
@@ -538,8 +637,9 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            receivedMessage = false;
-            currentTestCase = "ThenSubscriberShouldBeAbleToReceiveManyMessages";
+            bool receivedMessage = false;
+            bool receivedErrorMessage = false;
+            int numberOfReceivedMessages = 0;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -550,7 +650,39 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) =>
+                {
+                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m));
+                    if (m != null)
+                    {
+                        Console.WriteLine("SubscribeCallback: PNMessageResult: {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(m.Message));
+                        numberOfReceivedMessages++;
+                        if (numberOfReceivedMessages >= 10)
+                        {
+                            receivedMessage = true;
+                            subscribeManualEvent.Set();
+                        }
+                    }
+                },
+                (o, p) => {
+                    subscribeManualEvent.Set();
+                },
+                (o, s) => {
+                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    if (s.StatusCode != 200 || s.Error)
+                    {
+                        receivedErrorMessage = true;
+                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                        subscribeManualEvent.Set();
+                    }
+                    else if (s.StatusCode == 200 && s.Category == PNStatusCategory.PNConnectedCategory)
+                    {
+                        receivedMessage = true;
+                        subscribeManualEvent.Set();
+                    }
+                });
             pubnub = createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
@@ -558,8 +690,6 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
             numberOfReceivedMessages = 0;
-
-            subscribeManualEvent = new ManualResetEvent(false);
 
             string expected = "{\"t\":{\"t\":\"14839022442039237\",\"r\":7},\"m\":[]}";
 
@@ -585,24 +715,31 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
-
-            if (receivedMessage && !PubnubCommon.EnableStubTest)
-            {
-                subscribeManualEvent = new ManualResetEvent(false); //for messages
-
-                for (int index = 0; index < 10; index++)
+            if (!receivedErrorMessage){
+                if (receivedMessage && !PubnubCommon.EnableStubTest)
                 {
-                    Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Publishing " + index.ToString());
-                    publishManualEvent = new ManualResetEvent(false);
-                    pubnub.Publish().Channel(channel).Message(index.ToString()).Async(new UTPublishResult());
-                    publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+                    for (int index = 0; index < 10; index++)
+                    {
+                        Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Publishing " + index.ToString());
+                        ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+                        pubnub.Publish().Channel(channel).Message(index.ToString())
+                            .Async(new PNPublishResultExt((r, s) =>
+                            {
+                                if (r != null && s.StatusCode == 200 && !s.Error)
+                                {
+                                    receivedMessage = true;
+                                }
+                                publishManualEvent.Set();
+                            }));
+                        publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+                    }
+
                 }
 
+                pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
+
+                Thread.Sleep(1000);
             }
-
-            pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
-
-            Thread.Sleep(1000);
 
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
@@ -612,188 +749,5 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscriberShouldBeAbleToReceiveManyMessages Failed");
         }
 
-        private class UTGrantResult : PNCallback<PNAccessManagerGrantResult>
-        {
-            public override void OnResponse(PNAccessManagerGrantResult result, PNStatus status)
-            {
-                try
-                {
-                    Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-
-                    if (result != null)
-                    {
-                        Console.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                        if (result.Channels != null && result.Channels.Count > 0)
-                        {
-                            foreach(KeyValuePair<string, Dictionary<string, PNAccessManagerKeyData>> channelKP in result.Channels)
-                            {
-                                string channel = channelKP.Key;
-                                if (Array.IndexOf(channelsGrant,channel) > -1)
-                                {
-                                    var read = result.Channels[channel][authKey].ReadEnabled;
-                                    var write = result.Channels[channel][authKey].WriteEnabled;
-                                    if (read && write)
-                                    {
-                                        receivedGrantMessage = true;
-                                    }
-                                    else
-                                    {
-                                        receivedGrantMessage = false;
-                                    }
-                                }
-                                else
-                                {
-                                    receivedGrantMessage = false;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                catch
-                {
-                }
-                finally
-                {
-                    grantManualEvent.Set();
-                }
-            }
-        }
-
-        public class UTSubscribeCallback : SubscribeCallback
-        {
-            public override void Message<T>(Pubnub pubnub, PNMessageResult<T> message)
-            {
-                if (message != null)
-                {
-                    Console.WriteLine("SubscribeCallback: PNMessageResult: {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(message.Message));
-                    switch(currentTestCase)
-                    {
-                        case "ThenComplexMessageSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageSSLSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageSecretSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageSecretSSLSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageCipherSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageCipherSSLSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageCipherSecretSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageCipherSecretSSLSubscribeShouldReturnReceivedMessage":
-                            if (pubnub.JsonPluggableLibrary.SerializeToJsonString(publishedMessage) == message.Message.ToString())
-                            {
-                                receivedMessage = true;
-                            }
-                            subscribeManualEvent.Set();
-                            break;
-                        case "ThenSubscriberShouldBeAbleToReceiveManyMessages":
-                            numberOfReceivedMessages++;
-                            if (numberOfReceivedMessages >= 10)
-                            {
-                                receivedMessage = true;
-                                subscribeManualEvent.Set();
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-
-            public override void Presence(Pubnub pubnub, PNPresenceEventResult presence)
-            {
-            }
-
-            public override void Status(Pubnub pubnub, PNStatus status)
-            {
-                //Console.WriteLine("SubscribeCallback: PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-                Console.WriteLine("SubscribeCallback: PNStatus: " + status.StatusCode.ToString());
-                if (status.StatusCode != 200 || status.Error)
-                {
-                    switch (currentTestCase)
-                    {
-                        case "ThenPresenceShouldReturnReceivedMessage":
-                            //presenceManualEvent.Set();
-                            break;
-                        case "ThenComplexMessageSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageSSLSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageSecretSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageSecretSSLSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageCipherSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageCipherSSLSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageCipherSecretSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageCipherSecretSSLSubscribeShouldReturnReceivedMessage":
-                        case "ThenSubscribeShouldReturnConnectStatus":
-                        case "ThenMultiSubscribeShouldReturnConnectStatus":
-                        case "ThenMultiSubscribeShouldReturnConnectStatusSSL":
-                            subscribeManualEvent.Set();
-                            break;
-                        default:
-                            break;
-                    }
-
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    if (status.ErrorData != null)
-                    {
-                        Console.WriteLine(status.ErrorData.Information);
-                    }
-                    Console.ForegroundColor = ConsoleColor.White;
-                }
-                else if (status.StatusCode == 200 && status.Category == PNStatusCategory.PNConnectedCategory)
-                {
-                    switch (currentTestCase)
-                    {
-                        case "ThenComplexMessageSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageSSLSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageSecretSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageSecretSSLSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageCipherSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageCipherSSLSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageCipherSecretSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageCipherSecretSSLSubscribeShouldReturnReceivedMessage":
-                            subscribeManualEvent.Set();
-                            break;
-                        case "ThenSubscribeShouldReturnConnectStatus":
-                        case "ThenMultiSubscribeShouldReturnConnectStatus":
-                        case "ThenMultiSubscribeShouldReturnConnectStatusSSL":
-                        case "ThenSubscriberShouldBeAbleToReceiveManyMessages":
-                            receivedMessage = true;
-                            subscribeManualEvent.Set();
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-
-            }
-        }
-
-        public class UTPublishResult : PNCallback<PNPublishResult>
-        {
-            public override void OnResponse(PNPublishResult result, PNStatus status)
-            {
-                Console.WriteLine("Publish Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                Console.WriteLine("Publish PNStatus => Status = : " + status.StatusCode.ToString());
-                if (result != null && status.StatusCode == 200 && !status.Error)
-                {
-                    publishTimetoken = result.Timetoken;
-                    switch (currentTestCase)
-                    {
-                        case "ThenComplexMessageSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageSSLSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageSecretSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageSecretSSLSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageCipherSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageCipherSSLSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageCipherSecretSubscribeShouldReturnReceivedMessage":
-                        case "ThenComplexMessageCipherSecretSSLSubscribeShouldReturnReceivedMessage":
-                        case "ThenSubscriberShouldBeAbleToReceiveManyMessages":
-                            receivedMessage = true;
-                            publishManualEvent.Set();
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        }
     }
 }

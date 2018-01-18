@@ -1484,7 +1484,7 @@ namespace PubnubApi
         {
             try
             {
-                if (ChannelReconnectTimer.Count == 0 || !ChannelReconnectTimer.ContainsKey(PubnubInstance.InstanceId))
+                if (string.IsNullOrEmpty(PubnubInstance.InstanceId) || ChannelReconnectTimer == null || ChannelReconnectTimer.Count == 0 || !ChannelReconnectTimer.ContainsKey(PubnubInstance.InstanceId))
                 {
                     return;
                 }
