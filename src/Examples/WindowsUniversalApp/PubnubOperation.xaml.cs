@@ -24,7 +24,7 @@ namespace WindowsUniversalApp
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public partial class PubnubOperation : Page
+    public partial class PubnubOperation : Page //ignore codacy check
     {
         string channel = "";
         string channelGroup = "";
@@ -468,7 +468,7 @@ namespace WindowsUniversalApp
                              {
                                  if (r != null)
                                  {
-                                     await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                     await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                                  }
                              }));
                          }).ConfigureAwait(false);
