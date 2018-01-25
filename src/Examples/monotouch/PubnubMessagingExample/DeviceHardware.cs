@@ -60,46 +60,87 @@ namespace PubnubMessagingExample
                 
                 
                 if (hardwareStr == "iPhone1,1")
+                {
                     ret = HardwareVersion.iPhone;
+                }
                 else if (hardwareStr == "iPhone1,2")
+                {
                     ret = HardwareVersion.iPhone3G;
+                }
                 else if (hardwareStr == "iPhone2,1")
+                {
                     ret = HardwareVersion.iPhone3GS;
+                }
                 else if (hardwareStr == "iPhone3,1")
+                {
                     ret = HardwareVersion.iPhone4;
+                }
                 else if (hardwareStr == "iPhone3,3")
+                {
                     ret = HardwareVersion.VerizoniPhone4;
+                }
                 else if (hardwareStr == "iPhone4,1")
+                {
                     ret = HardwareVersion.iPhone4S;
+                }
                 else if (hardwareStr == "iPad1,1")
+                {
                     ret = HardwareVersion.iPad;
+                }
                 else if (hardwareStr == "iPad2,1")
+                {
                     ret = HardwareVersion.iPad2WIFI;
+                }
                 else if (hardwareStr == "iPad2,2")
+                {
                     ret = HardwareVersion.iPad2GSM;
+                }
                 else if (hardwareStr == "iPad2,3")
+                {
                     ret = HardwareVersion.iPad2CDMA;
+                }
                 else if (hardwareStr == "iPad2,4")
+                {
                     ret = HardwareVersion.iPad2WIFI24;
+                }
                 else if (hardwareStr == "iPad3,1")
+                {
                     ret = HardwareVersion.iPad3WIFI;
+                }
                 else if (hardwareStr == "iPad3,2")
+                {
                     ret = HardwareVersion.iPad3GSM;
+                }
                 else if (hardwareStr == "iPad3,3")
+                {
                     ret = HardwareVersion.iPad3CDMA;
+                }
                 else if (hardwareStr == "iPod1,1")
+                {
                     ret = HardwareVersion.iPod1G;
+                }
                 else if (hardwareStr == "iPod2,1")
+                {
                     ret = HardwareVersion.iPod2G;
+                }
                 else if (hardwareStr == "iPod3,1")
+                {
                     ret = HardwareVersion.iPod3G;
+                }
                 else if (hardwareStr == "iPod4,1")
+                {
                     ret = HardwareVersion.iPod4G;
-                else if (hardwareStr == "i386" || hardwareStr == "x86_64") {
-                    if (UIDevice.CurrentDevice.Model.Contains ("iPhone"))
+                }
+                else if (hardwareStr == "i386" || hardwareStr == "x86_64")
+                {
+                    if (UIDevice.CurrentDevice.Model.Contains("iPhone"))
+                    {
                         ret = UIScreen.MainScreen.Bounds.Height * UIScreen.MainScreen.Scale == 960 || UIScreen.MainScreen.Bounds.Width * UIScreen.MainScreen.Scale == 960 ? HardwareVersion.iPhone4Simulator : HardwareVersion.iPhoneSimulator;
+                    }
                     else
+                    {
                         ret = HardwareVersion.iPadSimulator;
+                    }
                 }
                 
                 Marshal.FreeHGlobal (pLen);

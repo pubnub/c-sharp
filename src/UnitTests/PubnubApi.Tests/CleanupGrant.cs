@@ -17,16 +17,6 @@ namespace PubNubMessaging.Tests
 
         private static Pubnub pubnub;
 
-        [TestFixtureSetUp]
-        public static void Init()
-        {
-        }
-
-        [TestFixtureTearDown]
-        public static void Exit()
-        {
-        }
-
         [Test]
         public static void AtUserLevel()
         {

@@ -39,7 +39,10 @@ namespace PubNubMessaging.Tests
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
 
-            if (!PubnubCommon.PAMEnabled) return;
+            if (!PubnubCommon.PAMEnabled)
+            {
+                return;
+            }
 
             receivedGrantMessage = false;
 
@@ -92,12 +95,6 @@ namespace PubNubMessaging.Tests
         public static void Exit()
         {
             server.Stop();
-        }
-
-        [TestFixtureTearDown]
-        public void Cleanup()
-        {
-
         }
 
         [Test]
