@@ -1338,7 +1338,7 @@ namespace PubnubApi
 
         private void RemoveUserState()
         {
-            if (ChannelLocalUserState.Count == 0 || !ChannelLocalUserState.ContainsKey(PubnubInstance.InstanceId)) return;
+            if (ChannelLocalUserState.Count == 0 || !ChannelLocalUserState.ContainsKey(PubnubInstance.InstanceId)) { return; }
 
             ICollection<string> channelLocalUserStateCollection = ChannelLocalUserState[PubnubInstance.InstanceId].Keys;
             ICollection<string> channelUserStateCollection = ChannelUserState[PubnubInstance.InstanceId].Keys;

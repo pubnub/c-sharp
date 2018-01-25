@@ -75,7 +75,7 @@ namespace PubnubApi
 			{
                 Task[] tasks = new Task[1];
 
-                tasks[0] = Task.Factory.StartNew(async() => await CheckClientNetworkAvailability(CallbackClientNetworkStatus, type, callback, channels, channelGroups));
+                tasks[0] = Task.Factory.StartNew(async() => await CheckClientNetworkAvailability(CallbackClientNetworkStatus, type, callback, channels, channelGroups).ConfigureAwait(false));
                 tasks[0].ConfigureAwait(false);
                 try
                 {

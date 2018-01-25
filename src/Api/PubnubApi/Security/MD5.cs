@@ -45,7 +45,9 @@ namespace PubnubApi
 
                 StringBuilder sb = new StringBuilder();
                 foreach (byte b in hash)
+                {
                     sb.Append(b.ToString("x2"));
+                }
                 return sb.ToString();
             }
         }
@@ -173,7 +175,7 @@ namespace PubnubApi
 		/// <remarks>
 		/// The RFC named it "MD5Init"
 		/// </remarks>
-		public virtual void Initialize()
+		private void Initialize()
 		{
 			count[0] = 0;
             count[1] = 0;
@@ -219,15 +221,19 @@ namespace PubnubApi
 				Transform(this.buffer, 0);
 
 				for (i = partLen; i + 63 < count; i += 64)
-					Transform(input, offset + i);
+                {
+                    Transform(input, offset + i);
+                }
 
-				index = 0;
+                index = 0;
 			}
-			else
-				i = 0;
+            else
+            {
+                i = 0;
+            }
 
-			// Buffer remaining input 
-			System.Buffer.BlockCopy(input, offset + i, this.buffer, index, count - i);
+            // Buffer remaining input 
+            System.Buffer.BlockCopy(input, offset + i, this.buffer, index, count - i);
 		}
 
 		/// <summary>
