@@ -9,9 +9,6 @@ namespace PubNubMessaging.Tests
     [TestFixture]
     public class WhenGetRequestServerTimeMultiInstance : TestHarness
     {
-        private static ManualResetEvent mreTime = new ManualResetEvent(false);
-        private static bool timeReceived1 = false;
-        private static string currentUnitTestCase = "";
         private static long expectedTime = 14725889985315301;
         private static Pubnub pubnub1;
         private static Pubnub pubnub2;
@@ -38,10 +35,7 @@ namespace PubNubMessaging.Tests
         public static void ThenItShouldReturnTimeStamp()
         {
             server.ClearRequests();
-
-            currentUnitTestCase = "ThenItShouldReturnTimeStamp";
-            timeReceived1 = false;
-            mreTime = new ManualResetEvent(false);
+            bool timeReceived1 = false;
 
             PNConfiguration config1 = new PNConfiguration
             {
@@ -85,11 +79,42 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected2)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub1.Time().Async(new TimeResult());
+            ManualResetEvent mreTime = new ManualResetEvent(false);
+            pubnub1.Time().Async(new PNTimeResultExt((r, s) => {
+                try
+                {
+                    Console.WriteLine("PNStatus={0}", pubnub1.JsonPluggableLibrary.SerializeToJsonString(s));
+                    if (r != null)
+                    {
+                        Console.WriteLine(pubnub1.JsonPluggableLibrary.SerializeToJsonString(r));
+                        if (s.StatusCode == 200 && s.Error == false && ((PubnubCommon.EnableStubTest && expectedTime == r.Timetoken) || r.Timetoken > 0))
+                        {
+                            timeReceived1 = true;
+                        }
+                    }
+                }
+                catch { /* ignore */ }
+                finally { mreTime.Set(); }
+            }));
             mreTime.WaitOne(310 * 1000);
 
             mreTime = new ManualResetEvent(false);
-            pubnub2.Time().Async(new TimeResult());
+            pubnub2.Time().Async(new PNTimeResultExt((r, s) => {
+                try
+                {
+                    Console.WriteLine("PNStatus={0}", pubnub1.JsonPluggableLibrary.SerializeToJsonString(s));
+                    if (r != null)
+                    {
+                        Console.WriteLine(pubnub1.JsonPluggableLibrary.SerializeToJsonString(r));
+                        if (s.StatusCode == 200 && s.Error == false && ((PubnubCommon.EnableStubTest && expectedTime == r.Timetoken) || r.Timetoken > 0))
+                        {
+                            timeReceived1 = true;
+                        }
+                    }
+                }
+                catch { /* ignore */ }
+                finally { mreTime.Set(); }
+            }));
             mreTime.WaitOne(310 * 1000);
 
             pubnub1.Destroy();
@@ -105,11 +130,7 @@ namespace PubNubMessaging.Tests
         public static void ThenItShouldReturnTimeStampWithSSL()
         {
             server.ClearRequests();
-
-            currentUnitTestCase = "ThenItShouldReturnTimeStampWithSSL";
-
-            timeReceived1 = false;
-            mreTime = new ManualResetEvent(false);
+            bool timeReceived1 = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -132,8 +153,23 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub1.Time().Async(new TimeResult());
-
+            ManualResetEvent mreTime = new ManualResetEvent(false);
+            pubnub1.Time().Async(new PNTimeResultExt((r, s) => {
+                try
+                {
+                    Console.WriteLine("PNStatus={0}", pubnub1.JsonPluggableLibrary.SerializeToJsonString(s));
+                    if (r != null)
+                    {
+                        Console.WriteLine(pubnub1.JsonPluggableLibrary.SerializeToJsonString(r));
+                        if (s.StatusCode == 200 && s.Error == false && ((PubnubCommon.EnableStubTest && expectedTime == r.Timetoken) || r.Timetoken > 0))
+                        {
+                            timeReceived1 = true;
+                        }
+                    }
+                }
+                catch { /* ignore */ }
+                finally { mreTime.Set(); }
+            }));
             mreTime.WaitOne(310 * 1000);
 
             pubnub1.Destroy();
@@ -147,13 +183,10 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            currentUnitTestCase = "ThenWithProxyItShouldReturnTimeStamp";
-
             Proxy proxy = new Proxy(new Uri("test.pandu.com:808"));
             proxy.Credentials = new System.Net.NetworkCredential("tuvpnfreeproxy", "Rx8zW78k");
 
-            timeReceived1 = false;
-            mreTime = new ManualResetEvent(false);
+            bool timeReceived1 = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -181,8 +214,23 @@ namespace PubNubMessaging.Tests
 
             if (config.Proxy != null)
             {
-                pubnub1.Time().Async(new TimeResult());
-
+                ManualResetEvent mreTime = new ManualResetEvent(false);
+                pubnub1.Time().Async(new PNTimeResultExt((r, s) => {
+                    try
+                    {
+                        Console.WriteLine("PNStatus={0}", pubnub1.JsonPluggableLibrary.SerializeToJsonString(s));
+                        if (r != null)
+                        {
+                            Console.WriteLine(pubnub1.JsonPluggableLibrary.SerializeToJsonString(r));
+                            if (s.StatusCode == 200 && s.Error == false && ((PubnubCommon.EnableStubTest && expectedTime == r.Timetoken) || r.Timetoken > 0))
+                            {
+                                timeReceived1 = true;
+                            }
+                        }
+                    }
+                    catch { /* ignore */ }
+                    finally { mreTime.Set(); }
+                }));
                 mreTime.WaitOne(310 * 1000);
 
                 pubnub1.Destroy();
@@ -206,8 +254,7 @@ namespace PubNubMessaging.Tests
             Proxy proxy = new Proxy(new Uri("test.pandu.com:808"));
             proxy.Credentials = new System.Net.NetworkCredential("tuvpnfreeproxy", "Rx8zW78k");
 
-            timeReceived1 = false;
-            mreTime = new ManualResetEvent(false);
+            bool timeReceived1 = false;
 
             PNConfiguration config = new PNConfiguration
             {
@@ -234,8 +281,23 @@ namespace PubNubMessaging.Tests
 
             if (config.Proxy != null)
             {
-                pubnub1.Time().Async(new TimeResult());
-
+                ManualResetEvent mreTime = new ManualResetEvent(false);
+                pubnub1.Time().Async(new PNTimeResultExt((r, s) => {
+                    try
+                    {
+                        Console.WriteLine("PNStatus={0}", pubnub1.JsonPluggableLibrary.SerializeToJsonString(s));
+                        if (r != null)
+                        {
+                            Console.WriteLine(pubnub1.JsonPluggableLibrary.SerializeToJsonString(r));
+                            if (s.StatusCode == 200 && s.Error == false && ((PubnubCommon.EnableStubTest && expectedTime == r.Timetoken) || r.Timetoken > 0))
+                            {
+                                timeReceived1 = true;
+                            }
+                        }
+                    }
+                    catch { /* ignore */ }
+                    finally { mreTime.Set(); }
+                }));
                 mreTime.WaitOne(310 * 1000);
 
                 pubnub1.Destroy();
@@ -269,45 +331,7 @@ namespace PubNubMessaging.Tests
             Assert.True(expectedDate == actualDate);
         }
 
-        public class TimeResult : PNCallback<PNTimeResult>
-        {
-            public override void OnResponse(PNTimeResult result, PNStatus status)
-            {
-                try
-                {
-                    Console.WriteLine("PNStatus={0}", pubnub1.JsonPluggableLibrary.SerializeToJsonString(status));
-
-                    if (result != null)
-                    {
-                        Console.WriteLine(pubnub1.JsonPluggableLibrary.SerializeToJsonString(result));
-
-                        if (status.StatusCode == 200 && status.Error == false)
-                        {
-                            if (PubnubCommon.EnableStubTest)
-                            {
-                                if (expectedTime == result.Timetoken)
-                                {
-                                    timeReceived1 = true;
-                                }
-                            }
-                            else if (result.Timetoken > 0)
-                            {
-                                timeReceived1 = true;
-                            }
-                        }
-                    }
-                }
-                catch 
-                {
-                    /* ignore */
-                }
-                finally
-                {
-                    mreTime.Set();
-                }
-
-            }
-        };
+        
 
     }
 }

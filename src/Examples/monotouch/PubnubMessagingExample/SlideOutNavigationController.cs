@@ -587,7 +587,9 @@ namespace MonoTouch.SlideoutNavigation
         private void HideRight ()
         {
             if (!_rightMenuShowing)
+            {
                 return;
+            }
             _internalMenuViewRight.View.Hidden = true;
             _rightMenuShowing = false;
         }
@@ -649,7 +651,9 @@ namespace MonoTouch.SlideoutNavigation
         {
             //Don't hide if its not visible.
             if (!Visible)
+            {
                 return;
+            }
             Visible = false;
 
             UIView view = _internalTopView.View;
@@ -659,7 +663,9 @@ namespace MonoTouch.SlideoutNavigation
             };
             Action finished = () => {
                 if (view.Subviews.Length > 0)
-                    view.Subviews [0].UserInteractionEnabled = true;
+                {
+                    view.Subviews[0].UserInteractionEnabled = true;
+                }
                 view.RemoveGestureRecognizer (_tapGesture);
                 //Hide the shadow when not needed to increase performance of the top layer!
                 HideShadow ();

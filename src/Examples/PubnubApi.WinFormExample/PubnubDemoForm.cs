@@ -12,7 +12,7 @@ namespace PubnubApi.WinFormExample
 {
     public partial class PubnubDemoForm : Form
     {
-        static public Pubnub[] pubnub;
+        static private Pubnub[] pubnub;
         PNConfiguration config1 = new PNConfiguration();
         PNConfiguration config2 = new PNConfiguration();
         string origin = "ps.pndsn.com";
@@ -612,6 +612,8 @@ namespace PubnubApi.WinFormExample
 
                                     }));
                                 }));
+                        break;
+                    default:
                         break;
                 }
             }

@@ -193,8 +193,8 @@ namespace PubNubMessaging.Tests
 
             pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
 
-            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
-            else Thread.Sleep(100);
+            if (!PubnubCommon.EnableStubTest) { Thread.Sleep(1000); }
+            else { Thread.Sleep(100); }
 
             if (!pubnub.RemoveListener(listenerSubCallack))
             {
@@ -275,8 +275,8 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new [] { channel }).WithPresence().Execute();
             presenceManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
-            else Thread.Sleep(100);
+            if (!PubnubCommon.EnableStubTest) { Thread.Sleep(1000); }
+            else { Thread.Sleep(100); }
 
             pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
 
@@ -363,13 +363,13 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new [] { channel }).WithPresence().Execute();
             presenceManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
-            else Thread.Sleep(100);
+            if (!PubnubCommon.EnableStubTest) { Thread.Sleep(1000); }
+            else { Thread.Sleep(100); }
 
             pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
 
-            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
-            else Thread.Sleep(100);
+            if (!PubnubCommon.EnableStubTest) { Thread.Sleep(1000); }
+            else { Thread.Sleep(100); }
 
             if (!pubnub.RemoveListener(listenerSubCallack))
             {
@@ -449,7 +449,7 @@ namespace PubNubMessaging.Tests
 
             if (!receivedErrorMessage)
             {
-                if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
+                if (!PubnubCommon.EnableStubTest) { Thread.Sleep(2000); }
                 else Thread.Sleep(200);
 
                 expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"Presence\", \"uuids\": [\"mytestuuid\"], \"occupancy\": 1}";
