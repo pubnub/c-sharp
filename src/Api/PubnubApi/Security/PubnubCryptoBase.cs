@@ -61,7 +61,7 @@ namespace PubnubApi
         // encrypt string
         public string Encrypt(string plainText)
         {
-            if (plainText == null || plainText.Length <= 0) throw new ArgumentNullException("plainText");
+            if (plainText == null || plainText.Length <= 0) { throw new ArgumentNullException("plainText"); }
 
             return EncryptOrDecrypt(true, plainText);
         }
@@ -69,7 +69,7 @@ namespace PubnubApi
         // decrypt string
         public string Decrypt(string cipherText)
         {
-            if (cipherText == null) throw new ArgumentNullException("cipherText");
+            if (cipherText == null) { throw new ArgumentNullException("cipherText"); }
 
             return EncryptOrDecrypt(false, cipherText);
         }

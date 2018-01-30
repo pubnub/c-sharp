@@ -538,8 +538,6 @@ namespace PubnubApi.EndPoint
                         try
                         {
                             SubscribeHeartbeatCheckTimer.Change(Timeout.Infinite, Timeout.Infinite);
-                            SubscribeHeartbeatCheckTimer.Dispose();
-                            SubscribeHeartbeatCheckTimer = null;
                         }
                         catch {  /* ignore */ }
                     }
@@ -1006,9 +1004,6 @@ namespace PubnubApi.EndPoint
                 try
                 {
                     SubscribeHeartbeatCheckTimer.Change(Timeout.Infinite, Timeout.Infinite);
-                    SubscribeHeartbeatCheckTimer.Dispose();
-                    SubscribeHeartbeatCheckTimer = null;
-
                     TerminateCurrentSubscriberRequest();
                 }
                 catch {  /* ignore */ }
