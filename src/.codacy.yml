@@ -27,4 +27,3 @@ exclude_paths:
   - '*.min.js'
   - '**/tests/**'
   - Examples/**
-  - 'src/UnitTests/PubnubApi.Tests/WhenAClientIsPresentedInMultiInstance.cs'

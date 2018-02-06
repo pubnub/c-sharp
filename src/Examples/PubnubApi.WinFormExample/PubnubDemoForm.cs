@@ -485,6 +485,8 @@ namespace PubnubApi.WinFormExample
                                     }));
                                 }));
                         break;
+                    default:
+                        break;
                 }
             }
         }
@@ -554,6 +556,8 @@ namespace PubnubApi.WinFormExample
 
                                     }));
                                 }));
+                        break;
+                    default:
                         break;
                 }
             }
@@ -673,6 +677,8 @@ namespace PubnubApi.WinFormExample
                                     }));
                                 }));
                         break;
+                    default:
+                        break;
                 }
             }
 
@@ -754,6 +760,8 @@ namespace PubnubApi.WinFormExample
                     case "apns":
                         pushType = PNPushType.APNS;
                         break;
+                    default:
+                        break;
                 }
                 switch (requesttype.ToLower())
                 {
@@ -815,6 +823,8 @@ namespace PubnubApi.WinFormExample
                                     }));
                                 }));
                         break;
+                    default:
+                        break;
                 }
             }
         }
@@ -834,6 +844,8 @@ namespace PubnubApi.WinFormExample
                         break;
                     case "apns":
                         pushType = PNPushType.APNS;
+                        break;
+                    default:
                         break;
                 }
                 switch (requesttype.ToLower())
@@ -895,6 +907,8 @@ namespace PubnubApi.WinFormExample
 
                                     }));
                                 }));
+                        break;
+                    default:
                         break;
                 }
             }
