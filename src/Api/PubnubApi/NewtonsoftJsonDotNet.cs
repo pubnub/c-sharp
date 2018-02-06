@@ -1430,6 +1430,8 @@ namespace PubnubApi
                 case "System.Object":
                     userMessage = Convert.ChangeType(inputValue, typeof(System.Object), CultureInfo.InvariantCulture);
                     break;
+                default:
+                    break;
             }
 
             return userMessage;
