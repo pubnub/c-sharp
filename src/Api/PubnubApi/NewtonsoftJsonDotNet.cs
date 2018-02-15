@@ -372,7 +372,11 @@ namespace PubnubApi
 
                             if (grantAckPayloadDic.ContainsKey("ttl"))
                             {
-                                ack.Ttl = Convert.ToInt32(grantAckPayloadDic["ttl"].ToString());
+                                int grantTtl;
+                                if (Int32.TryParse(grantAckPayloadDic["ttl"].ToString(), out grantTtl))
+                                {
+                                    ack.Ttl = grantTtl;
+                                }
                             }
 
                             if (!string.IsNullOrEmpty(ack.Level) && ack.Level == "subkey")
@@ -642,9 +646,11 @@ namespace PubnubApi
                 PNPublishResult result = null;
                 if (listObject.Count >= 2)
                 {
+                    long publishTimetoken;
+                    Int64.TryParse(listObject[2].ToString(), out publishTimetoken);
                     result = new PNPublishResult
                     {
-                        Timetoken = Int64.Parse(listObject[2].ToString()),
+                        Timetoken = publishTimetoken
                     };
                 }
 
@@ -662,12 +668,19 @@ namespace PubnubApi
                 {
                     ack = new PNPresenceEventResult();
                     ack.Event = presenceDicObj["action"].ToString();
-                    ack.Timestamp = Convert.ToInt64(presenceDicObj["timestamp"].ToString());
+                    long presenceTimeStamp;
+                    if (Int64.TryParse(presenceDicObj["timestamp"].ToString(), out presenceTimeStamp)){
+                        ack.Timestamp = presenceTimeStamp;
+                    }
                     if (presenceDicObj.ContainsKey("uuid"))
                     {
                         ack.Uuid = presenceDicObj["uuid"].ToString();
                     }
-                    ack.Occupancy = Int32.Parse(presenceDicObj["occupancy"].ToString());
+                    int presenceOccupany;
+                    if (Int32.TryParse(presenceDicObj["occupancy"].ToString(), out presenceOccupany))
+                    {
+                        ack.Occupancy = presenceOccupany;
+                    }
 
                     if (presenceDicObj.ContainsKey("data"))
                     {
@@ -678,7 +691,11 @@ namespace PubnubApi
                         }
                     }
 
-                    ack.Timetoken = Convert.ToInt64(listObject[2].ToString());
+                    long presenceTimetoken;
+                    if (Int64.TryParse(listObject[2].ToString(), out presenceTimetoken))
+                    {
+                        ack.Timetoken = presenceTimetoken;
+                    }
                     ack.Channel = (listObject.Count == 5) ? listObject[4].ToString() : listObject[3].ToString();
                     ack.Channel = ack.Channel.Replace("-pnpres", "");
 
@@ -743,8 +760,16 @@ namespace PubnubApi
             {
 #region "PNHistoryResult"
                 PNHistoryResult ack = new PNHistoryResult();
-                ack.StartTimeToken = Convert.ToInt64(listObject[1].ToString());
-                ack.EndTimeToken = Convert.ToInt64(listObject[2].ToString());
+                long historyStartTime;
+                long historyEndTime;
+                if (Int64.TryParse(listObject[1].ToString(), out historyStartTime))
+                {
+                    ack.StartTimeToken = historyStartTime;
+                }
+                if (Int64.TryParse(listObject[2].ToString(), out historyEndTime))
+                {
+                    ack.EndTimeToken = historyEndTime;
+                }
                 List<object> messagesContainer = listObject[0] as List<object>;
                 if (messagesContainer == null)
                 {
@@ -768,8 +793,10 @@ namespace PubnubApi
                                 result.Entry = dicMessageTimetoken["message"];
 
                                 long messageTimetoken;
-                                Int64.TryParse(dicMessageTimetoken["timetoken"].ToString(), out messageTimetoken);
-                                result.Timetoken = messageTimetoken;
+                                if (Int64.TryParse(dicMessageTimetoken["timetoken"].ToString(), out messageTimetoken))
+                                {
+                                    result.Timetoken = messageTimetoken;
+                                }
                             }
                             else
                             {
@@ -813,8 +840,16 @@ namespace PubnubApi
                         Dictionary<string, object> hereNowPayloadDic = ConvertToDictionaryObject(herenowDicObj["payload"]);
                         if (hereNowPayloadDic != null && hereNowPayloadDic.Count > 0)
                         {
-                            hereNowResult.TotalOccupancy = Int32.Parse(hereNowPayloadDic["total_occupancy"].ToString());
-                            hereNowResult.TotalChannels = Int32.Parse(hereNowPayloadDic["total_channels"].ToString());
+                            int hereNowTotalOccupancy;
+                            int hereNowTotalChannel;
+                            if (Int32.TryParse(hereNowPayloadDic["total_occupancy"].ToString(), out hereNowTotalOccupancy))
+                            {
+                                hereNowResult.TotalOccupancy = hereNowTotalOccupancy;
+                            }
+                            if (Int32.TryParse(hereNowPayloadDic["total_channels"].ToString(), out hereNowTotalChannel))
+                            {
+                                hereNowResult.TotalChannels = hereNowTotalChannel;
+                            }
                             if (hereNowPayloadDic.ContainsKey("channels"))
                             {
                                 Dictionary<string, object> hereNowChannelListDic = ConvertToDictionaryObject(hereNowPayloadDic["channels"]);
@@ -827,7 +862,11 @@ namespace PubnubApi
                                         {
                                             PNHereNowChannelData channelData = new PNHereNowChannelData();
                                             channelData.ChannelName = channel;
-                                            channelData.Occupancy = Convert.ToInt32(hereNowChannelItemDic["occupancy"].ToString());
+                                            int hereNowOccupancy;
+                                            if (Int32.TryParse(hereNowChannelItemDic["occupancy"].ToString(), out hereNowOccupancy))
+                                            {
+                                                channelData.Occupancy = hereNowOccupancy;
+                                            }
                                             if (hereNowChannelItemDic.ContainsKey("uuids"))
                                             {
                                                 object[] hereNowChannelUuidList = ConvertToObjectArray(hereNowChannelItemDic["uuids"]);
@@ -870,7 +909,11 @@ namespace PubnubApi
                     }
                     else if (herenowDicObj.ContainsKey("occupancy"))
                     {
-                        hereNowResult.TotalOccupancy = Int32.Parse(herenowDicObj["occupancy"].ToString());
+                        int hereNowTotalOccupancy;
+                        if (Int32.TryParse(herenowDicObj["occupancy"].ToString(), out hereNowTotalOccupancy))
+                        {
+                            hereNowResult.TotalOccupancy = hereNowTotalOccupancy;
+                        }
                         hereNowResult.Channels = new Dictionary<string, PNHereNowChannelData>();
                         if (herenowDicObj.ContainsKey("uuids"))
                         {
