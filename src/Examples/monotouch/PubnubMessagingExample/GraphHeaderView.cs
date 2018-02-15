@@ -72,9 +72,13 @@ namespace PubnubMessagingExample
         private double GetSlope (CGPoint p1, CGPoint p2)
         {
             if ((p2.Y - p1.Y) != 0)
+            {
                 return (p1.X - p2.X) / (p2.Y - p1.Y);
+            }
             else
+            {
                 return double.PositiveInfinity;
+            }
         }
 
         private double GetIntersect (CGPoint p1, CGPoint p2)
@@ -82,7 +86,9 @@ namespace PubnubMessagingExample
             double slope = GetSlope (p1, p2);
             CGPoint center = GetCenterPoint (p1, p2);
             if (double.IsPositiveInfinity (slope))
+            {
                 return 0;
+            }
             return center.Y - (slope * center.X);
         }
 

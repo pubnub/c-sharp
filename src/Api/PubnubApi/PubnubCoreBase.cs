@@ -49,9 +49,9 @@ namespace PubnubApi
         private IPubnubLog pubnubLog;
         private EndPoint.TelemetryManager pubnubTelemetryMgr;
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
-        private static HttpClient httpClientSubscribe;
-        private static HttpClient httpClientNonsubscribe;
-        private static HttpClient httpClientNetworkStatus;
+        private HttpClient httpClientSubscribe;
+        private HttpClient httpClientNonsubscribe;
+        private HttpClient httpClientNetworkStatus;
 #endif
 
         private bool clientNetworkStatusInternetStatus = true;
@@ -207,7 +207,7 @@ namespace PubnubApi
         }
 
 
-        #region "Constructors"
+#region "Constructors"
 
         public static bool IsNullOrWhiteSpace(string value)
         {
@@ -218,9 +218,9 @@ namespace PubnubApi
 
             return string.IsNullOrEmpty(value.Trim());
         }
-        #endregion
+#endregion
 
-        #region "Internet connection and Reconnect Network"
+#region "Internet connection and Reconnect Network"
 
         protected void ResetInternetCheckSettings(string[] channels, string[] channelGroups)
         {
@@ -257,9 +257,9 @@ namespace PubnubApi
             }
         }
 
-        #endregion
+#endregion
 
-        #region "Callbacks"
+#region "Callbacks"
 
         protected bool CheckInternetConnectionStatus<T>(bool systemActive, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
         {
@@ -414,6 +414,8 @@ namespace PubnubApi
                                     break;
                                 case "u":
                                     msg.UserMetadata = dicItem[key];
+                                    break;
+                                default:
                                     break;
                             }
                         }
@@ -691,9 +693,9 @@ namespace PubnubApi
             }
         }
 
-        #endregion
+#endregion
 
-        #region "Simulate network fail and machine sleep"
+#region "Simulate network fail and machine sleep"
         public static void EnableMachineSleepModeForTestingOnly()
         {
             PubnetSystemActive = false;
@@ -704,9 +706,9 @@ namespace PubnubApi
             PubnetSystemActive = true;
         }
 
-        #endregion
+#endregion
 
-        #region "Helpers"
+#region "Helpers"
 
         protected string[] GetCurrentSubscriberChannels()
         {
@@ -729,9 +731,9 @@ namespace PubnubApi
 
             return channelGroups;
         }
-        #endregion
+#endregion
 
-        #region "Build, process and send request"
+#region "Build, process and send request"
         internal protected string UrlProcessRequest<T>(Uri requestUri, RequestState<T> pubnubRequestState, bool terminateCurrentSubRequest)
         {
             return UrlProcessRequest(requestUri, pubnubRequestState, terminateCurrentSubRequest, "");
@@ -1074,6 +1076,8 @@ namespace PubnubApi
                                     result.Add(multiChannel);
                                 }
                                 break;
+                            default:
+                                break;
                         }
                         //switch stmt end
                     }
@@ -1108,7 +1112,7 @@ namespace PubnubApi
             }
         }
 
-        #endregion
+#endregion
 
         protected string BuildJsonUserState(string channel, string channelGroup, bool local)
         {
@@ -1241,7 +1245,7 @@ namespace PubnubApi
             return retJsonUserState;
         }
 
-        #region "Terminate requests and Timers"
+#region "Terminate requests and Timers"
 
         protected void TerminatePendingWebRequest()
         {
@@ -1338,7 +1342,7 @@ namespace PubnubApi
 
         private void RemoveUserState()
         {
-            if (ChannelLocalUserState.Count == 0 || !ChannelLocalUserState.ContainsKey(PubnubInstance.InstanceId)) return;
+            if (ChannelLocalUserState.Count == 0 || !ChannelLocalUserState.ContainsKey(PubnubInstance.InstanceId)) { return; }
 
             ICollection<string> channelLocalUserStateCollection = ChannelLocalUserState[PubnubInstance.InstanceId].Keys;
             ICollection<string> channelUserStateCollection = ChannelUserState[PubnubInstance.InstanceId].Keys;

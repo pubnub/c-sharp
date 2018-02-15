@@ -27,7 +27,7 @@ namespace PubNubMessaging.Tests
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
 
-            if (!PubnubCommon.PAMEnabled) return;
+            if (!PubnubCommon.PAMEnabled) { return; }
 
             bool receivedGrantMessage = false;
             string channel = "hello_my_channel";
@@ -94,12 +94,6 @@ namespace PubNubMessaging.Tests
         public static void Exit()
         {
             server.Stop();
-        }
-
-        [TestFixtureTearDown]
-        public void Cleanup()
-        {
-
         }
 
 #if (USE_JSONFX)
@@ -199,8 +193,8 @@ namespace PubNubMessaging.Tests
 
             pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
 
-            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
-            else Thread.Sleep(100);
+            if (!PubnubCommon.EnableStubTest) { Thread.Sleep(1000); }
+            else { Thread.Sleep(100); }
 
             if (!pubnub.RemoveListener(listenerSubCallack))
             {
@@ -281,8 +275,8 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new [] { channel }).WithPresence().Execute();
             presenceManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
-            else Thread.Sleep(100);
+            if (!PubnubCommon.EnableStubTest) { Thread.Sleep(1000); }
+            else { Thread.Sleep(100); }
 
             pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
 
@@ -369,13 +363,13 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new [] { channel }).WithPresence().Execute();
             presenceManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
-            else Thread.Sleep(100);
+            if (!PubnubCommon.EnableStubTest) { Thread.Sleep(1000); }
+            else { Thread.Sleep(100); }
 
             pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
 
-            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
-            else Thread.Sleep(100);
+            if (!PubnubCommon.EnableStubTest) { Thread.Sleep(1000); }
+            else { Thread.Sleep(100); }
 
             if (!pubnub.RemoveListener(listenerSubCallack))
             {
@@ -455,7 +449,7 @@ namespace PubNubMessaging.Tests
 
             if (!receivedErrorMessage)
             {
-                if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
+                if (!PubnubCommon.EnableStubTest) { Thread.Sleep(2000); }
                 else Thread.Sleep(200);
 
                 expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"Presence\", \"uuids\": [\"mytestuuid\"], \"occupancy\": 1}";
@@ -2118,12 +2112,12 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new [] { channel }).WithPresence().Execute();
             presenceManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            if (!PubnubCommon.EnableStubTest) Thread.Sleep(pubnub.PNConfig.PresenceTimeout + (3 * 1000));
+            if (!PubnubCommon.EnableStubTest) { Thread.Sleep(pubnub.PNConfig.PresenceTimeout + (3 * 1000)); }
 
             pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
 
-            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
-            else Thread.Sleep(100);
+            if (!PubnubCommon.EnableStubTest) { Thread.Sleep(1000); }
+            else { Thread.Sleep(100); }
 
             if (!pubnub.RemoveListener(listenerSubCallack))
             {

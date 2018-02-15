@@ -11,11 +11,11 @@ namespace PubnubApi.EndPoint
 {
     public class PublishOperation : PubnubCoreBase
     {
-        private PNConfiguration config;
-        private IJsonPluggableLibrary jsonLibrary;
-        private IPubnubUnitTest unit;
-        private IPubnubLog pubnubLog;
-        private EndPoint.TelemetryManager pubnubTelemetryMgr;
+        private readonly PNConfiguration config;
+        private readonly IJsonPluggableLibrary jsonLibrary;
+        private readonly IPubnubUnitTest unit;
+        private readonly IPubnubLog pubnubLog;
+        private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         private object msg;
         private string channelName = "";
@@ -102,7 +102,6 @@ namespace PubnubApi.EndPoint
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
-        private static System.Threading.ManualResetEvent syncEvent = new System.Threading.ManualResetEvent(false);
         public PNPublishResult Sync()
         {
             if (this.msg == null)
@@ -115,11 +114,12 @@ namespace PubnubApi.EndPoint
                 throw new MissingMemberException("publish key is required");
             }
 
-            Task<PNPublishResult> task = Task<PNPublishResult>.Factory.StartNew(() =>
+        System.Threading.ManualResetEvent syncEvent = new System.Threading.ManualResetEvent(false);
+        Task<PNPublishResult> task = Task<PNPublishResult>.Factory.StartNew(() =>
             {
                 syncRequest = true;
                 syncEvent = new System.Threading.ManualResetEvent(false);
-                Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, new SyncPublishResult());
+                Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, new PNPublishResultExt((r, s) => { SyncResult = r; syncEvent.Set(); }));
                 syncEvent.WaitOne(config.NonSubscribeRequestTimeout * 1000);
 
                 return SyncResult;
@@ -128,7 +128,6 @@ namespace PubnubApi.EndPoint
         }
 
         private static PNPublishResult SyncResult { get; set; }
-        private static PNStatus SyncStatus { get; set; }
 
         internal void Retry()
         {
@@ -199,16 +198,6 @@ namespace PubnubApi.EndPoint
             CleanUp();
         }
 
-        private class SyncPublishResult : PNCallback<PNPublishResult>
-        {
-            public override void OnResponse(PNPublishResult result, PNStatus status)
-            {
-                SyncResult = result;
-                SyncStatus = status;
-                syncEvent.Set();
-            }
-        }
-
         internal void CurrentPubnubInstance(Pubnub instance)
         {
             PubnubInstance = instance;
@@ -243,12 +232,6 @@ namespace PubnubApi.EndPoint
 
         private void CleanUp()
         {
-            config = null;
-            jsonLibrary = null;
-            unit = null;
-            pubnubLog = null;
-            pubnubTelemetryMgr = null;
-
             this.savedCallback = null;
         }
     }

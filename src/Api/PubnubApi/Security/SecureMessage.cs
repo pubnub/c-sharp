@@ -29,9 +29,9 @@ namespace PubnubApi
             if (config.CipherKey.Length > 0)
             {
                 PubnubCrypto aes = new PubnubCrypto(config.CipherKey, config, pubnubLog);
-                var myObjectArray = (from item in message
+                object[] myObjectArray = (from item in message
                                      select item as object).ToArray();
-                IEnumerable enumerable = myObjectArray[0] as IEnumerable;
+                object[] enumerable = myObjectArray[0] as object[];
                 if (enumerable != null)
                 {
                     List<object> receivedMsg = new List<object>();

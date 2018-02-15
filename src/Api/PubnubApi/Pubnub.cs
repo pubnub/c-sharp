@@ -10,16 +10,17 @@ namespace PubnubApi
 	{
         private PNConfiguration pubnubConfig;
         private IJsonPluggableLibrary jsonPluggableLibrary;
-        private static IPubnubUnitTest pubnubUnitTest;
+        private IPubnubUnitTest pubnubUnitTest;
         private IPubnubLog pubnubLog;
         private EndPoint.ListenerManager listenerManager;
         private readonly EndPoint.TelemetryManager telemetryManager;
 
         private string instanceId = "";
 
-        private static string sdkVersion = "PubNubCSharp4.0.13.0";
+        private static string sdkVersion = "PubNubCSharp4.0.14.0";
 
         private object savedSubscribeOperation;
+        private readonly string savedSdkVerion;
 
         #region "PubNub API Channel Methods"
 
@@ -384,6 +385,14 @@ namespace PubnubApi
             set
             {
                 pubnubUnitTest = value;
+                if (pubnubUnitTest != null)
+                {
+                    sdkVersion = pubnubUnitTest.SdkVersion;
+                }
+                else
+                {
+                    sdkVersion = savedSdkVerion;
+                }
             }
         }
 
@@ -407,16 +416,11 @@ namespace PubnubApi
         {
             get
             {
-                if (pubnubUnitTest != null)
-                {
-                    return pubnubUnitTest.SdkVersion;
-                }
-                else
-                {
-                    return sdkVersion;
-                }
+                return sdkVersion;
             }
         }
+
+
 
         public string InstanceId
         {
@@ -432,6 +436,7 @@ namespace PubnubApi
 
         public Pubnub(PNConfiguration config)
         {
+            savedSdkVerion = sdkVersion;
             instanceId = Guid.NewGuid().ToString();
             pubnubConfig = config;
             if (config != null)

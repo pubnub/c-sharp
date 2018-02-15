@@ -42,7 +42,10 @@ namespace PubnubApi
         public bool TryUpdate(TKey key, TValue newValue, TValue comparisonValue)
         {
             bool updated = false;
-            if (key == null) throw new ArgumentNullException("key");
+            if (key == null)
+            {
+                throw new ArgumentNullException("key");
+            }
 
             lock (syncRoot)
             {
@@ -93,15 +96,22 @@ namespace PubnubApi
 
         public bool Remove(TKey key)
         {
-            throw new NotImplementedException();
+            TValue value;
+            return Remove(key, out value);
         }
 
-        public bool Remove(TKey key, out TValue value)
+        private bool Remove(TKey key, out TValue value)
         {
             lock (syncRoot)
             {
-                d.TryGetValue(key, out value);
-                return d.Remove(key);
+                if (d.TryGetValue(key, out value))
+                {
+                    return d.Remove(key);
+                }
+                else
+                {
+                    return false;
+                }
             }
         }
 

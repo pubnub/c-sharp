@@ -19,8 +19,7 @@ namespace PubnubApi
         private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
 
-        private static bool networkStatus = true;
-		private static bool machineSuspendMode;
+        private bool networkStatus = true;
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
         private static HttpClient httpClient;
 #endif
@@ -48,34 +47,17 @@ namespace PubnubApi
 #endif
         }
 
-		internal static bool MachineSuspendMode
-		{
-			get
-			{
-				return machineSuspendMode;
-			}
-			set
-			{
-				machineSuspendMode = value;
-			}
-		}
-
 		internal bool CheckInternetStatus<T>(bool systemActive, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
 		{
             if (unit != null)
             {
                 return unit.InternetAvailable;
             }
-            else if (machineSuspendMode)
-			{
-				//Only to simulate network fail
-				return false;
-			}
 			else
 			{
                 Task[] tasks = new Task[1];
 
-                tasks[0] = Task.Factory.StartNew(async() => await CheckClientNetworkAvailability(CallbackClientNetworkStatus, type, callback, channels, channelGroups));
+                tasks[0] = Task.Factory.StartNew(async() => await CheckClientNetworkAvailability(CallbackClientNetworkStatus, type, callback, channels, channelGroups).ConfigureAwait(false));
                 tasks[0].ConfigureAwait(false);
                 try
                 {
@@ -91,15 +73,14 @@ namespace PubnubApi
                 return networkStatus;
 			}
 		}
-		//#endif
 
-		private static void CallbackClientNetworkStatus(bool status)
+		private void CallbackClientNetworkStatus(bool status)
 		{
 			networkStatus = status;
 		}
 
         private static object internetCheckLock = new object();
-        private static bool isInternetCheckRunning;
+        private bool isInternetCheckRunning;
 
         internal bool IsInternetCheckRunning()
         {

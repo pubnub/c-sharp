@@ -10,27 +10,12 @@ namespace PubNubMessaging.Tests
     [TestFixture]
     public class CleanupGrant : TestHarness
     {
-        private static ManualResetEvent auditManualEvent = new ManualResetEvent(false);
-        private static ManualResetEvent revokeManualEvent = new ManualResetEvent(false);
-        private static bool receivedAuditMessage = false;
-        private static string currentUnitTestCase;
-
         private static Pubnub pubnub;
-
-        [TestFixtureSetUp]
-        public static void Init()
-        {
-        }
-
-        [TestFixtureTearDown]
-        public static void Exit()
-        {
-        }
 
         [Test]
         public static void AtUserLevel()
         {
-            currentUnitTestCase = "AtUserLevel";
+            bool receivedAuditMessage = false;
 
             if (!PubnubCommon.PAMEnabled)
             {
@@ -41,8 +26,6 @@ namespace PubNubMessaging.Tests
             if (!PubnubCommon.EnableStubTest)
             {
                 receivedAuditMessage = false;
-                auditManualEvent = new ManualResetEvent(false);
-
                 PNConfiguration config = new PNConfiguration
                 {
                     PublishKey = PubnubCommon.PublishKey,
@@ -52,8 +35,66 @@ namespace PubNubMessaging.Tests
                 };
 
                 pubnub = createPubNubInstance(config);
+                ManualResetEvent auditManualEvent = new ManualResetEvent(false);
+                pubnub.Audit().Async(new PNAccessManagerAuditResultExt((r,s)=> {
+                    try
+                    {
+                        Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
 
-                pubnub.Audit().Async(new AuditResult());
+                        if (r != null)
+                        {
+                            Console.WriteLine("PNAccessManagerAuditResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                            if (s.StatusCode == 200 && s.Error == false)
+                            {
+                                if (!String.IsNullOrEmpty(r.Channel))
+                                {
+                                    var channels = r.Channel.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                                    Console.WriteLine("CleanupGrant / AtUserLevel / UserCallbackForCleanUpAccess - Channel Count = {0}", channels.Length);
+                                    foreach (string channelName in channels)
+                                    {
+                                        if (r.AuthKeys != null)
+                                        {
+                                            foreach (string authKey in r.AuthKeys.Keys)
+                                            {
+                                                Console.WriteLine("Auth Key = " + authKey);
+                                                ManualResetEvent revokeManualEvent = new ManualResetEvent(false);
+                                                pubnub.Grant().Channels(new[] { channelName }).AuthKeys(new[] { authKey }).Read(false).Write(false).Manage(false)
+                                                .Async(new PNAccessManagerGrantResultExt((r1,s1)=> 
+                                                {
+                                                    try
+                                                    {
+                                                        Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s1));
+
+                                                        if (r1 != null)
+                                                        {
+                                                            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r1));
+                                                        }
+                                                    }
+                                                    catch {  /* ignore */ }
+                                                    finally
+                                                    {
+                                                        revokeManualEvent.Set();
+                                                    }
+                                                }));
+                                                revokeManualEvent.WaitOne();
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (r.Level == "subkey")
+                                {
+                                    receivedAuditMessage = true;
+                                }
+                            }
+                        }
+                    }
+                    catch {  /* ignore */  }
+                    finally
+                    {
+                        auditManualEvent.Set();
+                    }
+                }));
                 auditManualEvent.WaitOne();
                 pubnub.Destroy();
                 pubnub = null;
@@ -68,7 +109,7 @@ namespace PubNubMessaging.Tests
         [Test]
         public static void AtChannelLevel()
         {
-            currentUnitTestCase = "AtChannelLevel";
+            bool receivedAuditMessage = false;
 
             if (!PubnubCommon.PAMEnabled)
             {
@@ -79,7 +120,6 @@ namespace PubNubMessaging.Tests
             if (!PubnubCommon.EnableStubTest)
             {
                 receivedAuditMessage = false;
-                auditManualEvent = new ManualResetEvent(false);
 
                 PNConfiguration config = new PNConfiguration
                 {
@@ -91,7 +131,66 @@ namespace PubNubMessaging.Tests
 
                 pubnub = createPubNubInstance(config);
 
-                pubnub.Audit().Async(new AuditResult());
+                ManualResetEvent auditManualEvent = new ManualResetEvent(false);
+                pubnub.Audit().Async(new PNAccessManagerAuditResultExt((r, s) => {
+                    try
+                    {
+                        Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
+
+                        if (r != null)
+                        {
+                            Console.WriteLine("PNAccessManagerAuditResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                            if (s.StatusCode == 200 && s.Error == false)
+                            {
+                                if (!String.IsNullOrEmpty(r.Channel))
+                                {
+                                    var channels = r.Channel.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                                    Console.WriteLine("CleanupGrant / AtUserLevel / UserCallbackForCleanUpAccess - Channel Count = {0}", channels.Length);
+                                    foreach (string channelName in channels)
+                                    {
+                                        if (r.AuthKeys != null)
+                                        {
+                                            foreach (string authKey in r.AuthKeys.Keys)
+                                            {
+                                                Console.WriteLine("Auth Key = " + authKey);
+                                                ManualResetEvent revokeManualEvent = new ManualResetEvent(false);
+                                                pubnub.Grant().Channels(new[] { channelName }).AuthKeys(new[] { authKey }).Read(false).Write(false).Manage(false)
+                                                .Async(new PNAccessManagerGrantResultExt((r1, s1) =>
+                                                {
+                                                    try
+                                                    {
+                                                        Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s1));
+
+                                                        if (r1 != null)
+                                                        {
+                                                            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r1));
+                                                        }
+                                                    }
+                                                    catch {  /* ignore */ }
+                                                    finally
+                                                    {
+                                                        revokeManualEvent.Set();
+                                                    }
+                                                }));
+                                                revokeManualEvent.WaitOne();
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (r.Level == "subkey")
+                                {
+                                    receivedAuditMessage = true;
+                                }
+                            }
+                        }
+                    }
+                    catch {  /* ignore */  }
+                    finally
+                    {
+                        auditManualEvent.Set();
+                    }
+                }));
                 auditManualEvent.WaitOne();
 
                 pubnub.Destroy();
@@ -101,74 +200,6 @@ namespace PubNubMessaging.Tests
             else
             {
                 Assert.Ignore("Only for live test; CleanupGrant -> AtChannelLevel.");
-            }
-        }
-
-        private class GrantResult : PNCallback<PNAccessManagerGrantResult>
-        {
-            public override void OnResponse(PNAccessManagerGrantResult result, PNStatus status)
-            {
-                try
-                {
-                    Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-
-                    if (result != null)
-                    {
-                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                    }
-                }
-                catch {  /* ignore */ }
-                finally
-                {
-                    revokeManualEvent.Set();
-                }
-            }
-        }
-
-        private class AuditResult : PNCallback<PNAccessManagerAuditResult>
-        {
-            public override void OnResponse(PNAccessManagerAuditResult result, PNStatus status)
-            {
-                try
-                {
-                    Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-
-                    if (result != null)
-                    {
-                        Console.WriteLine("PNAccessManagerAuditResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                        if (status.StatusCode == 200 && status.Error == false)
-                        {
-                            if (!String.IsNullOrEmpty(result.Channel))
-                            {
-                                var channels = result.Channel.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                                Console.WriteLine("CleanupGrant / AtUserLevel / UserCallbackForCleanUpAccess - Channel Count = {0}", channels.Length);
-                                foreach (string channelName in channels)
-                                {
-                                    if (result.AuthKeys != null)
-                                    {
-                                        foreach (string authKey in result.AuthKeys.Keys)
-                                        {
-                                            Console.WriteLine("Auth Key = " + authKey);
-                                            revokeManualEvent = new ManualResetEvent(false);
-                                            pubnub.Grant().Channels(new [] { channelName }).AuthKeys(new [] { authKey }).Read(false).Write(false).Manage(false).Async(new GrantResult());
-                                            revokeManualEvent.WaitOne();
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (result.Level == "subkey")
-                            {
-                                receivedAuditMessage = true;
-                            }
-                        }
-                    }
-                }
-                catch {  /* ignore */  }
-                finally
-                {
-                    auditManualEvent.Set();
-                }
             }
         }
     }

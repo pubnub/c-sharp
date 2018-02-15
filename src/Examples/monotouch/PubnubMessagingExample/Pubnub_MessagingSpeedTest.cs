@@ -207,14 +207,6 @@ namespace PubnubMessagingExample
             }
         }
 
-        void SpeedTestPublishReturnMessage (string result)
-        {
-        }
-
-        //void SpeedTestPublishReturnMessage (PubnubClientError result)
-        //{
-        //}
-
         void SpeedTestSubscribeReturnMessage (string result)
         {
             long endTime = DateTime.Now.Ticks;
@@ -222,8 +214,10 @@ namespace PubnubMessagingExample
             
             if (lag > 0) {
                 if (speedTestValues == null)
-                    speedTestValues = new List<double> ();
-                
+                {
+                    speedTestValues = new List<double>();
+                }
+
                 speedTestValues.Add (lag);
                 try {
                     double max = Math.Round (speedTestValues.Max (), 2);
@@ -232,9 +226,6 @@ namespace PubnubMessagingExample
                     int total = speedTestValues.Count;
                     speedTestValues.Sort ();
 
-                    foreach (double value in speedTestValues) {
-                        //Console.WriteLine(value);
-                    }
                     speedTestSorted [0] = ((int)speedTestValues [0]).ToString ();
                     speedTestSorted [1] = ((int)GetMedianLow (speedTestValues, 0.02)).ToString ();
                     speedTestSorted [2] = ((int)GetMedianLow (speedTestValues, 0.05)).ToString ();
@@ -262,32 +253,11 @@ namespace PubnubMessagingExample
             }
         }
 
-        /*private void UpdateMedian(List<double> valueList)
-        {
-            int length = valueList.Count - 1;
-            Medlen = (int)Math.Floor(length / 2.0d);
-            valueList.Sort();
-        }
-        
-        public double GetMedian(List<double> valueList, double value)
-        {
-            int lenght = valueList.Count - 1;
-            return valueList[Medlen + (int)Math.Floor(lenght * value)];
-        }*/
-
         public double GetMedianLow (List<double> valueList, double value)
         {
             int length = valueList.Count - 1;
-            //double medlen = Math.Floor(length/2d);
             return valueList [(int)Math.Floor (length * value)];
         }
-
-        /*public double GetMedian(List<long> valueList, double value)
-        {
-            int length = valueList.Count - 1;
-            double medlen = Math.Floor(length/2d);
-            return valueList[medlen + Math.Floor(length * value)];
-        }*/
 
         void DisplayHeader (int total, double min, double max, double avg, double lag)
         {

@@ -68,14 +68,14 @@ namespace PubnubApi.EndPoint
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
-        private static System.Threading.ManualResetEvent syncEvent = new System.Threading.ManualResetEvent(false);
         public PNPublishResult Sync()
         {
+            System.Threading.ManualResetEvent syncEvent = new System.Threading.ManualResetEvent(false);
             Task<PNPublishResult> task = Task<PNPublishResult>.Factory.StartNew(() =>
             {
                 syncRequest = true;
                 syncEvent = new System.Threading.ManualResetEvent(false);
-                Fire(this.channelName, this.msg, false, this.ttl, this.userMetadata, new SyncPublishResult());
+                Fire(this.channelName, this.msg, false, this.ttl, this.userMetadata, new PNPublishResultExt((r,s)=> { SyncResult = r; syncEvent.Set(); }));
                 syncEvent.WaitOne(config.NonSubscribeRequestTimeout * 1000);
 
                 return SyncResult;
@@ -146,15 +146,6 @@ namespace PubnubApi.EndPoint
             {
                 List<object> result = ProcessJsonResponse<PNPublishResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
-            }
-        }
-
-        private class SyncPublishResult : PNCallback<PNPublishResult>
-        {
-            public override void OnResponse(PNPublishResult result, PNStatus status)
-            {
-                SyncResult = result;
-                syncEvent.Set();
             }
         }
 
