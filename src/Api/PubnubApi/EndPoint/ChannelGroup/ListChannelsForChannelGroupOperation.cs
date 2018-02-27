@@ -17,6 +17,7 @@ namespace PubnubApi.EndPoint
 
         private string channelGroupName = "";
         private PNCallback<PNChannelGroupsAllChannelsResult> savedCallback;
+        private Dictionary<string, object> queryParam;
 
         public ListChannelsForChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
@@ -34,12 +35,18 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        public ListChannelsForChannelGroupOperation QueryParam(Dictionary<string, object> customQueryParam)
+        {
+            this.queryParam = customQueryParam;
+            return this;
+        }
+
         public void Async(PNCallback<PNChannelGroupsAllChannelsResult> callback)
         {
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                GetChannelsForChannelGroup(this.channelGroupName, callback);
+                GetChannelsForChannelGroup(this.channelGroupName, this.queryParam, callback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
@@ -47,11 +54,11 @@ namespace PubnubApi.EndPoint
         {
             Task.Factory.StartNew(() =>
             {
-                GetChannelsForChannelGroup(this.channelGroupName, savedCallback);
+                GetChannelsForChannelGroup(this.channelGroupName, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
-        internal void GetChannelsForChannelGroup(string groupName, PNCallback<PNChannelGroupsAllChannelsResult> callback)
+        internal void GetChannelsForChannelGroup(string groupName, Dictionary<string, object> externalQueryParam, PNCallback<PNChannelGroupsAllChannelsResult> callback)
         {
             if (string.IsNullOrEmpty(groupName) || groupName.Trim().Length == 0)
             {
@@ -61,7 +68,7 @@ namespace PubnubApi.EndPoint
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
 
-            Uri request = urlBuilder.BuildGetChannelsForChannelGroupRequest(null, groupName, false);
+            Uri request = urlBuilder.BuildGetChannelsForChannelGroupRequest(null, groupName, false, externalQueryParam);
 
             RequestState<PNChannelGroupsAllChannelsResult> requestState = new RequestState<PNChannelGroupsAllChannelsResult>();
             requestState.ResponseType = PNOperationType.ChannelGroupGet;

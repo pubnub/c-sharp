@@ -22,6 +22,7 @@ namespace PubnubApi.EndPoint
 
         private string channelName = "";
         private PNCallback<PNDeleteMessageResult> savedCallback;
+        private Dictionary<string, object> queryParam;
 
         public DeleteMessageOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
@@ -50,6 +51,12 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        public DeleteMessageOperation QueryParam(Dictionary<string, object> customQueryParam)
+        {
+            this.queryParam = customQueryParam;
+            return this;
+        }
+
         public void Async(PNCallback<PNDeleteMessageResult> callback)
         {
             if (string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length == 0)
@@ -59,7 +66,7 @@ namespace PubnubApi.EndPoint
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                DeleteMessage(this.channelName, this.startTimetoken, this.endTimetoken, callback);
+                DeleteMessage(this.channelName, this.startTimetoken, this.endTimetoken, this.queryParam, callback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
@@ -67,11 +74,11 @@ namespace PubnubApi.EndPoint
         {
             Task.Factory.StartNew(() =>
             {
-                DeleteMessage(this.channelName, this.startTimetoken, this.endTimetoken, savedCallback);
+                DeleteMessage(this.channelName, this.startTimetoken, this.endTimetoken, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
-        internal void DeleteMessage(string channel, long start, long end, PNCallback<PNDeleteMessageResult> callback)
+        internal void DeleteMessage(string channel, long start, long end, Dictionary<string, object> externalQueryParam, PNCallback<PNDeleteMessageResult> callback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()))
             {
@@ -80,7 +87,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildDeleteMessageRequest(channel, start, end);
+            Uri request = urlBuilder.BuildDeleteMessageRequest(channel, start, end, externalQueryParam);
 
             RequestState<PNDeleteMessageResult> requestState = new RequestState<PNDeleteMessageResult>();
             requestState.Channels = new [] { channel };

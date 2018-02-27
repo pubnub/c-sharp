@@ -136,7 +136,7 @@ namespace PubnubApi
             }
 
             PubnubApi.Interface.IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(pubnubConfig, jsonLib, unit, pubnubLog, null);
-            Uri requestUri = urlBuilder.BuildTimeRequest();
+            Uri requestUri = urlBuilder.BuildTimeRequest(null);
             try
             {
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10

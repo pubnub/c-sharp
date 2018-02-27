@@ -19,6 +19,7 @@ namespace PubnubApi.EndPoint
         private string channelGroupName = "";
         private string[] channelNames;
         private PNCallback<PNChannelGroupsAddChannelResult> savedCallback;
+        private Dictionary<string, object> queryParam;
 
         public AddChannelsToChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
@@ -41,12 +42,18 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        public AddChannelsToChannelGroupOperation QueryParam(Dictionary<string, object> customQueryParam)
+        {
+            this.queryParam = customQueryParam;
+            return this;
+        }
+
         public void Async(PNCallback<PNChannelGroupsAddChannelResult> callback)
         {
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                AddChannelsToChannelGroup(this.channelNames, "", this.channelGroupName, callback);
+                AddChannelsToChannelGroup(this.channelNames, "", this.channelGroupName, this.queryParam, callback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
@@ -54,11 +61,11 @@ namespace PubnubApi.EndPoint
         {
             Task.Factory.StartNew(() =>
             {
-                AddChannelsToChannelGroup(this.channelNames, "", this.channelGroupName, savedCallback);
+                AddChannelsToChannelGroup(this.channelNames, "", this.channelGroupName, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
-        internal void AddChannelsToChannelGroup(string[] channels, string nameSpace, string groupName, PNCallback<PNChannelGroupsAddChannelResult> callback)
+        internal void AddChannelsToChannelGroup(string[] channels, string nameSpace, string groupName, Dictionary<string, object> externalQueryParam, PNCallback<PNChannelGroupsAddChannelResult> callback)
         {
             if (channels == null || channels.Length == 0)
             {
@@ -80,7 +87,7 @@ namespace PubnubApi.EndPoint
 
             string channelsCommaDelimited = string.Join(",", channels.OrderBy(x => x).ToArray());
 
-            Uri request = urlBuilder.BuildAddChannelsToChannelGroupRequest(channelsCommaDelimited, nameSpace, groupName);
+            Uri request = urlBuilder.BuildAddChannelsToChannelGroupRequest(channelsCommaDelimited, nameSpace, groupName, externalQueryParam);
 
             RequestState<PNChannelGroupsAddChannelResult> requestState = new RequestState<PNChannelGroupsAddChannelResult>();
             requestState.ResponseType = PNOperationType.PNAddChannelsToGroupOperation;

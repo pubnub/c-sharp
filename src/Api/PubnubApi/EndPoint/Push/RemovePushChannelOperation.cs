@@ -20,6 +20,7 @@ namespace PubnubApi.EndPoint
         private string[] channelNames;
         private string deviceTokenId = "";
         private PNCallback<PNPushRemoveChannelResult> savedCallback;
+        private Dictionary<string, object> queryParam;
 
         public RemovePushChannelOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
@@ -48,12 +49,18 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        public RemovePushChannelOperation QueryParam(Dictionary<string, object> customQueryParam)
+        {
+            this.queryParam = customQueryParam;
+            return this;
+        }
+
         public void Async(PNCallback<PNPushRemoveChannelResult> callback)
         {
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, callback);
+                RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, this.queryParam, callback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
@@ -61,11 +68,11 @@ namespace PubnubApi.EndPoint
         {
             Task.Factory.StartNew(() =>
             {
-                RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, savedCallback);
+                RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
-        internal void RemoveChannelForDevice(string[] channels, PNPushType pushType, string pushToken, PNCallback<PNPushRemoveChannelResult> callback)
+        internal void RemoveChannelForDevice(string[] channels, PNPushType pushType, string pushToken, Dictionary<string, object> externalQueryParam, PNCallback<PNPushRemoveChannelResult> callback)
         {
             if (channels == null || channels.Length == 0 || channels[0] == null || channels[0].Trim().Length == 0)
             {
@@ -81,7 +88,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildRemoveChannelPushRequest(channel, pushType, pushToken);
+            Uri request = urlBuilder.BuildRemoveChannelPushRequest(channel, pushType, pushToken, externalQueryParam);
 
             RequestState<PNPushRemoveChannelResult> requestState = new RequestState<PNPushRemoveChannelResult>();
             requestState.Channels = new [] { channel };

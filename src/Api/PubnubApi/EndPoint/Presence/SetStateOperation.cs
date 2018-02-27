@@ -22,6 +22,7 @@ namespace PubnubApi.EndPoint
         private Dictionary<string, object> userState;
         private string channelUUID = "";
         private PNCallback<PNSetStateResult> savedCallback;
+        private Dictionary<string, object> queryParam;
 
         public SetStateOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
@@ -56,13 +57,19 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        public SetStateOperation QueryParam(Dictionary<string, object> customQueryParam)
+        {
+            this.queryParam = customQueryParam;
+            return this;
+        }
+
         public void Async(PNCallback<PNSetStateResult> callback)
         {
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
                 string serializedState = jsonLibrary.SerializeToJsonString(this.userState);
-                SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, callback);
+                SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, this.queryParam, callback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
@@ -71,11 +78,11 @@ namespace PubnubApi.EndPoint
             Task.Factory.StartNew(() =>
             {
                 string serializedState = jsonLibrary.SerializeToJsonString(this.userState);
-                SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, savedCallback);
+                SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
-        internal void SetUserState(string[] channels, string[] channelGroups, string uuid, string jsonUserState, PNCallback<PNSetStateResult> callback)
+        internal void SetUserState(string[] channels, string[] channelGroups, string uuid, string jsonUserState, Dictionary<string, object> externalQueryParam, PNCallback<PNSetStateResult> callback)
         {
             if ((channels == null && channelGroups == null)
                             || (channels != null && channelGroups != null && channels.Length == 0 && channelGroups.Length == 0))
@@ -161,10 +168,10 @@ namespace PubnubApi.EndPoint
                 }
             }
 
-            SharedSetUserState(channels, channelGroups, uuid, jsonUserState, jsonUserState, callback);
+            SharedSetUserState(channels, channelGroups, uuid, jsonUserState, jsonUserState, externalQueryParam, callback);
         }
 
-        internal void SetUserState(string[] channels, string[] channelGroups, string uuid, KeyValuePair<string, object> keyValuePair, PNCallback<PNSetStateResult> callback)
+        internal void SetUserState(string[] channels, string[] channelGroups, string uuid, KeyValuePair<string, object> keyValuePair, Dictionary<string, object> externalQueryParam, PNCallback<PNSetStateResult> callback)
         {
             if ((channels == null && channelGroups != null) || (channels.Length == 0 && channelGroups.Length == 0))
             {
@@ -278,10 +285,10 @@ namespace PubnubApi.EndPoint
                 currentChannelGroupUserState = "{}";
             }
 
-            SharedSetUserState(channels, channelGroups, uuid, currentChannelUserState, currentChannelGroupUserState, callback);
+            SharedSetUserState(channels, channelGroups, uuid, currentChannelUserState, currentChannelGroupUserState, externalQueryParam, callback);
         }
 
-        private void SharedSetUserState(string[] channels, string[] channelGroups, string uuid, string jsonChannelUserState, string jsonChannelGroupUserState, PNCallback<PNSetStateResult> callback)
+        private void SharedSetUserState(string[] channels, string[] channelGroups, string uuid, string jsonChannelUserState, string jsonChannelGroupUserState, Dictionary<string, object> externalQueryParam, PNCallback<PNSetStateResult> callback)
         {
             List<string> channelList = new List<string>();
             List<string> channelGroupList = new List<string>();
@@ -376,7 +383,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildSetUserStateRequest(commaDelimitedChannels, commaDelimitedChannelGroups, uuid, jsonUserState);
+            Uri request = urlBuilder.BuildSetUserStateRequest(commaDelimitedChannels, commaDelimitedChannelGroups, uuid, jsonUserState, externalQueryParam);
 
             RequestState<PNSetStateResult> requestState = new RequestState<PNSetStateResult>();
             requestState.Channels = channels;

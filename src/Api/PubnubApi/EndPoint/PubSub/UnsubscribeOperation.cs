@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -18,6 +19,7 @@ namespace PubnubApi.EndPoint
         private string[] subscribeChannelNames;
         private string[] subscribeChannelGroupNames;
         private string[] presenceChannelNames = new string[] { };
+        private Dictionary<string, object> queryParam;
 
         public UnsubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
@@ -37,6 +39,12 @@ namespace PubnubApi.EndPoint
         public UnsubscribeOperation<T> ChannelGroups(string[] channelGroups)
         {
             this.subscribeChannelGroupNames = channelGroups;
+            return this;
+        }
+
+        public UnsubscribeOperation<T> QueryParam(Dictionary<string, object> customQueryParam)
+        {
+            this.queryParam = customQueryParam;
             return this;
         }
 
@@ -60,7 +68,7 @@ namespace PubnubApi.EndPoint
             {
                 SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
                 manager.CurrentPubnubInstance(PubnubInstance);
-                manager.MultiChannelUnSubscribeInit<T>(PNOperationType.PNUnsubscribeOperation, channel, channelGroup);
+                manager.MultiChannelUnSubscribeInit<T>(PNOperationType.PNUnsubscribeOperation, channel, channelGroup, this.queryParam);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 

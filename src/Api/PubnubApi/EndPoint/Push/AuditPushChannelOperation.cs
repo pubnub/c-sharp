@@ -18,6 +18,7 @@ namespace PubnubApi.EndPoint
         private PNPushType pubnubPushType;
         private string deviceTokenId = "";
         private PNCallback<PNPushListProvisionsResult> savedCallback;
+        private Dictionary<string, object> queryParam;
 
         public AuditPushChannelOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
@@ -40,12 +41,18 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        public AuditPushChannelOperation QueryParam(Dictionary<string, object> customQueryParam)
+        {
+            this.queryParam = customQueryParam;
+            return this;
+        }
+
         public void Async(PNCallback<PNPushListProvisionsResult> callback)
         {
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                GetChannelsForDevice(this.pubnubPushType, this.deviceTokenId, callback);
+                GetChannelsForDevice(this.pubnubPushType, this.deviceTokenId, this.queryParam, callback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
@@ -53,11 +60,11 @@ namespace PubnubApi.EndPoint
         {
             Task.Factory.StartNew(() =>
             {
-                GetChannelsForDevice(this.pubnubPushType, this.deviceTokenId, savedCallback);
+                GetChannelsForDevice(this.pubnubPushType, this.deviceTokenId, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
-        internal void GetChannelsForDevice(PNPushType pushType, string pushToken, PNCallback<PNPushListProvisionsResult> callback)
+        internal void GetChannelsForDevice(PNPushType pushType, string pushToken, Dictionary<string, object> externalQueryParam, PNCallback<PNPushListProvisionsResult> callback)
         {
             if (pushToken == null)
             {
@@ -66,7 +73,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildGetChannelsPushRequest(pushType, pushToken);
+            Uri request = urlBuilder.BuildGetChannelsPushRequest(pushType, pushToken, externalQueryParam);
 
             RequestState<PNPushListProvisionsResult> requestState = new RequestState<PNPushListProvisionsResult>();
             requestState.ResponseType = PNOperationType.PushGet;

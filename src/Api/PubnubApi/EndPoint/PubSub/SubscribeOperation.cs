@@ -25,6 +25,7 @@ namespace PubnubApi.EndPoint
         private long subscribeTimetoken = -1;
         private bool presenceSubscribeEnabled;
         private SubscribeManager manager;
+        private Dictionary<string, object> queryParam;
 
         public SubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
@@ -65,6 +66,12 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        public SubscribeOperation<T> QueryParam(Dictionary<string, object> customQueryParam)
+        {
+            this.queryParam = customQueryParam;
+            return this;
+        }
+
         public void Execute()
         {
             if (this.subscribeChannelNames == null)
@@ -98,10 +105,10 @@ namespace PubnubApi.EndPoint
             string[] channelNames = this.subscribeChannelNames.ToArray();
             string[] channelGroupNames = this.subscribeChannelGroupNames.ToArray();
 
-            Subscribe(channelNames, channelGroupNames);
+            Subscribe(channelNames, channelGroupNames, this.queryParam);
         }
 
-        private void Subscribe(string[] channels, string[] channelGroups)
+        private void Subscribe(string[] channels, string[] channelGroups, Dictionary<string, object> externalQueryParam)
         {
             if ((channels == null || channels.Length == 0) && (channelGroups == null || channelGroups.Length  == 0))
             {
@@ -143,7 +150,7 @@ namespace PubnubApi.EndPoint
             {
                 manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
                 manager.CurrentPubnubInstance(PubnubInstance);
-                manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups, initialSubscribeUrlParams);
+                manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups, initialSubscribeUrlParams, externalQueryParam);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 

@@ -17,6 +17,8 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
+        private Dictionary<string, object> queryParam;
+
         private PNCallback<PNTimeResult> savedCallback;
 
         public TimeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
@@ -28,13 +30,18 @@ namespace PubnubApi.EndPoint
             pubnubTelemetryMgr = telemetryManager;
         }
 
+        public TimeOperation QueryParam(Dictionary<string, object> customQueryParam)
+        {
+            this.queryParam = customQueryParam;
+            return this;
+        }
 
         public void Async(PNCallback<PNTimeResult> callback)
         {
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                Time(callback);
+                Time(this.queryParam, callback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
@@ -42,15 +49,15 @@ namespace PubnubApi.EndPoint
         {
             Task.Factory.StartNew(() =>
             {
-                Time(savedCallback);
+                Time(this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
-        internal void Time(PNCallback<PNTimeResult> callback)
+        internal void Time(Dictionary<string, object> externalQueryParam, PNCallback<PNTimeResult> callback)
         {
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildTimeRequest();
+            Uri request = urlBuilder.BuildTimeRequest(externalQueryParam);
 
             RequestState<PNTimeResult> requestState = new RequestState<PNTimeResult>();
             requestState.Channels = null;

@@ -25,6 +25,7 @@ namespace PubnubApi.EndPoint
         private int ttl = -1;
         private PNCallback<PNPublishResult> savedCallback;
         private bool syncRequest;
+        private Dictionary<string, object> queryParam;
 
         public PublishOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
@@ -77,6 +78,12 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        public PublishOperation QueryParam(Dictionary<string, object> customQueryParam)
+        {
+            this.queryParam = customQueryParam;
+            return this;
+        }
+
         public void Async(PNCallback<PNPublishResult> callback)
         {
             if (this.msg == null)
@@ -98,7 +105,7 @@ namespace PubnubApi.EndPoint
             {
                 syncRequest = false;
                 this.savedCallback = callback;
-                Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, callback);
+                Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.queryParam, callback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
@@ -119,7 +126,7 @@ namespace PubnubApi.EndPoint
             {
                 syncRequest = true;
                 syncEvent = new System.Threading.ManualResetEvent(false);
-                Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, new PNPublishResultExt((r, s) => { SyncResult = r; syncEvent.Set(); }));
+                Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.queryParam, new PNPublishResultExt((r, s) => { SyncResult = r; syncEvent.Set(); }));
                 syncEvent.WaitOne(config.NonSubscribeRequestTimeout * 1000);
 
                 return SyncResult;
@@ -135,12 +142,12 @@ namespace PubnubApi.EndPoint
             {
                 if (!syncRequest)
                 {
-                    Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, savedCallback);
+                    Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.queryParam, savedCallback);
                 }
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
-        private void Publish(string channel, object message, bool storeInHistory, int ttl, Dictionary<string,object> metaData, PNCallback<PNPublishResult> callback)
+        private void Publish(string channel, object message, bool storeInHistory, int ttl, Dictionary<string,object> metaData, Dictionary<string, object> externalQueryParam, PNCallback<PNPublishResult> callback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
             {
@@ -167,7 +174,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildPublishRequest(channel, message, storeInHistory, ttl, metaData, httpPost, null);
+            Uri request = urlBuilder.BuildPublishRequest(channel, message, storeInHistory, ttl, metaData, httpPost, null, queryParam);
 
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
             requestState.Channels = new [] { channel };
