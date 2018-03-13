@@ -91,6 +91,10 @@ namespace PubnubApi
 
         public bool EnableTelemetry { get; set; } = true;
 
+        public  int MaximumMessagesCacheSize { get; set; }
+
+        public bool DedupOnSubscribe { get; set; }
+
         public PNConfiguration()
         {
             this.Origin = "ps.pndsn.com";
@@ -108,6 +112,8 @@ namespace PubnubApi
             this.HeartbeatNotificationOption = PNHeartbeatNotificationOption.Failures;
             this.IncludeRequestIdentifier = true;
             this.IncludeInstanceIdentifier = false;
+            this.DedupOnSubscribe = false;
+            this.MaximumMessagesCacheSize = 100;
         }
 
         public PNConfiguration SetPresenceTimeoutWithCustomInterval(int timeout, int interval)
