@@ -48,7 +48,7 @@ namespace PubnubApi
         private IPubnubUnitTest unitTest;
         private IPubnubLog pubnubLog;
         private EndPoint.TelemetryManager pubnubTelemetryMgr;
-        private EndPoint.DuplicationManager pubnubSubscribeDuplicationManager;
+        private EndPoint.DuplicationManager pubnubSubscribeDuplicationManager { get; set; }
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
         private HttpClient httpClientSubscribe;
         private HttpClient httpClientNonsubscribe;
@@ -170,7 +170,7 @@ namespace PubnubApi
             unitTest = pubnubUnitTest;
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
-            pubnubSubscribeDuplicationManager = new EndPoint.DuplicationManager(pubnubConfig, pubnubLog);
+            pubnubSubscribeDuplicationManager = new EndPoint.DuplicationManager(pubnubConfig, jsonPluggableLibrary, pubnubLog);
 
             CurrentUuid = pubnubConfig.Uuid;
 
@@ -316,7 +316,7 @@ namespace PubnubApi
         private List<SubscribeMessage> GetMessageFromMultiplexResult(List<object> result)
         {
             List<object> jsonMessageList = null;
-            List<SubscribeMessage> msgList = new List<SubscribeMessage>(); 
+            List<SubscribeMessage> msgList = new List<SubscribeMessage>();
 
             Dictionary<string, object> messageDicObj = jsonLib.ConvertToDictionaryObject(result[1]);
             if (messageDicObj != null && messageDicObj.Count > 0 && messageDicObj.ContainsKey("m"))
@@ -422,33 +422,37 @@ namespace PubnubApi
                             }
                         }
 
-                        if (pubnubConfig.DedupOnSubscribe)
-                        {
-                            try
-                            {
-                                if (pubnubSubscribeDuplicationManager.IsDuplicate(msg))
-                                {
-                                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, GetMessageFromMultiplexResult - dedupe duplicate identified. skipped msg = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), jsonLib.SerializeToJsonString(msg)), pubnubConfig.LogVerbosity);
-                                    continue;
-                                }
-                                else
-                                {
-                                    pubnubSubscribeDuplicationManager.AddEntry(msg);
-                                }
-                            }
-                            catch(Exception ex)
-                            {
-                                //Log and ignore any exception due to Dedupe manager
-                                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, GetMessageFromMultiplexResult - dedupe error = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), pubnubConfig.LogVerbosity);
-                            }
-                        }
-
                         msgList.Add(msg);
                     }
                 }
             }
-
             return msgList;
+        }
+
+        private bool IsTargetForDedup(SubscribeMessage message)
+        {
+            bool isTargetOfDedup = false;
+
+            try
+            {
+                if (pubnubSubscribeDuplicationManager.IsDuplicate(message))
+                {
+                    isTargetOfDedup = true;
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Dedupe - Duplicate skipped - msg = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), jsonLib.SerializeToJsonString(message)), pubnubConfig.LogVerbosity);
+                }
+                else
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Dedupe - AddEntry - msg = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), jsonLib.SerializeToJsonString(message)), pubnubConfig.LogVerbosity);
+                    pubnubSubscribeDuplicationManager.AddEntry(message);
+                }
+            }
+            catch (Exception ex)
+            {
+                //Log and ignore any exception due to Dedupe manager
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, IsTargetForDedup - dedupe error = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), pubnubConfig.LogVerbosity);
+            }
+
+            return isTargetOfDedup;
         }
 
         private bool IsZeroTimeTokenRequest<T>(RequestState<T> asyncRequestState, List<object> result)
@@ -518,7 +522,6 @@ namespace PubnubApi
                 case PNOperationType.PNSubscribeOperation:
                 case PNOperationType.Presence:
                     List<SubscribeMessage> messageList = GetMessageFromMultiplexResult(result);
-
                     if (messageList != null && messageList.Count > 0)
                     {
                         if (messageList.Count >= pubnubConfig.RequestMessageCountThreshold)
@@ -533,6 +536,14 @@ namespace PubnubApi
                             SubscribeMessage currentMessage = messageList[messageIndex];
                             if (currentMessage != null)
                             {
+                                if (pubnubConfig.DedupOnSubscribe)
+                                {
+                                    if (IsTargetForDedup(currentMessage))
+                                    {
+                                        continue;
+                                    }
+                                }
+
                                 string currentMessageChannel = currentMessage.Channel;
                                 string currentMessageChannelGroup = currentMessage.SubscriptionMatch;
 

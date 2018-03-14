@@ -7,39 +7,43 @@ namespace PubnubApi.EndPoint
 {
     internal class DuplicationManager
     {
-        private PNConfiguration pubnubConfig;
-        private IPubnubLog pubnubLog;
-        private SortedDictionary<string,bool> hashHistory;
+        private readonly PNConfiguration pubnubConfig;
+        private readonly IJsonPluggableLibrary jsonLib;
+        private readonly IPubnubLog pubnubLog;
+        private readonly PubnubCrypto dedupHasher;
+        private static ConcurrentDictionary<string, long> HashHistory { get; set; } = new ConcurrentDictionary<string, long>();
 
-        public DuplicationManager(PNConfiguration config, IPubnubLog log)
+        public DuplicationManager(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log)
         {
             this.pubnubConfig = config;
+            this.jsonLib = jsonPluggableLibrary;
             this.pubnubLog = log;
-            this.hashHistory = new SortedDictionary<string, bool>();
+            dedupHasher = new PubnubCrypto(null, null, null);
         }
 
         private string GetSubscribeMessageHashKey(SubscribeMessage message)
         {
-            return string.Format("{0}{1}", message.Channel, message.Payload.GetHashCode().ToString());
+            
+            return dedupHasher.GetHashRaw(jsonLib.SerializeToJsonString(message));
         }
 
         public bool IsDuplicate(SubscribeMessage message)
         {
-            return hashHistory.ContainsKey(this.GetSubscribeMessageHashKey(message));
+            return HashHistory.ContainsKey(this.GetSubscribeMessageHashKey(message));
         }
 
         public void AddEntry(SubscribeMessage message)
         {
-            if (hashHistory.Count >= pubnubConfig.MaximumMessagesCacheSize)
+            if (HashHistory.Count >= pubnubConfig.MaximumMessagesCacheSize)
             {
-                hashHistory.Remove(hashHistory.First().Key);
+                HashHistory.Remove(HashHistory.Aggregate((l,r)=> l.Value < r.Value ? l : r).Key);
             }
-            hashHistory.Add(this.GetSubscribeMessageHashKey(message),true);
+            HashHistory.Add(this.GetSubscribeMessageHashKey(message),Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(DateTime.UtcNow));
         }
 
         public void ClearHistory()
         {
-            this.hashHistory.Clear();
+            HashHistory.Clear();
         }
     }
 }
