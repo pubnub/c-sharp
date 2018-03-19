@@ -95,6 +95,8 @@ namespace PubnubApi
 
         public bool DedupOnSubscribe { get; set; }
 
+        public bool SupressLeaveEvents { get; set; }
+
         public PNConfiguration()
         {
             this.Origin = "ps.pndsn.com";
@@ -114,6 +116,7 @@ namespace PubnubApi
             this.IncludeInstanceIdentifier = false;
             this.DedupOnSubscribe = false;
             this.MaximumMessagesCacheSize = 100;
+            this.SupressLeaveEvents = false;
         }
 
         public PNConfiguration SetPresenceTimeoutWithCustomInterval(int timeout, int interval)
