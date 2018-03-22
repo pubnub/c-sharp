@@ -1487,6 +1487,15 @@ namespace PubnubApi
             }
         }
 
+        protected void TerminateDedupeManager()
+        {
+            if (pubnubSubscribeDuplicationManager != null)
+            {
+                pubnubSubscribeDuplicationManager.ClearHistory();
+                pubnubSubscribeDuplicationManager = null;
+            }
+        }
+
         protected void UpdatePubnubNetworkTcpCheckIntervalInSeconds()
         {
             int timerInterval;
@@ -1627,6 +1636,7 @@ namespace PubnubApi
             RemoveUserState();
             TerminatePresenceHeartbeatTimer();
             TerminateTelemetry();
+            TerminateDedupeManager();
 
             if (MultiChannelSubscribe.Count > 0 && MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId))
             {
