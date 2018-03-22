@@ -21,6 +21,7 @@ namespace PubnubApi.EndPoint
         private string[] channelGroupNames;
         private string channelUUID = "";
         private PNCallback<PNGetStateResult> savedCallback;
+        private Dictionary<string, object> queryParam;
 
         public GetStateOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
@@ -49,12 +50,18 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        public GetStateOperation QueryParam(Dictionary<string, object> customQueryParam)
+        {
+            this.queryParam = customQueryParam;
+            return this;
+        }
+
         public void Async(PNCallback<PNGetStateResult> callback)
         {
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                GetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, callback);
+                GetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, this.queryParam, callback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
@@ -62,11 +69,11 @@ namespace PubnubApi.EndPoint
         {
             Task.Factory.StartNew(() =>
             {
-                GetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, savedCallback);
+                GetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
-        internal void GetUserState(string[] channels, string[] channelGroups, string uuid, PNCallback<PNGetStateResult> callback)
+        internal void GetUserState(string[] channels, string[] channelGroups, string uuid, Dictionary<string, object> externalQueryParam, PNCallback<PNGetStateResult> callback)
         {
             if ((channels == null && channelGroups == null)
                            || (channels != null && channelGroups != null && channels.Length == 0 && channelGroups.Length == 0))
@@ -84,7 +91,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildGetUserStateRequest(channelsCommaDelimited, channelGroupsCommaDelimited, uuid);
+            Uri request = urlBuilder.BuildGetUserStateRequest(channelsCommaDelimited, channelGroupsCommaDelimited, uuid, externalQueryParam);
 
             RequestState<PNGetStateResult> requestState = new RequestState<PNGetStateResult>();
             requestState.Channels = channels;

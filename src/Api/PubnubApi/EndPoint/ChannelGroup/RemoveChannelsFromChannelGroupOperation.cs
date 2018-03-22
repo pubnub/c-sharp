@@ -19,6 +19,7 @@ namespace PubnubApi.EndPoint
         private string channelGroupName = "";
         private string[] channelNames;
         private PNCallback<PNChannelGroupsRemoveChannelResult> savedCallback;
+        private Dictionary<string, object> queryParam;
 
         public RemoveChannelsFromChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
@@ -41,12 +42,18 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        public RemoveChannelsFromChannelGroupOperation QueryParam(Dictionary<string, object> customQueryParam)
+        {
+            this.queryParam = customQueryParam;
+            return this;
+        }
+
         public void Async(PNCallback<PNChannelGroupsRemoveChannelResult> callback)
         {
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                RemoveChannelsFromChannelGroup(this.channelNames, "", this.channelGroupName, callback);
+                RemoveChannelsFromChannelGroup(this.channelNames, "", this.channelGroupName, this.queryParam, callback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
@@ -54,11 +61,11 @@ namespace PubnubApi.EndPoint
         {
             Task.Factory.StartNew(() =>
             {
-                RemoveChannelsFromChannelGroup(this.channelNames, "", this.channelGroupName, savedCallback);
+                RemoveChannelsFromChannelGroup(this.channelNames, "", this.channelGroupName, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
-        internal void RemoveChannelsFromChannelGroup(string[] channels, string nameSpace, string groupName, PNCallback<PNChannelGroupsRemoveChannelResult> callback)
+        internal void RemoveChannelsFromChannelGroup(string[] channels, string nameSpace, string groupName, Dictionary<string, object> externalQueryParam, PNCallback<PNChannelGroupsRemoveChannelResult> callback)
         {
             if (channels == null || channels.Length == 0)
             {
@@ -81,7 +88,7 @@ namespace PubnubApi.EndPoint
             string channelsCommaDelimited = channels != null && channels.Length > 0 ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
 
 
-            Uri request = urlBuilder.BuildRemoveChannelsFromChannelGroupRequest(channelsCommaDelimited, nameSpace, groupName);
+            Uri request = urlBuilder.BuildRemoveChannelsFromChannelGroupRequest(channelsCommaDelimited, nameSpace, groupName, externalQueryParam);
 
             RequestState<PNChannelGroupsRemoveChannelResult> requestState = new RequestState<PNChannelGroupsRemoveChannelResult>();
             requestState.ResponseType = PNOperationType.PNRemoveChannelsFromGroupOperation;

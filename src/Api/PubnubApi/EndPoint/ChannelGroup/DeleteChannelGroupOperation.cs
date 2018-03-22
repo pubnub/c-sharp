@@ -17,6 +17,7 @@ namespace PubnubApi.EndPoint
 
         private string channelGroupName = "";
         private PNCallback<PNChannelGroupsDeleteGroupResult> savedCallback;
+        private Dictionary<string, object> queryParam;
 
         public DeleteChannelGroupOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
@@ -33,12 +34,18 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        public DeleteChannelGroupOperation QueryParam(Dictionary<string, object> customQueryParam)
+        {
+            this.queryParam = customQueryParam;
+            return this;
+        }
+
         public void Async(PNCallback<PNChannelGroupsDeleteGroupResult> callback)
         {
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                DeleteChannelGroup(this.channelGroupName, callback);
+                DeleteChannelGroup(this.channelGroupName, this.queryParam, callback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
@@ -46,11 +53,11 @@ namespace PubnubApi.EndPoint
         {
             Task.Factory.StartNew(() =>
             {
-                DeleteChannelGroup(this.channelGroupName, savedCallback);
+                DeleteChannelGroup(this.channelGroupName, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
-        internal void DeleteChannelGroup(string groupName, PNCallback<PNChannelGroupsDeleteGroupResult> callback)
+        internal void DeleteChannelGroup(string groupName, Dictionary<string, object> externalQueryParam, PNCallback<PNChannelGroupsDeleteGroupResult> callback)
         {
             if (string.IsNullOrEmpty(groupName) || groupName.Trim().Length == 0)
             {
@@ -60,7 +67,7 @@ namespace PubnubApi.EndPoint
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
 
-            Uri request = urlBuilder.BuildRemoveChannelsFromChannelGroupRequest(null, "", groupName);
+            Uri request = urlBuilder.BuildRemoveChannelsFromChannelGroupRequest(null, "", groupName, externalQueryParam);
 
             RequestState<PNChannelGroupsDeleteGroupResult> requestState = new RequestState<PNChannelGroupsDeleteGroupResult>();
             requestState.ResponseType = PNOperationType.PNRemoveGroupOperation;

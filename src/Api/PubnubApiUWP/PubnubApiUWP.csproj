@@ -15,7 +15,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubUWP</PackageId>
-    <PackageVersion>4.0.14.0</PackageVersion>
+    <PackageVersion>4.0.15.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -23,13 +23,14 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Fix for Publish Sync.
-Refactored Int32/Int64 Parse to TryParse.
-Refactored code based on codacy.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added feature to allow external query params.
+Internal deduping mechanism when devices cross regions (DedupOnSubscribe).
+Added provision to SupressLeaveEvents
+Refactored code related to network check time request for non-200 response logging.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
-    <Copyright>PubNub 2012-2017</Copyright>
+    <Copyright>PubNub 2012-2018</Copyright>
 
     <!--<PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.0' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>-->
     <!--<NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.0' ">1.6.1</NetStandardImplicitPackageVersion>-->
@@ -219,6 +220,7 @@ Refactored code based on codacy.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\EndPoint\Presence\WhereNowOperation.cs">
       <Link>EndPoint\Presence\WhereNowOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\DuplicationManager.cs" Link="EndPoint\PubSub\DuplicationManager.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\FireOperation.cs">
       <Link>EndPoint\PubSub\FireOperation.cs</Link>
     </Compile>

@@ -21,6 +21,7 @@ namespace PubnubApi.EndPoint
         private string channelGroupName;
         private string[] authenticationKeys;
         private PNCallback<PNAccessManagerAuditResult> savedCallback;
+        private Dictionary<string, object> queryParam;
 
         public AuditOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
@@ -49,12 +50,18 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        public AuditOperation QueryParam(Dictionary<string, object> customQueryParam)
+        {
+            this.queryParam = customQueryParam;
+            return this;
+        }
+
         public void Async(PNCallback<PNAccessManagerAuditResult> callback)
         {
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, callback);
+                AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, this.queryParam, callback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
@@ -62,11 +69,11 @@ namespace PubnubApi.EndPoint
         {
             System.Threading.Tasks.Task.Factory.StartNew(() =>
             {
-                AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, savedCallback);
+                AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
-        internal void AuditAccess(string channel, string channelGroup, string[] authKeys, PNCallback<PNAccessManagerAuditResult> callback)
+        internal void AuditAccess(string channel, string channelGroup, string[] authKeys, Dictionary<string, object> externalQueryParam, PNCallback<PNAccessManagerAuditResult> callback)
         {
             if (string.IsNullOrEmpty(config.SecretKey) || string.IsNullOrEmpty(config.SecretKey.Trim()) || config.SecretKey.Length <= 0)
             {
@@ -77,7 +84,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildAuditAccessRequest(channel, channelGroup, authKeysCommaDelimited);
+            Uri request = urlBuilder.BuildAuditAccessRequest(channel, channelGroup, authKeysCommaDelimited, externalQueryParam);
 
             RequestState<PNAccessManagerAuditResult> requestState = new RequestState<PNAccessManagerAuditResult>();
             if (!string.IsNullOrEmpty(channel))

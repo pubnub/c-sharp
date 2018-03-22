@@ -136,7 +136,7 @@ namespace PubnubApi
             }
 
             PubnubApi.Interface.IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(pubnubConfig, jsonLib, unit, pubnubLog, null);
-            Uri requestUri = urlBuilder.BuildTimeRequest();
+            Uri requestUri = urlBuilder.BuildTimeRequest(null);
             try
             {
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
@@ -160,11 +160,18 @@ namespace PubnubApi
                 myRequest.Method = "GET";
                 using (HttpWebResponse response = await Task.Factory.FromAsync<HttpWebResponse>(myRequest.BeginGetResponse, asyncPubnubResult => (HttpWebResponse)myRequest.EndGetResponse(asyncPubnubResult), null))
                 {
-                    if (response != null && response.StatusCode == HttpStatusCode.OK)
+                    if (response != null)
                     {
                         LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} WebRequest CheckSocketConnect Resp {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), response.StatusCode.ToString()), pubnubConfig.LogVerbosity);
-                        networkStatus = true;
-                        t.TrySetResult(true);
+                        if (response.StatusCode == HttpStatusCode.OK)
+                        {
+                            networkStatus = true;
+                            t.TrySetResult(true);
+                        }
+                    }
+                    else
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} WebRequest CheckSocketConnect FAILED.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
                     }
                 }
 #endif

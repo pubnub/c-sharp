@@ -147,6 +147,9 @@ namespace PubnubApi
 #endif
         }
 
-
+        public string GetHashRaw(string input)
+        {
+            return ComputeHashRaw(input);
+        }
     }
 }

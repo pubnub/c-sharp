@@ -18,6 +18,7 @@ namespace PubnubApi.EndPoint
         private PNPushType pubnubPushType;
         private string deviceTokenId = "";
         private PNCallback<PNPushRemoveAllChannelsResult> savedCallback;
+        private Dictionary<string, object> queryParam;
 
         public RemoveAllPushChannelsOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
         {
@@ -40,12 +41,18 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        public RemoveAllPushChannelsOperation QueryParam(Dictionary<string, object> customQueryParam)
+        {
+            this.queryParam = customQueryParam;
+            return this;
+        }
+
         public void Async(PNCallback<PNPushRemoveAllChannelsResult> callback)
         {
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                RemoveAllChannelsForDevice(this.pubnubPushType, this.deviceTokenId, callback);
+                RemoveAllChannelsForDevice(this.pubnubPushType, this.deviceTokenId, this.queryParam, callback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
@@ -53,11 +60,11 @@ namespace PubnubApi.EndPoint
         {
             Task.Factory.StartNew(() =>
             {
-                RemoveAllChannelsForDevice(this.pubnubPushType, this.deviceTokenId, savedCallback);
+                RemoveAllChannelsForDevice(this.pubnubPushType, this.deviceTokenId, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
-        internal void RemoveAllChannelsForDevice(PNPushType pushType, string pushToken, PNCallback<PNPushRemoveAllChannelsResult> callback)
+        internal void RemoveAllChannelsForDevice(PNPushType pushType, string pushToken, Dictionary<string, object> externalQueryParam, PNCallback<PNPushRemoveAllChannelsResult> callback)
         {
             if (pushToken == null)
             {
@@ -66,7 +73,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildUnregisterDevicePushRequest(pushType, pushToken);
+            Uri request = urlBuilder.BuildUnregisterDevicePushRequest(pushType, pushToken, externalQueryParam);
 
             RequestState<PNPushRemoveAllChannelsResult> requestState = new RequestState<PNPushRemoveAllChannelsResult>();
             requestState.ResponseType = PNOperationType.PushUnregister;
