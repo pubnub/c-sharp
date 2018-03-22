@@ -24,7 +24,9 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
     <PackageReleaseNotes>Added feature to allow external query params.
-Internal deduping mechanism when devices cross regions (DedupOnSubscribe).</PackageReleaseNotes>
+Internal deduping mechanism when devices cross regions (DedupOnSubscribe).
+Added provision to SupressLeaveEvents
+Refactored code related to network check time request for non-200 response logging.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>

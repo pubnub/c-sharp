@@ -4,12 +4,16 @@ schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
   - version: 4.0.15.0
-    date: Mar 13, 2018
+    date: Mar 22, 2018
     changes:
       - type: Improvement
         text: Feature to add external query params
       - type: Improvement
         text: Internal deduping mechanism when devices cross regions (DedupOnSubscribe)
+      - type: Improvement
+        text: Added provision to SupressLeaveEvents
+      - type: Improvement
+        text: Refactored code related to network check time request for non-200 response logging
   - version: 4.0.14.0
     date: Feb 15, 2018
     changes:
