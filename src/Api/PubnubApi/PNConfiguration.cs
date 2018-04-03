@@ -89,6 +89,8 @@ namespace PubnubApi
 
         public bool UseClassicHttpWebRequest { get; set; } = false;
 
+        public bool UseTaskFactoryAsyncInsteadOfHttpClient { get; set; } = false;
+
         public bool EnableTelemetry { get; set; } = true;
 
         public  int MaximumMessagesCacheSize { get; set; }

@@ -85,7 +85,14 @@ namespace PubnubApi
             else
             {
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
-                return await SendRequestAndGetJsonResponseHttpClient(requestUri, pubnubRequestState, request).ConfigureAwait(false);
+                if (pubnubConfig.UseTaskFactoryAsyncInsteadOfHttpClient)
+                {
+                    return await SendRequestAndGetJsonResponseTaskFactory(pubnubRequestState, request).ConfigureAwait(false);
+                }
+                else
+                {
+                    return await SendRequestAndGetJsonResponseHttpClient(requestUri, pubnubRequestState, request).ConfigureAwait(false);
+                }
 #else
                 return await SendRequestAndGetJsonResponseTaskFactory(pubnubRequestState, request).ConfigureAwait(false);
 #endif
@@ -102,7 +109,14 @@ namespace PubnubApi
             else
             {
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
-                return await SendRequestAndGetJsonResponseHttpClientWithPOST(requestUri, pubnubRequestState, request, postData).ConfigureAwait(false);
+                if (pubnubConfig.UseTaskFactoryAsyncInsteadOfHttpClient)
+                {
+                    return await SendRequestAndGetJsonResponseTaskFactoryWithPOST(pubnubRequestState, request, postData).ConfigureAwait(false);
+                }
+                else
+                {
+                    return await SendRequestAndGetJsonResponseHttpClientWithPOST(requestUri, pubnubRequestState, request, postData).ConfigureAwait(false);
+                }
 #else
                 return await SendRequestAndGetJsonResponseTaskFactoryWithPOST(pubnubRequestState, request, postData).ConfigureAwait(false);
 #endif

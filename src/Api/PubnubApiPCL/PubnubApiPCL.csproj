@@ -14,7 +14,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubPCL</PackageId>
-    <PackageVersion>4.0.15.0</PackageVersion>
+    <PackageVersion>4.0.16.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -417,6 +417,7 @@ Refactored code related to network check time request for non-200 response loggi
     <Compile Include="..\PubnubApi\PubnubHttp.cs">
       <Link>PubnubHttp.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\PubnubHttpClientHandler.cs" Link="PubnubHttpClientHandler.cs" />
     <Compile Include="..\PubnubApi\Push\Mpns\MpnsCycleTileNotification.cs">
       <Link>Push\Mpns\MpnsCycleTileNotification.cs</Link>
     </Compile>

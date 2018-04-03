@@ -42,7 +42,7 @@ namespace PubnubApi
         private const int MAXEXPONENTIALBACKOFF = 32;
         private const int INTERVAL = 3;
 
-        private IPubnubHttp pubnubHttp;
+        private static IPubnubHttp pubnubHttp;
         private PNConfiguration pubnubConfig;
         private IJsonPluggableLibrary jsonLib;
         private IPubnubUnitTest unitTest;
@@ -50,9 +50,10 @@ namespace PubnubApi
         private EndPoint.TelemetryManager pubnubTelemetryMgr;
         private EndPoint.DuplicationManager pubnubSubscribeDuplicationManager { get; set; }
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
-        private HttpClient httpClientSubscribe;
-        private HttpClient httpClientNonsubscribe;
-        private HttpClient httpClientNetworkStatus;
+        private static HttpClient httpClientSubscribe;
+        private static HttpClient httpClientNonsubscribe;
+        private static HttpClient httpClientNetworkStatus;
+        private static PubnubHttpClientHandler pubnubHttpClientHandler;
 #endif
 
         private bool clientNetworkStatusInternetStatus = true;
@@ -175,16 +176,27 @@ namespace PubnubApi
             CurrentUuid = pubnubConfig.Uuid;
 
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+            HttpClientHandler httpClientHandler = new HttpClientHandler();
+            if (httpClientHandler.SupportsProxy && pubnubConfig.Proxy != null)
+            {
+                httpClientHandler.Proxy = pubnubConfig.Proxy;
+                httpClientHandler.UseProxy = true;
+            }
+            pubnubHttpClientHandler = new PubnubHttpClientHandler("PubnubHttpClientHandler", httpClientHandler, pubnubConfig, jsonLib, unitTest, pubnubLog);
+
+#endif
+
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
             if (httpClientSubscribe == null)
             {
-                httpClientSubscribe = new HttpClient();
+                httpClientSubscribe = new HttpClient(pubnubHttpClientHandler);
                 httpClientSubscribe.DefaultRequestHeaders.Accept.Clear();
                 httpClientSubscribe.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 httpClientSubscribe.Timeout = TimeSpan.FromSeconds(pubnubConfig.SubscribeTimeout);
             }
             if (httpClientNonsubscribe == null)
             {
-                httpClientNonsubscribe = new HttpClient();
+                httpClientNonsubscribe = new HttpClient(pubnubHttpClientHandler);
                 httpClientNonsubscribe.DefaultRequestHeaders.Accept.Clear();
                 httpClientNonsubscribe.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 httpClientNonsubscribe.Timeout = TimeSpan.FromSeconds(pubnubConfig.NonSubscribeRequestTimeout);
@@ -268,7 +280,7 @@ namespace PubnubApi
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
             if (httpClientNetworkStatus == null)
             {
-                httpClientNetworkStatus = new HttpClient();
+                httpClientNetworkStatus = new HttpClient(pubnubHttpClientHandler);
                 httpClientNetworkStatus.DefaultRequestHeaders.Accept.Clear();
                 httpClientNetworkStatus.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 httpClientNetworkStatus.Timeout = TimeSpan.FromSeconds(pubnubConfig.NonSubscribeRequestTimeout);

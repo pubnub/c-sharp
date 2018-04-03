@@ -39,7 +39,15 @@ namespace PubnubApi
             httpClient = refHttpClient;
             if (httpClient == null)
             {
-                httpClient = new HttpClient();
+                HttpClientHandler httpClientHandler = new HttpClientHandler();
+                if (httpClientHandler.SupportsProxy && pubnubConfig.Proxy != null)
+                {
+                    httpClientHandler.Proxy = pubnubConfig.Proxy;
+                    httpClientHandler.UseProxy = true;
+                }
+                PubnubHttpClientHandler pubnubHttpClientHandler = new PubnubHttpClientHandler("PubnubHttpClientHandler", httpClientHandler, pubnubConfig, jsonLib, unit, pubnubLog);
+
+                httpClient = new HttpClient(pubnubHttpClientHandler);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 httpClient.Timeout = TimeSpan.FromSeconds(pubnubConfig.NonSubscribeRequestTimeout);
@@ -139,42 +147,29 @@ namespace PubnubApi
             Uri requestUri = urlBuilder.BuildTimeRequest(null);
             try
             {
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
-                var response = await httpClient.GetAsync(requestUri);
-
-                if (response.IsSuccessStatusCode)
+                bool gotTimeResp = false;
+                if (pubnubConfig.UseClassicHttpWebRequest)
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} HttpClient CheckSocketConnect Resp {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), response.StatusCode.ToString()), pubnubConfig.LogVerbosity);
-                    networkStatus = true;
-                    t.TrySetResult(true);
+                    gotTimeResp = await GetTimeWithClassicHttp<T>(requestUri).ConfigureAwait(false);
+                    t.TrySetResult(gotTimeResp);
                 }
                 else
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} HttpClient CheckSocketConnect Resp {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), response.StatusCode.ToString()), pubnubConfig.LogVerbosity);
-                    networkStatus = false;
-                    t.TrySetResult(false);
-                }
-#else
-                HttpWebRequest myRequest = null;
-                myRequest = (HttpWebRequest)System.Net.WebRequest.Create(requestUri);
-                myRequest.Method = "GET";
-                using (HttpWebResponse response = await Task.Factory.FromAsync<HttpWebResponse>(myRequest.BeginGetResponse, asyncPubnubResult => (HttpWebResponse)myRequest.EndGetResponse(asyncPubnubResult), null))
-                {
-                    if (response != null)
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+                    if (pubnubConfig.UseTaskFactoryAsyncInsteadOfHttpClient)
                     {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} WebRequest CheckSocketConnect Resp {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), response.StatusCode.ToString()), pubnubConfig.LogVerbosity);
-                        if (response.StatusCode == HttpStatusCode.OK)
-                        {
-                            networkStatus = true;
-                            t.TrySetResult(true);
-                        }
+                        gotTimeResp = await GetTimeWithTaskFactoryAsync(requestUri);
                     }
                     else
                     {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} WebRequest CheckSocketConnect FAILED.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                        gotTimeResp = await GetTimeWithHttpClient(requestUri);
                     }
-                }
+                    t.TrySetResult(gotTimeResp);
+#else
+                    gotTimeResp = await GetTimeWithTaskFactoryAsync(requestUri);
+                    t.TrySetResult(gotTimeResp);
 #endif
+                }
             }
             catch (Exception ex)
             {
@@ -210,7 +205,122 @@ namespace PubnubApi
 			internalcallback(false);
 		}
 
-	}
-#endregion
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+        private async Task<bool> GetTimeWithHttpClient(Uri requestUri)
+        {
+            bool successFlag = false;
+            try
+            {
+                var response = await httpClient.GetAsync(requestUri);
+                successFlag = response.IsSuccessStatusCode;
+                if (successFlag)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} GetTimeWithHttpClient Resp OK", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                }
+                else
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} GetTimeWithHttpClient FAILED", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                }
+            }
+            finally
+            {
+                networkStatus = successFlag;
+            }
+            return networkStatus;
+        }
+#endif
+        private async Task<bool> GetTimeWithTaskFactoryAsync(Uri requestUri)
+        {
+            bool successFlag = false;
+            try
+            {
+                HttpWebRequest myRequest = null;
+                myRequest = (HttpWebRequest)System.Net.WebRequest.Create(requestUri);
+                myRequest.Method = "GET";
+                using (HttpWebResponse response = await Task.Factory.FromAsync<HttpWebResponse>(myRequest.BeginGetResponse, asyncPubnubResult => (HttpWebResponse)myRequest.EndGetResponse(asyncPubnubResult), null))
+                {
+                    if (response != null)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} GetTimeWithTaskFactoryAsync Resp {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), response.StatusCode.ToString()), pubnubConfig.LogVerbosity);
+                        successFlag = response.StatusCode == HttpStatusCode.OK;
+                    }
+                    else
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} GetTimeWithTaskFactoryAsync FAILED.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                    }
+                }
+            }
+            finally
+            {
+                networkStatus = successFlag;
+            }
+            return networkStatus;
+        }
+
+        private async Task<bool> GetTimeWithClassicHttp<T>(Uri requestUri)
+        {
+            bool successFlag = true;
+            try
+            {
+                HttpWebRequest myRequest = (HttpWebRequest)System.Net.WebRequest.Create(requestUri);
+                myRequest.Method = "GET";
+
+                RequestState<T> pubnubRequestState = new RequestState<T>();
+                pubnubRequestState.Request = myRequest;
+
+                IAsyncResult asyncResult = myRequest.BeginGetResponse(new AsyncCallback(
+                        (asynchronousResult) => {
+                            RequestState<T> asyncRequestState = asynchronousResult.AsyncState as RequestState<T>;
+                            HttpWebRequest asyncWebRequest = asyncRequestState.Request as HttpWebRequest;
+                            if (asyncWebRequest != null)
+                            {
+                                HttpWebResponse asyncWebResponse = (HttpWebResponse)asyncWebRequest.EndGetResponse(asynchronousResult);
+                                if (asyncWebResponse != null)
+                                {
+                                    successFlag = asyncWebResponse.StatusCode == HttpStatusCode.OK;
+                                }
+                                if (asyncRequestState.Response != null)
+                                {
+#if NET35 || NET40 || NET45 || NET461
+                                    pubnubRequestState.Response.Close();
+#endif
+                                    asyncRequestState.Response = null;
+                                    asyncRequestState.Request = null;
+                                }
+                            }
+                        }
+                        ), pubnubRequestState);
+
+                Timer webRequestTimer = new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, pubnubConfig.NonSubscribeRequestTimeout * 1000, Timeout.Infinite);
+            }
+            finally
+            {
+#if NET35 || NET40
+                await Task.Factory.StartNew(() => { });
+#else
+                await Task.Delay(1);
+#endif
+                networkStatus = successFlag;
+            }
+            return networkStatus;
+        }
+
+        private void OnPubnubWebRequestTimeout<T>(System.Object requestState)
+        {
+            RequestState<T> currentState = requestState as RequestState<T>;
+            if (currentState != null && currentState.Response == null && currentState.Request != null)
+            {
+                currentState.Timeout = true;
+                try
+                {
+                    currentState.Request.Abort();
+                }
+                catch {  /* ignore */ }
+
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, GetTimeWithClassicHttp timedout", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+            }
+        }
+    }
+    #endregion
 }
 
