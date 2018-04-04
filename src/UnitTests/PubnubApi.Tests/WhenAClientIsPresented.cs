@@ -82,7 +82,7 @@ namespace PubNubMessaging.Tests
 
             Thread.Sleep(100);
 
-            grantManualEvent.WaitOne();
+            grantManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;

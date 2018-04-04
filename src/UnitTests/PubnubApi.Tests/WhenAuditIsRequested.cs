@@ -15,6 +15,7 @@ namespace PubNubMessaging.Tests
         private static string currentUnitTestCase = "";
         private static Pubnub pubnub;
         private static Server server;
+        private static int manualResetEventWaitTimeout = 20 * 1000;
 
         [TestFixtureSetUp]
         public static void Init()
@@ -70,7 +71,7 @@ namespace PubNubMessaging.Tests
                 pubnub.Audit().Async(new AuditResult());
                 Thread.Sleep(1000);
 
-                auditManualEvent.WaitOne();
+                auditManualEvent.WaitOne(manualResetEventWaitTimeout);
 
                 pubnub.Destroy();
                 pubnub.PubnubUnitTest = null;
@@ -126,7 +127,7 @@ namespace PubNubMessaging.Tests
                 pubnub.Audit().Channel(channel).Async(new AuditResult());
                 Thread.Sleep(1000);
 
-                auditManualEvent.WaitOne();
+                auditManualEvent.WaitOne(manualResetEventWaitTimeout);
 
                 pubnub.Destroy();
                 pubnub.PubnubUnitTest = null;
