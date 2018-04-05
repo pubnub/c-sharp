@@ -544,7 +544,7 @@ namespace PubnubApi.EndPoint
                         }
                         catch {  /* ignore */ }
                     }
-                    SubscribeHeartbeatCheckTimer = new Timer(StartSubscribeHeartbeatCheckCallback<T>, null, config.SubscribeTimeout * 1000, config.SubscribeTimeout * 1000);
+                    SubscribeHeartbeatCheckTimer = new Timer(StartSubscribeHeartbeatCheckCallback<T>, null, config.SubscribeTimeout * 500, config.SubscribeTimeout * 500);
                 }
             }
             catch(Exception ex)
@@ -967,6 +967,7 @@ namespace PubnubApi.EndPoint
         {
             if (SubscribeDisconnected[PubnubInstance.InstanceId])
             {
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - SubscribeDisconnected. No heartbeat check.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                 return;
             }
 
@@ -1000,6 +1001,10 @@ namespace PubnubApi.EndPoint
                             TerminateCurrentSubscriberRequest();
                         }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
                     }
+                }
+                else
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - StartSubscribeHeartbeatCheckCallback - No network or no pubnub instance mapping", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                 }
             }
             else

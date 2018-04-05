@@ -40,7 +40,6 @@ namespace PubnubApi.EndPoint
 
         private void OnTelemetryIntervalTimeout(System.Object telemetryState)
         {
-            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - OnTelemetryIntervalTimeout => CleanupTelemetryData", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
             CleanupTelemetryData();
         }
 
@@ -184,7 +183,6 @@ namespace PubnubApi.EndPoint
                     {
                         double currentEpochMillisec = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
                         string[] latencyOpKeys = dicEndpointLatency.Keys.ToArray<string>();
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => latencyOpKeys count = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), latencyOpKeys.Length), pubnubConfig.LogVerbosity);
                         for (int keyIndex = 0; keyIndex < latencyOpKeys.Length; keyIndex++)
                         {
                             string opKey = latencyOpKeys[keyIndex];
