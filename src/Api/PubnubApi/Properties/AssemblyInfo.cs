@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Pubnub C# SDK")]
 [assembly: AssemblyCompany("PubNub")]
 [assembly: AssemblyProduct("Pubnub C# SDK")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
+[assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyVersion("4.0.16.0")]
 [assembly: AssemblyFileVersion("4.0.16.0")]
