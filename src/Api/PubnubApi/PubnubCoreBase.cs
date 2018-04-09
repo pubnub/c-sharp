@@ -56,7 +56,7 @@ namespace PubnubApi
         private static PubnubHttpClientHandler pubnubHttpClientHandler;
 #endif
 
-        private bool clientNetworkStatusInternetStatus = true;
+        private static bool clientNetworkStatusInternetStatus = true;
         protected static ConcurrentDictionary<string, bool> SubscribeDisconnected { get; set; } = new ConcurrentDictionary<string, bool>();
 
         protected Pubnub PubnubInstance { get; set; }
@@ -275,7 +275,7 @@ namespace PubnubApi
 
 #region "Callbacks"
 
-        protected bool CheckInternetConnectionStatus<T>(bool systemActive, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
+        protected static bool CheckInternetConnectionStatus<T>(bool systemActive, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
         {
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
             if (httpClientNetworkStatus == null)

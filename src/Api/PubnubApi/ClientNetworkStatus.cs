@@ -202,7 +202,7 @@ namespace PubnubApi
 		}
 
 
-        private void ParseCheckSocketConnectException<T>(Exception ex, PNOperationType type, PNCallback<T> callback, Action<bool> internalcallback)
+        private static void ParseCheckSocketConnectException<T>(Exception ex, PNOperationType type, PNCallback<T> callback, Action<bool> internalcallback)
 		{
             PNStatusCategory errorCategory = PNStatusCategoryHelper.GetPNStatusCategory(ex);
             StatusBuilder statusBuilder = new StatusBuilder(pubnubConfig, jsonLib);
@@ -317,7 +317,7 @@ namespace PubnubApi
             return networkStatus;
         }
 
-        private void OnPubnubWebRequestTimeout<T>(System.Object requestState)
+        private static void OnPubnubWebRequestTimeout<T>(System.Object requestState)
         {
             RequestState<T> currentState = requestState as RequestState<T>;
             if (currentState != null && currentState.Response == null && currentState.Request != null)
