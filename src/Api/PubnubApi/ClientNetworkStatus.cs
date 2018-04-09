@@ -158,15 +158,15 @@ namespace PubnubApi
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
                     if (pubnubConfig.UseTaskFactoryAsyncInsteadOfHttpClient)
                     {
-                        gotTimeResp = await GetTimeWithTaskFactoryAsync(requestUri);
+                        gotTimeResp = await GetTimeWithTaskFactoryAsync(requestUri).ConfigureAwait(false);
                     }
                     else
                     {
-                        gotTimeResp = await GetTimeWithHttpClient(requestUri);
+                        gotTimeResp = await GetTimeWithHttpClient(requestUri).ConfigureAwait(false);
                     }
                     t.TrySetResult(gotTimeResp);
 #else
-                    gotTimeResp = await GetTimeWithTaskFactoryAsync(requestUri);
+                    gotTimeResp = await GetTimeWithTaskFactoryAsync(requestUri).ConfigureAwait(false);
                     t.TrySetResult(gotTimeResp);
 #endif
                 }
@@ -268,7 +268,7 @@ namespace PubnubApi
                 RequestState<T> pubnubRequestState = new RequestState<T>();
                 pubnubRequestState.Request = myRequest;
 
-                IAsyncResult asyncResult = myRequest.BeginGetResponse(new AsyncCallback(
+                myRequest.BeginGetResponse(new AsyncCallback(
                         (asynchronousResult) => {
                             RequestState<T> asyncRequestState = asynchronousResult.AsyncState as RequestState<T>;
                             HttpWebRequest asyncWebRequest = asyncRequestState.Request as HttpWebRequest;
@@ -291,14 +291,14 @@ namespace PubnubApi
                         }
                         ), pubnubRequestState);
 
-                Timer webRequestTimer = new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, pubnubConfig.NonSubscribeRequestTimeout * 1000, Timeout.Infinite);
+                new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, pubnubConfig.NonSubscribeRequestTimeout * 1000, Timeout.Infinite);
             }
             finally
             {
 #if NET35 || NET40
                 await Task.Factory.StartNew(() => { });
 #else
-                await Task.Delay(1);
+                await Task.Delay(1).ConfigureAwait(false);
 #endif
                 networkStatus = successFlag;
             }

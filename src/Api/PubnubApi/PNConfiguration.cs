@@ -87,9 +87,9 @@ namespace PubnubApi
 
         public int RequestMessageCountThreshold { get; set; } = 100;
 
-        public bool UseClassicHttpWebRequest { get; set; } = false;
+        public bool UseClassicHttpWebRequest { get; set; }
 
-        public bool UseTaskFactoryAsyncInsteadOfHttpClient { get; set; } = false;
+        public bool UseTaskFactoryAsyncInsteadOfHttpClient { get; set; }
 
         public bool EnableTelemetry { get; set; } = true;
 

@@ -30,12 +30,12 @@ namespace PubnubApi
     public abstract class PubnubCoreBase
     {
         #region "Class variables"
-        private bool enableResumeOnReconnect = true;
+        private static bool enableResumeOnReconnect = true;
         protected static bool OverrideTcpKeepAlive { get; set; } = true;
         protected System.Threading.Timer PresenceHeartbeatTimer { get; set; }
         protected static bool PubnetSystemActive { get; set; } = true;
         protected Collection<Uri> PushRemoteImageDomainUri { get; set; } = new Collection<Uri>();
-        protected int ConnectionErrors { get; set; }
+        protected static int ConnectionErrors { get; set; }
         #endregion
 
         private const int MINEXPONENTIALBACKOFF = 1;
@@ -43,12 +43,12 @@ namespace PubnubApi
         private const int INTERVAL = 3;
 
         private static IPubnubHttp pubnubHttp;
-        private PNConfiguration pubnubConfig;
-        private IJsonPluggableLibrary jsonLib;
-        private IPubnubUnitTest unitTest;
-        private IPubnubLog pubnubLog;
-        private EndPoint.TelemetryManager pubnubTelemetryMgr;
-        private EndPoint.DuplicationManager pubnubSubscribeDuplicationManager { get; set; }
+        private static PNConfiguration pubnubConfig;
+        private static IJsonPluggableLibrary jsonLib;
+        private static IPubnubUnitTest unitTest;
+        private static IPubnubLog pubnubLog;
+        private static EndPoint.TelemetryManager pubnubTelemetryMgr;
+        private static EndPoint.DuplicationManager pubnubSubscribeDuplicationManager { get; set; }
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
         private static HttpClient httpClientSubscribe;
         private static HttpClient httpClientNonsubscribe;
@@ -63,12 +63,12 @@ namespace PubnubApi
 
         protected bool UuidChanged { get; set; }
 
-        protected string CurrentUuid { get; set; }
+        protected static string CurrentUuid { get; set; }
 
         protected static ConcurrentDictionary<string, long> LastSubscribeTimetoken { get; set; } = new ConcurrentDictionary<string, long>();
 
-        protected int PubnubNetworkTcpCheckIntervalInSeconds { get; set; } = 3;
-        private int PubnubLocalHeartbeatCheckIntervalInSeconds { get; set; } = 30;
+        protected static int PubnubNetworkTcpCheckIntervalInSeconds { get; set; } = 3;
+        private static int PubnubLocalHeartbeatCheckIntervalInSeconds { get; set; } = 30;
 
         protected static ConcurrentDictionary<string, List<SubscribeCallback>> SubscribeCallbackListenerList
         {
@@ -164,7 +164,7 @@ namespace PubnubApi
             }
         }
 
-        private void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager)
+        private static void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager)
         {
             pubnubConfig = pubnubConfiguation;
             jsonLib = jsonPluggableLibrary;
@@ -1508,7 +1508,7 @@ namespace PubnubApi
             }
         }
 
-        protected void UpdatePubnubNetworkTcpCheckIntervalInSeconds()
+        protected static void UpdatePubnubNetworkTcpCheckIntervalInSeconds()
         {
             int timerInterval;
 

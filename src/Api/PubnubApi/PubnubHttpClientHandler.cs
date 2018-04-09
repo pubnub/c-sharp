@@ -12,9 +12,7 @@ namespace PubnubApi
 {
     public class PubnubHttpClientHandler: DelegatingHandler
     {
-        private readonly IJsonPluggableLibrary jsonLib;
         private readonly PNConfiguration pubnubConfig;
-        private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
 
         private readonly string pubnubHandlerName;
@@ -24,8 +22,6 @@ namespace PubnubApi
             base.InnerHandler = innerHandler;
             pubnubHandlerName = string.IsNullOrEmpty(name) ? string.Empty : name;
             pubnubConfig = config;
-            jsonLib = jsonPluggableLibrary;
-            unit = pubnubUnit;
             pubnubLog = log;
         }
 

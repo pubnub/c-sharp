@@ -117,7 +117,7 @@ namespace PubnubApi.EndPoint
                     if (latencyMillisec > 0 && !string.IsNullOrEmpty(latencyEndPoint))
                     {
                         double epochMillisec = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
-                        if (dicEndpointLatency.ContainsKey(latencyEndPoint))
+                        if (dicEndpointLatency.ContainsKey(latencyEndPoint) && dicEndpointLatency[latencyEndPoint] != null && dicEndpointLatency[latencyEndPoint].Keys.Count > 0)
                         {
                             if (epochMillisec - dicEndpointLatency[latencyEndPoint].Keys.Max() > 500)
                             {
@@ -170,7 +170,7 @@ namespace PubnubApi.EndPoint
                         LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - GetOperationsLatency error: {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), pubnubConfig.LogVerbosity);
                     }
                     return dictionaryOpsLatency;
-                }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+                }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default).ConfigureAwait(false);
         }
 
         private void CleanupTelemetryData()
