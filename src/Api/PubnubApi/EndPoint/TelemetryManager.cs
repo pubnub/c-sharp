@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Globalization;
+using System.Threading.Tasks;
 
 namespace PubnubApi.EndPoint
 {
@@ -39,7 +40,6 @@ namespace PubnubApi.EndPoint
 
         private void OnTelemetryIntervalTimeout(System.Object telemetryState)
         {
-            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - OnTelemetryIntervalTimeout => CleanupTelemetryData", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
             CleanupTelemetryData();
         }
 
@@ -106,96 +106,121 @@ namespace PubnubApi.EndPoint
             return endpoint;
         }
 
-        public void StoreLatency(long latencyMillisec, PNOperationType type)
+        private static readonly object operationLatencyDataLock = new object();
+        public async Task StoreLatency(long latencyMillisec, PNOperationType type)
         {
-            try
+            await Task.Factory.StartNew(() => 
             {
-                string latencyEndPoint = EndpointNameForOperation(type);
-                if (latencyMillisec > 0 && !string.IsNullOrEmpty(latencyEndPoint))
+                try
                 {
-                    double epochMillisec = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
-                    if (dicEndpointLatency.ContainsKey(latencyEndPoint))
+                    string latencyEndPoint = EndpointNameForOperation(type);
+                    if (latencyMillisec > 0 && !string.IsNullOrEmpty(latencyEndPoint))
                     {
-                        dicEndpointLatency[latencyEndPoint].AddOrUpdate(epochMillisec, latencyMillisec, (key, oldValue) => latencyMillisec);
+                        double epochMillisec = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
+                        if (dicEndpointLatency.ContainsKey(latencyEndPoint) && dicEndpointLatency[latencyEndPoint] != null && dicEndpointLatency[latencyEndPoint].Keys.Count > 0)
+                        {
+                            if (epochMillisec - dicEndpointLatency[latencyEndPoint].Keys.Max() > 500)
+                            {
+                                lock (operationLatencyDataLock)
+                                {
+                                    dicEndpointLatency[latencyEndPoint].AddOrUpdate(epochMillisec, latencyMillisec, (key, oldValue) => latencyMillisec);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            lock (operationLatencyDataLock)
+                            {
+                                ConcurrentDictionary<double, long> elapsedInfo = new ConcurrentDictionary<double, long>();
+                                elapsedInfo.AddOrUpdate(epochMillisec, latencyMillisec, (o, n) => latencyMillisec);
+                                dicEndpointLatency.AddOrUpdate(latencyEndPoint, elapsedInfo, (o, n) => elapsedInfo);
+                            }
+                        }
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - StoreLatency {1} latency = {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), type, latencyMillisec), pubnubConfig.LogVerbosity);
                     }
-                    else
-                    {
-                        ConcurrentDictionary<double, long> elapsedInfo = new ConcurrentDictionary<double, long>();
-                        elapsedInfo.AddOrUpdate(epochMillisec, latencyMillisec, (o,n) => latencyMillisec);
-                        dicEndpointLatency.AddOrUpdate(latencyEndPoint, elapsedInfo,(o, n) => elapsedInfo);
-                    }
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - StoreLatency {1} latency = {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), type, latencyMillisec), pubnubConfig.LogVerbosity);
                 }
-            }
-            catch (Exception ex)
-            {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - StoreLatency error: {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), pubnubConfig.LogVerbosity);
-            }
+                catch (Exception ex)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - StoreLatency error: {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), pubnubConfig.LogVerbosity);
+                }
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
-        public Dictionary<string, string> GetOperationsLatency()
+        public async Task<Dictionary<string, string>> GetOperationsLatency()
         {
-            Dictionary<string, string> dictionaryOpsLatency = new Dictionary<string, string>();
-            try
-            {
-                foreach (string key in dicEndpointLatency.Keys)
+            return await Task<Dictionary<string,string>>.Factory.StartNew(() => 
                 {
-                    if (dicEndpointLatency[key] != null && dicEndpointLatency[key].Count > 0)
+                    Dictionary<string, string> dictionaryOpsLatency = new Dictionary<string, string>();
+                    try
                     {
+                        lock (operationLatencyDataLock)
+                        {
+                            foreach (string key in dicEndpointLatency.Keys)
+                            {
+                                if (dicEndpointLatency[key] != null && dicEndpointLatency[key].Count > 0)
+                                {
 
-                        dictionaryOpsLatency.Add(key, Math.Round(((double)dicEndpointLatency[key].Average(kvp => kvp.Value) / 1000.0), 10).ToString(CultureInfo.InvariantCulture)); //Convert millisec to sec
+                                    dictionaryOpsLatency.Add(key, Math.Round(((double)dicEndpointLatency[key].Average(kvp => kvp.Value) / 1000.0), 10).ToString(CultureInfo.InvariantCulture)); //Convert millisec to sec
+                                }
+                            }
+                        }
                     }
-                }
-            }
-            catch (Exception ex)
-            {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - GetOperationsLatency error: {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), pubnubConfig.LogVerbosity);
-            }
-            return dictionaryOpsLatency;
+                    catch (Exception ex)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - GetOperationsLatency error: {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), pubnubConfig.LogVerbosity);
+                    }
+                    return dictionaryOpsLatency;
+                }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default).ConfigureAwait(false);
         }
 
         private void CleanupTelemetryData()
         {
-            try
+            Task.Factory.StartNew(() => 
             {
-                double currentEpochMillisec = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
-                string[] latencyOpKeys = dicEndpointLatency.Keys.ToArray<string>();
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => latencyOpKeys count = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), latencyOpKeys.Length), pubnubConfig.LogVerbosity);
-                for (int keyIndex = 0; keyIndex < latencyOpKeys.Length; keyIndex++)
+                lock (operationLatencyDataLock)
                 {
-                    string opKey = latencyOpKeys[keyIndex];
-                    ConcurrentDictionary<double, long> outdatedLatencyValue = dicEndpointLatency[opKey];
-                    if (dicEndpointLatency != null)
+                    try
                     {
-                        IEnumerable<KeyValuePair<double, long>> enumerableOutdatedLatencies = outdatedLatencyValue.Where(dt => currentEpochMillisec - dt.Key >= 60000);
-                        if (enumerableOutdatedLatencies != null)
+                        double currentEpochMillisec = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
+                        string[] latencyOpKeys = dicEndpointLatency.Keys.ToArray<string>();
+                        for (int keyIndex = 0; keyIndex < latencyOpKeys.Length; keyIndex++)
                         {
-                            Dictionary<double, long> dicOutdatedLatencies = enumerableOutdatedLatencies.ToDictionary(item => item.Key, item => item.Value);
-                            if (dicOutdatedLatencies != null && dicOutdatedLatencies.Count > 0)
+                            string opKey = latencyOpKeys[keyIndex];
+                            ConcurrentDictionary<double, long> outdatedLatencyValue = dicEndpointLatency[opKey];
+                            if (dicEndpointLatency != null)
                             {
-                                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => {1} dicOutdatedLatencies count = {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), opKey, dicOutdatedLatencies.Count), pubnubConfig.LogVerbosity);
-                                double[] outLatencyKeys = dicOutdatedLatencies.Keys.ToArray<double>();
-                                for (int outdateIndex = 0; outdateIndex < outLatencyKeys.Length; outdateIndex++)
+                                IEnumerable<KeyValuePair<double, long>> enumerableOutdatedLatencies = outdatedLatencyValue.Where(dt => currentEpochMillisec - dt.Key >= 60000);
+                                if (enumerableOutdatedLatencies != null)
                                 {
-                                    double outKey = outLatencyKeys[outdateIndex];
-                                    if (dicEndpointLatency[opKey].ContainsKey(outKey))
+                                    Dictionary<double, long> dicOutdatedLatencies = enumerableOutdatedLatencies.ToDictionary(item => item.Key, item => item.Value);
+                                    if (dicOutdatedLatencies != null && dicOutdatedLatencies.Count > 0)
                                     {
-                                        long removeOutdatedLatency;
-                                        if (!dicEndpointLatency[opKey].TryRemove(outKey, out removeOutdatedLatency))
+                                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => {1} dicOutdatedLatencies count = {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), opKey, dicOutdatedLatencies.Count), pubnubConfig.LogVerbosity);
+                                        double[] outLatencyKeys = dicOutdatedLatencies.Keys.ToArray<double>();
+                                        for (int outdateIndex = 0; outdateIndex < outLatencyKeys.Length; outdateIndex++)
                                         {
-                                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => removed failed for key = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), outKey), pubnubConfig.LogVerbosity);
+                                            double outKey = outLatencyKeys[outdateIndex];
+                                            if (dicEndpointLatency[opKey].ContainsKey(outKey))
+                                            {
+                                                long removeOutdatedLatency;
+                                                if (!dicEndpointLatency[opKey].TryRemove(outKey, out removeOutdatedLatency))
+                                                {
+                                                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => removed failed for key = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), outKey), pubnubConfig.LogVerbosity);
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
+                    catch (Exception ex)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => Exception = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), pubnubConfig.LogVerbosity);
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => Exception = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), pubnubConfig.LogVerbosity);
-            }
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+
         }
 
         public void Destroy()

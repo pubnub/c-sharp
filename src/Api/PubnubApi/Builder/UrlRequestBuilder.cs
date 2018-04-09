@@ -993,7 +993,7 @@ namespace PubnubApi
 
                 if (pubnubConfig.EnableTelemetry && telemetryMgr != null)
                 {
-                    Dictionary<string, string> opsLatency = telemetryMgr.GetOperationsLatency();
+                    Dictionary<string, string> opsLatency = telemetryMgr.GetOperationsLatency().Result;
                     if (opsLatency != null && opsLatency.Count > 0)
                     {
                         foreach (string key in opsLatency.Keys)

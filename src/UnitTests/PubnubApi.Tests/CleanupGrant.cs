@@ -11,6 +11,7 @@ namespace PubNubMessaging.Tests
     public class CleanupGrant : TestHarness
     {
         private static Pubnub pubnub;
+        private static int manualResetEventWaitTimeout = 20 * 1000;
 
         [Test]
         public static void AtUserLevel()
@@ -31,7 +32,7 @@ namespace PubNubMessaging.Tests
                     PublishKey = PubnubCommon.PublishKey,
                     SubscribeKey = PubnubCommon.SubscribeKey,
                     SecretKey = PubnubCommon.SecretKey,
-                    Uuid = "mytestuuid",
+                    Uuid = "mytestuuid"
                 };
 
                 pubnub = createPubNubInstance(config);
@@ -95,7 +96,7 @@ namespace PubNubMessaging.Tests
                         auditManualEvent.Set();
                     }
                 }));
-                auditManualEvent.WaitOne();
+                auditManualEvent.WaitOne(manualResetEventWaitTimeout);
                 pubnub.Destroy();
                 pubnub = null;
                 Assert.IsTrue(receivedAuditMessage, "CleanupGrant -> AtUserLevel failed.");
@@ -126,7 +127,7 @@ namespace PubNubMessaging.Tests
                     PublishKey = PubnubCommon.PublishKey,
                     SubscribeKey = PubnubCommon.SubscribeKey,
                     SecretKey = PubnubCommon.SecretKey,
-                    Uuid = "mytestuuid",
+                    Uuid = "mytestuuid"
                 };
 
                 pubnub = createPubNubInstance(config);
@@ -191,7 +192,7 @@ namespace PubNubMessaging.Tests
                         auditManualEvent.Set();
                     }
                 }));
-                auditManualEvent.WaitOne();
+                auditManualEvent.WaitOne(manualResetEventWaitTimeout);
 
                 pubnub.Destroy();
                 pubnub = null;

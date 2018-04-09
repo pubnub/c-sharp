@@ -441,6 +441,9 @@
     <Compile Include="..\..\Api\PubnubApi\PubnubHttp.cs">
       <Link>LinkedSourceCode\PubnubHttp.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\PubnubHttpClientHandler.cs">
+      <Link>LinkedSourceCode\PubnubHttpClientHandler.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\Push\Mpns\MpnsCycleTileNotification.cs">
       <Link>LinkedSourceCode\Push\Mpns\MpnsCycleTileNotification.cs</Link>
     </Compile>
