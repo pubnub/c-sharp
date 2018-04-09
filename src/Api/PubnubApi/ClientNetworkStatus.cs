@@ -14,10 +14,10 @@ namespace PubnubApi
 	#region "Network Status -- code split required"
 	internal class ClientNetworkStatus
 	{
-        private readonly IJsonPluggableLibrary jsonLib;
-        private readonly PNConfiguration pubnubConfig;
-        private readonly IPubnubUnitTest unit;
-        private readonly IPubnubLog pubnubLog;
+        private static IJsonPluggableLibrary jsonLib;
+        private static PNConfiguration pubnubConfig;
+        private static IPubnubUnitTest unit;
+        private static IPubnubLog pubnubLog;
 
         private bool networkStatus = true;
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
@@ -26,13 +26,25 @@ namespace PubnubApi
 
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
         public ClientNetworkStatus(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, HttpClient refHttpClient)
+        {
+            InternalConstructor(config, jsonPluggableLibrary, pubnubUnit, log, refHttpClient);
+        }
 #else
         public ClientNetworkStatus(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log)
+        {
+            InternalConstructor(config, jsonPluggableLibrary, pubnubUnit, log);
+        }
+#endif
+
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+        private static void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, HttpClient refHttpClient)
+#else
+        private static void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log)
 #endif
         {
-            pubnubConfig = config;
+            pubnubConfig = pubnubConfiguation;
             jsonLib = jsonPluggableLibrary;
-            unit = pubnubUnit;
+            unit = pubnubUnitTest;
             pubnubLog = log;
 
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
@@ -55,7 +67,7 @@ namespace PubnubApi
 #endif
         }
 
-		internal bool CheckInternetStatus<T>(bool systemActive, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
+        internal bool CheckInternetStatus<T>(bool systemActive, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
 		{
             if (unit != null)
             {
@@ -321,6 +333,6 @@ namespace PubnubApi
             }
         }
     }
-    #endregion
+#endregion
 }
 

@@ -296,7 +296,7 @@ namespace PubnubApi
             return clientNetworkStatusInternetStatus;
         }
 
-        protected long GetTimetokenFromMultiplexResult(List<object> result)
+        protected static long GetTimetokenFromMultiplexResult(List<object> result)
         {
             long jsonTimetoken = 0;
             Dictionary<string, object> timetokenObj = jsonLib.ConvertToDictionaryObject(result[0]);
@@ -325,7 +325,7 @@ namespace PubnubApi
             return jsonTimetoken;
         }
 
-        private List<SubscribeMessage> GetMessageFromMultiplexResult(List<object> result)
+        private static List<SubscribeMessage> GetMessageFromMultiplexResult(List<object> result)
         {
             List<object> jsonMessageList = null;
             List<SubscribeMessage> msgList = new List<SubscribeMessage>();
@@ -441,7 +441,7 @@ namespace PubnubApi
             return msgList;
         }
 
-        private bool IsTargetForDedup(SubscribeMessage message)
+        private static bool IsTargetForDedup(SubscribeMessage message)
         {
             bool isTargetOfDedup = false;
 
@@ -1491,7 +1491,7 @@ namespace PubnubApi
             }
         }
 
-        protected void TerminateTelemetry()
+        protected static void TerminateTelemetry()
         {
             if (pubnubTelemetryMgr != null)
             {
@@ -1499,7 +1499,7 @@ namespace PubnubApi
             }
         }
 
-        protected void TerminateDedupeManager()
+        protected static void TerminateDedupeManager()
         {
             if (pubnubSubscribeDuplicationManager != null)
             {
@@ -1680,6 +1680,13 @@ namespace PubnubApi
                 ChannelGroupUserState[PubnubInstance.InstanceId].Clear();
             }
 
+            RemoveHttpClients();
+
+            PubnubInstance = null;
+        }
+
+        internal static void RemoveHttpClients()
+        {
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
             if (httpClientNetworkStatus != null)
             {
@@ -1709,7 +1716,6 @@ namespace PubnubApi
                 catch{}
             }
 #endif
-            PubnubInstance = null;
         }
 
         internal void TerminateCurrentSubscriberRequest()
