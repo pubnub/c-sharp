@@ -15,7 +15,7 @@ namespace PubnubApi
         private EndPoint.ListenerManager listenerManager;
         private readonly EndPoint.TelemetryManager telemetryManager;
 
-        private string instanceId = "";
+        private readonly string instanceId;
 
         private static string sdkVersion = "PubNubCSharp4.0.16.0";
 
