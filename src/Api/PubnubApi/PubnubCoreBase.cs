@@ -43,17 +43,17 @@ namespace PubnubApi
         private const int INTERVAL = 3;
 
         private static IPubnubHttp pubnubHttp;
-        private static ConcurrentDictionary<string, PNConfiguration> pubnubConfig { get; set; } = new ConcurrentDictionary<string, PNConfiguration>();
+        private static ConcurrentDictionary<string, PNConfiguration> pubnubConfig { get; } = new ConcurrentDictionary<string, PNConfiguration>();
         private static IJsonPluggableLibrary jsonLib;
         private static IPubnubUnitTest unitTest;
-        private static ConcurrentDictionary<string, IPubnubLog> pubnubLog { get; set; } = new ConcurrentDictionary<string, IPubnubLog>();
+        private static ConcurrentDictionary<string, IPubnubLog> pubnubLog { get; } = new ConcurrentDictionary<string, IPubnubLog>();
         private static EndPoint.TelemetryManager pubnubTelemetryMgr;
         private static EndPoint.DuplicationManager pubnubSubscribeDuplicationManager { get; set; }
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
-        private static HttpClient httpClientSubscribe { get; set; } //= new ConcurrentDictionary<string, HttpClient>();
-        private static HttpClient httpClientNonsubscribe { get; set; } //= new ConcurrentDictionary<string, HttpClient>();
-        private static HttpClient httpClientNetworkStatus { get; set; } //= new ConcurrentDictionary<string, HttpClient>();
-        private static PubnubHttpClientHandler pubnubHttpClientHandler { get; set; } //= new ConcurrentDictionary<string, PubnubHttpClientHandler>();
+        private static HttpClient httpClientSubscribe { get; set; }
+        private static HttpClient httpClientNonsubscribe { get; set; }
+        private static HttpClient httpClientNetworkStatus { get; set; }
+        private static PubnubHttpClientHandler pubnubHttpClientHandler { get; set; }
 #endif
 
         private static bool clientNetworkStatusInternetStatus = true;
@@ -1719,7 +1719,7 @@ namespace PubnubApi
                             {
                                 if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
                                 {
-                                    LoggingMethod.WriteToLog(currentLog, string.Format("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channel reconnect timer reference from collection for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key.ToString()), currentConfig.LogVerbosity);
+                                    LoggingMethod.WriteToLog(currentLog, string.Format("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channel reconnect timer reference from collection for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key), currentConfig.LogVerbosity);
                                 }
                             }
                         }
@@ -1756,7 +1756,7 @@ namespace PubnubApi
                             {
                                 if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
                                 {
-                                    LoggingMethod.WriteToLog(currentLog, string.Format("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channelgroup reconnect timer reference from collection for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), groupKey.ToString()), currentConfig.LogVerbosity);
+                                    LoggingMethod.WriteToLog(currentLog, string.Format("DateTime {0} TerminateReconnectTimer(null) - Unable to remove channelgroup reconnect timer reference from collection for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), groupKey), currentConfig.LogVerbosity);
                                 }
                             }
                         }

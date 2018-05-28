@@ -18,7 +18,7 @@ namespace PubnubApi.EndPoint
         private static EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         private static Timer SubscribeHeartbeatCheckTimer;
-        private static Timer multiplexExceptionTimer;
+        private Timer multiplexExceptionTimer;
         private Dictionary<string, object> customQueryParam;
 
         public SubscribeManager(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, instance)
