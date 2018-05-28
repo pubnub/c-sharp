@@ -20,6 +20,8 @@ namespace PubnubApi
                         LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = NETSTANDARD13", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
 #elif NETSTANDARD14
                         LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = NETSTANDARD14", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+#elif NETSTANDARD20
+                        LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = NETSTANDARD20", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
 #elif UAP
                         LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = UAP", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
 #elif NETFX_CORE
@@ -36,9 +38,9 @@ namespace PubnubApi
                         LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = NET45", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
 #elif NET461
             LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = NET461", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-            #else
+#else
                         LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = UNKNOWN", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-            #endif
+#endif
         }
     }
 }

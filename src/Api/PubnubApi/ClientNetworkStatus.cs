@@ -51,15 +51,22 @@ namespace PubnubApi
             httpClient = refHttpClient;
             if (httpClient == null)
             {
-                HttpClientHandler httpClientHandler = new HttpClientHandler();
-                if (httpClientHandler.SupportsProxy && pubnubConfig.Proxy != null)
+                if (pubnubConfig.Proxy != null)
                 {
-                    httpClientHandler.Proxy = pubnubConfig.Proxy;
-                    httpClientHandler.UseProxy = true;
-                }
-                PubnubHttpClientHandler pubnubHttpClientHandler = new PubnubHttpClientHandler("PubnubHttpClientHandler", httpClientHandler, pubnubConfig, jsonLib, unit, pubnubLog);
+                    HttpClientHandler httpClientHandler = new HttpClientHandler();
+                    if (httpClientHandler.SupportsProxy)
+                    {
+                        httpClientHandler.Proxy = pubnubConfig.Proxy;
+                        httpClientHandler.UseProxy = true;
+                    }
+                    PubnubHttpClientHandler pubnubHttpClientHandler = new PubnubHttpClientHandler("PubnubHttpClientHandler", httpClientHandler, pubnubConfig, jsonLib, unit, pubnubLog);
 
-                httpClient = new HttpClient(pubnubHttpClientHandler);
+                    httpClient = new HttpClient(pubnubHttpClientHandler);
+                }
+                else
+                {
+                    httpClient = new HttpClient();
+                }
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 httpClient.Timeout = TimeSpan.FromSeconds(pubnubConfig.NonSubscribeRequestTimeout);

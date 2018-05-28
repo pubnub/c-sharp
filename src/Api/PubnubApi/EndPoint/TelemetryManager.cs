@@ -116,6 +116,11 @@ namespace PubnubApi.EndPoint
                     string latencyEndPoint = EndpointNameForOperation(type);
                     if (latencyMillisec > 0 && !string.IsNullOrEmpty(latencyEndPoint))
                     {
+                        if (dicEndpointLatency == null)
+                        {
+                            dicEndpointLatency = new ConcurrentDictionary<string, ConcurrentDictionary<double, long>>();
+                        }
+
                         double epochMillisec = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
                         if (dicEndpointLatency.ContainsKey(latencyEndPoint) && dicEndpointLatency[latencyEndPoint] != null && dicEndpointLatency[latencyEndPoint].Keys.Count > 0)
                         {
@@ -155,12 +160,15 @@ namespace PubnubApi.EndPoint
                     {
                         lock (operationLatencyDataLock)
                         {
-                            foreach (string key in dicEndpointLatency.Keys)
+                            if (dicEndpointLatency != null)
                             {
-                                if (dicEndpointLatency[key] != null && dicEndpointLatency[key].Count > 0)
+                                foreach (string key in dicEndpointLatency.Keys)
                                 {
+                                    if (dicEndpointLatency[key] != null && dicEndpointLatency[key].Count > 0)
+                                    {
 
-                                    dictionaryOpsLatency.Add(key, Math.Round(((double)dicEndpointLatency[key].Average(kvp => kvp.Value) / 1000.0), 10).ToString(CultureInfo.InvariantCulture)); //Convert millisec to sec
+                                        dictionaryOpsLatency.Add(key, Math.Round(((double)dicEndpointLatency[key].Average(kvp => kvp.Value) / 1000.0), 10).ToString(CultureInfo.InvariantCulture)); //Convert millisec to sec
+                                    }
                                 }
                             }
                         }
@@ -182,12 +190,12 @@ namespace PubnubApi.EndPoint
                     try
                     {
                         double currentEpochMillisec = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
-                        string[] latencyOpKeys = dicEndpointLatency.Keys.ToArray<string>();
+                        string[] latencyOpKeys = (dicEndpointLatency != null) ? dicEndpointLatency.Keys.ToArray<string>() : new string[]{ };
                         for (int keyIndex = 0; keyIndex < latencyOpKeys.Length; keyIndex++)
                         {
                             string opKey = latencyOpKeys[keyIndex];
                             ConcurrentDictionary<double, long> outdatedLatencyValue = dicEndpointLatency[opKey];
-                            if (dicEndpointLatency != null)
+                            if (outdatedLatencyValue != null)
                             {
                                 IEnumerable<KeyValuePair<double, long>> enumerableOutdatedLatencies = outdatedLatencyValue.Where(dt => currentEpochMillisec - dt.Key >= 60000);
                                 if (enumerableOutdatedLatencies != null)

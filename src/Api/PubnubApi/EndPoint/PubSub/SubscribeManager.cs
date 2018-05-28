@@ -21,7 +21,7 @@ namespace PubnubApi.EndPoint
         private static Timer multiplexExceptionTimer;
         private Dictionary<string, object> customQueryParam;
 
-        public SubscribeManager(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
+        public SubscribeManager(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
@@ -105,6 +105,12 @@ namespace PubnubApi.EndPoint
             {
                 this.customQueryParam = externalQueryParam;
 
+                if (PubnubInstance == null)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, PubnubInstance is null. exiting MultiChannelUnSubscribeInit", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    return;
+                }
+
                 if (!MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId))
                 {
                     MultiChannelSubscribe.GetOrAdd(PubnubInstance.InstanceId, new ConcurrentDictionary<string, long>());
@@ -129,7 +135,7 @@ namespace PubnubApi.EndPoint
                                 continue;
                             }
 
-                            if (MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId) && !MultiChannelSubscribe[PubnubInstance.InstanceId].ContainsKey(channelName))
+                            if (MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelSubscribe[PubnubInstance.InstanceId] != null && !MultiChannelSubscribe[PubnubInstance.InstanceId].ContainsKey(channelName))
                             {
                                 PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNUnexpectedDisconnectCategory, null, (int)HttpStatusCode.NotFound, null);
                                 if (!status.AffectedChannels.Contains(channelName))
@@ -142,7 +148,7 @@ namespace PubnubApi.EndPoint
                             {
                                 validChannels.Add(channelName);
                                 string presenceChannelName = string.Format("{0}-pnpres", channelName);
-                                if (MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelSubscribe[PubnubInstance.InstanceId].ContainsKey(presenceChannelName))
+                                if (MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelSubscribe[PubnubInstance.InstanceId] != null && MultiChannelSubscribe[PubnubInstance.InstanceId].ContainsKey(presenceChannelName))
                                 {
                                     validChannels.Add(presenceChannelName);
                                 }
@@ -163,7 +169,7 @@ namespace PubnubApi.EndPoint
                                 continue;
                             }
 
-                            if (MultiChannelGroupSubscribe.ContainsKey(PubnubInstance.InstanceId) && !MultiChannelGroupSubscribe[PubnubInstance.InstanceId].ContainsKey(channelGroupName))
+                            if (MultiChannelGroupSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelGroupSubscribe[PubnubInstance.InstanceId] != null && !MultiChannelGroupSubscribe[PubnubInstance.InstanceId].ContainsKey(channelGroupName))
                             {
                                 PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNUnexpectedDisconnectCategory, null, (int)HttpStatusCode.NotFound, null);
                                 if (!status.AffectedChannelGroups.Contains(channelGroupName))
@@ -176,7 +182,7 @@ namespace PubnubApi.EndPoint
                             {
                                 validChannelGroups.Add(channelGroupName);
                                 string presenceChannelGroupName = string.Format("{0}-pnpres", channelGroupName);
-                                if (MultiChannelGroupSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelGroupSubscribe[PubnubInstance.InstanceId].ContainsKey(presenceChannelGroupName))
+                                if (MultiChannelGroupSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelGroupSubscribe[PubnubInstance.InstanceId] != null && MultiChannelGroupSubscribe[PubnubInstance.InstanceId].ContainsKey(presenceChannelGroupName))
                                 {
                                     validChannelGroups.Add(presenceChannelGroupName);
                                 }
@@ -325,36 +331,44 @@ namespace PubnubApi.EndPoint
                         }
                     }
 
-                    if (successExist)
+                    if (successExist && PubnubInstance != null)
                     {
                         Announce(successStatus);
                     }
 
-                    if (failExist)
+                    if (failExist && PubnubInstance != null)
                     {
                         Announce(failStatus);
                     }
 
                     //Get all the channels
-                    string[] channels = MultiChannelSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
-                    string[] channelGroups = MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
+                    string[] channels = new string[] { };
+                    string[] channelGroups = new string[] { };
 
-                    //Check any chained subscribes while unsubscribe 
-                    for (int keyIndex = 0; keyIndex < MultiChannelSubscribe[PubnubInstance.InstanceId].Count; keyIndex++)
+                    if (PubnubInstance != null && MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId))
                     {
-                        KeyValuePair<string, long> kvp = MultiChannelSubscribe[PubnubInstance.InstanceId].ElementAt(keyIndex);
-                        if (originalMultiChannelSubscribe != null && !originalMultiChannelSubscribe.ContainsKey(kvp.Key))
+                        channels = MultiChannelSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
+                        //Check any chained subscribes while unsubscribe 
+                        for (int keyIndex = 0; keyIndex < MultiChannelSubscribe[PubnubInstance.InstanceId].Count; keyIndex++)
                         {
-                            return;
+                            KeyValuePair<string, long> kvp = MultiChannelSubscribe[PubnubInstance.InstanceId].ElementAt(keyIndex);
+                            if (originalMultiChannelSubscribe != null && !originalMultiChannelSubscribe.ContainsKey(kvp.Key))
+                            {
+                                return;
+                            }
                         }
                     }
 
-                    for (int keyIndex = 0; keyIndex < MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Count; keyIndex++)
+                    if (PubnubInstance != null && MultiChannelGroupSubscribe.ContainsKey(PubnubInstance.InstanceId))
                     {
-                        KeyValuePair<string, long> kvp = MultiChannelGroupSubscribe[PubnubInstance.InstanceId].ElementAt(keyIndex);
-                        if (originalMultiChannelGroupSubscribe != null && !originalMultiChannelGroupSubscribe.ContainsKey(kvp.Key))
+                        channelGroups = MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
+                        for (int keyIndex = 0; keyIndex < MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Count; keyIndex++)
                         {
-                            return;
+                            KeyValuePair<string, long> kvp = MultiChannelGroupSubscribe[PubnubInstance.InstanceId].ElementAt(keyIndex);
+                            if (originalMultiChannelGroupSubscribe != null && !originalMultiChannelGroupSubscribe.ContainsKey(kvp.Key))
+                            {
+                                return;
+                            }
                         }
                     }
 
