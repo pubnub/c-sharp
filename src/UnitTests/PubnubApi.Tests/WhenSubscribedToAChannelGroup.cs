@@ -24,6 +24,14 @@ namespace PubNubMessaging.Tests
         private static Pubnub pubnub;
         private static Server server;
 
+        public class TestLog : IPubnubLog
+        {
+            void IPubnubLog.WriteToLog(string logText)
+            {
+                Console.WriteLine(logText);
+            }
+        }
+
         [TestFixtureSetUp]
         public static void Init()
         {
@@ -168,7 +176,10 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
                 AuthKey = authKey,
-                Secure = false
+                Secure = false,
+                LogVerbosity = PNLogVerbosity.BODY,
+                PubnubLog = new TestLog(),
+                NonSubscribeRequestTimeout = 120
             };
             server.RunOnHttps(false);
 
@@ -177,12 +188,12 @@ namespace PubNubMessaging.Tests
                 (o, m) => {
                     if (m != null) {
                         Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m));
-                        if (publishedMessage.ToString() == m.Message.ToString())
+                        if (string.Compare(publishedMessage.ToString(), m.Message.ToString(), true) == 0)
                         {
                             receivedMessage = true;
                         }
-                        subscribeManualEvent.Set();
                     }
+                    subscribeManualEvent.Set();
                 },
                 (o, p) => { /* Catch the presence events */ },
                 (o, s) => {
@@ -219,7 +230,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             ManualResetEvent channelGroupManualEvent = new ManualResetEvent(false);
-            pubnub.AddChannelsToChannelGroup().Channels(new [] { channelName }).ChannelGroup(channelGroupName)
+            pubnub.AddChannelsToChannelGroup().Channels(new [] { channelName }).ChannelGroup(channelGroupName).QueryParam(new Dictionary<string, object>() { { "ut", "ThenSubscribeShouldReturnReceivedMessage" } })
                 .Async(new PNChannelGroupsAddChannelResultExt((r, s) => {
                     try
                     {
@@ -265,7 +276,7 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.Subscribe<string>().ChannelGroups(new [] { channelGroupName }).Execute();
+                pubnub.Subscribe<string>().ChannelGroups(new [] { channelGroupName }).QueryParam(new Dictionary<string, object>() { { "ut", "ThenSubscribeShouldReturnReceivedMessage" } }).Execute();
                 subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
                 subscribeManualEvent = new ManualResetEvent(false);
@@ -283,7 +294,7 @@ namespace PubNubMessaging.Tests
                 Thread.Sleep(1000);
 
                 ManualResetEvent publishManualEvent = new ManualResetEvent(false);
-                pubnub.Publish().Channel(channelName).Message(publishedMessage)
+                pubnub.Publish().Channel(channelName).Message(publishedMessage).QueryParam(new Dictionary<string, object>() { { "ut", "ThenSubscribeShouldReturnReceivedMessage" } })
                     .Async(new PNPublishResultExt((r, s) =>
                     {
                         Console.WriteLine("Publish PNStatus => Status = : " + s.StatusCode.ToString());
@@ -299,8 +310,10 @@ namespace PubNubMessaging.Tests
                 publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
                 Thread.Sleep(1000);
-                pubnub.Unsubscribe<string>().ChannelGroups(new [] { channelGroupName }).Execute();
-
+                pubnub.Unsubscribe<string>().ChannelGroups(new [] { channelGroupName }).QueryParam(new Dictionary<string, object>() { { "ut", "ThenSubscribeShouldReturnReceivedMessage" } }).Execute();
+                Thread.Sleep(1000);
+                pubnub.RemoveListener(listenerSubCallack);
+                listenerSubCallack = null;
                 pubnub.Destroy();
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;

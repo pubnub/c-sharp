@@ -56,6 +56,7 @@ src/.vs/Pubnub/v15/sqlite3/storage.ide
 /src/Examples/PubnubApi.WinFormExample/bin/Release/*
 /src/Examples/PubnubApi.WinFormExample/obj/Release/*
 /src/Examples/PubnubApi.WinFormExample/*.user
+/src/Examples/PubnubApi.WinFormExample/packages/*
 
 /src/Examples/PubnubApiPCL.ConsoleExample/bin/Debug/*
 /src/Examples/PubnubApiPCL.ConsoleExample/obj/Debug/*

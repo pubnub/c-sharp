@@ -20,6 +20,14 @@ namespace PubNubMessaging.Tests
         private static Pubnub pubnub;
         private static Server server;
 
+        public class TestLog : IPubnubLog
+        {
+            void IPubnubLog.WriteToLog(string logText)
+            {
+                Console.WriteLine(logText);
+            }
+        }
+
         [TestFixtureSetUp]
         public static void Init()
         {
@@ -40,7 +48,9 @@ namespace PubNubMessaging.Tests
                 SecretKey = PubnubCommon.SecretKey,
                 AuthKey = authKey,
                 Uuid = "mytestuuid",
-                Secure = false
+                Secure = false,
+                LogVerbosity = PNLogVerbosity.BODY,
+                PubnubLog = new TestLog()
             };
             server.RunOnHttps(false);
 
@@ -434,7 +444,9 @@ namespace PubNubMessaging.Tests
                 SecretKey = secretKey,
                 CipherKey = cipherKey,
                 Uuid = "mytestuuid",
-                Secure = ssl
+                Secure = ssl,
+                LogVerbosity = PNLogVerbosity.BODY,
+                PubnubLog = new TestLog()
             };
             server.RunOnHttps(ssl);
 
@@ -1049,7 +1061,10 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
                 AuthKey = authKey,
-                Secure = false
+                Secure = false,
+                LogVerbosity = PNLogVerbosity.BODY,
+                PubnubLog = new TestLog(),
+                NonSubscribeRequestTimeout = 120
             };
             server.RunOnHttps(false);
 
@@ -1065,8 +1080,8 @@ namespace PubNubMessaging.Tests
                         {
                             receivedMessage = true;
                         }
-                        subscribeManualEvent.Set();
                     }
+                    subscribeManualEvent.Set();
                 },
                 (o, p) => {
                     receivedMessage = true;
@@ -1123,6 +1138,8 @@ namespace PubNubMessaging.Tests
                 Thread.Sleep(1000);
             }
             pubnub.RemoveListener(listenerSubCallack);
+            Thread.Sleep(1000);
+            listenerSubCallack = null;
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
