@@ -17,6 +17,21 @@ namespace PubnubApi.WinFormExample
         PNConfiguration config2 = new PNConfiguration();
         string origin = "ps.pndsn.com";
 
+        public class MyLog1 : IPubnubLog
+        {
+            void IPubnubLog.WriteToLog(string logText)
+            {
+                System.Diagnostics.Debug.WriteLine("LOGONE: " + logText);
+            }
+        }
+        public class MyLog2 : IPubnubLog
+        {
+            void IPubnubLog.WriteToLog(string logText)
+            {
+                System.Diagnostics.Debug.WriteLine("LOGTWO: " + logText);
+            }
+        }
+
         public PubnubDemoForm()
         {
             InitializeComponent();
@@ -37,6 +52,7 @@ namespace PubnubApi.WinFormExample
             config1.IncludeRequestIdentifier = true;
             config1.LogVerbosity = PNLogVerbosity.BODY;
             config1.Uuid = "myuuid1";
+            config1.PubnubLog = new MyLog1();
         }
 
         private void InitializeSecondInstanceConfig()
@@ -53,6 +69,7 @@ namespace PubnubApi.WinFormExample
             config2.IncludeRequestIdentifier = true;
             config2.LogVerbosity = PNLogVerbosity.BODY;
             config2.Uuid = "myuuid2";
+            config2.PubnubLog = new MyLog2();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -159,7 +176,14 @@ namespace PubnubApi.WinFormExample
                 .UsePOST(false)
                 .Async(new PNPublishResultExt((r, s) => {
                     Invoke(new Action(() => {
-                        lvResults1.Items.Add(r.Timetoken.ToString());
+                        if (r != null)
+                        {
+                            lvResults1.Items.Add(r.Timetoken.ToString());
+                        }
+                        else
+                        {
+                            lvResults1.Items.Add(s.ErrorData.Information);
+                        }
                     }));
                 }));
 
@@ -174,7 +198,14 @@ namespace PubnubApi.WinFormExample
                 .UsePOST(false)
                 .Async(new PNPublishResultExt((r, s) => {
                     Invoke(new Action(() => {
-                        lvResults2.Items.Add(r.Timetoken.ToString());
+                        if (r != null)
+                        {
+                            lvResults2.Items.Add(r.Timetoken.ToString());
+                        }
+                        else
+                        {
+                            lvResults2.Items.Add(s.ErrorData.Information);
+                        }
                     }));
                 }));
         }

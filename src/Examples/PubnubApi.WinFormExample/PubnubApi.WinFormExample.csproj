@@ -53,9 +53,8 @@
       <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Pubnub, Version=4.0.2.2, Culture=neutral, PublicKeyToken=dc66f52ce6619f44, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Pubnub.4.0.2.2\lib\net45\Pubnub.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Pubnub, Version=4.0.16.0, Culture=neutral, PublicKeyToken=dc66f52ce6619f44, processorArchitecture=MSIL">
+      <HintPath>packages\Pubnub.4.0.17\lib\net45\Pubnub.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
