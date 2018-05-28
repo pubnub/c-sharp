@@ -24,7 +24,7 @@ namespace PubNubMessaging.Tests
         {
             void IPubnubLog.WriteToLog(string logText)
             {
-                Console.WriteLine(logText);
+                System.Diagnostics.Debug.WriteLine(logText);
             }
         }
 
@@ -1139,7 +1139,6 @@ namespace PubNubMessaging.Tests
             }
             pubnub.RemoveListener(listenerSubCallack);
             Thread.Sleep(1000);
-            listenerSubCallack = null;
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;

@@ -28,7 +28,7 @@ namespace PubNubMessaging.Tests
         {
             void IPubnubLog.WriteToLog(string logText)
             {
-                Console.WriteLine(logText);
+                System.Diagnostics.Debug.WriteLine(logText);
             }
         }
 
@@ -230,7 +230,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             ManualResetEvent channelGroupManualEvent = new ManualResetEvent(false);
-            pubnub.AddChannelsToChannelGroup().Channels(new [] { channelName }).ChannelGroup(channelGroupName).QueryParam(new Dictionary<string, object>() { { "ut", "ThenSubscribeShouldReturnReceivedMessage" } })
+            pubnub.AddChannelsToChannelGroup().Channels(new [] { channelName }).ChannelGroup(channelGroupName).QueryParam(new Dictionary<string, object> { { "ut", "ThenSubscribeShouldReturnReceivedMessage" } })
                 .Async(new PNChannelGroupsAddChannelResultExt((r, s) => {
                     try
                     {
@@ -276,7 +276,7 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.Subscribe<string>().ChannelGroups(new [] { channelGroupName }).QueryParam(new Dictionary<string, object>() { { "ut", "ThenSubscribeShouldReturnReceivedMessage" } }).Execute();
+                pubnub.Subscribe<string>().ChannelGroups(new [] { channelGroupName }).QueryParam(new Dictionary<string, object> { { "ut", "ThenSubscribeShouldReturnReceivedMessage" } }).Execute();
                 subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
                 subscribeManualEvent = new ManualResetEvent(false);
@@ -294,7 +294,7 @@ namespace PubNubMessaging.Tests
                 Thread.Sleep(1000);
 
                 ManualResetEvent publishManualEvent = new ManualResetEvent(false);
-                pubnub.Publish().Channel(channelName).Message(publishedMessage).QueryParam(new Dictionary<string, object>() { { "ut", "ThenSubscribeShouldReturnReceivedMessage" } })
+                pubnub.Publish().Channel(channelName).Message(publishedMessage).QueryParam(new Dictionary<string, object> { { "ut", "ThenSubscribeShouldReturnReceivedMessage" } })
                     .Async(new PNPublishResultExt((r, s) =>
                     {
                         Console.WriteLine("Publish PNStatus => Status = : " + s.StatusCode.ToString());
@@ -310,10 +310,9 @@ namespace PubNubMessaging.Tests
                 publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
                 Thread.Sleep(1000);
-                pubnub.Unsubscribe<string>().ChannelGroups(new [] { channelGroupName }).QueryParam(new Dictionary<string, object>() { { "ut", "ThenSubscribeShouldReturnReceivedMessage" } }).Execute();
+                pubnub.Unsubscribe<string>().ChannelGroups(new [] { channelGroupName }).QueryParam(new Dictionary<string, object> { { "ut", "ThenSubscribeShouldReturnReceivedMessage" } }).Execute();
                 Thread.Sleep(1000);
                 pubnub.RemoveListener(listenerSubCallack);
-                listenerSubCallack = null;
                 pubnub.Destroy();
                 pubnub.PubnubUnitTest = null;
                 pubnub = null;

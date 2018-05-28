@@ -34,7 +34,7 @@ namespace PubNubMessaging.Tests
         {
             void IPubnubLog.WriteToLog(string logText)
             {
-                Console.WriteLine(logText);
+                System.Diagnostics.Debug.WriteLine(logText);
             }
         }
 
@@ -179,7 +179,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Subscribe<string>().Channels(new [] { channel }).QueryParam(new Dictionary<string, object>() { { "ut", currentTestCase } }).Execute();
+            pubnub.Subscribe<string>().Channels(new [] { channel }).QueryParam(new Dictionary<string, object> { { "ut", currentTestCase } }).Execute();
 
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
@@ -204,18 +204,17 @@ namespace PubNubMessaging.Tests
 
             Thread.Sleep(1000);
 
-            pubnub.Publish().Channel(channel).Message(publishedMessage).QueryParam(new Dictionary<string, object>() { { "ut", currentTestCase } }).Async(new UTPublishResult());
+            pubnub.Publish().Channel(channel).Message(publishedMessage).QueryParam(new Dictionary<string, object> { { "ut", currentTestCase } }).Async(new UTPublishResult());
 
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             Thread.Sleep(1000);
 
-            pubnub.Unsubscribe<string>().Channels(new [] { channel }).QueryParam(new Dictionary<string, object>() { { "ut", currentTestCase } }).Execute();
+            pubnub.Unsubscribe<string>().Channels(new [] { channel }).QueryParam(new Dictionary<string, object> { { "ut", currentTestCase } }).Execute();
 
             Thread.Sleep(1000);
 
             pubnub.RemoveListener(listenerSubCallack);
-            listenerSubCallack = null;
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
@@ -401,7 +400,6 @@ namespace PubNubMessaging.Tests
 
             pubnub.RemoveListener(listenerSubCallack);
             Thread.Sleep(1000);
-            listenerSubCallack = null;
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;

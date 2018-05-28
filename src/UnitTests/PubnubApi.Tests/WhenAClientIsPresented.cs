@@ -22,7 +22,7 @@ namespace PubNubMessaging.Tests
         {
             void IPubnubLog.WriteToLog(string logText)
             {
-                Console.WriteLine(logText);
+                System.Diagnostics.Debug.WriteLine(logText);
             }
         }
 
