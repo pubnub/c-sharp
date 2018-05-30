@@ -1040,6 +1040,25 @@ namespace PubnubApi.EndPoint
                 else
                 {
                     LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - StartSubscribeHeartbeatCheckCallback - No network or no pubnub instance mapping", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    if (PubnubInstance != null && !networkConnection)
+                    {
+                        PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNSubscribeOperation, PNStatusCategory.PNNetworkIssuesCategory, null, (int)System.Net.HttpStatusCode.NotFound, new Exception("Internet connection problem during subscribe heartbeat."));
+                        if (channels != null && channels.Length > 0)
+                        {
+                            status.AffectedChannels.AddRange(channels.ToList());
+                        }
+                        if (chananelGroups != null && chananelGroups.Length > 0)
+                        {
+                            status.AffectedChannelGroups.AddRange(chananelGroups.ToList());
+                        }
+                        Announce(status);
+
+                        Task.Factory.StartNew(() =>
+                        {
+                            TerminateCurrentSubscriberRequest();
+                            MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, GetCurrentSubscriberChannels(), GetCurrentSubscriberChannelGroups(), LastSubscribeTimetoken[PubnubInstance.InstanceId], false, null, this.customQueryParam);
+                        }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+                    }
                 }
             }
             else
@@ -1326,12 +1345,12 @@ namespace PubnubApi.EndPoint
             RequestState<T> currentState = presenceHeartbeatState as RequestState<T>;
             if (currentState != null)
             {
+                string[] subscriberChannels = (currentState.Channels != null) ? currentState.Channels.Where(s => s.Contains("-pnpres") == false).ToArray() : null;
+                string[] subscriberChannelGroups = (currentState.ChannelGroups != null) ? currentState.ChannelGroups.Where(s => s.Contains("-pnpres") == false).ToArray() : null;
+
                 bool networkConnection = CheckInternetConnectionStatus<T>(PubnetSystemActive, currentState.ResponseType, currentState.PubnubCallback, currentState.Channels, currentState.ChannelGroups);
                 if (networkConnection)
                 {
-                    string[] subscriberChannels = (currentState.Channels != null) ? currentState.Channels.Where(s => s.Contains("-pnpres") == false).ToArray() : null;
-                    string[] subscriberChannelGroups = (currentState.ChannelGroups != null) ? currentState.ChannelGroups.Where(s => s.Contains("-pnpres") == false).ToArray() : null;
-
                     if ((subscriberChannels != null && subscriberChannels.Length > 0) || (subscriberChannelGroups != null && subscriberChannelGroups.Length > 0))
                     {
                         string channelsJsonState = BuildJsonUserState(subscriberChannels, subscriberChannelGroups, false);
@@ -1355,7 +1374,23 @@ namespace PubnubApi.EndPoint
                         }
                     }
                 }
+                else
+                {
+                    if (PubnubInstance != null && !networkConnection)
+                    {
+                        PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNSubscribeOperation, PNStatusCategory.PNNetworkIssuesCategory, null, (int)System.Net.HttpStatusCode.NotFound, new Exception("Internet connection problem during presence heartbeat."));
+                        if (subscriberChannels != null && subscriberChannels.Length > 0)
+                        {
+                            status.AffectedChannels.AddRange(subscriberChannels.ToList());
+                        }
+                        if (subscriberChannelGroups != null && subscriberChannelGroups.Length > 0)
+                        {
+                            status.AffectedChannelGroups.AddRange(subscriberChannelGroups.ToList());
+                        }
+                        Announce(status);
+                    }
 
+                }
             }
 
         }
