@@ -30,6 +30,14 @@ namespace PubNubMessaging.Tests
 
         private static Server server;
 
+        public class TestLog : IPubnubLog
+        {
+            void IPubnubLog.WriteToLog(string logText)
+            {
+                System.Diagnostics.Debug.WriteLine(logText);
+            }
+        }
+
         [TestFixtureSetUp]
         public static void Init()
         {
@@ -119,7 +127,10 @@ namespace PubNubMessaging.Tests
                 CipherKey = cipherKey,
                 Uuid = "mytestuuid",
                 AuthKey = authKey,
-                Secure = ssl
+                Secure = ssl,
+                LogVerbosity = PNLogVerbosity.BODY,
+                PubnubLog = new TestLog(),
+                NonSubscribeRequestTimeout = 120
             };
             server.RunOnHttps(ssl);
 
@@ -168,7 +179,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
+            pubnub.Subscribe<string>().Channels(new [] { channel }).QueryParam(new Dictionary<string, object> { { "ut", currentTestCase } }).Execute();
 
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
@@ -193,18 +204,22 @@ namespace PubNubMessaging.Tests
 
             Thread.Sleep(1000);
 
-            pubnub.Publish().Channel(channel).Message(publishedMessage).Async(new UTPublishResult());
+            pubnub.Publish().Channel(channel).Message(publishedMessage).QueryParam(new Dictionary<string, object> { { "ut", currentTestCase } }).Async(new UTPublishResult());
 
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             Thread.Sleep(1000);
 
-            pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
+            pubnub.Unsubscribe<string>().Channels(new [] { channel }).QueryParam(new Dictionary<string, object> { { "ut", currentTestCase } }).Execute();
+
+            Thread.Sleep(1000);
 
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
+
+            Thread.Sleep(1000);
         }
 
         [Test]
@@ -299,7 +314,10 @@ namespace PubNubMessaging.Tests
                 CipherKey = cipherKey,
                 Uuid = "mytestuuid",
                 AuthKey = authKey,
-                Secure = ssl
+                Secure = ssl,
+                LogVerbosity = PNLogVerbosity.BODY,
+                PubnubLog = new TestLog(),
+                NonSubscribeRequestTimeout = 120
             };
             server.RunOnHttps(ssl);
 
@@ -348,7 +366,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
+            pubnub.Subscribe<string>().Channels(new [] { channel }).QueryParam(new Dictionary<string, object>() { {"ut", currentTestCase } }).Execute();
 
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
@@ -373,17 +391,19 @@ namespace PubNubMessaging.Tests
 
             Thread.Sleep(1000);
 
-            pubnub.Publish().Channel(channel).Message(publishedMessage).Async(new UTPublishResult());
+            pubnub.Publish().Channel(channel).Message(publishedMessage).QueryParam(new Dictionary<string, object>() { { "ut", currentTestCase } }).Async(new UTPublishResult());
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
+            pubnub.Unsubscribe<string>().Channels(new [] { channel }).QueryParam(new Dictionary<string, object>() { { "ut", currentTestCase } }).Execute();
 
             Thread.Sleep(1000);
 
             pubnub.RemoveListener(listenerSubCallack);
+            Thread.Sleep(1000);
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
+            Thread.Sleep(1000);
 
         }
 
@@ -506,7 +526,6 @@ namespace PubNubMessaging.Tests
                             {
                                 receivedMessage = true;
                             }
-                            subscribeManualEvent.Set();
                             break;
                         case "ThenSubscribeShouldReturnEmojiMessage":
                         case "ThenSubscribeShouldReturnEmojiMessageSSL":
@@ -518,12 +537,12 @@ namespace PubNubMessaging.Tests
                             {
                                 receivedMessage = true;
                             }
-                            subscribeManualEvent.Set();
                             break;
                         default:
                             break;
                     }
                 }
+                subscribeManualEvent.Set();
             }
 
             public override void Presence(Pubnub pubnub, PNPresenceEventResult presence)
@@ -536,6 +555,7 @@ namespace PubNubMessaging.Tests
                 Console.WriteLine("SubscribeCallback: PNStatus: " + status.StatusCode.ToString());
                 if (status.StatusCode != 200 || status.Error)
                 {
+                    Console.WriteLine("Subsccribe ErrorData: " + status.ErrorData?.Information);
                     switch (currentTestCase)
                     {
                         case "ThenPresenceShouldReturnReceivedMessage":
@@ -621,12 +641,16 @@ namespace PubNubMessaging.Tests
                         case "ThenSubscribeShouldReturnEmojiMessageCipherSecretSSL":
                         case "ThenSubscribeShouldReturnEmojiMessageSecretSSL":
                             receivedMessage = true;
-                            publishManualEvent.Set();
                             break;
                         default:
                             break;
                     }
                 }
+                else
+                {
+                    Console.WriteLine("Publish ErrorData: " + status.ErrorData?.Information);
+                }
+                publishManualEvent.Set();
             }
         }
 

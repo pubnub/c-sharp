@@ -18,6 +18,14 @@ namespace PubNubMessaging.Tests
         private static Pubnub pubnub;
         private static Server server;
 
+        public class TestLog : IPubnubLog
+        {
+            void IPubnubLog.WriteToLog(string logText)
+            {
+                System.Diagnostics.Debug.WriteLine(logText);
+            }
+        }
+
         [TestFixtureSetUp]
         public static void Init()
         {
@@ -219,7 +227,9 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 Uuid = "mytestuuid",
-                Secure = true
+                Secure = true,
+                LogVerbosity = PNLogVerbosity.BODY,
+                PubnubLog = new TestLog()
             };
             server.RunOnHttps(true);
 

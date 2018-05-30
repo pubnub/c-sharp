@@ -24,7 +24,7 @@ namespace PubnubApi.EndPoint
         private PNCallback<PNSetStateResult> savedCallback;
         private Dictionary<string, object> queryParam;
 
-        public SetStateOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
+        public SetStateOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
@@ -413,8 +413,7 @@ namespace PubnubApi.EndPoint
             {
                 if (ChannelLocalUserState[PubnubInstance.InstanceId].ContainsKey(channel))
                 {
-                    channelUserStateDictionary = ChannelLocalUserState[PubnubInstance.InstanceId][channel];
-                    if (channelUserStateDictionary != null)
+                    if (ChannelLocalUserState[PubnubInstance.InstanceId].TryGetValue(channel, out channelUserStateDictionary) && channelUserStateDictionary != null)
                     {
                         if (channelUserStateDictionary.ContainsKey(userStateKey))
                         {
@@ -459,8 +458,7 @@ namespace PubnubApi.EndPoint
             {
                 if (ChannelGroupLocalUserState[PubnubInstance.InstanceId].ContainsKey(channelGroup))
                 {
-                    channelGroupUserStateDictionary = ChannelGroupLocalUserState[PubnubInstance.InstanceId][channelGroup];
-                    if (channelGroupUserStateDictionary != null)
+                    if (ChannelGroupLocalUserState[PubnubInstance.InstanceId].TryGetValue(channelGroup, out channelGroupUserStateDictionary) && channelGroupUserStateDictionary != null)
                     {
                         if (channelGroupUserStateDictionary.ContainsKey(userStateKey))
                         {

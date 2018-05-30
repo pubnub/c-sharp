@@ -17,6 +17,14 @@ namespace PubNubMessaging.Tests
         private static Pubnub pubnub;
         private static Server server;
 
+        public class TestLog : IPubnubLog
+        {
+            void IPubnubLog.WriteToLog(string logText)
+            {
+                System.Diagnostics.Debug.WriteLine(logText);
+            }
+        }
+
         [TestFixtureSetUp]
         public static void Init()
         {
@@ -367,7 +375,10 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
-                Secure = false
+                Secure = false,
+                LogVerbosity = PNLogVerbosity.BODY,
+                PubnubLog = new TestLog(),
+                NonSubscribeRequestTimeout = 120
             };
             server.RunOnHttps(false);
 
@@ -419,6 +430,7 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(1000);
 
             pubnub.RemoveListener(listenerSubCallack);
+            Thread.Sleep(1000);
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
@@ -541,7 +553,10 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
-                Secure = true
+                Secure = true,
+                LogVerbosity = PNLogVerbosity.BODY,
+                PubnubLog = new TestLog(),
+                NonSubscribeRequestTimeout = 120
             };
             server.RunOnHttps(true);
 

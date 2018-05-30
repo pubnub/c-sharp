@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.0;netstandard1.3;netstandard1.4;netstandard1.1</TargetFrameworks>
+    <TargetFrameworks>netstandard1.0;netstandard1.3;netstandard1.4;netstandard1.1;netstandard2.0</TargetFrameworks>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>pubnub.snk</AssemblyOriginatorKeyFile>
@@ -14,7 +14,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubPCL</PackageId>
-    <PackageVersion>4.0.16.0</PackageVersion>
+    <PackageVersion>4.0.17.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -22,14 +22,15 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Code refactor for ClientNetworkStatus.
-Proxy support for HttpClient.
-Code refactor to Telemetry.
-Reduced internal subscribe heartbeat interval for improvement in message delivery.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added support to NetStandard 2.0
+Added support to Apple Watch
+Added timer to invoke MultiplexExceptionHandler based on reconnection policy.
+Code refactor in accessing ConcurrentDictionary key for channel names.
+Refactored code related to PubnubInstance access</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
-    <Copyright>PubNub 2012-2017</Copyright>
+    <Copyright>PubNub 2012-2018</Copyright>
 
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.0' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     <!--<NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.0' ">1.6.1</NetStandardImplicitPackageVersion>-->
@@ -42,6 +43,7 @@ Reduced internal subscribe heartbeat interval for improvement in message deliver
 
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.4' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     <!--<NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.4' ">1.6.1</NetStandardImplicitPackageVersion>-->
+
     <EnableDefaultCompileItems>False</EnableDefaultCompileItems>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
@@ -471,6 +473,10 @@ Reduced internal subscribe heartbeat interval for improvement in message deliver
     <DefineConstants>$(DefineConstants);NETSTANDARD14</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <DefineConstants>$(DefineConstants);NETSTANDARD20</DefineConstants>
+  </PropertyGroup>
+
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
     <DefineConstants>$(DefineConstants);PORTABLE111</DefineConstants>
   </PropertyGroup>
@@ -649,6 +655,38 @@ Reduced internal subscribe heartbeat interval for improvement in message deliver
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Net.Requests" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Reflection.Primitives" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Threading.ThreadPool" Version="4.0.10">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Linq.Queryable" Version="4.0.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Text.Encoding" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Text.Encoding.Extensions" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Net.Http" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Net.Primitives" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
   <ItemGroup>
     <Folder Include="Builder\" />
     <Folder Include="Callbacks\" />

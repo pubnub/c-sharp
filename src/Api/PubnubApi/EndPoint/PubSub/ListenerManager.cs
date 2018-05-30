@@ -14,10 +14,11 @@ namespace PubnubApi.EndPoint
         private readonly PNConfiguration pubnubConfig;
         private readonly IPubnubLog pubnubLog;
 
-        public ListenerManager(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager) : base(config, jsonPluggableLibrary, pubnubUnit, log, telemetryManager)
+        public ListenerManager(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance) : base(config, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, instance)
         {
             this.pubnubConfig = config;
             this.pubnubLog = log;
+            PubnubInstance = instance;
         }
 
         internal void CurrentPubnubInstance(Pubnub instance)
