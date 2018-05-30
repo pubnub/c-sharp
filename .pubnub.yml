@@ -4,7 +4,7 @@ schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
   - version: 4.0.17.0
-    date: May 29, 2018
+    date: May 30, 2018
     changes:
       - type: Improvement
         text: Code refactor related to MultiplexExceptionHandler
