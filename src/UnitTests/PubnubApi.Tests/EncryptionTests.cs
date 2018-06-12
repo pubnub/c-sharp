@@ -6,6 +6,7 @@ using PubnubApi;
 using System.Text.RegularExpressions;
 using System.Globalization;
 using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace PubNubMessaging.Tests
 {
@@ -238,7 +239,7 @@ namespace PubNubMessaging.Tests
             string message = "yay!";
             ////serialize the string
             message = JsonConvert.SerializeObject(message);
-            Console.WriteLine(message);
+            Debug.WriteLine(message);
             ////Encrypt
             string enc = pc.Encrypt(message);
             Assert.AreEqual("Wi24KS4pcTzvyuGOHubiXg==", enc);
@@ -516,9 +517,9 @@ namespace PubNubMessaging.Tests
             string message = "漢語";
 
             message = JsonConvert.SerializeObject(message);
-            Console.WriteLine(message);
+            Debug.WriteLine(message);
             string encryptedMessage = pc.Encrypt(message);
-            Console.WriteLine(encryptedMessage);
+            Debug.WriteLine(encryptedMessage);
             Assert.AreEqual("+BY5/miAA8aeuhVl4d13Kg==", encryptedMessage);
         }
 
@@ -570,9 +571,9 @@ namespace PubNubMessaging.Tests
             string message = "ÜÖ";
 
             message = JsonConvert.SerializeObject(message);
-            Console.WriteLine(message);
+            Debug.WriteLine(message);
             string encryptedMessage = pc.Encrypt(message);
-            Console.WriteLine(encryptedMessage);
+            Debug.WriteLine(encryptedMessage);
             Assert.AreEqual("stpgsG1DZZxb44J7mFNSzg==", encryptedMessage);
         }
 
@@ -587,19 +588,6 @@ namespace PubNubMessaging.Tests
 
             Assert.AreEqual("mIoxTVM2WAM5j-M2vlp9bVblDLoZQI5XIoYyQ48U0as=", signature);
         }
-
-        /// <summary>
-        /// Tests the cipher.
-        /// </summary>
-        /*[Test]
-        public void  TestCipher ()
-        {
-            PubnubCrypto pc = new PubnubCrypto("enigma");
-
-            string strCipher = pc.GetEncryptionKey();
-
-            Assert.AreEqual("67a4f45f0d1d9bc606486fc42dc49416", strCipher);
-        }*/
 
         public static string EncodeNonAsciiCharacters(string value)
         {

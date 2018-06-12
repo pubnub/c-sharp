@@ -4,6 +4,7 @@ using System.Threading;
 using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
+using System.Diagnostics;
 
 namespace PubNubMessaging.Tests
 {
@@ -142,11 +143,11 @@ namespace PubNubMessaging.Tests
             {
                 try
                 {
-                    Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                    Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
 
                     if (result != null)
                     {
-                        Console.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
                         if (result.Channels != null && result.Channels.Count > 0)
                         {
                             var read = result.Channels[channel][authKey].ReadEnabled;
@@ -172,8 +173,8 @@ namespace PubNubMessaging.Tests
         {
             public override void OnResponse(PNDeleteMessageResult result, PNStatus status)
             {
-                Console.WriteLine("DeleteMessage Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                Console.WriteLine("DeleteMessage PNStatus => Status = : " + status.StatusCode.ToString());
+                Debug.WriteLine("DeleteMessage Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                Debug.WriteLine("DeleteMessage PNStatus => Status = : " + status.StatusCode.ToString());
                 if (status != null && status.Error)
                 {
                     deleteMessageManualEvent.Set();

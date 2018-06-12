@@ -4,6 +4,7 @@ using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
 using System;
+using System.Diagnostics;
 
 namespace PubNubMessaging.Tests
 {
@@ -280,7 +281,7 @@ namespace PubNubMessaging.Tests
             {
                 try
                 {
-                    Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                    Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
                     if (status.Error == false)
                     {
                         receivedGrantMessage = true;
@@ -288,7 +289,7 @@ namespace PubNubMessaging.Tests
 
                     if (result != null)
                     {
-                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
                     }
                 }
                 catch
@@ -307,11 +308,11 @@ namespace PubNubMessaging.Tests
             {
                 try
                 {
-                    Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                    Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
 
                     if (result != null)
                     {
-                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
                         if (status.StatusCode == 200 && status.Error == false)
                         {
                             receivedChannelGroupMessage = true;
@@ -334,11 +335,11 @@ namespace PubNubMessaging.Tests
             {
                 try
                 {
-                    Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                    Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
 
                     if (result != null)
                     {
-                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
                         if (status.StatusCode == 200 && result.Message.ToLower() == "ok" && result.Service == "channel-registry" && status.Error == false && result.ChannelGroup == channelGroupName)
                         {
                             receivedChannelGroupMessage = true;
@@ -361,11 +362,11 @@ namespace PubNubMessaging.Tests
             {
                 try
                 {
-                    Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                    Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
 
                     if (result != null)
                     {
-                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
                         if (status.StatusCode == 200 && status.Error == false && result.ChannelGroup==channelGroupName && result.Channels.Count>0)
                         {
                             receivedChannelGroupMessage = true;
@@ -388,11 +389,11 @@ namespace PubNubMessaging.Tests
             {
                 try
                 {
-                    Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                    Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
 
                     if (result != null)
                     {
-                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
                         if (status.StatusCode == 200 && status.Error == false)
                         {
                             receivedChannelGroupMessage = true;

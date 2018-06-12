@@ -4,6 +4,7 @@ using System.Threading;
 using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
+using System.Diagnostics;
 
 namespace PubNubMessaging.Tests
 {
@@ -174,11 +175,11 @@ namespace PubNubMessaging.Tests
             {
                 try
                 {
-                    Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                    Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
 
                     if (result != null)
                     {
-                        Console.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
                         if (result.Channels != null && result.Channels.Count > 0)
                         {
                             foreach (KeyValuePair<string, Dictionary<string, PNAccessManagerKeyData>> channelKP in result.Channels)
@@ -214,7 +215,7 @@ namespace PubNubMessaging.Tests
             {
                 if (message != null)
                 {
-                    Console.WriteLine("SubscribeCallback: PNMessageResult: {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(message.Message));
+                    Debug.WriteLine("SubscribeCallback: PNMessageResult: {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(message.Message));
                 }
             }
 
@@ -224,8 +225,7 @@ namespace PubNubMessaging.Tests
 
             public override void Status(Pubnub pubnub, PNStatus status)
             {
-                //Console.WriteLine("SubscribeCallback: PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-                Console.WriteLine("SubscribeCallback: PNStatus: " + status.StatusCode.ToString());
+                Debug.WriteLine("SubscribeCallback: PNStatus: " + status.StatusCode.ToString());
                 if (status.StatusCode != 200 || status.Error)
                 {
                     switch (currentTestCase)
@@ -237,12 +237,10 @@ namespace PubNubMessaging.Tests
                             break;
                     }
 
-                    Console.ForegroundColor = ConsoleColor.Red;
                     if (status.ErrorData != null)
                     {
-                        Console.WriteLine(status.ErrorData.Information);
+                        Debug.WriteLine(status.ErrorData.Information);
                     }
-                    Console.ForegroundColor = ConsoleColor.White;
                 }
                 else if (status.StatusCode == 200 && status.Category == PNStatusCategory.PNConnectedCategory)
                 {

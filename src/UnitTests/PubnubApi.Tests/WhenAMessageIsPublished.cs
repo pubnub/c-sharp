@@ -5,6 +5,7 @@ using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
 using PubnubApi.Tests;
+using System.Diagnostics;
 
 namespace PubNubMessaging.Tests
 {
@@ -73,10 +74,10 @@ namespace PubNubMessaging.Tests
                                 {
                                     try
                                     {
-                                        Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
+                                        Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
                                         if (r != null)
                                         {
-                                            Console.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                            Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                             if (r.Channels != null && r.Channels.Count > 0)
                                             {
                                                 var read = r.Channels[channel][authKey].ReadEnabled;
@@ -228,7 +229,7 @@ namespace PubNubMessaging.Tests
                     .Async(new PNHistoryResultExt(
                                 (r, s) =>
                                 {
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedPublishMessage = true;
                                     historyManualEvent.Set();
                                 }));
@@ -323,7 +324,7 @@ namespace PubNubMessaging.Tests
                     .Async(new PNHistoryResultExt(
                                 (r, s) =>
                                 {
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedPublishMessage = true;
                                     historyManualEvent.Set();
                                 }));
@@ -420,7 +421,7 @@ namespace PubNubMessaging.Tests
                     .Async(new PNHistoryResultExt(
                                 (r, s) =>
                                 {
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedPublishMessage = true;
                                     historyManualEvent.Set();
                                 }));
@@ -516,7 +517,7 @@ namespace PubNubMessaging.Tests
                     .Async(new PNHistoryResultExt(
                                 (r, s) =>
                                 {
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedPublishMessage = true;
                                     historyManualEvent.Set();
                                 }));
@@ -616,7 +617,7 @@ namespace PubNubMessaging.Tests
                     .Async(new PNHistoryResultExt(
                                 (r, s) =>
                                 {
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedPublishMessage = true;
                                     historyManualEvent.Set();
                                 }));
@@ -717,7 +718,7 @@ namespace PubNubMessaging.Tests
                     .Async(new PNHistoryResultExt(
                                 (r, s) =>
                                 {
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedPublishMessage = true;
                                     historyManualEvent.Set();
                                 }));
@@ -804,7 +805,7 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                Console.WriteLine("WhenAMessageIsPublished-ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo - Publish OK. Now checking detailed history");
+                Debug.WriteLine("WhenAMessageIsPublished-ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo - Publish OK. Now checking detailed history");
 
                 ManualResetEvent historyManualEvent = new ManualResetEvent(false);
 
@@ -815,7 +816,7 @@ namespace PubNubMessaging.Tests
                     .Async(new PNHistoryResultExt(
                                 (r, s) =>
                                 {
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedPublishMessage = true;
                                     historyManualEvent.Set();
                                 }));
