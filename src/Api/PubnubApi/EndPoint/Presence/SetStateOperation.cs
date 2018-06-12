@@ -173,9 +173,10 @@ namespace PubnubApi.EndPoint
 
         internal void SetUserState(string[] channels, string[] channelGroups, string uuid, KeyValuePair<string, object> keyValuePair, Dictionary<string, object> externalQueryParam, PNCallback<PNSetStateResult> callback)
         {
-            if ((channels == null && channelGroups != null) || (channels.Length == 0 && channelGroups.Length == 0))
+            if ((channels == null && channelGroups == null)
+                            || (channels != null && channelGroups != null && channels.Length == 0 && channelGroups.Length == 0))
             {
-                throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
+                throw new ArgumentException("Either Channel Or Channel Group or Both should be provided");
             }
 
             List<string> channelList = new List<string>();
@@ -239,7 +240,6 @@ namespace PubnubApi.EndPoint
                     string currentChannelGroup = channelGroupList[channelGroupIndex];
 
                     string oldJsonChannelGroupState = GetLocalUserState("", currentChannelGroup);
-                    currentChannelGroupUserState = "";
 
                     if (keyValuePair.Value == null)
                     {

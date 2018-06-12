@@ -636,7 +636,7 @@ namespace PubnubApi
                                                 decryptMessage = "**DECRYPT ERROR**";
 
                                                 PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(ex);
-                                                PNStatus status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, category, null, (int)HttpStatusCode.NotFound, ex);
+                                                PNStatus status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, category, null, (int)HttpStatusCode.NotFound, new PNException(ex));
                                                 if (!string.IsNullOrEmpty(currentMessageChannel))
                                                 {
                                                     status.AffectedChannels.Add(currentMessageChannel);
@@ -764,14 +764,14 @@ namespace PubnubApi
                                     StatusBuilder statusBuilder = new StatusBuilder(currentConfig, jsonLib);
                                     PNStatus status = null;
 
-                                    Exception ex = null;
+                                    PNException ex = null;
                                     if (userResult != null && userResult.Status == 200)
                                     {
                                         status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNAcknowledgmentCategory, asyncRequestState, (int)HttpStatusCode.OK, null);
                                     }
                                     else
                                     {
-                                        ex = new Exception(userResult.Message);
+                                        ex = new PNException(userResult.Message);
                                         status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNAcknowledgmentCategory, asyncRequestState, userResult.Status, null);
                                     }
 
@@ -780,7 +780,7 @@ namespace PubnubApi
                                 else if (currentConfig.HeartbeatNotificationOption == PNHeartbeatNotificationOption.Failures && userResult.Status != 200)
                                 {
                                     StatusBuilder statusBuilder = new StatusBuilder(currentConfig, jsonLib);
-                                    PNStatus status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNAcknowledgmentCategory, asyncRequestState, userResult.Status, new Exception(userResult.Message));
+                                    PNStatus status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNAcknowledgmentCategory, asyncRequestState, userResult.Status, new PNException(userResult.Message));
                                     Announce(status);
                                 }
                             }
@@ -981,7 +981,7 @@ namespace PubnubApi
                     PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(webEx == null ? innerEx : webEx);
                     if (PubnubInstance != null && pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig))
                     {
-                        PNStatus status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(pubnubRequestState.ResponseType, category, pubnubRequestState, (int)HttpStatusCode.NotFound, ex);
+                        PNStatus status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(pubnubRequestState.ResponseType, category, pubnubRequestState, (int)HttpStatusCode.NotFound, new PNException(ex));
                         if (pubnubRequestState != null && pubnubRequestState.PubnubCallback != null)
                         {
                             pubnubRequestState.PubnubCallback.OnResponse(default(T), status);
@@ -1023,7 +1023,7 @@ namespace PubnubApi
                 {
                     if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig))
                     {
-                        status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, PNStatusCategory.PNUnknownCategory, asyncRequestState, (int)HttpStatusCode.NotFound, new Exception(jsonString));
+                        status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, PNStatusCategory.PNUnknownCategory, asyncRequestState, (int)HttpStatusCode.NotFound, new PNException(jsonString));
                     }
                 }
                 else if (deserializeStatus.ContainsKey("status") && deserializeStatus.ContainsKey("message"))
@@ -1036,7 +1036,7 @@ namespace PubnubApi
                         PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, statusMessage);
                         if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig))
                         {
-                            status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, category, asyncRequestState, statusCode, new Exception(jsonString));
+                            status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, category, asyncRequestState, statusCode, new PNException(jsonString));
                         }
                     }
                 }
