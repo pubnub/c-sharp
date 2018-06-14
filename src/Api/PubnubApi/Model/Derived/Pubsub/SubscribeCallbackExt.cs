@@ -28,6 +28,7 @@ namespace PubnubApi
             message1.Subscription = message.Subscription;
             message1.Timetoken = message.Timetoken;
             message1.UserMetadata = message.UserMetadata;
+            message1.Publisher = message.Publisher;
 
             subscribeAction?.Invoke(pubnub, message1);
         }

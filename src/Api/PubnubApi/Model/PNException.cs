@@ -4,7 +4,7 @@
     {
         public bool DirectException { get; }
 
-        public PNException():base()
+        public PNException()
         {
         }
 

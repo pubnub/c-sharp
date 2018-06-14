@@ -675,6 +675,8 @@ namespace PubnubApi
 
                                     payloadContainer.Add(currentMessage.PublishTimetokenMetadata.Timetoken); //Third one always Timetoken
 
+                                    payloadContainer.Add(currentMessage.IssuingClientId); //Fourth one always Publisher
+
                                     if (!string.IsNullOrEmpty(currentMessageChannelGroup)) //Add cg first before channel
                                     {
                                         payloadContainer.Add(currentMessageChannelGroup);

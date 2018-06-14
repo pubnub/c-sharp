@@ -236,15 +236,20 @@ namespace PubnubApi
                 Int64.TryParse(listObject[2].ToString(), out timetoken);
                 timeProp.SetValue(message, timetoken, null);
 
+                //Set Publisher
+                PropertyInfo publisherProp = specific.GetProperty("Publisher");
+                string publisherValue = (listObject[3] != null) ? listObject[3].ToString() : "";
+                publisherProp.SetValue(message, publisherValue, null);
+
                 // Set ChannelName
                 PropertyInfo channelNameProp = specific.GetProperty("Channel");
-                channelNameProp.SetValue(message, (listObject.Count == 5) ? listObject[4].ToString() : listObject[3].ToString(), null);
+                channelNameProp.SetValue(message, (listObject.Count == 6) ? listObject[5].ToString() : listObject[4].ToString(), null);
 
                 // Set ChannelGroup
-                if (listObject.Count == 5)
+                if (listObject.Count == 6)
                 {
                     PropertyInfo subsciptionProp = specific.GetProperty("Subscription");
-                    subsciptionProp.SetValue(message, listObject[3].ToString(), null);
+                    subsciptionProp.SetValue(message, listObject[4].ToString(), null);
                 }
                 
                 //Set Metadata list second position, index=1
@@ -304,17 +309,22 @@ namespace PubnubApi
                 Int64.TryParse(listObject[2].ToString(), out timetoken);
                 timeProp.SetValue(message, timetoken, null);
 
+                //Set Publisher
+                PropertyInfo publisherProp = specific.GetRuntimeProperty("Publisher");
+                string publisherValue = (listObject[3] != null) ? listObject[3].ToString() : "";
+                publisherProp.SetValue(message, publisherValue, null);
+
                 // Set ChannelName
                 PropertyInfo channelNameProp = specific.GetRuntimeProperty("Channel");
-                channelNameProp.SetValue(message, (listObject.Count == 5) ? listObject[4].ToString() : listObject[3].ToString(), null);
+                channelNameProp.SetValue(message, (listObject.Count == 6) ? listObject[5].ToString() : listObject[4].ToString(), null);
 
                 // Set ChannelGroup
-                if (listObject.Count == 5)
+                if (listObject.Count == 6)
                 {
                     PropertyInfo subsciptionProp = specific.GetRuntimeProperty("Subscription");
-                    subsciptionProp.SetValue(message, listObject[3].ToString(), null);
+                    subsciptionProp.SetValue(message, listObject[4].ToString(), null);
                 }
-                
+
                 //Set Metadata list second position, index=1
                 if (listObject[1] != null)
                 {

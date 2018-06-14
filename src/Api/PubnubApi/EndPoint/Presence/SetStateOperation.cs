@@ -378,7 +378,6 @@ namespace PubnubApi.EndPoint
                     }
                 }
                 jsonUserState = string.Format("{{{0}}}", jsonUserState);
-                //jsonUserState = string.Format("{{\"{0}\":{{{1}}},\"{2}\":{{{3}}}}}", channel, jsonChannelUserState, channelGroup, jsonChannelGroupUserState);
             }
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
@@ -453,7 +452,7 @@ namespace PubnubApi.EndPoint
                     }
                 }
             }
-            //
+            
             if (!string.IsNullOrEmpty(channelGroup) && channelGroup.Trim().Length > 0)
             {
                 if (ChannelGroupLocalUserState[PubnubInstance.InstanceId].ContainsKey(channelGroup))
