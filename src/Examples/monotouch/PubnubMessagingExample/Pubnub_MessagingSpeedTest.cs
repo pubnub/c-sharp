@@ -130,7 +130,6 @@ namespace PubnubMessagingExample
             secOutput.Add (segmentedControl);
 
             Section sectionSegmentedControl = new Section ();
-            //sectionSegmentedControl.Add(segmentedControl);
 
             root = new RootElement (head) {
                 new Section ("PubNub speed test"),

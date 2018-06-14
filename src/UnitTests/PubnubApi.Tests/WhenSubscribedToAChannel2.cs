@@ -1,5 +1,4 @@
 ﻿using System;
-using System;
 using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
@@ -559,7 +558,6 @@ namespace PubNubMessaging.Tests
                     switch (currentTestCase)
                     {
                         case "ThenPresenceShouldReturnReceivedMessage":
-                            //presenceManualEvent.Set();
                             break;
                         case "ThenSubscribeShouldReturnReceivedMessage":
                         case "ThenSubscribeShouldReturnReceivedMessageSSL":

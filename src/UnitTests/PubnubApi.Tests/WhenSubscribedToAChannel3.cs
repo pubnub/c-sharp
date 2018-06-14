@@ -660,7 +660,6 @@ namespace PubNubMessaging.Tests
                     switch (currentTestCase)
                     {
                         case "ThenPresenceShouldReturnReceivedMessage":
-                            //presenceManualEvent.Set();
                             break;
                         case "ThenSubscribeShouldReturnUnicodeMessage":
                         case "ThenSubscribeShouldReturnUnicodeMessageSSL":

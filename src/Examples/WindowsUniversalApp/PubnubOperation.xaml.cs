@@ -1047,7 +1047,7 @@ namespace WindowsUniversalApp
             }
             else if (status.Category == PNStatusCategory.PNConnectedCategory)
             {
-                //Console.WriteLine("CONNECTED {0} Channels = {1}, ChannelGroups = {2}", status.StatusCode, string.Join(",", status.AffectedChannels), string.Join(",", status.AffectedChannelGroups));
+                //Debug.WriteLine("CONNECTED {0} Channels = {1}, ChannelGroups = {2}", status.StatusCode, string.Join(",", status.AffectedChannels), string.Join(",", status.AffectedChannelGroups));
                 // Connect event. You can do stuff like publish, and know you'll get it.
                 // Or just use the connected event to confirm you are subscribed for
                 // UI / internal notifications, etc
@@ -1055,7 +1055,7 @@ namespace WindowsUniversalApp
             }
             else if (status.Category == PNStatusCategory.PNReconnectedCategory)
             {
-                //Console.WriteLine("RE-CONNECTED {0} Channels = {1}, ChannelGroups = {2}", status.StatusCode, string.Join(",", status.AffectedChannels), string.Join(",", status.AffectedChannelGroups));
+                //Debug.WriteLine("RE-CONNECTED {0} Channels = {1}, ChannelGroups = {2}", status.StatusCode, string.Join(",", status.AffectedChannels), string.Join(",", status.AffectedChannelGroups));
                 // Happens as part of our regular operation. This event happens when
                 // radio / connectivity is lost, then regained.
             }

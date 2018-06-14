@@ -99,7 +99,6 @@ namespace MockServer
 		{
 			if (writeToLog)
             {
-				//System.Diagnostics.Debug.WriteLine(logText);
 				try
 				{
 					if (mockServerLog != null)
