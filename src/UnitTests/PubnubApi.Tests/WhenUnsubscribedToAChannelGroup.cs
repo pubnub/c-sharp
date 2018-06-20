@@ -4,6 +4,7 @@ using System.Threading;
 using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
+using System.Diagnostics;
 
 namespace PubNubMessaging.Tests
 {
@@ -67,10 +68,10 @@ namespace PubNubMessaging.Tests
                                 {
                                     try
                                     {
-                                        Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
+                                        Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
                                         if (r != null)
                                         {
-                                            Console.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                            Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                             if (r.ChannelGroups != null && r.ChannelGroups.Count > 0)
                                             {
                                                 foreach (KeyValuePair<string, Dictionary<string, PNAccessManagerKeyData>> channelGroupKP in r.ChannelGroups)
@@ -131,19 +132,17 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
-                (o, m) => { if (m != null) { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); } },
+                (o, m) => { if (m != null) { Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); } },
                 (o, p) => { /* Catch the presence events */ },
                 (o, s) => {
-                    Console.WriteLine("SubscribeCallback: PNStatus: " + s.StatusCode.ToString());
+                    Debug.WriteLine("SubscribeCallback: PNStatus: " + s.StatusCode.ToString());
                     if (s.StatusCode != 200 || s.Error)
                     {
                         subscribeManualEvent.Set();
-                        Console.ForegroundColor = ConsoleColor.Red;
                         if (s.ErrorData != null)
                         {
-                            Console.WriteLine(s.ErrorData.Information);
+                            Debug.WriteLine(s.ErrorData.Information);
                         }
-                        Console.ForegroundColor = ConsoleColor.White;
                     }
                     else if (s.StatusCode == 200 && (s.Category == PNStatusCategory.PNConnectedCategory || s.Category == PNStatusCategory.PNDisconnectedCategory))
                     {
@@ -177,10 +176,10 @@ namespace PubNubMessaging.Tests
                 .Async(new PNChannelGroupsAddChannelResultExt((r,s)=> {
                     try
                     {
-                        Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
+                        Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
                         if (r != null)
                         {
-                            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                            Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                             if (s.StatusCode == 200 && s.Error == false && s.AffectedChannelGroups.Contains(channelGroupName))
                             {
                                 receivedMessage = true;

@@ -4,6 +4,7 @@ using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
 using MockServer;
+using System.Diagnostics;
 
 namespace PubNubMessaging.Tests
 {
@@ -197,13 +198,13 @@ namespace PubNubMessaging.Tests
         {
             public override void OnResponse(PNAccessManagerAuditResult result, PNStatus status)
             {
-                Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
 
                 try
                 {
                     if (result != null)
                     {
-                        Console.WriteLine("PNAccessManagerAuditResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        Debug.WriteLine("PNAccessManagerAuditResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
                         if (status.StatusCode == 200 && status.Error == false)
                         {
                             if (currentUnitTestCase == "ThenSubKeyLevelShouldReturnSuccess")
@@ -211,7 +212,7 @@ namespace PubNubMessaging.Tests
                                 if (!String.IsNullOrEmpty(result.Channel))
                                 {
                                     var channels = result.Channel.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                                    Console.WriteLine("{0} - AccessToSubKeyLevelCallback - Audit Count = {1}", currentUnitTestCase, channels.Length);
+                                    Debug.WriteLine("{0} - AccessToSubKeyLevelCallback - Audit Count = {1}", currentUnitTestCase, channels.Length);
                                 }
 
                                 if (result.Level == "subkey")
@@ -224,7 +225,7 @@ namespace PubNubMessaging.Tests
                                 if (!String.IsNullOrEmpty(result.Channel))
                                 {
                                     var channels = result.Channel.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                                    Console.WriteLine("{0} - AccessToChannelLevelCallback - Audit Channel Count = {1}", currentUnitTestCase, channels.Length);
+                                    Debug.WriteLine("{0} - AccessToChannelLevelCallback - Audit Channel Count = {1}", currentUnitTestCase, channels.Length);
                                 }
                                 if (result.Level.Contains("channel"))
                                 {
@@ -236,7 +237,7 @@ namespace PubNubMessaging.Tests
                                 if (!String.IsNullOrEmpty(result.ChannelGroup))
                                 {
                                     var channelgroups = result.ChannelGroup.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                                    Console.WriteLine("{0} - AccessToChannelLevelCallback - Audit ChannelGroup Count = {1}", currentUnitTestCase, channelgroups.Length);
+                                    Debug.WriteLine("{0} - AccessToChannelLevelCallback - Audit ChannelGroup Count = {1}", currentUnitTestCase, channelgroups.Length);
                                 }
                                 if (result.Level.Contains("channel-group"))
                                 {

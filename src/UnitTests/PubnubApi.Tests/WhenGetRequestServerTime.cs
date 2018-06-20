@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
 using MockServer;
+using System.Diagnostics;
 
 namespace PubNubMessaging.Tests
 {
@@ -248,11 +249,11 @@ namespace PubNubMessaging.Tests
             {
                 try
                 {
-                    Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                    Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
 
                     if (result != null)
                     {
-                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
 
                         if (status.StatusCode == 200 && status.Error == false)
                         {

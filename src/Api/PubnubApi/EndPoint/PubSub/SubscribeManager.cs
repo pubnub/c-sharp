@@ -261,7 +261,7 @@ namespace PubnubApi.EndPoint
                     }
 
                     PNStatus successStatus = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNDisconnectedCategory, null, (int)HttpStatusCode.OK, null);
-                    PNStatus failStatus = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNDisconnectedCategory, null, (int)HttpStatusCode.NotFound, new Exception("Unsubscribe Error. Please retry unsubscribe operation"));
+                    PNStatus failStatus = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNDisconnectedCategory, null, (int)HttpStatusCode.NotFound, new PNException("Unsubscribe Error. Please retry unsubscribe operation"));
                     bool successExist = false;
                     bool failExist = false;
 
@@ -742,7 +742,7 @@ namespace PubnubApi.EndPoint
                 LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} method:_subscribe \n channel={1} \n timetoken={2} \n Exception Details={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), string.Join(",", channels.OrderBy(x => x).ToArray()), timetoken, ex), config.LogVerbosity);
 
                 PNStatusCategory errorCategory = PNStatusCategoryHelper.GetPNStatusCategory(ex);
-                PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, errorCategory, pubnubRequestState, (int)HttpStatusCode.NotFound, ex);
+                PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, errorCategory, pubnubRequestState, (int)HttpStatusCode.NotFound, new PNException(ex));
                 if (channels != null)
                 {
                     status.AffectedChannels.AddRange(channels);
@@ -861,7 +861,7 @@ namespace PubnubApi.EndPoint
                     if (!networkAvailable)
                     {
                         PNStatusCategory errorCategory =  PNStatusCategory.PNNetworkIssuesCategory;
-                        PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, errorCategory, null, (int)HttpStatusCode.NotFound, new Exception("SDK Network related error"));
+                        PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, errorCategory, null, (int)HttpStatusCode.NotFound, new PNException("SDK Network related error"));
                         status.AffectedChannels.AddRange(channels);
                         status.AffectedChannels.AddRange(channelGroups);
                         Announce(status);
@@ -953,7 +953,7 @@ namespace PubnubApi.EndPoint
                     LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, No network for SubscribeManager Manual Reconnect", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
 
                     PNStatusCategory errorCategory = PNStatusCategory.PNNetworkIssuesCategory;
-                    PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNSubscribeOperation, errorCategory, null, (int)HttpStatusCode.NotFound, new Exception("SDK Network related error"));
+                    PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNSubscribeOperation, errorCategory, null, (int)HttpStatusCode.NotFound, new PNException("SDK Network related error"));
                     status.AffectedChannels.AddRange(channels);
                     status.AffectedChannels.AddRange(chananelGroups);
                     Announce(status);
@@ -1042,7 +1042,7 @@ namespace PubnubApi.EndPoint
                     LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - StartSubscribeHeartbeatCheckCallback - No network or no pubnub instance mapping", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                     if (PubnubInstance != null && !networkConnection)
                     {
-                        PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNSubscribeOperation, PNStatusCategory.PNNetworkIssuesCategory, null, (int)System.Net.HttpStatusCode.NotFound, new Exception("Internet connection problem during subscribe heartbeat."));
+                        PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNSubscribeOperation, PNStatusCategory.PNNetworkIssuesCategory, null, (int)System.Net.HttpStatusCode.NotFound, new PNException("Internet connection problem during subscribe heartbeat."));
                         if (channels != null && channels.Length > 0)
                         {
                             status.AffectedChannels.AddRange(channels.ToList());
@@ -1157,7 +1157,7 @@ namespace PubnubApi.EndPoint
 
                                 if (netState.Channels != null && netState.Channels.Length > 0)
                                 {
-                                    PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.NotFound, new Exception("Internet connection problem. Retrying connection"));
+                                    PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.NotFound, new PNException("Internet connection problem. Retrying connection"));
                                     if (netState.Channels != null && netState.Channels.Length > 0)
                                     {
                                         status.AffectedChannels.AddRange(netState.Channels.ToList());
@@ -1234,7 +1234,7 @@ namespace PubnubApi.EndPoint
 
                                 if (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)
                                 {
-                                    PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.NotFound, new Exception("Internet connection problem. Retrying connection"));
+                                    PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.NotFound, new PNException("Internet connection problem. Retrying connection"));
                                     if (netState.Channels != null && netState.Channels.Length > 0)
                                     {
                                         status.AffectedChannels.AddRange(netState.Channels.ToList());
@@ -1294,7 +1294,7 @@ namespace PubnubApi.EndPoint
                 if (netState != null)
                 {
                     PNStatusCategory errorCategory = PNStatusCategoryHelper.GetPNStatusCategory(ex);
-                    PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, errorCategory, null, (int)HttpStatusCode.NotFound, ex);
+                    PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, errorCategory, null, (int)HttpStatusCode.NotFound, new PNException(ex));
                     if (netState.Channels != null)
                     {
                         status.AffectedChannels.AddRange(netState.Channels.ToList());
@@ -1378,7 +1378,7 @@ namespace PubnubApi.EndPoint
                 {
                     if (PubnubInstance != null && !networkConnection)
                     {
-                        PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNSubscribeOperation, PNStatusCategory.PNNetworkIssuesCategory, null, (int)System.Net.HttpStatusCode.NotFound, new Exception("Internet connection problem during presence heartbeat."));
+                        PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNSubscribeOperation, PNStatusCategory.PNNetworkIssuesCategory, null, (int)System.Net.HttpStatusCode.NotFound, new PNException("Internet connection problem during presence heartbeat."));
                         if (subscriberChannels != null && subscriberChannels.Length > 0)
                         {
                             status.AffectedChannels.AddRange(subscriberChannels.ToList());

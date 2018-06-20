@@ -1,10 +1,10 @@
 ﻿using System;
-using System;
 using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
+using System.Diagnostics;
 
 namespace PubNubMessaging.Tests
 {
@@ -463,11 +463,11 @@ namespace PubNubMessaging.Tests
             {
                 try
                 {
-                    Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                    Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
 
                     if (result != null)
                     {
-                        Console.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
                         if (result.Channels != null && result.Channels.Count > 0)
                         {
                             foreach (KeyValuePair<string, Dictionary<string, PNAccessManagerKeyData>> channelKP in result.Channels)
@@ -511,7 +511,7 @@ namespace PubNubMessaging.Tests
             {
                 if (message != null)
                 {
-                    Console.WriteLine("SubscribeCallback: PNMessageResult: {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(message.Message));
+                    Debug.WriteLine("SubscribeCallback: PNMessageResult: {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(message.Message));
                     switch (currentTestCase)
                     {
                         case "ThenSubscribeShouldReturnReceivedMessage":
@@ -551,15 +551,13 @@ namespace PubNubMessaging.Tests
 
             public override void Status(Pubnub pubnub, PNStatus status)
             {
-                //Console.WriteLine("SubscribeCallback: PNStatus: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-                Console.WriteLine("SubscribeCallback: PNStatus: " + status.StatusCode.ToString());
+                Debug.WriteLine("SubscribeCallback: PNStatus: " + status.StatusCode.ToString());
                 if (status.StatusCode != 200 || status.Error)
                 {
-                    Console.WriteLine("Subsccribe ErrorData: " + status.ErrorData?.Information);
+                    Debug.WriteLine("Subsccribe ErrorData: " + status.ErrorData?.Information);
                     switch (currentTestCase)
                     {
                         case "ThenPresenceShouldReturnReceivedMessage":
-                            //presenceManualEvent.Set();
                             break;
                         case "ThenSubscribeShouldReturnReceivedMessage":
                         case "ThenSubscribeShouldReturnReceivedMessageSSL":
@@ -579,12 +577,10 @@ namespace PubNubMessaging.Tests
                             break;
                     }
 
-                    Console.ForegroundColor = ConsoleColor.Red;
                     if (status.ErrorData != null)
                     {
-                        Console.WriteLine(status.ErrorData.Information);
+                        Debug.WriteLine(status.ErrorData.Information);
                     }
-                    Console.ForegroundColor = ConsoleColor.White;
                 }
                 else if (status.StatusCode == 200 && status.Category == PNStatusCategory.PNConnectedCategory)
                 {
@@ -619,8 +615,8 @@ namespace PubNubMessaging.Tests
         {
             public override void OnResponse(PNPublishResult result, PNStatus status)
             {
-                Console.WriteLine("Publish Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                Console.WriteLine("Publish PNStatus => Status = : " + status.StatusCode.ToString());
+                Debug.WriteLine("Publish Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                Debug.WriteLine("Publish PNStatus => Status = : " + status.StatusCode.ToString());
                 if (result != null && status.StatusCode == 200 && !status.Error)
                 {
                     publishTimetoken = result.Timetoken;
@@ -648,7 +644,7 @@ namespace PubNubMessaging.Tests
                 }
                 else
                 {
-                    Console.WriteLine("Publish ErrorData: " + status.ErrorData?.Information);
+                    Debug.WriteLine("Publish ErrorData: " + status.ErrorData?.Information);
                 }
                 publishManualEvent.Set();
             }

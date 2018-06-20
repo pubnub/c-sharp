@@ -29,8 +29,6 @@ namespace PubnubMessagingExample
         public override bool FinishedLaunching (UIApplication app, NSDictionary options)
         {
 
-            //UITabBarController tabBarController;
-
             window = new UIWindow (UIScreen.MainScreen.Bounds);
 
             viewController = new Pubnub_MessagingMain ();
@@ -45,10 +43,6 @@ namespace PubnubMessagingExample
             window = new UIWindow (UIScreen.MainScreen.Bounds);
             window.MakeKeyAndVisible ();
             window.RootViewController = navigation;    
-            /*            if (UIDevice.CurrentDevice.CheckSystemVersion (5, 0))
-                window.RootViewController = navigation;    
-            else
-                window.AddSubview (navigation.View);*/
 
             return true;
         }

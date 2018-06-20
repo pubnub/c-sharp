@@ -213,7 +213,7 @@ namespace PubnubApi
 		{
             PNStatusCategory errorCategory = PNStatusCategoryHelper.GetPNStatusCategory(ex);
             StatusBuilder statusBuilder = new StatusBuilder(pubnubConfig, jsonLib);
-            PNStatus status = statusBuilder.CreateStatusResponse<T>(type, errorCategory, null, (int)System.Net.HttpStatusCode.NotFound, ex);
+            PNStatus status = statusBuilder.CreateStatusResponse<T>(type, errorCategory, null, (int)System.Net.HttpStatusCode.NotFound, new PNException(ex));
 
             if (callback != null)
             {

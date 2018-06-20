@@ -4,6 +4,7 @@ using System.Threading;
 using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
+using System.Diagnostics;
 
 namespace PubNubMessaging.Tests
 {
@@ -71,11 +72,11 @@ namespace PubNubMessaging.Tests
                 .Async(new PNAccessManagerGrantResultExt((r,s)=> {
                     try
                     {
-                        Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
+                        Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
 
                         if (r != null)
                         {
-                            Console.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                            Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                             if (r.Channels != null && r.Channels.Count > 0)
                             {
                                 var read = r.Channels[channel][authKey].ReadEnabled;
@@ -451,7 +452,7 @@ namespace PubNubMessaging.Tests
             ManualResetEvent timeManualEvent = new ManualResetEvent(false);
             pubnub.Time().Async(new PNTimeResultExt((r,s)=> {
                 try{
-                    Console.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                    Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                     currentTimetoken = (r != null && s.StatusCode == 200 && s.Error == false) ? r.Timetoken : 0;
                 } catch { /* ignore */ }
                 finally { timeManualEvent.Set(); }
@@ -684,7 +685,7 @@ namespace PubNubMessaging.Tests
             pubnub.Time().Async(new PNTimeResultExt((r, s) => {
                 try
                 {
-                    Console.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                    Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                     currentTimetoken = (r != null && s.StatusCode == 200 && s.Error == false) ? r.Timetoken : 0;
                 }
                 catch { /* ignore */ }
@@ -742,7 +743,7 @@ namespace PubNubMessaging.Tests
             pubnub.Time().Async(new PNTimeResultExt((r, s) => {
                 try
                 {
-                    Console.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                    Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                     currentTimetoken = (r != null && s.StatusCode == 200 && s.Error == false) ? r.Timetoken : 0;
                 }
                 catch { /* ignore */ }
@@ -804,7 +805,7 @@ namespace PubNubMessaging.Tests
             pubnub.Time().Async(new PNTimeResultExt((r, s) => {
                 try
                 {
-                    Console.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                    Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                     currentTimetoken = (r != null && s.StatusCode == 200 && s.Error == false) ? r.Timetoken : 0;
                 }
                 catch { /* ignore */ }
@@ -924,7 +925,7 @@ namespace PubNubMessaging.Tests
                 }
                 else
                 {
-                    Console.WriteLine("DetailedHistory with start & reverse = false");
+                    Debug.WriteLine("DetailedHistory with start & reverse = false");
                     expected = "[[\"kvIeHmojsLyV1KMBo82DYQ==\",\"Ld0rZfbe4yN0Qj4V7o2BuQ==\",\"zNlnhYco9o6a646+Ox6ksg==\",\"mR8EEMx154BBHU3OOa+YjQ==\",\"v+viLoq0Gj2docUMAYyoYg==\"],14835550731714499,14835550737165103]";
 
                     server.AddRequest(new Request()
@@ -1014,7 +1015,7 @@ namespace PubNubMessaging.Tests
             pubnub.Time().Async(new PNTimeResultExt((r, s) => {
                 try
                 {
-                    Console.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                    Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                     currentTimetoken = (r != null && s.StatusCode == 200 && s.Error == false) ? r.Timetoken : 0;
                 }
                 catch { /* ignore */ }
@@ -1024,7 +1025,7 @@ namespace PubNubMessaging.Tests
 
             starttime = currentTimetoken;
 
-            Console.WriteLine(string.Format("Start Time = {0}", starttime));
+            Debug.WriteLine(string.Format("Start Time = {0}", starttime));
             List<int> firstPublishSet = new List<int>();
 
             for (int index = 0; index < totalMessages / 2; index++)
@@ -1055,7 +1056,7 @@ namespace PubNubMessaging.Tests
                     }));
                 publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-                Console.WriteLine(string.Format("Message #{0} publish {1}", index, (receivedMessage) ? "SUCCESS" : "FAILED"));
+                Debug.WriteLine(string.Format("Message #{0} publish {1}", index, (receivedMessage) ? "SUCCESS" : "FAILED"));
             }
 
             currentTimetoken = 0;
@@ -1074,7 +1075,7 @@ namespace PubNubMessaging.Tests
             pubnub.Time().Async(new PNTimeResultExt((r, s) => {
                 try
                 {
-                    Console.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                    Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                     currentTimetoken = (r != null && s.StatusCode == 200 && s.Error == false) ? r.Timetoken : 0;
                 }
                 catch { /* ignore */ }
@@ -1084,7 +1085,7 @@ namespace PubNubMessaging.Tests
 
             midtime = currentTimetoken;
 
-            Console.WriteLine(string.Format("Mid Time = {0}", midtime));
+            Debug.WriteLine(string.Format("Mid Time = {0}", midtime));
             List<double> secondPublishSet = new List<double>();
             int arrayIndex = 0;
 
@@ -1117,7 +1118,7 @@ namespace PubNubMessaging.Tests
                     }));
                 publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-                Console.WriteLine(string.Format("Message #{0} publish {1}", index, (receivedMessage) ? "SUCCESS" : "FAILED"));
+                Debug.WriteLine(string.Format("Message #{0} publish {1}", index, (receivedMessage) ? "SUCCESS" : "FAILED"));
             }
 
             currentTimetoken = 0;
@@ -1136,7 +1137,7 @@ namespace PubNubMessaging.Tests
             pubnub.Time().Async(new PNTimeResultExt((r, s) => {
                 try
                 {
-                    Console.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                    Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                     currentTimetoken = (r != null && s.StatusCode == 200 && s.Error == false) ? r.Timetoken : 0;
                 }
                 catch { /* ignore */ }
@@ -1146,11 +1147,11 @@ namespace PubNubMessaging.Tests
 
             endtime = currentTimetoken;
 
-            Console.WriteLine(string.Format("End Time = {0}", endtime));
+            Debug.WriteLine(string.Format("End Time = {0}", endtime));
 
             Thread.Sleep(1000);
 
-            Console.WriteLine("Detailed History with Start & End");
+            Debug.WriteLine("Detailed History with Start & End");
 
             expected = "[[0,1,2,3,4],14715432709547189,14715432709547189]";
 
@@ -1200,11 +1201,11 @@ namespace PubNubMessaging.Tests
 
             if (!receivedMessage)
             {
-                Console.WriteLine("firstPublishSet did not match");
+                Debug.WriteLine("firstPublishSet did not match");
             }
             else
             {
-                Console.WriteLine("DetailedHistory with start & reverse = true");
+                Debug.WriteLine("DetailedHistory with start & reverse = true");
 
 
                 expected = "[[5.1,6.1,7.1,8.1,9.1],14715432709547189,14715432709547189]";
@@ -1253,11 +1254,11 @@ namespace PubNubMessaging.Tests
 
                 if (!receivedMessage)
                 {
-                    Console.WriteLine("secondPublishSet did not match");
+                    Debug.WriteLine("secondPublishSet did not match");
                 }
                 else
                 {
-                    Console.WriteLine("DetailedHistory with start & reverse = false");
+                    Debug.WriteLine("DetailedHistory with start & reverse = false");
                     expected = expected = "[[5.1,6.1,7.1,8.1,9.1],14715432709547189,14715432709547189]";
 
                     server.AddRequest(new Request()

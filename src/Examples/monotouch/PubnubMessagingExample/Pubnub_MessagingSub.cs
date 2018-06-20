@@ -147,8 +147,6 @@ namespace PubnubMessagingExample
         string Channel {
             get;
             set;
-            //get { return newChannels.Text; }
-            //set { newChannels.Text = value; }
         }
 
         string ChannelGroup {
@@ -249,17 +247,6 @@ namespace PubnubMessagingExample
             UIView uiView = new UIView (new CGRect (0, 0, this.View.Bounds.Width, iViewHeight));
             uiView.MultipleTouchEnabled = true;
 
-            /*UILabel lblChannel = new UILabel(new RectangleF (10, 2, 80, 25));
-            lblChannel.Font = font13;
-            lblChannel.Text = "Channel(s):";
-            uiView.Add (lblChannel);
-
-            tfChannels = new UITextField (new RectangleF (90, 2, 200, 25));
-            tfChannels.Enabled = false;
-            tfChannels.BackgroundColor = UIColor.FromRGB(239, 239, 244);
-            tfChannels.Font = font12;
-            uiView.Add (tfChannels);*/
-
             UILabel lblInfo = new UILabel (new CGRect (10, 2, 300, 25));
             lblInfo.Font = font12;
             lblInfo.Text = "Enter new channel(s)/channelgroup(s) and/or use the menu for actions";
@@ -303,48 +290,6 @@ namespace PubnubMessagingExample
                       .Execute();
             });
         }
-
-        /*public void Publish ()
-        {
-            UIAlertView alert = new UIAlertView ();
-            alert.AlertViewStyle = UIAlertViewStyle.PlainTextInput;
-            alert.Title = "Publish";
-            alert.Message = "Enter message to publish";
-            alert.AddButton ("Publish");
-            alert.AddButton ("Cancel");
-            alert.Clicked += delegate(object sender, UIButtonEventArgs e) {
-                if (e.ButtonIndex == 0) {
-                    if (alert.GetTextField (0) != null) {
-                        string input = alert.GetTextField (0).Text;
-                        Display ("Running Publish");
-                        Channel = newChannels.Text;
-                        string[] channels = Channel.Split (',');
-                        foreach (string channel in channels) {
-                            InvokeInBackground(() => {
-                                pubnub.Publish<string> (channel.Trim (), input, DisplayReturnMessage, DisplayErrorMessage);
-                            });
-                        }
-                    }
-                }           
-            };
-            alert.Show ();
-        }
-
-        void PublishAlertDismissed (object sender, UIButtonEventArgs e)
-        {
-            InputAlertView iav = (InputAlertView)sender;
-            if ((iav != null) && (!String.IsNullOrWhiteSpace (iav.EnteredText))) {
-                Display ("Running Publish");
-                Channel = newChannels.Text;
-                string[] channels = Channel.Split (',');
-
-                foreach (string channel in channels) {
-                    InvokeInBackground(() => {
-                        pubnub.Publish<string> (channel.Trim (), iav.EnteredText, DisplayReturnMessage, DisplayErrorMessage);
-                    });
-                }
-            }
-        }*/
 
         public void Publish (){
             ShowAlertType2 (CommonDialogStates.Publish);
@@ -398,15 +343,11 @@ namespace PubnubMessagingExample
 
         public void SubscribeAudit ()
         {
-            //Display("Running Subscribe Audit");
-            //pubnub.AuditAccess<string>(Channel,DisplayReturnMessage, DisplayErrorMessage);
             ShowAlertType1 (CommonDialogStates.AuditSubscribe);
         }
 
         public void SubscribeRevoke ()
         {
-            //Display("Running Subscribe Revoke");
-            //pubnub.GrantAccess<string>(Channel, false,false, DisplayReturnMessage, DisplayErrorMessage);
             ShowAlertType1 (CommonDialogStates.RevokeSubscribe);
         }
 
@@ -547,20 +488,6 @@ namespace PubnubMessagingExample
             dvc = new DialogViewController (newroot, true);
             AppDelegate.navigation.PushViewController (dvc, true);
         }
-
-        /*public void ViewUserState ()
-        {
-            string[] channels = Channel.Split (',');
-            foreach (string channelToCall in channels) {
-                string currentUserStateView = pubnub.GetUserState (channelToCall);
-                if (!string.IsNullOrEmpty (currentUserStateView)) {
-                    Display (string.Format("User state for channel {0}:{1}", channelToCall, currentUserStateView));
-                } else {
-                    Display (string.Format("No User State Exists for channel {0}", channelToCall));
-                }
-            }
-
-        }*/
 
         public void DelUserState ()
         {
@@ -732,11 +659,6 @@ namespace PubnubMessagingExample
                 alert.GetTextField (0).KeyboardType = UIKeyboardType.NumberPad;
                 alert.Title = "Presence Heartbeat";
                 alert.Message = "Enter Presence Heartbeat";
-            //} else if (cds == CommonDialogStates.PresenceHeartbeatInterval) {
-            //    isHeartbeatInterval = true;
-            //    alert.GetTextField (0).KeyboardType = UIKeyboardType.NumberPad;
-            //    alert.Title = "Presence Heartbeat Interval";
-            //    alert.Message = "Enter Presence Heartbeat Interval";
             } else if (cds == CommonDialogStates.ChangeUuid) {
                 alert.Title = "Change UUID";
                 alert.Message = "Enter UUID";
@@ -1021,7 +943,6 @@ namespace PubnubMessagingExample
         public PlatformPubnubLog ()
         {
             // Get folder path may vary based on environment
-            //string folder = System.IO.Directory.GetCurrentDirectory (); //For console
             string folder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments); // For iOS
             System.Diagnostics.Debug.WriteLine (folder);
             logFilePath = System.IO.Path.Combine (folder, "pubnubmessaging.log");
@@ -1189,16 +1110,6 @@ namespace PubnubMessagingExample
         {
             string msg = string.Format ("Operation: {0}; Category: {1};  StatusCode: {2}", status.Operation, status.Category, status.StatusCode);
             this.callback (msg);
-
-            //if (status.StatusCode != 200 || status.Error)
-            //{
-            //    Console.ForegroundColor = ConsoleColor.Red;
-            //    if (status.ErrorData != null)
-            //    {
-            //        Console.WriteLine(status.ErrorData.Information);
-            //    }
-            //    Console.ForegroundColor = ConsoleColor.White;
-            //}
 
             if (status.Category == PNStatusCategory.PNUnexpectedDisconnectCategory) {
                 // This event happens when radio / connectivity is lost

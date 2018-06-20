@@ -4,6 +4,7 @@ using System.Threading;
 using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
+using System.Diagnostics;
 
 namespace PubNubMessaging.Tests
 {
@@ -82,7 +83,7 @@ namespace PubNubMessaging.Tests
                                     {
                                         if (r != null)
                                         {
-                                            Console.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                            Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                             if (r.Channels != null && r.Channels.Count > 0)
                                             {
                                                 foreach (KeyValuePair<string, Dictionary<string, PNAccessManagerKeyData>> channelKP in r.Channels)
@@ -173,10 +174,10 @@ namespace PubNubMessaging.Tests
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
                 (o, m) => 
                 {
-                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m));
+                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m));
                     if (m != null)
                     {
-                        Console.WriteLine("SubscribeCallback: PNMessageResult: {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(m.Message));
+                        Debug.WriteLine("SubscribeCallback: PNMessageResult: {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(m.Message));
                         if (pubnub.JsonPluggableLibrary.SerializeToJsonString(publishedMessage) == m.Message.ToString())
                         {
                             internalReceivedMessage = true;
@@ -188,11 +189,11 @@ namespace PubNubMessaging.Tests
                     subscribeManualEvent.Set();
                 },
                 (o, s) => {
-                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
                     if (s.StatusCode != 200 || s.Error)
                     {
                         receivedErrorMessage = true;
-                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                        if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
                         subscribeManualEvent.Set();
                     }
                     else if (s.StatusCode == 200 && s.Category == PNStatusCategory.PNConnectedCategory)
@@ -387,7 +388,7 @@ namespace PubNubMessaging.Tests
                 (o, m) => { },
                 (o, p) => { },
                 (o, s) => {
-                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
                     if (s.StatusCode == 200 && s.Category == PNStatusCategory.PNConnectedCategory)
                     {
                         receivedMessage = true;
@@ -459,7 +460,7 @@ namespace PubNubMessaging.Tests
                 (o, m) => { },
                 (o, p) => { },
                 (o, s) => {
-                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
                     if (s.StatusCode == 200 && s.Category == PNStatusCategory.PNConnectedCategory)
                     {
                         receivedMessage = true;
@@ -565,7 +566,7 @@ namespace PubNubMessaging.Tests
                 (o, m) => { },
                 (o, p) => { },
                 (o, s) => {
-                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
                     if (s.StatusCode == 200 && s.Category == PNStatusCategory.PNConnectedCategory)
                     {
                         receivedMessage = true;
@@ -669,10 +670,10 @@ namespace PubNubMessaging.Tests
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
                 (o, m) =>
                 {
-                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m));
+                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m));
                     if (m != null)
                     {
-                        Console.WriteLine("SubscribeCallback: PNMessageResult: {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(m.Message));
+                        Debug.WriteLine("SubscribeCallback: PNMessageResult: {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(m.Message));
                         numberOfReceivedMessages++;
                         if (numberOfReceivedMessages >= 10)
                         {
@@ -685,11 +686,11 @@ namespace PubNubMessaging.Tests
                     subscribeManualEvent.Set();
                 },
                 (o, s) => {
-                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
                     if (s.StatusCode != 200 || s.Error)
                     {
                         receivedErrorMessage = true;
-                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                        if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
                         subscribeManualEvent.Set();
                     }
                     else if (s.StatusCode == 200 && s.Category == PNStatusCategory.PNConnectedCategory)
@@ -735,7 +736,7 @@ namespace PubNubMessaging.Tests
                 {
                     for (int index = 0; index < 10; index++)
                     {
-                        Console.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Publishing " + index.ToString());
+                        Debug.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Publishing " + index.ToString());
                         ManualResetEvent publishManualEvent = new ManualResetEvent(false);
                         pubnub.Publish().Channel(channel).Message(index.ToString())
                             .Async(new PNPublishResultExt((r, s) =>

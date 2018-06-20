@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
 using MockServer;
+using System.Diagnostics;
 
 namespace PubNubMessaging.Tests
 {
@@ -83,10 +84,10 @@ namespace PubNubMessaging.Tests
             pubnub1.Time().Async(new PNTimeResultExt((r, s) => {
                 try
                 {
-                    Console.WriteLine("PNStatus={0}", pubnub1.JsonPluggableLibrary.SerializeToJsonString(s));
+                    Debug.WriteLine("PNStatus={0}", pubnub1.JsonPluggableLibrary.SerializeToJsonString(s));
                     if (r != null)
                     {
-                        Console.WriteLine(pubnub1.JsonPluggableLibrary.SerializeToJsonString(r));
+                        Debug.WriteLine(pubnub1.JsonPluggableLibrary.SerializeToJsonString(r));
                         if (s.StatusCode == 200 && s.Error == false && ((PubnubCommon.EnableStubTest && expectedTime == r.Timetoken) || r.Timetoken > 0))
                         {
                             timeReceived1 = true;
@@ -102,10 +103,10 @@ namespace PubNubMessaging.Tests
             pubnub2.Time().Async(new PNTimeResultExt((r, s) => {
                 try
                 {
-                    Console.WriteLine("PNStatus={0}", pubnub1.JsonPluggableLibrary.SerializeToJsonString(s));
+                    Debug.WriteLine("PNStatus={0}", pubnub1.JsonPluggableLibrary.SerializeToJsonString(s));
                     if (r != null)
                     {
-                        Console.WriteLine(pubnub1.JsonPluggableLibrary.SerializeToJsonString(r));
+                        Debug.WriteLine(pubnub1.JsonPluggableLibrary.SerializeToJsonString(r));
                         if (s.StatusCode == 200 && s.Error == false && ((PubnubCommon.EnableStubTest && expectedTime == r.Timetoken) || r.Timetoken > 0))
                         {
                             timeReceived1 = true;
@@ -157,10 +158,10 @@ namespace PubNubMessaging.Tests
             pubnub1.Time().Async(new PNTimeResultExt((r, s) => {
                 try
                 {
-                    Console.WriteLine("PNStatus={0}", pubnub1.JsonPluggableLibrary.SerializeToJsonString(s));
+                    Debug.WriteLine("PNStatus={0}", pubnub1.JsonPluggableLibrary.SerializeToJsonString(s));
                     if (r != null)
                     {
-                        Console.WriteLine(pubnub1.JsonPluggableLibrary.SerializeToJsonString(r));
+                        Debug.WriteLine(pubnub1.JsonPluggableLibrary.SerializeToJsonString(r));
                         if (s.StatusCode == 200 && s.Error == false && ((PubnubCommon.EnableStubTest && expectedTime == r.Timetoken) || r.Timetoken > 0))
                         {
                             timeReceived1 = true;
@@ -218,10 +219,10 @@ namespace PubNubMessaging.Tests
                 pubnub1.Time().Async(new PNTimeResultExt((r, s) => {
                     try
                     {
-                        Console.WriteLine("PNStatus={0}", pubnub1.JsonPluggableLibrary.SerializeToJsonString(s));
+                        Debug.WriteLine("PNStatus={0}", pubnub1.JsonPluggableLibrary.SerializeToJsonString(s));
                         if (r != null)
                         {
-                            Console.WriteLine(pubnub1.JsonPluggableLibrary.SerializeToJsonString(r));
+                            Debug.WriteLine(pubnub1.JsonPluggableLibrary.SerializeToJsonString(r));
                             if (s.StatusCode == 200 && s.Error == false && ((PubnubCommon.EnableStubTest && expectedTime == r.Timetoken) || r.Timetoken > 0))
                             {
                                 timeReceived1 = true;
@@ -285,10 +286,10 @@ namespace PubNubMessaging.Tests
                 pubnub1.Time().Async(new PNTimeResultExt((r, s) => {
                     try
                     {
-                        Console.WriteLine("PNStatus={0}", pubnub1.JsonPluggableLibrary.SerializeToJsonString(s));
+                        Debug.WriteLine("PNStatus={0}", pubnub1.JsonPluggableLibrary.SerializeToJsonString(s));
                         if (r != null)
                         {
-                            Console.WriteLine(pubnub1.JsonPluggableLibrary.SerializeToJsonString(r));
+                            Debug.WriteLine(pubnub1.JsonPluggableLibrary.SerializeToJsonString(r));
                             if (s.StatusCode == 200 && s.Error == false && ((PubnubCommon.EnableStubTest && expectedTime == r.Timetoken) || r.Timetoken > 0))
                             {
                                 timeReceived1 = true;

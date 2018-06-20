@@ -405,6 +405,9 @@
     <Compile Include="..\..\Api\PubnubApi\Model\InternetState.cs">
       <Link>LinkedSourceCode\Model\InternetState.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\PNException.cs">
+      <Link>LinkedSourceCode\Model\PNException.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\PNStatusCategoryHelper.cs">
       <Link>LinkedSourceCode\Model\PNStatusCategoryHelper.cs</Link>
     </Compile>

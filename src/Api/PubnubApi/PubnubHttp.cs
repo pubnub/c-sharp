@@ -649,7 +649,7 @@ namespace PubnubApi
                     && currentState.ResponseType != PNOperationType.Leave)
                 {
                     PNStatusCategory errorCategory = PNStatusCategory.PNTimeoutCategory;
-                    PNStatus status = new StatusBuilder(pubnubConfig, jsonLib).CreateStatusResponse<T>(currentState.ResponseType, errorCategory, currentState, (int)HttpStatusCode.NotFound, new TimeoutException("Request timeout"));
+                    PNStatus status = new StatusBuilder(pubnubConfig, jsonLib).CreateStatusResponse<T>(currentState.ResponseType, errorCategory, currentState, (int)HttpStatusCode.NotFound, new PNException("Request timeout"));
 
                     if (currentState.Channels != null)
                     {

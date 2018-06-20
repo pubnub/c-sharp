@@ -14,7 +14,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubPCL</PackageId>
-    <PackageVersion>4.0.17.0</PackageVersion>
+    <PackageVersion>4.0.18.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -22,11 +22,8 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Added support to NetStandard 2.0
-Added support to Apple Watch
-Added timer to invoke MultiplexExceptionHandler based on reconnection policy.
-Code refactor in accessing ConcurrentDictionary key for channel names.
-Refactored code related to PubnubInstance access</PackageReleaseNotes>
+    <PackageReleaseNotes>Added Publisher property to PNMessageResult of subscribe.
+Added PNException class and refactored code internally around status response.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -380,6 +377,7 @@ Refactored code related to PubnubInstance access</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\Model\InternetState.cs">
       <Link>Model\InternetState.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\PNException.cs" Link="Model\PNException.cs" />
     <Compile Include="..\PubnubApi\Model\PNHeartbeatResult.cs">
       <Link>Model\PNHeartbeatResult.cs</Link>
     </Compile>
@@ -659,7 +657,7 @@ Refactored code related to PubnubInstance access</PackageReleaseNotes>
     <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Net.Requests" Version="4.3.0">
+    <PackageReference Include="System.Net.Requests" Version="4.0.11">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Reflection.Primitives" Version="4.3.0">

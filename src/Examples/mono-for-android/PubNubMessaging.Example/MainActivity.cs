@@ -854,13 +854,11 @@ namespace PubNubMessaging.Example
                 // This event happens when radio / connectivity is lost
                 System.Diagnostics.Debug.WriteLine("PNUnexpectedDisconnectCategory");
             } else if (statusObj.Category == PNStatusCategory.PNConnectedCategory) {
-                //Console.WriteLine("CONNECTED {0} Channels = {1}, ChannelGroups = {2}", status.StatusCode, string.Join(",", status.AffectedChannels), string.Join(",", status.AffectedChannelGroups));
                 // Connect event. You can do stuff like publish, and know you'll get it.
                 // Or just use the connected event to confirm you are subscribed for
                 // UI / internal notifications, etc
                 System.Diagnostics.Debug.WriteLine("PNConnectedCategory");
             } else if (statusObj.Category == PNStatusCategory.PNReconnectedCategory) {
-                //Console.WriteLine("RE-CONNECTED {0} Channels = {1}, ChannelGroups = {2}", status.StatusCode, string.Join(",", status.AffectedChannels), string.Join(",", status.AffectedChannelGroups));
                 // Happens as part of our regular operation. This event happens when
                 // radio / connectivity is lost, then regained.
                 System.Diagnostics.Debug.WriteLine("PNReconnectedCategory");

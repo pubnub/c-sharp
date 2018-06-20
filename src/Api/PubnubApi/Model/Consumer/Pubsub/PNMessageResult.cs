@@ -9,5 +9,6 @@ namespace PubnubApi
         public string Subscription { get; set; }
         public long Timetoken { get; set; }
         public object UserMetadata { get; set; }
+        public string Publisher { get; set; }
     }
 }

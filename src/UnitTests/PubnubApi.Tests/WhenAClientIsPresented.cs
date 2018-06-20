@@ -8,6 +8,7 @@ using System.Threading;
 using System.Collections;
 using PubnubApi;
 using MockServer;
+using System.Diagnostics;
 
 namespace PubNubMessaging.Tests
 {
@@ -69,10 +70,10 @@ namespace PubNubMessaging.Tests
                                 {
                                     try
                                     {
-                                        Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
+                                        Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
                                         if (r != null)
                                         {
-                                            Console.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                            Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                             if (r.Channels != null && r.Channels.Count > 0)
                                             {
                                                 var read = r.Channels[channel][authKey].ReadEnabled;
@@ -111,7 +112,7 @@ namespace PubNubMessaging.Tests
 #endif
         public void UsingJsonFx()
         {
-            Console.Write("UsingJsonFx");
+            Debug.Write("UsingJsonFx");
             Assert.True(true, "UsingJsonFx");
         }
 
@@ -122,7 +123,7 @@ namespace PubNubMessaging.Tests
 #endif
         public void UsingNewtonSoft()
         {
-            Console.Write("UsingNewtonSoft");
+            Debug.Write("UsingNewtonSoft");
             Assert.True(true, "UsingNewtonSoft");
         }
 
@@ -146,17 +147,17 @@ namespace PubNubMessaging.Tests
             ManualResetEvent presenceManualEvent = new ManualResetEvent(false);
 
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
-                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, m) => { Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
                 (o, p) => {
-                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(p));
+                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(p));
                     if (p.Event == "join") { receivedPresenceMessage = true; }
                     presenceManualEvent.Set();
                 },
                 (o, s) => {
-                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
                     if (s.StatusCode != 200 || s.Error)
                     {
-                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                        if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
                         presenceManualEvent.Set();
                     }
                 });
@@ -235,17 +236,17 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent presenceManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
-                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, m) => { Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
                 (o, p) => {
-                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(p));
+                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(p));
                     if (p.Event == "join") { receivedPresenceMessage = true; }
                     presenceManualEvent.Set();
                 },
                 (o, s) => {
-                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
                     if (s.StatusCode != 200 || s.Error)
                     {
-                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                        if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
                         presenceManualEvent.Set();
                     }
                 });
@@ -322,17 +323,17 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent presenceManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
-                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, m) => { Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
                 (o, p) => {
-                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(p));
+                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(p));
                     receivedCustomUUID = true;
                     presenceManualEvent.Set();
                 },
                 (o, s) => {
-                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
                     if (s.StatusCode != 200 || s.Error)
                     {
-                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                        if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
                         presenceManualEvent.Set();
                     }
                 });
@@ -411,16 +412,16 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
-                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, m) => { Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
                 (o, p) => {
                     subscribeManualEvent.Set();
                 },
                 (o, s) => {
-                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
                     if (s.StatusCode != 200 || s.Error)
                     {
                         receivedErrorMessage = true;
-                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                        if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
                     }
                     subscribeManualEvent.Set();
                 });
@@ -474,7 +475,7 @@ namespace PubNubMessaging.Tests
                 pubnub.HereNow().Channels(new[] { channel }).Async(new PNHereNowResultEx(
                                 (r, s) => {
                                     if (r == null) { return; }
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedHereNowMessage = true;
                                     hereNowManualEvent.Set();
                                 }));
@@ -526,16 +527,16 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
-                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, m) => { Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
                 (o, p) => {
                     subscribeManualEvent.Set();
                 },
                 (o, s) => {
-                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
                     if (s.StatusCode != 200 || s.Error)
                     {
                         receivedErrorMessage = true;
-                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                        if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
                     }
                     subscribeManualEvent.Set();
                 });
@@ -589,7 +590,7 @@ namespace PubNubMessaging.Tests
                 pubnub.HereNow().Channels(new[] { channel }).Async(new PNHereNowResultEx(
                                 (r, s) => {
                                     if (r == null) { return; }
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedHereNowMessage = true;
                                     hereNowManualEvent.Set();
                                 }));
@@ -638,15 +639,15 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
-                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, m) => { Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
                 (o, p) => {
                     subscribeManualEvent.Set();
                 },
                 (o, s) => {
-                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
                     if (s.StatusCode != 200 || s.Error)
                     {
-                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                        if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
                     }
                     subscribeManualEvent.Set();
                 });
@@ -701,7 +702,7 @@ namespace PubNubMessaging.Tests
             pubnub.HereNow().Channels(new [] { channel }).Async(new PNHereNowResultEx(
                                 (r, s) => {
                                     if (r == null) { return; }
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedHereNowMessage = true;
                                     hereNowManualEvent.Set();
                                 }));
@@ -750,15 +751,15 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
-                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, m) => { Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
                 (o, p) => {
                     subscribeManualEvent.Set();
                 },
                 (o, s) => {
-                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
                     if (s.StatusCode != 200 || s.Error)
                     {
-                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                        if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
                     }
                     subscribeManualEvent.Set();
                 });
@@ -813,7 +814,7 @@ namespace PubNubMessaging.Tests
             pubnub.HereNow().Channels(new [] { channel }).Async(new PNHereNowResultEx(
                                 (r, s) => {
                                     if (r == null) { return; }
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedHereNowMessage = true;
                                     hereNowManualEvent.Set();
                                 }));
@@ -863,16 +864,16 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
-                            (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                            (o, m) => { Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
                             (o, p) => {
                                 subscribeManualEvent.Set();
                             },
                             (o, s) => {
-                                Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                                Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
                                 if (s.StatusCode != 200 || s.Error)
                                 {
                                     receivedErrorMessage = true;
-                                    if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                                    if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
                                 }
                                 subscribeManualEvent.Set();
                             });
@@ -926,7 +927,7 @@ namespace PubNubMessaging.Tests
                 pubnub.HereNow().Channels(new[] { channel }).Async(new PNHereNowResultEx(
                                 (r, s) => {
                                     if (r == null) { return; }
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedHereNowMessage = true;
                                     hereNowManualEvent.Set();
                                 }));
@@ -975,15 +976,15 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
-                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, m) => { Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
                 (o, p) => {
                     subscribeManualEvent.Set();
                 },
                 (o, s) => {
-                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
                     if (s.StatusCode != 200 || s.Error)
                     {
-                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                        if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
                     }
                     subscribeManualEvent.Set();
                 });
@@ -1038,7 +1039,7 @@ namespace PubNubMessaging.Tests
             pubnub.HereNow().Channels(new [] { channel }).Async(new PNHereNowResultEx(
                                 (r, s) => {
                                     if (r == null) { return; }
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedHereNowMessage = true;
                                     hereNowManualEvent.Set();
                                 }));
@@ -1086,15 +1087,15 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
-                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, m) => { Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
                 (o, p) => {
                     subscribeManualEvent.Set();
                 },
                 (o, s) => {
-                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
                     if (s.StatusCode != 200 || s.Error)
                     {
-                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                        if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
                     }
                     subscribeManualEvent.Set();
                 });
@@ -1149,7 +1150,7 @@ namespace PubNubMessaging.Tests
             pubnub.HereNow().Channels(new [] { channel }).Async(new PNHereNowResultEx(
                                 (r, s) => {
                                     if (r == null) { return; }
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedHereNowMessage = true;
                                     hereNowManualEvent.Set();
                                 }));
@@ -1198,16 +1199,16 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
-                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, m) => { Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
                 (o, p) => {
                     subscribeManualEvent.Set();
                 },
                 (o, s) => {
-                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
                     if (s.StatusCode != 200 || s.Error)
                     {
                         receivedErrorMessage = true;
-                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                        if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
                     }
                     subscribeManualEvent.Set();
                 });
@@ -1262,7 +1263,7 @@ namespace PubNubMessaging.Tests
                 pubnub.HereNow().Channels(new[] { channel }).Async(new PNHereNowResultEx(
                                 (r, s) => {
                                     if (r == null) { return; }
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedHereNowMessage = true;
                                     hereNowManualEvent.Set();
                                 }));
@@ -1311,16 +1312,16 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
-                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, m) => { Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
                 (o, p) => {
                     subscribeManualEvent.Set();
                 },
                 (o, s) => {
-                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
                     if (s.StatusCode != 200 || s.Error)
                     {
                         receivedErrorMessage = true;
-                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                        if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
                     }
                     subscribeManualEvent.Set();
                 });
@@ -1386,7 +1387,7 @@ namespace PubNubMessaging.Tests
                                 .State(dicState)
                                 .Async(new PNSetStateResultExt(
                                 (r, s) => {
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     userStateManualEvent.Set();
                                 }));
                 userStateManualEvent.WaitOne(manualResetEventWaitTimeout);
@@ -1412,7 +1413,7 @@ namespace PubNubMessaging.Tests
                         .Async(new PNHereNowResultEx(
                                 (r, s) => {
                                     if (r == null) { return; }
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedHereNowMessage = true;
                                     hereNowManualEvent.Set();
                                 }));
@@ -1466,15 +1467,15 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
-                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, m) => { Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
                 (o, p) => {
                     subscribeManualEvent.Set();
                 },
                 (o, s) => {
-                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
                     if (s.StatusCode != 200 || s.Error)
                     {
-                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                        if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
                     }
                     subscribeManualEvent.Set();
                 });
@@ -1545,7 +1546,7 @@ namespace PubNubMessaging.Tests
             pubnub.HereNow().Async(new PNHereNowResultEx(
                                 (r, s) => {
                                     if (r == null) { return; }
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedHereNowMessage = true;
                                     hereNowManualEvent.Set();
                                 }));
@@ -1593,15 +1594,15 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
-                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, m) => { Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
                 (o, p) => {
                     subscribeManualEvent.Set();
                 },
                 (o, s) => {
-                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
                     if (s.StatusCode != 200 || s.Error)
                     {
-                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                        if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
                     }
                     subscribeManualEvent.Set();
                 });
@@ -1662,7 +1663,7 @@ namespace PubNubMessaging.Tests
                             .State(dicState)
                             .Async(new PNSetStateResultExt(
                                 (r, s) => {
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     userStateManualEvent.Set();
                                 }));
             userStateManualEvent.WaitOne(manualResetEventWaitTimeout);
@@ -1689,7 +1690,7 @@ namespace PubNubMessaging.Tests
                     .Async(new PNHereNowResultEx(
                                 (r, s) => {
                                     if (r == null) { return; }
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedHereNowMessage = true;
                                     hereNowManualEvent.Set();
                                 }));
@@ -1736,15 +1737,15 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
-                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, m) => { Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
                 (o, p) => {
                     subscribeManualEvent.Set();
                 },
                 (o, s) => {
-                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
                     if (s.StatusCode != 200 || s.Error)
                     {
-                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                        if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
                     }
                     subscribeManualEvent.Set();
                 });
@@ -1799,7 +1800,7 @@ namespace PubNubMessaging.Tests
             ManualResetEvent whereNowManualEvent = new ManualResetEvent(false);
             pubnub.WhereNow().Uuid(config.Uuid).Async(new PNWhereNowResultExt(
                                 (r, s) => {
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedWhereNowMessage = true;
                                     whereNowManualEvent.Set();
                                 }));
@@ -1867,7 +1868,7 @@ namespace PubNubMessaging.Tests
                             .State(dicState)
                             .Async(new PNSetStateResultExt(
                                 (r, s) => {
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedUserStateMessage = true;
                                     userStateManualEvent.Set();
                                 }));
@@ -1893,7 +1894,7 @@ namespace PubNubMessaging.Tests
                                 .Channels(new [] { channel })
                                 .Async(new PNGetStateResultExt(
                                 (r, s) => {
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedUserStateMessage = true;
                                     userStateManualEvent.Set();
                                 }));
@@ -1949,7 +1950,7 @@ namespace PubNubMessaging.Tests
                             .State(dicState)
                             .Async(new PNSetStateResultExt(
                                 (r, s) => {
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedUserStateMessage = true;
                                     userStateManualEvent.Set();
                                 }));
@@ -1979,7 +1980,7 @@ namespace PubNubMessaging.Tests
                                 .Channels(new [] { channel })
                                 .Async(new PNGetStateResultExt(
                                 (r, s) => {
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedUserStateMessage = true;
                                     userStateManualEvent.Set();
                                 }));
@@ -2015,7 +2016,7 @@ namespace PubNubMessaging.Tests
                                 .State(dicState)
                                 .Async(new PNSetStateResultExt(
                                 (r, s) => {
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedUserStateMessage = true;
                                     userStateManualEvent.Set();
                                 }));
@@ -2039,7 +2040,7 @@ namespace PubNubMessaging.Tests
                                 .Channels(new [] { channel })
                                 .Async(new PNGetStateResultExt(
                                 (r, s) => {
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedUserStateMessage = true;
                                     userStateManualEvent.Set();
                                 }));
@@ -2073,17 +2074,17 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent presenceManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
-                (o, m) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, m) => { Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
                 (o, p) => {
-                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(p));
+                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(p));
                     if (p.Event == "join") { receivedPresenceMessage = true; }
                     presenceManualEvent.Set();
                 },
                 (o, s) => {
-                    Console.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
                     if (s.StatusCode != 200 || s.Error)
                     {
-                        if (s.ErrorData != null) { Console.WriteLine(s.ErrorData.Information); }
+                        if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
                         presenceManualEvent.Set();
                     }
                 });

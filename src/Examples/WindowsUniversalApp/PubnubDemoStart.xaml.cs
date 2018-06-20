@@ -31,14 +31,12 @@ namespace WindowsUniversalApp
         {
             PubnubConfigData data = new PubnubConfigData();
             data.ssl = chkSSL.IsChecked.Value;
-            //data.resumeOnReconnect = chkReconnect.IsChecked.Value;
             data.publishKey = txtPublishKey.Text.Trim();
             data.subscribeKey = txtSubscribeKey.Text.Trim();
             data.cipherKey = txtCipherKey.Text.Trim();
             data.secretKey = txtSecretKey.Text.Trim();
             data.sessionUUID = txtSessionUUID.Text.Trim();
             data.origin = txtOrigin.Text.Trim();
-            //data.hideErrorCallbackMessages = chkHideErrors.IsChecked.Value;
 
             var frame = new Frame();
             frame.Navigate(typeof(PubnubTimeoutSettings), data);

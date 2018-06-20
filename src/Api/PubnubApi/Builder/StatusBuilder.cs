@@ -17,7 +17,7 @@ namespace PubnubApi
             jsonLibrary = jsonPluggableLibrary;
         }
 
-        public PNStatus CreateStatusResponse<T>(PNOperationType type, PNStatusCategory category, RequestState<T> asyncRequestState, int statusCode, Exception throwable)
+        public PNStatus CreateStatusResponse<T>(PNOperationType type, PNStatusCategory category, RequestState<T> asyncRequestState, int statusCode, PNException throwable)
         {
             int serverErrorStatusCode = 0;
             bool serverErrorMessage = false;
@@ -33,16 +33,29 @@ namespace PubnubApi
                 status.Error = true;
             }
 
+            Exception targetException = null;
             if (throwable != null)
             {
-                if (throwable.InnerException != null)
+                if (throwable.DirectException)
                 {
-                    PNErrorData errorData = new PNErrorData(jsonLibrary.SerializeToJsonString(throwable.InnerException.Message), throwable);
+                    targetException = throwable.InnerException;
+                }
+                else
+                {
+                    targetException = throwable as Exception;
+                }
+            }
+
+            if (targetException != null)
+            {
+                if (targetException.InnerException != null)
+                {
+                    PNErrorData errorData = new PNErrorData(jsonLibrary.SerializeToJsonString(targetException.InnerException.Message), targetException);
                     status.ErrorData = errorData;
                 }
                 else
                 {
-                    Dictionary<string, object> deserializeStatus = jsonLibrary.DeserializeToDictionaryOfObject(throwable.Message);
+                    Dictionary<string, object> deserializeStatus = jsonLibrary.DeserializeToDictionaryOfObject(targetException.Message);
                     if (deserializeStatus != null && deserializeStatus.Count >= 1 
                         && deserializeStatus.ContainsKey("error") && string.Equals(deserializeStatus["error"].ToString(), "true", StringComparison.CurrentCultureIgnoreCase)
                         && deserializeStatus.ContainsKey("status") && Int32.TryParse(deserializeStatus["status"].ToString(), out serverErrorStatusCode))
@@ -74,7 +87,7 @@ namespace PubnubApi
                         }
                     }
 
-                    PNErrorData errorData = new PNErrorData(jsonLibrary.SerializeToJsonString(throwable.Message), throwable);
+                    PNErrorData errorData = new PNErrorData(jsonLibrary.SerializeToJsonString(targetException.Message), targetException);
                     status.ErrorData = errorData;
                 }
             }

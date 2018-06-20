@@ -5,7 +5,6 @@ using System.Linq;
 
 using Foundation;
 using UIKit;
-//using MonoTouch.Dialog;
 using PubnubApi;
 using System.Threading;
 using System.Diagnostics;
@@ -135,7 +134,6 @@ namespace PubnubMessagingExample
 
 
             //needle
-            //double percentFromMaxValue = max / 100.0d;
             max = 1000;
             double percentFromMaxValue = max / 100.0d;
 
@@ -145,11 +143,7 @@ namespace PubnubMessagingExample
 
             //angle
             double invertLag = ((max - min) / 2 - lag) * 2 + lag;
-            //Debug.WriteLine("lag: "+ lag.ToString() + " invlag:" + invLag.ToString());
             double angle = 360 - Math.Round ((double)invertLag / percentFromMaxValue * (90 / 100.0f)) * Math.PI / 180.0;
-            //double angle2  = 360 - Math.Round((double)lag / percentFromMaxValue* (90 / 100.0f)) * Math.PI / 180.0;;
-            //Debug.WriteLine("lagangle: "+ angle.ToString() + " invLagangle" + angle2.ToString());
-            //double angle = WrapValue(lag, max);
             
             float distance = 80;
             CGPoint p = new CGPoint (distance * (float)Math.Cos (angle), distance * (float)Math.Sin (angle));
@@ -193,7 +187,6 @@ namespace PubnubMessagingExample
 
             //small circle
             UIColor.FromRGB (220, 214, 194).SetColor ();
-            //ctx.AddArc (x, y+y*.33f, r/1.5f, 0, twopi, true );
             ctx.AddArc (x, y + r / 2f, r / 2f, 0, twopi, true);
             ctx.FillPath ();
             

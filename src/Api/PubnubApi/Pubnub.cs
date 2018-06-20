@@ -17,7 +17,7 @@ namespace PubnubApi
 
         private readonly string instanceId;
 
-        private static string sdkVersion = "PubNubCSharp4.0.17.0";
+        private static string sdkVersion = "PubNubCSharp4.0.18.0";
 
         private object savedSubscribeOperation;
         private readonly string savedSdkVerion;
@@ -327,7 +327,7 @@ namespace PubnubApi
 
             if (pubnubConfig == null || string.IsNullOrEmpty(pubnubConfig.CipherKey))
             {
-                throw new Exception("CipherKey missing");
+                throw new ArgumentException("CipherKey missing");
             }
 
             PubnubCrypto pc = new PubnubCrypto(pubnubConfig.CipherKey);

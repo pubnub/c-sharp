@@ -57,7 +57,7 @@ namespace PubnubApi
                             decryptMessage = "**DECRYPT ERROR**";
 
                             PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(ex);
-                            PNStatus status = new StatusBuilder(config, jsonLib).CreateStatusResponse<T>(PNOperationType.PNHistoryOperation, category, null, (int)HttpStatusCode.NotFound, ex);
+                            PNStatus status = new StatusBuilder(config, jsonLib).CreateStatusResponse<T>(PNOperationType.PNHistoryOperation, category, null, (int)HttpStatusCode.NotFound, new PNException(ex));
                             status.AffectedChannels.AddRange(channels);
                             status.AffectedChannelGroups.AddRange(channelGroups);
 

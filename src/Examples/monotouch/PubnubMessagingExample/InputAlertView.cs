@@ -85,7 +85,6 @@ namespace PubnubMessagingExample
             this.fInitialHeight = this.Bounds.Height;
             // Increase height of the alert view to have space for the textfield.
             this.AddSubview (this.oTxtInput);
-            //this.Superview.SetNeedsLayout (  );
             this.SetNeedsLayout ();
             this.fInitialY = this.Frame.Y;
         }

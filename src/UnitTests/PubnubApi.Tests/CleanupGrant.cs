@@ -4,6 +4,7 @@ using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
 using MockServer;
+using System.Diagnostics;
 
 namespace PubNubMessaging.Tests
 {
@@ -40,35 +41,35 @@ namespace PubNubMessaging.Tests
                 pubnub.Audit().Async(new PNAccessManagerAuditResultExt((r,s)=> {
                     try
                     {
-                        Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
+                        Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
 
                         if (r != null)
                         {
-                            Console.WriteLine("PNAccessManagerAuditResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                            Debug.WriteLine("PNAccessManagerAuditResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                             if (s.StatusCode == 200 && s.Error == false)
                             {
                                 if (!String.IsNullOrEmpty(r.Channel))
                                 {
                                     var channels = r.Channel.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                                    Console.WriteLine("CleanupGrant / AtUserLevel / UserCallbackForCleanUpAccess - Channel Count = {0}", channels.Length);
+                                    Debug.WriteLine("CleanupGrant / AtUserLevel / UserCallbackForCleanUpAccess - Channel Count = {0}", channels.Length);
                                     foreach (string channelName in channels)
                                     {
                                         if (r.AuthKeys != null)
                                         {
                                             foreach (string authKey in r.AuthKeys.Keys)
                                             {
-                                                Console.WriteLine("Auth Key = " + authKey);
+                                                Debug.WriteLine("Auth Key = " + authKey);
                                                 ManualResetEvent revokeManualEvent = new ManualResetEvent(false);
                                                 pubnub.Grant().Channels(new[] { channelName }).AuthKeys(new[] { authKey }).Read(false).Write(false).Manage(false)
                                                 .Async(new PNAccessManagerGrantResultExt((r1,s1)=> 
                                                 {
                                                     try
                                                     {
-                                                        Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s1));
+                                                        Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s1));
 
                                                         if (r1 != null)
                                                         {
-                                                            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r1));
+                                                            Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r1));
                                                         }
                                                     }
                                                     catch {  /* ignore */ }
@@ -136,35 +137,35 @@ namespace PubNubMessaging.Tests
                 pubnub.Audit().Async(new PNAccessManagerAuditResultExt((r, s) => {
                     try
                     {
-                        Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
+                        Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
 
                         if (r != null)
                         {
-                            Console.WriteLine("PNAccessManagerAuditResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                            Debug.WriteLine("PNAccessManagerAuditResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                             if (s.StatusCode == 200 && s.Error == false)
                             {
                                 if (!String.IsNullOrEmpty(r.Channel))
                                 {
                                     var channels = r.Channel.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                                    Console.WriteLine("CleanupGrant / AtUserLevel / UserCallbackForCleanUpAccess - Channel Count = {0}", channels.Length);
+                                    Debug.WriteLine("CleanupGrant / AtUserLevel / UserCallbackForCleanUpAccess - Channel Count = {0}", channels.Length);
                                     foreach (string channelName in channels)
                                     {
                                         if (r.AuthKeys != null)
                                         {
                                             foreach (string authKey in r.AuthKeys.Keys)
                                             {
-                                                Console.WriteLine("Auth Key = " + authKey);
+                                                Debug.WriteLine("Auth Key = " + authKey);
                                                 ManualResetEvent revokeManualEvent = new ManualResetEvent(false);
                                                 pubnub.Grant().Channels(new[] { channelName }).AuthKeys(new[] { authKey }).Read(false).Write(false).Manage(false)
                                                 .Async(new PNAccessManagerGrantResultExt((r1, s1) =>
                                                 {
                                                     try
                                                     {
-                                                        Console.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s1));
+                                                        Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s1));
 
                                                         if (r1 != null)
                                                         {
-                                                            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r1));
+                                                            Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r1));
                                                         }
                                                     }
                                                     catch {  /* ignore */ }
