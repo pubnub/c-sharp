@@ -97,19 +97,21 @@ namespace PubnubApi.EndPoint
 
             List<string> channelList = new List<string>();
             List<string> channelGroupList = new List<string>();
+            string[] filteredChannels = channels;
+            string[] filteredChannelGroups = channelGroups;
 
             if (channels != null && channels.Length > 0)
             {
                 channelList = new List<string>(channels);
                 channelList = channelList.Where(ch => !string.IsNullOrEmpty(ch) && ch.Trim().Length > 0).Distinct<string>().ToList();
-                channels = channelList.ToArray();
+                filteredChannels = channelList.ToArray();
             }
 
             if (channelGroups != null && channelGroups.Length > 0)
             {
                 channelGroupList = new List<string>(channelGroups);
                 channelGroupList = channelGroupList.Where(cg => !string.IsNullOrEmpty(cg) && cg.Trim().Length > 0).Distinct<string>().ToList();
-                channelGroups = channelGroupList.ToArray();
+                filteredChannelGroups = channelGroupList.ToArray();
             }
 
             if (!jsonLibrary.IsDictionaryCompatible(jsonUserState, PNOperationType.PNSetStateOperation))
@@ -168,7 +170,7 @@ namespace PubnubApi.EndPoint
                 }
             }
 
-            SharedSetUserState(channels, channelGroups, uuid, jsonUserState, jsonUserState, externalQueryParam, callback);
+            SharedSetUserState(filteredChannels, filteredChannelGroups, uuid, jsonUserState, jsonUserState, externalQueryParam, callback);
         }
 
         internal void SetUserState(string[] channels, string[] channelGroups, string uuid, KeyValuePair<string, object> keyValuePair, Dictionary<string, object> externalQueryParam, PNCallback<PNSetStateResult> callback)
@@ -292,6 +294,7 @@ namespace PubnubApi.EndPoint
         {
             List<string> channelList = new List<string>();
             List<string> channelGroupList = new List<string>();
+            string currentUuid = uuid;
 
             if (channels != null && channels.Length > 0)
             {
@@ -312,7 +315,7 @@ namespace PubnubApi.EndPoint
 
             if (string.IsNullOrEmpty(uuid))
             {
-                uuid = config.Uuid;
+                currentUuid = config.Uuid;
             }
 
             Dictionary<string, object> deserializeChannelUserState = jsonLibrary.DeserializeToDictionaryOfObject(jsonChannelUserState);
@@ -336,17 +339,13 @@ namespace PubnubApi.EndPoint
 
             string jsonUserState = "{}";
 
-            if (jsonChannelUserState == jsonChannelGroupUserState)
+            if ((jsonChannelUserState == jsonChannelGroupUserState) || (jsonChannelUserState != "{}" && jsonChannelGroupUserState == "{}"))
             {
                 jsonUserState = jsonChannelUserState;
             }
             else if (jsonChannelUserState == "{}" && jsonChannelGroupUserState != "{}")
             {
                 jsonUserState = jsonChannelGroupUserState;
-            }
-            else if (jsonChannelUserState != "{}" && jsonChannelGroupUserState == "{}")
-            {
-                jsonUserState = jsonChannelUserState;
             }
             else if (jsonChannelUserState != "{}" && jsonChannelGroupUserState != "{}")
             {
@@ -382,7 +381,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildSetUserStateRequest(commaDelimitedChannels, commaDelimitedChannelGroups, uuid, jsonUserState, externalQueryParam);
+            Uri request = urlBuilder.BuildSetUserStateRequest(commaDelimitedChannels, commaDelimitedChannelGroups, currentUuid, jsonUserState, externalQueryParam);
 
             RequestState<PNSetStateResult> requestState = new RequestState<PNSetStateResult>();
             requestState.Channels = channels;
@@ -538,7 +537,7 @@ namespace PubnubApi.EndPoint
 
             if (jsonStateBuilder.Length > 0)
             {
-                retJsonUserState = string.Format("{{{0}}}", jsonStateBuilder.ToString());
+                retJsonUserState = string.Format("{{{0}}}", jsonStateBuilder);
             }
 
             return retJsonUserState;

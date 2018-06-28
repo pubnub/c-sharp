@@ -21,7 +21,7 @@ namespace PubnubApi.EndPoint
         private string channelName = "";
         private bool httpPost;
         private Dictionary<string, object> userMetadata;
-        private int ttl = -1;
+        private readonly int ttl = -1;
         private PNCallback<PNPublishResult> savedCallback;
         private bool syncRequest;
         private Dictionary<string, object> queryParam;
