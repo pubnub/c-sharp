@@ -211,7 +211,7 @@ namespace PubNubMessaging.Tests
                             {
                                 if (!String.IsNullOrEmpty(result.Channel))
                                 {
-                                    var channels = result.Channel.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                                    var channels = result.Channel.Split(new [] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                                     Debug.WriteLine("{0} - AccessToSubKeyLevelCallback - Audit Count = {1}", currentUnitTestCase, channels.Length);
                                 }
 
@@ -224,7 +224,7 @@ namespace PubNubMessaging.Tests
                             {
                                 if (!String.IsNullOrEmpty(result.Channel))
                                 {
-                                    var channels = result.Channel.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                                    var channels = result.Channel.Split(new [] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                                     Debug.WriteLine("{0} - AccessToChannelLevelCallback - Audit Channel Count = {1}", currentUnitTestCase, channels.Length);
                                 }
                                 if (result.Level.Contains("channel"))
@@ -236,7 +236,7 @@ namespace PubNubMessaging.Tests
                             {
                                 if (!String.IsNullOrEmpty(result.ChannelGroup))
                                 {
-                                    var channelgroups = result.ChannelGroup.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                                    var channelgroups = result.ChannelGroup.Split(new [] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                                     Debug.WriteLine("{0} - AccessToChannelLevelCallback - Audit ChannelGroup Count = {1}", currentUnitTestCase, channelgroups.Length);
                                 }
                                 if (result.Level.Contains("channel-group"))
@@ -247,9 +247,7 @@ namespace PubNubMessaging.Tests
                         }
                     }
                 }
-                catch
-                {
-                }
+                catch { /* empty */ }
                 finally
                 {
                     auditManualEvent.Set();

@@ -14,8 +14,8 @@ namespace PubNubMessaging.Tests
         private static ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
         private static ManualResetEvent grantManualEvent = new ManualResetEvent(false);
 
-        private static bool receivedMessage = false;
-        private static bool receivedGrantMessage = false;
+        private static bool receivedMessage;
+        private static bool receivedGrantMessage;
 
         private static int manualResetEventWaitTimeout = 310 * 1000;
         private static string channel = "hello_my_channel";
@@ -112,7 +112,7 @@ namespace PubNubMessaging.Tests
             pubnub = createPubNubInstance(config);
             pubnub.AddListener(listenerSubCallack);
 
-            string channel = "hello_my_channel";
+            string currentChannelName = "hello_my_channel";
             manualResetEventWaitTimeout = 310 * 1000;
 
             subscribeManualEvent = new ManualResetEvent(false);
@@ -121,7 +121,7 @@ namespace PubNubMessaging.Tests
 
             server.AddRequest(new Request()
                     .WithMethod("GET")
-                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, channel))
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, currentChannelName))
                     .WithParameter("auth", config.AuthKey)
                     .WithParameter("heartbeat", "300")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
@@ -135,11 +135,11 @@ namespace PubNubMessaging.Tests
 
             server.AddRequest(new Request()
                     .WithMethod("GET")
-                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, channel))
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, currentChannelName))
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
+            pubnub.Subscribe<string>().Channels(new [] { currentChannelName }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
             if (receivedMessage)
@@ -153,11 +153,11 @@ namespace PubNubMessaging.Tests
 
                 server.AddRequest(new Request()
                         .WithMethod("GET")
-                        .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/leave", PubnubCommon.SubscribeKey, channel))
+                        .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/leave", PubnubCommon.SubscribeKey, currentChannelName))
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
+                pubnub.Unsubscribe<string>().Channels(new [] { currentChannelName }).Execute();
                 subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
             }
 
@@ -199,9 +199,7 @@ namespace PubNubMessaging.Tests
                         }
                     }
                 }
-                catch
-                {
-                }
+                catch { /* empty */  }
                 finally
                 {
                     grantManualEvent.Set();
