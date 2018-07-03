@@ -122,19 +122,6 @@ namespace PubnubApi.EndPoint
 
             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, requested subscribe for channel(s)={1} and channel group(s)={2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), channel, channelGroup), config.LogVerbosity);
 
-            string[] arrayChannel = new string[] { };
-            string[] arrayChannelGroup = new string[] { };
-
-            if (!string.IsNullOrEmpty(channel) && channel.Trim().Length > 0)
-            {
-                arrayChannel = channel.Trim().Split(',');
-            }
-
-            if (!string.IsNullOrEmpty(channelGroup) && channelGroup.Trim().Length > 0)
-            {
-                arrayChannelGroup = channelGroup.Trim().Split(',');
-            }
-
             Dictionary<string, string> initialSubscribeUrlParams = new Dictionary<string, string>();
             if (this.subscribeTimetoken >= 0)
             {
@@ -144,7 +131,6 @@ namespace PubnubApi.EndPoint
             {
                 initialSubscribeUrlParams.Add("filter-expr", new UriUtil().EncodeUriComponent(config.FilterExpression, PNOperationType.PNSubscribeOperation, false, false, false));
             }
-
 
             Task.Factory.StartNew(() =>
             {

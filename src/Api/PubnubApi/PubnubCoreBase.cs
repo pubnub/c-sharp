@@ -442,16 +442,17 @@ namespace PubnubApi
 
                                         foreach (string metaKey in ttPublishMetaData.Keys)
                                         {
-                                            switch (metaKey.ToLowerInvariant())
+                                            string currentMetaKey = metaKey.ToLowerInvariant();
+                                            
+                                            if (currentMetaKey.Equals("t", StringComparison.OrdinalIgnoreCase))
                                             {
-                                                case "t":
-                                                    long timetoken;
-                                                    Int64.TryParse(ttPublishMetaData[metaKey].ToString(), out timetoken);
-                                                    ttMeta.Timetoken = timetoken;
-                                                    break;
-                                                case "r":
-                                                    ttMeta.Region = ttPublishMetaData[metaKey].ToString();
-                                                    break;
+                                                long timetoken;
+                                                Int64.TryParse(ttPublishMetaData[metaKey].ToString(), out timetoken);
+                                                ttMeta.Timetoken = timetoken;
+                                            }
+                                            else if (currentMetaKey.Equals("r", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                ttMeta.Region = ttPublishMetaData[metaKey].ToString();
                                             }
                                         }
                                         msg.PublishTimetokenMetadata = ttMeta;
