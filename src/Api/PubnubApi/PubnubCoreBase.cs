@@ -59,11 +59,11 @@ namespace PubnubApi
         private static bool clientNetworkStatusInternetStatus = true;
         protected static ConcurrentDictionary<string, bool> SubscribeDisconnected { get; set; } = new ConcurrentDictionary<string, bool>();
 
-        protected static Pubnub PubnubInstance { get; set; }
+        protected Pubnub PubnubInstance { get; set; }
 
-        protected static bool UuidChanged { get; set; }
+        protected bool UuidChanged { get; set; }
 
-        protected static string CurrentUuid { get; set; }
+        protected string CurrentUuid { get; set; }
 
         protected static ConcurrentDictionary<string, long> LastSubscribeTimetoken { get; set; } = new ConcurrentDictionary<string, long>();
 
@@ -164,13 +164,12 @@ namespace PubnubApi
             }
         }
 
-        private static void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance)
+        private void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance)
         {
             PubnubInstance = instance;
             pubnubConfig.AddOrUpdate(instance.InstanceId, pubnubConfiguation, (k,o)=> pubnubConfiguation);
             jsonLib = jsonPluggableLibrary;
             unitTest = pubnubUnitTest;
-            PubnubInstance = instance;
             pubnubLog.AddOrUpdate(instance.InstanceId, log, (k, o) => log);
             pubnubTelemetryMgr = telemetryManager;
             pubnubSubscribeDuplicationManager = new EndPoint.DuplicationManager(pubnubConfiguation, jsonPluggableLibrary, log);
@@ -294,7 +293,7 @@ namespace PubnubApi
 
 #region "Callbacks"
 
-        protected static bool CheckInternetConnectionStatus<T>(bool systemActive, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
+        protected bool CheckInternetConnectionStatus<T>(bool systemActive, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
         {
             PNConfiguration currentConfig;
             IPubnubLog currentLog;
@@ -442,16 +441,17 @@ namespace PubnubApi
 
                                         foreach (string metaKey in ttPublishMetaData.Keys)
                                         {
-                                            switch (metaKey.ToLowerInvariant())
+                                            string currentMetaKey = metaKey.ToLowerInvariant();
+                                            
+                                            if (currentMetaKey.Equals("t", StringComparison.OrdinalIgnoreCase))
                                             {
-                                                case "t":
-                                                    long timetoken;
-                                                    Int64.TryParse(ttPublishMetaData[metaKey].ToString(), out timetoken);
-                                                    ttMeta.Timetoken = timetoken;
-                                                    break;
-                                                case "r":
-                                                    ttMeta.Region = ttPublishMetaData[metaKey].ToString();
-                                                    break;
+                                                long timetoken;
+                                                Int64.TryParse(ttPublishMetaData[metaKey].ToString(), out timetoken);
+                                                ttMeta.Timetoken = timetoken;
+                                            }
+                                            else if (currentMetaKey.Equals("r", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                ttMeta.Region = ttPublishMetaData[metaKey].ToString();
                                             }
                                         }
                                         msg.PublishTimetokenMetadata = ttMeta;
@@ -472,7 +472,7 @@ namespace PubnubApi
             return msgList;
         }
 
-        private static bool IsTargetForDedup(SubscribeMessage message)
+        private bool IsTargetForDedup(SubscribeMessage message)
         {
             bool isTargetOfDedup = false;
             PNConfiguration currentConfig;
@@ -1643,7 +1643,7 @@ namespace PubnubApi
             }
         }
 
-        protected static void UpdatePubnubNetworkTcpCheckIntervalInSeconds()
+        protected void UpdatePubnubNetworkTcpCheckIntervalInSeconds()
         {
             int timerInterval;
             PNConfiguration currentConfig;

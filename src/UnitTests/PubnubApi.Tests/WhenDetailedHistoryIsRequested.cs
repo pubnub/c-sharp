@@ -380,7 +380,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
 
-            string expected = expected = "[[\"Pubnub Messaging API 1\",\"Pubnub Messaging API 2\",\"Pubnub Messaging API 3\",\"Pubnub Messaging API 4\",\"Pubnub Messaging API 5\",\"Pubnub Messaging API 6\",\"Pubnub Messaging API 7\",\"Pubnub Messaging API 8\",\"Pubnub Messaging API 9\",\"Pubnub Messaging API 10\"],14715432709547189,14715432709547189]";
+            string expected = "[[\"Pubnub Messaging API 1\",\"Pubnub Messaging API 2\",\"Pubnub Messaging API 3\",\"Pubnub Messaging API 4\",\"Pubnub Messaging API 5\",\"Pubnub Messaging API 6\",\"Pubnub Messaging API 7\",\"Pubnub Messaging API 8\",\"Pubnub Messaging API 9\",\"Pubnub Messaging API 10\"],14715432709547189,14715432709547189]";
 
             server.AddRequest(new Request()
                     .WithMethod("GET")
@@ -1259,7 +1259,7 @@ namespace PubNubMessaging.Tests
                 else
                 {
                     Debug.WriteLine("DetailedHistory with start & reverse = false");
-                    expected = expected = "[[5.1,6.1,7.1,8.1,9.1],14715432709547189,14715432709547189]";
+                    expected = "[[5.1,6.1,7.1,8.1,9.1],14715432709547189,14715432709547189]";
 
                     server.AddRequest(new Request()
                             .WithMethod("GET")

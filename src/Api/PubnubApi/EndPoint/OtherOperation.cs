@@ -102,7 +102,7 @@ namespace PubnubApi.EndPoint
         {
             try
             {
-                double timeStamp = unixNanoSecondTime / 10000000;
+                double timeStamp = (double)unixNanoSecondTime / 10000000;
                 DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(timeStamp);
                 return dateTime;
             }
@@ -116,11 +116,11 @@ namespace PubnubApi.EndPoint
         {
             long numericTime;
             bool tried = Int64.TryParse(unixNanoSecondTime, out numericTime);
-            if (tried)
+            if (tried && numericTime != 0)
             {
                 try
                 {
-                    double timeStamp = numericTime / 10000000;
+                    double timeStamp = (double)numericTime / 10000000;
                     DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(timeStamp);
                     return dateTime;
                 }

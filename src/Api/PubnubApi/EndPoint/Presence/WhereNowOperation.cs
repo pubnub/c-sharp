@@ -63,7 +63,7 @@ namespace PubnubApi.EndPoint
         {
             if (jsonLibrary == null)
             {
-                throw new NullReferenceException("Missing Json Pluggable Library for Pubnub Instance");
+                throw new MissingMemberException("Missing Json Pluggable Library for Pubnub Instance");
             }
 
             if (string.IsNullOrEmpty(uuid))
