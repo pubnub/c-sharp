@@ -67,12 +67,23 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNPublishResult> callback)
         {
+#if NET35 || NET40 || NET45 || NET461
+            new System.Threading.Thread(() =>
+            {
+                syncRequest = false;
+                this.savedCallback = callback;
+                Fire(this.channelName, this.msg, false, this.ttl, this.userMetadata, this.queryParam, callback);
+            })
+            { IsBackground = true }.Start();
+#else
             Task.Factory.StartNew(() =>
             {
                 syncRequest = false;
                 this.savedCallback = callback;
                 Fire(this.channelName, this.msg, false, this.ttl, this.userMetadata, this.queryParam, callback);
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default);
+
+#endif
         }
 
         public PNPublishResult Sync()
@@ -94,13 +105,24 @@ namespace PubnubApi.EndPoint
 
         internal void Retry()
         {
+#if NET35 || NET40 || NET45 || NET461
+            new System.Threading.Thread(() =>
+            {
+                if (!syncRequest)
+                {
+                    Fire(this.channelName, this.msg, false, this.ttl, this.userMetadata, this.queryParam, savedCallback);
+                }
+            })
+            { IsBackground = true }.Start();
+#else
             Task.Factory.StartNew(() =>
             {
                 if (!syncRequest)
                 {
                     Fire(this.channelName, this.msg, false, this.ttl, this.userMetadata, this.queryParam, savedCallback);
                 }
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default);
+#endif
         }
 
         private void Fire(string channel, object message, bool storeInHistory, int ttl, Dictionary<string, object> metaData, Dictionary<string, object> externalQueryParam, PNCallback<PNPublishResult> callback)

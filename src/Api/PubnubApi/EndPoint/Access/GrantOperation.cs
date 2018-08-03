@@ -86,19 +86,36 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNAccessManagerGrantResult> callback)
         {
+#if NET35 || NET40 || NET45 || NET461
+            new System.Threading.Thread(() =>
+            {
+                this.savedCallback = callback;
+                GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, this.queryParam, callback);
+            })
+            { IsBackground = true }.Start();
+#else
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
                 GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, this.queryParam, callback);
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default);
+#endif
         }
 
         internal void Retry()
         {
+#if NET35 || NET40 || NET45 || NET461
+            new System.Threading.Thread(() =>
+            {
+                GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, this.queryParam, savedCallback);
+            })
+            { IsBackground = true }.Start();
+#else
             Task.Factory.StartNew(() =>
             {
                 GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, this.queryParam, savedCallback);
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default);
+#endif
         }
 
         internal void GrantAccess(string[] channels, string[] channelGroups, string[] authKeys, bool read, bool write, bool manage, long ttl, Dictionary<string, object> externalQueryParam, PNCallback<PNAccessManagerGrantResult> callback)
