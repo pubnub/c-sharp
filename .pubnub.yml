@@ -1,8 +1,15 @@
 name: c-sharp
-version: "4.0.19.0"
+version: "4.0.20.0"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
+  - version: 4.0.20.0
+    date: Aug 06, 2018
+    changes:
+      - type: Improvement
+        text: Refactored code to publish multiple emoji characters
+      - type: Improvement
+        text: Refactored code to improve performance of Publish/Fire/Grant/Subscribe/Unsubscribe requests targeting .net framework
   - version: 4.0.19.0
     date: Jul 12, 2018
     changes:
@@ -304,7 +311,7 @@ features:
     - SUBSCRIBE-PUBLISHER-UUID
 supported-platforms:
   - 
-    version: Pubnub 'C#' 4.0.19.0
+    version: Pubnub 'C#' 4.0.20.0
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
@@ -312,9 +319,9 @@ supported-platforms:
       - .Net Framework 3.5
       - .Net Framework 4.0
       - .Net Framework 4.5
-      - .Net Framework 4.6.1
+      - .Net Framework 4.6.1+
   - 
-    version: PubnubPCL 'C#' 4.0.19.0
+    version: PubnubPCL 'C#' 4.0.20.0
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -326,7 +333,7 @@ supported-platforms:
       - Mono 4.8.0
       - PCL Profile 111
   - 
-    version: PubnubUWP 'C#' 4.0.19.0
+    version: PubnubUWP 'C#' 4.0.20.0
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
