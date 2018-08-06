@@ -35,12 +35,22 @@ namespace PubnubApi.EndPoint
 
         private void UnsubscribeAll()
         {
+#if NET35 || NET40 || NET45 || NET461
+            new System.Threading.Thread(() =>
+            {
+                SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, PubnubInstance);
+                manager.CurrentPubnubInstance(PubnubInstance);
+                manager.MultiChannelUnSubscribeAll<T>(PNOperationType.PNUnsubscribeOperation, this.queryParam);
+            })
+            { IsBackground = true }.Start();
+#else
             Task.Factory.StartNew(() =>
             {
                 SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, PubnubInstance);
                 manager.CurrentPubnubInstance(PubnubInstance);
                 manager.MultiChannelUnSubscribeAll<T>(PNOperationType.PNUnsubscribeOperation, this.queryParam);
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default);
+#endif
         }
 
         internal void CurrentPubnubInstance(Pubnub instance)

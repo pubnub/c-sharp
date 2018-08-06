@@ -13,8 +13,9 @@ namespace PubnubApi
             string encodedUri = "";
             bool prevSurroagePair = false;
             StringBuilder o = new StringBuilder();
-            foreach (char ch in s)
+            for (int index = 0; index < s.Length; index++)
             {
+                char ch = s[index];
                 if (prevSurroagePair)
                 {
                     prevSurroagePair = false;
@@ -29,7 +30,7 @@ namespace PubnubApi
                 }
                 else
                 {
-                    int positionOfChar = s.IndexOf(ch);
+                    int positionOfChar = index;
                     if ((ch == ',' && ignoreComma) || (ch == ':' && ignoreColon))
                     {
                         o.Append(ch.ToString());
