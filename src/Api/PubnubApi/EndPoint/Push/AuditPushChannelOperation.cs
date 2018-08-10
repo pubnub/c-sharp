@@ -49,19 +49,36 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNPushListProvisionsResult> callback)
         {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
                 GetChannelsForDevice(this.pubnubPushType, this.deviceTokenId, this.queryParam, callback);
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+#else
+            new Thread(() =>
+            {
+                this.savedCallback = callback;
+                GetChannelsForDevice(this.pubnubPushType, this.deviceTokenId, this.queryParam, callback);
+            })
+            { IsBackground = true }.Start();
+#endif
         }
 
         internal void Retry()
         {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
                 GetChannelsForDevice(this.pubnubPushType, this.deviceTokenId, this.queryParam, savedCallback);
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+#else
+            new Thread(() =>
+            {
+                GetChannelsForDevice(this.pubnubPushType, this.deviceTokenId, this.queryParam, savedCallback);
+            })
+            { IsBackground = true }.Start();
+#endif
         }
 
         internal void GetChannelsForDevice(PNPushType pushType, string pushToken, Dictionary<string, object> externalQueryParam, PNCallback<PNPushListProvisionsResult> callback)

@@ -28,8 +28,6 @@ namespace PubnubApi
                         LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = NETFX_CORE", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
 #elif WINDOWS_UWP
                         LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = WINDOWS_UWP", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-#elif PORTABLE111
-                        LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = PORTABLE111", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
 #elif NET35
                         LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = NET35", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
 #elif NET40

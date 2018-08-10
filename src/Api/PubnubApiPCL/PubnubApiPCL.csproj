@@ -22,8 +22,7 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Refactored code to publish multiple emoji characters.
-Refactored code to improve performance of Publish/Fire/Grant/Subscribe/Unsubscribe requests targeting .net framework.</PackageReleaseNotes>
+    <PackageReleaseNotes>Refactored code to improve performance of calls.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -45,35 +44,6 @@ Refactored code to improve performance of Publish/Fire/Grant/Subscribe/Unsubscri
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   
-  <!--<PropertyGroup>
-    <Description>PubNub allows you to securely connect mobile phones, tablets, laptops, desktops and other clients outside of your cloud. PubNub provides the connectivity from your cloud to push data to end clients (phones, tablets, laptops and servers). This is called Real-time Data Push, or Push Notifications. PubNub removes the need for your client apps to constantly poll your cloud for new updates. So you can push data from a Server to a Client. And also you may push data from one Server to another Server, just like Azure ServiceBus ESB. Another option is available for a Mobile Phone to Push Data to another Mobile Phone or any endpoint. With PubNub this becomes easy using the two basic Publish/Subscribe APIs. Additionally PubNub provides automatic Broadcasting. When multiple clients/servers/phones are subscribed to a single channel, each endpoint receives a published message simultaneously.</Description>
-    <Copyright>PubNub 2012-2018</Copyright>
-    <AssemblyTitle>PubNub C# .NET - Web Data Push API</AssemblyTitle>
-    <VersionPrefix>4.0.2.2</VersionPrefix>
-    <Authors>Pandu Masabathula</Authors>
-    <TargetFrameworks>netstandard1.0;portable45-net45+win8+wpa81;netstandard1.3;netstandard1.4</TargetFrameworks>
-    <AssemblyName>PubnubPCL</AssemblyName>
-    <AssemblyOriginatorKeyFile>pubnub.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>PubnubApiPCL</PackageId>
-    <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
-    <PackageReleaseNotes>code refactor to fix subscribe timeout and reconnect</PackageReleaseNotes>
-    <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
-    <PackageLicenseUrl>http://www.pubnub.com/terms</PackageLicenseUrl>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.0' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
-    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.0' ">1.6.0</NetStandardImplicitPackageVersion>
-    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'portable45-net45+win8+wpa81' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
-    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.3' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
-    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.0</NetStandardImplicitPackageVersion>
-    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.4' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
-    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.4' ">1.6.0</NetStandardImplicitPackageVersion>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-  </PropertyGroup>-->
 
   <ItemGroup>
     <Compile Include="..\PubnubApi\Builder\ResponseBuilder.cs">
@@ -450,17 +420,13 @@ Refactored code to improve performance of Publish/Fire/Grant/Subscribe/Unsubscri
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <!--<ItemGroup>
-    <Compile Include="..\PubnubApi\*.cs;..\PubnubApi\Builder\*.cs;..\PubnubApi\Callbacks\*.cs;..\PubnubApi\EndPoint\*.cs;..\PubnubApi\EndPoint\*\*.cs;..\PubnubApi\Enum\*.cs;..\PubnubApi\HttpUtility\*.cs;..\PubnubApi\Interface\*.cs;..\PubnubApi\Log\*.cs;..\PubnubApi\Model\*.cs;..\PubnubApi\Model\*\*.cs;..\PubnubApi\Model\*\*\*.cs;..\PubnubApi\Proxy\*.cs;..\PubnubApi\Push\*.cs;..\PubnubApi\Push\*\*.cs;..\PubnubApi\Security\*.cs" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
-  </ItemGroup>-->
-
-  <!--<PropertyGroup Condition=" '$(TargetFramework)' == 'portable45-net45+win8+wpa81' ">
-    <DefineConstants>$(DefineConstants);PORTABLE111</DefineConstants>
-  </PropertyGroup>-->
-
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
     <DefineConstants>$(DefineConstants);NETSTANDARD10</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
+    <DefineConstants>$(DefineConstants);NETSTANDARD11</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
@@ -475,9 +441,6 @@ Refactored code to improve performance of Publish/Fire/Grant/Subscribe/Unsubscri
     <DefineConstants>$(DefineConstants);NETSTANDARD20</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
-    <DefineConstants>$(DefineConstants);PORTABLE111</DefineConstants>
-  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="NETStandard.Library" Version="1.6.1">
@@ -492,10 +455,6 @@ Refactored code to improve performance of Publish/Fire/Grant/Subscribe/Unsubscri
     </PackageReference>
   </ItemGroup>
   
-  <!--<ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
-  </ItemGroup>-->
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
     <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.1">
       <PrivateAssets>None</PrivateAssets>
@@ -520,60 +479,15 @@ Refactored code to improve performance of Publish/Fire/Grant/Subscribe/Unsubscri
     </PackageReference>
   </ItemGroup>
   
-  <!--<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
-    <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.1" />
-    <PackageReference Include="System.Net.Requests" Version="4.0.11" />
-    <PackageReference Include="System.Reflection.Primitives" Version="4.0.1" />
-    <PackageReference Include="System.Linq.Queryable" Version="4.0.1" />
-    <PackageReference Include="System.Text.Encoding" Version="4.0.11" />
-    <PackageReference Include="System.Text.Encoding.Extensions" Version="4.0.11" />
-    <PackageReference Include="System.Net.Primitives" Version="4.3.0" />
-  </ItemGroup>-->
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
     <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <!--<PackageReference Include="System.Net.Http" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>-->
     <PackageReference Include="System.Net.Requests" Version="4.0.11">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <!--<PackageReference Include="System.Reflection.Primitives" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>-->
-    <!--<PackageReference Include="System.Threading.ThreadPool" Version="4.0.10">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Linq.Queryable" Version="4.0.1">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Text.Encoding" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Text.Encoding.Extensions" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>-->
-    <!--<PackageReference Include="System.Net.Primitives" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>-->
   </ItemGroup>
   
-  <!--<ItemGroup Condition=" '$(TargetFramework)' == 'portable45-net45+win8+wpa81' ">
-    <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.1" />
-    <Reference Include="mscorlib" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Net" />
-    <Reference Include="System.Net.Primitives" />
-    <Reference Include="System.Net.Requests" />
-    <Reference Include="System.Net.Http" />
-  </ItemGroup>-->
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
     <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.1">
       <PrivateAssets>None</PrivateAssets>
@@ -588,6 +502,9 @@ Refactored code to improve performance of Publish/Fire/Grant/Subscribe/Unsubscri
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Threading.ThreadPool" Version="4.0.10">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Threading.Thread" Version="4.0.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Linq.Queryable" Version="4.0.1">
@@ -636,6 +553,9 @@ Refactored code to improve performance of Publish/Fire/Grant/Subscribe/Unsubscri
     <PackageReference Include="System.Threading.ThreadPool" Version="4.0.10">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="System.Threading.Thread" Version="4.0.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="System.Linq.Queryable" Version="4.0.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
@@ -667,6 +587,9 @@ Refactored code to improve performance of Publish/Fire/Grant/Subscribe/Unsubscri
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Threading.ThreadPool" Version="4.0.10">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Threading.Thread" Version="4.0.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Linq.Queryable" Version="4.0.1">

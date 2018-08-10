@@ -300,6 +300,10 @@ namespace PubnubApi
             pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig);
             pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog);
 
+            ClientNetworkStatus.PubnubConfiguation = currentConfig;
+            ClientNetworkStatus.JsonLibrary = jsonLib;
+            ClientNetworkStatus.PubnubUnitTest = unitTest;
+            ClientNetworkStatus.PubnubLog = currentLog;
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
             if (httpClientNetworkStatus == null)
             {
@@ -315,13 +319,11 @@ namespace PubnubApi
                 httpClientNetworkStatus.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 httpClientNetworkStatus.Timeout = TimeSpan.FromSeconds(currentConfig.NonSubscribeRequestTimeout);
             }
-            ClientNetworkStatus clientNetworkStatus = new ClientNetworkStatus(currentConfig, jsonLib, unitTest, currentLog, httpClientNetworkStatus);
-#else
-            ClientNetworkStatus clientNetworkStatus = new ClientNetworkStatus(currentConfig, jsonLib, unitTest, currentLog);
+            ClientNetworkStatus.RefHttpClient = httpClientNetworkStatus;
 #endif
-            if (!clientNetworkStatus.IsInternetCheckRunning())
+            if (!ClientNetworkStatus.IsInternetCheckRunning())
             {
-                clientNetworkStatusInternetStatus = clientNetworkStatus.CheckInternetStatus<T>(PubnetSystemActive, type, callback, channels, channelGroups);
+                clientNetworkStatusInternetStatus = ClientNetworkStatus.CheckInternetStatus<T>(PubnetSystemActive, type, callback, channels, channelGroups);
             }
             return clientNetworkStatusInternetStatus;
         }

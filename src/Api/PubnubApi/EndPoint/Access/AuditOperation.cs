@@ -58,19 +58,36 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNAccessManagerAuditResult> callback)
         {
-            Task.Factory.StartNew(() =>
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+            Task.Factory.StartNew(() => 
             {
                 this.savedCallback = callback;
                 AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, this.queryParam, callback);
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+#else
+            new Thread(() =>
+            {
+                this.savedCallback = callback;
+                AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, this.queryParam, callback);
+            })
+            { IsBackground = true }.Start();
+#endif
         }
 
         internal void Retry()
         {
-            System.Threading.Tasks.Task.Factory.StartNew(() =>
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+            Task.Factory.StartNew(() =>
             {
                 AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, this.queryParam, savedCallback);
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+#else
+            new Thread(() =>
+            {
+                AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, this.queryParam, savedCallback);
+            })
+            { IsBackground = true }.Start();
+#endif
         }
 
         internal void AuditAccess(string channel, string channelGroup, string[] authKeys, Dictionary<string, object> externalQueryParam, PNCallback<PNAccessManagerAuditResult> callback)

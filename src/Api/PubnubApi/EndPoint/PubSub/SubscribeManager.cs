@@ -71,7 +71,7 @@ namespace PubnubApi.EndPoint
                     {
                         LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unable to capture channel(s)={1}; channelgroup(s)={2} from _channelRequest to abort request.", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.LogVerbosity);
                     }
-                }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+                }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 
                 if (type == PNOperationType.PNUnsubscribeOperation && !config.SupressLeaveEvents)
                 {
@@ -202,7 +202,7 @@ namespace PubnubApi.EndPoint
                         string multiChannelName = (currentChannels.Length > 0) ? string.Join(",", currentChannels.OrderBy(x => x).ToArray()) : ",";
                         string multiChannelGroupName = (currentChannelGroups.Length > 0) ? string.Join(",", currentChannelGroups.OrderBy(x => x).ToArray()) : "";
 
-                        System.Threading.Tasks.Task.Factory.StartNew(() =>
+                        Task.Factory.StartNew(() =>
                         {
                             if (ChannelRequest[PubnubInstance.InstanceId].ContainsKey(multiChannelName))
                             {
@@ -229,7 +229,7 @@ namespace PubnubApi.EndPoint
                             {
                                 LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unable to capture channel(s)={1}; channelgroup(s)={2} from _channelRequest to abort request.", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.LogVerbosity);
                             }
-                        }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+                        }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 
                         if (type == PNOperationType.PNUnsubscribeOperation)
                         {
@@ -823,11 +823,11 @@ namespace PubnubApi.EndPoint
                 }
 
                 long timetoken = GetTimetokenFromMultiplexResult(message);
-                System.Threading.Tasks.Task.Factory.StartNew(() =>
+                Task.Factory.StartNew(() =>
                 {
                     LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} MultiplexInternalCallback timetoken = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), timetoken), config.LogVerbosity);
                     MultiChannelSubscribeRequest<T>(type, channels, channelGroups, timetoken, false, null, this.customQueryParam);
-                }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+                }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
             }
             else
             {
@@ -978,7 +978,7 @@ namespace PubnubApi.EndPoint
                     LastSubscribeTimetoken[PubnubInstance.InstanceId] = 0;
                 }
                 MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, GetCurrentSubscriberChannels(), GetCurrentSubscriberChannelGroups(), LastSubscribeTimetoken[PubnubInstance.InstanceId], false, null, this.customQueryParam);
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 
             return true;
         }
@@ -1028,7 +1028,7 @@ namespace PubnubApi.EndPoint
                             {
                                 TerminateCurrentSubscriberRequest();
                                 MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, channels, chananelGroups, LastSubscribeTimetoken[PubnubInstance.InstanceId], false, null, this.customQueryParam);
-                            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+                            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
                         }
                         else
                         {
@@ -1036,7 +1036,7 @@ namespace PubnubApi.EndPoint
                             Task.Factory.StartNew(() =>
                             {
                                 TerminateCurrentSubscriberRequest();
-                            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+                            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
                         }
                     }
                     else
@@ -1059,7 +1059,7 @@ namespace PubnubApi.EndPoint
                             {
                                 TerminateCurrentSubscriberRequest();
                                 MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, GetCurrentSubscriberChannels(), GetCurrentSubscriberChannelGroups(), LastSubscribeTimetoken[PubnubInstance.InstanceId], false, null, this.customQueryParam);
-                            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+                            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
                         }
                     }
                 }

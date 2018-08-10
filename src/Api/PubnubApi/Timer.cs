@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace System.Threading
 {
-#if NETSTANDARD10 || NETSTANDARD11 || PORTABLE111
+#if NETSTANDARD10 || NETSTANDARD11
     public delegate void TimerCallback(object state);
 
     public sealed class Timer : CancellationTokenSource, IDisposable
@@ -102,7 +102,7 @@ namespace System.Threading
 
             }, Tuple.Create(callback, state), CancellationToken.None,
                 TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.OnlyOnRanToCompletion,
-                TaskScheduler.Default);
+                TaskScheduler.Default).ConfigureAwait(false);
 
             return status;
         }

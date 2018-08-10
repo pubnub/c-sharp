@@ -1143,7 +1143,7 @@ namespace PubnubApi
 
         private void ForceCanonicalPathAndQuery(Uri requestUri)
         {
-#if !NETSTANDARD10 && !NETSTANDARD11 && !NETSTANDARD12 && !WP81 && !PORTABLE111
+#if !NETSTANDARD10 && !NETSTANDARD11 && !NETSTANDARD12 && !WP81
             LoggingMethod.WriteToLog(pubnubLog, "Inside ForceCanonicalPathAndQuery = " + requestUri.ToString(), pubnubConfig.LogVerbosity);
             try
             {

@@ -56,7 +56,7 @@ namespace PubnubApi.EndPoint
                         string channelsJsonState = BuildJsonUserState(channels.ToArray(), channelGroups.ToArray(), false);
                         IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
                         urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-                        Uri request = urlBuilder.BuildMultiChannelLeaveRequest(channels, channelGroups, oldUUID, channelsJsonState,null);
+                        Uri request = urlBuilder.BuildMultiChannelLeaveRequest(channels, channelGroups, oldUUID, channelsJsonState, null);
 
                         RequestState<string> requestState = new RequestState<string>();
                         requestState.Channels = channels;
@@ -70,8 +70,7 @@ namespace PubnubApi.EndPoint
                     TerminateCurrentSubscriberRequest();
                 }
                 catch {  /* ignore */ }
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
-
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
         }
 
         public static long TranslateDateTimeToSeconds(DateTime dotNetUTCDateTime)
