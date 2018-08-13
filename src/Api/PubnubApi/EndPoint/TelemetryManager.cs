@@ -194,7 +194,8 @@ namespace PubnubApi.EndPoint
                         for (int keyIndex = 0; keyIndex < latencyOpKeys.Length; keyIndex++)
                         {
                             string opKey = latencyOpKeys[keyIndex];
-                            ConcurrentDictionary<double, long> outdatedLatencyValue = dicEndpointLatency[opKey];
+                            ConcurrentDictionary<double, long> outdatedLatencyValue = null;
+                            dicEndpointLatency.TryGetValue(opKey, out outdatedLatencyValue);
                             if (outdatedLatencyValue != null)
                             {
                                 IEnumerable<KeyValuePair<double, long>> enumerableOutdatedLatencies = outdatedLatencyValue.Where(dt => currentEpochMillisec - dt.Key >= 60000);
@@ -208,10 +209,12 @@ namespace PubnubApi.EndPoint
                                         for (int outdateIndex = 0; outdateIndex < outLatencyKeys.Length; outdateIndex++)
                                         {
                                             double outKey = outLatencyKeys[outdateIndex];
-                                            if (dicEndpointLatency[opKey].ContainsKey(outKey))
+                                            ConcurrentDictionary<double, long> currentEndPointLatency = null;
+                                            dicEndpointLatency.TryGetValue(opKey, out currentEndPointLatency);
+                                            if (currentEndPointLatency != null && currentEndPointLatency.ContainsKey(outKey))
                                             {
                                                 long removeOutdatedLatency;
-                                                if (!dicEndpointLatency[opKey].TryRemove(outKey, out removeOutdatedLatency))
+                                                if (!currentEndPointLatency.TryRemove(outKey, out removeOutdatedLatency))
                                                 {
                                                     LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => removed failed for key = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), outKey), pubnubConfig.LogVerbosity);
                                                 }
