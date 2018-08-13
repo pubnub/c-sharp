@@ -56,7 +56,7 @@ namespace PubnubApi
         private static PubnubHttpClientHandler pubnubHttpClientHandler { get; set; }
 #endif
 
-        private static bool clientNetworkStatusInternetStatus = true;
+        private bool clientNetworkStatusInternetStatus = true;
         protected static ConcurrentDictionary<string, bool> SubscribeDisconnected { get; set; } = new ConcurrentDictionary<string, bool>();
 
         protected Pubnub PubnubInstance { get; set; }
