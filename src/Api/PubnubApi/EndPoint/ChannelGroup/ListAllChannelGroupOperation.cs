@@ -35,19 +35,36 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNChannelGroupsListAllResult> callback)
         {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
                 GetAllChannelGroup(this.queryParam, callback);
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+#else
+            new Thread(() =>
+            {
+                this.savedCallback = callback;
+                GetAllChannelGroup(this.queryParam, callback);
+            })
+            { IsBackground = true }.Start();
+#endif
         }
 
         internal void Retry()
         {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
                 GetAllChannelGroup(this.queryParam, savedCallback);
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+#else
+            new Thread(() =>
+            {
+                GetAllChannelGroup(this.queryParam, savedCallback);
+            })
+            { IsBackground = true }.Start();
+#endif
         }
 
         internal void GetAllChannelGroup(Dictionary<string, object> externalQueryParam, PNCallback<PNChannelGroupsListAllResult> callback)

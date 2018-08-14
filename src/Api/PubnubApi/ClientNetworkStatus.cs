@@ -12,69 +12,104 @@ using System.Net.Http.Headers;
 namespace PubnubApi
 {
 	#region "Network Status -- code split required"
-	internal class ClientNetworkStatus
+	internal static class ClientNetworkStatus
 	{
         private static IJsonPluggableLibrary jsonLib;
         private static PNConfiguration pubnubConfig;
         private static IPubnubUnitTest unit;
         private static IPubnubLog pubnubLog;
 
-        private bool networkStatus = true;
+        private static bool networkStatus = true;
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
         private static HttpClient httpClient;
 #endif
 
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
-        public ClientNetworkStatus(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, HttpClient refHttpClient)
+        public static PNConfiguration PubnubConfiguation
         {
-            InternalConstructor(config, jsonPluggableLibrary, pubnubUnit, log, refHttpClient);
-        }
-#else
-        public ClientNetworkStatus(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log)
-        {
-            InternalConstructor(config, jsonPluggableLibrary, pubnubUnit, log);
-        }
-#endif
-
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
-        private static void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, HttpClient refHttpClient)
-#else
-        private static void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log)
-#endif
-        {
-            pubnubConfig = pubnubConfiguation;
-            jsonLib = jsonPluggableLibrary;
-            unit = pubnubUnitTest;
-            pubnubLog = log;
-
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
-            httpClient = refHttpClient;
-            if (httpClient == null)
+            set
             {
-                if (pubnubConfig.Proxy != null)
-                {
-                    HttpClientHandler httpClientHandler = new HttpClientHandler();
-                    if (httpClientHandler.SupportsProxy)
-                    {
-                        httpClientHandler.Proxy = pubnubConfig.Proxy;
-                        httpClientHandler.UseProxy = true;
-                    }
-                    PubnubHttpClientHandler pubnubHttpClientHandler = new PubnubHttpClientHandler("PubnubHttpClientHandler", httpClientHandler, pubnubConfig, jsonLib, unit, pubnubLog);
-
-                    httpClient = new HttpClient(pubnubHttpClientHandler);
-                }
-                else
-                {
-                    httpClient = new HttpClient();
-                }
-                httpClient.DefaultRequestHeaders.Accept.Clear();
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                httpClient.Timeout = TimeSpan.FromSeconds(pubnubConfig.NonSubscribeRequestTimeout);
+                pubnubConfig = value;
             }
-#endif
+            get
+            {
+                return pubnubConfig;
+            }
         }
 
-        internal bool CheckInternetStatus<T>(bool systemActive, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
+        public static IJsonPluggableLibrary JsonLibrary
+        {
+            set
+            {
+                jsonLib = value;
+            }
+            get
+            {
+                return jsonLib;
+            }
+        }
+
+        public static IPubnubUnitTest PubnubUnitTest
+        {
+            set
+            {
+                unit = value;
+            }
+            get
+            {
+                return unit;
+            }
+        }
+
+        public static IPubnubLog PubnubLog
+        {
+            set
+            {
+                pubnubLog = value;
+            }
+            get
+            {
+                return pubnubLog;
+            }
+        }
+
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+        public static HttpClient RefHttpClient
+        {
+            set
+            {
+                httpClient = value;
+                if (httpClient == null)
+                {
+                    if (pubnubConfig.Proxy != null)
+                    {
+                        HttpClientHandler httpClientHandler = new HttpClientHandler();
+                        if (httpClientHandler.SupportsProxy)
+                        {
+                            httpClientHandler.Proxy = pubnubConfig.Proxy;
+                            httpClientHandler.UseProxy = true;
+                        }
+                        PubnubHttpClientHandler pubnubHttpClientHandler = new PubnubHttpClientHandler("PubnubHttpClientHandler", httpClientHandler, pubnubConfig, jsonLib, unit, pubnubLog);
+
+                        httpClient = new HttpClient(pubnubHttpClientHandler);
+                    }
+                    else
+                    {
+                        httpClient = new HttpClient();
+                    }
+                    httpClient.DefaultRequestHeaders.Accept.Clear();
+                    httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    httpClient.Timeout = TimeSpan.FromSeconds(pubnubConfig.NonSubscribeRequestTimeout);
+                }
+
+            }
+            get
+            {
+                return httpClient;
+            }
+        }
+#endif
+
+        internal static bool CheckInternetStatus<T>(bool systemActive, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
 		{
             if (unit != null)
             {
@@ -82,13 +117,25 @@ namespace PubnubApi
             }
 			else
 			{
-                Task[] tasks = new Task[1];
-
-                tasks[0] = Task.Factory.StartNew(async() => await CheckClientNetworkAvailability(CallbackClientNetworkStatus, type, callback, channels, channelGroups).ConfigureAwait(false));
-                tasks[0].ConfigureAwait(false);
                 try
                 {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+                    Task[] tasks = new Task[1];
+                    tasks[0] = Task.Factory.StartNew(async() =>
+                    {
+                        await CheckClientNetworkAvailability(CallbackClientNetworkStatus, type, callback, channels, channelGroups).ConfigureAwait(false);
+                    }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default);
+                    tasks[0].ConfigureAwait(false);
                     Task.WaitAll(tasks);
+#else
+                    Thread networkCheckThread = new Thread(async () =>
+                    {
+                        await CheckClientNetworkAvailability(CallbackClientNetworkStatus, type, callback, channels, channelGroups).ConfigureAwait(false);
+                    })
+                    { IsBackground = true };
+                    networkCheckThread.Start();
+                    networkCheckThread.Join(pubnubConfig.NonSubscribeRequestTimeout * 1000);
+#endif
                 }
                 catch (AggregateException ae) {
                     foreach (var ie in ae.InnerExceptions)
@@ -96,25 +143,29 @@ namespace PubnubApi
                         LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} AggregateException CheckInternetStatus Error: {1} {2} ", DateTime.Now.ToString(CultureInfo.InvariantCulture), ie.GetType().Name, ie.Message), pubnubConfig.LogVerbosity);
                     }
                 }
+                catch(Exception ex)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} Exception CheckInternetStatus Error: {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex.Message), pubnubConfig.LogVerbosity);
+                }
 
                 return networkStatus;
 			}
 		}
 
-		private void CallbackClientNetworkStatus(bool status)
+		private static void CallbackClientNetworkStatus(bool status)
 		{
 			networkStatus = status;
 		}
 
         private static object internetCheckLock = new object();
-        private bool isInternetCheckRunning;
+        private static bool isInternetCheckRunning;
 
-        internal bool IsInternetCheckRunning()
+        internal static bool IsInternetCheckRunning()
         {
             return isInternetCheckRunning;
         }
 
-        private async Task<bool> CheckClientNetworkAvailability<T>(Action<bool> internalCallback, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
+        private static async Task<bool> CheckClientNetworkAvailability<T>(Action<bool> internalCallback, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
 		{
             lock (internetCheckLock)
             {
@@ -136,7 +187,7 @@ namespace PubnubApi
             return networkStatus;
 		}
 
-        private async Task<bool> CheckSocketConnect<T>(object internetState)
+        private static async Task<bool> CheckSocketConnect<T>(object internetState)
 		{
             lock (internetCheckLock)
             {
@@ -225,7 +276,7 @@ namespace PubnubApi
 		}
 
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
-        private async Task<bool> GetTimeWithHttpClient(Uri requestUri)
+        private static async Task<bool> GetTimeWithHttpClient(Uri requestUri)
         {
             bool successFlag = false;
             try
@@ -248,7 +299,7 @@ namespace PubnubApi
             return networkStatus;
         }
 #endif
-        private async Task<bool> GetTimeWithTaskFactoryAsync(Uri requestUri)
+        private static async Task<bool> GetTimeWithTaskFactoryAsync(Uri requestUri)
         {
             bool successFlag = false;
             try
@@ -276,7 +327,7 @@ namespace PubnubApi
             return networkStatus;
         }
 
-        private async Task<bool> GetTimeWithClassicHttp<T>(Uri requestUri)
+        private static async Task<bool> GetTimeWithClassicHttp<T>(Uri requestUri)
         {
             bool successFlag = true;
             try

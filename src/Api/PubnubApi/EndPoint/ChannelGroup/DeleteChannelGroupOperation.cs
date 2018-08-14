@@ -42,19 +42,36 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNChannelGroupsDeleteGroupResult> callback)
         {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
                 DeleteChannelGroup(this.channelGroupName, this.queryParam, callback);
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+#else
+            new Thread(() =>
+            {
+                this.savedCallback = callback;
+                DeleteChannelGroup(this.channelGroupName, this.queryParam, callback);
+            })
+            { IsBackground = true }.Start();
+#endif
         }
 
         internal void Retry()
         {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
                 DeleteChannelGroup(this.channelGroupName, this.queryParam, savedCallback);
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+#else
+            new Thread(() =>
+            {
+                DeleteChannelGroup(this.channelGroupName, this.queryParam, savedCallback);
+            })
+            { IsBackground = true }.Start();
+#endif
         }
 
         internal void DeleteChannelGroup(string groupName, Dictionary<string, object> externalQueryParam, PNCallback<PNChannelGroupsDeleteGroupResult> callback)

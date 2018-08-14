@@ -100,21 +100,22 @@ namespace PubnubApi.EndPoint
             {
                 throw new ArgumentException("Missing userCallback");
             }
-#if NET35 || NET40 || NET45 || NET461
-            new System.Threading.Thread(() =>
+
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+            Task.Factory.StartNew(() =>
+            {
+                syncRequest = false;
+                this.savedCallback = callback;
+                Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.queryParam, callback);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+#else
+            new Thread(() =>
             {
                 syncRequest = false;
                 this.savedCallback = callback;
                 Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.queryParam, callback);
             })
             { IsBackground = true }.Start();
-#else
-            Task.Factory.StartNew(() =>
-            {
-                syncRequest = false;
-                this.savedCallback = callback;
-                Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.queryParam, callback);
-            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default);
 #endif
         }
 
@@ -139,7 +140,7 @@ namespace PubnubApi.EndPoint
                 syncEvent.WaitOne(config.NonSubscribeRequestTimeout * 1000);
 
                 return SyncResult;
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default);
             return task.Result;
         }
 
@@ -147,8 +148,16 @@ namespace PubnubApi.EndPoint
 
         internal void Retry()
         {
-#if NET35 || NET40 || NET45 || NET461
-            new System.Threading.Thread(() =>
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+            Task.Factory.StartNew(() =>
+            {
+                if (!syncRequest)
+                {
+                    Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.queryParam, savedCallback);
+                }
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+#else
+            new Thread(() =>
             {
                 if (!syncRequest)
                 {
@@ -156,15 +165,6 @@ namespace PubnubApi.EndPoint
                 }
             })
             { IsBackground = true }.Start();
-#else
-            Task.Factory.StartNew(() =>
-            {
-                if (!syncRequest)
-                {
-                    Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.queryParam, savedCallback);
-                }
-            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default);
-
 #endif
         }
 

@@ -86,35 +86,35 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNAccessManagerGrantResult> callback)
         {
-#if NET35 || NET40 || NET45 || NET461
-            new System.Threading.Thread(() =>
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+            Task.Factory.StartNew(() =>
+            {
+                this.savedCallback = callback;
+                GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, this.queryParam, callback);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+#else
+            new Thread(() =>
             {
                 this.savedCallback = callback;
                 GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, this.queryParam, callback);
             })
             { IsBackground = true }.Start();
-#else
-            Task.Factory.StartNew(() =>
-            {
-                this.savedCallback = callback;
-                GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, this.queryParam, callback);
-            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default);
 #endif
         }
 
         internal void Retry()
         {
-#if NET35 || NET40 || NET45 || NET461
-            new System.Threading.Thread(() =>
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+            Task.Factory.StartNew(() =>
+            {
+                GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, this.queryParam, savedCallback);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+#else
+            new Thread(() =>
             {
                 GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, this.queryParam, savedCallback);
             })
             { IsBackground = true }.Start();
-#else
-            Task.Factory.StartNew(() =>
-            {
-                GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, this.queryParam, savedCallback);
-            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default);
 #endif
         }
 

@@ -65,21 +65,40 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNSetStateResult> callback)
         {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
                 string serializedState = jsonLibrary.SerializeToJsonString(this.userState);
                 SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, this.queryParam, callback);
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+#else
+            new Thread(() =>
+            {
+                this.savedCallback = callback;
+                string serializedState = jsonLibrary.SerializeToJsonString(this.userState);
+                SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, this.queryParam, callback);
+            })
+            { IsBackground = true }.Start();
+#endif
         }
 
         internal void Retry()
         {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
                 string serializedState = jsonLibrary.SerializeToJsonString(this.userState);
                 SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, this.queryParam, savedCallback);
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+#else
+            new Thread(() =>
+            {
+                string serializedState = jsonLibrary.SerializeToJsonString(this.userState);
+                SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, this.queryParam, savedCallback);
+            })
+            { IsBackground = true }.Start();
+#endif
         }
 
         internal void SetUserState(string[] channels, string[] channelGroups, string uuid, string jsonUserState, Dictionary<string, object> externalQueryParam, PNCallback<PNSetStateResult> callback)

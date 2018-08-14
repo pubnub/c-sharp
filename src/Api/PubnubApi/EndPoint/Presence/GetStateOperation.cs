@@ -58,19 +58,36 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNGetStateResult> callback)
         {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
                 GetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, this.queryParam, callback);
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+#else
+            new Thread(() =>
+            {
+                this.savedCallback = callback;
+                GetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, this.queryParam, callback);
+            })
+            { IsBackground = true }.Start();
+#endif
         }
 
         internal void Retry()
         {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
                 GetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, this.queryParam, savedCallback);
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+#else
+            new Thread(() =>
+            {
+                GetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, this.queryParam, savedCallback);
+            })
+            { IsBackground = true }.Start();
+#endif
         }
 
         internal void GetUserState(string[] channels, string[] channelGroups, string uuid, Dictionary<string, object> externalQueryParam, PNCallback<PNGetStateResult> callback)

@@ -71,7 +71,7 @@ namespace PubnubApi.EndPoint
                     {
                         LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unable to capture channel(s)={1}; channelgroup(s)={2} from _channelRequest to abort request.", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.LogVerbosity);
                     }
-                }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+                }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 
                 if (type == PNOperationType.PNUnsubscribeOperation && !config.SupressLeaveEvents)
                 {
@@ -202,7 +202,7 @@ namespace PubnubApi.EndPoint
                         string multiChannelName = (currentChannels.Length > 0) ? string.Join(",", currentChannels.OrderBy(x => x).ToArray()) : ",";
                         string multiChannelGroupName = (currentChannelGroups.Length > 0) ? string.Join(",", currentChannelGroups.OrderBy(x => x).ToArray()) : "";
 
-                        System.Threading.Tasks.Task.Factory.StartNew(() =>
+                        Task.Factory.StartNew(() =>
                         {
                             if (ChannelRequest[PubnubInstance.InstanceId].ContainsKey(multiChannelName))
                             {
@@ -229,7 +229,7 @@ namespace PubnubApi.EndPoint
                             {
                                 LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unable to capture channel(s)={1}; channelgroup(s)={2} from _channelRequest to abort request.", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.LogVerbosity);
                             }
-                        }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+                        }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 
                         if (type == PNOperationType.PNUnsubscribeOperation)
                         {
@@ -823,11 +823,11 @@ namespace PubnubApi.EndPoint
                 }
 
                 long timetoken = GetTimetokenFromMultiplexResult(message);
-                System.Threading.Tasks.Task.Factory.StartNew(() =>
+                Task.Factory.StartNew(() =>
                 {
                     LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} MultiplexInternalCallback timetoken = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), timetoken), config.LogVerbosity);
                     MultiChannelSubscribeRequest<T>(type, channels, channelGroups, timetoken, false, null, this.customQueryParam);
-                }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+                }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
             }
             else
             {
@@ -978,7 +978,7 @@ namespace PubnubApi.EndPoint
                     LastSubscribeTimetoken[PubnubInstance.InstanceId] = 0;
                 }
                 MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, GetCurrentSubscriberChannels(), GetCurrentSubscriberChannelGroups(), LastSubscribeTimetoken[PubnubInstance.InstanceId], false, null, this.customQueryParam);
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 
             return true;
         }
@@ -1000,76 +1000,83 @@ namespace PubnubApi.EndPoint
 
         internal void StartSubscribeHeartbeatCheckCallback<T>(object state)
         {
-            if (SubscribeDisconnected[PubnubInstance.InstanceId])
+            try
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - SubscribeDisconnected. No heartbeat check.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-                return;
-            }
-
-            string[] channels = GetCurrentSubscriberChannels();
-            string[] chananelGroups = GetCurrentSubscriberChannelGroups();
-
-            if ((channels != null && channels.Length > 0) || (chananelGroups != null && chananelGroups.Length > 0))
-            {
-                bool networkConnection = CheckInternetConnectionStatus<T>(PubnetSystemActive, PNOperationType.PNSubscribeOperation, null, channels, chananelGroups);
-                if (networkConnection && PubnubInstance != null && SubscribeRequestTracker.ContainsKey(PubnubInstance.InstanceId))
+                if (SubscribeDisconnected[PubnubInstance.InstanceId])
                 {
-                    DateTime lastSubscribeRequestTime = SubscribeRequestTracker[PubnubInstance.InstanceId];
-                    if ((DateTime.Now - lastSubscribeRequestTime).TotalSeconds <= config.SubscribeTimeout)
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - SubscribeDisconnected. No heartbeat check.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    return;
+                }
+
+                string[] channels = GetCurrentSubscriberChannels();
+                string[] chananelGroups = GetCurrentSubscriberChannelGroups();
+
+                if ((channels != null && channels.Length > 0) || (chananelGroups != null && chananelGroups.Length > 0))
+                {
+                    bool networkConnection = CheckInternetConnectionStatus<T>(PubnetSystemActive, PNOperationType.PNSubscribeOperation, null, channels, chananelGroups);
+                    if (networkConnection && PubnubInstance != null && SubscribeRequestTracker.ContainsKey(PubnubInstance.InstanceId))
                     {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - ok. expected subscribe within threshold limit of SubscribeTimeout. No action needed", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-                    }
-                    else if ((DateTime.Now - lastSubscribeRequestTime).TotalSeconds > 2*config.SubscribeTimeout)
-                    {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - **No auto subscribe within threshold limit of SubscribeTimeout**. Calling MultiChannelSubscribeRequest", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-                        Task.Factory.StartNew(() =>
+                        DateTime lastSubscribeRequestTime = SubscribeRequestTracker[PubnubInstance.InstanceId];
+                        if ((DateTime.Now - lastSubscribeRequestTime).TotalSeconds <= config.SubscribeTimeout)
                         {
-                            TerminateCurrentSubscriberRequest();
-                            MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, channels, chananelGroups, LastSubscribeTimetoken[PubnubInstance.InstanceId], false, null, this.customQueryParam);
-                        }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - ok. expected subscribe within threshold limit of SubscribeTimeout. No action needed", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                        }
+                        else if ((DateTime.Now - lastSubscribeRequestTime).TotalSeconds > 2 * config.SubscribeTimeout)
+                        {
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - **No auto subscribe within threshold limit of SubscribeTimeout**. Calling MultiChannelSubscribeRequest", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                            Task.Factory.StartNew(() =>
+                            {
+                                TerminateCurrentSubscriberRequest();
+                                MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, channels, chananelGroups, LastSubscribeTimetoken[PubnubInstance.InstanceId], false, null, this.customQueryParam);
+                            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - **No auto subscribe within threshold limit of SubscribeTimeout**. Calling TerminateCurrentSubscriberRequest", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                            Task.Factory.StartNew(() =>
+                            {
+                                TerminateCurrentSubscriberRequest();
+                            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+                        }
                     }
                     else
                     {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - **No auto subscribe within threshold limit of SubscribeTimeout**. Calling TerminateCurrentSubscriberRequest", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-                        Task.Factory.StartNew(() =>
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - StartSubscribeHeartbeatCheckCallback - No network or no pubnub instance mapping", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                        if (PubnubInstance != null && !networkConnection)
                         {
-                            TerminateCurrentSubscriberRequest();
-                        }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+                            PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNSubscribeOperation, PNStatusCategory.PNNetworkIssuesCategory, null, (int)System.Net.HttpStatusCode.NotFound, new PNException("Internet connection problem during subscribe heartbeat."));
+                            if (channels != null && channels.Length > 0)
+                            {
+                                status.AffectedChannels.AddRange(channels.ToList());
+                            }
+                            if (chananelGroups != null && chananelGroups.Length > 0)
+                            {
+                                status.AffectedChannelGroups.AddRange(chananelGroups.ToList());
+                            }
+                            Announce(status);
+
+                            Task.Factory.StartNew(() =>
+                            {
+                                TerminateCurrentSubscriberRequest();
+                                MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, GetCurrentSubscriberChannels(), GetCurrentSubscriberChannelGroups(), LastSubscribeTimetoken[PubnubInstance.InstanceId], false, null, this.customQueryParam);
+                            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+                        }
                     }
                 }
                 else
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - StartSubscribeHeartbeatCheckCallback - No network or no pubnub instance mapping", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-                    if (PubnubInstance != null && !networkConnection)
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - StartSubscribeHeartbeatCheckCallback - No channels/cgs avaialable", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    try
                     {
-                        PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNSubscribeOperation, PNStatusCategory.PNNetworkIssuesCategory, null, (int)System.Net.HttpStatusCode.NotFound, new PNException("Internet connection problem during subscribe heartbeat."));
-                        if (channels != null && channels.Length > 0)
-                        {
-                            status.AffectedChannels.AddRange(channels.ToList());
-                        }
-                        if (chananelGroups != null && chananelGroups.Length > 0)
-                        {
-                            status.AffectedChannelGroups.AddRange(chananelGroups.ToList());
-                        }
-                        Announce(status);
-
-                        Task.Factory.StartNew(() =>
-                        {
-                            TerminateCurrentSubscriberRequest();
-                            MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, GetCurrentSubscriberChannels(), GetCurrentSubscriberChannelGroups(), LastSubscribeTimetoken[PubnubInstance.InstanceId], false, null, this.customQueryParam);
-                        }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+                        SubscribeHeartbeatCheckTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                        TerminateCurrentSubscriberRequest();
                     }
+                    catch {  /* ignore */ }
                 }
             }
-            else
+            catch (Exception ex)
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - StartSubscribeHeartbeatCheckCallback - No channels/cgs avaialable", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-                try
-                {
-                    SubscribeHeartbeatCheckTimer.Change(Timeout.Infinite, Timeout.Infinite);
-                    TerminateCurrentSubscriberRequest();
-                }
-                catch {  /* ignore */ }
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - StartSubscribeHeartbeatCheckCallback - EXCEPTION: {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture),ex), config.LogVerbosity);
             }
         }
 
