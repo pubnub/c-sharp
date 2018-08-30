@@ -1219,7 +1219,7 @@ namespace PubnubApi.EndPoint
                             && (netState.ResponseType == PNOperationType.PNSubscribeOperation || netState.ResponseType == PNOperationType.Presence))
                         {
                             bool networkConnection = CheckInternetConnectionStatus(PubnetSystemActive, netState.ResponseType, netState.PubnubCallback, netState.Channels, netState.ChannelGroups);
-                            if (networkConnection)
+                            if (!networkConnection)
                             {
                                 //Re-try to avoid false alert
                                 networkConnection = CheckInternetConnectionStatus(PubnetSystemActive, netState.ResponseType, netState.PubnubCallback, netState.Channels, netState.ChannelGroups);
