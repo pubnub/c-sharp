@@ -686,6 +686,14 @@ namespace PubnubApiDemo
                             write = (writeAccess.ToLower() == "n") ? false : true;
                         }
 
+                        bool delete = false;
+                        if (channel.Trim().Length > 0)
+                        {
+                            Console.WriteLine("Delete Access? Enter Y for Yes (default), N for No.");
+                            string deleteAccess = Console.ReadLine();
+                            delete = (deleteAccess.ToLower() == "n") ? false : true;
+                        }
+
                         bool manage = false;
                         if (channelGroup.Trim().Length > 0)
                         {
@@ -715,6 +723,7 @@ namespace PubnubApiDemo
                         if (channel.Trim().Length > 0)
                         {
                             pamGrantStringBuilder.AppendLine(string.Format("Write Access = {0}", write.ToString()));
+                            pamGrantStringBuilder.AppendLine(string.Format("Delete Access = {0}", delete.ToString()));
                         }
                         if (channelGroup.Trim().Length > 0)
                         {
@@ -733,6 +742,7 @@ namespace PubnubApiDemo
                             .AuthKeys(authKeyList)
                             .Read(read)
                             .Write(write)
+                            .Delete(delete)
                             .Manage(manage)
                             .TTL(grantTimeLimitInMinutes)
                             .Async(new PNAccessManagerGrantResultExt(
