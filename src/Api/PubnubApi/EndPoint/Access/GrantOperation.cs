@@ -23,6 +23,7 @@ namespace PubnubApi.EndPoint
         private bool grantWrite;
         private bool grantRead;
         private bool grantManage;
+        private bool grantDelete;
         private long grantTTL = -1;
         private PNCallback<PNAccessManagerGrantResult> savedCallback;
         private Dictionary<string, object> queryParam;
@@ -72,6 +73,12 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        public GrantOperation Delete(bool delete)
+        {
+            this.grantDelete = delete;
+            return this;
+        }
+
         public GrantOperation TTL(long ttl)
         {
             this.grantTTL = ttl;
@@ -90,13 +97,13 @@ namespace PubnubApi.EndPoint
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, this.queryParam, callback);
+                GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantDelete, this.grantManage, this.grantTTL, this.queryParam, callback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
                 this.savedCallback = callback;
-                GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, this.queryParam, callback);
+                GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantDelete, this.grantManage, this.grantTTL, this.queryParam, callback);
             })
             { IsBackground = true }.Start();
 #endif
@@ -107,18 +114,18 @@ namespace PubnubApi.EndPoint
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
-                GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, this.queryParam, savedCallback);
+                GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantDelete, this.grantManage, this.grantTTL, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
-                GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantManage, this.grantTTL, this.queryParam, savedCallback);
+                GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantDelete, this.grantManage, this.grantTTL, this.queryParam, savedCallback);
             })
             { IsBackground = true }.Start();
 #endif
         }
 
-        internal void GrantAccess(string[] channels, string[] channelGroups, string[] authKeys, bool read, bool write, bool manage, long ttl, Dictionary<string, object> externalQueryParam, PNCallback<PNAccessManagerGrantResult> callback)
+        internal void GrantAccess(string[] channels, string[] channelGroups, string[] authKeys, bool read, bool write, bool delete, bool manage, long ttl, Dictionary<string, object> externalQueryParam, PNCallback<PNAccessManagerGrantResult> callback)
         {
             if (string.IsNullOrEmpty(config.SecretKey) || string.IsNullOrEmpty(config.SecretKey.Trim()) || config.SecretKey.Length <= 0)
             {
@@ -153,7 +160,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildGrantAccessRequest(channelsCommaDelimited, channelGroupsCommaDelimited, authKeysCommaDelimited, read, write, manage, ttl, externalQueryParam);
+            Uri request = urlBuilder.BuildGrantAccessRequest(channelsCommaDelimited, channelGroupsCommaDelimited, authKeysCommaDelimited, read, write, delete, manage, ttl, externalQueryParam);
 
             RequestState<PNAccessManagerGrantResult> requestState = new RequestState<PNAccessManagerGrantResult>();
             requestState.Channels = channels;

@@ -14,7 +14,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubPCL</PackageId>
-    <PackageVersion>4.0.21.0</PackageVersion>
+    <PackageVersion>4.0.22.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -22,8 +22,8 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Refactored code to improve performance of calls.
-Refactored CleanupTelemetryData.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added Grant Delete permission feature
+Modified dependency Portable.BouncyCastle minimum version to 1.8.1.2, to support compatibility during version upgrades.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -457,7 +457,7 @@ Refactored CleanupTelemetryData.</PackageReleaseNotes>
   </ItemGroup>
   
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
-    <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.1">
+    <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.2">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Net.Requests" Version="4.0.11">
@@ -481,7 +481,7 @@ Refactored CleanupTelemetryData.</PackageReleaseNotes>
   </ItemGroup>
   
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
-    <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.1">
+    <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.2">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Net.Requests" Version="4.0.11">
@@ -490,7 +490,7 @@ Refactored CleanupTelemetryData.</PackageReleaseNotes>
   </ItemGroup>
   
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.1">
+    <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.2">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Net.Requests" Version="4.0.11">
@@ -539,7 +539,7 @@ Refactored CleanupTelemetryData.</PackageReleaseNotes>
   </ItemGroup>-->
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.4' ">
-    <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.1">
+    <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.2">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Net.Requests" Version="4.0.11">
@@ -575,7 +575,7 @@ Refactored CleanupTelemetryData.</PackageReleaseNotes>
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.1">
+    <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.2">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Net.Requests" Version="4.0.11">
