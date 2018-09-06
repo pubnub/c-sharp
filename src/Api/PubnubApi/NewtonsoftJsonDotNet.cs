@@ -424,6 +424,7 @@ namespace PubnubApi
                                                                 authData.ReadEnabled = grantAckChannelAuthDataDic["r"].ToString() == "1";
                                                                 authData.WriteEnabled = grantAckChannelAuthDataDic["w"].ToString() == "1";
                                                                 authData.ManageEnabled = grantAckChannelAuthDataDic.ContainsKey("m") ? grantAckChannelAuthDataDic["m"].ToString() == "1" : false;
+                                                                authData.DeleteEnabled = grantAckChannelAuthDataDic.ContainsKey("d") ? grantAckChannelAuthDataDic["d"].ToString() == "1" : false;
 
                                                                 authKeyDataDic.Add(authKey, authData);
                                                             }
@@ -459,6 +460,7 @@ namespace PubnubApi
                                                     authData.ReadEnabled = grantAckChannelAuthDataDic["r"].ToString() == "1";
                                                     authData.WriteEnabled = grantAckChannelAuthDataDic["w"].ToString() == "1";
                                                     authData.ManageEnabled = grantAckChannelAuthDataDic.ContainsKey("m") ? grantAckChannelAuthDataDic["m"].ToString() == "1" : false;
+                                                    authData.DeleteEnabled = grantAckChannelAuthDataDic.ContainsKey("d") ? grantAckChannelAuthDataDic["d"].ToString() == "1" : false;
 
                                                     authKeyDataDic.Add(authKey, authData);
                                                 }
@@ -498,6 +500,7 @@ namespace PubnubApi
                                                                 authData.ReadEnabled = grantAckCgAuthDataDic["r"].ToString() == "1";
                                                                 authData.WriteEnabled = grantAckCgAuthDataDic["w"].ToString() == "1";
                                                                 authData.ManageEnabled = grantAckCgAuthDataDic.ContainsKey("m") ? grantAckCgAuthDataDic["m"].ToString() == "1" : false;
+                                                                authData.DeleteEnabled = grantAckCgAuthDataDic.ContainsKey("d") ? grantAckCgAuthDataDic["d"].ToString() == "1" : false;
 
                                                                 authKeyDataDic.Add(authKey, authData);
                                                             }
@@ -530,6 +533,7 @@ namespace PubnubApi
                                                         authData.ReadEnabled = grantAckChannelAuthDataDic["r"].ToString() == "1";
                                                         authData.WriteEnabled = grantAckChannelAuthDataDic["w"].ToString() == "1";
                                                         authData.ManageEnabled = grantAckChannelAuthDataDic.ContainsKey("m") ? grantAckChannelAuthDataDic["m"].ToString() == "1" : false;
+                                                        authData.DeleteEnabled = grantAckChannelAuthDataDic.ContainsKey("d") ? grantAckChannelAuthDataDic["d"].ToString() == "1" : false;
 
                                                         authKeyDataDic.Add(authKey, authData);
                                                     }
@@ -564,6 +568,7 @@ namespace PubnubApi
                                                     authData.ReadEnabled = grantAckChannelAuthDataDic["r"].ToString() == "1";
                                                     authData.WriteEnabled = grantAckChannelAuthDataDic["w"].ToString() == "1";
                                                     authData.ManageEnabled = grantAckChannelAuthDataDic.ContainsKey("m") ? grantAckChannelAuthDataDic["m"].ToString() == "1" : false;
+                                                    authData.DeleteEnabled = grantAckChannelAuthDataDic.ContainsKey("d") ? grantAckChannelAuthDataDic["d"].ToString() == "1" : false;
 
                                                     authKeyDataDic.Add(authKey, authData);
                                                 }
@@ -636,6 +641,7 @@ namespace PubnubApi
                                             authData.ReadEnabled = authDataDic["r"].ToString() == "1";
                                             authData.WriteEnabled = authDataDic["w"].ToString() == "1";
                                             authData.ManageEnabled = authDataDic.ContainsKey("m") ? authDataDic["m"].ToString() == "1" : false;
+                                            authData.DeleteEnabled = authDataDic.ContainsKey("d") ? authDataDic["d"].ToString() == "1" : false;
 
                                             ack.AuthKeys.Add(authKey, authData);
                                         }

@@ -29,7 +29,7 @@ namespace PubnubApi.Interface
 
         Uri BuildWhereNowRequest(string uuid, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildGrantAccessRequest(string channelsCommaDelimited, string channelGroupsCommaDelimited, string authKeysCommaDelimited, bool read, bool write, bool manage, long ttl, Dictionary<string, object> externalQueryParam);
+        Uri BuildGrantAccessRequest(string channelsCommaDelimited, string channelGroupsCommaDelimited, string authKeysCommaDelimited, bool read, bool write, bool delete, bool manage, long ttl, Dictionary<string, object> externalQueryParam);
 
         Uri BuildAuditAccessRequest(string channel, string channelGroup, string authKeysCommaDelimited, Dictionary<string, object> externalQueryParam);
 

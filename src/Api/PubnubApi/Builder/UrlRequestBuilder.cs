@@ -400,7 +400,7 @@ namespace PubnubApi
             return BuildRestApiRequest<Uri>(url, currentType, queryParams);
         }
 
-        Uri IUrlRequestBuilder.BuildGrantAccessRequest(string channelsCommaDelimited, string channelGroupsCommaDelimited, string authKeysCommaDelimited, bool read, bool write, bool manage, long ttl, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildGrantAccessRequest(string channelsCommaDelimited, string channelGroupsCommaDelimited, string authKeysCommaDelimited, bool read, bool write, bool delete, bool manage, long ttl, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNAccessManagerGrant;
 
@@ -435,6 +435,7 @@ namespace PubnubApi
 
             requestQueryStringParams.Add("r", Convert.ToInt32(read).ToString());
             requestQueryStringParams.Add("w", Convert.ToInt32(write).ToString());
+            requestQueryStringParams.Add("d", Convert.ToInt32(delete).ToString());
             requestQueryStringParams.Add("m", Convert.ToInt32(manage).ToString());
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
