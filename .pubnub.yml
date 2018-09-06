@@ -1,8 +1,15 @@
 name: c-sharp
-version: "4.0.21.0"
+version: "4.0.22.0"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
+  - version: 4.0.22.0
+    date: Sept 06, 2018
+    changes:
+      - type: Improvement
+        text: Added Grant delete permission feature
+      - type: Improvement
+        text: Modified SDK dependency Portable.BouncyCastle minimum version to 1.8.1.2
   - version: 4.0.21.0
     date: Aug 13, 2018
     changes:
@@ -318,7 +325,7 @@ features:
     - SUBSCRIBE-PUBLISHER-UUID
 supported-platforms:
   - 
-    version: Pubnub 'C#' 4.0.21.0
+    version: Pubnub 'C#' 4.0.22.0
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
@@ -328,7 +335,7 @@ supported-platforms:
       - .Net Framework 4.5
       - .Net Framework 4.6.1+
   - 
-    version: PubnubPCL 'C#' 4.0.21.0
+    version: PubnubPCL 'C#' 4.0.22.0
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -345,7 +352,7 @@ supported-platforms:
       - .Net Standard 2.0
       - .Net Core
   - 
-    version: PubnubUWP 'C#' 4.0.21.0
+    version: PubnubUWP 'C#' 4.0.22.0
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
