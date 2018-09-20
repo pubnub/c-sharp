@@ -11,7 +11,7 @@ namespace PubnubApi.EndPoint
         private readonly IJsonPluggableLibrary jsonLib;
         private readonly IPubnubLog pubnubLog;
         private readonly PubnubCrypto dedupHasher;
-        private static ConcurrentDictionary<string, long> HashHistory { get; set; } = new ConcurrentDictionary<string, long>();
+        private static ConcurrentDictionary<string, long> HashHistory { get; } = new ConcurrentDictionary<string, long>();
 
         public DuplicationManager(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log)
         {

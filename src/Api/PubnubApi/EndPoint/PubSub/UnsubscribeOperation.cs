@@ -18,7 +18,6 @@ namespace PubnubApi.EndPoint
 
         private string[] subscribeChannelNames;
         private string[] subscribeChannelGroupNames;
-        private string[] presenceChannelNames = new string[] { };
         private Dictionary<string, object> queryParam;
 
         public UnsubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, instance)
