@@ -128,22 +128,24 @@ namespace PubnubApi
         {
             string jsonString = "";
             HttpResponseMessage response = null;
+            CancellationTokenSource cts = new CancellationTokenSource();
             try
             {
                 LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Inside SendRequestAndGetJsonResponseHttpClient", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                cts.CancelAfter(GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000);
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
                 if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
                 {
-                    response = await httpClientSubscribe.GetAsync(requestUri).ConfigureAwait(false);
+                    response = await httpClientSubscribe.GetAsync(requestUri, cts.Token).ConfigureAwait(false);
                 }
                 else if (pubnubRequestState.ResponseType == PNOperationType.PNDeleteMessageOperation)
                 {
-                    response = await httpClientNonsubscribe.DeleteAsync(requestUri).ConfigureAwait(false);
+                    response = await httpClientNonsubscribe.DeleteAsync(requestUri, cts.Token).ConfigureAwait(false);
                 }
                 else
                 {
-                    response = await httpClientNonsubscribe.GetAsync(requestUri).ConfigureAwait(false);
+                    response = await httpClientNonsubscribe.GetAsync(requestUri, cts.Token).ConfigureAwait(false);
                 }
                 if (response.IsSuccessStatusCode || response.Content != null)
                 {
@@ -167,8 +169,38 @@ namespace PubnubApi
                 }
 
             }
-            catch
+            catch (HttpRequestException httpReqEx)
             {
+                if (httpReqEx.InnerException is WebException)
+                {
+                    WebException currentWebException = httpReqEx.InnerException as WebException;
+                    if (currentWebException != null)
+                    {
+                        if (currentWebException.Response != null)
+                        {
+                            pubnubRequestState.Response = currentWebException.Response as HttpWebResponse;
+                            using (StreamReader streamReader = new StreamReader(currentWebException.Response.GetResponseStream()))
+                            {
+                                //Need to return this response 
+                                jsonString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
+                                System.Diagnostics.Debug.WriteLine(jsonString);
+                                System.Diagnostics.Debug.WriteLine("");
+                                System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON from HttpClient WebException response", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
+                                return jsonString;
+                            }
+                        }
+                    }
+                    
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, SendRequestAndGetJsonResponseHttpClient InnerException WebException status {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ((WebException)httpReqEx.InnerException).Status.ToString()), pubnubConfig.LogVerbosity);
+                    throw httpReqEx.InnerException;
+                }
+
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, SendRequestAndGetJsonResponseHttpClient HttpRequestException {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), httpReqEx.Message), pubnubConfig.LogVerbosity);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, SendRequestAndGetJsonResponseHttpClient Exception {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex.Message), pubnubConfig.LogVerbosity);
                 throw;
             }
             finally
@@ -187,20 +219,21 @@ namespace PubnubApi
         {
             string jsonString = "";
             HttpResponseMessage response = null;
+            CancellationTokenSource cts = new CancellationTokenSource();
             try
             {
                 System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, SendRequestAndGetJsonResponseHttpClientPOST Before httpClient.GetAsync", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
-                
+                cts.CancelAfter(GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000);
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
                 StringContent jsonPostString = new StringContent(postData, Encoding.UTF8);
                 if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
                 {
-                    response = await httpClientSubscribe.PostAsync(requestUri, jsonPostString).ConfigureAwait(false);
+                    response = await httpClientSubscribe.PostAsync(requestUri, jsonPostString, cts.Token).ConfigureAwait(false);
                 }
                 else
                 {
-                    response = await httpClientNonsubscribe.PostAsync(requestUri, jsonPostString).ConfigureAwait(false);
+                    response = await httpClientNonsubscribe.PostAsync(requestUri, jsonPostString, cts.Token).ConfigureAwait(false);
                 }
 
                 if (response.IsSuccessStatusCode || response.Content != null)
@@ -225,8 +258,38 @@ namespace PubnubApi
                 }
 
             }
-            catch
+            catch (HttpRequestException httpReqEx)
             {
+                if (httpReqEx.InnerException is WebException)
+                {
+                    WebException currentWebException = httpReqEx.InnerException as WebException;
+                    if (currentWebException != null)
+                    {
+                        if (currentWebException.Response != null)
+                        {
+                            pubnubRequestState.Response = currentWebException.Response as HttpWebResponse;
+                            using (StreamReader streamReader = new StreamReader(currentWebException.Response.GetResponseStream()))
+                            {
+                                //Need to return this response 
+                                jsonString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
+                                System.Diagnostics.Debug.WriteLine(jsonString);
+                                System.Diagnostics.Debug.WriteLine("");
+                                System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON from HttpClient POST WebException response", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
+                                return jsonString;
+                            }
+                        }
+                    }
+
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, SendRequestAndGetJsonResponseHttpClientPOST InnerException WebException status {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ((WebException)httpReqEx.InnerException).Status.ToString()), pubnubConfig.LogVerbosity);
+                    throw httpReqEx.InnerException;
+                }
+
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, SendRequestAndGetJsonResponseHttpClientPOST HttpRequestException {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), httpReqEx.Message), pubnubConfig.LogVerbosity);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, SendRequestAndGetJsonResponseHttpClientPOST Exception {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex.Message), pubnubConfig.LogVerbosity);
                 throw;
             }
             finally
@@ -249,7 +312,7 @@ namespace PubnubApi
             try
             {
                 request.Method = (pubnubRequestState != null && pubnubRequestState.ResponseType == PNOperationType.PNDeleteMessageOperation) ? "DELETE" : "GET";
-                Timer webRequestTimer = new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000, Timeout.Infinite);
+                new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000, Timeout.Infinite);
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
                 response = await Task.Factory.FromAsync<HttpWebResponse>(request.BeginGetResponse, asyncPubnubResult => (HttpWebResponse)request.EndGetResponse(asyncPubnubResult), pubnubRequestState).ConfigureAwait(false);
@@ -420,7 +483,7 @@ namespace PubnubApi
                 System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Before BeginGetResponse", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
-                IAsyncResult asyncResult = request.BeginGetResponse(new AsyncCallback(
+                request.BeginGetResponse(new AsyncCallback(
                     async (asynchronousResult) => {
                         RequestState<T> asyncRequestState = asynchronousResult.AsyncState as RequestState<T>;
                         HttpWebRequest asyncWebRequest = asyncRequestState.Request as HttpWebRequest;
