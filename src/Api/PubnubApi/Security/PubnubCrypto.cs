@@ -118,7 +118,7 @@ namespace PubnubApi
                     cipher.Init(false, keyParamWithIV);
                     byte[] encryptedBytes = new byte[cipher.GetOutputSize(inputBytes.Length)];
                     int encryptLength = cipher.ProcessBytes(inputBytes, encryptedBytes, 0);
-                    int numOfOutputBytes = cipher.DoFinal(encryptedBytes, encryptLength); //Do the final block
+                    cipher.DoFinal(encryptedBytes, encryptLength); //Do the final block
                     int len = Array.IndexOf(encryptedBytes, (byte)0);
                     len = (len == -1) ? encryptedBytes.Length : len;
                     string actualInput = Encoding.UTF8.GetString(encryptedBytes, 0, len);
