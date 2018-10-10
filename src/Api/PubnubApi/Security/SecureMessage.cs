@@ -58,8 +58,14 @@ namespace PubnubApi
 
                             PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(ex);
                             PNStatus status = new StatusBuilder(config, jsonLib).CreateStatusResponse<T>(PNOperationType.PNHistoryOperation, category, null, (int)HttpStatusCode.NotFound, new PNException(ex));
-                            status.AffectedChannels.AddRange(channels);
-                            status.AffectedChannelGroups.AddRange(channelGroups);
+                            if (channels != null && channels.Length > 0)
+                            {
+                                status.AffectedChannels.AddRange(channels);
+                            }
+                            if (channelGroups != null && channelGroups.Length > 0)
+                            {
+                                status.AffectedChannelGroups.AddRange(channelGroups);
+                            }
 
                             errorCallback.OnResponse(default(T), status);
                         }
