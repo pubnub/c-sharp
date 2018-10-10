@@ -4,7 +4,7 @@ schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
   - version: 4.0.24.0
-    date: Oct 01, 2018
+    date: Oct 11, 2018
     changes:
       - type: Improvement
         text: Code refactor to check null value of variables related to Reconnect usage
