@@ -714,12 +714,12 @@ namespace PubnubApi
                     PNStatusCategory errorCategory = PNStatusCategory.PNTimeoutCategory;
                     PNStatus status = new StatusBuilder(pubnubConfig, jsonLib).CreateStatusResponse<T>(currentState.ResponseType, errorCategory, currentState, (int)HttpStatusCode.NotFound, new PNException("Request timeout"));
 
-                    if (currentState.Channels != null)
+                    if (currentState.Channels != null && currentState.Channels.Length > 0)
                     {
                         status.AffectedChannels.AddRange(currentState.Channels);
                     }
 
-                    if (currentState.ChannelGroups != null)
+                    if (currentState.ChannelGroups != null && currentState.ChannelGroups.Length > 0)
                     {
                         status.AffectedChannels.AddRange(currentState.ChannelGroups);
                     }

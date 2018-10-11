@@ -152,6 +152,11 @@ namespace PubnubApi.EndPoint
 
         internal bool Retry(bool reconnect)
         {
+            if (manager == null)
+            {
+                return false;
+            }
+
             if (reconnect)
             {
                 return manager.Reconnect<T>(false);
@@ -164,6 +169,11 @@ namespace PubnubApi.EndPoint
 
         internal bool Retry(bool reconnect, bool resetSubscribeTimetoken)
         {
+            if (manager == null)
+            {
+                return false;
+            }
+
             if (reconnect)
             {
                 return manager.Reconnect<T>(resetSubscribeTimetoken);

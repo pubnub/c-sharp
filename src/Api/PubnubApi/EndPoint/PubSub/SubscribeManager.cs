@@ -743,12 +743,12 @@ namespace PubnubApi.EndPoint
 
                 PNStatusCategory errorCategory = PNStatusCategoryHelper.GetPNStatusCategory(ex);
                 PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, errorCategory, pubnubRequestState, (int)HttpStatusCode.NotFound, new PNException(ex));
-                if (channels != null)
+                if (channels != null && channels.Length > 0)
                 {
                     status.AffectedChannels.AddRange(channels);
                 }
 
-                if (channelGroups != null)
+                if (channelGroups != null && channelGroups.Length > 0)
                 {
                     status.AffectedChannels.AddRange(channelGroups);
                 }
@@ -862,8 +862,14 @@ namespace PubnubApi.EndPoint
                     {
                         PNStatusCategory errorCategory =  PNStatusCategory.PNNetworkIssuesCategory;
                         PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, errorCategory, null, (int)HttpStatusCode.NotFound, new PNException("SDK Network related error"));
-                        status.AffectedChannels.AddRange(channels);
-                        status.AffectedChannels.AddRange(channelGroups);
+                        if (channels != null && channels.Length > 0)
+                        {
+                            status.AffectedChannels.AddRange(channels);
+                        }
+                        if (channelGroups != null && channelGroups.Length > 0)
+                        {
+                            status.AffectedChannels.AddRange(channelGroups);
+                        }
                         Announce(status);
 
                     }
@@ -954,8 +960,14 @@ namespace PubnubApi.EndPoint
 
                     PNStatusCategory errorCategory = PNStatusCategory.PNNetworkIssuesCategory;
                     PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNSubscribeOperation, errorCategory, null, (int)HttpStatusCode.NotFound, new PNException("SDK Network related error"));
-                    status.AffectedChannels.AddRange(channels);
-                    status.AffectedChannels.AddRange(chananelGroups);
+                    if (channels != null && channels.Length > 0)
+                    {
+                        status.AffectedChannels.AddRange(channels);
+                    }
+                    if (chananelGroups != null && chananelGroups.Length > 0)
+                    {
+                        status.AffectedChannels.AddRange(chananelGroups);
+                    }
                     Announce(status);
 
                     return false;
@@ -1302,11 +1314,11 @@ namespace PubnubApi.EndPoint
                 {
                     PNStatusCategory errorCategory = PNStatusCategoryHelper.GetPNStatusCategory(ex);
                     PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, errorCategory, null, (int)HttpStatusCode.NotFound, new PNException(ex));
-                    if (netState.Channels != null)
+                    if (netState.Channels != null && netState.Channels.Length > 0)
                     {
                         status.AffectedChannels.AddRange(netState.Channels.ToList());
                     }
-                    if (netState.ChannelGroups != null)
+                    if (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)
                     {
                         status.AffectedChannels.AddRange(netState.ChannelGroups.ToList());
                     }
