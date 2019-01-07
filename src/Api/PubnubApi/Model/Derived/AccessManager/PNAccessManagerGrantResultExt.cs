@@ -8,7 +8,7 @@ namespace PubnubApi
 {
     public class PNAccessManagerGrantResultExt: PNCallback<PNAccessManagerGrantResult>
     {
-        readonly Action<PNAccessManagerGrantResult, PNStatus> callbackAction = null;
+        readonly Action<PNAccessManagerGrantResult, PNStatus> callbackAction;
 
         public PNAccessManagerGrantResultExt(Action<PNAccessManagerGrantResult, PNStatus> callback)
         {

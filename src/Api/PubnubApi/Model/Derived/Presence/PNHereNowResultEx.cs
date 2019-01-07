@@ -8,7 +8,7 @@ namespace PubnubApi
 {
     public class PNHereNowResultEx : PNCallback<PNHereNowResult>
     {
-        readonly Action<PNHereNowResult, PNStatus> callbackAction = null;
+        readonly Action<PNHereNowResult, PNStatus> callbackAction;
 
         public PNHereNowResultEx(Action<PNHereNowResult, PNStatus> callback)
         {

@@ -8,7 +8,7 @@ namespace PubnubApi
 {
     public class PNDeleteMessageResultExt : PNCallback<PNDeleteMessageResult>
     {
-        readonly Action<PNDeleteMessageResult, PNStatus> callbackAction = null;
+        readonly Action<PNDeleteMessageResult, PNStatus> callbackAction;
 
         public PNDeleteMessageResultExt(Action<PNDeleteMessageResult, PNStatus> callback)
         {

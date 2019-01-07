@@ -4,7 +4,7 @@ namespace PubnubApi
 {
     public class PNPushRemoveChannelResultExt : PNCallback<PNPushRemoveChannelResult>
     {
-        readonly Action<PNPushRemoveChannelResult, PNStatus> callbackAction = null;
+        readonly Action<PNPushRemoveChannelResult, PNStatus> callbackAction;
 
         public PNPushRemoveChannelResultExt(Action<PNPushRemoveChannelResult, PNStatus> callback)
         {

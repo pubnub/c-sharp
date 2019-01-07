@@ -8,7 +8,7 @@ namespace PubnubApi
 {
     public class PNPushAddChannelResultExt : PNCallback<PNPushAddChannelResult>
     {
-        readonly Action<PNPushAddChannelResult, PNStatus> callbackAction = null;
+        readonly Action<PNPushAddChannelResult, PNStatus> callbackAction;
 
         public PNPushAddChannelResultExt(Action<PNPushAddChannelResult, PNStatus> callback)
         {

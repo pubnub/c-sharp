@@ -223,7 +223,9 @@ namespace PubnubApi.EndPoint
                                     LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unable to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelUnSubscribeInit).", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.LogVerbosity);
                                 }
                                 if (webRequest != null)
+                                {
                                     TerminatePendingWebRequest(webRequest);
+                                }
                             }
                             else
                             {
