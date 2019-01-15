@@ -63,8 +63,6 @@ namespace PubnubApi
         /// </summary>
         private object u { get; set; }
 
-        public SubscribeMessage() { }
-
         public string Shard
         {
             get

@@ -15,7 +15,7 @@ namespace PubnubApi
 {
     public abstract class PubnubCryptoBase
     {
-        private string cipherKey = "";
+        private readonly string cipherKey = "";
         public PubnubCryptoBase(string cipher_key)
         {
             this.cipherKey = cipher_key;
@@ -44,7 +44,7 @@ namespace PubnubApi
             //delete the "-" that appear after every 2 chars
             string strKeySHA256Hash = strKeySHA256HashRaw.Replace("-", "").Substring(0, 32);
             //convert to lower case
-            return strKeySHA256Hash.ToLower();
+            return strKeySHA256Hash.ToLowerInvariant();
         }
 
         /**
@@ -99,7 +99,7 @@ namespace PubnubApi
         /// <param name='value'>
         /// Value.
         /// </param>
-        protected string EncodeNonAsciiCharacters(string value)
+        protected static string EncodeNonAsciiCharacters(string value)
         {
             StringBuilder sb = new StringBuilder();
             foreach (char c in value)

@@ -113,7 +113,7 @@ namespace PubnubApi
             }
         }
 
-        private char ToHex(int ch)
+        private static char ToHex(int ch)
         {
             return (char)(ch < 10 ? '0' + ch : 'A' + ch - 10);
         }

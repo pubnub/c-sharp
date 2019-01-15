@@ -12,11 +12,10 @@ namespace PubnubApi
         private PNConfiguration config;
         private IJsonPluggableLibrary jsonLib;
         private IPubnubLog pubnubLog;
-        private static SecureMessage secureMessage;
 
         public static SecureMessage Instance(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log)
         {
-            secureMessage = new SecureMessage();
+            SecureMessage secureMessage = new SecureMessage();
             secureMessage.config = pubnubConfig;
             secureMessage.jsonLib = jsonPluggableLibrary;
             secureMessage.pubnubLog = log;

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using PubnubApi.Interface;
+using System.Globalization;
 
 namespace PubnubApi
 {
@@ -77,12 +78,13 @@ namespace PubnubApi
             url.Add(channelForUrl);
             url.Add("0");
 
-            if (initialSubscribeUrlParams == null)
+            Dictionary<string, string> internalInitialSubscribeUrlParams = new Dictionary<string, string>();
+            if (initialSubscribeUrlParams != null)
             {
-                initialSubscribeUrlParams = new Dictionary<string, string>();
+                internalInitialSubscribeUrlParams = initialSubscribeUrlParams;
             }
 
-            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>(initialSubscribeUrlParams);
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>(internalInitialSubscribeUrlParams);
 
             if (!requestQueryStringParams.ContainsKey("filter-expr") && !string.IsNullOrEmpty(pubnubConfig.FilterExpression))
             {
@@ -192,12 +194,13 @@ namespace PubnubApi
                 url.Add(message);
             }
 
-            if (additionalUrlParams == null)
+            Dictionary<string, string> additionalUrlParamsDic = new Dictionary<string, string>();
+            if (additionalUrlParams != null)
             {
-                additionalUrlParams = new Dictionary<string, string>();
+                additionalUrlParamsDic = additionalUrlParams;
             }
 
-            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>(additionalUrlParams);
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>(additionalUrlParamsDic);
 
             if (userMetaData != null)
             {
@@ -297,20 +300,20 @@ namespace PubnubApi
 
             if (reverse)
             {
-                requestQueryStringParams.Add("reverse", reverse.ToString().ToLower());
+                requestQueryStringParams.Add("reverse", "true");
             }
             if (start != -1)
             {
-                requestQueryStringParams.Add("start", start.ToString().ToLower());
+                requestQueryStringParams.Add("start", start.ToString(CultureInfo.InvariantCulture));
             }
             if (end != -1)
             {
-                requestQueryStringParams.Add("end", end.ToString().ToLower());
+                requestQueryStringParams.Add("end", end.ToString(CultureInfo.InvariantCulture));
             }
 
             if (includeToken)
             {
-                requestQueryStringParams.Add("include_token", includeToken.ToString().ToLower());
+                requestQueryStringParams.Add("include_token", "true");
             }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -346,11 +349,11 @@ namespace PubnubApi
 
             if (start != -1)
             {
-                requestQueryStringParams.Add("start", start.ToString().ToLower());
+                requestQueryStringParams.Add("start", start.ToString(CultureInfo.InvariantCulture));
             }
             if (end != -1)
             {
-                requestQueryStringParams.Add("end", end.ToString().ToLower());
+                requestQueryStringParams.Add("end", end.ToString(CultureInfo.InvariantCulture));
             }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -550,10 +553,15 @@ namespace PubnubApi
         Uri IUrlRequestBuilder.BuildSetUserStateRequest(string channelsCommaDelimited, string channelGroupsCommaDelimited, string uuid, string jsonUserState, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNSetStateOperation;
+            string internalChannelsCommaDelimited;
 
             if (string.IsNullOrEmpty(channelsCommaDelimited) && channelsCommaDelimited.Trim().Length <= 0)
             {
-                channelsCommaDelimited = ",";
+                internalChannelsCommaDelimited = ",";
+            }
+            else
+            {
+                internalChannelsCommaDelimited = channelsCommaDelimited;
             }
 
             List<string> url = new List<string>();
@@ -562,7 +570,7 @@ namespace PubnubApi
             url.Add("sub_key");
             url.Add(pubnubConfig.SubscribeKey);
             url.Add("channel");
-            url.Add(channelsCommaDelimited);
+            url.Add(internalChannelsCommaDelimited);
             url.Add("uuid");
             url.Add(uuid);
             url.Add("data");
@@ -903,7 +911,7 @@ namespace PubnubApi
             url.Add("sub-key");
             url.Add(pubnubConfig.SubscribeKey);
             url.Add("devices");
-            url.Add(pushToken.ToString());
+            url.Add(pushToken);
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
@@ -1033,7 +1041,7 @@ namespace PubnubApi
 
             PubnubCrypto pubnubCrypto = new PubnubCrypto(this.pubnubConfig.CipherKey, this.pubnubConfig, this.pubnubLog);
             signature = pubnubCrypto.PubnubAccessManagerSign(this.pubnubConfig.SecretKey, string_to_sign.ToString());
-            System.Diagnostics.Debug.WriteLine("string_to_sign = " + string_to_sign.ToString());
+            System.Diagnostics.Debug.WriteLine("string_to_sign = " + string_to_sign);
             System.Diagnostics.Debug.WriteLine("signature = " + signature);
             return signature;
         }
@@ -1044,13 +1052,14 @@ namespace PubnubApi
 
             try
             {
-                if (queryStringParamDic == null)
+                Dictionary<string, string> internalQueryStringParamDic = new Dictionary<string, string>();
+                if (queryStringParamDic != null)
                 {
-                    queryStringParamDic = new Dictionary<string, string>();
+                    internalQueryStringParamDic = queryStringParamDic;
                 }
 
                 Dictionary<string, string> commonQueryStringParams = GenerateCommonQueryParams(type);
-                Dictionary<string, string> queryStringParams = new Dictionary<string, string>(commonQueryStringParams.Concat(queryStringParamDic).GroupBy(item => item.Key).ToDictionary(item => item.Key, item => item.First().Value));
+                Dictionary<string, string> queryStringParams = new Dictionary<string, string>(commonQueryStringParams.Concat(internalQueryStringParamDic).GroupBy(item => item.Key).ToDictionary(item => item.Key, item => item.First().Value));
 
                 string queryToSign = string.Join("&", queryStringParams.OrderBy(kvp => kvp.Key).Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value)).ToArray());
 

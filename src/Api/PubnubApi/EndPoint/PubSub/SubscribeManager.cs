@@ -706,15 +706,10 @@ namespace PubnubApi.EndPoint
                             }
                         }
 
-                        switch (pubnubRequestState.ResponseType)
+                        if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
                         {
-                            case PNOperationType.PNSubscribeOperation:
-                                MultiplexInternalCallback<T>(pubnubRequestState.ResponseType, result);
-                                break;
-                            default:
-                                break;
+                            MultiplexInternalCallback<T>(pubnubRequestState.ResponseType, result);
                         }
-
                     }
                     else
                     {

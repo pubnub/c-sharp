@@ -1219,7 +1219,7 @@ namespace PubnubApi
 
                 Int64.TryParse(listObject[0].ToString(), out timetoken);
 
-                PNTimeResult result = new PNTimeResult()
+                PNTimeResult result = new PNTimeResult
                 {
                     Timetoken = timetoken
                 };

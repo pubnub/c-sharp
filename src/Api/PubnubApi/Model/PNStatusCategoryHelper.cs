@@ -31,7 +31,6 @@ namespace PubnubApi
                     else
                     {
                         Debug.WriteLine("ATTENTION: webExceptionStatus = " + webExceptionStatus.ToString());
-                        ret = PNStatusCategory.PNUnknownCategory;
                     }
                     break;
             }
@@ -111,10 +110,7 @@ namespace PubnubApi
             {
                 ret = PNStatusCategory.PNDisconnectedCategory;
             }
-            else
-            {
-                ret = PNStatusCategory.PNUnknownCategory;
-            }
+
             return ret;
         }
 
