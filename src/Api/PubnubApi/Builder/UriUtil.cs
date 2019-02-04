@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -8,10 +9,12 @@ namespace PubnubApi
 {
     public class UriUtil
     {
-        public string EncodeUriComponent(string s, PNOperationType type, bool ignoreComma, bool ignoreColon, bool ignorePercent2fEncode)
+        public string EncodeUriComponent(bool forPamSign, string s, PNOperationType type, bool ignoreComma, bool ignoreColon, bool ignorePercent2fEncode)
         {
             string encodedUri = "";
             bool prevSurroagePair = false;
+            bool tildeCharPresent = s != null && s.IndexOf("~") > 0;
+            //System.Diagnostics.Debug.WriteLine("s = " + s);
             StringBuilder o = new StringBuilder();
             for (int index = 0; index < s.Length; index++)
             {
@@ -21,8 +24,14 @@ namespace PubnubApi
                     prevSurroagePair = false;
                     continue;
                 }
+                if (forPamSign) {
+                    if (ch.ToString() == "!")
+                    {
+                        //System.Diagnostics.Debug.WriteLine(ch.ToString());
+                    }
+                }
 
-                if (IsUnsafe(ch, ignoreComma, ignoreColon))
+                if (!forPamSign && IsUnsafeToEncode(ch, ignoreComma, ignoreColon))
                 {
                     o.Append('%');
                     o.Append(ToHex(ch / 16));
@@ -73,8 +82,29 @@ namespace PubnubApi
 
                         prevSurroagePair = true;
                     }
+                    else if (forPamSign && IsUnsafeToEscapeForPamSign(ch) && tildeCharPresent)
+                    {
+                        if (ch.ToString() == "~") {
+                            System.Diagnostics.Debug.WriteLine(ch.ToString() + "is true for IsUnsafeToEscapeForPamSign");
+                        }
+                        o.Append(ch);
+                    }
+                    //else if (forPamSign && IsSafeToEscapeForPamSign(ch))
+                    //{
+                    //    if (ch.ToString() == "~")
+                    //    {
+                    //        System.Diagnostics.Debug.WriteLine(ch.ToString() + "is true for IsSafeToEscapeForPamSign");
+                    //    }
+                    //    o.Append('%');
+                    //    o.Append(ToHex(ch / 16));
+                    //    o.Append(ToHex(ch % 16));
+                    //}
                     else
                     {
+                        if (ch.ToString() == "~")
+                        {
+                            System.Diagnostics.Debug.WriteLine(ch.ToString() + " is EscapeDataString");
+                        }
                         string escapeChar = System.Uri.EscapeDataString(ch.ToString());
                         o.Append(escapeChar);
                     }
@@ -93,7 +123,7 @@ namespace PubnubApi
             return encodedUri;
         }
 
-        private static bool IsUnsafe(char ch, bool ignoreComma, bool ignoreColon)
+        private static bool IsUnsafeToEncode(char ch, bool ignoreComma, bool ignoreColon)
         {
             if (ignoreComma && ignoreColon)
             {
@@ -111,6 +141,15 @@ namespace PubnubApi
             {
                 return " ~`!@#$%^&*()+=[]\\{}|;':\",/<>?".IndexOf(ch) >= 0;
             }
+        }
+
+        private static bool IsUnsafeToEscapeForPamSign(char ch)
+        {
+            return "*()':!".IndexOf(ch.ToString()) >= 0;
+        }
+        private static bool IsSafeToEscapeForPamSign(char ch)
+        {
+            return "~".IndexOf(ch.ToString()) >= 0;
         }
 
         private static char ToHex(int ch)

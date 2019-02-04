@@ -21,7 +21,7 @@ namespace PubnubApi
         }
 
         #region IJsonPlugableLibrary methods implementation
-        private bool IsValidJson(string jsonString, PNOperationType operationType)
+        private static bool IsValidJson(string jsonString, PNOperationType operationType)
         {
             bool ret = false;
             try
