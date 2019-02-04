@@ -408,6 +408,10 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
             server.RunOnHttps(false);
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
@@ -523,7 +527,12 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
             server.RunOnHttps(false);
+
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
@@ -860,6 +869,10 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = true
             };
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
             server.RunOnHttps(true);
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
@@ -1195,6 +1208,10 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = true
             };
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
             server.RunOnHttps(true);
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
@@ -1308,6 +1325,10 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
             server.RunOnHttps(false);
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);

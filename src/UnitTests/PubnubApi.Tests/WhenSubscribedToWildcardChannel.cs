@@ -450,6 +450,10 @@ namespace PubNubMessaging.Tests
                 PubnubLog = new TestLog()
             };
             server.RunOnHttps(ssl);
+            if (PubnubCommon.PAMEnabled && string.IsNullOrEmpty(config.SecretKey))
+            {
+                config.AuthKey = "myAuth";
+            }
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
@@ -654,6 +658,10 @@ namespace PubNubMessaging.Tests
                 Secure = ssl
             };
             server.RunOnHttps(ssl);
+            if (PubnubCommon.PAMEnabled && string.IsNullOrEmpty(config.SecretKey))
+            {
+                config.AuthKey = "myAuth";
+            }
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
@@ -836,6 +844,10 @@ namespace PubNubMessaging.Tests
                 Secure = false
             };
             server.RunOnHttps(false);
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.AuthKey = "myAuth";
+            }
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(

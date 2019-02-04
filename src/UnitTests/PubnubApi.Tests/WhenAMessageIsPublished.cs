@@ -31,6 +31,11 @@ namespace PubNubMessaging.Tests
 
             if (!PubnubCommon.PAMEnabled) { return; }
 
+            if (PubnubCommon.PAMEnabled && !string.IsNullOrEmpty(PubnubCommon.SecretKey))
+            {
+                return;
+            }
+
             bool receivedGrantMessage = false;
             string channel = "hello_my_channel";
             string authKey = "myAuth";
@@ -166,8 +171,11 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid"
             };
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
             server.RunOnHttps(true);
-
             pubnub = createPubNubInstance(config);
 
             string expected = "[1,\"Sent\",\"14715278266153304\"]";
@@ -261,8 +269,11 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
             };
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
             server.RunOnHttps(true);
-
             pubnub = createPubNubInstance(config);
 
             string expected = "[1,\"Sent\",\"14715286132003364\"]";
@@ -358,8 +369,11 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
             server.RunOnHttps(false);
-
             pubnub = createPubNubInstance(config);
 
             string expected = "[1,\"Sent\",\"14715322883933786\"]";
@@ -454,8 +468,11 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = true
             };
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
             server.RunOnHttps(true);
-
             pubnub = createPubNubInstance(config);
 
             string expected = "[1,\"Sent\",\"14715322883933786\"]";
@@ -550,8 +567,11 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
             server.RunOnHttps(false);
-
             pubnub = createPubNubInstance(config);
 
             string expected = "[1,\"Sent\",\"14715426119520817\"]";
@@ -751,6 +771,10 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid4",
                 Secure = false
             };
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
             server.RunOnHttps(false);
 
             pubnub = createPubNubInstance(config);
@@ -939,8 +963,11 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
             };
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
             server.RunOnHttps(true);
-
             pubnub = createPubNubInstance(config);
 
             string expected = "[1,\"Sent\",\"14722484585147754\"]";
@@ -973,6 +1000,271 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedPublishMessage, "Publish Failed with no SSL");
+        }
+
+        [Test]
+        public static void IfSecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess()
+        {
+            server.ClearRequests();
+
+            bool receivedPublishMessage = false;
+            long publishTimetoken = 0;
+
+            //string channel = "hello_my_channel ~!@#$%^&()+=[]{}|;\"<>?-_.aA1©®€™₹😜🎉";
+            string channel = "hello_my_channel";
+            //string message = " !~`@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉";
+            //string message = " !~";
+            //string message = "{a:\"!\"}";
+            //string message = "{a:6}";
+            string message = "!";
+            //var message = new { a="!" };
+            //":";
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                //Uuid = "my ~`!@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉uuid",
+                Uuid = "myuuid",
+                Secure = false,
+                IncludeRequestIdentifier = false,
+            };
+            server.RunOnHttps(false);
+
+            pubnub = createPubNubInstance(config);
+
+            string expected = "[1,\"Sent\",\"14722484585147754\"]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/%22%21%22", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel))
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+            Dictionary<string, object> cp = new Dictionary<string, object>();
+            cp.Add("seqn", "1");
+            pubnub.Publish().Channel(channel).Message(message).QueryParam(cp)
+                    .Async(new PNPublishResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            publishTimetoken = r.Timetoken;
+                            receivedPublishMessage = true;
+                        }
+                        else {
+                            //System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(s.ErrorData));
+                        }
+                        publishManualEvent.Set();
+                    }));
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedPublishMessage, "FAILED - IfSecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess");
+        }
+
+        [Test]
+        public static void IfSecretKeyCipherKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess()
+        {
+            server.ClearRequests();
+
+            bool receivedPublishMessage = false;
+            long publishTimetoken = 0;
+
+            string channel = "hello_my_channel ~!@#$%^&()+=[]{}|;\"<>?-_.aA1©®€™₹😜🎉";
+            string message = " ~`!@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉";
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                CipherKey = "enigma",
+                Uuid = "my ~`!@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉uuid",
+                Secure = false,
+                IncludeRequestIdentifier = false,
+            };
+            server.RunOnHttps(false);
+
+            pubnub = createPubNubInstance(config);
+
+            string expected = "[1,\"Sent\",\"14722484585147754\"]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/%22%21%22", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel))
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+            Dictionary<string, object> cp = new Dictionary<string, object>();
+            cp.Add("seqn", "1");
+            pubnub.Publish().Channel(channel).Message(message).QueryParam(cp)
+                    .Async(new PNPublishResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            publishTimetoken = r.Timetoken;
+                            receivedPublishMessage = true;
+                        }
+                        else
+                        {
+                            //System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(s.ErrorData));
+                        }
+                        publishManualEvent.Set();
+                    }));
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedPublishMessage, "FAILED - IfSecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess");
+        }
+
+        [Test]
+        public static void IfSecretKeyWithoutAuthThenPostMessageWithSpecialCharsReturnSuccess()
+        {
+            server.ClearRequests();
+
+            bool receivedPublishMessage = false;
+            long publishTimetoken = 0;
+
+            string channel = "hello_my_channel ~!@#$%^&()+=[]{}|;\"<>?-_.aA1©®€™₹😜🎉";
+            //string channel = "hello_my_channel";
+            string message = " !~`@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉";
+            //string message = " !~";
+            //string message = "{a:\"!\"}";
+            //string message = "{a:6}";
+            //string message = "!";
+            //var message = new { a="!" };
+            //":";
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "my ~`!@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉uuid",
+                //Uuid = "myuuid",
+                Secure = false,
+                IncludeRequestIdentifier = false,
+            };
+            server.RunOnHttps(false);
+
+            pubnub = createPubNubInstance(config);
+
+            string expected = "[1,\"Sent\",\"14722484585147754\"]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/%22%21%22", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel))
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+            Dictionary<string, object> cp = new Dictionary<string, object>();
+            cp.Add("seqn", "1");
+            pubnub.Publish().Channel(channel).Message(message).QueryParam(cp).UsePOST(true)
+                    .Async(new PNPublishResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            publishTimetoken = r.Timetoken;
+                            receivedPublishMessage = true;
+                        }
+                        else
+                        {
+                            //System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(s.ErrorData));
+                        }
+                        publishManualEvent.Set();
+                    }));
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedPublishMessage, "FAILED - IfSecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess");
+        }
+
+        [Test]
+        public static void IfSecretKeyCipherKeyWithoutAuthThenPostMessageWithSpecialCharsReturnSuccess()
+        {
+            server.ClearRequests();
+
+            bool receivedPublishMessage = false;
+            long publishTimetoken = 0;
+
+            string channel = "hello_my_channel ~!@#$%^&()+=[]{}|;\"<>?-_.aA1©®€™₹😜🎉";
+            string message = " ~`!@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉";
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                CipherKey = "enigma",
+                Uuid = "my ~`!@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉uuid",
+                Secure = false,
+                IncludeRequestIdentifier = false,
+            };
+            server.RunOnHttps(false);
+
+            pubnub = createPubNubInstance(config);
+
+            string expected = "[1,\"Sent\",\"14722484585147754\"]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/%22%21%22", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel))
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+            Dictionary<string, object> cp = new Dictionary<string, object>();
+            cp.Add("seqn", "1");
+            pubnub.Publish().Channel(channel).Message(message).QueryParam(cp).UsePOST(true)
+                    .Async(new PNPublishResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            publishTimetoken = r.Timetoken;
+                            receivedPublishMessage = true;
+                        }
+                        else
+                        {
+                            //System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(s.ErrorData));
+                        }
+                        publishManualEvent.Set();
+                    }));
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedPublishMessage, "FAILED - IfSecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess");
         }
     }
 }
