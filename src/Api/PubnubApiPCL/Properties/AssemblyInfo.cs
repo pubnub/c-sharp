@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 //[assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("PubNub")]
 [assembly: AssemblyProduct("Pubnub C# SDK")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
+[assembly: AssemblyCopyright("Copyright ©  2019")]
 
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyVersion("4.0.25.0")]
