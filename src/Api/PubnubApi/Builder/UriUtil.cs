@@ -128,7 +128,7 @@ namespace PubnubApi
 
         private static bool IsUnsafeToEscapeForPamSign(char ch)
         {
-            return "*()':!".ToLowerInvariant().IndexOf(ch.ToString()) >= 0;
+            return "*()':!".ToLowerInvariant().IndexOf(ch) >= 0;
         }
 
         private static char ToHex(int ch)
