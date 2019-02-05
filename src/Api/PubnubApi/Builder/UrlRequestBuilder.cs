@@ -986,7 +986,6 @@ namespace PubnubApi
 
             Dictionary<string, string> ret = new Dictionary<string, string>();
             ret.Add("uuid", new UriUtil().EncodeUriComponent(false, this.pubnubConfig.Uuid, PNOperationType.PNSubscribeOperation, false, false, true));
-            //ret.Add("uuid", this.pubnubConfig.Uuid);
             ret.Add("pnsdk", new UriUtil().EncodeUriComponent(false, Pubnub.Version, PNOperationType.PNSubscribeOperation, false, false, true));
 
             if (pubnubConfig != null)
@@ -1126,7 +1125,7 @@ namespace PubnubApi
             }
 
             url.Append(queryString);
-            System.Diagnostics.Debug.WriteLine("sb = " + url.ToString());
+            System.Diagnostics.Debug.WriteLine("sb = " + url);
             Uri requestUri = new Uri(url.ToString());
 
             if (type == PNOperationType.PNPublishOperation || type == PNOperationType.PNSubscribeOperation || type == PNOperationType.Presence)

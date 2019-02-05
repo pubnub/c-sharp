@@ -13,8 +13,7 @@ namespace PubnubApi
         {
             string encodedUri = "";
             bool prevSurroagePair = false;
-            bool tildeCharPresent = s != null && s.IndexOf("~") > 0;
-            //System.Diagnostics.Debug.WriteLine("s = " + s);
+            bool tildeCharPresent = s != null && s.ToLowerInvariant().IndexOf("~") >= 0;
             StringBuilder o = new StringBuilder();
             for (int index = 0; index < s.Length; index++)
             {
@@ -23,12 +22,6 @@ namespace PubnubApi
                 {
                     prevSurroagePair = false;
                     continue;
-                }
-                if (forPamSign) {
-                    if (ch.ToString() == "!")
-                    {
-                        //System.Diagnostics.Debug.WriteLine(ch.ToString());
-                    }
                 }
 
                 if (!forPamSign && IsUnsafeToEncode(ch, ignoreComma, ignoreColon))
@@ -89,16 +82,6 @@ namespace PubnubApi
                         }
                         o.Append(ch);
                     }
-                    //else if (forPamSign && IsSafeToEscapeForPamSign(ch))
-                    //{
-                    //    if (ch.ToString() == "~")
-                    //    {
-                    //        System.Diagnostics.Debug.WriteLine(ch.ToString() + "is true for IsSafeToEscapeForPamSign");
-                    //    }
-                    //    o.Append('%');
-                    //    o.Append(ToHex(ch / 16));
-                    //    o.Append(ToHex(ch % 16));
-                    //}
                     else
                     {
                         if (ch.ToString() == "~")
@@ -127,29 +110,25 @@ namespace PubnubApi
         {
             if (ignoreComma && ignoreColon)
             {
-                return " ~`!@#$%^&*()+=[]\\{}|;'\"/<>?".IndexOf(ch) >= 0;
+                return " ~`!@#$%^&*()+=[]\\{}|;'\"/<>?".ToLowerInvariant().IndexOf(ch) >= 0;
             }
             else if (ignoreColon)
             {
-                return " ~`!@#$%^&*()+=[]\\{}|;'\",/<>?".IndexOf(ch) >= 0;
+                return " ~`!@#$%^&*()+=[]\\{}|;'\",/<>?".ToLowerInvariant().IndexOf(ch) >= 0;
             }
             else if (ignoreComma)
             {
-                return " ~`!@#$%^&*()+=[]\\{}|;':\"/<>?".IndexOf(ch) >= 0;
+                return " ~`!@#$%^&*()+=[]\\{}|;':\"/<>?".ToLowerInvariant().IndexOf(ch) >= 0;
             }
             else
             {
-                return " ~`!@#$%^&*()+=[]\\{}|;':\",/<>?".IndexOf(ch) >= 0;
+                return " ~`!@#$%^&*()+=[]\\{}|;':\",/<>?".ToLowerInvariant().IndexOf(ch) >= 0;
             }
         }
 
         private static bool IsUnsafeToEscapeForPamSign(char ch)
         {
-            return "*()':!".IndexOf(ch.ToString()) >= 0;
-        }
-        private static bool IsSafeToEscapeForPamSign(char ch)
-        {
-            return "~".IndexOf(ch.ToString()) >= 0;
+            return "*()':!".ToLowerInvariant().IndexOf(ch.ToString()) >= 0;
         }
 
         private static char ToHex(int ch)
