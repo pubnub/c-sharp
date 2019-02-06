@@ -9,7 +9,7 @@ namespace PubnubApi
 {
     public class UriUtil
     {
-        public string EncodeUriComponent(bool forPamSign, string s, PNOperationType type, bool ignoreComma, bool ignoreColon, bool ignorePercent2fEncode)
+        public static string EncodeUriComponent(bool forPamSign, string s, PNOperationType type, bool ignoreComma, bool ignoreColon, bool ignorePercent2fEncode)
         {
             if (s == null) { return string.Empty; }
 
