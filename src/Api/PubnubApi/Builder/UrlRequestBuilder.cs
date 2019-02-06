@@ -63,7 +63,7 @@ namespace PubnubApi
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
 
-            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+            return BuildRestApiRequest(url, currentType, queryParams);
         }
 
         Uri IUrlRequestBuilder.BuildMultiChannelSubscribeRequest(string[] channels, string[] channelGroups, long timetoken, string channelsJsonState, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
@@ -124,7 +124,7 @@ namespace PubnubApi
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
 
-            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+            return BuildRestApiRequest(url, currentType, queryParams);
         }
 
         Uri IUrlRequestBuilder.BuildMultiChannelLeaveRequest(string[] channels, string[] channelGroups, string uuid, string jsonUserState, Dictionary<string, object> externalQueryParam)
@@ -173,7 +173,7 @@ namespace PubnubApi
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
 
-            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+            return BuildRestApiRequest(url, currentType, queryParams);
         }
 
         Uri IUrlRequestBuilder.BuildPublishRequest(string channel, object originalMessage, bool storeInHistory, int ttl, Dictionary<string, object> userMetaData, bool usePOST, Dictionary<string, string> additionalUrlParams, Dictionary<string, object> externalQueryParam)
@@ -232,7 +232,7 @@ namespace PubnubApi
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
 
-            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+            return BuildRestApiRequest(url, currentType, queryParams);
         }
 
         Uri IUrlRequestBuilder.BuildHereNowRequest(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, Dictionary<string, object> externalQueryParam)
@@ -279,7 +279,7 @@ namespace PubnubApi
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
 
-            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+            return BuildRestApiRequest(url, currentType, queryParams);
         }
 
         Uri IUrlRequestBuilder.BuildHistoryRequest(string channel, long start, long end, int count, bool reverse, bool includeToken, Dictionary<string, object> externalQueryParam)
@@ -330,7 +330,7 @@ namespace PubnubApi
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
 
-            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+            return BuildRestApiRequest(url, currentType, queryParams);
         }
 
         Uri IUrlRequestBuilder.BuildDeleteMessageRequest(string channel, long start, long end, Dictionary<string, object> externalQueryParam)
@@ -370,7 +370,7 @@ namespace PubnubApi
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
 
-            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+            return BuildRestApiRequest(url, currentType, queryParams);
         }
 
         Uri IUrlRequestBuilder.BuildWhereNowRequest(string uuid, Dictionary<string, object> externalQueryParam)
@@ -400,7 +400,7 @@ namespace PubnubApi
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
 
-            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+            return BuildRestApiRequest(url, currentType, queryParams);
         }
 
         Uri IUrlRequestBuilder.BuildGrantAccessRequest(string channelsCommaDelimited, string channelGroupsCommaDelimited, string authKeysCommaDelimited, bool read, bool write, bool delete, bool manage, long ttl, Dictionary<string, object> externalQueryParam)
@@ -455,7 +455,7 @@ namespace PubnubApi
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
 
-            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+            return BuildRestApiRequest(url, currentType, queryParams);
         }
 
         Uri IUrlRequestBuilder.BuildAuditAccessRequest(string channel, string channelGroup, string authKeysCommaDelimited, Dictionary<string, object> externalQueryParam)
@@ -500,7 +500,7 @@ namespace PubnubApi
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
 
-            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+            return BuildRestApiRequest(url, currentType, queryParams);
         }
 
         Uri IUrlRequestBuilder.BuildGetUserStateRequest(string channelsCommaDelimited, string channelGroupsCommaDelimited, string uuid, Dictionary<string, object> externalQueryParam)
@@ -547,7 +547,7 @@ namespace PubnubApi
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
 
-            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+            return BuildRestApiRequest(url, currentType, queryParams);
         }
 
         Uri IUrlRequestBuilder.BuildSetUserStateRequest(string channelsCommaDelimited, string channelGroupsCommaDelimited, string uuid, string jsonUserState, Dictionary<string, object> externalQueryParam)
@@ -601,7 +601,7 @@ namespace PubnubApi
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
 
-            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+            return BuildRestApiRequest(url, currentType, queryParams);
         }
 
         Uri IUrlRequestBuilder.BuildAddChannelsToChannelGroupRequest(string channelsCommaDelimited, string nameSpace, string groupName, Dictionary<string, object> externalQueryParam)
@@ -639,7 +639,7 @@ namespace PubnubApi
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
 
-            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+            return BuildRestApiRequest(url, currentType, queryParams);
         }
 
         Uri IUrlRequestBuilder.BuildRemoveChannelsFromChannelGroupRequest(string channelsCommaDelimited, string nameSpace, string groupName, Dictionary<string, object> externalQueryParam)
@@ -708,7 +708,7 @@ namespace PubnubApi
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
 
-            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+            return BuildRestApiRequest(url, currentType, queryParams);
         }
 
         Uri IUrlRequestBuilder.BuildGetChannelsForChannelGroupRequest(string nameSpace, string groupName, bool limitToChannelGroupScopeOnly, Dictionary<string, object> externalQueryParam)
@@ -767,7 +767,7 @@ namespace PubnubApi
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
 
-            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+            return BuildRestApiRequest(url, currentType, queryParams);
         }
 
         Uri IUrlRequestBuilder.BuildGetAllChannelGroupRequest(Dictionary<string, object> externalQueryParam)
@@ -796,7 +796,7 @@ namespace PubnubApi
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
 
-            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+            return BuildRestApiRequest(url, currentType, queryParams);
         }
 
         Uri IUrlRequestBuilder.BuildRegisterDevicePushRequest(string channel, PNPushType pushType, string pushToken, Dictionary<string, object> externalQueryParam)
@@ -830,7 +830,7 @@ namespace PubnubApi
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
 
-            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+            return BuildRestApiRequest(url, currentType, queryParams);
         }
 
         Uri IUrlRequestBuilder.BuildUnregisterDevicePushRequest(PNPushType pushType, string pushToken, Dictionary<string, object> externalQueryParam)
@@ -843,7 +843,7 @@ namespace PubnubApi
             url.Add("sub-key");
             url.Add(pubnubConfig.SubscribeKey);
             url.Add("devices");
-            url.Add(pushToken.ToString());
+            url.Add(pushToken);
             url.Add("remove");
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
@@ -864,7 +864,7 @@ namespace PubnubApi
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
 
-            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+            return BuildRestApiRequest(url, currentType, queryParams);
         }
 
         Uri IUrlRequestBuilder.BuildRemoveChannelPushRequest(string channel, PNPushType pushType, string pushToken, Dictionary<string, object> externalQueryParam)
@@ -877,7 +877,7 @@ namespace PubnubApi
             url.Add("sub-key");
             url.Add(pubnubConfig.SubscribeKey);
             url.Add("devices");
-            url.Add(pushToken.ToString());
+            url.Add(pushToken);
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
@@ -898,7 +898,7 @@ namespace PubnubApi
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
 
-            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+            return BuildRestApiRequest(url, currentType, queryParams);
         }
 
         Uri IUrlRequestBuilder.BuildGetChannelsPushRequest(PNPushType pushType, string pushToken, Dictionary<string, object> externalQueryParam)
@@ -931,7 +931,7 @@ namespace PubnubApi
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
 
-            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+            return BuildRestApiRequest(url, currentType, queryParams);
         }
 
         Uri IUrlRequestBuilder.BuildPresenceHeartbeatRequest(string[] channels, string[] channelGroups, string jsonUserState)
@@ -970,7 +970,7 @@ namespace PubnubApi
             string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
             string queryParams = string.Format("?{0}", queryString);
 
-            return BuildRestApiRequest<Uri>(url, currentType, queryParams);
+            return BuildRestApiRequest(url, currentType, queryParams);
         }
 
         private Dictionary<string, string> GenerateCommonQueryParams(PNOperationType type)
@@ -1095,7 +1095,7 @@ namespace PubnubApi
             return queryString;
         }
 
-        private Uri BuildRestApiRequest<T>(List<string> urlComponents, PNOperationType type, string queryString)
+        private Uri BuildRestApiRequest(List<string> urlComponents, PNOperationType type, string queryString)
         {   
             StringBuilder url = new StringBuilder();
 

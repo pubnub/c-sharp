@@ -83,17 +83,22 @@ namespace PubnubApi.EndPoint
                 throw new MissingMemberException("Missing Json Pluggable Library for Pubnub Instance");
             }
 
+            string currentUuid = "";
             if (string.IsNullOrEmpty(uuid))
             {
-                uuid = config.Uuid;
+                currentUuid = config.Uuid;
+            }
+            else
+            {
+                currentUuid = uuid;
             }
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildWhereNowRequest(uuid, externalQueryParam);
+            Uri request = urlBuilder.BuildWhereNowRequest(currentUuid, externalQueryParam);
 
             RequestState<PNWhereNowResult> requestState = new RequestState<PNWhereNowResult>();
-            requestState.Channels = new [] { uuid };
+            requestState.Channels = new [] { currentUuid };
             requestState.ResponseType = PNOperationType.PNWhereNowOperation;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;

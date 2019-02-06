@@ -762,11 +762,11 @@ namespace PubnubApi.EndPoint
             RequestState<T> currentState = state as RequestState<T>;
             if (currentState != null)
             {
-                MultiplexExceptionHandler<T>(currentState.ResponseType, currentState.Channels, currentState.ChannelGroups, false, false);
+                MultiplexExceptionHandler<T>(currentState.ResponseType, currentState.Channels, currentState.ChannelGroups, false);
             }
         }
 
-        private void MultiplexExceptionHandler<T>(PNOperationType type, string[] channels, string[] channelGroups, bool reconnectMaxTried, bool resumeOnReconnect)
+        private void MultiplexExceptionHandler<T>(PNOperationType type, string[] channels, string[] channelGroups, bool resumeOnReconnect)
         {
             List<object> result = new List<object>();
             result.Add("0");
@@ -1426,7 +1426,6 @@ namespace PubnubApi.EndPoint
                 if (SubscribeHeartbeatCheckTimer != null)
                 {
                     SubscribeHeartbeatCheckTimer.Dispose();
-                    SubscribeHeartbeatCheckTimer = null;
                 }
 
                 disposedValue = true;

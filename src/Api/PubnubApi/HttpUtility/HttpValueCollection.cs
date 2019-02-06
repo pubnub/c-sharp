@@ -127,6 +127,8 @@ namespace PubnubApi
 
         private void FillFromString(string query, bool urlencoded)
         {
+            if (query == null) { return; }
+
             int num = (query != null) ? query.Length : 0;
             for (int i = 0; i < num; i++)
             {

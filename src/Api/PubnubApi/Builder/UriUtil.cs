@@ -11,9 +11,11 @@ namespace PubnubApi
     {
         public string EncodeUriComponent(bool forPamSign, string s, PNOperationType type, bool ignoreComma, bool ignoreColon, bool ignorePercent2fEncode)
         {
+            if (s == null) { return string.Empty; }
+
             string encodedUri = "";
             bool prevSurroagePair = false;
-            bool tildeCharPresent = s != null && s.ToLowerInvariant().IndexOf("~") >= 0;
+            bool tildeCharPresent = s.Contains("~");
             StringBuilder o = new StringBuilder();
             for (int index = 0; index < s.Length; index++)
             {
@@ -110,19 +112,19 @@ namespace PubnubApi
         {
             if (ignoreComma && ignoreColon)
             {
-                return " ~`!@#$%^&*()+=[]\\{}|;'\"/<>?".ToLowerInvariant().IndexOf(ch) >= 0;
+                return " ~`!@#$%^&*()+=[]\\{}|;'\"/<>?".IndexOf(ch) >= 0;
             }
             else if (ignoreColon)
             {
-                return " ~`!@#$%^&*()+=[]\\{}|;'\",/<>?".ToLowerInvariant().IndexOf(ch) >= 0;
+                return " ~`!@#$%^&*()+=[]\\{}|;'\",/<>?".IndexOf(ch) >= 0;
             }
             else if (ignoreComma)
             {
-                return " ~`!@#$%^&*()+=[]\\{}|;':\"/<>?".ToLowerInvariant().IndexOf(ch) >= 0;
+                return " ~`!@#$%^&*()+=[]\\{}|;':\"/<>?".IndexOf(ch) >= 0;
             }
             else
             {
-                return " ~`!@#$%^&*()+=[]\\{}|;':\",/<>?".ToLowerInvariant().IndexOf(ch) >= 0;
+                return " ~`!@#$%^&*()+=[]\\{}|;':\",/<>?".IndexOf(ch) >= 0;
             }
         }
 

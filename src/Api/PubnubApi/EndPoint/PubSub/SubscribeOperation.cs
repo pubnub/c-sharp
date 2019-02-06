@@ -20,8 +20,6 @@ namespace PubnubApi.EndPoint
 
         private List<string> subscribeChannelNames = new List<string>();
         private List<string> subscribeChannelGroupNames = new List<string>();
-        private List<string> presenceChannelNames = new List<string>();
-        private List<string> presenceChannelGroupNames = new List<string>();
         private long subscribeTimetoken = -1;
         private bool presenceSubscribeEnabled;
         private SubscribeManager manager;
@@ -74,6 +72,9 @@ namespace PubnubApi.EndPoint
 
         public void Execute()
         {
+            List<string> presenceChannelNames = new List<string>();
+            List<string> presenceChannelGroupNames = new List<string>();
+
             if (this.subscribeChannelNames == null)
             {
                 this.subscribeChannelNames = new List<string>();
@@ -86,19 +87,19 @@ namespace PubnubApi.EndPoint
 
             if (this.presenceSubscribeEnabled)
             {
-                this.presenceChannelNames = (this.subscribeChannelNames != null && this.subscribeChannelNames.Count > 0 && !string.IsNullOrEmpty(this.subscribeChannelNames[0])) 
+                presenceChannelNames = (this.subscribeChannelNames != null && this.subscribeChannelNames.Count > 0 && !string.IsNullOrEmpty(this.subscribeChannelNames[0])) 
                                                 ? this.subscribeChannelNames.Select(c => string.Format("{0}-pnpres",c)).ToList() : new List<string>();
-                this.presenceChannelGroupNames = (this.subscribeChannelGroupNames != null && this.subscribeChannelGroupNames.Count > 0 && !string.IsNullOrEmpty(this.subscribeChannelGroupNames[0])) 
+                presenceChannelGroupNames = (this.subscribeChannelGroupNames != null && this.subscribeChannelGroupNames.Count > 0 && !string.IsNullOrEmpty(this.subscribeChannelGroupNames[0])) 
                                                 ? this.subscribeChannelGroupNames.Select(c => string.Format("{0}-pnpres", c)).ToList() : new List<string>();
 
-                if (this.presenceChannelNames.Count > 0)
+                if (presenceChannelNames.Count > 0)
                 {
-                    this.subscribeChannelNames.AddRange(this.presenceChannelNames);
+                    this.subscribeChannelNames.AddRange(presenceChannelNames);
                 }
 
-                if (this.presenceChannelGroupNames.Count > 0)
+                if (presenceChannelGroupNames.Count > 0)
                 {
-                    this.subscribeChannelGroupNames.AddRange(this.presenceChannelGroupNames);
+                    this.subscribeChannelGroupNames.AddRange(presenceChannelGroupNames);
                 }
             }
 
