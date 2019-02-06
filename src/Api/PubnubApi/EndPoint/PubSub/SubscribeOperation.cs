@@ -72,9 +72,6 @@ namespace PubnubApi.EndPoint
 
         public void Execute()
         {
-            List<string> presenceChannelNames = new List<string>();
-            List<string> presenceChannelGroupNames = new List<string>();
-
             if (this.subscribeChannelNames == null)
             {
                 this.subscribeChannelNames = new List<string>();
@@ -87,9 +84,9 @@ namespace PubnubApi.EndPoint
 
             if (this.presenceSubscribeEnabled)
             {
-                presenceChannelNames = (this.subscribeChannelNames != null && this.subscribeChannelNames.Count > 0 && !string.IsNullOrEmpty(this.subscribeChannelNames[0])) 
+                List<string> presenceChannelNames = (this.subscribeChannelNames != null && this.subscribeChannelNames.Count > 0 && !string.IsNullOrEmpty(this.subscribeChannelNames[0])) 
                                                 ? this.subscribeChannelNames.Select(c => string.Format("{0}-pnpres",c)).ToList() : new List<string>();
-                presenceChannelGroupNames = (this.subscribeChannelGroupNames != null && this.subscribeChannelGroupNames.Count > 0 && !string.IsNullOrEmpty(this.subscribeChannelGroupNames[0])) 
+                List<string> presenceChannelGroupNames = (this.subscribeChannelGroupNames != null && this.subscribeChannelGroupNames.Count > 0 && !string.IsNullOrEmpty(this.subscribeChannelGroupNames[0])) 
                                                 ? this.subscribeChannelGroupNames.Select(c => string.Format("{0}-pnpres", c)).ToList() : new List<string>();
 
                 if (presenceChannelNames.Count > 0)
