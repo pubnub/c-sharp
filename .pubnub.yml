@@ -4,7 +4,7 @@ schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
   - version: 4.0.25.0
-    date: Feb 06, 2019
+    date: Feb 07, 2019
     changes:
       - type: Improvement
         text: Refactored code to allow tilde char for publish GET with secret key
