@@ -222,6 +222,10 @@ namespace PubNubMessaging.Tests
                 Secure = false
             };
             server.RunOnHttps(false);
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.AuthKey = "myAuth";
+            }
 
             pubnub = createPubNubInstance(config);
 
@@ -323,6 +327,10 @@ namespace PubNubMessaging.Tests
                 Secure = false
             };
             server.RunOnHttps(false);
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.AuthKey = "myAuth";
+            }
 
             pubnub = createPubNubInstance(config);
 
@@ -375,6 +383,10 @@ namespace PubNubMessaging.Tests
                 Secure = false
             };
             server.RunOnHttps(false);
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.AuthKey = "myAuth";
+            }
 
             pubnub = createPubNubInstance(config);
 
@@ -429,6 +441,10 @@ namespace PubNubMessaging.Tests
                 Secure = false
             };
             server.RunOnHttps(false);
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.AuthKey = "myAuth";
+            }
 
             pubnub = createPubNubInstance(config);
 
@@ -666,6 +682,10 @@ namespace PubNubMessaging.Tests
                 Secure = ssl
             };
             server.RunOnHttps(ssl);
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.AuthKey = "myAuth";
+            }
 
             pubnub = createPubNubInstance(config);
 
@@ -996,6 +1016,10 @@ namespace PubNubMessaging.Tests
                 Secure = ssl
             };
             server.RunOnHttps(ssl);
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.AuthKey = "myAuth";
+            }
 
             pubnub = createPubNubInstance(config);
 

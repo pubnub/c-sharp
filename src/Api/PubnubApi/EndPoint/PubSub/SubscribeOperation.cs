@@ -20,8 +20,6 @@ namespace PubnubApi.EndPoint
 
         private List<string> subscribeChannelNames = new List<string>();
         private List<string> subscribeChannelGroupNames = new List<string>();
-        private List<string> presenceChannelNames = new List<string>();
-        private List<string> presenceChannelGroupNames = new List<string>();
         private long subscribeTimetoken = -1;
         private bool presenceSubscribeEnabled;
         private SubscribeManager manager;
@@ -86,19 +84,19 @@ namespace PubnubApi.EndPoint
 
             if (this.presenceSubscribeEnabled)
             {
-                this.presenceChannelNames = (this.subscribeChannelNames != null && this.subscribeChannelNames.Count > 0 && !string.IsNullOrEmpty(this.subscribeChannelNames[0])) 
+                List<string> presenceChannelNames = (this.subscribeChannelNames != null && this.subscribeChannelNames.Count > 0 && !string.IsNullOrEmpty(this.subscribeChannelNames[0])) 
                                                 ? this.subscribeChannelNames.Select(c => string.Format("{0}-pnpres",c)).ToList() : new List<string>();
-                this.presenceChannelGroupNames = (this.subscribeChannelGroupNames != null && this.subscribeChannelGroupNames.Count > 0 && !string.IsNullOrEmpty(this.subscribeChannelGroupNames[0])) 
+                List<string> presenceChannelGroupNames = (this.subscribeChannelGroupNames != null && this.subscribeChannelGroupNames.Count > 0 && !string.IsNullOrEmpty(this.subscribeChannelGroupNames[0])) 
                                                 ? this.subscribeChannelGroupNames.Select(c => string.Format("{0}-pnpres", c)).ToList() : new List<string>();
 
-                if (this.presenceChannelNames.Count > 0)
+                if (presenceChannelNames.Count > 0)
                 {
-                    this.subscribeChannelNames.AddRange(this.presenceChannelNames);
+                    this.subscribeChannelNames.AddRange(presenceChannelNames);
                 }
 
-                if (this.presenceChannelGroupNames.Count > 0)
+                if (presenceChannelGroupNames.Count > 0)
                 {
-                    this.subscribeChannelGroupNames.AddRange(this.presenceChannelGroupNames);
+                    this.subscribeChannelGroupNames.AddRange(presenceChannelGroupNames);
                 }
             }
 
@@ -129,7 +127,7 @@ namespace PubnubApi.EndPoint
             }
             if (!string.IsNullOrEmpty(config.FilterExpression) && config.FilterExpression.Trim().Length > 0)
             {
-                initialSubscribeUrlParams.Add("filter-expr", new UriUtil().EncodeUriComponent(config.FilterExpression, PNOperationType.PNSubscribeOperation, false, false, false));
+                initialSubscribeUrlParams.Add("filter-expr", UriUtil.EncodeUriComponent(false, config.FilterExpression, PNOperationType.PNSubscribeOperation, false, false, false));
             }
 
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12

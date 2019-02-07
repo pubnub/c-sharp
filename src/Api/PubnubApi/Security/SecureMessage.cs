@@ -9,14 +9,13 @@ namespace PubnubApi
 {
     internal class SecureMessage
     {
-        private PNConfiguration config = null;
-        private IJsonPluggableLibrary jsonLib = null;
-        private IPubnubLog pubnubLog = null;
-        private static SecureMessage secureMessage;
+        private PNConfiguration config;
+        private IJsonPluggableLibrary jsonLib;
+        private IPubnubLog pubnubLog;
 
         public static SecureMessage Instance(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log)
         {
-            secureMessage = new SecureMessage();
+            SecureMessage secureMessage = new SecureMessage();
             secureMessage.config = pubnubConfig;
             secureMessage.jsonLib = jsonPluggableLibrary;
             secureMessage.pubnubLog = log;

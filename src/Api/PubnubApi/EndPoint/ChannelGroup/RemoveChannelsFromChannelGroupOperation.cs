@@ -102,7 +102,7 @@ namespace PubnubApi.EndPoint
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
 
-            string channelsCommaDelimited = channels != null && channels.Length > 0 ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
+            string channelsCommaDelimited = string.Join(",", channels.OrderBy(x => x).ToArray());
 
 
             Uri request = urlBuilder.BuildRemoveChannelsFromChannelGroupRequest(channelsCommaDelimited, nameSpace, groupName, externalQueryParam);
@@ -110,7 +110,7 @@ namespace PubnubApi.EndPoint
             RequestState<PNChannelGroupsRemoveChannelResult> requestState = new RequestState<PNChannelGroupsRemoveChannelResult>();
             requestState.ResponseType = PNOperationType.PNRemoveChannelsFromGroupOperation;
             requestState.Channels = new string[] { };
-            requestState.ChannelGroups = new string[] { groupName };
+            requestState.ChannelGroups = new [] { groupName };
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;

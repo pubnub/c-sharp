@@ -4,7 +4,7 @@ namespace PubnubApi
     public class MpnsFlipTileNotification
     {
         public string type { get; set; } = "flip";
-        public int delay { get; set; } = 0;
+        public int delay { get; set; }
         public string title { get; set; } = "";
         public int? count { get; set; } = 0;
         public string small_background_image { get; set; } = "";

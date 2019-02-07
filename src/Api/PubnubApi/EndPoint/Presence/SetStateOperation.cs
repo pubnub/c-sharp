@@ -315,22 +315,24 @@ namespace PubnubApi.EndPoint
             List<string> channelGroupList = new List<string>();
             string currentUuid = uuid;
 
+            string[] channelArray = null;
             if (channels != null && channels.Length > 0)
             {
                 channelList = new List<string>(channels);
                 channelList = channelList.Where(ch => !string.IsNullOrEmpty(ch) && ch.Trim().Length > 0).Distinct<string>().ToList();
-                channels = channelList.ToArray();
+                channelArray = channelList.ToArray();
             }
 
+            string[] channelGroupsArray = null;
             if (channelGroups != null && channelGroups.Length > 0)
             {
                 channelGroupList = new List<string>(channelGroups);
                 channelGroupList = channelGroupList.Where(cg => !string.IsNullOrEmpty(cg) && cg.Trim().Length > 0).Distinct<string>().ToList();
-                channelGroups = channelGroupList.ToArray();
+                channelGroupsArray = channelGroupList.ToArray();
             }
 
-            string commaDelimitedChannels = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
-            string commaDelimitedChannelGroups = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
+            string commaDelimitedChannels = (channelArray != null && channelArray.Length > 0) ? string.Join(",", channelArray.OrderBy(x => x).ToArray()) : "";
+            string commaDelimitedChannelGroups = (channelGroupsArray != null && channelGroupsArray.Length > 0) ? string.Join(",", channelGroupsArray.OrderBy(x => x).ToArray()) : "";
 
             if (string.IsNullOrEmpty(uuid))
             {
@@ -403,8 +405,8 @@ namespace PubnubApi.EndPoint
             Uri request = urlBuilder.BuildSetUserStateRequest(commaDelimitedChannels, commaDelimitedChannelGroups, currentUuid, jsonUserState, externalQueryParam);
 
             RequestState<PNSetStateResult> requestState = new RequestState<PNSetStateResult>();
-            requestState.Channels = channels;
-            requestState.ChannelGroups = channelGroups;
+            requestState.Channels = channelArray;
+            requestState.ChannelGroups = channelGroupsArray;
             requestState.ResponseType = PNOperationType.PNSetStateOperation;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;

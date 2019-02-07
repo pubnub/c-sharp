@@ -8,7 +8,7 @@ namespace PubnubApi
 {
     public class PNPushListProvisionsResultExt : PNCallback<PNPushListProvisionsResult>
     {
-        readonly Action<PNPushListProvisionsResult, PNStatus> callbackAction = null;
+        readonly Action<PNPushListProvisionsResult, PNStatus> callbackAction;
 
         public PNPushListProvisionsResultExt(Action<PNPushListProvisionsResult, PNStatus> callback)
         {

@@ -28,8 +28,8 @@ namespace PubnubApi
             }
             else
             {
-                NewtonsoftJsonDotNet jsonLib = new NewtonsoftJsonDotNet(this.config, this.pubnubLog);
-                ret = jsonLib.DeserializeToObject<T>(result);
+                NewtonsoftJsonDotNet jsonNewtonLib = new NewtonsoftJsonDotNet(this.config, this.pubnubLog);
+                ret = jsonNewtonLib.DeserializeToObject<T>(result);
             }
 
             return ret;

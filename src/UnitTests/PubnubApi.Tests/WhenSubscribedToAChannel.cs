@@ -382,6 +382,10 @@ namespace PubNubMessaging.Tests
                 NonSubscribeRequestTimeout = 120
             };
             server.RunOnHttps(false);
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.AuthKey = "myAuth";
+            }
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
@@ -454,6 +458,10 @@ namespace PubNubMessaging.Tests
                 Secure = false
             };
             server.RunOnHttps(false);
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.AuthKey = "myAuth";
+            }
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
@@ -560,6 +568,10 @@ namespace PubNubMessaging.Tests
                 NonSubscribeRequestTimeout = 120
             };
             server.RunOnHttps(true);
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.AuthKey = "myAuth";
+            }
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
@@ -665,6 +677,10 @@ namespace PubNubMessaging.Tests
                 Secure = false
             };
             server.RunOnHttps(false);
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.AuthKey = "myAuth";
+            }
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(

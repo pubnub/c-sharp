@@ -9,9 +9,9 @@ namespace PubnubApi
 {
     public class SubscribeCallbackExt : SubscribeCallback
     {
-        readonly Action<Pubnub, PNMessageResult<object>> subscribeAction = null;
-        readonly Action<Pubnub, PNPresenceEventResult> presenceAction = null;
-        readonly Action<Pubnub, PNStatus> statusAction = null;
+        readonly Action<Pubnub, PNMessageResult<object>> subscribeAction;
+        readonly Action<Pubnub, PNPresenceEventResult> presenceAction;
+        readonly Action<Pubnub, PNStatus> statusAction;
 
         public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback, Action<Pubnub, PNPresenceEventResult> presenceCallback, Action<Pubnub, PNStatus> statusCallback)
         {

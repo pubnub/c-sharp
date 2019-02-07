@@ -1860,7 +1860,7 @@ namespace PubnubApi
                     httpClientNetworkStatus.Dispose();
                     httpClientNetworkStatus = null;
                 }
-                catch{}
+                catch { /* ignore */ }
             }
             if (httpClientSubscribe != null)
             {
@@ -1869,7 +1869,7 @@ namespace PubnubApi
                     httpClientSubscribe.Dispose();
                     httpClientSubscribe = null;
                 }
-                catch{}
+                catch { /* ignore */ }
             }
             if (httpClientNonsubscribe != null)
             {
@@ -1878,7 +1878,7 @@ namespace PubnubApi
                     httpClientNonsubscribe.Dispose();
                     httpClientNonsubscribe = null;
                 }
-                catch{}
+                catch { /* ignore */ }
             }
 #endif
         }

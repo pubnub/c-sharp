@@ -183,6 +183,10 @@ namespace PubNubMessaging.Tests
                 NonSubscribeRequestTimeout = 120
             };
             server.RunOnHttps(false);
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.AuthKey = "myAuth";
+            }
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(

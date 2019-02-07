@@ -42,7 +42,7 @@ namespace PubnubApi
         public bool TryUpdate(TKey key, TValue newValue, TValue comparisonValue)
         {
             bool updated = false;
-            if (key == null)
+            if (object.Equals(key, default(TKey)))
             {
                 throw new ArgumentNullException("key");
             }

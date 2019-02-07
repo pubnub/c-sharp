@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -8,10 +9,13 @@ namespace PubnubApi
 {
     public class UriUtil
     {
-        public string EncodeUriComponent(string s, PNOperationType type, bool ignoreComma, bool ignoreColon, bool ignorePercent2fEncode)
+        public static string EncodeUriComponent(bool forPamSign, string s, PNOperationType type, bool ignoreComma, bool ignoreColon, bool ignorePercent2fEncode)
         {
+            if (s == null) { return string.Empty; }
+
             string encodedUri = "";
             bool prevSurroagePair = false;
+            bool tildeCharPresent = s.Contains("~");
             StringBuilder o = new StringBuilder();
             for (int index = 0; index < s.Length; index++)
             {
@@ -22,7 +26,7 @@ namespace PubnubApi
                     continue;
                 }
 
-                if (IsUnsafe(ch, ignoreComma, ignoreColon))
+                if (!forPamSign && IsUnsafeToEncode(ch, ignoreComma, ignoreColon))
                 {
                     o.Append('%');
                     o.Append(ToHex(ch / 16));
@@ -73,8 +77,19 @@ namespace PubnubApi
 
                         prevSurroagePair = true;
                     }
+                    else if (forPamSign && IsUnsafeToEscapeForPamSign(ch) && tildeCharPresent)
+                    {
+                        if (ch.ToString() == "~") {
+                            System.Diagnostics.Debug.WriteLine(ch.ToString() + "is true for IsUnsafeToEscapeForPamSign");
+                        }
+                        o.Append(ch);
+                    }
                     else
                     {
+                        if (ch.ToString() == "~")
+                        {
+                            System.Diagnostics.Debug.WriteLine(ch.ToString() + " is EscapeDataString");
+                        }
                         string escapeChar = System.Uri.EscapeDataString(ch.ToString());
                         o.Append(escapeChar);
                     }
@@ -93,7 +108,7 @@ namespace PubnubApi
             return encodedUri;
         }
 
-        private static bool IsUnsafe(char ch, bool ignoreComma, bool ignoreColon)
+        private static bool IsUnsafeToEncode(char ch, bool ignoreComma, bool ignoreColon)
         {
             if (ignoreComma && ignoreColon)
             {
@@ -113,7 +128,12 @@ namespace PubnubApi
             }
         }
 
-        private char ToHex(int ch)
+        private static bool IsUnsafeToEscapeForPamSign(char ch)
+        {
+            return "*()':!".ToLowerInvariant().IndexOf(ch) >= 0;
+        }
+
+        private static char ToHex(int ch)
         {
             return (char)(ch < 10 ? '0' + ch : 'A' + ch - 10);
         }

@@ -97,10 +97,13 @@ namespace PubnubApi.EndPoint
             {
                 throw new ArgumentException("Either Channel Or Channel Group or Both should be provided");
             }
-
+            string internalUuid;
             if (string.IsNullOrEmpty(uuid) || uuid.Trim().Length == 0)
             {
-                uuid = config.Uuid;
+                internalUuid = config.Uuid;
+            }
+            else {
+                internalUuid = uuid;
             }
 
             string channelsCommaDelimited = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
@@ -108,7 +111,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildGetUserStateRequest(channelsCommaDelimited, channelGroupsCommaDelimited, uuid, externalQueryParam);
+            Uri request = urlBuilder.BuildGetUserStateRequest(channelsCommaDelimited, channelGroupsCommaDelimited, internalUuid, externalQueryParam);
 
             RequestState<PNGetStateResult> requestState = new RequestState<PNGetStateResult>();
             requestState.Channels = channels;

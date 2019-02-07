@@ -223,7 +223,9 @@ namespace PubnubApi.EndPoint
                                     LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unable to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelUnSubscribeInit).", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.LogVerbosity);
                                 }
                                 if (webRequest != null)
+                                {
                                     TerminatePendingWebRequest(webRequest);
+                                }
                             }
                             else
                             {
@@ -704,15 +706,10 @@ namespace PubnubApi.EndPoint
                             }
                         }
 
-                        switch (pubnubRequestState.ResponseType)
+                        if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
                         {
-                            case PNOperationType.PNSubscribeOperation:
-                                MultiplexInternalCallback<T>(pubnubRequestState.ResponseType, result);
-                                break;
-                            default:
-                                break;
+                            MultiplexInternalCallback<T>(pubnubRequestState.ResponseType, result);
                         }
-
                     }
                     else
                     {
@@ -765,11 +762,11 @@ namespace PubnubApi.EndPoint
             RequestState<T> currentState = state as RequestState<T>;
             if (currentState != null)
             {
-                MultiplexExceptionHandler<T>(currentState.ResponseType, currentState.Channels, currentState.ChannelGroups, false, false);
+                MultiplexExceptionHandler<T>(currentState.ResponseType, currentState.Channels, currentState.ChannelGroups, false);
             }
         }
 
-        private void MultiplexExceptionHandler<T>(PNOperationType type, string[] channels, string[] channelGroups, bool reconnectMaxTried, bool resumeOnReconnect)
+        private void MultiplexExceptionHandler<T>(PNOperationType type, string[] channels, string[] channelGroups, bool resumeOnReconnect)
         {
             List<object> result = new List<object>();
             result.Add("0");
@@ -1429,7 +1426,6 @@ namespace PubnubApi.EndPoint
                 if (SubscribeHeartbeatCheckTimer != null)
                 {
                     SubscribeHeartbeatCheckTimer.Dispose();
-                    SubscribeHeartbeatCheckTimer = null;
                 }
 
                 disposedValue = true;

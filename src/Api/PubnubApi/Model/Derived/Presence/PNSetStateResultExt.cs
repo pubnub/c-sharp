@@ -8,7 +8,7 @@ namespace PubnubApi
 {
     public class PNSetStateResultExt : PNCallback<PNSetStateResult>
     {
-        readonly Action<PNSetStateResult, PNStatus> callbackAction = null;
+        readonly Action<PNSetStateResult, PNStatus> callbackAction;
 
         public PNSetStateResultExt(Action<PNSetStateResult, PNStatus> callback)
         {

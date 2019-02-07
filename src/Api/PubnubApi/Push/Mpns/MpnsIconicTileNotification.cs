@@ -4,7 +4,7 @@ namespace PubnubApi
     public class MpnsIconicTileNotification
     {
         public string type { get; set; } = "iconic";
-        public int delay { get; set; } = 0;
+        public int delay { get; set; }
         public string title { get; set; } = "";
         public int? count { get; set; } = 0;
         public string icon_image { get; set; } = "";

@@ -10,7 +10,7 @@ namespace PubnubApi.EndPoint
 {
     public class ListenerManager : PubnubCoreBase
     {
-        private object syncLockSubscribeCallback = new object();
+        private readonly object syncLockSubscribeCallback = new object();
         private readonly PNConfiguration pubnubConfig;
         private readonly IPubnubLog pubnubLog;
 

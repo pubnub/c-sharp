@@ -7,6 +7,7 @@ namespace PubnubApi
     {
         public static HttpValueCollection ParseQueryString(string query)
         {
+            string queryResult = "";
             if (query == null)
             {
                 throw new ArgumentNullException("query");
@@ -14,10 +15,10 @@ namespace PubnubApi
 
             if ((query.Length > 0) && (query[0] == '?'))
             {
-                query = query.Substring(1);
+                queryResult = query.Substring(1);
             }
 
-            return new HttpValueCollection(query, true);
+            return new HttpValueCollection(queryResult, true);
         }
     }
 }
