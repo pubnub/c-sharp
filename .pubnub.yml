@@ -1,8 +1,13 @@
 name: c-sharp
-version: "4.0.25.0"
+version: "4.0.26.0"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
+  - version: 4.0.26.0
+    date: Feb 14, 2019
+    changes:
+      - type: Improvement
+        text: Fix to capture last timetoken when subscribe request timeout/terminated
   - version: 4.0.25.0
     date: Feb 07, 2019
     changes:
@@ -349,7 +354,7 @@ features:
     - QUERY-PARAM    
 supported-platforms:
   - 
-    version: Pubnub 'C#' 4.0.25.0
+    version: Pubnub 'C#' 4.0.26.0
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
@@ -359,7 +364,7 @@ supported-platforms:
       - .Net Framework 4.5
       - .Net Framework 4.6.1+
   - 
-    version: PubnubPCL 'C#' 4.0.25.0
+    version: PubnubPCL 'C#' 4.0.26.0
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -377,7 +382,7 @@ supported-platforms:
       - .Net Standard 2.0
       - .Net Core
   - 
-    version: PubnubUWP 'C#' 4.0.25.0
+    version: PubnubUWP 'C#' 4.0.26.0
     platforms:
       - Windows Phone 10
       - Universal Windows Apps

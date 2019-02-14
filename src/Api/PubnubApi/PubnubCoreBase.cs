@@ -352,6 +352,10 @@ namespace PubnubApi
                         Int64.TryParse(timeAndRegionDictionary["t"].ToString(), out jsonTimetoken);
                     }
                 }
+                else
+                {
+                    Int64.TryParse(result[1].ToString(), out jsonTimetoken);
+                }
             }
 
             return jsonTimetoken;

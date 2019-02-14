@@ -770,14 +770,15 @@ namespace PubnubApi.EndPoint
         {
             List<object> result = new List<object>();
             result.Add("0");
-            if (resumeOnReconnect)
+            if (resumeOnReconnect || LastSubscribeTimetoken == null || !LastSubscribeTimetoken.ContainsKey(PubnubInstance.InstanceId))
             {
                 result.Add(0); //send 0 time token to enable presence event
             }
             else
             {
-                result.Add(LastSubscribeTimetoken); //get last timetoken
+                result.Add(LastSubscribeTimetoken[PubnubInstance.InstanceId]); //get last timetoken of the current instance
             }
+
             if (channelGroups != null && channelGroups.Length > 0)
             {
                 result.Add(channelGroups);
