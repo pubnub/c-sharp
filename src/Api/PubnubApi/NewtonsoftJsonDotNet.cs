@@ -838,6 +838,31 @@ namespace PubnubApi
                 ret = (T)Convert.ChangeType(ack, typeof(PNDeleteMessageResult), CultureInfo.InvariantCulture);
 #endregion
             }
+            else if (typeof(T) == typeof(PNMessageCountResult))
+            {
+                #region "PNMessageCountResult"
+                PNMessageCountResult ack = null;
+                Dictionary<string, object> messageCouuntContainerDicObj = ConvertToDictionaryObject(listObject[0]);
+                if (messageCouuntContainerDicObj != null && messageCouuntContainerDicObj.ContainsKey("channels"))
+                {
+                    ack = new PNMessageCountResult();
+                    Dictionary<string, object> messageCountDic = ConvertToDictionaryObject(messageCouuntContainerDicObj["channels"]);
+                    if (messageCountDic != null)
+                    {
+                        ack.Channels = new Dictionary<string, long>();
+                        foreach (string channel in messageCountDic.Keys)
+                        {
+                            long msgCount=0;
+                            if (Int64.TryParse(messageCountDic[channel].ToString(), out msgCount))
+                            {
+                                ack.Channels.Add(channel, msgCount);
+                            }
+                        }
+                    }
+                }
+                ret = (T)Convert.ChangeType(ack, typeof(PNMessageCountResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
             else if (typeof(T) == typeof(PNHereNowResult))
             {
 #region "PNHereNowResult"

@@ -44,6 +44,7 @@ namespace PubnubApi
         DuplicateChannelGroup = 139,
         ReceiveFailure = 140,
         CallbackMissing = 141,
+        MessageCountsOperationTimeout = 142,
 
         MessageTooLarge = 4000,
         BadRequest = 4001,

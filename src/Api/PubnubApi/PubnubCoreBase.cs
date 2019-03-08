@@ -517,8 +517,13 @@ namespace PubnubApi
         private bool IsZeroTimeTokenRequest<T>(RequestState<T> asyncRequestState, List<object> result)
         {
             bool ret = false;
+            PNConfiguration currentConfig = null;
+            IPubnubLog currentLog = null;
             try
             {
+                pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig);
+                pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog);
+
                 if (asyncRequestState != null && asyncRequestState.ResponseType == PNOperationType.PNSubscribeOperation && result != null && result.Count > 0)
                 {
                     List<SubscribeMessage> message = GetMessageFromMultiplexResult(result);
@@ -537,7 +542,13 @@ namespace PubnubApi
                     }
                 }
             }
-            catch {  /* ignore */ }
+            catch (Exception ex)
+            {
+                if (currentConfig != null && currentLog != null)
+                {
+                    LoggingMethod.WriteToLog(currentLog, string.Format("DateTime: {0}, IsZeroTimeTokenRequest - Exception = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), currentConfig.LogVerbosity);
+                }
+            }
             return ret;
         }
 
@@ -577,8 +588,8 @@ namespace PubnubApi
 
         private void ResponseToUserCallback<T>(List<object> result, PNOperationType type, RequestState<T> asyncRequestState)
         {
-            PNConfiguration currentConfig;
-            IPubnubLog currentLog;
+            PNConfiguration currentConfig = null;
+            IPubnubLog currentLog = null;
             try
             {
                 pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig);
@@ -726,6 +737,7 @@ namespace PubnubApi
                     case PNOperationType.PNFireOperation:
                     case PNOperationType.PNHistoryOperation:
                     case PNOperationType.PNDeleteMessageOperation:
+                    case PNOperationType.PNMessageCountsOperation:
                     case PNOperationType.PNHereNowOperation:
                     case PNOperationType.PNWhereNowOperation:
                     case PNOperationType.PNAccessManagerGrant:
@@ -801,7 +813,10 @@ namespace PubnubApi
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.ToString());
+                if (currentConfig != null && currentLog != null)
+                {
+                    LoggingMethod.WriteToLog(currentLog, string.Format("DateTime: {0}, ResponseToUserCallback - Exception = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), currentConfig.LogVerbosity);
+                }
             }
         }
 
@@ -1172,6 +1187,12 @@ namespace PubnubApi
                                 {
                                     result = SecureMessage.Instance(currentConfig, jsonLib, currentLog).DecodeDecryptLoop(result, channels, channelGroups, callback);
                                 }
+                                result.Add(multiChannel);
+                                break;
+                            case PNOperationType.PNMessageCountsOperation:
+                                Dictionary<string, object> msgCountDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                                result = new List<object>();
+                                result.Add(msgCountDictionary);
                                 result.Add(multiChannel);
                                 break;
                             case PNOperationType.PNHereNowOperation:

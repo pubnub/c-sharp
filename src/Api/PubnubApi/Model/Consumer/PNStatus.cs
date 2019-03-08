@@ -217,6 +217,16 @@ namespace PubnubApi
                             }
                         }
                         break;
+                    case PNOperationType.PNMessageCountsOperation:
+                        if (savedEndpointOperation is MessageCountsOperation)
+                        {
+                            MessageCountsOperation endpoint = savedEndpointOperation as MessageCountsOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
                     case PNOperationType.PNTimeOperation:
                         if (savedEndpointOperation is TimeOperation)
                         {

@@ -17,7 +17,7 @@ namespace PubnubApi
 
         private readonly string instanceId;
 
-        private static string sdkVersion = "PubNubCSharp4.0.26.0";
+        private static string sdkVersion = "PubNubCSharp4.0.27.0";
 
         private object savedSubscribeOperation;
         private readonly string savedSdkVerion;
@@ -71,6 +71,13 @@ namespace PubnubApi
             EndPoint.DeleteMessageOperation deleteMessageOperaton = new EndPoint.DeleteMessageOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
             deleteMessageOperaton.CurrentPubnubInstance(this);
             return deleteMessageOperaton;
+        }
+
+        public EndPoint.MessageCountsOperation MessageCounts()
+        {
+            EndPoint.MessageCountsOperation messageCount = new EndPoint.MessageCountsOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            messageCount.CurrentPubnubInstance(this);
+            return messageCount;
         }
 
         public EndPoint.HereNowOperation HereNow()
