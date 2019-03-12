@@ -619,6 +619,10 @@ namespace PubnubApi
                                 SubscribeMessage currentMessage = messageList[messageIndex];
                                 if (currentMessage != null)
                                 {
+                                    if (currentConfig != null && currentLog != null)
+                                    {
+                                        LoggingMethod.WriteToLog(currentLog, string.Format("DateTime: {0}, ResponseToUserCallback - messageIndex={1}; currentMessage = {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), messageIndex, jsonLib.SerializeToJsonString(currentMessage)), currentConfig.LogVerbosity);
+                                    }
                                     if (currentConfig.DedupOnSubscribe)
                                     {
                                         if (IsTargetForDedup(currentMessage))
@@ -629,11 +633,6 @@ namespace PubnubApi
                                             }
                                             continue;
                                         }
-                                    }
-
-                                    if (currentConfig != null && currentLog != null)
-                                    {
-                                        LoggingMethod.WriteToLog(currentLog, string.Format("DateTime: {0}, ResponseToUserCallback - messageList for loop - messageIndex = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), messageIndex), currentConfig.LogVerbosity);
                                     }
 
                                     string currentMessageChannel = currentMessage.Channel;
