@@ -141,6 +141,9 @@
     <Compile Include="..\..\Api\PubnubApi\EndPoint\HistoryOperation.cs">
       <Link>LinkedSourceCode\EndPoint\HistoryOperation.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\MessageCountsOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\MessageCountsOperation.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\EndPoint\OtherOperation.cs">
       <Link>LinkedSourceCode\EndPoint\OtherOperation.cs</Link>
     </Compile>
@@ -294,6 +297,9 @@
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\History\PNHistoryResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\History\PNHistoryResult.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\History\PNMessageCountResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\History\PNMessageCountResult.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\PNErrorData.cs">
       <Link>LinkedSourceCode\Model\Consumer\PNErrorData.cs</Link>
     </Compile>
@@ -368,6 +374,9 @@
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Derived\History\PNHistoryResultExt.cs">
       <Link>LinkedSourceCode\Model\Derived\History\PNHistoryResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\History\PNMessageCountResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\History\PNMessageCountResultExt.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Derived\PNTimeResultExt.cs">
       <Link>LinkedSourceCode\Model\Derived\PNTimeResultExt.cs</Link>
@@ -499,6 +508,7 @@
     <Compile Include="WhenGetRequestServerTimeMultiInstance.cs" />
     <Compile Include="WhenGetRequestServerTime.cs" />
     <Compile Include="WhenGrantIsRequested.cs" />
+    <Compile Include="WhenMessageCountIsRequested.cs" />
     <Compile Include="WhenMessageDeletedFromChannel.cs" />
     <Compile Include="WhenPushIsRequested.cs" />
     <Compile Include="WhenSubscribedToAChannel.cs" />
