@@ -610,6 +610,10 @@ namespace PubnubApi
                                 Announce(status);
                             }
 
+                            if (currentConfig != null && currentLog != null)
+                            {
+                                LoggingMethod.WriteToLog(currentLog, string.Format("DateTime: {0}, ResponseToUserCallback - messageList.Count = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), messageList.Count), currentConfig.LogVerbosity);
+                            }
                             for (int messageIndex = 0; messageIndex < messageList.Count; messageIndex++)
                             {
                                 SubscribeMessage currentMessage = messageList[messageIndex];
@@ -619,8 +623,17 @@ namespace PubnubApi
                                     {
                                         if (IsTargetForDedup(currentMessage))
                                         {
+                                            if (currentConfig != null && currentLog != null)
+                                            {
+                                                LoggingMethod.WriteToLog(currentLog, string.Format("DateTime: {0}, ResponseToUserCallback - messageList for loop - messageIndex = {1} => IsTargetForDedup", DateTime.Now.ToString(CultureInfo.InvariantCulture), messageIndex), currentConfig.LogVerbosity);
+                                            }
                                             continue;
                                         }
+                                    }
+
+                                    if (currentConfig != null && currentLog != null)
+                                    {
+                                        LoggingMethod.WriteToLog(currentLog, string.Format("DateTime: {0}, ResponseToUserCallback - messageList for loop - messageIndex = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), messageIndex), currentConfig.LogVerbosity);
                                     }
 
                                     string currentMessageChannel = currentMessage.Channel;
@@ -727,6 +740,13 @@ namespace PubnubApi
                                         }
                                     }
 
+                                }
+                                else
+                                {
+                                    if (currentConfig != null && currentLog != null)
+                                    {
+                                        LoggingMethod.WriteToLog(currentLog, string.Format("DateTime: {0}, ResponseToUserCallback - messageList for loop - messageIndex = {1} => null message", DateTime.Now.ToString(CultureInfo.InvariantCulture), messageIndex), currentConfig.LogVerbosity);
+                                    }
                                 }
                             }
 
