@@ -98,6 +98,9 @@ namespace PubnubApi.EndPoint
                 case PNOperationType.PNTimeOperation:
                     endpoint = "l_time";
                     break;
+                case PNOperationType.PNMessageCountsOperation:
+                    endpoint = "l_mc";
+                    break;
                 default:
                     endpoint = "";
                     break;

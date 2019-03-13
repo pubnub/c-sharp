@@ -71,7 +71,7 @@ namespace PubnubApiDemo
             Console.ForegroundColor = ConsoleColor.Blue;
             if (origin.Trim() == "")
             {
-                origin = "ps.pndsn.com";
+                origin = "ps.pndsn.com"; //"balancer1g.bronze.aws-pdx-1.ps.pn";//
                 Console.WriteLine("Default Origin selected");
             }
             else
@@ -124,7 +124,7 @@ namespace PubnubApiDemo
             else
             {
                 Console.WriteLine("Default demo subscribe key provided");
-                subscribeKey = "demo-36";
+                subscribeKey = "sub-c-c9710928-1b7a-11e3-a0c8-02ee2ddab7fe";// "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -139,7 +139,7 @@ namespace PubnubApiDemo
             else
             {
                 Console.WriteLine("Default demo publish key provided");
-                publishKey = "demo-36";
+                publishKey = "pub-c-38994634-9e05-4967-bc66-2ac2cef65ed9";// "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -154,7 +154,7 @@ namespace PubnubApiDemo
             else
             {
                 Console.WriteLine("Default demo Secret key provided");
-                secretKey = "demo-36";
+                secretKey = "sec-c-ZDkzZTBkOTEtNTQxZS00MmQ3LTljMWUtMTNiNGZjNWUwMTVk";// "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -316,6 +316,7 @@ namespace PubnubApiDemo
                     menuOptionsStringBuilder.AppendLine("Enter 21 FOR GetSubscribeChannels");
                     menuOptionsStringBuilder.AppendLine("Enter 22 FOR GetSubscribeChannelGroups");
                     menuOptionsStringBuilder.AppendLine("Enter 23 FOR DeleteMessages");
+                    menuOptionsStringBuilder.AppendLine("Enter 24 FOR MessagesCount");
                     menuOptionsStringBuilder.AppendLine("Enter 31 FOR Push - Register Device");
                     menuOptionsStringBuilder.AppendLine("Enter 32 FOR Push - Remove Channel");
                     menuOptionsStringBuilder.AppendLine("Enter 33 FOR Push - Get Current Channels");
@@ -1082,9 +1083,18 @@ namespace PubnubApiDemo
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", deleteMessageChannel));
                         Console.ResetColor();
+                        Console.WriteLine("Enter start timetoken: ");
+                        string ttStartDeleteMessage = Console.ReadLine();
+                        Console.WriteLine("Enter end timetoken: ");
+                        string ttEndDeleteMessage = Console.ReadLine();
+                        long deleteStart;
+                        long deleteEnd;
+                        Int64.TryParse(ttStartDeleteMessage, out deleteStart);
+                        Int64.TryParse(ttEndDeleteMessage, out deleteEnd);
+
                         pubnub.DeleteMessages().Channel(deleteMessageChannel)
-                            .Start(15088506076921021)
-                              .End(15088532035597390)
+                            .Start(deleteStart)
+                              .End(deleteEnd)
                             .Async(new PNDeleteMessageResultExt(
                                 (r, s) => {
                                     if (s != null && s.Error)
@@ -1097,6 +1107,43 @@ namespace PubnubApiDemo
                                     }
                                 }));
 
+                        break;
+                    case "24":
+                        Console.WriteLine("Enter channel name: ");
+                        string channelMsgCount = Console.ReadLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel = {0}", channelMsgCount));
+                        Console.ResetColor();
+                        Console.WriteLine("Enter timetoken: ");
+                        string ttMessageCount = Console.ReadLine();
+                        string[] arrTTMsgCount = ttMessageCount.Split(',');
+                        List<long> lstTTMsgCount = new List<long>(arrTTMsgCount.Length);
+                        for (int index=0; index < arrTTMsgCount.Length; index++)
+                        {
+                            long outTT = 0;
+                            if (Int64.TryParse(arrTTMsgCount[index], out outTT))
+                            {
+                                lstTTMsgCount.Add(outTT);
+                            }
+                        }
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        long channelsTT;
+                        long.TryParse(ttMessageCount, out channelsTT);
+                        Console.WriteLine(string.Format("Timetoken = {0}", ttMessageCount));
+                        Console.ResetColor();
+                        pubnub.MessageCounts().Channels(channelMsgCount.Split(','))
+                            .ChannelsTimetoken(lstTTMsgCount.ToArray())
+                            .Async(new PNMessageCountResultExt(
+                                (r, s) => {
+                                    if (s != null && s.Error)
+                                    {
+                                        Console.WriteLine(s.ErrorData.Information);
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    }
+                                }));
                         break;
                     case "31":
                         Console.WriteLine("Enter channel name");

@@ -54,5 +54,7 @@ namespace PubnubApi.Interface
         Uri BuildGetChannelsPushRequest(PNPushType pushType, string pushToken, Dictionary<string, object> externalQueryParam);
 
         Uri BuildPresenceHeartbeatRequest(string[] channels, string[] channelGroups, string jsonUserState);
+
+        Uri BuildMessageCountsRequest(string[] channels, long[] timetokens, Dictionary<string, object> externalQueryParam);
     }
 }

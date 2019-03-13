@@ -333,6 +333,54 @@ namespace PubnubApi
             return BuildRestApiRequest(url, currentType, queryParams);
         }
 
+        Uri IUrlRequestBuilder.BuildMessageCountsRequest(string[] channels, long[] timetokens, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNMessageCountsOperation;
+            string channel = (channels != null && channels.Length > 0) ? string.Join(",", channels) : "";
+
+            List<string> url = new List<string>();
+            url.Add("v3");
+            url.Add("history");
+            url.Add("sub-key");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("message-counts");
+            if (!string.IsNullOrEmpty(channel))
+            {
+                url.Add(channel);
+            }
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            if (timetokens != null && timetokens.Length > 0)
+            {
+                string tt = string.Join(",", timetokens.Select(x => x.ToString()).ToArray());
+                if (timetokens.Length == 1)
+                {
+                    requestQueryStringParams.Add("timetoken", tt);
+                }
+                else
+                {
+                    requestQueryStringParams.Add("channelsTimetoken", tt);
+                }
+            }
+
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest(url, currentType, queryParams);
+        }
+
         Uri IUrlRequestBuilder.BuildDeleteMessageRequest(string channel, long start, long end, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNDeleteMessageOperation;
