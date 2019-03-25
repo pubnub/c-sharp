@@ -35,7 +35,9 @@ namespace PubNubMessaging.Tests
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
 
-            if (!PubnubCommon.PAMEnabled)
+            if (!PubnubCommon.PAMEnabled) { return; }
+
+            if (PubnubCommon.PAMEnabled && !string.IsNullOrEmpty(PubnubCommon.SecretKey))
             {
                 return;
             }
