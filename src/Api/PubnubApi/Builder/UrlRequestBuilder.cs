@@ -346,7 +346,7 @@ namespace PubnubApi
             url.Add("message-counts");
             if (!string.IsNullOrEmpty(channel))
             {
-                url.Add(channel);
+                url.Add(UriUtil.EncodeUriComponent(false, channel, currentType, false, false, false));
             }
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
@@ -360,7 +360,7 @@ namespace PubnubApi
                 }
                 else
                 {
-                    requestQueryStringParams.Add("channelsTimetoken", tt);
+                    requestQueryStringParams.Add("channelsTimetoken", UriUtil.EncodeUriComponent(false, tt, currentType, false, false, false));
                 }
             }
 

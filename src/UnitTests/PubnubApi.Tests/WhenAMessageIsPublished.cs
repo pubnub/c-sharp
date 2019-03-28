@@ -31,7 +31,7 @@ namespace PubNubMessaging.Tests
 
             if (!PubnubCommon.PAMEnabled) { return; }
 
-            if (PubnubCommon.PAMEnabled && !string.IsNullOrEmpty(PubnubCommon.SecretKey))
+            if (PubnubCommon.PAMEnabled && string.IsNullOrEmpty(PubnubCommon.SecretKey))
             {
                 return;
             }
