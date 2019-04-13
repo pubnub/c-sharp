@@ -64,7 +64,7 @@ namespace PubnubApi.EndPoint
                 throw new MissingMemberException("Invalid Subscribe Key");
             }
 
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
@@ -82,7 +82,7 @@ namespace PubnubApi.EndPoint
 
         internal void Retry()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD
             Task.Factory.StartNew(() =>
             {
                 DeleteMessage(this.channelName, this.startTimetoken, this.endTimetoken, this.queryParam, savedCallback);

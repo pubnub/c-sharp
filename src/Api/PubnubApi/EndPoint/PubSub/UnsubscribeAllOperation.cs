@@ -35,7 +35,7 @@ namespace PubnubApi.EndPoint
 
         private void UnsubscribeAll()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD
             Task.Factory.StartNew(() =>
             {
                 SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, PubnubInstance);

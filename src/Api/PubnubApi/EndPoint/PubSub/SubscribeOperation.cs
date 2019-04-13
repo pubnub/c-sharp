@@ -130,7 +130,7 @@ namespace PubnubApi.EndPoint
                 initialSubscribeUrlParams.Add("filter-expr", UriUtil.EncodeUriComponent(false, config.FilterExpression, PNOperationType.PNSubscribeOperation, false, false, false));
             }
 
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD
             Task.Factory.StartNew(() =>
             {
                 manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, PubnubInstance);

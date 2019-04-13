@@ -119,7 +119,7 @@ namespace PubnubApi
 			{
                 try
                 {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD
                     Task[] tasks = new Task[1];
                     tasks[0] = Task.Factory.StartNew(async() =>
                     {

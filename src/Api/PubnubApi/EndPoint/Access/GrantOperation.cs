@@ -93,7 +93,7 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNAccessManagerGrantResult> callback)
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
@@ -111,7 +111,7 @@ namespace PubnubApi.EndPoint
 
         internal void Retry()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD
             Task.Factory.StartNew(() =>
             {
                 GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantDelete, this.grantManage, this.grantTTL, this.queryParam, savedCallback);

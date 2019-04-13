@@ -42,7 +42,7 @@ namespace PubnubApi.EndPoint
 
         public void Async(PNCallback<PNChannelGroupsDeleteGroupResult> callback)
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
@@ -60,7 +60,7 @@ namespace PubnubApi.EndPoint
 
         internal void Retry()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD
             Task.Factory.StartNew(() =>
             {
                 DeleteChannelGroup(this.channelGroupName, this.queryParam, savedCallback);
