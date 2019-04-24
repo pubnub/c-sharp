@@ -124,7 +124,7 @@ namespace PubnubApiDemo
             else
             {
                 Console.WriteLine("Default demo subscribe key provided");
-                subscribeKey = "sub-c-c9710928-1b7a-11e3-a0c8-02ee2ddab7fe";// "demo-36";
+                subscribeKey = "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -139,7 +139,7 @@ namespace PubnubApiDemo
             else
             {
                 Console.WriteLine("Default demo publish key provided");
-                publishKey = "pub-c-38994634-9e05-4967-bc66-2ac2cef65ed9";// "demo-36";
+                publishKey = "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -154,7 +154,7 @@ namespace PubnubApiDemo
             else
             {
                 Console.WriteLine("Default demo Secret key provided");
-                secretKey = "sec-c-ZDkzZTBkOTEtNTQxZS00MmQ3LTljMWUtMTNiNGZjNWUwMTVk";// "demo-36";
+                secretKey = "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
