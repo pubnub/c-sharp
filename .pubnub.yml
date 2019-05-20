@@ -8,6 +8,8 @@ changelog:
     changes:
       - type: Improvement
         text: Refactored code to enforce minimum PresenceTimeout value to 20
+      - type: Improvement
+        text: Refactored code to handle bool type in presence state
   - version: 4.0.29.0
     date: Apr 25, 2019
     changes:

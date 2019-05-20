@@ -221,6 +221,7 @@ namespace PubnubApi.EndPoint
 
             int valueInt;
             double valueDouble;
+            bool valueBool;
             bool stateChanged = false;
             string currentChannelUserState = "";
             string currentChannelGroupUserState = "";
@@ -242,6 +243,10 @@ namespace PubnubApi.EndPoint
                 else if (Double.TryParse(keyValuePair.Value.ToString(), out valueDouble))
                 {
                     currentChannelUserState = SetLocalUserState(currentChannel, "", key, valueDouble);
+                }
+                else if (Boolean.TryParse(keyValuePair.Value.ToString(), out valueBool))
+                {
+                    currentChannelUserState = SetLocalUserState(currentChannel, "", key, valueBool);
                 }
                 else
                 {
@@ -271,6 +276,10 @@ namespace PubnubApi.EndPoint
                         currentChannelGroupUserState = SetLocalUserState("", currentChannelGroup, key, valueInt);
                     }
                     else if (Double.TryParse(keyValuePair.Value.ToString(), out valueDouble))
+                    {
+                        currentChannelGroupUserState = SetLocalUserState("", currentChannelGroup, key, valueDouble);
+                    }
+                    else if (Boolean.TryParse(keyValuePair.Value.ToString(), out valueBool))
                     {
                         currentChannelGroupUserState = SetLocalUserState("", currentChannelGroup, key, valueDouble);
                     }
@@ -570,6 +579,11 @@ namespace PubnubApi.EndPoint
         }
 
         private string SetLocalUserState(string channel, string channelGroup, string userStateKey, double userStateValue)
+        {
+            return AddOrUpdateOrDeleteLocalUserState(channel, channelGroup, userStateKey, userStateValue);
+        }
+
+        private string SetLocalUserState(string channel, string channelGroup, string userStateKey, bool userStateValue)
         {
             return AddOrUpdateOrDeleteLocalUserState(channel, channelGroup, userStateKey, userStateValue);
         }
