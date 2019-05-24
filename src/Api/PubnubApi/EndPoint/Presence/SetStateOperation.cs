@@ -281,7 +281,7 @@ namespace PubnubApi.EndPoint
                     }
                     else if (Boolean.TryParse(keyValuePair.Value.ToString(), out valueBool))
                     {
-                        currentChannelGroupUserState = SetLocalUserState("", currentChannelGroup, key, valueDouble);
+                        currentChannelGroupUserState = SetLocalUserState("", currentChannelGroup, key, valueBool);
                     }
                     else
                     {
