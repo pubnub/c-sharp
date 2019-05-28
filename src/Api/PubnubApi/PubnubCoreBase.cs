@@ -1360,6 +1360,10 @@ namespace PubnubApi
                     {
                         jsonStateBuilder.AppendFormat("\"{0}\":{1}", channelUserStateKey, string.Format("\"{0}\"", "null"));
                     }
+                    else if (channelUserStateValue.GetType().ToString() == "System.Boolean")
+                    {
+                        jsonStateBuilder.AppendFormat("\"{0}\":{1}", channelUserStateKey, channelUserStateValue.ToString().ToLowerInvariant());
+                    }
                     else
                     {
                         jsonStateBuilder.AppendFormat("\"{0}\":{1}", channelUserStateKey, (channelUserStateValue.GetType().ToString() == "System.String") ? string.Format("\"{0}\"", channelUserStateValue) : channelUserStateValue);
@@ -1381,6 +1385,10 @@ namespace PubnubApi
                     if (channelGroupUserStateValue == null)
                     {
                         jsonStateBuilder.AppendFormat("\"{0}\":{1}", channelGroupUserStateKey, string.Format("\"{0}\"", "null"));
+                    }
+                    else if (channelGroupUserStateValue.GetType().ToString() == "System.Boolean")
+                    {
+                        jsonStateBuilder.AppendFormat("\"{0}\":{1}", channelGroupUserStateKey, channelGroupUserStateValue.ToString().ToLowerInvariant());
                     }
                     else
                     {

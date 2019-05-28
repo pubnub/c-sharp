@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Threading;
 using PubnubApi;
 
@@ -17,7 +18,7 @@ namespace PubnubApi
 
         private readonly string instanceId;
 
-        private static string sdkVersion = "PubNubCSharp4.0.29.0";
+        private static string sdkVersion = "PubNubCSharp4.0.30.0";
 
         private object savedSubscribeOperation;
         private readonly string savedSdkVerion;
@@ -458,6 +459,14 @@ namespace PubnubApi
             if (config != null && pubnubLog != null)
             {
                 PNPlatform.Print(config, pubnubLog);
+            }
+            if (config != null && config.PresenceTimeout < 20)
+            {
+                config.PresenceTimeout = 20;
+                if (pubnubLog != null)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, WARNING: The PresenceTimeout cannot be less than 20, defaulting the value to 20. Please update the settings in your code.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                }
             }
         }
 
