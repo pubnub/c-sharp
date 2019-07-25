@@ -91,6 +91,12 @@ namespace PubnubApi
                             System.Diagnostics.Debug.WriteLine(ch.ToString() + " is EscapeDataString");
                         }
                         string escapeChar = System.Uri.EscapeDataString(ch.ToString());
+#if NET35 || NET40
+                        if (escapeChar == ch.ToString() && IsUnsafeToEncode(ch, ignoreComma, ignoreColon))
+                        {
+                            escapeChar = string.Format("%{0}{1}", ToHex(ch / 16), ToHex(ch % 16));
+                        }
+#endif
                         o.Append(escapeChar);
                     }
                 }
