@@ -7,7 +7,7 @@ changelog:
     date: July 25, 2019
     changes:
       - type: Improvement
-        text: Refactored code to encode unsafe chars ignorned by EscapeDataString in NET35/NET40
+        text: Refactored code to encode unsafe chars ignored by EscapeDataString in NET35/NET40
   - version: 4.0.30.0
     date: May 28, 2019
     changes:
