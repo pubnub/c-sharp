@@ -10,5 +10,6 @@ namespace PubnubApi
 
         public abstract void Presence(Pubnub pubnub, PNPresenceEventResult presence);
 
+        public abstract void Signal<T>(Pubnub pubnub, PNMessageResult<T> signal);
     }
 }

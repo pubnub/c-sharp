@@ -16,6 +16,8 @@ namespace MockServer
 
         internal string Method { get; set; }
 
+        internal string Content { get; set; }
+
         internal List<string> Parameters { get; set; }
 
         public Request()
@@ -54,6 +56,17 @@ namespace MockServer
         public Request WithMethod(string method)
         {
             this.Method = method;
+            return this;
+        }
+
+        /// <summary>
+        /// Request body content when POST method used
+        /// </summary>
+        /// <param name="content">Content</param>
+        /// <returns></returns>
+        public Request WithContent(string content)
+        {
+            this.Content = content;
             return this;
         }
 

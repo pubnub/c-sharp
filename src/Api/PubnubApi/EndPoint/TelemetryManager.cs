@@ -101,6 +101,16 @@ namespace PubnubApi.EndPoint
                 case PNOperationType.PNMessageCountsOperation:
                     endpoint = "l_mc";
                     break;
+                case PNOperationType.PNSignalOperation:
+                    endpoint = "l_sig";
+                    break;
+                case PNOperationType.PNCreateUserOperation:
+                case PNOperationType.PNUpdateUserOperation:
+                case PNOperationType.PNDeleteUserOperation:
+                case PNOperationType.PNGetUsersOperation:
+                case PNOperationType.PNGetUserOperation:
+                    endpoint = "l_obj";
+                    break;
                 default:
                     endpoint = "";
                     break;

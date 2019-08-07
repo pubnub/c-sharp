@@ -221,6 +221,11 @@ namespace PubNubMessaging.Tests
             {
             }
 
+            public override void Signal<T>(Pubnub pubnub, PNMessageResult<T> signal)
+            {
+                throw new NotImplementedException();
+            }
+
             public override void Status(Pubnub pubnub, PNStatus status)
             {
                 Debug.WriteLine("SubscribeCallback: PNStatus: " + status.StatusCode.ToString());

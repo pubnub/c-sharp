@@ -190,7 +190,7 @@ namespace PubnubApi
             url.Add("0");
             if (!usePOST)
             {
-                string message = enableJsonEncodingForPublish ? JsonEncodePublishMsg(originalMessage) : originalMessage.ToString();
+                string message = enableJsonEncodingForPublish ? JsonEncodePublishMsg(originalMessage, currentType) : originalMessage.ToString();
                 url.Add(message);
             }
 
@@ -216,6 +216,47 @@ namespace PubnubApi
             if (!storeInHistory)
             {
                 requestQueryStringParams.Add("store", "0");
+            }
+
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest(url, currentType, queryParams);
+        }
+
+        Uri IUrlRequestBuilder.BuildSignalRequest(string channel, object originalMessage, Dictionary<string, object> userMetaData, bool usePOST, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNSignalOperation;
+
+            List<string> url = new List<string>();
+            url.Add("signal");
+            url.Add(pubnubConfig.PublishKey);
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("0");
+            url.Add(channel);
+            url.Add("0");
+            if (!usePOST)
+            {
+                string message = JsonEncodePublishMsg(originalMessage, currentType);
+                url.Add(message);
+            }
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+            if (userMetaData != null)
+            {
+                string jsonMetaData = jsonLib.SerializeToJsonString(userMetaData);
+                requestQueryStringParams.Add("meta", UriUtil.EncodeUriComponent(false, jsonMetaData, currentType, false, false, false));
             }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -1079,7 +1120,7 @@ namespace PubnubApi
             return ret;
         }
 
-        private string GenerateSignature(string queryStringToSign, string partialUrl)
+        private string GenerateSignature(string queryStringToSign, string partialUrl, PNOperationType opType)
         {
             string signature = "";
             StringBuilder string_to_sign = new StringBuilder();
@@ -1087,7 +1128,7 @@ namespace PubnubApi
             string_to_sign.Append(partialUrl).Append("\n");
             string_to_sign.Append(queryStringToSign);
 
-            PubnubCrypto pubnubCrypto = new PubnubCrypto(this.pubnubConfig.CipherKey, this.pubnubConfig, this.pubnubLog);
+            PubnubCrypto pubnubCrypto = new PubnubCrypto((opType != PNOperationType.PNSignalOperation) ? this.pubnubConfig.CipherKey : "", this.pubnubConfig, this.pubnubLog);
             signature = pubnubCrypto.PubnubAccessManagerSign(this.pubnubConfig.SecretKey, string_to_sign.ToString());
             System.Diagnostics.Debug.WriteLine("string_to_sign = " + string_to_sign);
             System.Diagnostics.Debug.WriteLine("signature = " + signature);
@@ -1127,7 +1168,7 @@ namespace PubnubApi
                         }
                     }
 
-                    string signature = GenerateSignature(queryToSign, partialUrl.ToString());
+                    string signature = GenerateSignature(queryToSign, partialUrl.ToString(), type);
                     queryString = string.Format("{0}&signature={1}", queryToSign, signature);
                 }
                 else
@@ -1184,11 +1225,11 @@ namespace PubnubApi
             return requestUri;
         }
 
-        private string JsonEncodePublishMsg(object originalMessage)
+        private string JsonEncodePublishMsg(object originalMessage, PNOperationType opType)
         {
             string message = jsonLib.SerializeToJsonString(originalMessage);
 
-            if (pubnubConfig.CipherKey.Length > 0)
+            if (pubnubConfig.CipherKey.Length > 0 && opType != PNOperationType.PNSignalOperation)
             {
                 PubnubCrypto aes = new PubnubCrypto(pubnubConfig.CipherKey, pubnubConfig, pubnubLog);
                 string encryptMessage = aes.Encrypt(message);
@@ -1197,7 +1238,6 @@ namespace PubnubApi
 
             return message;
         }
-
 
         private void ForceCanonicalPathAndQuery(Uri requestUri)
         {

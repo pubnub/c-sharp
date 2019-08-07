@@ -29,6 +29,11 @@ namespace PubnubApi
         private object d { get; set; } = "";
 
         /// <summary>
+        /// signal indicator
+        /// </summary>
+        private int e { get; set; }
+
+        /// <summary>
         /// flags
         /// </summary>
         private string f { get; set; } = "";
@@ -84,6 +89,18 @@ namespace PubnubApi
             set
             {
                 b = value;
+            }
+        }
+
+        public int MessageType
+        {
+            get
+            {
+                return e;
+            }
+            set
+            {
+                e = value;
             }
         }
 

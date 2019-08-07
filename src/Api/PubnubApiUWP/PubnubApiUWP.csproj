@@ -15,7 +15,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubUWP</PackageId>
-    <PackageVersion>4.0.31.0</PackageVersion>
+    <PackageVersion>4.0.32.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -23,7 +23,8 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Refactored code to encode unsafe chars ignored by EscapeDataString in NET35/NET40</PackageReleaseNotes>
+    <PackageReleaseNotes>Async() is deprecated. Use Execute() instead.
+Signal feature</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -228,6 +229,7 @@
     <Compile Include="..\PubnubApi\EndPoint\PubSub\PublishOperation.cs">
       <Link>EndPoint\PubSub\PublishOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\SignalOperation.cs" Link="EndPoint\PubSub\SignalOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeManager.cs">
       <Link>EndPoint\PubSub\SubscribeManager.cs</Link>
     </Compile>
@@ -464,6 +466,7 @@
     <Compile Include="..\PubnubApi\Model\PNStatusCategoryHelper.cs">
       <Link>Model\PNStatusCategoryHelper.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\PNStatusCodeHelper.cs" Link="Model\PNStatusCodeHelper.cs" />
     <Compile Include="..\PubnubApi\Model\ReconnectState.cs">
       <Link>Model\ReconnectState.cs</Link>
     </Compile>
@@ -550,8 +553,12 @@
     <None Include="pubnub.snk" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="EndPoint\Objects\" />
     <Folder Include="Model\Consumer\DeleteMessage\" />
+    <Folder Include="Model\Consumer\Objects\" />
     <Folder Include="Model\Derived\DeleteMessage\" />
+    <Folder Include="Model\Derived\Objects\" />
+    <Folder Include="JsonDataParse\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

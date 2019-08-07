@@ -16,6 +16,7 @@ namespace PubnubApi
         public long Timetoken { get; set; }
         public PNCallback<T> PubnubCallback { get; set; }
         public bool UsePostMethod { get; set; }
+        public bool UsePatchMethod { get; set; }
         public object EndPointOperation { get; set; }
 
         public RequestState()
