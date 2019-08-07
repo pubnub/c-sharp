@@ -1256,9 +1256,6 @@ namespace PubnubApi
                                     }
                                 }
                                 break;
-                            case PNOperationType.Leave:
-                                result.Add(multiChannel);
-                                break;
                             case PNOperationType.PNHeartbeatOperation:
                                 Dictionary<string, object> heartbeatadictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
                                 result = new List<object>();
@@ -1323,6 +1320,11 @@ namespace PubnubApi
                             case PNOperationType.PushRemove:
                             case PNOperationType.PushGet:
                             case PNOperationType.PushUnregister:
+                            case PNOperationType.Leave:
+                            case PNOperationType.PNCreateUserOperation:
+                            case PNOperationType.PNUpdateUserOperation:
+                            case PNOperationType.PNCreateSpaceOperation:
+                            case PNOperationType.PNUpdateSpaceOperation:
                                 result.Add(multiChannel);
                                 break;
                             case PNOperationType.PNAddChannelsToGroupOperation:
@@ -1341,12 +1343,6 @@ namespace PubnubApi
                                 {
                                     result.Add(multiChannel);
                                 }
-                                break;
-                            case PNOperationType.PNCreateUserOperation:
-                            case PNOperationType.PNUpdateUserOperation:
-                            case PNOperationType.PNCreateSpaceOperation:
-                            case PNOperationType.PNUpdateSpaceOperation:
-                                result.Add(multiChannel);
                                 break;
                             default:
                                 break;

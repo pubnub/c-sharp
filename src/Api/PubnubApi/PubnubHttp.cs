@@ -129,7 +129,7 @@ namespace PubnubApi
             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, patchData = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), patchData), pubnubConfig.LogVerbosity);
             if (pubnubConfig.UseClassicHttpWebRequest)
             {
-                return await SendRequestAndGetJsonResponseClassicHttpWithPATCH(requestUri, pubnubRequestState, request, patchData).ConfigureAwait(false);
+                return await SendRequestAndGetJsonResponseClassicHttpWithPATCH(pubnubRequestState, request, patchData).ConfigureAwait(false);
             }
             else
             {
@@ -140,7 +140,7 @@ namespace PubnubApi
                 }
                 else
                 {
-                    return await SendRequestAndGetJsonResponseHttpClientWithPATCH(requestUri, pubnubRequestState, request, patchData).ConfigureAwait(false);
+                    return await SendRequestAndGetJsonResponseHttpClientWithPATCH(requestUri, pubnubRequestState, patchData).ConfigureAwait(false);
                 }
 #else
                 return await SendRequestAndGetJsonResponseTaskFactoryWithPATCH(pubnubRequestState, request, patchData).ConfigureAwait(false);
@@ -329,7 +329,7 @@ namespace PubnubApi
             return jsonString;
         }
 
-        async Task<string> SendRequestAndGetJsonResponseHttpClientWithPATCH<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request, string patchData)
+        async Task<string> SendRequestAndGetJsonResponseHttpClientWithPATCH<T>(Uri requestUri, RequestState<T> pubnubRequestState, string patchData)
         {
             string jsonString = "";
             HttpResponseMessage response = null;
@@ -877,7 +877,7 @@ namespace PubnubApi
             }
         }
 
-        async Task<string> SendRequestAndGetJsonResponseClassicHttpWithPATCH<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request, string patchData)
+        async Task<string> SendRequestAndGetJsonResponseClassicHttpWithPATCH<T>(RequestState<T> pubnubRequestState, HttpWebRequest request, string patchData)
         {
             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Inside SendRequestAndGetJsonResponseClassicHttpWithPATCH", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
             var taskComplete = new TaskCompletionSource<string>();

@@ -195,10 +195,6 @@ namespace PubnubApi.EndPoint
                         {
                             requestState.PubnubCallback.OnResponse(default(PNPublishResult), status);
                         }
-                        else
-                        {
-                            Announce(status);
-                        }
                     }
                 }
                 else

@@ -24,6 +24,7 @@ namespace PubnubApi
                     ret = 500;
                     break;
                 default:
+                    ret = 0;
                     break;
             }
             return ret;

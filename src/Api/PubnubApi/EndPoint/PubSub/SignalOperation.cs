@@ -19,8 +19,6 @@ namespace PubnubApi.EndPoint
 
         private object msg;
         private string channelName = "";
-        private readonly bool httpPost = false;
-        private readonly Dictionary<string, object> userMetadata = null;
         private PNCallback<PNPublishResult> savedCallback;
         private Dictionary<string, object> queryParam;
 
@@ -73,13 +71,13 @@ namespace PubnubApi.EndPoint
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                Signal(this.channelName, this.msg, this.userMetadata, this.queryParam, callback);
+                Signal(this.channelName, this.msg, null, this.queryParam, callback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
                 this.savedCallback = callback;
-                Signal(this.channelName, this.msg, this.userMetadata, this.queryParam, callback);
+                Signal(this.channelName, this.msg, null, this.queryParam, callback);
             })
             { IsBackground = true }.Start();
 #endif
@@ -90,12 +88,12 @@ namespace PubnubApi.EndPoint
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
-                Signal(this.channelName, this.msg, this.userMetadata, this.queryParam, savedCallback);
+                Signal(this.channelName, this.msg, null, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
-                Signal(this.channelName, this.msg, this.userMetadata, this.queryParam, savedCallback);
+                Signal(this.channelName, this.msg, null, this.queryParam, savedCallback);
             })
             { IsBackground = true }.Start();
 #endif
@@ -121,7 +119,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildSignalRequest(channel, message, metaData, httpPost, externalQueryParam);
+            Uri request = urlBuilder.BuildSignalRequest(channel, message, metaData, false, externalQueryParam);
 
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
             requestState.Channels = new[] { channel };
@@ -130,20 +128,7 @@ namespace PubnubApi.EndPoint
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 
-            string json = "";
-            if (this.httpPost)
-            {
-                requestState.UsePostMethod = true;
-                Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
-                messageEnvelope.Add("message", message);
-                string postMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
-                json = UrlProcessRequest<PNPublishResult>(request, requestState, false, postMessage);
-            }
-            else
-            {
-                json = UrlProcessRequest<PNPublishResult>(request, requestState, false);
-            }
-
+            string json = UrlProcessRequest<PNPublishResult>(request, requestState, false);
 
             if (!string.IsNullOrEmpty(json))
             {
@@ -164,10 +149,6 @@ namespace PubnubApi.EndPoint
                         if (requestState != null && requestState.PubnubCallback != null)
                         {
                             requestState.PubnubCallback.OnResponse(default(PNPublishResult), status);
-                        }
-                        else
-                        {
-                            Announce(status);
                         }
                     }
                 }
