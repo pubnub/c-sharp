@@ -146,7 +146,7 @@ namespace PubnubApi.EndPoint
                     {
                         PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, result[1].ToString());
                         PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<PNPublishResult>(PNOperationType.PNSignalOperation, category, requestState, 400, new PNException(json));
-                        if (requestState != null && requestState.PubnubCallback != null)
+                        if (requestState.PubnubCallback != null)
                         {
                             requestState.PubnubCallback.OnResponse(default(PNPublishResult), status);
                         }
