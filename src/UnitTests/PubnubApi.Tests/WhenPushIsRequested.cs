@@ -81,7 +81,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Execute(new UTGrantResult());
 
             Thread.Sleep(1000);
 
@@ -143,7 +143,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             publishManualEvent = new ManualResetEvent(false);
-            pubnub.Publish().Channel(channel).Message(dicToast).Async(new UTPublishResult());
+            pubnub.Publish().Channel(channel).Message(dicToast).Execute(new UTPublishResult());
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             pubnub.Destroy();
@@ -202,7 +202,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Publish().Channel(channel).Message(dicTile).Async(new UTPublishResult());
+            pubnub.Publish().Channel(channel).Message(dicTile).Execute(new UTPublishResult());
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             pubnub.Destroy();
@@ -260,7 +260,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Publish().Channel(channel).Message(dicTile).Async(new UTPublishResult());
+            pubnub.Publish().Channel(channel).Message(dicTile).Execute(new UTPublishResult());
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             pubnub.Destroy();
@@ -318,7 +318,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Publish().Channel(channel).Message(dicTile).Async(new UTPublishResult());
+            pubnub.Publish().Channel(channel).Message(dicTile).Execute(new UTPublishResult());
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             pubnub.Destroy();
@@ -355,7 +355,7 @@ namespace PubNubMessaging.Tests
 
             mrePush = new ManualResetEvent(false);
 
-            pubnub.AuditPushChannelProvisions().DeviceId("4e71acc275a8eeb400654d923724c073956661455697c92ca6c5438f2c19aa7b").PushType(PNPushType.APNS).Async(new UTAuditPushChannel());
+            pubnub.AuditPushChannelProvisions().DeviceId("4e71acc275a8eeb400654d923724c073956661455697c92ca6c5438f2c19aa7b").PushType(PNPushType.APNS).Execute(new UTAuditPushChannel());
             mrePush.WaitOne(manualResetEventWaitTimeout);
 
             pubnub.Destroy();

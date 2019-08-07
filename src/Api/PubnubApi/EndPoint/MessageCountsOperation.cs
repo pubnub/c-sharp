@@ -50,7 +50,13 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        [Obsolete("Async is deprecated, please use Execute instead.")]
         public void Async(PNCallback<PNMessageCountResult> callback)
+        {
+            Execute(callback);
+        }
+
+        public void Execute(PNCallback<PNMessageCountResult> callback)
         {
             if (string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length == 0)
             {

@@ -81,7 +81,7 @@ namespace PubNubMessaging.Tests
             ManualResetEvent grantManualEvent = new ManualResetEvent(false);
 
             pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Async(new PNAccessManagerGrantResultExt(
+                .Execute(new PNAccessManagerGrantResultExt(
                                 (r, s) =>
                                 {
                                     try
@@ -150,7 +150,7 @@ namespace PubNubMessaging.Tests
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
                 pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Async(new PNAccessManagerGrantResultExt(
+                .Execute(new PNAccessManagerGrantResultExt(
                                 (r, s) =>
                                 {
                                     try
@@ -222,7 +222,7 @@ namespace PubNubMessaging.Tests
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
                 pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Async(new PNAccessManagerGrantResultExt(
+                .Execute(new PNAccessManagerGrantResultExt(
                                 (r, s) =>
                                 {
                                     try
@@ -294,7 +294,7 @@ namespace PubNubMessaging.Tests
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
                 pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Async(new PNAccessManagerGrantResultExt(
+                .Execute(new PNAccessManagerGrantResultExt(
                                 (r, s) =>
                                 {
                                     try
@@ -365,7 +365,7 @@ namespace PubNubMessaging.Tests
 
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.Grant().ChannelGroups(new [] { channelGroupName }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Async(new PNAccessManagerGrantResultExt(
+                .Execute(new PNAccessManagerGrantResultExt(
                                 (r, s) =>
                                 {
                                     try
@@ -555,7 +555,7 @@ namespace PubNubMessaging.Tests
             {
                 ManualResetEvent publishManualEvent = new ManualResetEvent(false);
                 pubnub.Publish().Channel(publishChannel).Message(publishedMessage)
-                    .Async(new PNPublishResultExt((r, s) =>
+                    .Execute(new PNPublishResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
@@ -765,7 +765,7 @@ namespace PubNubMessaging.Tests
             {
                 ManualResetEvent publishManualEvent = new ManualResetEvent(false);
                 pubnub.Publish().Channel(publishChannel).Message(publishedMessage)
-                    .Async(new PNPublishResultExt((r, s) =>
+                    .Execute(new PNPublishResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
@@ -907,7 +907,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent channelGroupManualEvent = new ManualResetEvent(false);
             pubnub.AddChannelsToChannelGroup().Channels(new [] { channelAddForGroup }).ChannelGroup(channelGroupName)
-                .Async(new PNChannelGroupsAddChannelResultExt(
+                .Execute(new PNChannelGroupsAddChannelResultExt(
                                 (r, s) => {
                                     try
                                     {
@@ -972,7 +972,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent publishManualEvent = new ManualResetEvent(false);
             pubnub.Publish().Channel(channelAddForGroup).Message(publishedMessage)
-                    .Async(new PNPublishResultExt((r, s) =>
+                    .Execute(new PNPublishResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
@@ -1005,7 +1005,7 @@ namespace PubNubMessaging.Tests
 
                 publishManualEvent = new ManualResetEvent(false);
                 pubnub.Publish().Channel(pubWildChannelName).Message(publishedMessage)
-                    .Async(new PNPublishResultExt((r, s) =>
+                    .Execute(new PNPublishResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
@@ -1035,7 +1035,7 @@ namespace PubNubMessaging.Tests
                 Thread.Sleep(1000);
 
                 pubnub.Publish().Channel(subChannelName).Message(publishedMessage)
-                    .Async(new PNPublishResultExt((r, s) =>
+                    .Execute(new PNPublishResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {

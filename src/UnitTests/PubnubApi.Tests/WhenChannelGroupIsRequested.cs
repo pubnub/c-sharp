@@ -71,7 +71,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().ChannelGroups(new [] { channelGroupName }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new GrantResult());
+            pubnub.Grant().ChannelGroups(new [] { channelGroupName }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Execute(new GrantResult());
 
             Thread.Sleep(1000);
 
@@ -123,7 +123,7 @@ namespace PubNubMessaging.Tests
 
             channelGroupManualEvent = new ManualResetEvent(false);
 
-            pubnub.AddChannelsToChannelGroup().Channels(new [] { channelName }).ChannelGroup(channelGroupName).Async(new ChannelGroupAddChannelResult());
+            pubnub.AddChannelsToChannelGroup().Channels(new [] { channelName }).ChannelGroup(channelGroupName).Execute(new ChannelGroupAddChannelResult());
             Thread.Sleep(1000);
 
             channelGroupManualEvent.WaitOne();
@@ -170,7 +170,7 @@ namespace PubNubMessaging.Tests
 
             channelGroupManualEvent = new ManualResetEvent(false);
 
-            pubnub.RemoveChannelsFromChannelGroup().Channels(new [] { channelName }).ChannelGroup(channelGroupName).Async(new ChannelGroupRemoveChannel());
+            pubnub.RemoveChannelsFromChannelGroup().Channels(new [] { channelName }).ChannelGroup(channelGroupName).Execute(new ChannelGroupRemoveChannel());
             Thread.Sleep(1000);
 
             channelGroupManualEvent.WaitOne();
@@ -217,7 +217,7 @@ namespace PubNubMessaging.Tests
 
             channelGroupManualEvent = new ManualResetEvent(false);
 
-            pubnub.ListChannelsForChannelGroup().ChannelGroup(channelGroupName).Async(new ChannelGroupAllChannels());
+            pubnub.ListChannelsForChannelGroup().ChannelGroup(channelGroupName).Execute(new ChannelGroupAllChannels());
             Thread.Sleep(1000);
 
             channelGroupManualEvent.WaitOne();
@@ -263,7 +263,7 @@ namespace PubNubMessaging.Tests
 
             channelGroupManualEvent = new ManualResetEvent(false);
 
-            pubnub.ListChannelGroups().Async(new ChannelGroupAll());
+            pubnub.ListChannelGroups().Execute(new ChannelGroupAll());
             Thread.Sleep(1000);
 
             channelGroupManualEvent.WaitOne();

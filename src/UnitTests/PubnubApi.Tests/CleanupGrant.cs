@@ -38,7 +38,7 @@ namespace PubNubMessaging.Tests
 
                 pubnub = createPubNubInstance(config);
                 ManualResetEvent auditManualEvent = new ManualResetEvent(false);
-                pubnub.Audit().Async(new PNAccessManagerAuditResultExt((r,s)=> {
+                pubnub.Audit().Execute(new PNAccessManagerAuditResultExt((r,s)=> {
                     try
                     {
                         Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
@@ -61,7 +61,7 @@ namespace PubNubMessaging.Tests
                                                 Debug.WriteLine("Auth Key = " + authKey);
                                                 ManualResetEvent revokeManualEvent = new ManualResetEvent(false);
                                                 pubnub.Grant().Channels(new[] { channelName }).AuthKeys(new[] { authKey }).Read(false).Write(false).Manage(false)
-                                                .Async(new PNAccessManagerGrantResultExt((r1,s1)=> 
+                                                .Execute(new PNAccessManagerGrantResultExt((r1,s1)=> 
                                                 {
                                                     try
                                                     {
@@ -134,7 +134,7 @@ namespace PubNubMessaging.Tests
                 pubnub = createPubNubInstance(config);
 
                 ManualResetEvent auditManualEvent = new ManualResetEvent(false);
-                pubnub.Audit().Async(new PNAccessManagerAuditResultExt((r, s) => {
+                pubnub.Audit().Execute(new PNAccessManagerAuditResultExt((r, s) => {
                     try
                     {
                         Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
@@ -157,7 +157,7 @@ namespace PubNubMessaging.Tests
                                                 Debug.WriteLine("Auth Key = " + authKey);
                                                 ManualResetEvent revokeManualEvent = new ManualResetEvent(false);
                                                 pubnub.Grant().Channels(new[] { channelName }).AuthKeys(new[] { authKey }).Read(false).Write(false).Manage(false)
-                                                .Async(new PNAccessManagerGrantResultExt((r1, s1) =>
+                                                .Execute(new PNAccessManagerGrantResultExt((r1, s1) =>
                                                 {
                                                     try
                                                     {
