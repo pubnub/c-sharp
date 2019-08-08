@@ -29,7 +29,7 @@ namespace PubnubApi
         private object d { get; set; } = "";
 
         /// <summary>
-        /// signal indicator
+        /// message type indicator
         /// </summary>
         private int e { get; set; }
 

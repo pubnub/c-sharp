@@ -111,11 +111,15 @@ namespace PubnubApi.EndPoint
                 throw new MissingMemberException("Invalid publish key");
             }
 
+            if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) || config.SubscribeKey.Length <= 0)
+            {
+                throw new MissingMemberException("Invalid subscribe key");
+            }
+
             if (callback == null)
             {
                 throw new ArgumentException("Missing userCallback");
             }
-
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
