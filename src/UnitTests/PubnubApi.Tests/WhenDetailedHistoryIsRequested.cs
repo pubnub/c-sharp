@@ -69,7 +69,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent grantManualEvent = new ManualResetEvent(false);
             pubnub.Grant().Channels(new [] { grantChannel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Async(new PNAccessManagerGrantResultExt((r,s)=> {
+                .Execute(new PNAccessManagerGrantResultExt((r,s)=> {
                     try
                     {
                         Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
@@ -145,7 +145,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             pubnub.Publish().Channel(channel).Message(message).ShouldStore(false)
-                .Async(new PNPublishResultExt((r,s)=> {
+                .Execute(new PNPublishResultExt((r,s)=> {
                     if (r != null && s.StatusCode == 200 && !s.Error)
                     {
                         publishTimetoken = r.Timetoken;
@@ -182,7 +182,7 @@ namespace PubNubMessaging.Tests
                     .Start(publishTimetoken)
                     .Reverse(false)
                     .IncludeTimetoken(false)
-                    .Async(new PNHistoryResultExt((r,s)=> {
+                    .Execute(new PNHistoryResultExt((r,s)=> {
                         if (r != null && s.StatusCode == 200 && !s.Error && r.Messages != null && r.Messages.Count > 0) {
                             foreach (PNHistoryItemResult item in r.Messages)
                             {
@@ -247,7 +247,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent publishManualEvent = new ManualResetEvent(false);
             pubnub.Publish().Channel(channel).Message(message).ShouldStore(true)
-                .Async(new PNPublishResultExt((r, s) => {
+                .Execute(new PNPublishResultExt((r, s) => {
                     if (r != null && s.StatusCode == 200 && !s.Error)
                     {
                         publishTimetoken = r.Timetoken;
@@ -289,7 +289,7 @@ namespace PubNubMessaging.Tests
                     .Count(1)
                     .Reverse(false)
                     .IncludeTimetoken(true)
-                    .Async(new PNHistoryResultExt((r, s) => {
+                    .Execute(new PNHistoryResultExt((r, s) => {
                         if (r != null && s.StatusCode == 200 && !s.Error && r.Messages != null && r.Messages.Count > 0)
                         {
                             foreach (PNHistoryItemResult item in r.Messages)
@@ -353,7 +353,7 @@ namespace PubNubMessaging.Tests
             pubnub.History().Channel(channel)
                 .Count(10)
                 .IncludeTimetoken(false)
-                .Async(new PNHistoryResultExt((r, s) => {
+                .Execute(new PNHistoryResultExt((r, s) => {
                     if (r != null && s.StatusCode == 200 && !s.Error && r.Messages != null && r.Messages.Count >= 10)
                     {
                         receivedMessage = true;
@@ -410,7 +410,7 @@ namespace PubNubMessaging.Tests
                 .Count(10)
                 .Reverse(true)
                 .IncludeTimetoken(false)
-                .Async(new PNHistoryResultExt((r, s) => {
+                .Execute(new PNHistoryResultExt((r, s) => {
                     if (r != null && s.StatusCode == 200 && !s.Error && r.Messages != null && r.Messages.Count >= 10)
                     {
                         receivedMessage = true;
@@ -466,7 +466,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             ManualResetEvent timeManualEvent = new ManualResetEvent(false);
-            pubnub.Time().Async(new PNTimeResultExt((r,s)=> {
+            pubnub.Time().Execute(new PNTimeResultExt((r,s)=> {
                 try{
                     Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                     currentTimetoken = (r != null && s.StatusCode == 200 && s.Error == false) ? r.Timetoken : 0;
@@ -494,7 +494,7 @@ namespace PubNubMessaging.Tests
                 ManualResetEvent publishManualEvent = new ManualResetEvent(false);
                 pubnub.Publish().Channel(channel)
                     .Message(string.Format("DetailedHistoryStartTimeWithReverseTrue {0}", index))
-                    .Async(new PNPublishResultExt((r, s) => {
+                    .Execute(new PNPublishResultExt((r, s) => {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
                             publishTimetoken = r.Timetoken;
@@ -531,7 +531,7 @@ namespace PubNubMessaging.Tests
                 pubnub.History().Channel(channel)
                     .Start(currentTimetoken)
                     .Reverse(false)
-                    .Async(new PNHistoryResultExt((r, s) => {
+                    .Execute(new PNHistoryResultExt((r, s) => {
                         if (r != null && s.StatusCode == 200 && !s.Error && r.Messages != null && r.Messages.Count >= 10)
                         {
                             receivedMessage = true;
@@ -577,7 +577,7 @@ namespace PubNubMessaging.Tests
                 .Count(10)
                 .Reverse(true)
                 .IncludeTimetoken(false)
-                .Async(new PNHistoryResultExt((r, s) => {
+                .Execute(new PNHistoryResultExt((r, s) => {
                     receivedMessage = r == null || s.StatusCode != 200 || s.Error;
                     historyManualEvent.Set();
                 }));
@@ -702,7 +702,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             ManualResetEvent timeManualEvent = new ManualResetEvent(false);
-            pubnub.Time().Async(new PNTimeResultExt((r, s) => {
+            pubnub.Time().Execute(new PNTimeResultExt((r, s) => {
                 try
                 {
                     Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -735,7 +735,7 @@ namespace PubNubMessaging.Tests
 
                 ManualResetEvent publishManualEvent = new ManualResetEvent(false);
                 pubnub.Publish().Channel(channel).Message(message).ShouldStore(true)
-                    .Async(new PNPublishResultExt((r, s) => {
+                    .Execute(new PNPublishResultExt((r, s) => {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
                             receivedMessage = true;
@@ -760,7 +760,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             timeManualEvent = new ManualResetEvent(false);
-            pubnub.Time().Async(new PNTimeResultExt((r, s) => {
+            pubnub.Time().Execute(new PNTimeResultExt((r, s) => {
                 try
                 {
                     Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -797,7 +797,7 @@ namespace PubNubMessaging.Tests
 
                 ManualResetEvent publishManualEvent = new ManualResetEvent(false);
                 pubnub.Publish().Channel(channel).Message(message).ShouldStore(true)
-                    .Async(new PNPublishResultExt((r, s) => {
+                    .Execute(new PNPublishResultExt((r, s) => {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
                             receivedMessage = true;
@@ -822,7 +822,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             timeManualEvent = new ManualResetEvent(false);
-            pubnub.Time().Async(new PNTimeResultExt((r, s) => {
+            pubnub.Time().Execute(new PNTimeResultExt((r, s) => {
                 try
                 {
                     Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -857,7 +857,7 @@ namespace PubNubMessaging.Tests
                 .Count(totalMessages / 2)
                 .Reverse(true)
                 .IncludeTimetoken(false)
-                .Async(new PNHistoryResultExt((r, s) => {
+                .Execute(new PNHistoryResultExt((r, s) => {
                     historyMessageList = new List<object>();
                     if (r != null && s.StatusCode == 200 && !s.Error && r.Messages != null && r.Messages.Count > 0)
                     {
@@ -909,7 +909,7 @@ namespace PubNubMessaging.Tests
                     .Count(totalMessages / 2)
                     .Reverse(true)
                     .IncludeTimetoken(false)
-                    .Async(new PNHistoryResultExt((r, s) => {
+                    .Execute(new PNHistoryResultExt((r, s) => {
                         historyMessageList = new List<object>();
                         if (r != null && s.StatusCode == 200 && !s.Error && r.Messages != null && r.Messages.Count > 0)
                         {
@@ -960,7 +960,7 @@ namespace PubNubMessaging.Tests
                         .Count(totalMessages / 2)
                         .Reverse(false)
                         .IncludeTimetoken(false)
-                        .Async(new PNHistoryResultExt((r, s) => {
+                        .Execute(new PNHistoryResultExt((r, s) => {
                             historyMessageList = new List<object>();
                             if (r != null && s.StatusCode == 200 && !s.Error && r.Messages != null && r.Messages.Count > 0)
                             {
@@ -1036,7 +1036,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             ManualResetEvent timeManualEvent = new ManualResetEvent(false);
-            pubnub.Time().Async(new PNTimeResultExt((r, s) => {
+            pubnub.Time().Execute(new PNTimeResultExt((r, s) => {
                 try
                 {
                     Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -1071,7 +1071,7 @@ namespace PubNubMessaging.Tests
 
                 ManualResetEvent publishManualEvent = new ManualResetEvent(false);
                 pubnub.Publish().Channel(channel).Message(message).ShouldStore(true)
-                    .Async(new PNPublishResultExt((r, s) => {
+                    .Execute(new PNPublishResultExt((r, s) => {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
                             receivedMessage = true;
@@ -1096,7 +1096,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             timeManualEvent = new ManualResetEvent(false);
-            pubnub.Time().Async(new PNTimeResultExt((r, s) => {
+            pubnub.Time().Execute(new PNTimeResultExt((r, s) => {
                 try
                 {
                     Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -1133,7 +1133,7 @@ namespace PubNubMessaging.Tests
 
                 ManualResetEvent publishManualEvent = new ManualResetEvent(false);
                 pubnub.Publish().Channel(channel).Message(message).ShouldStore(true)
-                    .Async(new PNPublishResultExt((r, s) => {
+                    .Execute(new PNPublishResultExt((r, s) => {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
                             receivedMessage = true;
@@ -1158,7 +1158,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             timeManualEvent = new ManualResetEvent(false);
-            pubnub.Time().Async(new PNTimeResultExt((r, s) => {
+            pubnub.Time().Execute(new PNTimeResultExt((r, s) => {
                 try
                 {
                     Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -1193,7 +1193,7 @@ namespace PubNubMessaging.Tests
                 .Count(totalMessages / 2)
                 .Reverse(true)
                 .IncludeTimetoken(false)
-                .Async(new PNHistoryResultExt((r, s) => {
+                .Execute(new PNHistoryResultExt((r, s) => {
                     historyMessageList = new List<object>();
                     if (r != null && s.StatusCode == 200 && !s.Error && r.Messages != null && r.Messages.Count > 0)
                     {
@@ -1246,7 +1246,7 @@ namespace PubNubMessaging.Tests
                     .Count(totalMessages / 2)
                     .Reverse(true)
                     .IncludeTimetoken(false)
-                    .Async(new PNHistoryResultExt((r, s) => {
+                    .Execute(new PNHistoryResultExt((r, s) => {
                         historyMessageList = new List<object>();
                         if (r != null && s.StatusCode == 200 && !s.Error && r.Messages != null && r.Messages.Count > 0)
                         {
@@ -1297,7 +1297,7 @@ namespace PubNubMessaging.Tests
                         .Count(totalMessages / 2)
                         .Reverse(false)
                         .IncludeTimetoken(false)
-                        .Async(new PNHistoryResultExt((r, s) => {
+                        .Execute(new PNHistoryResultExt((r, s) => {
                             historyMessageList = new List<object>();
                             if (r != null && s.StatusCode == 200 && !s.Error && r.Messages != null && r.Messages.Count > 0)
                             {

@@ -77,7 +77,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().Channels(channelsGrant).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+            pubnub.Grant().Channels(channelsGrant).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Execute(new UTGrantResult());
 
             Thread.Sleep(1000);
 
@@ -177,7 +177,7 @@ namespace PubNubMessaging.Tests
 
             Thread.Sleep(1000);
 
-            pubnub.Publish().Channel(channel).Message(publishedMessage).Async(new UTPublishResult());
+            pubnub.Publish().Channel(channel).Message(publishedMessage).Execute(new UTPublishResult());
 
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -295,7 +295,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
 
-            pubnub.Publish().Channel(channel).Message(publishedMessage).Async(new UTPublishResult());
+            pubnub.Publish().Channel(channel).Message(publishedMessage).Execute(new UTPublishResult());
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             Thread.Sleep(1000);
@@ -475,7 +475,7 @@ namespace PubNubMessaging.Tests
 
             Thread.Sleep(1000);
 
-            pubnub.Publish().Channel(channel).Message(publishedMessage).Async(new UTPublishResult());
+            pubnub.Publish().Channel(channel).Message(publishedMessage).Execute(new UTPublishResult());
 
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -650,6 +650,11 @@ namespace PubNubMessaging.Tests
                 {
                     Debug.WriteLine("SubscribeCallback: Presence: " + presence.Event);
                 }
+            }
+
+            public override void Signal<T>(Pubnub pubnub, PNMessageResult<T> signal)
+            {
+                throw new NotImplementedException();
             }
 
             public override void Status(Pubnub pubnub, PNStatus status)

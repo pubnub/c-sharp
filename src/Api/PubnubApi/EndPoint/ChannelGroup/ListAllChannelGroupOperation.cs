@@ -33,7 +33,13 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        [Obsolete("Async is deprecated, please use Execute instead.")]
         public void Async(PNCallback<PNChannelGroupsListAllResult> callback)
+        {
+            Execute(callback);
+        }
+
+        public void Execute(PNCallback<PNChannelGroupsListAllResult> callback)
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>

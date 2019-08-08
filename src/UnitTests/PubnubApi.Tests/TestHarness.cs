@@ -26,6 +26,7 @@ namespace PubNubMessaging.Tests
             }
             else
             {
+                pnConfiguration.Origin = "ps.pndsn.com";
                 pubnub = new Pubnub(pnConfiguration);
             }
             return pubnub;

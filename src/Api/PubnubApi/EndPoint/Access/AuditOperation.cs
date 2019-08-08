@@ -56,10 +56,16 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        [Obsolete("Async is deprecated, please use Execute instead.")]
         public void Async(PNCallback<PNAccessManagerAuditResult> callback)
         {
+            Execute(callback);
+        }
+
+        public void Execute(PNCallback<PNAccessManagerAuditResult> callback)
+        {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            Task.Factory.StartNew(() => 
+            Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
                 AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, this.queryParam, callback);

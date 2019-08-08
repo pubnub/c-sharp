@@ -18,7 +18,7 @@ namespace PubnubApi
 
         private readonly string instanceId;
 
-        private static string sdkVersion = "PubNubCSharp4.0.31.0";
+        private static string sdkVersion = "PubNubCSharp4.0.32.0";
 
         private object savedSubscribeOperation;
         private readonly string savedSdkVerion;
@@ -58,6 +58,12 @@ namespace PubnubApi
             EndPoint.FireOperation fireOperation = new EndPoint.FireOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
             fireOperation.CurrentPubnubInstance(this);
             return fireOperation;
+        }
+
+        public EndPoint.SignalOperation Signal()
+        {
+            EndPoint.SignalOperation signalOperation = new EndPoint.SignalOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            return signalOperation;
         }
 
         public EndPoint.HistoryOperation History()

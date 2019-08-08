@@ -76,7 +76,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent grantManualEvent = new ManualResetEvent(false);
             pubnub.Grant().Channels(channelsGrant).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Async(new PNAccessManagerGrantResultExt(
+                .Execute(new PNAccessManagerGrantResultExt(
                                 (r, s) =>
                                 {
                                     try
@@ -270,7 +270,7 @@ namespace PubNubMessaging.Tests
             {
                 ManualResetEvent publishManualEvent = new ManualResetEvent(false);
                 pubnub.Publish().Channel(channel).Message(publishedMessage)
-                        .Async(new PNPublishResultExt((r, s) =>
+                        .Execute(new PNPublishResultExt((r, s) =>
                         {
                             if (r != null && s.StatusCode == 200 && !s.Error)
                             {
@@ -755,7 +755,7 @@ namespace PubNubMessaging.Tests
                         Debug.WriteLine("ThenSubscriberShouldBeAbleToReceiveManyMessages..Publishing " + index.ToString());
                         ManualResetEvent publishManualEvent = new ManualResetEvent(false);
                         pubnub.Publish().Channel(channel).Message(index.ToString())
-                            .Async(new PNPublishResultExt((r, s) =>
+                            .Execute(new PNPublishResultExt((r, s) =>
                             {
                                 if (r != null && s.StatusCode == 200 && !s.Error)
                                 {

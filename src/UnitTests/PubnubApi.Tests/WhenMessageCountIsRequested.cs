@@ -75,7 +75,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             pubnub.Grant().Channels(new[] { channelName1, channelName2 }).AuthKeys(new[] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Async(new PNAccessManagerGrantResultExt((r,s)=> 
+                .Execute(new PNAccessManagerGrantResultExt((r,s)=> 
                 {
                     if (r != null)
                     {
@@ -141,7 +141,7 @@ namespace PubNubMessaging.Tests
             pubnub.MessageCounts()
                 .Channels(new[] { channelName1 })
                 .ChannelsTimetoken(new long[] { 15505396580138884 })
-                .Async(new PNMessageCountResultExt((r,s)=> 
+                .Execute(new PNMessageCountResultExt((r,s)=> 
                     {
                         if (r != null && r.Channels != null)
                         {
@@ -198,7 +198,7 @@ namespace PubNubMessaging.Tests
             pubnub.MessageCounts()
                 .Channels(new[] { channelName1, channelName2 })
                 .ChannelsTimetoken(new long[] { 15505396580138884, 15505396580138884 })
-                .Async(new PNMessageCountResultExt((r, s) =>
+                .Execute(new PNMessageCountResultExt((r, s) =>
                 {
                     if (r != null && r.Channels != null)
                     {

@@ -87,7 +87,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(false).TTL(5).Async(new GrantResult());
+                pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(false).TTL(5).Execute(new GrantResult());
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -145,7 +145,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(false).Manage(false).TTL(5).Async(new GrantResult());
+                pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(false).Manage(false).TTL(5).Execute(new GrantResult());
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -204,7 +204,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(false).Write(true).Manage(false).TTL(5).Async(new GrantResult());
+                pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(false).Write(true).Manage(false).TTL(5).Execute(new GrantResult());
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -269,7 +269,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.Grant().AuthKeys(new [] { authKey }).Channels(channelBuilder).Read(true).Write(true).Manage(false).TTL(5).Async(new GrantResult());
+                pubnub.Grant().AuthKeys(new [] { authKey }).Channels(channelBuilder).Read(true).Write(true).Manage(false).TTL(5).Execute(new GrantResult());
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -336,7 +336,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.Grant().Channels(channelBuilder).AuthKeys(authKeyBuilder).Read(true).Write(true).Manage(false).TTL(5).Async(new GrantResult());
+                pubnub.Grant().Channels(channelBuilder).AuthKeys(authKeyBuilder).Read(true).Write(true).Manage(false).TTL(5).Execute(new GrantResult());
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -412,14 +412,14 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(false).TTL(5).Async(new GrantResult());
+                pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(false).TTL(5).Execute(new GrantResult());
                 Thread.Sleep(1000);
                 grantManualEvent.WaitOne();
 
                 if (receivedGrantMessage)
                 {
                     revokeManualEvent = new ManualResetEvent(false);
-                    pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(false).Write(false).Manage(false).TTL(0).Async(new RevokeGrantResult());
+                    pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(false).Write(false).Manage(false).TTL(0).Execute(new RevokeGrantResult());
                     Thread.Sleep(1000);
                     revokeManualEvent.WaitOne();
 
@@ -481,7 +481,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.Grant().ChannelGroups(new [] { channelGroup }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(5).Async(new GrantResult());
+                pubnub.Grant().ChannelGroups(new [] { channelGroup }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(5).Execute(new GrantResult());
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -539,7 +539,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.Grant().ChannelGroups(new [] { channelGroup }).AuthKeys(new [] { authKey }).Read(true).Write(false).Manage(false).TTL(5).Async(new GrantResult());
+                pubnub.Grant().ChannelGroups(new [] { channelGroup }).AuthKeys(new [] { authKey }).Read(true).Write(false).Manage(false).TTL(5).Execute(new GrantResult());
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();

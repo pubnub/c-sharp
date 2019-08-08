@@ -8,6 +8,7 @@ namespace PubnubApi
         PNUnsubscribeOperation,
         PNPublishOperation,
         PNFireOperation,
+        PNSignalOperation,
         PNHistoryOperation,
         PNDeleteMessageOperation,
         PNMessageCountsOperation,
@@ -20,6 +21,22 @@ namespace PubnubApi
         PNChannelGroupsOperation,
         PNRemoveGroupOperation,
         PNChannelsForGroupOperation,
+
+        PNCreateUserOperation,
+        PNUpdateUserOperation,
+        PNDeleteUserOperation,
+        PNGetUserOperation,
+        PNGetUsersOperation,
+
+        PNCreateSpaceOperation,
+        PNUpdateSpaceOperation,
+        PNDeleteSpaceOperation,
+        PNGetSpacesOperation,
+
+        PNMembershipsOperation,
+        PNMembersOperation,
+        PNGetMembershipsOperation,
+        PNGetMembersOperation,
 
         Presence,
         Leave,

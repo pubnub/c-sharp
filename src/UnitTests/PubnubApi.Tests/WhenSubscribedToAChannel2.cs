@@ -86,7 +86,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().Channels(channelsGrant).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+            pubnub.Grant().Channels(channelsGrant).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Execute(new UTGrantResult());
 
             Thread.Sleep(1000);
 
@@ -204,7 +204,7 @@ namespace PubNubMessaging.Tests
 
             Thread.Sleep(1000);
 
-            pubnub.Publish().Channel(channel).Message(publishedMessage).QueryParam(new Dictionary<string, object> { { "ut", currentTestCase } }).Async(new UTPublishResult());
+            pubnub.Publish().Channel(channel).Message(publishedMessage).QueryParam(new Dictionary<string, object> { { "ut", currentTestCase } }).Execute(new UTPublishResult());
 
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
@@ -391,7 +391,7 @@ namespace PubNubMessaging.Tests
 
             Thread.Sleep(1000);
 
-            pubnub.Publish().Channel(channel).Message(publishedMessage).QueryParam(new Dictionary<string, object>() { { "ut", currentTestCase } }).Async(new UTPublishResult());
+            pubnub.Publish().Channel(channel).Message(publishedMessage).QueryParam(new Dictionary<string, object>() { { "ut", currentTestCase } }).Execute(new UTPublishResult());
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             pubnub.Unsubscribe<string>().Channels(new [] { channel }).QueryParam(new Dictionary<string, object>() { { "ut", currentTestCase } }).Execute();
@@ -549,6 +549,11 @@ namespace PubNubMessaging.Tests
             {
             }
 
+            public override void Signal<T>(Pubnub pubnub, PNMessageResult<T> signal)
+            {
+                throw new NotImplementedException();
+            }
+
             public override void Status(Pubnub pubnub, PNStatus status)
             {
                 Debug.WriteLine("SubscribeCallback: PNStatus: " + status.StatusCode.ToString());
@@ -609,6 +614,8 @@ namespace PubNubMessaging.Tests
 
 
             }
+
+
         }
 
         public class UTPublishResult : PNCallback<PNPublishResult>

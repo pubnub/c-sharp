@@ -65,7 +65,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Time().Async(new TimeResult());
+            pubnub.Time().Execute(new TimeResult());
                 
             mreTime.WaitOne(310 * 1000);
 
@@ -106,7 +106,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Time().Async(new TimeResult());
+            pubnub.Time().Execute(new TimeResult());
 
             mreTime.WaitOne(310 * 1000);
 
@@ -155,7 +155,7 @@ namespace PubNubMessaging.Tests
 
             if (config.Proxy != null)
             {
-                pubnub.Time().Async(new TimeResult());
+                pubnub.Time().Execute(new TimeResult());
 
                 mreTime.WaitOne(310 * 1000);
 
@@ -208,7 +208,7 @@ namespace PubNubMessaging.Tests
 
             if (config.Proxy != null)
             {
-                pubnub.Time().Async(new TimeResult());
+                pubnub.Time().Execute(new TimeResult());
 
                 mreTime.WaitOne(310 * 1000);
 

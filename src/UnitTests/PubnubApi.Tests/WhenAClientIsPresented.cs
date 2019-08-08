@@ -65,7 +65,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent grantManualEvent = new ManualResetEvent(false);
             pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Async(new PNAccessManagerGrantResultExt(
+                .Execute(new PNAccessManagerGrantResultExt(
                                 (r, s) =>
                                 {
                                     try
@@ -476,7 +476,7 @@ namespace PubNubMessaging.Tests
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
                 ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
-                pubnub.HereNow().Channels(new[] { channel }).Async(new PNHereNowResultEx(
+                pubnub.HereNow().Channels(new[] { channel }).Execute(new PNHereNowResultEx(
                                 (r, s) => {
                                     if (r == null) { return; }
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -596,7 +596,7 @@ namespace PubNubMessaging.Tests
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
                 ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
-                pubnub.HereNow().Channels(new[] { channel }).Async(new PNHereNowResultEx(
+                pubnub.HereNow().Channels(new[] { channel }).Execute(new PNHereNowResultEx(
                                 (r, s) => {
                                     if (r == null) { return; }
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -708,7 +708,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow().Channels(new [] { channel }).Async(new PNHereNowResultEx(
+            pubnub.HereNow().Channels(new [] { channel }).Execute(new PNHereNowResultEx(
                                 (r, s) => {
                                     if (r == null) { return; }
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -820,7 +820,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow().Channels(new [] { channel }).Async(new PNHereNowResultEx(
+            pubnub.HereNow().Channels(new [] { channel }).Execute(new PNHereNowResultEx(
                                 (r, s) => {
                                     if (r == null) { return; }
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -937,7 +937,7 @@ namespace PubNubMessaging.Tests
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
                 ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
-                pubnub.HereNow().Channels(new[] { channel }).Async(new PNHereNowResultEx(
+                pubnub.HereNow().Channels(new[] { channel }).Execute(new PNHereNowResultEx(
                                 (r, s) => {
                                     if (r == null) { return; }
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -1049,7 +1049,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow().Channels(new [] { channel }).Async(new PNHereNowResultEx(
+            pubnub.HereNow().Channels(new [] { channel }).Execute(new PNHereNowResultEx(
                                 (r, s) => {
                                     if (r == null) { return; }
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -1160,7 +1160,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow().Channels(new [] { channel }).Async(new PNHereNowResultEx(
+            pubnub.HereNow().Channels(new [] { channel }).Execute(new PNHereNowResultEx(
                                 (r, s) => {
                                     if (r == null) { return; }
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -1277,7 +1277,7 @@ namespace PubNubMessaging.Tests
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
                 ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
-                pubnub.HereNow().Channels(new[] { channel }).Async(new PNHereNowResultEx(
+                pubnub.HereNow().Channels(new[] { channel }).Execute(new PNHereNowResultEx(
                                 (r, s) => {
                                     if (r == null) { return; }
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -1406,7 +1406,7 @@ namespace PubNubMessaging.Tests
                 pubnub.SetPresenceState()
                                 .Channels(new[] { channel })
                                 .State(dicState)
-                                .Async(new PNSetStateResultExt(
+                                .Execute(new PNSetStateResultExt(
                                 (r, s) => {
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     userStateManualEvent.Set();
@@ -1431,7 +1431,7 @@ namespace PubNubMessaging.Tests
                 pubnub.HereNow().Channels(new[] { channel })
                         .IncludeState(true)
                         .IncludeUUIDs(true)
-                        .Async(new PNHereNowResultEx(
+                        .Execute(new PNHereNowResultEx(
                                 (r, s) => {
                                     if (r == null) { return; }
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -1564,7 +1564,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             ManualResetEvent hereNowManualEvent = new ManualResetEvent(false);
-            pubnub.HereNow().Async(new PNHereNowResultEx(
+            pubnub.HereNow().Execute(new PNHereNowResultEx(
                                 (r, s) => {
                                     if (r == null) { return; }
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -1682,7 +1682,7 @@ namespace PubNubMessaging.Tests
             pubnub.SetPresenceState()
                             .Channels(new [] { channel })
                             .State(dicState)
-                            .Async(new PNSetStateResultExt(
+                            .Execute(new PNSetStateResultExt(
                                 (r, s) => {
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     userStateManualEvent.Set();
@@ -1708,7 +1708,7 @@ namespace PubNubMessaging.Tests
             pubnub.HereNow()
                     .IncludeState(true)
                     .IncludeUUIDs(true)
-                    .Async(new PNHereNowResultEx(
+                    .Execute(new PNHereNowResultEx(
                                 (r, s) => {
                                     if (r == null) { return; }
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -1819,7 +1819,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             ManualResetEvent whereNowManualEvent = new ManualResetEvent(false);
-            pubnub.WhereNow().Uuid(config.Uuid).Async(new PNWhereNowResultExt(
+            pubnub.WhereNow().Uuid(config.Uuid).Execute(new PNWhereNowResultExt(
                                 (r, s) => {
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedWhereNowMessage = true;
@@ -1887,7 +1887,7 @@ namespace PubNubMessaging.Tests
             pubnub.SetPresenceState()
                             .Channels(new [] { channel })
                             .State(dicState)
-                            .Async(new PNSetStateResultExt(
+                            .Execute(new PNSetStateResultExt(
                                 (r, s) => {
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedUserStateMessage = true;
@@ -1913,7 +1913,7 @@ namespace PubNubMessaging.Tests
 
                 pubnub.GetPresenceState()
                                 .Channels(new [] { channel })
-                                .Async(new PNGetStateResultExt(
+                                .Execute(new PNGetStateResultExt(
                                 (r, s) => {
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedUserStateMessage = true;
@@ -1969,7 +1969,7 @@ namespace PubNubMessaging.Tests
             pubnub.SetPresenceState()
                             .Channels(new [] { channel })
                             .State(dicState)
-                            .Async(new PNSetStateResultExt(
+                            .Execute(new PNSetStateResultExt(
                                 (r, s) => {
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedUserStateMessage = true;
@@ -1999,7 +1999,7 @@ namespace PubNubMessaging.Tests
                 userStateManualEvent = new ManualResetEvent(false);
                 pubnub.GetPresenceState()
                                 .Channels(new [] { channel })
-                                .Async(new PNGetStateResultExt(
+                                .Execute(new PNGetStateResultExt(
                                 (r, s) => {
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedUserStateMessage = true;
@@ -2035,7 +2035,7 @@ namespace PubNubMessaging.Tests
                 pubnub.SetPresenceState()
                                 .Channels(new [] { channel })
                                 .State(dicState)
-                                .Async(new PNSetStateResultExt(
+                                .Execute(new PNSetStateResultExt(
                                 (r, s) => {
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedUserStateMessage = true;
@@ -2059,7 +2059,7 @@ namespace PubNubMessaging.Tests
                 userStateManualEvent = new ManualResetEvent(false);
                 pubnub.GetPresenceState()
                                 .Channels(new [] { channel })
-                                .Async(new PNGetStateResultExt(
+                                .Execute(new PNGetStateResultExt(
                                 (r, s) => {
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedUserStateMessage = true;

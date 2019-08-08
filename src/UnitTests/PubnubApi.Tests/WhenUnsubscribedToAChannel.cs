@@ -72,7 +72,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Execute(new UTGrantResult());
 
             Thread.Sleep(1000);
 
@@ -219,6 +219,11 @@ namespace PubNubMessaging.Tests
 
             public override void Presence(Pubnub pubnub, PNPresenceEventResult presence)
             {
+            }
+
+            public override void Signal<T>(Pubnub pubnub, PNMessageResult<T> signal)
+            {
+                throw new NotImplementedException();
             }
 
             public override void Status(Pubnub pubnub, PNStatus status)

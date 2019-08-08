@@ -125,6 +125,10 @@ namespace PubnubApi
                     {
                         ret = PNStatusCategory.PNBadRequestCategory;
                     }
+                    else if (httpErrorCodeMessage.ToUpperInvariant() == "SIGNAL SIZE TOO LARGE")
+                    {
+                        ret = PNStatusCategory.PNBadRequestCategory;
+                    }
                     else if (httpErrorCodeMessage.ToUpperInvariant() == "INVALID KEY" || httpErrorCodeMessage.ToUpperInvariant() == "INVALID SUBSCRIBE KEY")
                     {
                         ret = PNStatusCategory.PNAccessDeniedCategory;

@@ -21,6 +21,8 @@ namespace PubnubApi.Interface
 
         Uri BuildPublishRequest(string channel, object originalMessage, bool storeInHistory, int ttl, Dictionary<string, object> userMetaData, bool usePOST, Dictionary<string, string> additionalUrlParams, Dictionary<string, object> externalQueryParam);
 
+        Uri BuildSignalRequest(string channel, object originalMessage, Dictionary<string, object> userMetaData, bool usePOST, Dictionary<string, object> externalQueryParam);
+
         Uri BuildHereNowRequest(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, Dictionary<string, object> externalQueryParam);
 
         Uri BuildHistoryRequest(string channel, long start, long end, int count, bool reverse, bool includeToken, Dictionary<string, object> externalQueryParam);

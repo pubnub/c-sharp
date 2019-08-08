@@ -81,7 +81,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             ManualResetEvent mreTime = new ManualResetEvent(false);
-            pubnub1.Time().Async(new PNTimeResultExt((r, s) => {
+            pubnub1.Time().Execute(new PNTimeResultExt((r, s) => {
                 try
                 {
                     Debug.WriteLine("PNStatus={0}", pubnub1.JsonPluggableLibrary.SerializeToJsonString(s));
@@ -100,7 +100,7 @@ namespace PubNubMessaging.Tests
             mreTime.WaitOne(310 * 1000);
 
             mreTime = new ManualResetEvent(false);
-            pubnub2.Time().Async(new PNTimeResultExt((r, s) => {
+            pubnub2.Time().Execute(new PNTimeResultExt((r, s) => {
                 try
                 {
                     Debug.WriteLine("PNStatus={0}", pubnub1.JsonPluggableLibrary.SerializeToJsonString(s));
@@ -155,7 +155,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             ManualResetEvent mreTime = new ManualResetEvent(false);
-            pubnub1.Time().Async(new PNTimeResultExt((r, s) => {
+            pubnub1.Time().Execute(new PNTimeResultExt((r, s) => {
                 try
                 {
                     Debug.WriteLine("PNStatus={0}", pubnub1.JsonPluggableLibrary.SerializeToJsonString(s));
@@ -216,7 +216,7 @@ namespace PubNubMessaging.Tests
             if (config.Proxy != null)
             {
                 ManualResetEvent mreTime = new ManualResetEvent(false);
-                pubnub1.Time().Async(new PNTimeResultExt((r, s) => {
+                pubnub1.Time().Execute(new PNTimeResultExt((r, s) => {
                     try
                     {
                         Debug.WriteLine("PNStatus={0}", pubnub1.JsonPluggableLibrary.SerializeToJsonString(s));
@@ -283,7 +283,7 @@ namespace PubNubMessaging.Tests
             if (config.Proxy != null)
             {
                 ManualResetEvent mreTime = new ManualResetEvent(false);
-                pubnub1.Time().Async(new PNTimeResultExt((r, s) => {
+                pubnub1.Time().Execute(new PNTimeResultExt((r, s) => {
                     try
                     {
                         Debug.WriteLine("PNStatus={0}", pubnub1.JsonPluggableLibrary.SerializeToJsonString(s));

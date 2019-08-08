@@ -74,7 +74,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent grantManualEvent = new ManualResetEvent(false);
             pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Async(new PNAccessManagerGrantResultExt(
+                .Execute(new PNAccessManagerGrantResultExt(
                                 (r, s) =>
                                 {
                                     try
@@ -146,7 +146,7 @@ namespace PubNubMessaging.Tests
             pubnub.Publish()
                     .Channel(channel)
                     .Message(message)
-                    .Async(new PNPublishResultExt((r, s) => { }));
+                    .Execute(new PNPublishResultExt((r, s) => { }));
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
@@ -193,7 +193,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent publishManualEvent = new ManualResetEvent(false);
             pubnub.Publish().Channel(channel).Message(message)
-                    .Async(new PNPublishResultExt((r, s) =>
+                    .Execute(new PNPublishResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
@@ -234,7 +234,7 @@ namespace PubNubMessaging.Tests
                     .End(PubnubCommon.EnableStubTest ? 14715278266153304 : publishTimetoken)
                     .Reverse(false)
                     .IncludeTimetoken(true)
-                    .Async(new PNHistoryResultExt(
+                    .Execute(new PNHistoryResultExt(
                                 (r, s) =>
                                 {
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -291,7 +291,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent publishManualEvent = new ManualResetEvent(false);
             pubnub.Publish().Channel(channel).Message(message)
-                    .Async(new PNPublishResultExt((r, s) =>
+                    .Execute(new PNPublishResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
@@ -332,7 +332,7 @@ namespace PubNubMessaging.Tests
                     .End(PubnubCommon.EnableStubTest ? 14715286132003364 : publishTimetoken)
                     .Reverse(false)
                     .IncludeTimetoken(true)
-                    .Async(new PNHistoryResultExt(
+                    .Execute(new PNHistoryResultExt(
                                 (r, s) =>
                                 {
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -391,7 +391,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent publishManualEvent = new ManualResetEvent(false);
             pubnub.Publish().Channel(channel).Message(message)
-                    .Async(new PNPublishResultExt((r, s) =>
+                    .Execute(new PNPublishResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
@@ -432,7 +432,7 @@ namespace PubNubMessaging.Tests
                     .Count(100)
                     .Reverse(false)
                     .IncludeTimetoken(false)
-                    .Async(new PNHistoryResultExt(
+                    .Execute(new PNHistoryResultExt(
                                 (r, s) =>
                                 {
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -490,7 +490,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent publishManualEvent = new ManualResetEvent(false);
             pubnub.Publish().Channel(channel).Message(message)
-                    .Async(new PNPublishResultExt((r, s) =>
+                    .Execute(new PNPublishResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
@@ -531,7 +531,7 @@ namespace PubNubMessaging.Tests
                     .Count(100)
                     .Reverse(false)
                     .IncludeTimetoken(false)
-                    .Async(new PNHistoryResultExt(
+                    .Execute(new PNHistoryResultExt(
                                 (r, s) =>
                                 {
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -589,7 +589,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent publishManualEvent = new ManualResetEvent(false);
             pubnub.Publish().Channel(channel).Message(message)
-                    .Async(new PNPublishResultExt((r, s) =>
+                    .Execute(new PNPublishResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
@@ -634,7 +634,7 @@ namespace PubNubMessaging.Tests
                     .End(PubnubCommon.EnableStubTest ? 14715426119520817 : publishTimetoken)
                     .Reverse(false)
                     .IncludeTimetoken(true)
-                    .Async(new PNHistoryResultExt(
+                    .Execute(new PNHistoryResultExt(
                                 (r, s) =>
                                 {
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -693,7 +693,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent publishManualEvent = new ManualResetEvent(false);
             pubnub.Publish().Channel(channel).Message(message)
-                    .Async(new PNPublishResultExt((r, s) =>
+                    .Execute(new PNPublishResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
@@ -735,7 +735,7 @@ namespace PubNubMessaging.Tests
                     .End(PubnubCommon.EnableStubTest ? 14715438956854374 : publishTimetoken)
                     .Reverse(false)
                     .IncludeTimetoken(false)
-                    .Async(new PNHistoryResultExt(
+                    .Execute(new PNHistoryResultExt(
                                 (r, s) =>
                                 {
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -794,7 +794,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent publishManualEvent = new ManualResetEvent(false);
             pubnub.Publish().Channel(channel).Message(message)
-                    .Async(new PNPublishResultExt((r, s) =>
+                    .Execute(new PNPublishResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
@@ -837,7 +837,7 @@ namespace PubNubMessaging.Tests
                     .End(PubnubCommon.EnableStubTest ? 14715459088445832 : publishTimetoken)
                     .Reverse(false)
                     .IncludeTimetoken(true)
-                    .Async(new PNHistoryResultExt(
+                    .Execute(new PNHistoryResultExt(
                                 (r, s) =>
                                 {
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -885,7 +885,7 @@ namespace PubNubMessaging.Tests
             string message = "Pubnub API Usage Example";
 
             pubnub.Publish().Channel(channel).Message(message)
-                    .Async(new PNPublishResultExt((r, s) => { }));
+                    .Execute(new PNPublishResultExt((r, s) => { }));
             pubnub = null;
 
         }
@@ -930,7 +930,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent publishManualEvent = new ManualResetEvent(false);
             pubnub.Publish().Channel(channel).Message(message)
-                    .Async(new PNPublishResultExt((r, s) =>
+                    .Execute(new PNPublishResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
@@ -985,7 +985,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent publishManualEvent = new ManualResetEvent(false);
             pubnub.Publish().Channel(channel).Message(message)
-                    .Async(new PNPublishResultExt((r, s) =>
+                    .Execute(new PNPublishResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
@@ -1051,7 +1051,7 @@ namespace PubNubMessaging.Tests
             Dictionary<string, object> cp = new Dictionary<string, object>();
             cp.Add("seqn", "1");
             pubnub.Publish().Channel(channel).Message(message).QueryParam(cp)
-                    .Async(new PNPublishResultExt((r, s) =>
+                    .Execute(new PNPublishResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
@@ -1113,7 +1113,7 @@ namespace PubNubMessaging.Tests
             Dictionary<string, object> cp = new Dictionary<string, object>();
             cp.Add("seqn", "1");
             pubnub.Publish().Channel(channel).Message(message).QueryParam(cp)
-                    .Async(new PNPublishResultExt((r, s) =>
+                    .Execute(new PNPublishResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
@@ -1183,7 +1183,7 @@ namespace PubNubMessaging.Tests
             Dictionary<string, object> cp = new Dictionary<string, object>();
             cp.Add("seqn", "1");
             pubnub.Publish().Channel(channel).Message(message).QueryParam(cp).UsePOST(true)
-                    .Async(new PNPublishResultExt((r, s) =>
+                    .Execute(new PNPublishResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
@@ -1246,7 +1246,7 @@ namespace PubNubMessaging.Tests
             Dictionary<string, object> cp = new Dictionary<string, object>();
             cp.Add("seqn", "1");
             pubnub.Publish().Channel(channel).Message(message).QueryParam(cp).UsePOST(true)
-                    .Async(new PNPublishResultExt((r, s) =>
+                    .Execute(new PNPublishResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {

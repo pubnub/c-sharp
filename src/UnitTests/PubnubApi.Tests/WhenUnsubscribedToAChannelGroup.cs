@@ -63,7 +63,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent grantManualEvent = new ManualResetEvent(false);
             pubnub.Grant().ChannelGroups(new [] { channelGroupName }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Async(new PNAccessManagerGrantResultExt(
+                .Execute(new PNAccessManagerGrantResultExt(
                                 (r, s) =>
                                 {
                                     try
@@ -173,7 +173,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent cgManualEvent = new ManualResetEvent(false);
             pubnub.AddChannelsToChannelGroup().Channels(new [] { channelName }).ChannelGroup(channelGroupName)
-                .Async(new PNChannelGroupsAddChannelResultExt((r,s)=> {
+                .Execute(new PNChannelGroupsAddChannelResultExt((r,s)=> {
                     try
                     {
                         Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));

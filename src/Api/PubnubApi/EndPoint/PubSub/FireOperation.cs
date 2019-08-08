@@ -65,7 +65,13 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        [Obsolete("Async is deprecated, please use Execute instead.")]
         public void Async(PNCallback<PNPublishResult> callback)
+        {
+            Execute(callback);
+        }
+
+        public void Execute(PNCallback<PNPublishResult> callback)
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
@@ -173,7 +179,28 @@ namespace PubnubApi.EndPoint
             if (!string.IsNullOrEmpty(json))
             {
                 List<object> result = ProcessJsonResponse<PNPublishResult>(requestState, json);
-                ProcessResponseCallbacks(result, requestState);
+                if (result != null && result.Count >= 3)
+                {
+                    int publishStatus;
+                    Int32.TryParse(result[0].ToString(), out publishStatus);
+                    if (publishStatus == 1)
+                    {
+                        ProcessResponseCallbacks(result, requestState);
+                    }
+                    else
+                    {
+                        PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, result[1].ToString());
+                        PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<PNPublishResult>(PNOperationType.PNFireOperation, category, requestState, 400, new PNException(json));
+                        if (requestState.PubnubCallback != null)
+                        {
+                            requestState.PubnubCallback.OnResponse(default(PNPublishResult), status);
+                        }
+                    }
+                }
+                else
+                {
+                    ProcessResponseCallbacks(result, requestState);
+                }
             }
         }
 

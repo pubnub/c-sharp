@@ -73,7 +73,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Async(new UTGrantResult());
+            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Execute(new UTGrantResult());
 
             Thread.Sleep(1000);
 
@@ -126,7 +126,7 @@ namespace PubNubMessaging.Tests
 
             manualResetEventWaitTimeout = 310 * 1000;
             deleteMessageManualEvent = new ManualResetEvent(false);
-            pubnub.DeleteMessages().Channel(channel).Async(new UTDeleteMessagaeResult());
+            pubnub.DeleteMessages().Channel(channel).Execute(new UTDeleteMessagaeResult());
             deleteMessageManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             pubnub.Destroy();

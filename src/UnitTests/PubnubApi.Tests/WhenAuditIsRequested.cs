@@ -69,7 +69,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.Audit().Async(new AuditResult());
+                pubnub.Audit().Execute(new AuditResult());
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne(manualResetEventWaitTimeout);
@@ -125,7 +125,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.Audit().Channel(channel).Async(new AuditResult());
+                pubnub.Audit().Channel(channel).Execute(new AuditResult());
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne(manualResetEventWaitTimeout);
@@ -178,7 +178,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.Audit().ChannelGroup(channelgroup).Async(new AuditResult());
+                pubnub.Audit().ChannelGroup(channelgroup).Execute(new AuditResult());
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();

@@ -82,7 +82,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             pubnub.Grant().AuthKeys(new [] { authKey }).ChannelGroups(new [] { channelGroupName, channelGroupName1, channelGroupName2 }).Channels(new [] { channelName }).Read(true).Write(true).Manage(true).TTL(20)
-                .Async(new PNAccessManagerGrantResultExt(
+                .Execute(new PNAccessManagerGrantResultExt(
                                 (r, s) =>
                                 {
                                     try
@@ -234,7 +234,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent channelGroupManualEvent = new ManualResetEvent(false);
             pubnub.AddChannelsToChannelGroup().Channels(new [] { channelName }).ChannelGroup(channelGroupName).QueryParam(new Dictionary<string, object> { { "ut", "ThenSubscribeShouldReturnReceivedMessage" } })
-                .Async(new PNChannelGroupsAddChannelResultExt((r, s) => {
+                .Execute(new PNChannelGroupsAddChannelResultExt((r, s) => {
                     try
                     {
                         Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
@@ -298,7 +298,7 @@ namespace PubNubMessaging.Tests
 
                 ManualResetEvent publishManualEvent = new ManualResetEvent(false);
                 pubnub.Publish().Channel(channelName).Message(publishedMessage).QueryParam(new Dictionary<string, object> { { "ut", "ThenSubscribeShouldReturnReceivedMessage" } })
-                    .Async(new PNPublishResultExt((r, s) =>
+                    .Execute(new PNPublishResultExt((r, s) =>
                     {
                         Debug.WriteLine("Publish PNStatus => Status = : " + s.StatusCode.ToString());
                         if (r != null && s.StatusCode == 200 && !s.Error)
@@ -384,7 +384,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent channelGroupManualEvent = new ManualResetEvent(false);
             pubnub.AddChannelsToChannelGroup().Channels(new [] { channelName }).ChannelGroup(channelGroupName)
-                .Async(new PNChannelGroupsAddChannelResultExt((r, s) => {
+                .Execute(new PNChannelGroupsAddChannelResultExt((r, s) => {
                     try
                     {
                         Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
@@ -511,7 +511,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent channelGroupManualEvent = new ManualResetEvent(false);
             pubnub.AddChannelsToChannelGroup().Channels(new [] { channelName1 }).ChannelGroup(channelGroupName1)
-                .Async(new PNChannelGroupsAddChannelResultExt((r, s) => {
+                .Execute(new PNChannelGroupsAddChannelResultExt((r, s) => {
                     try
                     {
                         Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
@@ -548,7 +548,7 @@ namespace PubNubMessaging.Tests
 
                 channelGroupManualEvent = new ManualResetEvent(false);
                 pubnub.AddChannelsToChannelGroup().Channels(new [] { channelName2 }).ChannelGroup(channelGroupName2)
-                .Async(new PNChannelGroupsAddChannelResultExt((r, s) => {
+                .Execute(new PNChannelGroupsAddChannelResultExt((r, s) => {
                     try
                     {
                         Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
